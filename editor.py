@@ -45,13 +45,6 @@ class BaseHandler(webapp2.RequestHandler):
     self.response.out.write('Resource not found.')
     return
 
-  def DescriptiveError(self, code, error_message):
-    """Displays a simple error page to the content creator."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write('Error: ' + str(error_message))
-    return
-
   def JsonError(self, error_message, code=406):
     """Used to handle error messages in JSON returns."""
     super(BaseHandler, self).error(code)
