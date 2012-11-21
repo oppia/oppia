@@ -1,0 +1,5 @@
+*~
+*.pyc
+third_party/*
+
+
