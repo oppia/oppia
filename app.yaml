@@ -1,0 +1,33 @@
+application: oppia-test-server
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: false
+
+builtins:
+- remote_api: on
+
+handlers:
+- url: /favicon.ico
+  static_files: static/images/favicon.ico
+  upload: static/images/favicon.ico
+  secure: always
+- url: /images
+  static_dir: static/images
+  secure: always
+- url: /third_party
+  static_dir: third_party
+  secure: always
+- url: /.*
+  script: main.app
+  login: required
+  secure: always
+
+libraries:
+- name: jinja2
+  version: latest
+- name: webapp2
+  version: latest
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'oppia-test-server.settings'

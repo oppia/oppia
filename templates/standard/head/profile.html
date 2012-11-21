@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-body">
+    <div class="single-col">
+      <h3>My Profile</h3>
+      <br>
+      {% for metric_data in metrics_data %}
+        Story: <a href="/reader/{{metric_data.story_id}}">{{metric_data.story_name}}</a>
+        <br>
+        Metrics:
+          {% if not metric_data.metrics %}
+            None
+          {% else %}
+            {% for key in metric_data.metrics %}
+              {{key}}: {{metric_data.metrics[key]}}
+              <br>
+            {% endfor %}
+          {% endif %}
+        <br><br>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

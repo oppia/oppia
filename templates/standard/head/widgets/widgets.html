@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="oppia">
+<head>
+  <meta charset=utf-8>
+  <title>Oppia Widget Repository</title>
+
+  <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js"></script>
+  <script src="/third_party/angular-ui/build/angular-ui.js"></script>
+
+  <script src="https://caja.appspot.com/caja.js"></script>
+  <script type="text/javascript">
+    caja.initialize({
+      cajaServer: 'https://caja.appspot.com/',
+      debug: true
+    });
+  </script>
+
+  <style type="text/css" media="screen">{{css}}</style>
+</head>
+<body ng-controller="Widgets">
+  <div class="single-col">
+    <h2>Widget Repository</h2>
+    <ul>
+      <li ng-repeat="widget in widgets">
+        <[widget.name]>
+        <div id="widget-<[$index]>"></div>
+        <button ng-click="selectWidget(widget)">Choose Widget</button>
+      </li>
+    </ul>
+  </div>
+  <script type="text/javascript">{{js}}</script>
+</body>
+</html>

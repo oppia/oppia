@@ -1,0 +1,84 @@
+<div class="classifier" ng-show="classifier == 'finite'" ng-controller="FiniteClassifierEditor">
+  <div class="input-view-name">
+    <form name="addCategoryForm" ng-submit="addCategory()">
+      <input type="text" ng-model="newCategoryName" placeholder="Add Answer" autofocus required>
+      <input type="submit" value="+" id="addCategorySubmit" class="add-button">
+    </form>
+  </div>
+
+  <div ng-repeat="action in optionalActions" class="category-block">
+    <a class="delete-button" ng-click="deleteCategory($index)">
+      &times;
+    </a>
+
+    <form ng-submit="saveCategoryName($index, newCategoryName)"
+          ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category')">
+      Answer:
+      <span ng-class="getCategoryClass(states[stateId]['dests'][$index].category)"
+            ng-hide="currentActiveInput == classifier + '.' + $index + '.category'">
+        <[states[stateId]['dests'][$index].category]>
+      </span>
+      <span ng-show="currentActiveInput == classifier + '.' + $index + '.category'">
+        <input type="text" ng-model="newCategoryName" autofocus>
+        <input type="submit" value="Save">
+      </span>
+    </form>
+
+    <span class="dest-name"
+          ng-hide="currentActiveInput == classifier + '.' + $index + '.dest'"
+          ng-click="initializeNewActiveInput(classifier + '.' + $index + '.dest')">
+      <[getDestDescription(states[stateId]['dests'][$index].dest)]>
+    </span>
+    <span ng-show="currentActiveInput == classifier + '.' + $index + '.dest'">
+      <form ng-submit="saveDest($index, newFiniteDestData)">
+        Destination:
+        <input type="text" size="40" list="destinations" ng-model="newFiniteDestData" placeholder="Type name of state, or '[Q' for questions" autofocus required>
+        <datalist id="destinations">
+          <option ng-repeat="(id, properties) in states" value="<[properties.desc]>"></option>
+          <option ng-repeat="(id, properties) in questions" value="[Question] <[properties.desc]>"></option>
+          <option value="END"></option>
+        </datalist>
+        <button type="button" ng-click="saveDest($index, newFiniteDestData)">Save</button>
+      </form>
+    </span>
+
+    <p ng-click="showEditorModal('text', $index)">
+      <span class="feedback-name">Feedback:</span>
+      <span ng-hide="action.text">[Add feedback]</span>
+      <span ng-show="action.text" ng-bind-html="action.text | truncate"></span>
+    </p>
+
+    <p>
+      <span>Metrics:</span>
+      <span ng-repeat="metric in action.metrics">
+        <span ng-click="editMetric($parent.$index, metric.key, metric.value)">
+          <[getMetricDescription(metric.key, metric.value)]>,
+        </span>
+      </span>
+      <span ng-click="initializeMetricAdder($index)"
+            ng-hide="currentActiveInput == classifier + '.' + $index + '.metrics.add' ||
+                     currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
+        <a ng-hide="action.metrics">[Add metrics]</a>
+        <a ng-show="action.metrics">[add more...]</a>
+      </span>
+      <span ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.add'">
+        <input type="text" ng-model="newMetricKey">
+        <input type="number" ng-model="newMetricValue">
+        <button type="button" ng-click="addMetric($index, newMetricKey, newMetricValue)">+</button>
+        <button type="button" ng-click="clearActiveInputs()">Cancel</button>
+      </span>
+      <div ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
+        <form ng-submit="saveMetric($index, newMetricKey, newMetricValue)">
+          New value for change in <[newMetricKey]>:
+          <input type="number" ng-model="newMetricValue" autofocus>
+          <input type="submit" value="Save">
+        </form>
+      </div>
+    </p>
+  </div>
+
+  <div ng-show="hasUnsavedChanges">
+    <button type="button" id="saveState" ng-click="saveState()" class="commit-button">Save</button>
+    <div class="loading" ng-show="saveStateLoading"></div>
+  </div>
+</div>

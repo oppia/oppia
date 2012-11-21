@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content" ng-controller="IndexEditor">
+    <div class="single-col">
+      <br>
+      {% if story_list %}
+        <div class="panel">
+          <h3>Edit a story</h3>
+          {% for story in story_list %}
+            <div class="tile">
+              <a href="/editor/{{story.0}}/structure/">{{story.1}}</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <center>
+        <h3>Create a new story</h3>
+        <br>
+        <form name="input" action="/editor/" method="post">
+          <input style="width: 80%" type="text" name="story_name" placeholder="Add New Story Title" required>
+          <input type="submit" class="add-button" value="+">
+        </form>
+      </center>
+
+    </div>
+  </div>
+{% endblock %}

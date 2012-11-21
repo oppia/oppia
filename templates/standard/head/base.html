@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html ng-app="oppia">
+<head>
+  <meta charset=utf-8>
+  <title>Oppia</title>
+
+  <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js"></script>
+  <script src="/third_party/angular-ui/build/angular-ui.js"></script>
+
+  <script src="https://caja.appspot.com/caja.js"></script>
+  <script type="text/javascript">
+    caja.initialize({
+      cajaServer: 'https://caja.appspot.com/',
+      debug:
+        {% if debug %}
+          true
+        {% else %}
+          false
+        {% endif %}
+    });
+  </script>
+
+  <style type="text/css" media="screen">{{css}}</style>
+</head>
+<body ng-controller="Base">
+  <header>
+    <div class="restrict-width">
+      {% if story_name %}
+        <h1>{{story_name}}</h1>
+      {% else %}
+        <h1>Oppia</h1>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- nav bar -->
+  <div class="navbar">
+    <div class="restrict-width">
+      <ul>
+        <li>
+          {% if mode == 'index' %}
+            <span class="active-nav">Home</span>
+          {% else %}
+            <a href="/">Home</a>
+          {% endif %}
+        </li>
+        <li>
+          {% if mode == 'profile' %}
+            <span class="active-nav">Profile</span>
+          {% else %}
+            <a href="/reader/profile/">Profile</a>
+          {% endif %}
+        </li>
+
+        <li class="float-right">
+          <a href="{{logout_url}}">Log out</a>
+        </li>
+        <li class="float-right">
+          <a href="/editor/">Editor mode</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="restrict-width" ng-cloak>
+    {% block content %}{% endblock %}
+  </div>
+
+  <script type="text/javascript">{{js}}</script>
+</body>
+</html>

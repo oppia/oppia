@@ -1,0 +1,103 @@
+<div class="classifier" ng-show="classifier=='text'" ng-controller="TextClassifierEditor">
+
+  <div ng-repeat="action in optionalActions" class="category-block">
+    <a class="delete-button" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'All other inputs'">
+      &times;
+    </a>
+
+    <form ng-submit="saveCategoryName($index, newTmpCategory, newTmpType)">
+      <span ng-class="getCategoryClass(states[stateId]['dests'][$index].category)"
+            ng-hide="currentActiveInput == classifier + '.' + $index + '.category'"
+            ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category')">
+        <[states[stateId]['dests'][$index].category]>
+      </span>
+      <span ng-show="currentActiveInput == classifier + '.' + $index +
+        '.category'">
+        <select ng-model="newTmpType" required>
+          <option ng-selected="states[stateId]['dests'][$index].category.indexOf('Answer contains') == 0">
+            Answer contains
+          </option>
+          <option ng-selected="states[stateId]['dests'][$index].category.indexOf('Answer does not contain') == 0">
+            Answer does not contain
+          </option>
+        </select>
+        <input type="text" ng-model="newTmpCategory" placeholder="Add text" autofocus required>
+        <input type="submit" value="Save">
+        <button type="button" ng-click="hideCategoryInput()">Cancel</button>
+      </span>
+    </form>
+
+    <span class="dest-name"
+          ng-hide="currentActiveInput == classifier + '.' + $index + '.dest'"
+          ng-click="initializeNewActiveInput(classifier + '.' + $index + '.dest')">
+      <[getDestDescription(states[stateId]['dests'][$index].dest)]>
+    </span>
+    <span ng-show="currentActiveInput == classifier + '.' + $index + '.dest'">
+      <form ng-submit="saveDest($index, newTextDestData)">
+        Destination:
+        <input type="text" size="40" list="destinations" ng-model="newTextDestData" placeholder="Type name of state, or '[Q' for questions" autofocus required>
+        <datalist id="destinations">
+          <option ng-repeat="(id, properties) in states" value="<[properties.desc]>"></option>
+          <option ng-repeat="(id, properties) in questions" value="[Question] <[properties.desc]>"></option>
+          <option value="END"></option>
+        </datalist>
+        <button type="button" ng-click="saveDest($index, newTextDestData)">Save</button>
+      </form>
+    </span>
+
+    <p ng-click="showEditorModal('text', $index)">
+      <span class="feedback-name">Feedback:</span>
+      <span ng-click="showEditorModal('text', $index)" ng-hide="action.text">[Add feedback]</span>
+      <span ng-show="action.text" ng-bind-html="action.text | truncate"></span>
+    </p>
+
+    <p>
+      <span>Metrics:</span>
+      <span ng-repeat="metric in action.metrics">
+        <span ng-click="editMetric($parent.$index, metric.key, metric.value)">
+          <[getMetricDescription(metric.key, metric.value)]>,
+        </span>
+      </span>
+      <span ng-click="initializeMetricAdder($index)"
+            ng-hide="currentActiveInput == classifier + '.' + $index + '.metrics.add' ||
+                     currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
+        <a ng-hide="action.metrics">[Add metrics]</a>
+        <a ng-show="action.metrics">[add more...]</a>
+      </span>
+      <span ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.add'">
+        <input type="text" ng-model="newMetricKey">
+        <input type="number" ng-model="newMetricValue">
+        <button type="button" ng-click="addMetric($index, newMetricKey, newMetricValue)">+</button>
+        <button type="button" ng-click="clearActiveInputs()">Cancel</button>
+      </span>
+      <div ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
+        <form ng-submit="saveMetric($index, newMetricKey, newMetricValue)">
+          New value for change in <[newMetricKey]>:
+          <input type="number" ng-model="newMetricValue" autofocus>
+          <input type="submit" value="Save">
+        </form>
+      </div>
+    </p>
+  </div>
+
+  <br>
+  <button type="button" class="add-button" ng-click="initializeNewActiveInput(classifier + '.dummy.category')">Add new answer</button>
+  <br><br>
+  <div class="category-block" ng-show="currentActiveInput == classifier + '.dummy.category'">
+    <a class="delete-button" ng-click="hideCategoryInput()">&times;</a>
+    <form ng-submit="addCategory(newTmpCategory, newTmpType)">
+      Answer
+      <select ng-model="newTmpType" required>
+        <option ng-selected="true">contains</option>
+        <option>does not contain</option>
+      </select>
+      <input type="text" ng-model="newTmpCategory" placeholder="Add text" autofocus required>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+
+  <div ng-show="hasUnsavedChanges">
+    <button type="button" id="saveState" ng-click="saveState()" class="commit-button">Save</button>
+    <div class="loading" ng-show="saveStateLoading"></div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html ng-app="cb">
+<head>
+  <meta charset=utf-8>
+  <title>Course Builder</title>
+
+  <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js"></script>
+  <script src="/third_party/angular-ui/build/angular-ui.js"></script>
+
+  <script src="https://caja.appspot.com/caja.js"></script>
+  <script type="text/javascript">
+    caja.initialize({
+      cajaServer: 'https://caja.appspot.com/',
+      debug:
+        {% if debug %}
+          true
+        {% else %}
+          false
+        {% endif %}
+    });
+  </script>
+
+  <style type="text/css" media="screen">{{css}}</style>
+</head>
+<body>
+  <header>
+    <a class="float-right" href="{{logout_url}}">Log out</a>
+    <a class="float-right" href="/">My courses</a>
+    <a class="float-right" href="/reader/profile/">Profile</a>
+    {% if story_name %}
+      <h1>{{story_name}}</h1>
+    {% else %}
+      <h1>Course Builder</h1>
+    {% endif %}
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <script type="text/javascript">{{js}}</script>
+</body>
+</html>
