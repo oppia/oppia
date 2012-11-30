@@ -1,35 +1,6 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:400,600,700';
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-:focus {
-  outline: none;
-}
-html {
-  height: 100%;
-}
+
 body {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 11pt;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  width: 100%;
+  padding-top: 50px;
 }
-header {
-  background: #efefef;
-  border-bottom: 2px solid #F5F5F5;
-  height: 57px;
-  padding: 16px 16px 16px 48px;
-}
-header a {
-  text-decoration: none;
-}
-h1 {
-  font-size: 1.6em;
-}
-ul {
-  padding: 24px;
-}
+

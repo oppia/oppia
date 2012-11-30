@@ -98,6 +98,7 @@ class HomePage(BaseHandler):
         'debug': feconf.DEBUG,
         'js': utils.GetJsFile('editorMain'),
         'logout_url': users.create_logout_url(self.request.uri),
+        'navbar': 'create',
         'user': user,
     }
     self.response.out.write(
@@ -119,6 +120,7 @@ class ExplorationPage(BaseHandler):
         'debug': feconf.DEBUG,
         'js': utils.GetJsFile('editorExploration'),
         'logout_url': users.create_logout_url(self.request.uri),
+        'navbar': 'create',
         'user': user,
     }
     self.response.out.write(

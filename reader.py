@@ -68,6 +68,7 @@ class HomePage(BaseHandler):
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
         'js': utils.GetJsFile('readerMain'),
+        'navbar': 'learn',
     }
     self.response.out.write(
         jinja_env.get_template('reader/reader_main.html').render(values))
@@ -83,6 +84,7 @@ class ExplorationPage(BaseHandler):
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
         'js': utils.GetJsFile('readerExploration'),
+        'navbar': 'learn',
     }
     self.response.out.write(
         jinja_env.get_template('reader/reader_exploration.html').render(values))
