@@ -4,3 +4,8 @@ body {
   padding-top: 50px;
 }
 
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
