@@ -26,6 +26,15 @@ if [ ! -d "third_party/angular-ui" ]; then
   mv third_party/angular-ui-0.3.1 third_party/angular-ui
 fi
 
+echo Checking whether bootstrap is installed in third_party
+if [ ! -d "third_party/bootstrap" ]; then
+  echo Installing Bootstrap
+  mkdir -p third_party/
+  wget http://twitter.github.com/bootstrap/assets/bootstrap.zip -O bootstrap-download.zip
+  unzip bootstrap-download.zip -d third_party/
+  rm bootstrap-download.zip
+fi
+
 echo Checking whether the Closure Compiler is installed in third_party
 if [ ! -d "third_party/closure-compiler" ]; then
   echo Installing Closure Compiler
