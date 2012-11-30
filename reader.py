@@ -58,6 +58,36 @@ class BaseHandler(webapp2.RequestHandler):
     return
 
 
+class HomePage(BaseHandler):
+  """The reader's home page, which displays a catalog of explorations."""
+  
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('readerMain'),
+    }
+    self.response.out.write(
+        jinja_env.get_template('reader/reader_main.html').render(values))
+
+
+class ExplorationPage(BaseHandler):
+  """Page describing a single exploration."""
+  
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('readerExploration'),
+    }
+    self.response.out.write(
+        jinja_env.get_template('reader/reader_exploration.html').render(values))
+
+
 class MainPage(BaseHandler):
   """The main index page, which displays a choice of stories for the user."""
 

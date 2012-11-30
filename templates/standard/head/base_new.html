@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html ng-app="oppia">
+  <head>
+    <meta charset=utf-8>
+    <title>Oppia</title>
+
+    <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js"></script>
+    <script src="/third_party/angular-ui/build/angular-ui.js"></script>
+
+    <style type="text/css" media="screen">{{css}}</style>
+  </head>
+
+  <body ng-controller="Base">
+    <header>
+      HEADER PLACEHOLDER
+    </header>
+
+    <!-- nav bar -->
+    <div class="navbar">
+      NAVBAR PLACEHOLDER
+    </div>
+
+    <div ng-cloak>
+      {% block content %}{% endblock %}
+    </div>
+
+    <script type="text/javascript">{{js}}</script>
+  </body>
+</html>
+

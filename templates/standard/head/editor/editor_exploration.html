@@ -1,0 +1,18 @@
+{% extends "base_new.html" %}
+
+{% block content %}
+  <div>
+
+    <div ng-repeat="warning in warnings">
+      <p class="butterbar">
+        <[warning]>
+      </p>
+    </div>
+
+    <div class="content">
+      This is a particular exploration you can edit.
+    </div>
+
+  </div>
+{% endblock %}
+

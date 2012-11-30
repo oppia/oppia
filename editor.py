@@ -33,7 +33,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR + 'editor/')))
+    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 END_DEST = '-1'
 
 
@@ -54,7 +54,7 @@ class BaseHandler(webapp2.RequestHandler):
 
   def InitializeStoryPage(self, story_id):
     [story] = utils.TryParsingUrlParameters(True, story_id)
-    self.response.out.write(jinja_env.get_template('story.html').render({
+    self.response.out.write(jinja_env.get_template('editor/story.html').render({
         'css': utils.GetCssFile('main'),
         'debug': feconf.DEBUG,
         'js': utils.GetJsFile('editorStory'),
@@ -69,7 +69,7 @@ class BaseHandler(webapp2.RequestHandler):
     [story, chapter, question] = utils.TryParsingUrlParameters(
         True, story_id, chapter_id, question_id)
     dir_prefix = 'classifier_editors/'
-    self.response.out.write(jinja_env.get_template('question.html').render({
+    self.response.out.write(jinja_env.get_template('editor/question.html').render({
         'css': utils.GetCssFile('main'),
         'debug': feconf.DEBUG,
         'js': utils.GetJsFileWithClassifiers('editorQuestion'),
@@ -81,6 +81,48 @@ class BaseHandler(webapp2.RequestHandler):
         'set_code': utils.GetFileContents('%s/set.html' % dir_prefix),
         'text_code': utils.GetFileContents('%s/text.html' % dir_prefix),
     }))
+
+
+class HomePage(BaseHandler):
+  """The editor's home page, which displays a list of explorations that he can edit."""
+  
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('editorMain'),
+        'logout_url': users.create_logout_url(self.request.uri),
+        'user': user,
+    }
+    self.response.out.write(
+        jinja_env.get_template('editor/editor_main.html').render(values))
+
+
+class ExplorationPage(BaseHandler):
+  """Page describing a single exploration."""
+  
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('editorExploration'),
+        'logout_url': users.create_logout_url(self.request.uri),
+        'user': user,
+    }
+    self.response.out.write(
+        jinja_env.get_template('editor/editor_exploration.html').render(values))
 
 
 class MainPage(BaseHandler):
@@ -131,7 +173,7 @@ class MainPage(BaseHandler):
                        for story in editable_stories],
         'user': user,
     }
-    self.response.out.write(jinja_env.get_template('index.html').render(values))
+    self.response.out.write(jinja_env.get_template('editor/index.html').render(values))
 
   def post(self):  # pylint: disable-msg=C6409
     """Adds a new story."""
