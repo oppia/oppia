@@ -92,7 +92,13 @@ class ExplorationPage(base.BaseHandler):
         'js': utils.GetJsFile('readerExploration'),
         'navbar': READER_NAVBAR_TEXT,
     })
-    logging.info(self.values)
+    logging.info(self.request.arguments())
+    # The following is needed for embedding Oppia explorations in other pages.
+    logging.info(self.request.get('hideNavbar'))
+    if self.request.get('hideNavbar') == 'true':
+      logging.info('hide')
+      self.values['hide_navbar'] = True
+
     self.response.out.write(jinja_env.get_template(
         'reader/reader_exploration.html').render(self.values))
 
@@ -115,10 +121,11 @@ class ExplorationHandler(base.BaseHandler):
       # and replaced with:
       #     raise utils.InvalidInputError('This exploration does not exist.')
       self.response.out.write(json.dumps({
-          'html': ['hello'],
+          'categories': ['Yes', 'No'],
+          'html': ['Do you enjoy listening to lectures?'],
           'input_template': utils.GetInputTemplate('multiple_choice'),
           'input_view': 'multiple_choice',
-          'title': 'Title',
+          'title': 'Helping others learn',
           'widgets': [],
       }))
       return

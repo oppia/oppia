@@ -24,6 +24,8 @@ import webapp2
 import feconf
 import utils
 
+from google.appengine.api import users
+
 
 class BaseHandler(webapp2.RequestHandler):
   """Base class for all Oppia handlers."""
@@ -33,6 +35,14 @@ class BaseHandler(webapp2.RequestHandler):
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
     }
+    user = users.get_current_user()
+    if user:
+      self.values.update({
+          'logout_url': users.create_logout_url(self.request.uri),
+          'user': user,
+      })
+    else:
+      self.values['login_url'] = users.create_login_url(self.request.uri)
 
   def error(self, code):  # pylint: disable-msg=C6409
     super(BaseHandler, self).error(code)

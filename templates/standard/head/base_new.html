@@ -21,22 +21,38 @@
   </head>
 
   <body ng-controller="Base">
-    <!-- nav bar -->
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="/index">Oppia</a>
-          <ul class="nav">
-            <li {% if navbar == 'learn' %} class="active" {% endif %}>
-              <a href="/learn">Learn</a>
-            </li>
-            <li {% if navbar == 'create' %} class="active" {% endif %}>
-              <a href="/create">Create</a>
-            </li>
-          </ul>
+    {% if not hide_navbar %}
+      <!-- nav bar -->
+      <div class="navbar oppia-navbar">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="brand" href="/index">Oppia</a>
+            <ul class="nav">
+              <li {% if navbar == 'learn' %} class="active" {% endif %}>
+                <a href="/learn">Learn</a>
+              </li>
+              <li {% if navbar == 'create' %} class="active" {% endif %}>
+                <a href="/create">Create</a>
+              </li>
+            </ul>
+            <ul class="nav pull-right">
+              {% if user %}
+                <li>
+                  <span class="navbar-text">{{user}}</span>
+                </li>
+                <li>
+                  <a href="{{logout_url}}">Logout</a>
+                </li>
+              {% else %}
+                <li>
+                  <a href="{{login_url}}">Login</a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    {% endif %}
 
     <div ng-cloak>
       {% block content %}{% endblock %}

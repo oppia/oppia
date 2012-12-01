@@ -4,58 +4,63 @@ body {
   padding-top: 50px;
 }
 
-.class-category {
+.oppia-content {
+  margin: 0 auto;
+  padding-left: 30px;
+  width: 80%;
+}
+
+.oppia-class-category {
   border: 3px solid #CCC; 
   border-radius: 20px;
   margin: 10px; 
-  width: 90%; 
+  width: 100%;
 }
 
-.class-category hr {
+.oppia-class-category hr {
   border-top: 3px double #CCC;
   margin: 0;
 }
 
-.content {
-  padding-left: 30px;
-}
-
-.form-search {
+.oppia-form-search {
   padding-right: 20px;
 }
 
-.navbar {
+.oppia-navbar {
   position: fixed;
   top: 0;
   width: 100%;
 }
 
-.exploration {
+.oppia-exploration {
   border: 1px solid black;
   margin: 10px auto;
   padding: 10px;
   width: 98%;
 }
 
-.exploration-header {
+.oppia-exploration-header {
   margin: 10px auto;
   padding: 6px 0;
   text-align: center;
   width: 80%;
 }
 
-.exploration-header a {
+.oppia-exploration-header a {
   font-size: 200%;
   text-decoration: none;
 }
 
-.wide-panel {
+.oppia-wide-panel {
   border: 5px solid black;
   border-radius: 3px;
   font-size: large;
-  min-height: 300px;
+  min-height: 400px;
   margin: 20px auto;
   padding: 10px;
-  width: 70%;
+  width: 100%;
 }
 
+.oppia-btn-container {
+  padding: 10px;
+}

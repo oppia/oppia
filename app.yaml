@@ -18,6 +18,16 @@ handlers:
 - url: /third_party
   static_dir: third_party
   secure: always
+- url: /index
+  script: main.app
+  secure: always
+- url: /learn(/.*)?
+  script: main.app
+  secure: always
+- url: /create/.*
+  script: main.app
+  login: required
+  secure: always
 - url: /.*
   script: main.app
   login: required

@@ -1,8 +1,10 @@
 <div id="multiple_choice">
+  <br>
   <div ng-repeat="category in categories">
-    <input type="radio" class="answer" name="answer" value="<[$index]>" id="<[$index]>" required>
-    <label for="<[$index]>"><[category]></label>
-    <br>
+    <label class="radio">
+      <input type="radio" class="answer" name="answer" value="<[$index]>" id="<[$index]>" required>
+      <[category]>
+    </label>
   </div>
 </div>
 

@@ -2,7 +2,7 @@
 
 {% block content %}
   <div>
-    <form class="form-search pull-right">
+    <form class="oppia-form-search pull-right">
       <div class="add-on">
         <input type="text" placeholder="Search" class="input-medium search-query">
         <i class="icon-search"></i>
@@ -15,11 +15,11 @@
         <[warning]>
     </div>
 
-    <div class="content">
+    <div class="oppia-content">
       <h2> Available Explorations</h2>
       <center>
         {% for category in categories %}
-          <div class="class-category">
+          <div class="oppia-class-category">
             <h4>{{category}}</h4>
             <hr>
             <ul class="thumbnails">

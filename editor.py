@@ -37,8 +37,8 @@ from google.appengine.ext import ndb
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
-END_DEST = '-1'
 EDITOR_NAVBAR_TEXT = 'create'
+END_DEST = '-1'
 
 
 class MainPage(base.BaseHandler):
@@ -54,9 +54,7 @@ class MainPage(base.BaseHandler):
     # TODO(sll): Send a list of this user's available explorations to the frontend.
     self.values.update({
         'js': utils.GetJsFile('editorMain'),
-        'logout_url': users.create_logout_url(self.request.uri),
         'navbar': EDITOR_NAVBAR_TEXT,
-        'user': user,
     })
     self.response.out.write(
         jinja_env.get_template('editor/editor_main.html').render(self.values))
@@ -76,9 +74,7 @@ class ExplorationPage(base.BaseHandler):
     # TODO(sll): Morph this into the question editor page.
     self.values.update({
         'js': utils.GetJsFile('editorExploration'),
-        'logout_url': users.create_logout_url(self.request.uri),
         'navbar': EDITOR_NAVBAR_TEXT,
-        'user': user,
     })
     self.response.out.write(
         jinja_env.get_template('editor/editor_exploration.html').render(self.values))
@@ -98,9 +94,7 @@ class ExplorationHandler(base.BaseHandler):
     # TODO(sll): Morph this into the question editor page.
     self.values.update({
         'js': utils.GetJsFile('editorExploration'),
-        'logout_url': users.create_logout_url(self.request.uri),
         'navbar': EDITOR_NAVBAR_TEXT,
-        'user': user,
     })
     self.response.out.write(json.dumps(data_values))
 
