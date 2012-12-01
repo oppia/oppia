@@ -23,6 +23,7 @@ import os
 import jinja2
 import webapp2
 
+import base
 import classifiers
 import datamodels
 import feconf
@@ -35,31 +36,8 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
-class BaseHandler(webapp2.RequestHandler):
-  """This base class allows 404 errors to be handled easily."""
-
-  def error(self, code):  # pylint: disable-msg=C6409
-    super(BaseHandler, self).error(code)
-    self.response.out.write('Resource not found.')
-    return
-
-  def DescriptiveError(self, code, error_message):
-    """Displays a simple error page to the content creator."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write('Error: ' + str(error_message))
-    return
-
-  def JsonError(self, error_message, code=404):
-    """Used to handle error messages in JSON returns."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write(json.dumps({'error': str(error_message)}))
-    return
-
-
-class HomePage(BaseHandler):
-  """The reader's home page, which displays a catalog of explorations."""
+class MainPage(base.BaseHandler):
+  """The reader's main page, which displays a catalog of explorations."""
   
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
@@ -74,7 +52,7 @@ class HomePage(BaseHandler):
         jinja_env.get_template('reader/reader_main.html').render(values))
 
 
-class ExplorationPage(BaseHandler):
+class ExplorationPage(base.BaseHandler):
   """Page describing a single exploration."""
   
   def get(self, exploration_id):  # pylint: disable-msg=C6409
@@ -90,7 +68,18 @@ class ExplorationPage(BaseHandler):
         jinja_env.get_template('reader/reader_exploration.html').render(values))
 
 
-class MainPage(BaseHandler):
+class BaseHandler(base.BaseHandler):
+  """This base class allows 404 errors to be handled easily."""
+
+  def DescriptiveError(self, code, error_message):
+    """Displays a simple error page to the content creator."""
+    super(BaseHandler, self).error(code)
+    logging.error('%s: %s', code, error_message)
+    self.response.out.write('Error: ' + str(error_message))
+    return
+
+
+class HomePage(BaseHandler):
   """The main index page, which displays a choice of stories for the user."""
 
   def GetReaderList(self, user):

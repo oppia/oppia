@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import jinja2
 import webapp2
 
+import base
 import editor
 import feconf
 import os
@@ -31,23 +32,14 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
-class BaseHandler(webapp2.RequestHandler):
-  """This base class allows 404 errors to be handled easily."""
-
-  def error(self, code):  # pylint: disable-msg=C6409
-    super(BaseHandler, self).error(code)
-    self.response.out.write('Resource not found.')
-    return
-
-
-class Error404Handler(BaseHandler):
+class Error404Handler(base.BaseHandler):
   """Handles 404 errors."""
 
   def get(self):  # pylint: disable-msg=C6409
     self.error(404)
 
 
-class MainPage(BaseHandler):
+class MainPage(base.BaseHandler):
   """Oppia's main page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -70,20 +62,19 @@ urls = [
     # Handlers for the new version of Oppia
     # TODO(sll): Use the URL r'/?' instead.
     (r'/index/?', MainPage),
-    # TODO(sll): Use the handler reader.MainPage instead.
-    (r'/learn/?', reader.HomePage),
+    (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
-    (r'/create/?', editor.HomePage),
+    (r'/create/?', editor.MainPage),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     # Reader handlers
-    (r'/?', reader.MainPage),
+    (r'/?', reader.HomePage),
     (r'/reader/profile/?', reader.ProfilePage),
     (r'/reader/(%s)/?' % r, reader.StoryInitPage),
     (r'/reader/(%s)/data/?' % r, reader.StoryHandler),
     (r'/reader/(%s)/data/(%s)/?' % (r, r), reader.StoryHandler),
     (r'/reader/(%s)/data/(%s)/(%s)/?' % (r, r, r), reader.StoryHandler),
     # Editor handlers
-    (r'/editor/?', editor.MainPage),
+    (r'/editor/?', editor.HomePage),
     (r'/editor/images/?', editor.Image),
     (r'/editor/images/(%s)/?' % r, editor.Image),
     (r'/editor/(%s)/structure/?' % r, editor.StoryPage),

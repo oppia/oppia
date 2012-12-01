@@ -24,9 +24,11 @@ import os
 import jinja2
 import webapp2
 
+import base
 import classifiers
 import datamodels
 import feconf
+import main
 import utils
 
 from google.appengine.api import users
@@ -37,20 +39,52 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
 END_DEST = '-1'
 
 
-class BaseHandler(webapp2.RequestHandler):
-  """Base class for all handlers in this file."""
+class MainPage(base.BaseHandler):
+  """The editor's main page, which displays a list of explorations that he can edit."""
+  
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
 
-  def error(self, code):  # pylint: disable-msg=C6409
-    super(BaseHandler, self).error(code)
-    self.response.out.write('Resource not found.')
-    return
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('editorMain'),
+        'logout_url': users.create_logout_url(self.request.uri),
+        'navbar': 'create',
+        'user': user,
+    }
+    self.response.out.write(
+        jinja_env.get_template('editor/editor_main.html').render(values))
 
-  def JsonError(self, error_message, code=406):
-    """Used to handle error messages in JSON returns."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write(json.dumps({'error': str(error_message)}))
-    return
+
+class ExplorationPage(base.BaseHandler):
+  """Page describing a single exploration."""
+  
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+        'js': utils.GetJsFile('editorExploration'),
+        'logout_url': users.create_logout_url(self.request.uri),
+        'navbar': 'create',
+        'user': user,
+    }
+    self.response.out.write(
+        jinja_env.get_template('editor/editor_exploration.html').render(values))
+
+
+class BaseHandler(base.BaseHandler):
+  """Base class for all subsequent handlers in this file."""
 
   def InitializeStoryPage(self, story_id):
     [story] = utils.TryParsingUrlParameters(True, story_id)
@@ -84,50 +118,6 @@ class BaseHandler(webapp2.RequestHandler):
 
 
 class HomePage(BaseHandler):
-  """The editor's home page, which displays a list of explorations that he can edit."""
-  
-  def get(self):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
-        'js': utils.GetJsFile('editorMain'),
-        'logout_url': users.create_logout_url(self.request.uri),
-        'navbar': 'create',
-        'user': user,
-    }
-    self.response.out.write(
-        jinja_env.get_template('editor/editor_main.html').render(values))
-
-
-class ExplorationPage(BaseHandler):
-  """Page describing a single exploration."""
-  
-  def get(self, exploration_id):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
-        'js': utils.GetJsFile('editorExploration'),
-        'logout_url': users.create_logout_url(self.request.uri),
-        'navbar': 'create',
-        'user': user,
-    }
-    self.response.out.write(
-        jinja_env.get_template('editor/editor_exploration.html').render(values))
-
-
-class MainPage(BaseHandler):
   """Displays a page with a list of stories that content creators can edit."""
 
   def GetEditableStories(self, user):
