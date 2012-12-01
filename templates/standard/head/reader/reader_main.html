@@ -2,17 +2,36 @@
 
 {% block content %}
   <div>
-    {{ categories }}
+    <form class="form-search pull-right">
+      <div class="add-on">
+        <input type="text" placeholder="Search" class="input-medium search-query">
+        <i class="icon-search"></i>
+      </div>
+    </form>
 
-    <div ng-repeat="warning in warnings">
-      <p class="butterbar">
+    <div ng-repeat="warning in warnings" class="alert">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <strong>Warning!</strong>
         <[warning]>
-      </p>
     </div>
 
     <div class="content">
-      This is a catalog of explorations you can enjoy. Here is a <a href="/learn/I7532">link</a> to a particular exploration.
+      <h2> Available Explorations</h2>
+      <center>
+        {% for category in categories %}
+          <div class="class-category">
+            <h4>{{category}}</h4>
+            <hr>
+            <!-- placeholder for real data on explorations -->
+            {% for exploration in categories[category].explorations %}
+              <div>
+                <h5>{{exploration.name}} <br /></h5>
+                {{exploration.author}} <br />
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </center>
     </div>
-
   </div>
 {% endblock %}
