@@ -45,13 +45,9 @@ class MainPage(base.BaseHandler):
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
 
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
-        'js': utils.GetJsFile('indexNew'),
-    }
+    self.values['js'] = utils.GetJsFile('indexNew')
     self.response.out.write(
-        jinja_env.get_template('index_new.html').render(values))
+        jinja_env.get_template('index_new.html').render(self.values))
 
 
 # Regex for base64 hash_id encoding
@@ -64,8 +60,10 @@ urls = [
     (r'/index/?', MainPage),
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
+    (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
     (r'/create/?', editor.MainPage),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
+    (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
     # Reader handlers
     (r'/?', reader.HomePage),
     (r'/reader/profile/?', reader.ProfilePage),

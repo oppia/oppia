@@ -34,6 +34,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
+READER_NAVBAR_TEXT = 'learn'
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
@@ -69,15 +70,13 @@ class MainPage(base.BaseHandler):
         }]
     }
 
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
+    self.values.update({
         'categories': categories,
         'js': utils.GetJsFile('readerMain'),
         'navbar': 'learn',
-    }
+    })
     self.response.out.write(
-        jinja_env.get_template('reader/reader_main.html').render(values))
+        jinja_env.get_template('reader/reader_main.html').render(self.values))
 
 
 class ExplorationPage(base.BaseHandler):
@@ -89,45 +88,53 @@ class ExplorationPage(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
     """
+    self.values.update({
+        'js': utils.GetJsFile('readerExploration'),
+        'navbar': READER_NAVBAR_TEXT,
+    })
+    logging.info(self.values)
+    self.response.out.write(jinja_env.get_template(
+        'reader/reader_exploration.html').render(self.values))
+
+
+class ExplorationHandler(base.BaseHandler):
+  """Provides the data for a single exploration."""
+
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Populates the data on the individual exploration page.
+
+    Args:
+      exploration_id: string representing the exploration id.
+    """
+    # TODO(sll): This should send a complete state machine to the frontend.
+    # All interaction would happen client-side.
     exploration = models.Exploration.query().filter(
         models.Exploration.hash_id == exploration_id).get()
     if not exploration:
       # TODO(sll): The following is fake data for testing. It should be removed
       # and replaced with:
       #     raise utils.InvalidInputError('This exploration does not exist.')
-      values = {
-          'css': utils.GetCssFile('oppia'),
-          'debug': feconf.DEBUG,
-          'html': 'hello',
+      self.response.out.write(json.dumps({
+          'html': ['hello'],
+          'input_template': utils.GetInputTemplate('multiple_choice'),
           'input_view': 'multiple_choice',
-          'js': utils.GetJsFile('readerExploration'),
-          'navbar': 'learn',
           'title': 'Title',
           'widgets': [],
-      }
-      values['input_template'] = utils.GetInputTemplate(values['input_view'])
-      self.response.out.write(
-          jinja_env.get_template('reader/reader_exploration.html').render(values))
+      }))
       return
 
     init_state = exploration.init_state.get()
     init_html, init_widgets = ParseContentIntoHtml(init_state.text, 0)
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
+    data_values = {
         'html': init_html,
         'input_view': init_state.get().input_view.get().name,
-        'js': utils.GetJsFile('readerExploration'),
-        'navbar': 'learn',
         'title': exploration.title,
         'widgets': init_widgets,
     }
-    values['input_template'] = utils.GetInputTemplate(values['input_view'])
-    if values['input_view'] == utils.input_views.multiple_choice:
-      values['categories'] = reader.state.get().classifier_categories
-
-    self.response.out.write(
-        jinja_env.get_template('reader/reader_exploration.html').render(values))
+    data_values['input_template'] = utils.GetInputTemplate(data_values['input_view'])
+    if data_values['input_view'] == utils.input_views.multiple_choice:
+      data_values['categories'] = reader.state.get().classifier_categories
+    self.response.out.write(json.dumps(data_values))
 
 
 class BaseHandler(base.BaseHandler):

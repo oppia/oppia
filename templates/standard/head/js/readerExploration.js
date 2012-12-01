@@ -11,13 +11,44 @@ oppia.directive('angularHtmlBind', function($compile) {
 });
 
 function ReaderExploration($scope, $http, $timeout) {
-  $scope.categories = data.categories;
-
-  // The pathname is expected to be: /[story_id]
+  // The pathname is expected to be: /[exploration_id]
   var pathnameArray = window.location.pathname.split('/');
-  $scope.story = { id: pathnameArray[2] };
-  $scope.storyUrl = '/reader/' + $scope.story.id + '/data';
-  $scope.contentPanelIsActive = true;
+  $scope.explorationId = pathnameArray[2];
+  $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
+
+  $scope.loadPage = function(data) {
+    console.log(data);
+    $scope.html = '<div>' + data.html.join(' </div><div> ') + '</div>';
+    $scope.categories = data.categories;
+    $scope.inputTemplate = data.input_template;
+  };
+
+  // Initializes the story page using data from the server.
+  $http.get($scope.explorationDataUrl)
+      .success(function(data) {
+        $scope.explorationTitle = data.title;
+        $scope.loadPage(data);
+      }).error(function(data) {
+        $scope.addWarning(
+            data.error || 'There was an error loading the story.');
+      });
+
+  $scope.submitAnswer = function() {
+    $http.post(
+        $scope.storyUrl,
+        $('.answer').serialize(),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success($scope.refreshStory);
+  };
+
+  $scope.clearProgress = function() {
+    $http.delete(
+        $scope.explorationDataUrl, '',
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+      location.reload();
+    });
+  };
 }
 
 function SetCtrl($scope, $http) {

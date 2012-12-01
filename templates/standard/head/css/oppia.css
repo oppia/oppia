@@ -50,3 +50,13 @@ body {
   text-decoration: none;
 }
 
+.wide-panel {
+  border: 5px solid black;
+  border-radius: 3px;
+  font-size: large;
+  min-height: 300px;
+  margin: 20px auto;
+  padding: 10px;
+  width: 70%;
+}
+

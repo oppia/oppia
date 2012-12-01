@@ -21,9 +21,18 @@ import logging
 
 import webapp2
 
+import feconf
+import utils
+
 
 class BaseHandler(webapp2.RequestHandler):
   """Base class for all Oppia handlers."""
+  def __init__(self, *args, **kwargs):
+    webapp2.RequestHandler.__init__(self, *args, **kwargs)
+    self.values = {
+        'css': utils.GetCssFile('oppia'),
+        'debug': feconf.DEBUG,
+    }
 
   def error(self, code):  # pylint: disable-msg=C6409
     super(BaseHandler, self).error(code)

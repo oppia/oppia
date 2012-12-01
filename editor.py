@@ -38,6 +38,7 @@ from google.appengine.ext import ndb
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 END_DEST = '-1'
+EDITOR_NAVBAR_TEXT = 'create'
 
 
 class MainPage(base.BaseHandler):
@@ -51,16 +52,14 @@ class MainPage(base.BaseHandler):
       return
 
     # TODO(sll): Send a list of this user's available explorations to the frontend.
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
+    self.values.update({
         'js': utils.GetJsFile('editorMain'),
         'logout_url': users.create_logout_url(self.request.uri),
-        'navbar': 'create',
+        'navbar': EDITOR_NAVBAR_TEXT,
         'user': user,
-    }
+    })
     self.response.out.write(
-        jinja_env.get_template('editor/editor_main.html').render(values))
+        jinja_env.get_template('editor/editor_main.html').render(self.values))
 
 
 class ExplorationPage(base.BaseHandler):
@@ -73,17 +72,37 @@ class ExplorationPage(base.BaseHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
 
+    # TODO(sll): Rewrite this.
     # TODO(sll): Morph this into the question editor page.
-    values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
+    self.values.update({
         'js': utils.GetJsFile('editorExploration'),
         'logout_url': users.create_logout_url(self.request.uri),
-        'navbar': 'create',
+        'navbar': EDITOR_NAVBAR_TEXT,
         'user': user,
-    }
+    })
     self.response.out.write(
-        jinja_env.get_template('editor/editor_exploration.html').render(values))
+        jinja_env.get_template('editor/editor_exploration.html').render(self.values))
+
+
+class ExplorationHandler(base.BaseHandler):
+  """Page with editor data for a single exploration."""
+  
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    # TODO(sll): Rewrite this.
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    # TODO(sll): Morph this into the question editor page.
+    self.values.update({
+        'js': utils.GetJsFile('editorExploration'),
+        'logout_url': users.create_logout_url(self.request.uri),
+        'navbar': EDITOR_NAVBAR_TEXT,
+        'user': user,
+    })
+    self.response.out.write(json.dumps(data_values))
 
 
 class BaseHandler(base.BaseHandler):

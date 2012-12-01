@@ -2,16 +2,43 @@
 
 {% block content %}
   <div>
-    <ul>
-      <li>
-        This is the main page.
-      </li>
-      <li>
-        You can start learning <a href="/learn">here</a>.
-      </li>
-      <li>
-        You can start creating <a href="/create">here</a>.
-      </li>
-    </ul>
+
+    <div class="container-fluid wide-panel">
+      <div class="row-fluid">
+        <div class="span4">
+          <!--TODO(sll): replace this with an embedded demo-->
+          <img src="images/reader-image.png">
+        </div>
+        <div class="span8">
+          <p>Oppia allows you to create interactive learning explorations.</p>
+          <p>
+            When you interact with Oppia, the system determines the best response to give,
+            based on your answer. This enables you to get immediate, personalized feedback,
+            and help you learn faster and more enjoyably.
+          </p>
+          <center>
+            <a class="btn btn-large btn-success" href="/learn">Start learning</a>
+          </center>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid wide-panel">
+      <div class="row-fluid">
+        <div class="span8">
+          <p>
+            You can create your own explorations with our nifty editor interface, and edit
+            other explorations to make them better.
+          </p>
+          <center>
+            <a class="btn btn-large btn-success" href="/create">Create an exploration</a>
+          </center>
+        </div>
+        <div class="span4">
+          <img src="images/editor-image.png">
+        </div>
+      </div>
+    </div>
+
   </div>
 {% endblock %}
