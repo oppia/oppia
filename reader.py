@@ -43,20 +43,36 @@ class MainPage(base.BaseHandler):
   
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    explorations_by_category = {}
+    categories = {}
     for exploration in models.Exploration.query():
       category_name = exploration.metadata.get(
           'category', DEFAULT_CATALOG_CATEGORY_NAME)
 
-      if not explorations_by_category.get(category_name):
-        explorations_by_category[category_name] = []
+      if not categories.get(category_name):
+        categories[category_name] = {'explorations': [exploration]}
       else:
-        explorations_by_category[category_name].append(exploration)
+        # TODO(sll): make the following 'exploration' more explicit
+        categories[category_name].explorations.append(exploration)
+
+    # TODO(sll): this is sample data; remove it later.
+    categories['Test Category'] = {
+        'explorations': [{
+            'name': 'Adding fractions',
+            'author': 'A fractionmaster',
+            'rating': 4,
+            'hash_id': '12345ABCDE',
+        }, {
+            'name': 'Learning to live',
+            'author': 'A liver',
+            'rating': 5,
+            'hash_id': '34567CDEFG',
+        }]
+    }
 
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
-        'explorations': explorations_by_category,
+        'categories': categories,
         'js': utils.GetJsFile('readerMain'),
         'navbar': 'learn',
     }
