@@ -265,6 +265,18 @@ def GetCssFile(filename):
   return GetFileContents('css/%s.css' % filename)
 
 
+def GetInputTemplate(template_name):
+  """Gets a template for the reader's input view.
+
+  Args:
+    template_name: the name of the template.
+
+  Returns:
+    the corresponding input template.
+  """
+  return GetFileContents('input_views/%s.html' % template_name)
+
+
 def ParseContentIntoHtml(content_array, block_number):
   """Takes a content array and transforms it into HTML.
 

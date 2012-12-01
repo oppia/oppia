@@ -9,3 +9,23 @@ body {
   top: 0;
   width: 100%;
 }
+
+.exploration {
+  border: 1px solid black;
+  margin: 10px auto;
+  padding: 10px;
+  width: 98%;
+}
+
+.exploration-header {
+  margin: 10px auto;
+  padding: 6px 0;
+  text-align: center;
+  width: 80%;
+}
+
+.exploration-header a {
+  font-size: 200%;
+  text-decoration: none;
+}
+

@@ -112,6 +112,8 @@ class Exploration(ndb.Model):
   hash_id = ndb.StringProperty(required=True)
   # Metadata for this exploration (name, category, etc.)
   metadata = ndb.JsonProperty()
+  # What this exploration is called.
+  title = ndb.StringProperty(default='New exploration')
   # The state which forms the start of this exploration
   init_state = ndb.KeyProperty(kind=State, required=True)
   # The list of states this exploration consists of.

@@ -82,17 +82,50 @@ class MainPage(base.BaseHandler):
 
 class ExplorationPage(base.BaseHandler):
   """Page describing a single exploration."""
-  
-  def get(self, exploration_id):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
 
-    # TODO(sll): Morph this into what was originally the 'story page'.
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests.
+
+    Args:
+      exploration_id: string representing the exploration id.
+    """
+    exploration = models.Exploration.query().filter(
+        models.Exploration.hash_id == exploration_id).get()
+    if not exploration:
+      # TODO(sll): The following is fake data for testing. It should be removed
+      # and replaced with:
+      #     raise utils.InvalidInputError('This exploration does not exist.')
+      values = {
+          'css': utils.GetCssFile('oppia'),
+          'debug': feconf.DEBUG,
+          'html': 'hello',
+          'input_view': 'multiple_choice',
+          'js': utils.GetJsFile('readerExploration'),
+          'navbar': 'learn',
+          'title': 'Title',
+          'widgets': [],
+      }
+      values['input_template'] = utils.GetInputTemplate(values['input_view'])
+      self.response.out.write(
+          jinja_env.get_template('reader/reader_exploration.html').render(values))
+      return
+
+    init_state = exploration.init_state.get()
+    init_html, init_widgets = ParseContentIntoHtml(init_state.text, 0)
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
+        'html': init_html,
+        'input_view': init_state.get().input_view.get().name,
         'js': utils.GetJsFile('readerExploration'),
         'navbar': 'learn',
+        'title': exploration.title,
+        'widgets': init_widgets,
     }
+    values['input_template'] = utils.GetInputTemplate(values['input_view'])
+    if values['input_view'] == utils.input_views.multiple_choice:
+      values['categories'] = reader.state.get().classifier_categories
+
     self.response.out.write(
         jinja_env.get_template('reader/reader_exploration.html').render(values))
 
