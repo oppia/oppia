@@ -29,6 +29,7 @@ import classifiers
 import datamodels
 import feconf
 import main
+import models
 import utils
 
 from google.appengine.api import users
@@ -49,6 +50,7 @@ class MainPage(base.BaseHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
 
+    # TODO(sll): Send a list of this user's available explorations to the frontend.
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
@@ -71,6 +73,7 @@ class ExplorationPage(base.BaseHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
 
+    # TODO(sll): Morph this into the question editor page.
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,

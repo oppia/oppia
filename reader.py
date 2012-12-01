@@ -27,11 +27,13 @@ import base
 import classifiers
 import datamodels
 import feconf
+import models
 import utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
+DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
@@ -41,10 +43,20 @@ class MainPage(base.BaseHandler):
   
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
+    explorations_by_category = {}
+    for exploration in models.Exploration.query():
+      category_name = exploration.metadata.get(
+          'category', DEFAULT_CATALOG_CATEGORY_NAME)
+
+      if not explorations_by_category.get(category_name):
+        explorations_by_category[category_name] = []
+      else:
+        explorations_by_category[category_name].append(exploration)
 
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
+        'explorations': explorations_by_category,
         'js': utils.GetJsFile('readerMain'),
         'navbar': 'learn',
     }
@@ -58,6 +70,7 @@ class ExplorationPage(base.BaseHandler):
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
 
+    # TODO(sll): Morph this into what was originally the 'story page'.
     values = {
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
