@@ -4,6 +4,27 @@ body {
   padding-top: 50px;
 }
 
+.class-category {
+  border: 3px solid #CCC; 
+  border-radius: 20px;
+  height: 250px; 
+  margin: 10px; 
+  width: 90%; 
+}
+
+.class-category hr {
+  border-top: 3px double #CCC;
+  margin: 0;
+}
+
+.content {
+  padding-left: 30px;
+}
+
+.form-search {
+  padding-right: 20px;
+}
+
 .navbar {
   position: fixed;
   top: 0;
