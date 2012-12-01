@@ -34,7 +34,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
-READER_NAVBAR_TEXT = 'learn'
+READER_MODE = 'reader'
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
@@ -73,7 +73,7 @@ class MainPage(base.BaseHandler):
     self.values.update({
         'categories': categories,
         'js': utils.GetJsFile('readerMain'),
-        'navbar': 'learn',
+        'mode': READER_MODE,
     })
     self.response.out.write(
         jinja_env.get_template('reader/reader_main.html').render(self.values))
@@ -90,7 +90,7 @@ class ExplorationPage(base.BaseHandler):
     """
     self.values.update({
         'js': utils.GetJsFile('readerExploration'),
-        'navbar': READER_NAVBAR_TEXT,
+        'mode': READER_MODE,
     })
     logging.info(self.request.arguments())
     # The following is needed for embedding Oppia explorations in other pages.

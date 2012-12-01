@@ -3,6 +3,13 @@
 {% block content %}
   <div>
 
+    <form class="oppia-form-search pull-right">
+      <div class="add-on">
+        <input type="text" placeholder="Search" class="input-medium search-query">
+        <i class="icon-search"></i>
+      </div>
+    </form>
+
     <div ng-repeat="warning in warnings">
       <p class="butterbar">
         <[warning]>
@@ -10,8 +17,44 @@
     </div>
 
     <div class="oppia-content">
-      Create an exploration! Here is a <a href="/create/I7532">link</a> to a particular exploration you can edit.
+      <h2> Explorations I can edit</h2>
+
+      {% if categories %}
+        <center>
+          {% for category in categories %}
+            <div class="oppia-class-category">
+              <h4>{{category}}</h4>
+              <hr>
+              <ul class="thumbnails">
+                <!-- placeholder for real data on explorations -->
+                {% for exploration in categories[category].explorations %}
+                  <li class="span3">
+                    <div class="thumbnail">
+                      <img src="http://placehold.it/300x200" alt="">
+                      <div>
+                        <h5>{{exploration.name}} <br /></h5>
+                        {{exploration.rating}}/5 stars <br />
+                        <a href="learn/{{exploration.hash_id}}">Link</a>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </center>
+      {% else %}
+        No one has created any explorations yet. Why don't you?
+      {% endif %}
+
+      <br>
+      <br>
+
+      <p>
+        <!-- TODO(sll): redo the link. -->
+        <a class="btn btn-large btn-success" href="/create/I7532">Create New Exploration</a>
+      </p>
     </div>
 
   </div>
 {% endblock %}
+

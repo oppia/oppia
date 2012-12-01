@@ -28,10 +28,10 @@
           <div class="container">
             <a class="brand" href="/index">Oppia</a>
             <ul class="nav">
-              <li {% if navbar == 'learn' %} class="active" {% endif %}>
+              <li {% if mode == 'reader' %} class="active" {% endif %}>
                 <a href="/learn">Learn</a>
               </li>
-              <li {% if navbar == 'create' %} class="active" {% endif %}>
+              <li {% if mode == 'editor' %} class="active" {% endif %}>
                 <a href="/create">Create</a>
               </li>
             </ul>
