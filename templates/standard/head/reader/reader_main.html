@@ -22,14 +22,20 @@
           <div class="class-category">
             <h4>{{category}}</h4>
             <hr>
-            <!-- placeholder for real data on explorations -->
-            {% for exploration in categories[category].explorations %}
-              <div>
-                <h5>{{exploration.name}} <br /></h5>
-                {{exploration.author}} <br />
-                <a href="learn/{{exploration.hash_id}}">Link</a>
-              </div>
-            {% endfor %}
+            <ul class="thumbnails">
+              <!-- placeholder for real data on explorations -->
+              {% for exploration in categories[category].explorations %}
+                <li class="span3">
+                  <div class="thumbnail">
+                    <img src="http://placehold.it/300x200" alt="">
+                    <div>
+                      <h5>{{exploration.name}} <br /></h5>
+                      {{exploration.author}} <br />
+                      <a href="learn/{{exploration.hash_id}}">Link</a>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
           </div>
         {% endfor %}
       </center>

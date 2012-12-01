@@ -18,9 +18,10 @@ function ReaderExploration($scope, $http, $timeout) {
 
   $scope.loadPage = function(data) {
     console.log(data);
-    $scope.html = '<div>' + data.html.join(' </div><div> ') + '</div>';
     $scope.categories = data.categories;
+    $scope.html = '<div>' + data.html.join(' </div><div> ') + '</div>';
     $scope.inputTemplate = data.input_template;
+    $scope.title = data.title;
   };
 
   // Initializes the story page using data from the server.
