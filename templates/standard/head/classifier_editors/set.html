@@ -1,11 +1,12 @@
 <div class="classifier" ng-show="classifier=='set'" ng-controller="SetClassifierEditor">
 
-  <div ng-repeat="action in optionalActions" class="category-block">
-    <a class="delete-button" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'All other inputs'">
+  <div ng-repeat="action in optionalActions" class="oppia-category-block">
+    <a class="close" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'All other inputs'">
       &times;
     </a>
 
-    <p>Answer:
+    <p>
+      <span class="oppia-editable-name">Answer:</span>
       <span ng-class="getCategoryClass(states[stateId]['dests'][$index].category)"
             ng-hide="$parent.currentActiveInput.indexOf(classifier + '.' + $index + '.category') == 0"
             ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category')">
@@ -53,7 +54,7 @@
       </div>
     </p>
 
-    <span class="dest-name" ng-hide="$parent.currentActiveInput == classifier + '.' + $index + '.dest'"
+    <span class="oppia-editable-name" ng-hide="$parent.currentActiveInput == classifier + '.' + $index + '.dest'"
           ng-click="initializeNewActiveInput(classifier + '.' + $index + '.dest')">
       <[getDestDescription(states[stateId]['dests'][$index].dest)]>
     </span>
@@ -71,45 +72,17 @@
     </span>
 
     <p ng-click="showEditorModal('text', $index)">
-      <span class="feedback-name">Feedback:</span>
+      <span class="oppia-editable-name">Feedback:</span>
       <span ng-click="showEditorModal('text', $index)" ng-hide="action.text">[Add feedback]</span>
       <span ng-show="action.text" ng-bind-html="action.text | truncate"></span>
-    </p>
-
-    <p>
-      <span>Metrics:</span>
-      <span ng-repeat="metric in action.metrics">
-        <span ng-click="editMetric($parent.$index, metric.key, metric.value)">
-          <[getMetricDescription(metric.key, metric.value)]>,
-        </span>
-      </span>
-      <span ng-click="initializeMetricAdder($index)"
-            ng-hide="currentActiveInput == classifier + '.' + $index + '.metrics.add' ||
-                     currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
-        <a ng-hide="action.metrics">[Add metrics]</a>
-        <a ng-show="action.metrics">[add more...]</a>
-      </span>
-      <span ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.add'">
-        <input type="text" ng-model="newMetricKey">
-        <input type="number" ng-model="newMetricValue">
-        <button type="button" ng-click="addMetric($index, newMetricKey, newMetricValue)">+</button>
-        <button type="button" ng-click="clearActiveInputs()">Cancel</button>
-      </span>
-      <div ng-show="currentActiveInput == classifier + '.' + $index + '.metrics.edit'">
-        <form ng-submit="saveMetric($index, newMetricKey, newMetricValue)">
-          New value for change in <[newMetricKey]>:
-          <input type="number" ng-model="newMetricValue" autofocus required>
-          <input type="submit" value="Save">
-        </form>
-      </div>
     </p>
   </div>
 
   <br>
   <button type="button" class="add-button" ng-click="initializeNewActiveInput(classifier + '.dummy.category')">Add new answer</button>
   <br><br>
-  <div class="category-block" ng-show="currentActiveInput.indexOf(classifier + '.dummy.category') == 0">
-    <a class="delete-button" ng-click="hideCategoryInput()">&times;</a>
+  <div class="oppia-category-block" ng-show="currentActiveInput.indexOf(classifier + '.dummy.category') == 0">
+    <a class="close" ng-click="hideCategoryInput()">&times;</a>
     <span ng-show="currentActiveInput == classifier + '.dummy.category'">
       <a class="set-button set-button-extra" ng-click="initializeNewActiveInput(classifier + '.dummy.category.extra')"></a>
       <a class="set-button set-button-incomplete" ng-click="initializeNewActiveInput(classifier + '.dummy.category.incomplete')"></a>

@@ -366,7 +366,7 @@ function EditorExploration($scope, $http, $timeout) {
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, changeIsInline, categoryId) {
-    if (!$scope.isValidEntityName(newStateName))
+    if (!$scope.isValidEntityName(newStateName, true))
       return;
     // States may not start with '[', since that label is reserved for
     // '[Chapter]', '[Question]', etc.
@@ -499,7 +499,7 @@ function EditorExploration($scope, $http, $timeout) {
   };
 
   $scope.saveQuestionName = function() {
-    if (!$scope.isValidEntityName($scope.explorationDesc))
+    if (!$scope.isValidEntityName($scope.explorationDesc, true))
       return;
     if ($scope.isDuplicateInput($scope.questions, 'desc',
             $scope.explorationId, $scope.explorationDesc)) {
@@ -528,7 +528,7 @@ function EditorExploration($scope, $http, $timeout) {
   };
 
   $scope.saveStateName = function() {
-    if (!$scope.isValidEntityName($scope.stateName))
+    if (!$scope.isValidEntityName($scope.stateName, true))
       return;
     if ($scope.isDuplicateInput(
             $scope.states, 'desc', $scope.stateId, $scope.stateName)) {

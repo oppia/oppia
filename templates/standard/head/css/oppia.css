@@ -8,6 +8,10 @@ textarea {
   width: 90%;
 }
 
+textarea.oppia-code {
+  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
+}
+
 .oppia-content {
   margin: 0 auto;
   padding-left: 30px;
@@ -89,7 +93,6 @@ textarea {
   z-index: 9002;
 }
 
-
 .oppia-butterbar {
   background: #F9EDBE;
   -webkit-border-radius: 2px;
@@ -105,11 +108,6 @@ textarea {
   top: 100px;
 }
 
-
-textarea.oppia-code {
-  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
-}
-
 .oppia-editable-name {
   color: #8f8661;
 }
@@ -120,13 +118,13 @@ textarea.oppia-code {
   content: ' ✎';
 }
 
-
 .oppia-droppable-active {
   background: lightyellow;
 }
 .oppia-droppable-trash-active {
   background: red;
 }
+
 .oppia-add-content-box {
   border: 1px dashed silver;
   color: silver;
@@ -224,4 +222,12 @@ textarea.oppia-code {
   height: 48px;
   margin: 300px 3px 0 3px;
   width: 48px;
+}
+
+
+/* Category editor styles */
+
+.oppia-category-block {
+  border: 1px solid #efefef;
+  min-height: 40px;
 }

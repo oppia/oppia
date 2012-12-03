@@ -36,11 +36,14 @@ function Base($scope, $timeout) {
    * Checks whether an entity name is valid, and displays a warning message
    * if it isn't.
    * @param {string} input The input to be checked.
+   * @param {boolean} showWarnings Whether to show warnings in the butterbar.
    * @return {boolean} True if the entity name is valid, false otherwise.
    */
-  $scope.isValidEntityName = function(input) {
+  $scope.isValidEntityName = function(input, showWarnings) {
     if (!input) {
-      $scope.addWarning('Please enter a non-empty name.');
+      if (showWarnings) {
+        $scope.addWarning('Please enter a non-empty name.');
+      }
       return false;
     }
     // Remove whitespace from the beginning and end of the string, and replace
@@ -50,16 +53,43 @@ function Base($scope, $timeout) {
     // Do not allow input to start with '[', since this is part of the prefix
     // used in the auto-suggest boxes to identify chapters, questions, etc.
     if (input[0] == '[') {
-      $scope.addWarning('Names should not start with a \'[\'.');
+      if (showWarnings) {
+        $scope.addWarning('Names should not start with a \'[\'.');
+      }      
       return false;
     }
     if (!ALPHANUMERIC_REGEXP.regexp.test(input)) {
-      $scope.addWarning(ALPHANUMERIC_REGEXP.warning);
+      if (showWarnings) {
+        $scope.addWarning(ALPHANUMERIC_REGEXP.warning);
+      }      
       return false;
     }
     return true;
   };
 }
+
+oppia.directive('mustBeValidString', function($timeout) {
+  return {
+    require: 'ngModel',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$parsers.unshift(function(viewValue) {
+        if (scope.isValidEntityName(viewValue, false)) {
+          // it is valid
+          ctrl.$setValidity('invalidChar', true);
+          return viewValue;
+        } else {
+          // it is invalid, return the old model value
+          elm[0].value = ctrl.$modelValue;
+          ctrl.$setValidity('invalidChar', false);
+          $timeout(function() {
+            ctrl.$setValidity('invalidChar', true);
+          }, 2000);
+          return ctrl.$modelValue;
+        }
+      });
+    }
+  };
+});
 
 /**
  * Injects dependencies in a way that is preserved by minification.

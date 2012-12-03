@@ -21,7 +21,7 @@
 // Code for the finite classifier editor.
 function FiniteClassifierEditor($scope) {
   $scope.addCategory = function() {
-    if (!$scope.isValidEntityName($scope.newCategoryName))
+    if (!$scope.isValidEntityName($scope.newCategoryName, true))
       return;
     if ($scope.isDuplicateArrayInput(
             $scope.optionalActions, 'category', null, $scope.newCategoryName))
@@ -34,9 +34,10 @@ function FiniteClassifierEditor($scope) {
     $scope.saveStateChange('states');
     $scope.newCategoryName = '';
   };
+  
 
   $scope.saveCategoryName = function(categoryId, newCategoryName) {
-    if (!$scope.isValidEntityName(newCategoryName))
+    if (!$scope.isValidEntityName(newCategoryName, false))
       return;
     if ($scope.isDuplicateArrayInput(
             $scope.states[$scope.stateId].dests,
