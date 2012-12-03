@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import datetime, json, logging, os
-import jinja2, webapp2
 import base, classifiers, feconf, main, models, reader, utils
 
 from google.appengine.api import users
@@ -30,37 +29,12 @@ END_DEST = '-1'
 class MainPage(base.BaseHandler):
   """The editor's main page, which displays a list of explorations that he/she can edit."""
   
-  def InitializeInputViews(self):
-    """Loads pre-written input views into the Oppia datastore."""
-    # TODO(sll): This is temporary code that automatically loads input views
-    # into the datastore on startup. Remove it once the bulk upload described
-    # below is implemented.
-    input_view_list = [utils.input_views.none,
-                       utils.input_views.multiple_choice,
-                       utils.input_views.int,
-                       utils.input_views.set,
-                       utils.input_views.text]
-    classifier_list = [classifiers.classifiers.none,
-                       classifiers.classifiers.finite,
-                       classifiers.classifiers.numeric,
-                       classifiers.classifiers.set,
-                       classifiers.classifiers.text]
-    for i in range(len(input_view_list)):
-      name = input_view_list[i]
-      if not models.InputView.gql('WHERE name = :name', name=name).get():
-        input_view = models.InputView(
-            name=name, classifier=classifier_list[i],
-            html=utils.GetFileContents('/input_views/%s.html' % name))
-        input_view.put()
-
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user = users.get_current_user()
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
       return
-
-    self.InitializeInputViews()
 
     categories = {}
     # TODO(sll): Restrict this to explorations editable by this user.

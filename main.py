@@ -16,8 +16,8 @@
 
 __author__ = 'Sean Lip'
 
-import jinja2, webapp2
-import base, editor, feconf, models, os, reader, utils, widgets
+import base, classifiers, editor, feconf, models, os, reader, utils, widgets
+import webapp2
 
 
 class Error404Handler(base.BaseHandler):
@@ -29,6 +29,29 @@ class Error404Handler(base.BaseHandler):
 
 class MainPage(base.BaseHandler):
   """Oppia's main page."""
+  def InitializeInputViews(self):
+    """Loads pre-written input views into the Oppia datastore."""
+    # TODO(sll): This is temporary code that automatically loads input views
+    # into the datastore on startup. Remove it once the bulk upload described
+    # below is implemented.
+    input_view_list = [utils.input_views.none,
+                       utils.input_views.multiple_choice,
+                       utils.input_views.int,
+                       utils.input_views.set,
+                       utils.input_views.text]
+    classifier_list = [classifiers.classifiers.none,
+                       classifiers.classifiers.finite,
+                       classifiers.classifiers.numeric,
+                       classifiers.classifiers.set,
+                       classifiers.classifiers.text]
+    for i in range(len(input_view_list)):
+      name = input_view_list[i]
+      if not models.InputView.gql('WHERE name = :name', name=name).get():
+        input_view = models.InputView(
+            name=name, classifier=classifier_list[i],
+            html=utils.GetFileContents('/input_views/%s.html' % name))
+        input_view.put()
+
   def EnsureDefaultExplorationExists(self):
     """Add the default exploration, if it doesn't already exist."""
     try:
@@ -39,10 +62,11 @@ class MainPage(base.BaseHandler):
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
+    self.InitializeInputViews()
     self.EnsureDefaultExplorationExists()
-    self.values['js'] = utils.GetJsFile('indexNew')
+    self.values['js'] = utils.GetJsFile('index')
     self.response.out.write(
-        base.JINJA_ENV.get_template('index_new.html').render(self.values))
+        base.JINJA_ENV.get_template('index.html').render(self.values))
 
 
 # Regex for base64 hash_id encoding

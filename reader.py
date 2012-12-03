@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 import json, logging, os
-import jinja2, webapp2
 import base, classifiers, feconf, models, utils
 
 from google.appengine.api import users
@@ -65,11 +64,9 @@ class ExplorationPage(base.BaseHandler):
         'js': utils.GetJsFile('readerExploration'),
         'mode': READER_MODE,
     })
-    logging.info(self.request.arguments())
+
     # The following is needed for embedding Oppia explorations in other pages.
-    logging.info(self.request.get('hideNavbar'))
     if self.request.get('hideNavbar') == 'true':
-      logging.info('hide')
       self.values['hide_navbar'] = True
 
     self.response.out.write(base.JINJA_ENV.get_template(
@@ -88,6 +85,7 @@ class ExplorationHandler(base.BaseHandler):
     # TODO(sll): This should send a complete state machine to the frontend.
     # All interaction would happen client-side.
     exploration = utils.GetEntity(models.Exploration, exploration_id)
+    logging.info(exploration.init_state)
     init_state = exploration.init_state.get()
     init_html, init_widgets = utils.ParseContentIntoHtml(init_state.text, 0)
     self.data_values.update({

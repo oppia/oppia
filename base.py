@@ -16,8 +16,8 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging
-import webapp2
+import json, logging, os
+import jinja2, webapp2
 import feconf, utils
 
 from google.appengine.api import users
