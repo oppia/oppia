@@ -63,13 +63,14 @@ r = '[A-Za-z0-9=_-]+'
 
 # Register the URL with the responsible classes
 urls = [
-    # Handlers for the new version of Oppia
     (r'/?', MainPage),
+
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
     (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
+
     (r'/create/?', editor.MainPage),
     (r'/create_new/?', editor.NewExploration),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
@@ -77,11 +78,12 @@ urls = [
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
     (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
-    # Widget repository handlers
+
     (r'/widgets/?', widgets.Widget),
     (r'/widgets/repository/?', widgets.WidgetRepositoryPage),
     (r'/widgets/(%s)/?' % r, widgets.Widget),
     (r'/widgets/repository/data/?', widgets.WidgetRepositoryHandler),
+
     # 404 error handler.
     (r'/.*', Error404Handler),
 ]
