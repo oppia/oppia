@@ -16,17 +16,11 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64
-import datetime
-import hashlib
-import logging
-import os
+import base64, datetime, hashlib, logging, os
 
 import jinja2
 
-import datamodels
-import feconf
-import models
+import feconf, models
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -136,66 +130,19 @@ def CheckExistenceOfName(entity, name, ancestor=None):
   return True
 
 
-def CheckAuthorship(story):
-  """Checks whether the current user has rights to edit this story.
+def CheckAuthorship(exploration):
+  """Checks whether the current user has rights to edit this exploration.
 
   Args:
-    story: a story.
+    exploration: an exploration.
 
   Raises:
     EntityIdNotFoundError: if the current user does not have editing rights to
-        the given story.
+        the given exploration.
   """
   user = users.get_current_user()
-  if user not in story.editors:
+  if user not in exploration.editors:
     raise EntityIdNotFoundError('%s is not an editor of this story.' % user)
-
-
-def TryParsingUrlParameters(auth, *args):
-  """Returns the entities corresponding to the ids in an HTTP request.
-
-  Args:
-    auth: True if we need to check if the user has edit access, False if not.
-    *args: A list of hash_ids. This is expected to be of the form [story],
-           [story, chapter, question] or [story, chapter, question, state].
-
-  Returns:
-    the list of entities corresponding to these hash_ids.
-
-  Raises:
-    EntityIdNotFoundError:
-      - If there are too many or too few arguments.
-      - If any of the entities doesn't exist.
-      - If the entities don't relate to each other (e.g. the state does not
-        belong to the question).
-      - If auth=True and the current user does not have editing permissions for
-        the story.
-  """
-  if not args or len(args) > 4:
-    raise EntityIdNotFoundError(
-        'Path corresponding to %s does not exist' % args)
-
-  logging.info(args)
-  story = GetEntity(datamodels.Story, args[0])
-  entities = [story]
-  if len(args) > 1:
-    chapter = story.chapters[int(args[1])].get()
-    entities.append(chapter)
-    if len(args) > 2:
-      question = GetEntity(datamodels.Question, args[2])
-      if question.key not in chapter.questions:
-        raise EntityIdNotFoundError('Question does not belong to chapter.')
-      entities.append(question)
-      if len(args) > 3:
-        state = GetEntity(datamodels.State, args[3])
-        if state.key not in question.states:
-          raise EntityIdNotFoundError('State does not belong to question.')
-        entities.append(state)
-
-  if auth:
-    CheckAuthorship(story)
-
-  return entities
 
 
 def GetNewId(entity, entity_name):
@@ -319,74 +266,6 @@ def ParseContentIntoHtml(content_array, block_number):
     else:
       raise InvalidInputError('Invalid content type %s', content['type'])
   return html, widget_array
-
-
-def CreateNewReader(user, story):
-  """Creates and saves a new reader for the given user/story combination.
-
-  Args:
-    user: the person who is going to read the story
-    story: the story to be read
-
-  Returns:
-    a new reader corresponding to this user/story combination.
-
-  Raises:
-    InvalidStoryError: if the story cannot be initialized.
-  """
-  init_chapter = story.chapters[0].get()
-  if not init_chapter.question_groups:
-    raise InvalidStoryError('This story is not ready for viewing. It has no '
-                            'question groups defined yet.')
-  init_question_group = init_chapter.question_groups[0].get()
-  init_question = datamodels.Question.query(ancestor=init_chapter.key).filter(
-      datamodels.Question.question_group == init_question_group.key).get()
-  if not init_question:
-    raise InvalidStoryError('This story is not ready for viewing. The initial '
-                            'question group has no questions yet.')
-  init_state = init_question.init_state.get()
-  init_html, init_widgets = ParseContentIntoHtml(init_state.text, 0)
-  init_page = datamodels.PageContent(html=[init_html], widgets=[init_widgets])
-  init_page.put()
-
-  new_reader = datamodels.Reader.query().filter(
-      datamodels.Reader.reader == user).filter(
-          datamodels.Reader.story == story.key).get()
-  if not new_reader:
-    new_reader = datamodels.Reader(
-        reader=user, story=story.key, question=init_question.key,
-        state=init_state.key, pages=[init_page.key])
-  else:
-    logging.info('Reader for %s | %s is being replaced', user, story.name)
-    new_reader.question = init_question.key
-    new_reader.state = init_state.key
-    new_reader.pages = [init_page.key]
-
-  new_reader.put()
-  Log('New reader created.')
-  return new_reader
-
-
-def CheckPrereqs(prereq_date, prereq_metrics, reader_metrics):
-  """Checks whether the prerequisites for an entity are satisfied.
-
-  Args:
-    prereq_date: the earliest date at which this entity can be seen.
-    prereq_metrics: the minimum metrics qualification for this entity.
-    reader_metrics: the reader's metrics.
-
-  Returns:
-    True if the prerequisites are satisfied; False otherwise.
-  """
-  if prereq_date and datetime.date.today() < prereq_date:
-    return False
-  logging.info(prereq_metrics)
-  for (metric_key, metric_value) in prereq_metrics.iteritems():
-    if not reader_metrics.get(metric_key) and metric_value > 0:
-      return False
-    elif reader_metrics[metric_key] < metric_value:
-      return False
-  return True
 
 
 def CreateNewExploration(user, title='New exploration', id=None):

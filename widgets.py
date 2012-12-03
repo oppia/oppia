@@ -16,16 +16,11 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-import logging
-import os
+import json, logging, os
 
-import jinja2
-import webapp2
+import jinja2, webapp2
 
-import datamodels
-import feconf
-import utils
+import feconf, models, utils
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR + 'widgets/')))

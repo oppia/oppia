@@ -119,6 +119,9 @@ class Exploration(ndb.Model):
   init_state = ndb.KeyProperty(kind=State, required=True)
   # The list of states this exploration consists of.
   states = ndb.KeyProperty(kind=State, repeated=True)
+  # The list of users who can edit this exploration.
+  # TODO(sll): Change this to be a list of explorations for each user.
+  editors = ndb.UserProperty(repeated=True)
 
 
 class Reader(ndb.Model):

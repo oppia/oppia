@@ -64,8 +64,7 @@ r = '[A-Za-z0-9=_-]+'
 # Register the URL with the responsible classes
 urls = [
     # Handlers for the new version of Oppia
-    # TODO(sll): Use the URL r'/?' instead.
-    (r'/index/?', MainPage),
+    (r'/?', MainPage),
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
@@ -76,31 +75,8 @@ urls = [
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/create/(%s)/(%s)/?' % (r, r), editor.ExplorationStatePage),
-    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.ExplorationStateHandler),
-    # Reader handlers
-    (r'/?', reader.HomePage),
-    (r'/reader/profile/?', reader.ProfilePage),
-    (r'/reader/(%s)/?' % r, reader.StoryInitPage),
-    (r'/reader/(%s)/data/?' % r, reader.StoryHandler),
-    (r'/reader/(%s)/data/(%s)/?' % (r, r), reader.StoryHandler),
-    (r'/reader/(%s)/data/(%s)/(%s)/?' % (r, r, r), reader.StoryHandler),
-    # Editor handlers
-    (r'/editor/?', editor.HomePage),
-    (r'/editor/images/?', editor.Image),
-    (r'/editor/images/(%s)/?' % r, editor.Image),
-    (r'/editor/(%s)/structure/?' % r, editor.StoryPage),
-    (r'/editor/(%s)/structure/(%s)/?' % (r, r), editor.ChapterPage),
-    (r'/editor/(%s)/structure/(%s)/data/?' % (r, r), editor.ChapterHandler),
-    (r'/editor/(%s)/structure/(%s)/g/(%s)/?' % (r, r, r),
-     editor.QuestionGroupHandler),
-    (r'/editor/(%s)/qneditor/(%s)/(%s)/?' % (r, r, r), editor.QuestionPage),
-    (r'/editor/(%s)/qneditor/(%s)/(%s)/data/?' % (r, r, r),
-     editor.QuestionHandler),
-    (r'/editor/(%s)/qneditor/(%s)/(%s)/(%s)/?' % (r, r, r, r),
-     editor.StatePage),
-    (r'/editor/(%s)/qneditor/(%s)/(%s)/(%s)/data/?' % (r, r, r, r),
-     editor.StateHandler),
+    (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
+    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
     # Widget repository handlers
     (r'/widgets/?', widgets.Widget),
     (r'/widgets/repository/?', widgets.WidgetRepositoryPage),
