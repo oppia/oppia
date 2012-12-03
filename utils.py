@@ -295,7 +295,7 @@ def CreateNewExploration(user, title='New exploration', id=None):
 
   exploration = models.Exploration(
       hash_id=exploration_hash_id, init_state=fake_state_key,
-      metadata={'title': title, 'author': str(user)})
+      metadata={'title': title, 'owner': str(user)})
   exploration.put()
   new_init_state = models.State(
       hash_id=state_hash_id, input_view=none_input_view.key,
