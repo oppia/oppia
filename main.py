@@ -12,25 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for URL routing."""
+"""Main package for URL routing and the index page."""
 
 __author__ = 'Sean Lip'
 
-import jinja2
-import webapp2
-
-import base
-import editor
-import feconf
-import models
-import os
-import reader
-import utils
-import widgets
-
-
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
+import jinja2, webapp2
+import base, editor, feconf, models, os, reader, utils, widgets
 
 
 class Error404Handler(base.BaseHandler):
@@ -55,7 +42,7 @@ class MainPage(base.BaseHandler):
     self.EnsureDefaultExplorationExists()
     self.values['js'] = utils.GetJsFile('indexNew')
     self.response.out.write(
-        jinja_env.get_template('index_new.html').render(self.values))
+        base.JINJA_ENV.get_template('index_new.html').render(self.values))
 
 
 # Regex for base64 hash_id encoding

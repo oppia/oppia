@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Oppia base handlers."""
+"""Oppia base constants and handlers."""
 
 __author__ = 'Sean Lip'
 
-import json
-import logging
-
+import json, logging
 import webapp2
-
-import feconf
-import utils
+import feconf, utils
 
 from google.appengine.api import users
+
+
+JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
+    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
 class BaseHandler(webapp2.RequestHandler):

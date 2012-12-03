@@ -25,8 +25,6 @@ from google.appengine.ext import ndb
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
 class MainPage(base.BaseHandler):
@@ -51,7 +49,7 @@ class MainPage(base.BaseHandler):
         'mode': READER_MODE,
     })
     self.response.out.write(
-        jinja_env.get_template('reader/reader_main.html').render(self.values))
+        base.JINJA_ENV.get_template('reader/reader_main.html').render(self.values))
 
 
 class ExplorationPage(base.BaseHandler):
@@ -74,7 +72,7 @@ class ExplorationPage(base.BaseHandler):
       logging.info('hide')
       self.values['hide_navbar'] = True
 
-    self.response.out.write(jinja_env.get_template(
+    self.response.out.write(base.JINJA_ENV.get_template(
         'reader/reader_exploration.html').render(self.values))
 
 
@@ -135,11 +133,11 @@ class ExplorationHandler(base.BaseHandler):
     widget_output = []
     # Append reader's response.
     if state.input_view.get().classifier == 'finite':
-      html_output = jinja_env.get_template(
+      html_output = base.JINJA_ENV.get_template(
           'reader_response.html').render(
               {'response': state.classifier_categories[int(response)]})
     else:
-      html_output = jinja_env.get_template(
+      html_output = base.JINJA_ENV.get_template(
           'reader_response.html').render({'response': response})
 
     if not action_set.dest:

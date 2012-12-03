@@ -16,27 +16,13 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import datetime
-import json
-import logging
-import os
-
-import jinja2
-import webapp2
-
-import base
-import classifiers
-import feconf
-import main
-import models
-import reader
-import utils
+import datetime, json, logging, os
+import jinja2, webapp2
+import base, classifiers, feconf, main, models, reader, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 EDITOR_MODE = 'editor'
 END_DEST = '-1'
 
@@ -93,7 +79,7 @@ class MainPage(base.BaseHandler):
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
-        jinja_env.get_template('editor/editor_main.html').render(self.values))
+        base.JINJA_ENV.get_template('editor/editor_main.html').render(self.values))
 
 
 class NewExploration(base.BaseHandler):
@@ -132,7 +118,7 @@ class ExplorationPage(base.BaseHandler):
         'text_code': utils.GetFileContents('%s/text.html' % DIR_PREFIX),
     })
     self.response.out.write(
-        jinja_env.get_template('editor/editor_exploration.html').render(self.values))
+        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
   def post(self, exploration_id):  # pylint: disable-msg=C6409
     """Adds a new state.
@@ -269,7 +255,7 @@ class StatePage(base.BaseHandler):
         'text_code': utils.GetFileContents('%s/text.html' % DIR_PREFIX),
     })
     self.response.out.write(
-        jinja_env.get_template('editor/editor_exploration.html').render(self.values))
+        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
   def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Called when a state is initialized for editing.
