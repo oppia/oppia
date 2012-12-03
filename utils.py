@@ -268,6 +268,16 @@ def ParseContentIntoHtml(content_array, block_number):
   return html, widget_array
 
 
+def GetAugmentedUser(user):
+  """Gets the corresponding AugmentedUser, creating a new one if it doesn't exist."""
+  augmented_user = models.AugmentedUser.query().filter(
+      models.AugmentedUser.user == user).get()
+  if not augmented_user:
+    augmented_user = models.AugmentedUser(user=user)
+    augmented_user.put()
+  return augmented_user
+
+
 def CreateNewExploration(user, title='New exploration', id=None):
   """Creates and returns a new exploration."""
   if id:
@@ -298,4 +308,7 @@ def CreateNewExploration(user, title='New exploration', id=None):
   exploration.init_state = new_init_state.key
   exploration.states = [new_init_state.key]
   exploration.put()
+  augmented_user = GetAugmentedUser(user)
+  augmented_user.editable_explorations.append(exploration.key)
+  augmented_user.put()
   return exploration

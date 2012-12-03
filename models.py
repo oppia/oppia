@@ -106,7 +106,7 @@ class State(ndb.Model):
   classifier_params = ndb.StringProperty(repeated=True)
 
 
-# TODO(sll): Add editor permissions (and also an anyone-can-edit mode).
+# TODO(sll): Add an anyone-can-edit mode.
 class Exploration(ndb.Model):
   """An exploration (which is made up of several states)."""
   # A hash_id to show in the browser.
@@ -119,9 +119,14 @@ class Exploration(ndb.Model):
   init_state = ndb.KeyProperty(kind=State, required=True)
   # The list of states this exploration consists of.
   states = ndb.KeyProperty(kind=State, repeated=True)
-  # The list of users who can edit this exploration.
-  # TODO(sll): Change this to be a list of explorations for each user.
-  editors = ndb.UserProperty(repeated=True)
+
+
+class AugmentedUser(ndb.Model):
+  """Stores information about a particular user."""
+  # The corresponding user.
+  user = ndb.UserProperty(required=True)
+  # The list of explorations that this user has editing rights for.
+  editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
 
 
 class Reader(ndb.Model):
@@ -137,9 +142,6 @@ class Reader(ndb.Model):
   current_page = ndb.IntegerProperty(default=0)
   # The reader's current state.
   state = ndb.KeyProperty(kind=State, required=True)
-  # The reader's metrics. This is a dict whose keys are the metric names and
-  # whose values are the corresponding metric values.
-  metrics = ndb.JsonProperty(default={})
   # The reader's parameters.
   parameters = ndb.KeyProperty(kind=Parameter, repeated=True)
   # Whether the reader has finished the story.
@@ -152,10 +154,6 @@ class ActionSet(ndb.Model):
   category_index = ndb.IntegerProperty(required=True)
   # The text to be added as a response to the reader's input.
   text = ndb.TextProperty(default='')
-  # The list of changes to metrics that should be performed as a response to the
-  # reader's input. Each element is of the form {'key': ..., 'value': ...},
-  # representing a change in 'key' by 'value'.
-  metrics = ndb.JsonProperty(repeated=True)
   # The destination exploration id that the reader should be sent to. If both
   # dest_exploration and dest are specified, dest_exploration takes precedence. But
   # dest should equal dest_exploration.init_state.

@@ -35,10 +35,12 @@ class MainPage(base.BaseHandler):
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
       return
-
+    augmented_user = utils.GetAugmentedUser(user)
+  
     categories = {}
     # TODO(sll): Restrict this to explorations editable by this user.
-    for exploration in models.Exploration.query():
+    for exploration_key in augmented_user.editable_explorations:
+      exploration = exploration_key.get()
       category_name = exploration.metadata.get(
           'category', reader.DEFAULT_CATALOG_CATEGORY_NAME)
       if not categories.get(category_name):
