@@ -23,6 +23,14 @@ function ReaderExploration($scope, $http, $timeout) {
     $scope.inputTemplate = data.input_template;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
+    $scope.widgets = data.widgets;
+    // We need to generate the HTML (with the iframe) before populating it.
+    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.$apply();
+    if (data.widgets.length > 0) {
+      $scope.addContentToIframe('widgetCompiled' + data.widgets[0].blockIndex + '-' +
+          data.widgets[0].index, data.widgets[0].code);
+    }
   };
 
   // Initializes the story page using data from the server.
@@ -46,6 +54,13 @@ function ReaderExploration($scope, $http, $timeout) {
   $scope.refreshPage = function(data) {
     console.log(data);
     $scope.html += data.html;
+    // We need to generate the HTML (with the iframe) before populating it.
+    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.$apply();
+    if ($scope.widgets.length > 0) {
+      $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
+          $scope.widgets[0].index, $scope.widgets[0].code);
+    }
   }
 }
 

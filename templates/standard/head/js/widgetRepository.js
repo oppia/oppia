@@ -8,12 +8,7 @@ function Widgets($scope, $http) {
     $scope.widgets = data.widgets;
     for (var i = 0; i < data.widgets.length; ++i) {
       var widgetCode = data.widgets[i];
-      caja.load(document.getElementById('widget-' + i),
-        caja.policy.net.NO_NETWORK,
-        function(frame) {
-          frame.cajoled('https://fake.url', widgetCode['js'],
-              widgetCode['html']).run();
-        });
+      // TODO(sll): Load code into document.getElementById('widget-' + i)        
     }
   };
 

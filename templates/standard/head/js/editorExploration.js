@@ -150,7 +150,6 @@ oppia.directive('oppiaPaletteDroppable', function($compile) {
             scope.stateText.push({type: 'video', value: ''});
           } else if ($(ui.draggable).hasClass('oppia-palette-widget')) {
             scope.stateText.push({type: 'widget', value: ''});
-            scope.resetWidgetDisplay();
           } else {
             scope.addWarning('Unknown palette icon.');
             console.log('ERROR: Unknown palette icon:');
@@ -241,7 +240,6 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.classifier = '';
     $scope.console = '';
     $scope.widgetCode = '';
-    $scope.widgetDisplay = 'code';
     $scope.optionalActions = [];
   };
 
@@ -476,13 +474,13 @@ function EditorExploration($scope, $http, $timeout) {
     // view fields.
     for (var i = 0; i < $scope.stateText.length; ++i) {
       if ($scope.stateText[i].type == 'widget') {
-        $scope.widgetDisplay = 'compiled';
+        var widgetFrameId = 'widgetPreview' + i;
         // Get the widget with id $scope.stateText[i].value
         $http.get('/widgets/' + $scope.stateText[i].value).
             success(function(data) {
               console.log(data);
               $scope.widgetCode = data.raw;
-              $scope.loadJsWidget(data.js, data.html);
+              $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
             }).error(function(data) {
               $scope.addWarning(
                   'Widget could not be loaded: ' + String(data.error));
@@ -492,10 +490,6 @@ function EditorExploration($scope, $http, $timeout) {
 
     // Changes the active node in the graph.
     drawStateGraph($scope.states);
-  };
-
-  $scope.resetWidgetDisplay = function() {
-    $scope.widgetDisplay = 'code';
   };
 
   $scope.saveQuestionName = function() {
@@ -859,81 +853,43 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.saveStateChange('stateText');
   };
 
-  /**
-   * Initializes a Caja frame for the cajoled widget.
-   * @param {string} js The cajoled JavaScript.
-   * @param {string} html The cajoled HTML.
-   */
-  $scope.loadJsWidget = function(js, html) {
-    console.log('Cajoled code:');
-    console.log(js);
-    console.log(html);
-    caja.load(document.getElementById('widgetCompiled'),
-        caja.policy.net.NO_NETWORK,
-        function(frame) {
-          frame.cajoled('https://fake.url', js, html).run();
-        });
-  };
-
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     console.log(arg);
     console.log(arg.origin);
     console.log(arg.data);
     // Save the code. TODO(sll): fix this, the $scope is wrong.
-    $scope.widgetDisplay = 'compiled';
     $scope.$apply();
   });
 
   $scope.saveWidget = function(widgetCode, index) {
-    var cajaRestEndpoint = 'https://caja.appspot.com/cajole' +
-        '?url=' + encodeURIComponent('https://fake.url/') +
-        '&input-mime-type=' + encodeURIComponent('text/html') +
-        '&transform=CAJOLE';
-
+    $scope.addContentToIframe('widgetPreview' + index, widgetCode);
+  
     // TODO(sll): Escape widgetCode first!
     // TODO(sll): Need to ensure that anything stored server-side cannot lead
     //     to malicious behavior (e.g. the user could do his/her own POST
     //     request). Get a security review done on this feature.
-    $http.post(cajaRestEndpoint, widgetCode,
-        {headers: {'Content-Type': 'text/html', 'X-Requested-With': ''}}
-    ).success(function(data) {
-      console.log(data.html);
-      console.log(data.js);
-      console.log(data.messages);
+    
+    var request = $.param(
+        {'raw': JSON.stringify(widgetCode)},
+        true
+    );
+    var widgetId = $scope.stateText[index].value || '';
+    console.log(widgetId);
 
-      var requestParameters = {
-        'html': JSON.stringify(data.html),
-        'js': JSON.stringify(data.js),
-        'raw': JSON.stringify(widgetCode)
-      };
-      var request = $.param(requestParameters, true);
-      console.log('REQUEST');
-      console.log(request);
-      var widgetId = $scope.stateText[index].value || '';
-
-      $http.post(
-        '/widgets/' + widgetId,
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      ).success(function(widgetData) {
-        // Check that the data has been saved correctly.
-        if (widgetData.js != data.js || widgetData.html != data.html) {
-          console.log('widgetData changed');
-          console.log(widgetData);
-          console.log(data);
-        }
-
-        $scope.stateText[index].value = widgetData.widgetId;
-        $scope.saveStateChange('stateText');
-        $('#widgetCompiled').html('');
-        // TODO(sll): This should probably change later to accept multiple
-        // widget div's.
-        $scope.loadJsWidget(widgetData.js, widgetData.html);
-        $scope.clearActiveInputs();
-        $scope.widgetDisplay = 'compiled';
-        console.log($scope.stateText);
-      });
+    $http.post(
+      '/widgets/' + widgetId,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(widgetData) {
+      // Check that the data has been saved correctly.
+      console.log(widgetData);
+      $('#widgetTabs' + index + ' a:first').tab('show');  
+      $scope.stateText[index].value = widgetData.widgetId;
+      $scope.saveStateChange('stateText');
+      // TODO(sll): Display multiple widget div's here.
+      $scope.clearActiveInputs();
+      console.log($scope.stateText);
     });
   };
 

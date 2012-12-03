@@ -17,9 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json, logging, os
-
 import jinja2, webapp2
-
 import feconf, models, utils
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
@@ -64,10 +62,10 @@ class WidgetRepositoryHandler(BaseHandler):
   """Provides data to populate the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
-    generic_widgets = datamodels.GenericWidget.query()
+    generic_widgets = models.GenericWidget.query()
     response = []
     # TODO(sll): The following line is here for testing, and should be removed.
-    response.append({'hash_id': 1, 'name': 'clock', 'html': 'html', 'js': ''})
+    response.append({'hash_id': 'abcd', 'name': 'clock', 'raw': 'clock'})
     for widget in generic_widgets:
       response.append({'hash_id': widget.hash_id, 'name': widget.name,
                        'html': widget.html, 'js': widget.js})
@@ -87,11 +85,9 @@ class Widget(BaseHandler):
       utils.EntityIdNotFoundError, if an id is not supplied or no widget with
       this id exists.
     """
-    widget = utils.GetEntity(datamodels.Widget, long(widget_id))
+    widget = utils.GetEntity(models.Widget, widget_id)
     if widget:
       self.response.out.write(json.dumps({
-          'js': widget.js,
-          'html': widget.html,
           'raw': widget.raw,
       }))
     else:
@@ -101,31 +97,21 @@ class Widget(BaseHandler):
     """Saves or edits a widget uploaded by a content creator."""
     logging.info(widget_id)
     # TODO(sll): Make sure this JS is clean!
-    if self.request.get('js'):
-      js = json.loads(self.request.get('js'))
-    if self.request.get('html'):
-      html = json.loads(self.request.get('html'))
     if self.request.get('raw'):
       raw = json.loads(self.request.get('raw'))
     logging.info(self.request.arguments())
     if not widget_id:
       # TODO(sll): Figure out what to pass into the hashing function.
-      widget_hash_id = utils.GetNewId(datamodels.Widget, 'temp_hash_id')
-      widget = datamodels.Widget(
-          hash_id=long(widget_hash_id), js=js, html=html, raw=raw)
+      widget_hash_id = utils.GetNewId(models.Widget, 'temp_hash_id')
+      widget = models.Widget(hash_id=widget_hash_id, raw=raw)
       widget.put()
     else:
-      widget = utils.GetEntity(datamodels.Widget, widget_id)
+      widget = utils.GetEntity(models.Widget, widget_id)
       if not widget:
         self.JsonError('No widget found with id %s' % widget_id)
         return
-      if 'js' in self.request.arguments():
-        widget.js = js
-      if 'html' in self.request.arguments():
-        widget.html = html
       if 'raw' in self.request.arguments():
         widget.raw = raw
       widget.put()
-    response = {'widgetId': widget.hash_id, 'js': widget.js,
-                'html': widget.html, 'raw': widget.raw}
+    response = {'widgetId': widget.hash_id, 'raw': widget.raw}
     self.response.out.write(json.dumps(response))

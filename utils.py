@@ -79,8 +79,7 @@ def GetEntity(entity, entity_id):
   """Gets the story, question or state corresponding to a given id.
 
   Args:
-    entity: one of datamodels.Story, datamodels.QuestionGroup,
-        datamodels.Question or datamodels.State
+    entity: one of models.Exploration or models.State
     entity_id: string representing the entity id.
 
   Returns:
@@ -102,8 +101,7 @@ def CheckExistenceOfName(entity, name, ancestor=None):
   """Checks whether an entity with the given name and ancestor already exists.
 
   Args:
-    entity: one of datamodels.Story, datamodels.QuestionGroup,
-        datamodels.Question or datamodels.State
+    entity: one of models.Exploration or models.State
     name: string representing the entity name.
     ancestor: the ancestor entity, if applicable.
 
@@ -146,10 +144,10 @@ def CheckAuthorship(exploration):
 
 
 def GetNewId(entity, entity_name):
-  """Gets the id of a new story, question or state, based on its name.
+  """Gets a new id for an entity, based on its name.
 
   Args:
-    entity: one of datamodels.Story, datamodels.Question or datamodels.State
+    entity: one of models.Exploration or models.State
     entity_name: string representing the name of the story, question or state
 
   Returns:
@@ -239,8 +237,7 @@ def ParseContentIntoHtml(content_array, block_number):
     block_number: the number of content blocks preceding this one.
 
   Returns:
-    the HTML string representing the array, and the widget array containing JS
-    and HTML for each widget.
+    the HTML string representing the array.
 
   Raises:
     InvalidInputError: if content has no 'type' attribute, or an invalid 'type'
@@ -254,12 +251,13 @@ def ParseContentIntoHtml(content_array, block_number):
       raise InvalidInputError(
           'Content type for content_array %s does not exist', content_array)
     if content['type'] == 'widget':
-      widget = GetEntity(datamodels.Widget, content['value'])
+      widget = GetEntity(models.Widget, content['value'])
+      widget_counter += 1
       html += jinja_env.get_template('content.html').render({
           'type': content['type'], 'blockIndex': block_number,
           'index': widget_counter})
-      widget_counter += 1
-      widget_array.append({'js': widget.js, 'html': widget.html})
+      widget_array.append({'blockIndex': block_number, 'index': widget_counter,
+          'code': widget.raw})
     elif (content['type'] in ['text', 'image', 'video']):
       html += jinja_env.get_template('content.html').render({
           'type': content['type'], 'value': content['value']})

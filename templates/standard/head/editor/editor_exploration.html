@@ -116,29 +116,26 @@
                     </div>
 
                     <div ng-switch-when="widget">
-                      <label class="radio inline">
-                        <input type="radio" id="widgetCodeOption" value="code" ng-model="widgetDisplay">
-                        Code
-                      </label>
-                      <label class="radio inline">
-                        <input type="radio" id="widgetCompiledOption" value="compiled" ng-model="widgetDisplay">
-                        Compiled
-                      </label>
-                      <label class="radio inline">
-                        <input type="radio" id="widgetRepositoryOption" value="repository" ng-model="widgetDisplay">
-                        Repository
-                      </label>
-
-                      <div ng-show="widgetDisplay == 'code'">
-                        Upload a widget:
-                        <textarea class="oppia-code" ng-model="widgetCode" rows="30"></textarea>
-                        <button type="button" ng-click="saveWidget(widgetCode, $index)">Save</button>
-                      </div>
-                      <div ng-show="widgetDisplay == 'compiled'">
-                        <div id="widgetCompiled"></div>
-                      </div>
-                      <div ng-show="widgetDisplay == 'repository'">
-                        <iframe src="/widgets/repository/"></iframe>
+                      <ul class="nav nav-tabs" id="widgetTabs<[$index]>">
+                        <li class="active"><a data-toggle="tab" data-target="#preview">Preview</a></li>
+                        <li><a data-toggle="tab" data-target="#code">Code</a></li>
+                        <li><a data-toggle="tab" data-target="#repository">Repository</a></li>
+                      </ul>
+                      <div class="tab-content">
+                        <div class="tab-pane active" id="preview">
+                          <iframe id="widgetPreview<[$index]>" width="100%"></iframe>
+                        </div>
+                        <div class="tab-pane" id="code">
+                          Add code for a widget:
+                          <textarea class="oppia-code" ng-model="widgetCode" rows="10">
+                          </textarea>
+                          <button type="button" ng-click="saveWidget(widgetCode, $index)">
+                            Save and Preview
+                          </button>
+                        </div>
+                        <div class="tab-pane" id="repository">
+                          <iframe src="/widgets/repository/"></iframe>
+                        </div>
                       </div>
                     </div>
 

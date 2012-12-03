@@ -33,6 +33,23 @@ function Base($scope, $timeout) {
   };
 
   /**
+   * Adds content to an iframe.
+   * @param {string} iframeId The id of the iframe to add content to.
+   * @param {string} content The code for the iframe.
+   */  
+  $scope.addContentToIframe = function(iframeId, content) {
+    var iframe = document.getElementById(iframeId);
+    if (iframe.contentDocument) {
+      doc = iframe.contentDocument;
+    } else {
+      doc = iframe.contentWindow ? iframe.contentWindow.document : iframe.document;
+    }
+    doc.open();
+    doc.writeln(content);
+    doc.close();
+  };
+
+  /**
    * Checks whether an entity name is valid, and displays a warning message
    * if it isn't.
    * @param {string} input The input to be checked.
