@@ -29,7 +29,7 @@ function FiniteClassifierEditor($scope) {
 
     $scope.states[$scope.stateId].dests.push(
         {category: $scope.newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.push({'text': '', 'metrics': []});
+    $scope.optionalActions.push({'text': ''});
     createEdge($scope.stateId, $scope.stateId, $scope.newCategoryName);
     $scope.saveStateChange('states');
     $scope.newCategoryName = '';
@@ -134,7 +134,7 @@ function NumericClassifierEditor($scope) {
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
         -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': '', 'metrics': []});
+    $scope.optionalActions.splice(-1, 0, {'text': ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.newDummyCategoryName = '';
@@ -223,7 +223,7 @@ function SetClassifierEditor($scope) {
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
         -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': '', 'metrics': []});
+    $scope.optionalActions.splice(-1, 0, {'text': ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.hideCategoryInput();
@@ -272,7 +272,7 @@ function TextClassifierEditor($scope) {
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
         -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': '', 'metrics': []});
+    $scope.optionalActions.splice(-1, 0, {'text': ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.hideCategoryInput();

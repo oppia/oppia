@@ -15,19 +15,19 @@
 
       <div ng-show="$parent.currentActiveInput.indexOf(classifier + '.' + $index + '.category') == 0">
         <span ng-show="$parent.currentActiveInput == classifier + '.' + $index + '.category'">
-          <a class="set-button set-button-extra"
+          <a class="oppia-set-button oppia-set-button-extra"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.extra')">
           </a>
-          <a class="set-button set-button-incomplete"
+          <a class="oppia-set-button oppia-set-button-incomplete"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.incomplete')">
           </a>
-          <a class="set-button set-button-equal"
+          <a class="oppia-set-button oppia-set-button-equal"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.equal')">
           </a>
-          <a class="set-button set-button-contains"
+          <a class="oppia-set-button oppia-set-button-contains"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.contains')">
           </a>
-          <a class="set-button set-button-excludes"
+          <a class="oppia-set-button oppia-set-button-excludes"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.excludes')">
           </a>
           <button type="button" ng-click="hideCategoryInput()">Cancel</button>
@@ -84,11 +84,11 @@
   <div class="oppia-category-block" ng-show="currentActiveInput.indexOf(classifier + '.dummy.category') == 0">
     <a class="close" ng-click="hideCategoryInput()">&times;</a>
     <span ng-show="currentActiveInput == classifier + '.dummy.category'">
-      <a class="set-button set-button-extra" ng-click="initializeNewActiveInput(classifier + '.dummy.category.extra')"></a>
-      <a class="set-button set-button-incomplete" ng-click="initializeNewActiveInput(classifier + '.dummy.category.incomplete')"></a>
-      <a class="set-button set-button-equal" ng-click="initializeNewActiveInput(classifier + '.dummy.category.equal')"></a>
-      <a class="set-button set-button-contains" ng-click="initializeNewActiveInput(classifier + '.dummy.category.contains')"></a>
-      <a class="set-button set-button-excludes" ng-click="initializeNewActiveInput(classifier + '.dummy.category.excludes')"></a>
+      <a class="oppia-set-button oppia-set-button-extra" ng-click="initializeNewActiveInput(classifier + '.dummy.category.extra')"></a>
+      <a class="oppia-set-button oppia-set-button-incomplete" ng-click="initializeNewActiveInput(classifier + '.dummy.category.incomplete')"></a>
+      <a class="oppia-set-button oppia-set-button-equal" ng-click="initializeNewActiveInput(classifier + '.dummy.category.equal')"></a>
+      <a class="oppia-set-button oppia-set-button-contains" ng-click="initializeNewActiveInput(classifier + '.dummy.category.contains')"></a>
+      <a class="oppia-set-button oppia-set-button-excludes" ng-click="initializeNewActiveInput(classifier + '.dummy.category.excludes')"></a>
     </span>
 
     <div ng-show="currentActiveInput.indexOf(classifier + '.dummy.category.') == 0">

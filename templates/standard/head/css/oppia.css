@@ -231,3 +231,46 @@ textarea.oppia-code {
   border: 1px solid #efefef;
   min-height: 40px;
 }
+
+
+/* Set classifier buttons */
+
+.oppia-set-button {
+  background: url(/images/set.png) no-repeat center;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 150%;
+  text-align: center;
+  text-decoration: none;
+}
+.oppia-set-button-dup {
+  background-position: -15px -7px;
+  height: 44px;
+  width: 44px;
+}
+.oppia-set-button-extra {
+  background-position: -73px -6px;
+  height: 44px;
+  width: 58px;
+}
+.oppia-set-button-incomplete {
+  background-position: -140px -7px;
+  height: 44px;
+  width: 60px;
+}
+.oppia-set-button-equal {
+  background-position: -210px -12px;
+  height: 40px;
+  width: 61px;
+}
+.oppia-set-button-contains {
+  background-position: -285px -6px;
+  height: 45px;
+  width: 43px;
+}
+.oppia-set-button-excludes {
+  background-position: -339px -7px;
+  height: 43px;
+  width: 60px;
+}

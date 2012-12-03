@@ -580,17 +580,6 @@ function EditorExploration($scope, $http, $timeout) {
     return text ? 'Feedback: ' + text : '';
   };
 
-  $scope.getMetricDescription = function(metric, delta) {
-    delta = Number(delta);
-    if (typeof delta === 'number') {
-      if (delta > 0)
-        return metric ? 'Increase ' + metric + ' by ' + delta : '';
-      else if (delta < 0)
-        return metric ? 'Decrease ' + metric + ' by ' + (-delta) : '';
-    }
-    return '';
-  };
-
   $scope.getDestDescription = function(dest) {
     if (!dest) {
       return 'Error: unspecified destination';
@@ -607,59 +596,6 @@ function EditorExploration($scope, $http, $timeout) {
     }
   };
 
-  /**
-   * Displays the 'Add metric' box.
-   * @param {int} categoryId The id of the category containing the metric.
-   */
-  $scope.initializeMetricAdder = function(categoryId) {
-    $scope.initializeNewActiveInput(
-        $scope.classifier + '.' + categoryId + '.metrics.add');
-    $scope.newMetricKey = '';
-    $scope.newMetricValue = 1;
-  };
-
-  /**
-   * Adds a metric.
-   * @param {int} categoryId The id of the category containing the metric.
-   * @param {string} key The name of the metric to be changed.
-   * @param {float} value The value to change the metric by.
-   */
-  $scope.addMetric = function(categoryId, key, value) {
-    value = Number(value);
-    if (!value || typeof value !== 'number' || value == 0) {
-      $scope.addWarning('Changing a metric by 0 doesn\'t do anything!');
-      $scope.clearActiveInputs();
-      return;
-    }
-    for (var i = 0; i < $scope.optionalActions[categoryId]['metrics'].length;
-        ++i) {
-      if ($scope.optionalActions[categoryId]['metrics'][i].key == key) {
-        $scope.addWarning('This metric has already been changed.');
-        return;
-      }
-    }
-
-    $scope.optionalActions[categoryId]['metrics'].push(
-        {'key': key, 'value': value});
-    $scope.newMetricKey = '';
-    $scope.newMetricValue = 0;
-    $scope.saveStateChange('states');
-    $scope.clearActiveInputs();
-  };
-
-  /**
-   * Displays the 'edit metric' box.
-   * @param {int} categoryId The id of the category containing the metric.
-   * @param {string} key The name of the metric to be changed.
-   * @param {float} value The current value of the metric.
-   */
-  $scope.editMetric = function(categoryId, key, value) {
-    $scope.initializeNewActiveInput(
-        $scope.classifier + '.' + categoryId + '.metrics.edit');
-    $scope.newMetricKey = key;
-    $scope.newMetricValue = value;
-  };
-
   $scope.getCategoryClass = function(categoryName) {
     return categoryName != DEFAULT_CATEGORY_NAME ? 'category-name' : '';
   };
@@ -669,33 +605,6 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.optionalActions[categoryId]['text'] = $scope.textData;
     $scope.saveStateChange('states');
     $scope.closeModalWindow();
-  };
-
-  /**
-   * Saves the change to a metric.
-   * @param {int} categoryId The id of the category containing the metric.
-   * @param {string} key The name of the metric to be changed.
-   * @param {float} value The value that the metric should be changed to.
-   */
-  $scope.saveMetric = function(categoryId, key, value) {
-    if (typeof value !== 'number') {
-      $scope.addWarning('Invalid value for metric change: ' + value);
-      $scope.clearActiveInputs();
-      return;
-    }
-    for (var i = 0; i < $scope.optionalActions[categoryId]['metrics'].length;
-        ++i) {
-      if ($scope.optionalActions[categoryId]['metrics'][i].key == key) {
-        value ?
-            $scope.optionalActions[categoryId]['metrics'][i].value = value :
-            $scope.optionalActions[categoryId]['metrics'].splice(i, 1);
-        $scope.newMetricKey = '';
-        $scope.newMetricValue = 0;
-        $scope.saveStateChange('states');
-        $scope.clearActiveInputs();
-        return;
-      }
-    }
   };
 
   $scope.saveDest = function(categoryId, destName) {

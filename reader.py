@@ -106,16 +106,13 @@ class ExplorationHandler(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
       state_id: string representing the state id.
-
-    Raises:
-      KeyError: if a metric change or destination is invalid.
     """
     values = {'error': []}
 
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     state = utils.GetEntity(models.State, state_id)
     old_state = state
-    # Modify the reader's metrics and state based on the response received.
+    # Modify the reader's state based on the response received.
     response = self.request.get('answer')
     category = classifiers.Classify(state.input_view.get().classifier, response,
                                     state.classifier_categories)

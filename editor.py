@@ -267,7 +267,6 @@ class StatePage(base.BaseHandler):
       action = {'category': category_list[i], 'dest': state.hash_id}
       if action_set.text:
         action['text'] = action_set.text
-      action['metrics'] = action_set.metrics
       if action_set.dest_exploration:
         action['dest'] = 'q-%s' % action_set.dest_exploration.get().hash_id
       elif action_set.dest:
@@ -340,8 +339,6 @@ class StateHandler(base.BaseHandler):
         # Add each action to the action_set.
         if 'text' in actions[i]:
           action_set.text = actions[i]['text']
-        if 'metrics' in actions[i]:
-          action_set.metrics = actions[i]['metrics']
         if 'dest' in actions[i]:
           # Note that actions[i]['dest'] is a state's hash_id, or END_DEST
           # if this is an END state, or 'q-[exploration_id]' if the destination is
