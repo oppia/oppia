@@ -1,7 +1,11 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:400,600,700';
 
 body {
-  padding-top: 50px;
+  margin: 0 auto;
+}
+
+textarea {
+  width: 90%;
 }
 
 .oppia-content {
@@ -27,7 +31,6 @@ body {
 }
 
 .oppia-navbar {
-  position: fixed;
   top: 0;
   width: 100%;
 }
@@ -63,4 +66,162 @@ body {
 
 .oppia-btn-container {
   padding: 10px;
+}
+
+.oppia-loading {
+  background: url(/images/loading.gif) no-repeat center;
+  display: none;
+  float: left;
+  height: 15px;
+  margin: 3px;
+  width: 15px;
+}
+
+#oppia-popup {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  left: 300px;
+  padding: 20px;
+  position: fixed;
+  top: 300px;
+  width: 500px;
+  z-index: 9002;
+}
+
+
+.oppia-butterbar {
+  background: #F9EDBE;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  border: 1px solid #F0C36D;
+  -webkit-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  left: 500px;
+  margin: -20px auto 0 auto;
+  padding: 0 16px;
+  position: fixed;
+  text-align: center;
+  top: 100px;
+}
+
+
+textarea.oppia-code {
+  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
+}
+
+.oppia-editable-name {
+  color: #8f8661;
+}
+.oppia-editable-name:hover {
+  background: #efefef;
+}
+.oppia-editable-name:hover::after {
+  content: ' ✎';
+}
+
+
+.oppia-droppable-active {
+  background: lightyellow;
+}
+.oppia-droppable-trash-active {
+  background: red;
+}
+.oppia-add-content-box {
+  border: 1px dashed silver;
+  color: silver;
+  font-size: 150%;
+  margin: 0 auto -30px auto;
+  padding: 10px 0;
+  text-align: center;
+  width: 94%;
+}
+.oppia-small-image {
+  height: 50px;
+}
+
+.oppia-thumbnail {
+  position: relative;
+  top: -50px;
+}
+
+.oppia-placeholder {
+  color: grey;
+}
+
+.oppia-state-text-item {
+  border: 1px solid black;
+  cursor: pointer;
+  min-height: 20px;
+  padding: 5px;
+}
+.oppia-state-text-list {
+  border-collapse: collapse;
+  list-style-type: none;
+}
+
+
+/* Graph styles */
+
+#oppia-state-graph-container {
+  padding-top: 70px;
+}
+#oppia-state-graph-canvas {
+  padding-top: 40px;
+  position: absolute;
+}
+.oppia-state-graph-vertex-delete {
+  font-size: 1em;
+  position: absolute;
+  right: 5px;
+  top: 1px;
+}
+.oppia-state-graph-vertex-delete:hover {
+  background-color: red;
+  cursor: move;
+}
+.oppia-state-graph-vertex-info {
+  font-size: 1em;
+  padding: 4px;
+}
+.oppia-state-graph-vertex-info-editable:hover {
+  background-color: #8F8661;
+  cursor: move;
+}
+
+
+/* Palette styles */
+
+.oppia-palette {
+  border-color: black;
+  border-style: solid;
+  border-width: 0 0 0 1px;
+  height: 100%;
+  margin: 0 2px 0 0;
+  width: 50px;
+}
+.oppia-palette-icon {
+  background: url(/images/palette-sprites.png) no-repeat 0 0;
+  cursor: move;
+  height: 48px;
+  margin: 3px;
+  width: 48px;
+}
+.oppia-palette-image {
+  background-position: 0 -144px;
+}
+.oppia-palette-widget {
+  background-position: 0 0;
+}
+.oppia-palette-text {
+  background-position: 0 -48px;
+}
+.oppia-palette-video {
+  background-position: 0 -96px;
+}
+.oppia-palette-trash {
+  background: url(/images/trash.png) no-repeat 0 0;
+  height: 48px;
+  margin: 300px 3px 0 3px;
+  width: 48px;
 }

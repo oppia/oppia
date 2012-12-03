@@ -106,6 +106,7 @@ class State(ndb.Model):
   classifier_params = ndb.StringProperty(repeated=True)
 
 
+# TODO(sll): Add editor permissions (and also an anyone-can-edit mode).
 class Exploration(ndb.Model):
   """An exploration (which is made up of several states)."""
   # A hash_id to show in the browser.

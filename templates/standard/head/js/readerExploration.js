@@ -19,8 +19,9 @@ function ReaderExploration($scope, $http, $timeout) {
   $scope.loadPage = function(data) {
     console.log(data);
     $scope.categories = data.categories;
-    $scope.html = '<div>' + data.html.join(' </div><div> ') + '</div>';
+    $scope.html = data.html;
     $scope.inputTemplate = data.input_template;
+    $scope.stateId = data.state_id;
     $scope.title = data.title;
   };
 
@@ -36,20 +37,16 @@ function ReaderExploration($scope, $http, $timeout) {
 
   $scope.submitAnswer = function() {
     $http.post(
-        $scope.storyUrl,
+        '/learn/' + $scope.explorationId + '/' + $scope.stateId,
         $('.answer').serialize(),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshStory);
+    ).success($scope.refreshPage);
   };
 
-  $scope.clearProgress = function() {
-    $http.delete(
-        $scope.explorationDataUrl, '',
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      location.reload();
-    });
-  };
+  $scope.refreshPage = function(data) {
+    console.log(data);
+    $scope.html += data.html;
+  }
 }
 
 function SetCtrl($scope, $http) {

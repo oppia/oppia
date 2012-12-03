@@ -32,9 +32,8 @@
                     <div class="thumbnail">
                       <img src="http://placehold.it/300x200" alt="">
                       <div>
-                        <h5>{{exploration.name}} <br /></h5>
-                        {{exploration.rating}}/5 stars <br />
-                        <a href="learn/{{exploration.hash_id}}">Link</a>
+                        <h5>{{exploration.metadata.title}}</h5>
+                        <a href="create/{{exploration.hash_id}}">Edit</a>
                     </div>
                   </li>
                 {% endfor %}
@@ -49,9 +48,8 @@
       <br>
       <br>
 
-      <p>
-        <!-- TODO(sll): redo the link. -->
-        <a class="btn btn-large btn-success" href="/create/I7532">Create New Exploration</a>
+      <p ng-controller="EditorMain">
+        <a class="btn btn-large btn-success" ng-click="createNewExploration()">Create New Exploration</a>
       </p>
     </div>
 

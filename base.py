@@ -35,12 +35,15 @@ class BaseHandler(webapp2.RequestHandler):
         'css': utils.GetCssFile('oppia'),
         'debug': feconf.DEBUG,
     }
+    self.data_values = {'debug': feconf.DEBUG}
+
     user = users.get_current_user()
     if user:
       self.values.update({
           'logout_url': users.create_logout_url(self.request.uri),
-          'user': user,
+          'user': str(user),
       })
+      self.data_values.update({'user': str(user)})
     else:
       self.values['login_url'] = users.create_login_url(self.request.uri)
 

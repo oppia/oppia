@@ -22,6 +22,7 @@ import webapp2
 import base
 import editor
 import feconf
+import models
 import os
 import reader
 import utils
@@ -41,10 +42,17 @@ class Error404Handler(base.BaseHandler):
 
 class MainPage(base.BaseHandler):
   """Oppia's main page."""
+  def EnsureDefaultExplorationExists(self):
+    """Add the default exploration, if it doesn't already exist."""
+    try:
+      exploration = utils.GetEntity(models.Exploration, '0')
+    except:
+      # TODO(sll): Populate the data for this sample exploration.
+      utils.CreateNewExploration('One day this will be a demo', id='0')
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-
+    self.EnsureDefaultExplorationExists()
     self.values['js'] = utils.GetJsFile('indexNew')
     self.response.out.write(
         jinja_env.get_template('index_new.html').render(self.values))
@@ -61,9 +69,15 @@ urls = [
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
+    # TODO(sll): there is a potential collision here if the state_id is 'data'.
+    (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
     (r'/create/?', editor.MainPage),
+    (r'/create_new/?', editor.NewExploration),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
+    # TODO(sll): there is a potential collision here if the state_id is 'data'.
+    (r'/create/(%s)/(%s)/?' % (r, r), editor.ExplorationStatePage),
+    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.ExplorationStateHandler),
     # Reader handlers
     (r'/?', reader.HomePage),
     (r'/reader/profile/?', reader.ProfilePage),

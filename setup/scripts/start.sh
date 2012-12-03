@@ -44,13 +44,20 @@ if [ ! -d "third_party/closure-compiler" ]; then
   rm closure-compiler-download.zip
 fi
 
+echo Checking whether GAE is installed in third_party
+if [ ! -d "third_party/google_appengine" ]; then
+  echo Installing Google App Engine
+  mkdir -p third_party/google_appengine
+  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
+  unzip gae-download.zip -d third_party/google_appengine
+  rm gae-download.zip
+fi
+
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME 
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
-  echo Installing GAE
-  mkdir -p $RUNTIME_HOME/
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
-  unzip gae-download.zip -d $RUNTIME_HOME
-  rm gae-download.zip
+  echo Copying GAE to runtime folder
+  mkdir -p $GOOGLE_APP_ENGINE_HOME/
+  cp third_party/google_appengine/* $GOOGLE_APP_ENGINE_HOME/
 fi
 
 echo Deleting old *.pyc files

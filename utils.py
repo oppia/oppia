@@ -26,8 +26,10 @@ import jinja2
 
 import datamodels
 import feconf
+import models
 
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
@@ -125,8 +127,8 @@ def CheckExistenceOfName(entity, name, ancestor=None):
     entity = entity.query(ancestor=ancestor.key).filter(
         entity.name == name).get()
   else:
-    if entity != datamodels.Story:
-      raise KeyError('Queries for non-story entities should include ancestors.')
+    if entity == models.State:
+      raise KeyError('Queries for state entities should include ancestors.')
     else:
       entity = entity.query().filter(entity.name == name).get()
   if not entity:
@@ -385,3 +387,36 @@ def CheckPrereqs(prereq_date, prereq_metrics, reader_metrics):
     elif reader_metrics[metric_key] < metric_value:
       return False
   return True
+
+
+def CreateNewExploration(user, title='New exploration', id=None):
+  """Creates and returns a new exploration."""
+  if id:
+    exploration_hash_id = '0'
+  else:
+    exploration_hash_id = GetNewId(models.Exploration, title)
+  state_hash_id = GetNewId(models.State, 'Initial state')
+
+  # Create a fake state key temporarily for initialization of the question.
+  # TODO(sll): Do this in a transaction so it doesn't break other things.
+  fake_state_key = ndb.Key(models.State, state_hash_id)
+
+  none_input_view = models.InputView.gql(
+      'WHERE name = :name', name='none').get()
+  none_action_set = models.ActionSet(category_index=0, dest=None)
+  none_action_set.put()
+
+  exploration = models.Exploration(
+      hash_id=exploration_hash_id, init_state=fake_state_key,
+      metadata={'title': title, 'author': str(user)})
+  exploration.put()
+  new_init_state = models.State(
+      hash_id=state_hash_id, input_view=none_input_view.key,
+      action_sets=[none_action_set.key], parent=exploration.key)
+  new_init_state.put()
+
+  # Replace the fake key with its real counterpart.
+  exploration.init_state = new_init_state.key
+  exploration.states = [new_init_state.key]
+  exploration.put()
+  return exploration
