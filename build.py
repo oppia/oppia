@@ -85,4 +85,3 @@ for root, dirs, files in os.walk(os.getcwd()):
       ProcessCSS(full_filename, target_filename)
     if fn.endswith('.js'):
       ProcessJS(full_filename, target_filename)
-
