@@ -32,7 +32,8 @@ class MainPage(base.BaseHandler):
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     categories = {}
-    for exploration in models.Exploration.query():
+    for exploration in models.Exploration.query().filter(
+        models.Exploration.is_public == True):
       category_name = exploration.metadata.get(
           'category', DEFAULT_CATALOG_CATEGORY_NAME)
 

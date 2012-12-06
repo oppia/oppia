@@ -14,7 +14,15 @@
             <span class="oppia-loading" ng-show="saveQuestionNameLoading"></span>
           </form>
 
-          <br>
+          <span ng-show="isPublic" class="label label-info">Published</span>
+          <div ng-hide="isPublic">
+            <button type="button" ng-click="makePublic()">
+              Publish
+            </button>
+            (irreversible)
+          </div>
+
+          <br><br><br>
 
           <form ng-submit="addState(newStateDesc, false)">
             <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>

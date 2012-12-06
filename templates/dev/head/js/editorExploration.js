@@ -259,6 +259,7 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.stateId = pathnameArray[3] || $scope.initStateId;
+    $scope.isPublic = data.is_public;
     initJsPlumb();
     drawStateGraph($scope.states);
     $scope.getStateDataFromBackend($scope.stateId);
@@ -946,7 +947,26 @@ function EditorExploration($scope, $http, $timeout) {
     });
   };
 
+  /**
+   * Makes this exploration public.
+   */
+  $scope.makePublic = function() {
+    console.log('Publishing exploration');
+    $http.put(
+        $scope.explorationUrl, '',
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              $scope.isPublic = true;
+            }).
+            error(function(data) {
+              $scope.addWarning('Error publishing exploration: ' + data.error);
+            });
+  };
 
+
+  /************************************************
+   * Code for the state graph.
+   ***********************************************/
   var stateCanvas = $('#oppia-state-graph-canvas');
   var vertexIds = [];
   var clickDelay = 500;

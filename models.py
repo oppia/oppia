@@ -115,10 +115,12 @@ class Exploration(ndb.Model):
   metadata = ndb.JsonProperty()
   # What this exploration is called.
   title = ndb.StringProperty(default='New exploration')
-  # The state which forms the start of this exploration
+  # The state which forms the start of this exploration.
   init_state = ndb.KeyProperty(kind=State, required=True)
   # The list of states this exploration consists of.
   states = ndb.KeyProperty(kind=State, repeated=True)
+  # Whether this exploration is publicly viewable.
+  is_public = ndb.BooleanProperty(default=False)
 
 
 class AugmentedUser(ndb.Model):

@@ -38,7 +38,6 @@ class MainPage(base.BaseHandler):
     augmented_user = utils.GetAugmentedUser(user)
   
     categories = {}
-    # TODO(sll): Restrict this to explorations editable by this user.
     for exploration_key in augmented_user.editable_explorations:
       exploration = exploration_key.get()
       category_name = exploration.metadata.get(
@@ -60,7 +59,7 @@ class MainPage(base.BaseHandler):
 
 class NewExploration(base.BaseHandler):
   """Creates a new exploration."""
-  
+
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user = users.get_current_user()
@@ -136,6 +135,16 @@ class ExplorationPage(base.BaseHandler):
         'stateText': state.text,
     }))
 
+  def put(self, exploration_id):  # pylint: disable-msg=C6409
+    """Makes an exploration public.
+
+    Args:
+      exploration_id: string representing the exploration id.
+    """
+    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    exploration.is_public = True
+    exploration.put()
+
 
 class ExplorationHandler(base.BaseHandler):
   """Page with editor data for a single exploration."""
@@ -183,6 +192,7 @@ class ExplorationHandler(base.BaseHandler):
     self.data_values.update({
         'exploration_id': exploration.hash_id,
         'init_state_id': exploration.init_state.get().hash_id,
+        'is_public': exploration.is_public,
         'js': utils.GetJsFile('editorExploration'),
         'metadata': exploration.metadata,
         'mode': EDITOR_MODE,
