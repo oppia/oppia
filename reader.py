@@ -90,6 +90,7 @@ class ExplorationHandler(base.BaseHandler):
     init_state = exploration.init_state.get()
     init_html, init_widgets = utils.ParseContentIntoHtml(init_state.text, 0)
     self.data_values.update({
+        'block_number': 0,
         'html': init_html,
         'input_view': init_state.input_view.get().name,
         'state_id': init_state.hash_id,
@@ -113,8 +114,10 @@ class ExplorationHandler(base.BaseHandler):
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     state = utils.GetEntity(models.State, state_id)
     old_state = state
-    # Modify the reader's state based on the response received.
+    # The reader's answer.
     response = self.request.get('answer')
+    # The 0-based index of the last content block already on the page.
+    block_number = int(self.request.get('block_number'))
     category = classifiers.Classify(state.input_view.get().classifier, response,
                                     state.classifier_categories)
     try:
@@ -140,9 +143,8 @@ class ExplorationHandler(base.BaseHandler):
       # This leads to a FINISHED state.
       if action_set.text:
         action_html, action_widgets = utils.ParseContentIntoHtml(
-            [{'type': 'text', 'value': action_set.text}], len(page.html))
+            [{'type': 'text', 'value': action_set.text}], block_number)
         html_output += action_html
-        html_output += 'FINISHED'
         widget_output.append(action_widgets)
     else:
       if action_set.dest_exploration:
@@ -156,27 +158,27 @@ class ExplorationHandler(base.BaseHandler):
       #     array.
       if action_set.text:
         action_html, action_widgets = utils.ParseContentIntoHtml(
-            [{'type': 'text', 'value': action_set.text}], len(page.html))
+            [{'type': 'text', 'value': action_set.text}], block_number)
         html_output += action_html
         widget_output.append(action_widgets)
       # Append text for the new state only if the new and old states differ.
       if old_state.hash_id != state.hash_id:
         state_html, state_widgets = utils.ParseContentIntoHtml(
-            state.text, len(page.html))
+            state.text, block_number)
         html_output += state_html
         widget_output.append(state_widgets)
 
-
     values['exploration_id'] = exploration.hash_id
+    values['state_id'] = state.hash_id
     values['html'] = html_output
     values['widgets'] = widget_output
+    values['block_number'] = block_number + 1
     if not action_set.dest:
       values['input_view'] = utils.input_views.finished
-      values['input_template'] = ' '
     else:
-      values['input_view'] = (state.input_view.get().name)
-      values['input_template'] = utils.GetInputTemplate(values['input_view'])
-    if values['input_view'] == utils.input_views.multiple_choice:
-      values['categories'] = state.classifier_categories
+      values['input_view'] = state.input_view.get().name
+      if values['input_view'] == utils.input_views.multiple_choice:
+        values['categories'] = state.classifier_categories
+    values['input_template'] = utils.GetInputTemplate(values['input_view'])
     utils.Log(values)
     self.response.out.write(json.dumps(values))

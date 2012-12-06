@@ -18,6 +18,7 @@ function ReaderExploration($scope, $http, $timeout) {
 
   $scope.loadPage = function(data) {
     console.log(data);
+    $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.html = data.html;
     $scope.inputTemplate = data.input_template;
@@ -46,13 +47,19 @@ function ReaderExploration($scope, $http, $timeout) {
   $scope.submitAnswer = function() {
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        $('.answer').serialize(),
+        $('.answer').serialize() +
+            '&block_number=' + JSON.stringify($scope.blockNumber),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage);
   };
 
   $scope.refreshPage = function(data) {
     console.log(data);
+    $scope.blockNumber = data.block_number;
+    $scope.categories = data.categories;
+    $scope.inputTemplate = data.input_template;
+    $scope.stateId = data.state_id;
+
     $scope.html += data.html;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -63,6 +70,7 @@ function ReaderExploration($scope, $http, $timeout) {
     }
   }
 }
+
 
 function SetCtrl($scope, $http) {
   $scope.answer = [];
@@ -80,7 +88,7 @@ function SetCtrl($scope, $http) {
   $scope.submitAnswer = function() {
     // Send a JSON version of $scope.answer to the backend.
     $http.post(
-        $scope.storyUrl,
+        '/learn/' + $scope.explorationId + '/' + $scope.stateId,
         'answer=' + JSON.stringify($scope.answer),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshStory);
