@@ -30,9 +30,6 @@
                     <img src="http://placehold.it/300x200" alt="">
                     <div>
                       <h5>{{exploration.metadata.title}}</h5>
-                      {% if exploration.metadata.owner %}
-                        <p>Owner: {{exploration.metadata.owner}}</p>
-                      {% endif %}
                       <a href="learn/{{exploration.hash_id}}">Link</a> | 
                       <a ng-click="showModal('{{exploration.hash_id}}')">Embed</a>
                   </div>
