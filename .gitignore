@@ -1,4 +1,4 @@
 *~
 *.pyc
 third_party/*
-
+templates/prod/*

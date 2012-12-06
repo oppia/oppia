@@ -57,7 +57,7 @@ echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Copying GAE to runtime folder
   mkdir -p $GOOGLE_APP_ENGINE_HOME/
-  cp third_party/google_appengine/* $GOOGLE_APP_ENGINE_HOME/
+  cp -r third_party/google_appengine/* $GOOGLE_APP_ENGINE_HOME/
 fi
 
 echo Deleting old *.pyc files

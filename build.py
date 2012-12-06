@@ -20,7 +20,7 @@ from subprocess import call
 
 import css_minifier
 
-HEAD_DIR = 'templates/standard/head/'
+HEAD_DIR = 'templates/dev/head/'
 OUT_DIR = 'templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
 CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
@@ -76,7 +76,7 @@ for root, dirs, files in os.walk(os.getcwd()):
     if full_filename.find(OUT_DIR) > 0:
       continue
     # Do not process files in third_party.
-    if full_filename.find('third_party') != -1:
+    if full_filename.find('third_party') != -1 or full_filename.find('.git') != -1:
       continue
     target_filename = GetTarget(full_filename)
     if fn.endswith('.html'):

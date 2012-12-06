@@ -16,6 +16,6 @@ DEV = (os.environ['SERVER_SOFTWARE'].startswith('Development')
        and not PRODUCTION_MODE)
 
 # The directory containing the HTML/JS/CSS templates.
-TEMPLATE_DIR = ('templates/standard/head/' if DEV
-                else 'templates/output/standard/')
+TEMPLATE_DIR = ('templates/dev/head/' if DEV
+                else 'templates/prod/head/')
 

@@ -18,7 +18,7 @@ handlers:
 - url: /third_party
   static_dir: third_party
   secure: always
-- url: /index
+- url: /
   script: main.app
   secure: always
 - url: /learn(/.*)?

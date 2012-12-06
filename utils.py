@@ -306,7 +306,9 @@ def CreateNewExploration(user, title='New exploration', id=None):
   exploration.init_state = new_init_state.key
   exploration.states = [new_init_state.key]
   exploration.put()
-  augmented_user = GetAugmentedUser(user)
-  augmented_user.editable_explorations.append(exploration.key)
-  augmented_user.put()
+  if user:
+    augmented_user = GetAugmentedUser(user)
+    augmented_user.editable_explorations.append(exploration.key)
+    augmented_user.put()
   return exploration
+

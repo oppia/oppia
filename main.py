@@ -58,7 +58,7 @@ class MainPage(base.BaseHandler):
       exploration = utils.GetEntity(models.Exploration, '0')
     except:
       # TODO(sll): Populate the data for this sample exploration.
-      utils.CreateNewExploration('One day this will be a demo', id='0')
+      utils.CreateNewExploration(None, 'One day this will be a demo', id='0')
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
