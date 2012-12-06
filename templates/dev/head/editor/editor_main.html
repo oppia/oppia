@@ -30,10 +30,11 @@
                 {% for exploration in categories[category].explorations %}
                   <li class="span3">
                     <div class="thumbnail">
-                      <img src="http://placehold.it/300x200" alt="">
+                      <a href="create/{{exploration.hash_id}}">
+                        <img src="http://placehold.it/300x200" alt="Image placeholder">
+                      </a>
                       <div>
                         <h5>{{exploration.metadata.title}}</h5>
-                        <a href="create/{{exploration.hash_id}}">Edit</a>
                     </div>
                   </li>
                 {% endfor %}
