@@ -33,17 +33,29 @@ class BaseHandler(base.BaseHandler):
     """Checks if the user has credentials to access the given exploration.
 
     Args:
-    - user: the current user
-    - exploration: the exploration
+        user: the current user
+        exploration: the exploration
 
     Returns:
-    - True, if the user has edit access to the given exploration; False otherwise.
+        True, if the user has edit access to the given exploration; False otherwise.
     """
-    augmented_user = utils.GetAugmentedUser(user)
-    return exploration.key in augmented_user.editable_explorations
+    return exploration.key in utils.GetAugmentedUser(user).editable_explorations
 
   def GetUserAndExploration(self, exploration_id):
-    """Returns the user and exploration id if the user has the right credentials."""
+    """Returns the user and exploration id if the user has the right credentials.
+
+    Args:
+        exploration_id: the id of the exploration
+
+    Returns:
+        The user and exploration instance, if the user is authorized to edit this
+        exploration.
+
+    Raises:
+        self.NotLoggedInException: if there is no current user.
+        self.UnauthorizedUserException: if the user exists but does not have the
+            right credentials.
+    """
     user = users.get_current_user()
     if not user:
       raise self.NotLoggedInException('Please log in.')
