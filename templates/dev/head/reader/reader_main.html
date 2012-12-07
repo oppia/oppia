@@ -17,29 +17,33 @@
 
     <div class="oppia-content">
       <h2> Available Explorations</h2>
-      <center>
-        {% for category in categories %}
-          <div class="oppia-class-category">
-            <h4>{{category}}</h4>
-            <hr>
-            <ul class="thumbnails">
-              <!-- placeholder for real data on explorations -->
-              {% for exploration in categories[category].explorations %}
-                <li class="span3">
-                  <div class="thumbnail">
-                    <a href="learn/{{exploration.hash_id}}">
-                      <img src="http://placehold.it/300x200" alt="Image placeholder">
-                    </a>
-                    <div>
-                      <h5>{{exploration.metadata.title}}</h5>
-                      <a ng-click="showModal('{{exploration.hash_id}}')">Embed</a>
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
-      </center>
+      {% if categories %}
+        <center>
+          {% for category in categories %}
+            <div class="oppia-class-category">
+              <h4>{{category}}</h4>
+              <hr>
+              <ul class="thumbnails">
+                <!-- placeholder for real data on explorations -->
+                {% for exploration in categories[category].explorations %}
+                  <li class="span3">
+                    <div class="thumbnail">
+                      <a href="learn/{{exploration.hash_id}}">
+                        <img src="http://placehold.it/300x200" alt="Image placeholder">
+                      </a>
+                      <div>
+                        <h5>{{exploration.metadata.title}}</h5>
+                        <a ng-click="showModal('{{exploration.hash_id}}')">Embed</a>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </center>
+      {% else %}
+        There aren't any available explorations yet. Why not <a href="/create">create</a> one?
+      {% endif %}
     </div>
 
     <div ui-modal class="fade" id="embedModal" ng-model="modalShown">

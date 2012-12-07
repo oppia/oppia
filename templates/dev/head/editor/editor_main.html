@@ -33,8 +33,10 @@
                       <a href="create/{{exploration.hash_id}}">
                         <img src="http://placehold.it/300x200" alt="Image placeholder">
                       </a>
-                      <div>
-                        <h5>{{exploration.metadata.title}}</h5>
+                      <h5>{{exploration.metadata.title}}</h5>
+                      {% if not exploration.metadata.is_public %}
+                        (Draft)
+                      {% endif %}
                     </div>
                   </li>
                 {% endfor %}
@@ -43,7 +45,7 @@
           {% endfor %}
         </center>
       {% else %}
-        No one has created any explorations yet. Why don't you?
+        You haven't created any explorations yet.
       {% endif %}
 
       <br>
