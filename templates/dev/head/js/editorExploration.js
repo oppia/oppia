@@ -879,6 +879,9 @@ function EditorExploration($scope, $http, $timeout) {
   $scope.saveWidget = function(widgetCode, index) {
     $scope.addContentToIframe('widgetPreview' + index, widgetCode);
   
+    // TODO(sll): This does not update the view value when widgetCode is
+    // called from the repository. Fix this.
+    $scope.widgetCode = widgetCode;
     // TODO(sll): Escape widgetCode first!
     // TODO(sll): Need to ensure that anything stored server-side cannot lead
     //     to malicious behavior (e.g. the user could do his/her own POST
