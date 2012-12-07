@@ -65,10 +65,10 @@ class WidgetRepositoryHandler(BaseHandler):
     generic_widgets = models.GenericWidget.query()
     response = []
     # TODO(sll): The following line is here for testing, and should be removed.
-    response.append({'hash_id': 'abcd', 'name': 'clock', 'raw': 'clock'})
+    response.append({'hash_id': 'abcd', 'name': 'Clock', 'raw': 'clock_code'})
     for widget in generic_widgets:
       response.append({'hash_id': widget.hash_id, 'name': widget.name,
-                       'html': widget.html, 'js': widget.js})
+                       'raw': widget.raw})
     self.response.out.write(json.dumps({'widgets': response}))
 
 

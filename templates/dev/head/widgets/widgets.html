@@ -4,6 +4,11 @@
   <meta charset=utf-8>
   <title>Oppia Widget Repository</title>
 
+  <link rel="stylesheet" href="/third_party/bootstrap/css/bootstrap.css">
+  <!-- The next line should be added before bootstrap-responsive.css: see
+      http://twitter.github.com/bootstrap/components.html#navbar -->
+  <style type="text/css" media="screen">{{css}}</style>
+  <link rel="stylesheet" href="/third_party/bootstrap/css/bootstrap-responsive.css">
   <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -12,19 +17,21 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js"></script>
   <script src="/third_party/angular-ui/build/angular-ui.js"></script>
 
-  <style type="text/css" media="screen">{{css}}</style>
 </head>
 <body ng-controller="Widgets">
-  <div class="single-col">
-    <h2>Widget Repository</h2>
-    <ul>
-      <li ng-repeat="widget in widgets">
-        <[widget.name]>
-        <div id="widget-<[$index]>"></div>
-        <button ng-click="selectWidget(widget)">Choose Widget</button>
-      </li>
-    </ul>
-  </div>
+  <ul class="thumbnails">
+    <!-- placeholder for real data on explorations -->
+    <li ng-repeat="widget in widgets" class="span3">
+      <div class="thumbnail">
+        <iframe id="widget-<[$index]>" src="" width="100%"></iframe>
+        <center>
+          <button ng-click="selectWidget(widget)">
+            <[widget.name]>
+          </button>
+        </center>
+      </div>
+    </li>
+  </ul>
   <script type="text/javascript">{{js}}</script>
 </body>
 </html>

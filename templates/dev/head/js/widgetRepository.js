@@ -1,14 +1,13 @@
 function Widgets($scope, $http) {
   $scope.widgetDataUrl = '/widgets/repository/data/';
 
-  // TODO(sll): Make sure the code retrieved from the server is safe before
-  // running it in the student's browser.
   $scope.loadPage = function(data) {
     console.log(data);
     $scope.widgets = data.widgets;
     for (var i = 0; i < data.widgets.length; ++i) {
       var widgetCode = data.widgets[i];
-      // TODO(sll): Load code into document.getElementById('widget-' + i)        
+      $scope.$apply();
+      $scope.fillFrame('widget-' + i, widgetCode.raw);  
     }
   };
 
@@ -21,6 +20,11 @@ function Widgets($scope, $http) {
   $scope.selectWidget = function(widget) {
     window.parent.postMessage(widget, '*');
   };
+
+  $scope.fillFrame = function(domId, widgetCode) {
+    var F = $('#' + domId);
+    F[0].contentWindow.document.write(widgetCode);
+  }
 }
 
 /**

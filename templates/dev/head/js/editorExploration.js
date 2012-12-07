@@ -857,10 +857,23 @@ function EditorExploration($scope, $http, $timeout) {
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     console.log(arg);
-    console.log(arg.origin);
-    console.log(arg.data);
     // Save the code. TODO(sll): fix this, the $scope is wrong.
-    $scope.$apply();
+    console.log(arg.data.raw);
+    // Send arg.data.raw to the preview. Change tab to preview. Save code in backend.
+
+    var index = -1;
+    for (var i = 0; i < $scope.stateText.length; ++i) {
+      if ($scope.stateText[i].type == 'widget') {
+        index = i;
+        break;
+      }
+    }
+    if (index == -1) {
+      // TODO(sll): Do more substantial error-checking here.
+      return;
+    }
+
+    $scope.saveWidget(arg.data.raw, index);
   });
 
   $scope.saveWidget = function(widgetCode, index) {
@@ -870,7 +883,7 @@ function EditorExploration($scope, $http, $timeout) {
     // TODO(sll): Need to ensure that anything stored server-side cannot lead
     //     to malicious behavior (e.g. the user could do his/her own POST
     //     request). Get a security review done on this feature.
-    
+
     var request = $.param(
         {'raw': JSON.stringify(widgetCode)},
         true
