@@ -47,9 +47,8 @@ fi
 echo Checking whether GAE is installed in third_party
 if [ ! -d "third_party/google_appengine" ]; then
   echo Installing Google App Engine
-  mkdir -p third_party/google_appengine
   wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
-  unzip gae-download.zip -d third_party/google_appengine
+  unzip gae-download.zip -d third_party
   rm gae-download.zip
 fi
 
