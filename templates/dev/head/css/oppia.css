@@ -60,12 +60,23 @@ textarea.oppia-code {
 
 .oppia-wide-panel {
   border: 5px solid black;
-  border-radius: 3px;
-  font-size: large;
-  min-height: 400px;
-  margin: 20px auto;
-  padding: 10px;
+  border-radius: 20px;
   width: 100%;
+}
+
+.oppia-wide-panel-content {
+  font-size: large;
+  margin: 20px auto;
+  min-height: 400px;
+  padding: 20px;
+}
+
+.oppia-wide-panel-title {
+  color: #062770;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 24pt;
+  font-weight: bold;
+  margin-bottom: 30px;
 }
 
 .oppia-btn-container {
