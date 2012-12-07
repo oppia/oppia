@@ -26,7 +26,36 @@ EDITOR_MODE = 'editor'
 END_DEST = '-1'
 
 
-class MainPage(base.BaseHandler):
+class BaseHandler(base.BaseHandler):
+  """Common methods for editor handlers."""
+
+  def CheckAuth(self, user, exploration):
+    """Checks if the user has credentials to access the given exploration.
+
+    Args:
+    - user: the current user
+    - exploration: the exploration
+
+    Returns:
+    - True, if the user has edit access to the given exploration; False otherwise.
+    """
+    augmented_user = utils.GetAugmentedUser(user)
+    return exploration.key in augmented_user.editable_explorations
+
+  def GetUserAndExploration(self, exploration_id):
+    """Returns the user and exploration id if the user has the right credentials."""
+    user = users.get_current_user()
+    if not user:
+      raise self.NotLoggedInException('Please log in.')
+
+    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    if not self.CheckAuth(user, exploration):
+      raise self.UnauthorizedUserException(
+          'User %s does not have the credentials to edit this exploration.' % user)
+    return user, exploration
+
+
+class MainPage(BaseHandler):
   """The editor's main page, which displays a list of explorations that he/she can edit."""
   
   def get(self):  # pylint: disable-msg=C6409
@@ -57,7 +86,7 @@ class MainPage(base.BaseHandler):
         base.JINJA_ENV.get_template('editor/editor_main.html').render(self.values))
 
 
-class NewExploration(base.BaseHandler):
+class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -73,15 +102,12 @@ class NewExploration(base.BaseHandler):
     }))
 
 
-class ExplorationPage(base.BaseHandler):
+class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
   
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
+    user, exploration = self.GetUserAndExploration(exploration_id)
 
     DIR_PREFIX = 'classifier_editors/'
     self.values.update({
@@ -101,6 +127,8 @@ class ExplorationPage(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
     """
+    user, exploration = self.GetUserAndExploration(exploration_id)
+
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     state_name = self.request.get('state_name')
     if not state_name:
@@ -141,12 +169,12 @@ class ExplorationPage(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
     """
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    user, exploration = self.GetUserAndExploration(exploration_id)
     exploration.is_public = True
     exploration.put()
 
 
-class ExplorationHandler(base.BaseHandler):
+class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
   
   def get(self, exploration_id):  # pylint: disable-msg=C6409
@@ -155,12 +183,7 @@ class ExplorationHandler(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
     """
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    user, exploration = self.GetUserAndExploration(exploration_id)
 
     state_list = {}
     for state_key in exploration.states:
@@ -206,6 +229,8 @@ class ExplorationHandler(base.BaseHandler):
     Args:
       exploration_id: string representing the exploration id.
     """
+    user, exploration = self.GetUserAndExploration(exploration_id)
+
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     exploration_name = self.request.get('exploration_name')
     if exploration_name:
@@ -213,7 +238,7 @@ class ExplorationHandler(base.BaseHandler):
       exploration.put()
 
 
-class StatePage(base.BaseHandler):
+class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
   def get(self, exploration_id, state_id):  # pylint: disable-msg=C6409
@@ -226,10 +251,7 @@ class StatePage(base.BaseHandler):
     Returns:
       a generic page that represents an exploration with a list of states.
     """
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
+    user, exploration = self.GetUserAndExploration(exploration_id)
 
     DIR_PREFIX = 'classifier_editors/'
     self.values.update({
@@ -254,7 +276,7 @@ class StatePage(base.BaseHandler):
       parameters describing properties of the state (its id, name, text,
       input_type and actions).
     """
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
     values = {
         'classifier': state.input_view.get().classifier,
@@ -288,12 +310,12 @@ class StatePage(base.BaseHandler):
     self.response.out.write(json.dumps(values))
 
 
-class StateHandler(base.BaseHandler):
+class StateHandler(BaseHandler):
   """Handles state transactions."""
 
   def put(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
 
     if self.request.get('state_name'):
@@ -383,7 +405,7 @@ class StateHandler(base.BaseHandler):
 
   def delete(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Deletes the state with id state_id."""
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
 
     # Do not allow deletion of initial states.

@@ -47,15 +47,26 @@ class BaseHandler(webapp2.RequestHandler):
     else:
       self.values['login_url'] = users.create_login_url(self.request.uri)
 
-  def error(self, code):  # pylint: disable-msg=C6409
-    super(BaseHandler, self).error(code)
-    self.response.out.write('Resource not found.')
-    return
-
   def JsonError(self, error_message, code=404):
     """Used to handle error messages in JSON returns."""
     super(BaseHandler, self).error(code)
     logging.error('%s: %s', code, error_message)
     self.response.out.write(json.dumps({'error': str(error_message)}))
-    return
 
+  def handle_exception(self, exception, debug_mode):
+    logging.error('Exception raised: %s' % exception)
+    if isinstance(exception, self.NotLoggedInException):
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+    if isinstance(exception, self.UnauthorizedUserException):
+      self.error(401)
+      self.response.out.write('401 Unauthorized: %s' % exception)
+      return
+    webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
+    logging.error('Exception was not handled: %s' % exception)
+
+  class UnauthorizedUserException(Exception):
+    """Error class for unauthorized access."""
+
+  class NotLoggedInException(Exception):
+    """Error class for users that are not logged in."""
