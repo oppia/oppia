@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64, datetime, hashlib, logging, os
+import base64, datetime, hashlib, json, logging, os
 
 import jinja2
 
@@ -69,9 +69,11 @@ def Log(message):
   Args:
     message: the message to be logged.
   """
-
   if feconf.DEV or feconf.DEBUG:
-    logging.info(str(message))
+    if isinstance(message, dict):
+      logging.info(json.dumps(message, sort_keys=True, indent=4))
+    else:
+      logging.info(str(message))
 
 
 # TODO(sll): Consider refactoring this to include ancestors.
