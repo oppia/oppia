@@ -19,12 +19,6 @@ __author__ = 'Sean Lip'
 from google.appengine.ext import ndb
 
 
-class Parameter(ndb.Model):
-  """A generic parameter (like in a Mad Lib)."""
-  name = ndb.StringProperty(required=True)
-  value = ndb.StringProperty(required=True)
-
-
 class Image(ndb.Model):
   """An image."""
   # The id of the image.
@@ -61,15 +55,6 @@ class GenericWidget(ndb.Model):
   default_args = ndb.StringProperty(repeated=True)
   # The raw code for the generic widget.
   raw = ndb.TextProperty()
-
-
-class PageContent(ndb.Model):
-  """An exploration 'page' shown to the reader."""
-  # The HTML to be displayed in each of the generated divs.
-  html = ndb.TextProperty(repeated=True)
-  # The code for each widget appearing on the page. This is a list of
-  # widget hash_ids.
-  widgets = ndb.JsonProperty(repeated=True)
 
 
 class InputView(ndb.Model):
@@ -129,25 +114,6 @@ class AugmentedUser(ndb.Model):
   user = ndb.UserProperty(required=True)
   # The list of explorations that this user has editing rights for.
   editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
-
-
-class Reader(ndb.Model):
-  """A user/exploration combination."""
-  # The user described by this Reader. Note that a user may have multiple
-  # Reader instances (for different stories).
-  reader = ndb.UserProperty(required=True)
-  # The exploration described by this Reader.
-  exploration = ndb.KeyProperty(kind=Exploration, required=True)
-  # The page contents for this reader.
-  pages = ndb.KeyProperty(kind=PageContent, repeated=True)
-  # The reader's current page number.
-  current_page = ndb.IntegerProperty(default=0)
-  # The reader's current state.
-  state = ndb.KeyProperty(kind=State, required=True)
-  # The reader's parameters.
-  parameters = ndb.KeyProperty(kind=Parameter, repeated=True)
-  # Whether the reader has finished the story.
-  finished = ndb.BooleanProperty(default=False)
 
 
 class ActionSet(ndb.Model):
