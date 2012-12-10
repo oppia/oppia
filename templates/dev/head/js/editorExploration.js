@@ -32,10 +32,10 @@ var NEW_QUESTION_STRING = 'New question';
 var DEFAULT_CATEGORY_NAME = 'All other inputs';
 var DEFAULT_DESTS = {
     'finite': [],
-    'none': [{'category': '', 'dest': END_DEST}],
-    'numeric': [{'category': 'All other inputs', 'dest': END_DEST}],
-    'set': [{'category': 'All other inputs', 'dest': END_DEST}],
-    'text': [{'category': 'All other inputs', 'dest': END_DEST}]
+    'none': [{'category': '', 'dest': END_DEST, 'text': ''}],
+    'numeric': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}],
+    'set': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}],
+    'text': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}]
 };
 // The following list maps input views to classifiers.
 var CLASSIFIER_MAPPING = {
@@ -240,7 +240,6 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.classifier = '';
     $scope.console = '';
     $scope.widgetCode = '';
-    $scope.optionalActions = [];
   };
 
   $scope.clearStateVariables();
@@ -454,13 +453,15 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.stateId = data.stateId;
     var prefix = $scope.stateId + '.';
     var variableList = ['stateName', 'stateText', 'inputType', 'classifier',
-                        'optionalActions', 'states'];
+                        'states'];
     for (var i = 0; i < variableList.length; ++i) {
       // Exclude 'states', because it is not returned from the backend.
       if (variableList[i] != 'states') {
         $scope[variableList[i]] = data[variableList[i]];
       }
     }
+    // Update the states using the actions variable.
+    $scope.states[$scope.stateId].dests = data.actions;
 
     console.log(data);
     if (!prevStateId || prevStateId == $scope.stateId) {
@@ -543,7 +544,6 @@ function EditorExploration($scope, $http, $timeout) {
     // TODO(wilsonhong): Modify the following to remove the edge corresponding
     // to the specific category ID from the graph (rather than a generic edge
     // from the start node to the destination node).
-    $scope.optionalActions.splice(categoryId, 1);
     $scope.states[$scope.stateId]['dests'].splice(categoryId, 1);
     $scope.saveStateChange('states');
     drawStateGraph($scope.states);
@@ -562,10 +562,10 @@ function EditorExploration($scope, $http, $timeout) {
 
     if (actionType != 'view') {
       $scope.activeModalCategoryId = categoryId;
-      if ($scope.optionalActions[categoryId][actionType]) {
+      if ($scope.states[$scope.stateId]['dests'][categoryId][actionType]) {
         if (actionType === 'text') {
           $scope[actionType + 'Data'] =
-              $scope.optionalActions[categoryId][actionType];
+              $scope.states[$scope.stateId]['dests'][categoryId][actionType];
         }
       }
     }
@@ -597,7 +597,7 @@ function EditorExploration($scope, $http, $timeout) {
 
   $scope.saveText = function() {
     var categoryId = $scope.activeModalCategoryId;
-    $scope.optionalActions[categoryId]['text'] = $scope.textData;
+    $scope.states[$scope.stateId].dests.[categoryId]['text'] = $scope.textData;
     $scope.saveStateChange('states');
     $scope.closeModalWindow();
   };
@@ -668,8 +668,7 @@ function EditorExploration($scope, $http, $timeout) {
           $scope.tempStateText.push($scope.stateText[i]);
       }
       requestParameters['state_text'] = JSON.stringify($scope.tempStateText);
-    } else if (property == 'inputType' || property == 'states' ||
-        property == 'optionalActions') {
+    } else if (property == 'inputType' || property == 'states') {
       requestParameters['input_type'] = $scope.inputType;
       if ($scope.classifier != 'none' &&
           $scope.states[$scope.stateId]['dests'].length == 0) {
@@ -679,7 +678,7 @@ function EditorExploration($scope, $http, $timeout) {
         return;
       }
 
-      var actionsForBackend = $scope.optionalActions;
+      var actionsForBackend = $scope.states[$scope.stateId].dests;
       console.log(actionsForBackend);
       for (var ind = 0;
            ind < $scope.states[$scope.stateId]['dests'].length; ++ind) {
@@ -736,12 +735,7 @@ function EditorExploration($scope, $http, $timeout) {
     // Change $scope.states to the default for the new classifier type.
     $scope.states[$scope.stateId]['dests'] =
         DEFAULT_DESTS[$scope.classifier].slice();
-    // Update $scope.optionalActions.
-    $scope.optionalActions = [];
 
-    for (var i = 0; i < $scope.states[$scope.stateId]['dests'].length; ++i) {
-      $scope.optionalActions.push({});
-    }
     if ($scope.classifier != 'finite') {
       $scope.saveStateChange('states');
     }
@@ -878,7 +872,7 @@ function EditorExploration($scope, $http, $timeout) {
 
   $scope.saveWidget = function(widgetCode, index) {
     $scope.addContentToIframe('widgetPreview' + index, widgetCode);
-  
+
     // TODO(sll): This does not update the view value when widgetCode is
     // called from the repository. Fix this.
     $scope.widgetCode = widgetCode;
@@ -901,7 +895,7 @@ function EditorExploration($scope, $http, $timeout) {
     ).success(function(widgetData) {
       // Check that the data has been saved correctly.
       console.log(widgetData);
-      $('#widgetTabs' + index + ' a:first').tab('show');  
+      $('#widgetTabs' + index + ' a:first').tab('show');
       $scope.stateText[index].value = widgetData.widgetId;
       $scope.saveStateChange('stateText');
       // TODO(sll): Display multiple widget div's here.

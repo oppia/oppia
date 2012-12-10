@@ -69,7 +69,7 @@ class BaseHandler(base.BaseHandler):
 
 class MainPage(BaseHandler):
   """The editor's main page, which displays a list of explorations that he/she can edit."""
-  
+
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user = users.get_current_user()
@@ -77,7 +77,7 @@ class MainPage(BaseHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
     augmented_user = utils.GetAugmentedUser(user)
-  
+
     categories = {}
     for exploration_key in augmented_user.editable_explorations:
       exploration = exploration_key.get()
@@ -116,7 +116,7 @@ class NewExploration(BaseHandler):
 
 class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
-  
+
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user, exploration = self.GetUserAndExploration(exploration_id)
@@ -168,8 +168,6 @@ class ExplorationPage(BaseHandler):
     self.response.out.write(json.dumps({
         'classifier': state.input_view.get().classifier,
         'inputType': state.input_view.get().name,
-        # The following actions correspond to input type 'none' (the default).
-        'optionalActions': [{'category': '', 'dest': state.hash_id}],
         'stateId': state.hash_id,
         'stateName': state.name,
         'stateText': state.text,
@@ -188,7 +186,7 @@ class ExplorationPage(BaseHandler):
 
 class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
-  
+
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Gets the question name and state list for a question page.
 
@@ -291,9 +289,9 @@ class StatePage(BaseHandler):
     user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
     values = {
+        'actions': [],
         'classifier': state.input_view.get().classifier,
         'inputType': state.input_view.get().name,
-        'optionalActions': [],
         'stateId': state.hash_id,
         'stateName': state.name,
         'stateText': state.text,
@@ -317,7 +315,7 @@ class StatePage(BaseHandler):
         action['dest'] = 'q-%s' % action_set.dest_exploration.get().hash_id
       elif action_set.dest:
         action['dest'] = action_set.dest.get().hash_id
-      values['optionalActions'].append(action)
+      values['actions'].append(action)
 
     self.response.out.write(json.dumps(values))
 

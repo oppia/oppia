@@ -28,7 +28,7 @@ READER_MODE = 'reader'
 
 class MainPage(base.BaseHandler):
   """The reader's main page, which displays a catalog of explorations."""
-  
+
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     categories = {}

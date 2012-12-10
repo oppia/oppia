@@ -52,11 +52,40 @@ if [ ! -d "third_party/google_appengine" ]; then
   rm gae-download.zip
 fi
 
-echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME 
+echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Copying GAE to runtime folder
   mkdir -p $GOOGLE_APP_ENGINE_HOME/
   cp -r third_party/google_appengine/* $GOOGLE_APP_ENGINE_HOME/
+fi
+
+echo Checking whether jquery is installed in third_party
+if [ ! -d "third_party/jquery" ]; then
+  echo Installing JQuery
+  mkdir -p third_party/jquery/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/jquery/jquery.min.js
+fi
+
+echo Checking whether jqueryui is installed in third_party
+if [ ! -d "third_party/jqueryui" ]; then
+  echo Installing JQueryUI
+  mkdir -p third_party/jqueryui/
+  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/jqueryui/jquery-ui.min.js
+fi
+
+echo Checking whether angularjs is installed in third_party
+if [ ! -d "third_party/angular" ]; then
+  echo Installing AngularJS and angular-sanitize
+  mkdir -p third_party/angularjs/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js -O third_party/angularjs/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
+fi
+
+echo Checking whether jsplumb is installed in third_party
+if [ ! -d "third_party/jsplumb" ]; then
+  echo Installing JSPlumb
+  mkdir -p third_party/jsplumb/
+  wget https://jsplumb.googlecode.com/files/jquery.jsPlumb-1.3.15-all.js -O third_party/jsplumb/jsPlumb.js
 fi
 
 echo Deleting old *.pyc files
