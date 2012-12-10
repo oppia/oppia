@@ -90,6 +90,9 @@ urls = [
     (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
+    (r'/imagehandler/?', editor.Image),
+    (r'/imagehandler/(%s)/?' % r, editor.Image),
+
     (r'/widgets/?', widgets.Widget),
     (r'/widgets/repository/?', widgets.WidgetRepositoryPage),
     (r'/widgets/(%s)/?' % r, widgets.Widget),

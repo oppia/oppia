@@ -101,7 +101,7 @@
                           <span class="oppia-loading" id="uploadImageLoading"></span>
                         </div>
                         <div ng-switch-default>
-                          <img class="oppia-small-image" ng-src="/editor/images/<[item.value]>"></img>
+                          <img class="oppia-small-image" ng-src="/imagehandler/<[item.value]>"></img>
                           <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
                         </div>
                       </ng-switch>
@@ -125,12 +125,12 @@
 
                     <div ng-switch-when="widget">
                       <ul class="nav nav-tabs" id="widgetTabs<[$index]>">
-                        <li class="active"><a data-toggle="tab" data-target="#preview">Preview</a></li>
+                        <li><a data-toggle="tab" data-target="#preview">Preview</a></li>
                         <li><a data-toggle="tab" data-target="#code">Code</a></li>
-                        <li><a data-toggle="tab" data-target="#repository">Repository</a></li>
+                        <li class="active"><a data-toggle="tab" data-target="#repository">Repository</a></li>
                       </ul>
                       <div class="tab-content">
-                        <div class="tab-pane active" id="preview">
+                        <div class="tab-pane" id="preview">
                           <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
                         </div>
                         <div class="tab-pane" id="code">
@@ -141,7 +141,7 @@
                             Save and Preview
                           </button>
                         </div>
-                        <div class="tab-pane" id="repository">
+                        <div class="tab-pane active" id="repository">
                           <iframe src="/widgets/repository/" width="100%" height="400px" frameborder="0"></iframe>
                         </div>
                       </div>
@@ -209,7 +209,7 @@
 
               <div id="oppia-popup" ng-show="isModalWindowActive">
                 <a class="close" ng-click="closeModalWindow()">&times;</a>
-  
+
                 <div id="textInput">
                   <label for="textData">
                     <h5>In response to the reader's answer, display the text:</h5>
@@ -230,7 +230,7 @@
             <div class="oppia-palette-image oppia-palette-icon" title="Add image"></div>
             <div class="oppia-palette-video oppia-palette-icon" title="Add video"></div>
             <div class="oppia-palette-widget oppia-palette-icon" title="Add interactive widget" ng-hide="isWidgetInStateText()"></div>
-  
+
            <!-- The outer div below is needed to make the background color appear
            behind the image. -->
             <div class="oppia-item-droppable">

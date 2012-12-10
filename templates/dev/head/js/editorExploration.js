@@ -780,13 +780,19 @@ function EditorExploration($scope, $http, $timeout) {
 
       // The following validation method is the one described in
       // stackoverflow.com/questions/2742813/how-to-validate-youtube-video-ids
-      $http.get('http://gdata.youtube.com/feeds/api/videos/' + videoId[2], '').
+      // It does not work at the moment, so it is temporarily disabled and replaced
+      // with the two lines below it.
+      /*
+      $http.get('https://gdata.youtube.com/feeds/api/videos/' + videoId[2], '').
           success(function(data) {
             $scope.stateText[index].value = videoId[2];
             $scope.saveStateChange('stateText');
           }).error(function(data) {
             $scope.addWarning('This is not a valid YouTube video id.');
           });
+      */
+      $scope.stateText[index].value = videoId[2];
+      $scope.saveStateChange('stateText');
     }
     $scope.clearActiveInputs();
   };
@@ -816,7 +822,7 @@ function EditorExploration($scope, $http, $timeout) {
     form.append('image', image);
 
     $.ajax({
-        url: '/editor/images/',
+        url: '/imagehandler/',
         data: form,
         processData: false,
         contentType: false,
