@@ -597,7 +597,7 @@ function EditorExploration($scope, $http, $timeout) {
 
   $scope.saveText = function() {
     var categoryId = $scope.activeModalCategoryId;
-    $scope.states[$scope.stateId].dests.[categoryId]['text'] = $scope.textData;
+    $scope.states[$scope.stateId]['dests'][categoryId]['text'] = $scope.textData;
     $scope.saveStateChange('states');
     $scope.closeModalWindow();
   };

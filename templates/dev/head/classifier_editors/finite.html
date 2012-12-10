@@ -1,5 +1,5 @@
 <div class="classifier" ng-show="classifier == 'finite'" ng-controller="FiniteClassifierEditor">
-  <div ng-repeat="action in optionalActions" class="oppia-category-block">
+  <div ng-repeat="action in states[stateId].dests" class="oppia-category-block">
     <a class="close" ng-click="deleteCategory($index)">&times;</a>
 
     <form name="finiteCategoryForm" class="form-inline" ng-submit="saveCategoryName($index, states[stateId].dests[$index].category)"

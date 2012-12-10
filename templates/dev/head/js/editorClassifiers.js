@@ -24,17 +24,17 @@ function FiniteClassifierEditor($scope) {
     if (!$scope.isValidEntityName($scope.newCategoryName, true))
       return;
     if ($scope.isDuplicateArrayInput(
-            $scope.optionalActions, 'category', null, $scope.newCategoryName))
+            $scope.states[$scope.stateId]['dests'], 'category', null,
+            $scope.newCategoryName))
       return;
 
     $scope.states[$scope.stateId].dests.push(
-        {category: $scope.newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.push({'text': ''});
+        {category: $scope.newCategoryName, dest: $scope.stateId, text: ''});
     createEdge($scope.stateId, $scope.stateId, $scope.newCategoryName);
     $scope.saveStateChange('states');
     $scope.newCategoryName = '';
   };
-  
+
 
   $scope.saveCategoryName = function(categoryId, newCategoryName) {
     if (!$scope.isValidEntityName(newCategoryName, false))
@@ -133,8 +133,7 @@ function NumericClassifierEditor($scope) {
 
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
-        -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': ''});
+        -1, 0, {category: newCategoryName, dest: $scope.stateId, text: ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.newDummyCategoryName = '';
@@ -222,8 +221,7 @@ function SetClassifierEditor($scope) {
 
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
-        -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': ''});
+        -1, 0, {category: newCategoryName, dest: $scope.stateId, text: ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.hideCategoryInput();
@@ -271,8 +269,7 @@ function TextClassifierEditor($scope) {
 
     // Keep DEFAULT_CATEGORY_NAME as the last option.
     $scope.states[$scope.stateId].dests.splice(
-        -1, 0, {category: newCategoryName, dest: $scope.stateId});
-    $scope.optionalActions.splice(-1, 0, {'text': ''});
+        -1, 0, {category: newCategoryName, dest: $scope.stateId, text: ''});
     createEdge($scope.stateId, $scope.stateId, newCategoryName);
     $scope.saveStateChange('states');
     $scope.hideCategoryInput();

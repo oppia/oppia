@@ -1,6 +1,6 @@
 <div class="classifier" ng-show="classifier=='set'" ng-controller="SetClassifierEditor">
 
-  <div ng-repeat="action in optionalActions" class="oppia-category-block">
+  <div ng-repeat="action in states[stateId].dests" class="oppia-category-block">
     <a class="close" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'All other inputs'">
       &times;
     </a>
