@@ -89,9 +89,10 @@ function SetCtrl($scope, $http) {
     // Send a JSON version of $scope.answer to the backend.
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        'answer=' + JSON.stringify($scope.answer),
+        'answer=' + JSON.stringify($scope.answer) +
+            '&block_number=' + JSON.stringify($scope.blockNumber),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshStory);
+    ).success($scope.refreshPage);
     $scope.answer = [];
   };
 }
