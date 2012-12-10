@@ -77,8 +77,8 @@ echo Checking whether angularjs is installed in third_party
 if [ ! -d "third_party/angular" ]; then
   echo Installing AngularJS and angular-sanitize
   mkdir -p third_party/angularjs/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js -O third_party/angularjs/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
 fi
 
 echo Checking whether jsplumb is installed in third_party
