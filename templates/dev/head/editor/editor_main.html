@@ -30,12 +30,17 @@
                 {% for exploration in categories[category].explorations %}
                   <li class="span3">
                     <div class="thumbnail">
-                      <a href="create/{{exploration.hash_id}}">
+                      <a href="/create/{{exploration.hash_id}}">
                         <img src="http://placehold.it/300x200" alt="Image placeholder">
                       </a>
                       <h5>{{exploration.metadata.title}}</h5>
+                      <div>
+                        <a href="/create/convert/{{exploration.hash_id}}">
+                          File import
+                        </a> (experimental)
+                      </div>
                       {% if not exploration.metadata.is_public %}
-                        (Draft)
+                        <span>Draft</span>
                       {% endif %}
                     </div>
                   </li>

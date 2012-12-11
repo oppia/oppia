@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import base, classifiers, editor, feconf, models, os, reader, utils, widgets
+import base, classifiers, converter, editor, feconf, models, os, reader, utils, widgets
 import webapp2
 
 
@@ -90,6 +90,7 @@ urls = [
 
     (r'/create/?', editor.MainPage),
     (r'/create_new/?', editor.NewExploration),
+    (r'/create/convert/(%s)/?' % r, converter.ImportPage),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.

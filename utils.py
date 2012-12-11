@@ -168,8 +168,8 @@ def GetFileContents(filepath):
   Returns:
     the file contents.
   """
-  file_contents = open(feconf.TEMPLATE_DIR + filepath, 'r')
-  return file_contents.read().decode('utf-8')
+  with open(feconf.TEMPLATE_DIR + filepath) as f:
+    return f.read().decode('utf-8')
 
 
 def GetJsFile(filename):
@@ -272,7 +272,7 @@ def GetAugmentedUser(user):
   return augmented_user
 
 
-def CreateNewExploration(user, title, id=None):
+def CreateNewExploration(user, title='New Exploration', id=None):
   """Creates and returns a new exploration."""
   if id:
     exploration_hash_id = id
