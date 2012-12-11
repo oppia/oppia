@@ -53,12 +53,18 @@ class MainPage(base.BaseHandler):
         input_view.put()
 
   def EnsureDefaultExplorationExists(self):
-    """Add the default exploration, if it doesn't already exist."""
+    """Add the default explorations, if they don't already exist."""
     try:
       exploration = utils.GetEntity(models.Exploration, '0')
     except:
       # TODO(sll): Populate the data for this sample exploration.
-      utils.CreateNewExploration(None, 'One day this will be a demo', id='0')
+      utils.CreateNewExploration(None, title='Demo 1', id='0')
+
+    try:
+      exploration = utils.GetEntity(models.Exploration, '1')
+    except:
+      # TODO(sll): Populate the data for this sample exploration.
+      utils.CreateNewExploration(None, title='Demo 2', id='1')
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""

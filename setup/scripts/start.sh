@@ -74,7 +74,7 @@ if [ ! -d "third_party/jqueryui" ]; then
 fi
 
 echo Checking whether angularjs is installed in third_party
-if [ ! -d "third_party/angular" ]; then
+if [ ! -d "third_party/angularjs" ]; then
   echo Installing AngularJS and angular-sanitize
   mkdir -p third_party/angularjs/
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs/angular.min.js
