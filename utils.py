@@ -163,7 +163,7 @@ def GetFileContents(filepath):
 
   Args:
     filepath: a path to a HTML, JS or CSS file. It should not include the
-        template/standard/head or template/output/standard prefix.
+        template/dev/head or template/prod/head prefix.
 
   Returns:
     the file contents.
