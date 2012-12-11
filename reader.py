@@ -67,8 +67,8 @@ class ExplorationPage(base.BaseHandler):
     })
 
     # The following is needed for embedding Oppia explorations in other pages.
-    if self.request.get('hideNavbar') == 'true':
-      self.values['hide_navbar'] = True
+    if self.request.get('iframed') == 'true':
+      self.values['iframed'] = True
 
     self.response.out.write(base.JINJA_ENV.get_template(
         'reader/reader_exploration.html').render(self.values))

@@ -17,16 +17,10 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import base64, datetime, hashlib, json, logging, os
-
-import jinja2
-
-import feconf, models
-
+import base, feconf, models
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 DEFAULT_CATEGORY = 'All other inputs'
 
 
@@ -255,13 +249,13 @@ def ParseContentIntoHtml(content_array, block_number):
     if content['type'] == 'widget':
       widget = GetEntity(models.Widget, content['value'])
       widget_counter += 1
-      html += jinja_env.get_template('content.html').render({
+      html += base.JINJA_ENV.get_template('content.html').render({
           'type': content['type'], 'blockIndex': block_number,
           'index': widget_counter})
       widget_array.append({'blockIndex': block_number, 'index': widget_counter,
           'code': widget.raw})
     elif (content['type'] in ['text', 'image', 'video']):
-      html += jinja_env.get_template('content.html').render({
+      html += base.JINJA_ENV.get_template('content.html').render({
           'type': content['type'], 'value': content['value']})
     else:
       raise InvalidInputError('Invalid content type %s', content['type'])

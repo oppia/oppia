@@ -273,7 +273,8 @@ class StatePage(BaseHandler):
         'text_code': utils.GetFileContents('%s/text.html' % DIR_PREFIX),
     })
     self.response.out.write(
-        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
+        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(
+            self.values))
 
   def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Called when a state is initialized for editing.
