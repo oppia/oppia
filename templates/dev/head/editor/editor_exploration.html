@@ -122,12 +122,11 @@
                         </div>
                       </ng-switch>
                     </div>
-
                     <div ng-switch-when="widget">
                       <ul class="nav nav-tabs" id="widgetTabs<[$index]>">
-                        <li><a data-toggle="tab" data-target="#preview">Preview</a></li>
-                        <li><a data-toggle="tab" data-target="#code">Code</a></li>
-                        <li class="active"><a data-toggle="tab" data-target="#repository">Repository</a></li>
+                        <li><a data-toggle="tab" href="#preview" href="#preview" ng-click="selectTab('preview')">Preview</a></li>
+                        <li><a data-toggle="tab" href="#code">Code</a></li>
+                        <li class="active"><a data-toggle="tab" href="#repository">Repository</a></li>
                       </ul>
                       <div class="tab-content">
                         <div class="tab-pane" id="preview">
