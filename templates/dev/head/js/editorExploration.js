@@ -204,7 +204,7 @@ oppia.directive('oppiaItemDroppable', function($compile) {
                   tempStateText.push(scope.stateText[j]);
                 }
               }
-              scope.stateText = tempStateText;
+              scope.$parent.stateText = tempStateText;
               return;
             }
           }
