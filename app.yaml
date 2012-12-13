@@ -15,6 +15,9 @@ handlers:
 - url: /images
   static_dir: static/images
   secure: always
+- url: /templates
+  static_dir: static/templates
+  secure: always
 - url: /third_party
   static_dir: third_party
   secure: always

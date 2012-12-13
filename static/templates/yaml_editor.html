@@ -1,0 +1,20 @@
+  <div ng-cloak>
+    <div class="container-fluid">
+      <div class="oppia-content row-fluid">
+
+        <h3>
+          <span> <[stateName]> </span>
+        </h3>
+
+        <button ng-click="changeMode('gui')">Use GUI editor</button>
+        <br>
+        <br>
+        Enter a description of this state below.
+        <button type="button" ng-click="saveState(yaml)">
+          Save
+        </button>
+        <br><br>
+        <textarea rows="40" ng-model="yaml" class="oppia-code"></textarea>
+      </div>
+    </div>
+  </div>

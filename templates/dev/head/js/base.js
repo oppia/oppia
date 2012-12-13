@@ -36,7 +36,7 @@ function Base($scope, $timeout) {
    * Adds content to an iframe.
    * @param {string} iframeId The id of the iframe to add content to.
    * @param {string} content The code for the iframe.
-   */  
+   */
   $scope.addContentToIframe = function(iframeId, content) {
     var iframe = document.getElementById(iframeId);
     if (iframe.contentDocument) {
@@ -72,13 +72,13 @@ function Base($scope, $timeout) {
     if (input[0] == '[') {
       if (showWarnings) {
         $scope.addWarning('Names should not start with a \'[\'.');
-      }      
+      }
       return false;
     }
     if (!ALPHANUMERIC_REGEXP.regexp.test(input)) {
       if (showWarnings) {
         $scope.addWarning(ALPHANUMERIC_REGEXP.warning);
-      }      
+      }
       return false;
     }
     return true;
@@ -105,6 +105,18 @@ oppia.directive('mustBeValidString', function($timeout) {
         }
       });
     }
+  };
+});
+
+oppia.directive('angularHtmlBind', function($compile) {
+  return function(scope, elm, attrs) {
+    scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
+      if (newValue && newValue !== oldValue) {
+        elm.html(newValue);
+        console.log(elm.contents());
+        $compile(elm.contents())(scope);
+      }
+    });
   };
 });
 

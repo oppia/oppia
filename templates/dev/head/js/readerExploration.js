@@ -1,15 +1,3 @@
-oppia.directive('angularHtmlBind', function($compile) {
-  return function(scope, elm, attrs) {
-    scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
-      if (newValue && newValue !== oldValue) {
-        elm.html(newValue);
-        console.log(elm.contents());
-        $compile(elm.contents())(scope);
-      }
-    });
-  };
-});
-
 function ReaderExploration($scope, $http, $timeout) {
   // The pathname is expected to be: /[exploration_id]
   var pathnameArray = window.location.pathname.split('/');

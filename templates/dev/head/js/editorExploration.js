@@ -23,6 +23,8 @@ var QN_DEST_PREFIX = 'q-';
 // TODO(sll): Internationalize these.
 var END_STRING = 'END';
 var NEW_QUESTION_STRING = 'New question';
+var GUI_EDITOR_URL = '/gui'
+var YAML_EDITOR_URL = '/text'
 
 // TODO(sll): Move all strings to the top of the file, particularly
 // warning messages and $scope.currentActiveInput.
@@ -52,6 +54,24 @@ var HUMAN_READABLE_INPUT_TYPE_MAPPING = {
     'set': 'Set',
     'text': 'Free text'
 };
+
+oppia.config(['$routeProvider', function($routeProvider) {
+  $routeProvider.
+      when(YAML_EDITOR_URL,
+           {templateUrl: '/templates/yaml_editor.html',
+            controller: YamlEditor}).
+      when(YAML_EDITOR_URL + '/:stateId',
+           {templateUrl: '/templates/yaml_editor.html',
+            controller: YamlEditor}).
+      when(GUI_EDITOR_URL,
+           {templateUrl: '/templates/gui_editor.html',
+            controller: GuiEditor}).
+      when(GUI_EDITOR_URL + '/:stateId',
+           {templateUrl: '/templates/gui_editor.html',
+            controller: GuiEditor}).
+      otherwise({redirectTo: GUI_EDITOR_URL});
+}]);
+
 
 // Filter that truncates long descriptors.
 // TODO(sll): Strip out HTML tags before truncating.
@@ -223,13 +243,27 @@ oppia.directive('sortable', function($compile) {
 });
 
 
-function EditorExploration($scope, $http, $timeout) {
-  window.addEventListener('popstate', function(e) {
-    if (e.state) {
-      $scope.stateId = e.state;
-      $scope.getStateDataFromBackend($scope.stateId);
+function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
+  $scope.getMode = function() {
+    if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
+      return GUI_EDITOR_URL.substring(1);
+    } else {
+      return YAML_EDITOR_URL.substring(1);
     }
-  });
+  };
+
+  /**
+   * Changes the editor mode.
+   */
+  $scope.changeMode = function(mode) {
+    if (mode == GUI_EDITOR_URL.substring(1)) {
+      $location.path(GUI_EDITOR_URL + '/' + $scope.stateId);
+    } else if (mode == YAML_EDITOR_URL.substring(1)) {
+      $location.path(YAML_EDITOR_URL + '/' + $scope.stateId);
+    } else {
+      $scope.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
+    }
+  };
 
   // Initialize data associated with the current state.
   $scope.clearStateVariables = function() {
@@ -257,8 +291,12 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.states = data.state_list;
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
-    $scope.stateId = pathnameArray[3] || $scope.initStateId;
+    $scope.stateId = $routeParams.stateId || $scope.initStateId;
     $scope.isPublic = data.is_public;
+    $scope.finiteCode = data.finite_code;
+    $scope.numericCode = data.numeric_code;
+    $scope.setCode = data.set_code;
+    $scope.textCode = data.text_code;
     initJsPlumb();
     drawStateGraph($scope.states);
     $scope.getStateDataFromBackend($scope.stateId);
@@ -464,29 +502,26 @@ function EditorExploration($scope, $http, $timeout) {
     $scope.states[$scope.stateId].dests = data.actions;
 
     console.log(data);
-    if (!prevStateId || prevStateId == $scope.stateId) {
-      window.history.replaceState(
-          $scope.stateId, null, $scope.explorationUrl + '/' + $scope.stateId);
-    } else {
-      window.history.pushState(
-          $scope.stateId, null, $scope.explorationUrl + '/' + $scope.stateId);
-    }
 
-    // If a widget exists, show its compiled version and populate the widget
-    // view fields.
-    for (var i = 0; i < $scope.stateText.length; ++i) {
-      if ($scope.stateText[i].type == 'widget') {
-        var widgetFrameId = 'widgetPreview' + i;
-        // Get the widget with id $scope.stateText[i].value
-        $http.get('/widgets/' + $scope.stateText[i].value).
-            success(function(data) {
-              console.log(data);
-              $scope.widgetCode = data.raw;
-              $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-            }).error(function(data) {
-              $scope.addWarning(
-                  'Widget could not be loaded: ' + String(data.error));
-            });
+    if ($scope.getMode() == 'gui') {
+      $location.path(GUI_EDITOR_URL + '/' + $scope.stateId);
+
+      // If a widget exists, show its compiled version and populate the widget
+      // view fields.
+      for (var i = 0; i < $scope.stateText.length; ++i) {
+        if ($scope.stateText[i].type == 'widget') {
+          var widgetFrameId = 'widgetPreview' + i;
+          // Get the widget with id $scope.stateText[i].value
+          $http.get('/widgets/' + $scope.stateText[i].value).
+              success(function(data) {
+                console.log(data);
+                $scope.widgetCode = data.raw;
+                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
+              }).error(function(data) {
+                $scope.addWarning(
+                    'Widget could not be loaded: ' + String(data.error));
+              });
+        }
       }
     }
 
@@ -744,9 +779,6 @@ function EditorExploration($scope, $http, $timeout) {
   };
 
   $scope.closeEditorWindow = function() {
-    window.history.replaceState(
-        $scope.stateId, null, $scope.explorationUrl + '/' + $scope.stateId);
-    window.history.pushState('', null, $scope.explorationUrl);
     $scope.stateId = '';
   };
 
@@ -1234,4 +1266,48 @@ function EditorExploration($scope, $http, $timeout) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$timeout'];
+EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams'];
+
+
+function GuiEditor() {
+  // TODO(sll): Move GUI-editor-only methods to this function.
+}
+
+GuiEditor.$inject = [];
+
+
+function YamlEditor($scope, $http) {
+  // The pathname should be: .../create/{exploration_id}/[state_id]
+  var pathnameArray = window.location.pathname.split('/');
+  $scope.explorationId = pathnameArray[2];
+
+  // TODO(sll): Initialize this default with the current status of the
+  // exploration in the datastore.
+  $scope.yaml = 'Activity 1:\n  answers:\n  - default:\n      dest: END\n' +
+      '      text: First category\n  content:\n  - text: Text1\n  - text: Text2\n  ' +
+      '- image: 41pMJXnVrf\n  - video: jd5ffc48RJU\n  - widget: Yp9mxyOKSa\n' +
+      '  input_type:\n    name: set';
+
+  /**
+   * Saves the YAML representation of a state.
+   */
+  // TODO(sll): Change this to save the representation of a state, not an
+  // exploration.
+  $scope.saveState = function() {
+    $http.put(
+        '/create/convert/' + $scope.explorationId,
+        'yaml_file=' + encodeURIComponent($scope.yaml),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              console.log(data);
+            }).error(function(data) {
+              $scope.addWarning(data.error ||
+                  'Error: Could not add new exploration.');
+            });
+  };
+}
+
+/**
+ * Injects dependencies in a way that is preserved by minification.
+ */
+YamlEditor.$inject = ['$scope', '$http'];
