@@ -54,14 +54,25 @@ class BaseHandler(webapp2.RequestHandler):
     self.response.out.write(json.dumps({'error': str(error_message)}))
 
   def handle_exception(self, exception, debug_mode):
+    """Overwrites the default exception handler."""
     logging.error('Exception raised: %s' % exception)
+
     if isinstance(exception, self.NotLoggedInException):
       self.redirect(users.create_login_url(self.request.uri))
       return
+
     if isinstance(exception, self.UnauthorizedUserException):
       self.error(401)
-      self.response.out.write('401 Unauthorized: %s' % exception)
+      self.response.out.write(json.dumps(
+          {'code': '401 Unauthorized', 'error': str(exception)}))
       return
+
+    if isinstance(exception, self.InvalidInputException):
+      self.error(400)
+      self.response.out.write(json.dumps(
+          {'code': '400 Bad Request', 'error': str(exception)}))
+      return
+
     webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
     logging.error('Exception was not handled: %s' % exception)
 
@@ -69,4 +80,7 @@ class BaseHandler(webapp2.RequestHandler):
     """Error class for unauthorized access."""
 
   class NotLoggedInException(Exception):
-    """Error class for users that are not logged in."""
+    """Error class for users that are not logged in (error code 401)."""
+
+  class InvalidInputException(Exception):
+    """Error class for invalid input on the user's side (error code 400)."""

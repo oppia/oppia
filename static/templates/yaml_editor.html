@@ -2,6 +2,13 @@
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
 
+        <div ng-repeat="warning in warnings">
+          <p class="alert alert-block">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <[warning]>
+          </p>
+        </div>
+
         <h3>
           <span> <[stateName]> </span>
         </h3>

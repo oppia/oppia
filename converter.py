@@ -22,29 +22,84 @@ from google.appengine.ext import ndb
 
 EDITOR_MODE = 'editor'
 
-def Import(yaml_file):
-    """Converts a YAML file to an exploration and saves it in the datastore."""
-    # TODO(sll): Enforce the following constraints.
-    # - There must be at least one state.
-    # - Each state_name must exist and be unique. No state may be named 'END'.
-    # - Content is optional, treated as [] if non-existent.
-    # - input_type.widget is optional, treated as default for given input type
-    #   if non-existent
-    # - input_type.name is optional, the default is exact match. If present, it
-    #   must be one of some enum, otherwise it goes to the default.
-    # - answers.default.dest must exist, and be valid.
-    # - All dest states must be valid.
-    #
-    # NB: the first state in the list is the initial state.
 
-    exploration = yaml.safe_load(yaml_file)
+def ValidateState(description):
+  """Validates a state representation.
 
-    logging.info(exploration)
-    return exploration
+  This enforces the following constraints:
+  - The only accepted fields are ['answers', 'content', 'input_type'].
+  - Permitted subfields of 'content' are ['text', 'image', 'video', 'widget'].
+  - Permitted subfields of 'input_type' are ['name', 'widget'].
+  - Each item in 'answers' must have exactly one key.
+  - 'content' is optional and defaults to [].
+  - input_type.name is optional and defaults to 'none'. If it exists, it must be
+    one of ['none', 'multiple_choice', 'int', 'set', 'text'].
+    - If input_type.name == 'none' and there is more than one answer category, an
+      error is thrown. The name of the answer category can be anything; it is
+      ignored.
+  - input_type.widget is optional and defaults to the default for the given
+        input type.
+  - If input_type != 'multiple_choice' then answers.default.dest must exist, and
+    be the last one in the list.
+  - If input_type == 'multiple_choice' then 'answers' must not be non-empty.
+  """
+  logging.info(description)
+  if 'answers' not in description or len(description['answers']) == 0:
+    return False, 'No answer choices supplied'
+
+  if 'content' not in description:
+    description['content'] = []
+  if 'input_type' not in description:
+    description['input_type'] = {'name': 'none'}
+
+  for key in description:
+    if key not in ['answers', 'content', 'input_type']:
+      return False, 'Invalid key: %s' % key
+
+  for item in description['content']:
+    if len(item) != 1:
+      return False, 'Invalid content item: %s' % item
+    for key in item:
+      if key not in ['text', 'image', 'video', 'widget']:
+        return False, 'Invalid key in content array: %s' % key
+
+  for key in description['input_type']:
+    if key not in ['name', 'widget']:
+      return False, 'Invalid key in input_type: %s' % key
+
+  if (description['input_type']['name'] not in
+      ['none', 'multiple_choice', 'int', 'set', 'text']):
+    return False, 'Invalid key in input_type.name: %s' % description['input_type']['name']
+
+  for item in description['answers']:
+    if len(item) != 1:
+      return False, 'Invalid answer item: %s' % item
+
+  if description['input_type']['name'] == 'none' and len(description['answers']) > 1:
+    return False, 'Expected only a single answer for a state with no input'
+
+  if description['input_type']['name'] != 'multiple_choice':
+    if description['answers'][-1].keys() != ['default']:
+      return False, 'The last category of the answers array should be \'default\''
+
+  return True, ''
 
 
 class ImportPage(editor.BaseHandler):
-  """Imports a YAML file and creates an exploration."""
+  """Imports a YAML file and creates a state from it."""
+
+  def Import(self, yaml_file):
+      """Converts a YAML file into a state description."""
+      try:
+        description = yaml.safe_load(yaml_file)
+      except yaml.YAMLError as e:
+        raise self.InvalidInputException(e)
+
+      is_valid, error_log = ValidateState(description)
+      if is_valid:
+        return description
+      else:
+        raise self.InvalidInputException(error_log)
 
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
@@ -64,63 +119,69 @@ class ImportPage(editor.BaseHandler):
       exploration_id: string representing the exploration id.
     """
     user, exploration = self.GetUserAndExploration(exploration_id)
+    state_id = self.request.get('state_id')
+    if not state_id:
+      raise self.InvalidInputException('No state id received.')
+    state = utils.GetEntity(models.State, state_id)
 
+    state_name = self.request.get('state_name')
     yaml_file = self.request.get('yaml_file')
-    if not yaml_file:
-      self.JsonError('No exploration data received.')
+    if not state_name and not yaml_file:
+      raise self.InvalidInputException('No data received.')
+    if state_name and yaml_file:
+      raise self.InvalidInputException(
+          'Only one of the state name and the state description can be edited'
+          'at a time')
+
+    if state_name:
+      # Replace the state name with this one, after checking validity.
+      if state_name == 'END':
+        raise self.InvalidInputException('Invalid state name: END')
+      # Check that no other state has this name.
+      if (state_name != state.name and utils.CheckExistenceOfName(
+              models.State, state_name, exploration)):
+          raise self.InvalidInputException(
+              'Duplicate state name: %s', state_name)
+      state.name = state_name
+      state.put()
       return
 
-    description = Import(yaml_file)
+    # Otherwise, a YAML file has been passed in.
+    description = self.Import(yaml_file)
 
-    # Delete all states belonging to this exploration first.
-    for state in exploration.states:
-      state.delete()
-    exploration.states = []
+    input_view_name = 'none'
+    if ('input_type' in description and 'name' in description['input_type']):
+      input_view_name = description['input_type']['name']
+    input_view = models.InputView.gql(
+        'WHERE name = :name', name=input_view_name).get()
 
-    init_state_found = False
+    content = []
+    for dic in description['content']:
+      content_item = {}
+      for key, val in dic.iteritems():
+        content_item['type'] = key
+        content_item['value'] = val
+        content.append(content_item)
+    action_set_list = []
+    for index in range(len(description['answers'])):
+      for key, val in description['answers'][index].iteritems():
+        # TODO(sll): add destination information here (remember that it could
+        # be 'END').
+        # TODO(sll): If a dest state does not exist, it needs to be created. States
+        # are referred to by their name in 'description'.
+        action_set = models.ActionSet(category_index=index, text=val['text'])
+        action_set.put()
+        action_set_list.append(action_set.key)
 
-    for state_name in description:
-      state_hash_id = utils.GetNewId(models.State, state_name)
-      input_view_name = 'none'
-      if ('input_type' in description[state_name] and
-          'name' in description[state_name]['input_type']):
-        input_view_name = description[state_name]['input_type']['name']
-      input_view = models.InputView.gql(
-          'WHERE name = :name', name=input_view_name).get()
+    state.input_view = input_view.key
+    if state_name:
+      state.name = state_name
+    state.text = content
+    state.action_sets = action_set_list
+    state.put()
 
-      content = []
-      for dic in description[state_name]['content']:
-        content_item = {}
-        for key, val in dic.iteritems():
-          content_item['type'] = key
-          content_item['value'] = val
-          content.append(content_item)
-
-      action_set_list = []
-      for index in range(len(description[state_name]['answers'])):
-        for key, val in description[state_name]['answers'][index].iteritems():
-          # TODO(sll): add destination information here (remember that it could
-          # be 'END').
-          action_set = models.ActionSet(category_index=index, text=val['text'])
-          action_set.put()
-          action_set_list.append(action_set.key)
-
-      state = models.State(
-          name=state_name, hash_id=state_hash_id, text=content,
-          input_view=input_view.key, action_sets=action_set_list,
-          parent=exploration.key)
-      state.put()
-
-      action_set.dest = state.key
-      action_set.put()
-      exploration.states.append(state.key)
-
-      # TODO(sll): ensure that this actually finds the correct initial state.
-      if not init_state_found:
-        init_state_found = True
-        exploration.init_state = state.key
-
-    exploration.put()
+    action_set.dest = state.key
+    action_set.put()
 
     self.response.out.write(json.dumps({
         'explorationId': exploration_id,
