@@ -1279,7 +1279,6 @@ function YamlEditor($scope, $http) {
       '- image: 41pMJXnVrf\n- video: jd5ffc48RJU\n- widget: Yp9mxyOKSa\n' +
       'input_type:\n  name: set';
 
-  // TODO(sll): Add a handler for state_name.
   /**
    * Saves the YAML representation of a state.
    */

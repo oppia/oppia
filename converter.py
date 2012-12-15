@@ -141,29 +141,9 @@ class ImportPage(editor.BaseHandler):
       raise self.InvalidInputException('No state id received.')
     state = utils.GetEntity(models.State, state_id)
 
-    state_name = self.request.get('state_name')
     yaml_file = self.request.get('yaml_file')
-    if not state_name and not yaml_file:
+    if not yaml_file:
       raise self.InvalidInputException('No data received.')
-    if state_name and yaml_file:
-      raise self.InvalidInputException(
-          'Only one of the state name and the state description can be edited'
-          'at a time')
-
-    if state_name:
-      # Replace the state name with this one, after checking validity.
-      if state_name == 'END':
-        raise self.InvalidInputException('Invalid state name: END')
-      # Check that no other state has this name.
-      if (state_name != state.name and utils.CheckExistenceOfName(
-              models.State, state_name, exploration)):
-          raise self.InvalidInputException(
-              'Duplicate state name: %s', state_name)
-      state.name = state_name
-      state.put()
-      return
-
-    # Otherwise, a YAML file has been passed in.
     description = self.Import(yaml_file)
 
     # Delete the old actions.

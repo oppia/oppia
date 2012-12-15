@@ -331,17 +331,17 @@ class StateHandler(BaseHandler):
     user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
 
-    if self.request.get('state_name'):
-      state_name = self.request.get('state_name')
-      if state_name:
-        # Check if the new name is already in use
-        if models.State.gql('WHERE name = :state_name',
-                                state_name=state_name).get():
+    state_name = self.request.get('state_name')
+    if state_name:
+      # Replace the state name with this one, after checking validity.
+      if state_name == 'END':
+        raise self.InvalidInputException('Invalid state name: END')
+      if (state_name != state.name and utils.CheckExistenceOfName(
+              models.State, state_name, exploration)):
           raise self.InvalidInputException(
-              'State name %s is already in use.' % state_name)
-          return
-        else:
-          state.name = state_name
+              'Duplicate state name: %s', state_name)
+      state.name = state_name
+      state.put()
 
     if self.request.get('state_text'):
       state_text = json.loads(self.request.get('state_text'))
