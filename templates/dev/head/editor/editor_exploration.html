@@ -32,10 +32,8 @@
             <div class="oppia-loading" ng-show="addStateLoading"></div>
           </form>
 
-          <div id="oppia-state-graph-container">
-            <div id="oppia-state-graph-canvas">
-            </div>
-          </div>
+          {% include 'editor/editor_graph.html' %}
+
         </div>
 
         <div class="span9">
