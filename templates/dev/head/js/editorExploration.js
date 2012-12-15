@@ -1272,12 +1272,13 @@ function YamlEditor($scope, $http) {
   var pathnameArray = window.location.pathname.split('/');
   $scope.$parent.explorationId = pathnameArray[2];
 
-  // TODO(sll): Initialize this default with the current status of the
-  // exploration in the datastore.
-  $scope.yaml = 'answers:\n- default:\n    dest: END\n' +
-      '    text: First category\ncontent:\n- text: Text1\n- text: Text2\n' +
-      '- image: 41pMJXnVrf\n- video: jd5ffc48RJU\n- widget: Yp9mxyOKSa\n' +
-      'input_type:\n  name: set';
+  // Initializes the YAML textarea using data from the backend.
+  $http.get(
+      '/create/convert/' + $scope.$parent.explorationId + '/'
+          + $scope.$parent.stateId + '/data').
+      success(function(data) {
+        $scope.yaml = data;
+      });
 
   /**
    * Saves the YAML representation of a state.

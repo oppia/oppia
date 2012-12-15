@@ -306,20 +306,6 @@ class StatePage(BaseHandler):
         action['dest'] = action_set.dest.get().hash_id
       values['actions'].append(action)
 
-    # TODO(sll): this is temporary code; remove it.
-    # TODO(sll): check whether the 'Default' is triggering correctly.
-    logging.info(yaml.safe_dump({
-      state.name: {
-      'content': [{text['type']: text['value']} for text in state.text],
-      'input_type': {'name': state.input_view.get().name},
-      'answers': [
-          {state.classifier_categories[i] if len(state.classifier_categories) > i else 'Default':
-              {'text': state.action_sets[i].get().text,
-               'dest': state.action_sets[i].get().dest.get().name if state.action_sets[i].get().dest else None}
-          }
-          for i in range(len(state.action_sets))],
-    }}, default_flow_style=False))
-
     self.response.out.write(json.dumps(values))
 
 
