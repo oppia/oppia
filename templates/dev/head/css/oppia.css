@@ -12,6 +12,10 @@ textarea.oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
+.alert-block {
+  width: 80%
+}
+
 .oppia-content {
   margin: 0 auto;
   padding-left: 30px;
@@ -241,6 +245,7 @@ textarea.oppia-code {
 .oppia-category-block {
   border: 1px solid #efefef;
   min-height: 40px;
+  width: 80%;
 }
 
 
