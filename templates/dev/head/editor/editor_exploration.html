@@ -49,6 +49,13 @@
             </h3>
           </form>
 
+          <div ng-repeat="warning in warnings">
+            <p class="alert alert-block">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <[warning]>
+            </p>
+          </div>
+
           <div ng-view></div>
 
           <div ng-show="inputType != 'none' && getMode() == 'gui'">

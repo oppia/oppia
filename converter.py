@@ -52,6 +52,9 @@ def ValidateState(description):
   if 'input_type' not in description:
     description['input_type'] = {'name': 'none'}
 
+  if 'name' not in description['input_type']:
+    return False, 'input_type should have a \'name\' attribute'
+
   for key in description:
     if key not in ['answers', 'content', 'input_type']:
       return False, 'Invalid key: %s' % key
@@ -149,11 +152,10 @@ class ImportPage(editor.BaseHandler):
     # Otherwise, a YAML file has been passed in.
     description = self.Import(yaml_file)
 
-    input_view_name = 'none'
-    if ('input_type' in description and 'name' in description['input_type']):
-      input_view_name = description['input_type']['name']
+    input_view_name = description['input_type']['name']
     input_view = models.InputView.gql(
         'WHERE name = :name', name=input_view_name).get()
+    # TODO(sll): Deal with input_view.widget here (and handle its verification above).
 
     content = []
     for dic in description['content']:
@@ -176,8 +178,6 @@ class ImportPage(editor.BaseHandler):
         action_set_list.append(action_set.key)
 
     state.input_view = input_view.key
-    if state_name:
-      state.name = state_name
     state.text = content
     state.action_sets = action_set_list
     state.put()
