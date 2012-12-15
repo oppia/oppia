@@ -11,16 +11,7 @@
 
           <div id="editorWindow" ng-show="stateId">
             <a class="close" ng-click="closeEditorWindow()">&times;</a>
-            <form ng-submit="saveStateName()">
-              <h3>
-                <span class="oppia-editable-name" ng-hide="currentActiveInput == 'stateName'" ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
-                <span ng-show="currentActiveInput == 'stateName'">
-                  <input type="text" ng-model="stateName">
-                  <input type="submit" value="Save">
-                </span>
-              </h3>
-            </form>
-
+            
             <button ng-click="changeMode('text')">Use YAML text editor (experimental)</button>
 
             <h4>Content displayed to the reader</h4>
