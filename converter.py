@@ -169,6 +169,8 @@ class ImportPage(editor.BaseHandler):
         # be 'END').
         # TODO(sll): If a dest state does not exist, it needs to be created. States
         # are referred to by their name in 'description'.
+        if 'text' not in val:
+          val['text'] = ''
         action_set = models.ActionSet(category_index=index, text=val['text'])
         action_set.put()
         action_set_list.append(action_set.key)
