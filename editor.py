@@ -139,13 +139,12 @@ class ExplorationPage(BaseHandler):
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     state_name = self.request.get('state_name')
     if not state_name:
-      self.JsonError('Please specify a state name.')
-      return
+      raise self.InvalidInputException('Please specify a state name.')
 
     # Check that the state_name has not been taken.
     if utils.CheckExistenceOfName(models.State, state_name, exploration):
-      self.JsonError('A state called %s already exists' % state_name)
-      return
+      raise self.InvalidInputException(
+          'A state called %s already exists' % state_name)
     state_hash_id = utils.GetNewId(models.State, state_name)
     none_input_view = models.InputView.gql(
         'WHERE name = :name', name='none').get()
@@ -348,7 +347,8 @@ class StateHandler(BaseHandler):
         # Check if the new name is already in use
         if models.State.gql('WHERE name = :state_name',
                                 state_name=state_name).get():
-          self.JsonError('State name %s is already in use.' % state_name)
+          raise self.InvalidInputException(
+              'State name %s is already in use.' % state_name)
           return
         else:
           state.name = state_name
@@ -434,7 +434,8 @@ class StateHandler(BaseHandler):
 
     # Do not allow deletion of initial states.
     if exploration.init_state == state.key:
-      self.JsonError('Cannot delete initial state of an exploration.')
+      raise self.InvalidInputException(
+          'Cannot delete initial state of an exploration.')
       return
 
     # Find all action_sets whose dest is the state to be deleted, and change
@@ -489,5 +490,5 @@ class Image(base.BaseHandler):
       image_entity.put()
       self.response.out.write(json.dumps({'image_id': image_entity.hash_id}))
     else:
-      self.JsonError('No image supplied')
+      raise self.InvalidInputException('No image supplied')
       return

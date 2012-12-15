@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging, os
+import json, logging, os, sys, traceback
 import jinja2, webapp2
 import feconf, utils
 
@@ -55,6 +55,7 @@ class BaseHandler(webapp2.RequestHandler):
 
   def handle_exception(self, exception, debug_mode):
     """Overwrites the default exception handler."""
+    logging.info(''.join(traceback.format_exception(*sys.exc_info())))
     logging.error('Exception raised: %s' % exception)
 
     if isinstance(exception, self.NotLoggedInException):
