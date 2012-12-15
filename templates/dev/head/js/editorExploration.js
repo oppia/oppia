@@ -1342,7 +1342,10 @@ function YamlEditor($scope, $http, stateData) {
               $scope.$parent.stateText = data.stateText;
               $scope.$parent.inputType = data.inputType;
               $scope.$parent.classifier = data.classifier;
-              // TODO(sll): Refresh the graph.
+
+              // TODO(sll): Try and do this refresh without requiring an
+              // update from the backend.
+              stateData.getData($scope.$parent.stateId);
             }).error(function(data) {
               $scope.addWarning(data.error ||
                   'Error: Could not add new state.');
