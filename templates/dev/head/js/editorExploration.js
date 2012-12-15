@@ -1290,9 +1290,8 @@ function YamlEditor($scope, $http) {
             '&yaml_file=' + encodeURIComponent($scope.yaml),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              console.log(data);
-              // TODO(sll): Update the $scope.states vars here, and refresh
-              // the graph.
+              $scope.$parent.states[$scope.$parent.stateId] = data.state;
+              // TODO(sll): Refresh the graph.
             }).error(function(data) {
               $scope.addWarning(data.error ||
                   'Error: Could not add new state.');

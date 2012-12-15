@@ -155,6 +155,7 @@ class ImportPage(editor.BaseHandler):
     input_view = models.InputView.gql(
         'WHERE name = :name', name=input_view_name).get()
     # TODO(sll): Deal with input_view.widget here (and handle its verification above).
+    dests_array = []
 
     content = []
     for dic in description['content']:
@@ -163,8 +164,14 @@ class ImportPage(editor.BaseHandler):
         content_item['type'] = key
         content_item['value'] = val
         content.append(content_item)
+
+    # Retrieve the actions corresponding to this state.
+    category_list = classifiers.GetCategoryList(
+        state.input_view.get().classifier, state.classifier_categories)
+
     action_set_list = []
     for index in range(len(description['answers'])):
+      dests_array_item = {}
       for key, val in description['answers'][index].iteritems():
         dest_name = val['dest']
         dest_key = None
@@ -178,6 +185,11 @@ class ImportPage(editor.BaseHandler):
             dest_state = utils.CreateNewState(exploration, dest_name)
             dest_key = dest_state.key
 
+        dests_array_item['category'] = category_list[index]
+        dests_array_item['text'] = val['text']
+        dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
+        dests_array.append(dests_array_item)
+
         action_set = models.ActionSet(
             category_index=index, text=val['text'], dest=dest_key)
         action_set.put()
@@ -188,8 +200,11 @@ class ImportPage(editor.BaseHandler):
     state.action_sets = action_set_list
     state.put()
 
+    logging.info(dests_array)
+
     self.response.out.write(json.dumps({
         'explorationId': exploration_id,
+        'state': {'desc': state.name, 'dests': dests_array},
     }))
 
 
@@ -203,6 +218,9 @@ class ExportHandler(editor.BaseHandler):
     user, exploration = self.GetUserAndExploration(exploration_id)
 
     state = utils.GetEntity(models.State, state_id)
+
+    # TODO(sll): This code is similar to the code in StatePage.post(). Refactor
+    # to unify them.
     values = {
         'actions': [],
         'classifier': state.input_view.get().classifier,
