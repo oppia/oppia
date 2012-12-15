@@ -71,6 +71,56 @@ oppia.config(['$routeProvider', function($routeProvider) {
 }]);
 
 
+oppia.factory('stateDataFactory', function($rootScope, $http) {
+  // Put state variables here.
+  var stateData = {};
+
+  stateData.data = '';
+  stateData.stateName = '';
+  stateData.stateText = '';
+  stateData.inputType = '';
+  stateData.classifier = '';
+
+  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  var pathnameArray = window.location.pathname.split('/');
+  var explorationId = pathnameArray[2];
+  var explorationUrl = '/create/' + explorationId;
+
+  /**
+   * Gets the data for a particular state.
+   * @param {string} stateId The id of the state to get the data for.
+   */
+  stateData.getData = function(stateId) {
+    var obj = this;
+    console.log('Getting state data');
+    $http.post(
+        explorationUrl + '/' + stateId, '',
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              obj.data = data;
+              console.log(data);
+              obj.stateName = data.stateName;
+              obj.stateText = data.stateText;
+              obj.inputType = data.inputType;
+              obj.classifier = data.classifier;
+
+              obj.broadcastState();
+            }).
+            error(function(data) {
+              $rootScope.$broadcast('warning');
+              // TODO(sll): Broadcast the warning.
+              // $rootScope.addWarning('Server error: ' + data.error);
+            });
+  };
+
+  stateData.broadcastState = function() {
+    $rootScope.$broadcast('stateData');
+  }
+
+  return stateData;
+});
+
+
 // Filter that truncates long descriptors.
 // TODO(sll): Strip out HTML tags before truncating.
 oppia.filter('truncate', function() {
@@ -241,7 +291,7 @@ oppia.directive('sortable', function($compile) {
 });
 
 
-function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
+function EditorExploration($scope, $http, $timeout, $location, $routeParams, stateData) {
   $scope.getMode = function() {
     if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
       return GUI_EDITOR_URL.substring(1);
@@ -455,7 +505,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
                 $scope.saveStateChange('states');
               } else {
                 // The content creator added a state from the state list.
-                $scope.initializeEditorWindow(data);
+                $scope.getStateDataFromBackend(data.stateId);
               }
             }).error(function(data) {
               $scope.addStateLoading = false;
@@ -469,25 +519,19 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
    * @param {string} stateId The id of the state to get the data for.
    */
   $scope.getStateDataFromBackend = function(stateId) {
-    console.log('Getting state data');
-    $http.post(
-        $scope.explorationUrl + '/' + stateId, '',
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success($scope.initializeEditorWindow).
-            error(function(data) {
-              $scope.addWarning('Server error: ' + data.error);
-            });
+    stateData.getData(stateId);
   };
 
   /**
    * Sets up the state editor, given its data from the backend.
    * @param {Object} data Data received from the backend about the state.
    */
-  $scope.initializeEditorWindow = function(data) {
+  $scope.$on('stateData', function() {
+    var data = stateData.data;
+
     var prevStateId = $scope.stateId;
     $scope.closeModalWindow();
     $scope.stateId = data.stateId;
-    var prefix = $scope.stateId + '.';
     var variableList = ['stateName', 'stateText', 'inputType', 'classifier',
                         'states'];
     for (var i = 0; i < variableList.length; ++i) {
@@ -499,6 +543,9 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
     // Update the states using the actions variable.
     $scope.states[$scope.stateId].dests = data.actions;
 
+    console.log('States for editor');
+    console.log(data.actions);
+    console.log($scope.states);
     console.log(data);
 
     if ($scope.getMode() == 'gui') {
@@ -525,7 +572,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
 
     // Changes the active node in the graph.
     drawStateGraph($scope.states);
-  };
+  });
 
   $scope.saveQuestionName = function() {
     if (!$scope.isValidEntityName($scope.explorationDesc, true))
@@ -1264,7 +1311,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams'];
+EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams', 'stateDataFactory'];
 
 
 function YamlEditor($scope, $http) {
