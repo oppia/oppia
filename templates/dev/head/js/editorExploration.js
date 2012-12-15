@@ -1291,6 +1291,9 @@ function YamlEditor($scope, $http) {
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.$parent.states[$scope.$parent.stateId] = data.state;
+              $scope.$parent.stateText = data.stateText;
+              $scope.$parent.inputType = data.inputType;
+              $scope.$parent.classifier = data.classifier;
               // TODO(sll): Refresh the graph.
             }).error(function(data) {
               $scope.addWarning(data.error ||

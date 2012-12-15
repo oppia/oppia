@@ -200,11 +200,12 @@ class ImportPage(editor.BaseHandler):
     state.action_sets = action_set_list
     state.put()
 
-    logging.info(dests_array)
-
     self.response.out.write(json.dumps({
+        'classifier': input_view.classifier,
         'explorationId': exploration_id,
+        'inputType': input_view.name,
         'state': {'desc': state.name, 'dests': dests_array},
+        'stateText': content,
     }))
 
 
