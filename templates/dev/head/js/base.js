@@ -27,9 +27,6 @@ function Base($scope, $timeout) {
   $scope.addWarning = function(warning) {
     console.log('WARNING: ' + warning);
     $scope.warnings.push(warning);
-    $timeout(function() {
-      $scope.warnings.shift();
-    }, 3000);
   };
 
   /**
