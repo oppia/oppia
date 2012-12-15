@@ -80,6 +80,7 @@ oppia.factory('stateDataFactory', function($rootScope, $http) {
   stateData.stateText = '';
   stateData.inputType = '';
   stateData.classifier = '';
+  stateData.yaml = '';
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var pathnameArray = window.location.pathname.split('/');
@@ -90,6 +91,7 @@ oppia.factory('stateDataFactory', function($rootScope, $http) {
    * Gets the data for a particular state.
    * @param {string} stateId The id of the state to get the data for.
    */
+  // TODO(sll): Get this from the frontend if is already there.
   stateData.getData = function(stateId) {
     var obj = this;
     console.log('Getting state data');
@@ -103,6 +105,7 @@ oppia.factory('stateDataFactory', function($rootScope, $http) {
               obj.stateText = data.stateText;
               obj.inputType = data.inputType;
               obj.classifier = data.classifier;
+              obj.yaml = data.yaml;
 
               obj.broadcastState();
             }).
@@ -1314,18 +1317,16 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams, sta
 EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams', 'stateDataFactory'];
 
 
-function YamlEditor($scope, $http) {
+function YamlEditor($scope, $http, stateData) {
   // The pathname should be: .../create/{exploration_id}/[state_id]
   var pathnameArray = window.location.pathname.split('/');
   $scope.$parent.explorationId = pathnameArray[2];
 
   // Initializes the YAML textarea using data from the backend.
-  $http.get(
-      '/create/convert/' + $scope.$parent.explorationId + '/'
-          + $scope.$parent.stateId + '/data').
-      success(function(data) {
-        $scope.yaml = data;
-      });
+  stateData.getData($scope.$parent.stateId);
+  $scope.$on('stateData', function() {
+    $scope.yaml = stateData.yaml;
+  });
 
   /**
    * Saves the YAML representation of a state.
@@ -1352,4 +1353,4 @@ function YamlEditor($scope, $http) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-YamlEditor.$inject = ['$scope', '$http'];
+YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory'];

@@ -91,7 +91,6 @@ urls = [
     (r'/create/?', editor.MainPage),
     (r'/create_new/?', editor.NewExploration),
     (r'/create/convert/(%s)/?' % r, converter.ImportPage),
-    (r'/create/convert/(%s)/(%s)/data/?' % (r, r), converter.ExportHandler),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.

@@ -284,6 +284,7 @@ class StatePage(BaseHandler):
         'stateId': state.hash_id,
         'stateName': state.name,
         'stateText': state.text,
+        'yaml': '',
     }
 
     # Retrieve the actions corresponding to this state.
@@ -305,6 +306,18 @@ class StatePage(BaseHandler):
       elif action_set.dest:
         action['dest'] = action_set.dest.get().hash_id
       values['actions'].append(action)
+
+    values['yaml'] = yaml.safe_dump({
+        'content': [{text['type']: text['value']} for text in state.text],
+        'input_type': {'name': state.input_view.get().name},
+        'answers': [
+            {category_list[i] if category_list[i] != 'All other inputs' else 'default':
+                {'text': state.action_sets[i].get().text,
+                 'dest': (state.action_sets[i].get().dest.get().name
+                          if state.action_sets[i].get().dest else 'END')}
+            }
+            for i in range(len(state.action_sets))],
+    }, default_flow_style=False)
 
     self.response.out.write(json.dumps(values))
 
