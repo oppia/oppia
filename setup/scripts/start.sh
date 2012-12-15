@@ -81,6 +81,13 @@ if [ ! -d "third_party/angularjs" ]; then
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
 fi
 
+echo Checking whether d3.js is installed in third_party
+if [ ! -d "third_party/d3js" ]; then
+  echo Installing d3.js
+  mkdir -p third_party/d3js/
+  wget http://d3js.org/d3.v2.min.js -O third_party/d3js/d3.min.js
+fi
+
 echo Checking whether jsplumb is installed in third_party
 if [ ! -d "third_party/jsplumb" ]; then
   echo Installing JSPlumb
