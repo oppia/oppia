@@ -23,9 +23,9 @@ textarea.oppia-code {
 }
 
 .oppia-class-category {
-  border: 3px solid #CCC; 
+  border: 3px solid #CCC;
   border-radius: 20px;
-  margin: 10px; 
+  margin: 10px;
   width: 100%;
 }
 
@@ -289,4 +289,30 @@ textarea.oppia-code {
   background-position: -339px -7px;
   height: 43px;
   width: 60px;
+}
+
+
+/* Styles for the force-directed graph (temporary). */
+
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+text {
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+
+text.shadow {
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-opacity: .8;
 }

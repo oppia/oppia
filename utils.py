@@ -172,16 +172,29 @@ def GetFileContents(filepath):
     return f.read().decode('utf-8')
 
 
-def GetJsFile(filename):
-  """Gets the contents of a JS file, including the base JS.
+def GetJsFiles(filenames):
+  """Gets the concatenated contents of some JS files.
 
   Args:
-    filename: the name of a JS file (without the '.js' suffix).
+    filenames: an array with names of JS files (without the '.js' suffix).
 
   Returns:
-    the JS file contents.
+    the concatenated contents of these JS files.
   """
-  return GetFileContents('js/base.js') + GetFileContents('js/%s.js' % filename)
+  return '\n'.join(
+      [GetFileContents('js/%s.js' % filename) for filename in filenames])
+
+
+def GetJsFilesWithBase(filenames):
+  """Gets the concatenated contents of some JS files, including the base JS.
+
+  Args:
+    filenames: an array with names of JS files (without the '.js' suffix).
+
+  Returns:
+    the concatenated contents of these JS files, with base.js prepended.
+  """
+  return GetJsFiles(['base'] + filenames)
 
 
 def GetJsFileWithClassifiers(filename):
@@ -193,7 +206,7 @@ def GetJsFileWithClassifiers(filename):
   Returns:
     the JS file contents.
   """
-  return GetJsFile(filename) + GetFileContents('js/editorClassifiers.js')
+  return GetJsFiles(['base', filename, 'editorClassifiers'])
 
 
 def GetCssFile(filename):

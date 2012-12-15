@@ -54,7 +54,7 @@ class WidgetRepositoryPage(BaseHandler):
     """Returns the widget repository page."""
     self.response.out.write(jinja_env.get_template('widgets.html').render({
         'css': utils.GetCssFile('oppia'),
-        'js': utils.GetJsFile('widgetRepository'),
+        'js': utils.GetJsFiles(['widgetRepository']),
     }))
 
 

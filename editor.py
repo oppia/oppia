@@ -91,7 +91,7 @@ class MainPage(BaseHandler):
 
     self.values.update({
         'categories': categories,
-        'js': utils.GetJsFile('editorMain'),
+        'js': utils.GetJsFilesWithBase(['editorMain']),
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
@@ -122,7 +122,8 @@ class ExplorationPage(BaseHandler):
     user, exploration = self.GetUserAndExploration(exploration_id)
 
     self.values.update({
-        'js': utils.GetJsFileWithClassifiers('editorExploration'),
+        'js': utils.GetJsFilesWithBase(
+            ['editorExploration', 'editorClassifiers', 'editorGraph']),
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
@@ -210,7 +211,7 @@ class ExplorationHandler(BaseHandler):
         'exploration_id': exploration.hash_id,
         'init_state_id': exploration.init_state.get().hash_id,
         'is_public': exploration.is_public,
-        'js': utils.GetJsFile('editorExploration'),
+        'js': utils.GetJsFilesWithBase(['editorExploration', 'editorGraph']),
         'metadata': exploration.metadata,
         'mode': EDITOR_MODE,
         'state_list': state_list,
@@ -253,7 +254,8 @@ class StatePage(BaseHandler):
 
     DIR_PREFIX = 'classifier_editors/'
     self.values.update({
-        'js': utils.GetJsFileWithClassifiers('editorExploration'),
+        'js': utils.GetJsFilesWithBase(
+            ['editorExploration', 'editorClassifiers', 'editorGraph']),
         'mode': EDITOR_MODE,
         'finite_code': utils.GetFileContents('%s/finite.html' % DIR_PREFIX),
         'numeric_code': utils.GetFileContents('%s/numeric.html' % DIR_PREFIX),

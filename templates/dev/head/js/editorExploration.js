@@ -71,16 +71,42 @@ oppia.config(['$routeProvider', function($routeProvider) {
 }]);
 
 
+oppia.factory('explorationDataFactory', function($rootScope, $http) {
+  // Put exploration variables here.
+  var explorationData = {};
+
+  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  var pathnameArray = window.location.pathname.split('/');
+  var explorationId = pathnameArray[2];
+  var explorationUrl = '/create/' + explorationId;
+
+  explorationData.getData = function() {
+    var obj = this;
+    console.log('Getting exploration data');
+    $http.get(explorationUrl + '/data').success(function(data) {
+      obj.data = data;
+      obj.states = data.state_list;
+      obj.initState = data.init_state_id;
+
+      obj.broadcastExploration();
+    }).error(function(data) {
+      $rootScope.$broadcast('warning');
+      // TODO(sll): Broadcast the warning.
+      // $rootScope.addWarning('Server error: ' + data.error);
+    });
+  };
+
+  explorationData.broadcastExploration = function() {
+    $rootScope.$broadcast('explorationData');
+  }
+
+  return explorationData;
+});
+
+
 oppia.factory('stateDataFactory', function($rootScope, $http) {
   // Put state variables here.
   var stateData = {};
-
-  stateData.data = '';
-  stateData.stateName = '';
-  stateData.stateText = '';
-  stateData.inputType = '';
-  stateData.classifier = '';
-  stateData.yaml = '';
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var pathnameArray = window.location.pathname.split('/');
@@ -294,7 +320,8 @@ oppia.directive('sortable', function($compile) {
 });
 
 
-function EditorExploration($scope, $http, $timeout, $location, $routeParams, stateData) {
+function EditorExploration($scope, $http, $timeout, $location, $routeParams,
+    stateData, explorationData) {
   $scope.getMode = function() {
     if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
       return GUI_EDITOR_URL.substring(1);
@@ -335,11 +362,14 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams, sta
   $scope.explorationUrl = '/create/' + $scope.explorationId;
 
   // Initializes the exploration page using data from the backend.
-  $http.get($scope.explorationUrl + '/data').success(function(data) {
+  explorationData.getData();
+
+  $scope.$on('explorationData', function() {
+    var data = explorationData.data;
+    $scope.states = explorationData.states;
     console.log('Data for exploration page:');
     console.log(data);
     $scope.explorationDesc = data.metadata.title;
-    $scope.states = data.state_list;
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.stateId = $routeParams.stateId || $scope.initStateId;
@@ -351,8 +381,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams, sta
     initJsPlumb();
     drawStateGraph($scope.states);
     $scope.getStateDataFromBackend($scope.stateId);
-  }).error(function(data) {
-    $scope.addWarning(data.error || 'Error: Could not load question page.');
   });
 
   // Clears modal window data when it is closed.
@@ -1314,10 +1342,11 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams, sta
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams', 'stateDataFactory'];
+EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location',
+    '$routeParams', 'stateDataFactory', 'explorationDataFactory'];
 
 
-function YamlEditor($scope, $http, stateData) {
+function YamlEditor($scope, $http, stateData, explorationData) {
   // The pathname should be: .../create/{exploration_id}/[state_id]
   var pathnameArray = window.location.pathname.split('/');
   $scope.$parent.explorationId = pathnameArray[2];
@@ -1356,4 +1385,4 @@ function YamlEditor($scope, $http, stateData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory'];
+YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory', 'explorationDataFactory'];

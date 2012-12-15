@@ -45,7 +45,7 @@ class MainPage(base.BaseHandler):
 
     self.values.update({
         'categories': categories,
-        'js': utils.GetJsFile('readerMain'),
+        'js': utils.GetJsFiles(['readerMain']),
         'mode': READER_MODE,
     })
     self.response.out.write(
@@ -62,7 +62,7 @@ class ExplorationPage(base.BaseHandler):
       exploration_id: string representing the exploration id.
     """
     self.values.update({
-        'js': utils.GetJsFile('readerExploration'),
+        'js': utils.GetJsFiles(['readerExploration']),
         'mode': READER_MODE,
     })
 
