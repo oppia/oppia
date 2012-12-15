@@ -145,19 +145,8 @@ class ExplorationPage(BaseHandler):
     if utils.CheckExistenceOfName(models.State, state_name, exploration):
       raise self.InvalidInputException(
           'A state called %s already exists' % state_name)
-    state_hash_id = utils.GetNewId(models.State, state_name)
-    none_input_view = models.InputView.gql(
-        'WHERE name = :name', name='none').get()
-    none_action_set = models.ActionSet(category_index=0)
-    none_action_set.put()
-    state = models.State(
-        name=state_name, hash_id=state_hash_id, input_view=none_input_view.key,
-        action_sets=[none_action_set.key], parent=exploration.key)
-    state.put()
-    none_action_set.dest = state.key
-    none_action_set.put()
-    exploration.states.append(state.key)
-    exploration.put()
+
+    state = utils.CreateNewState(exploration, state_name)
 
     self.response.out.write(json.dumps({
         'classifier': state.input_view.get().classifier,
@@ -318,6 +307,7 @@ class StatePage(BaseHandler):
       values['actions'].append(action)
 
     # TODO(sll): this is temporary code; remove it.
+    # TODO(sll): check whether the 'Default' is triggering correctly.
     logging.info(yaml.safe_dump({
       state.name: {
       'content': [{text['type']: text['value']} for text in state.text],

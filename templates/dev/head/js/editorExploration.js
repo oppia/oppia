@@ -64,11 +64,9 @@ oppia.config(['$routeProvider', function($routeProvider) {
            {templateUrl: '/templates/yaml_editor.html',
             controller: YamlEditor}).
       when(GUI_EDITOR_URL,
-           {templateUrl: '/templates/gui_editor.html',
-            controller: GuiEditor}).
+           {templateUrl: '/templates/gui_editor.html'}).
       when(GUI_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/gui_editor.html',
-            controller: GuiEditor}).
+           {templateUrl: '/templates/gui_editor.html'}).
       otherwise({redirectTo: GUI_EDITOR_URL});
 }]);
 
@@ -1269,17 +1267,10 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams) {
 EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location', '$routeParams'];
 
 
-function GuiEditor() {
-  // TODO(sll): Move GUI-editor-only methods to this function.
-}
-
-GuiEditor.$inject = [];
-
-
 function YamlEditor($scope, $http) {
   // The pathname should be: .../create/{exploration_id}/[state_id]
   var pathnameArray = window.location.pathname.split('/');
-  $scope.explorationId = pathnameArray[2];
+  $scope.$parent.explorationId = pathnameArray[2];
 
   // TODO(sll): Initialize this default with the current status of the
   // exploration in the datastore.
@@ -1294,13 +1285,14 @@ function YamlEditor($scope, $http) {
    */
   $scope.saveState = function() {
     $http.put(
-        '/create/convert/' + $scope.explorationId,
-        'state_id=' + $scope.stateId +
+        '/create/convert/' + $scope.$parent.explorationId,
+        'state_id=' + $scope.$parent.stateId +
             '&yaml_file=' + encodeURIComponent($scope.yaml),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               console.log(data);
-              // Update the $scope.states vars here.
+              // TODO(sll): Update the $scope.states vars here, and refresh
+              // the graph.
             }).error(function(data) {
               $scope.addWarning(data.error ||
                   'Error: Could not add new state.');

@@ -30,7 +30,9 @@ def ValidateState(description):
   - The only accepted fields are ['answers', 'content', 'input_type'].
   - Permitted subfields of 'content' are ['text', 'image', 'video', 'widget'].
   - Permitted subfields of 'input_type' are ['name', 'widget'].
-  - Each item in 'answers' must have exactly one key.
+  - Each item in 'answers' must have exactly one key, and the corresponding
+    value must also have a 'dest'. The 'text' field is optional and defaults to ''.
+  - Each item in 'answers' should have a unique key.
   - 'content' is optional and defaults to [].
   - input_type.name is optional and defaults to 'none'. If it exists, it must be
     one of ['none', 'multiple_choice', 'int', 'set', 'text'].
@@ -77,9 +79,21 @@ def ValidateState(description):
   for item in description['answers']:
     if len(item) != 1:
       return False, 'Invalid answer item: %s' % item
+    key = item.keys()[0]
+    val = item.values()[0]
+    if 'dest' not in val or not val['dest']:
+      return False, 'Each answer should contain a \'dest\' attribute'
+    if 'text' not in val:
+      item[key]['text'] = ''
+
+  # Check uniqueness of keys in 'answers'
+  answer_keys = sorted([item.keys()[0] for item in description['answers']])
+  for i in range(len(answer_keys) - 1):
+    if answer_keys[i] == answer_keys[i+1]:
+      return False, 'Answer key %s appears more than once' % answer_keys[i]
 
   if description['input_type']['name'] == 'none' and len(description['answers']) > 1:
-    return False, 'Expected only a single answer for a state with no input'
+    return False, 'Expected only a single \'answer\' for a state with no input'
 
   if description['input_type']['name'] != 'multiple_choice':
     if description['answers'][-1].keys() != ['default']:
@@ -152,6 +166,11 @@ class ImportPage(editor.BaseHandler):
     # Otherwise, a YAML file has been passed in.
     description = self.Import(yaml_file)
 
+    # Delete the old actions.
+    for action_key in state.action_sets:
+      action_key.delete()
+    state.action_sets = []
+
     input_view_name = description['input_type']['name']
     input_view = models.InputView.gql(
         'WHERE name = :name', name=input_view_name).get()
@@ -167,13 +186,20 @@ class ImportPage(editor.BaseHandler):
     action_set_list = []
     for index in range(len(description['answers'])):
       for key, val in description['answers'][index].iteritems():
-        # TODO(sll): add destination information here (remember that it could
-        # be 'END').
-        # TODO(sll): If a dest state does not exist, it needs to be created. States
-        # are referred to by their name in 'description'.
-        if 'text' not in val:
-          val['text'] = ''
-        action_set = models.ActionSet(category_index=index, text=val['text'])
+        dest_name = val['dest']
+        dest_key = None
+        if dest_name != 'END':
+          # Use the state with this destination name, if it exists.
+          dest_state = models.State.query(ancestor=exploration.key).filter(
+              models.State.name == dest_name).get()
+          if dest_state:
+            dest_key = dest_state.key
+          else:
+            dest_state = utils.CreateNewState(exploration, dest_name)
+            dest_key = dest_state.key
+
+        action_set = models.ActionSet(
+            category_index=index, text=val['text'], dest=dest_key)
         action_set.put()
         action_set_list.append(action_set.key)
 
@@ -181,9 +207,6 @@ class ImportPage(editor.BaseHandler):
     state.text = content
     state.action_sets = action_set_list
     state.put()
-
-    action_set.dest = state.key
-    action_set.put()
 
     self.response.out.write(json.dumps({
         'explorationId': exploration_id,
