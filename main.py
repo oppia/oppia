@@ -70,7 +70,7 @@ class MainPage(base.BaseHandler):
     """Handles GET requests."""
     self.InitializeInputViews()
     self.EnsureDefaultExplorationExists()
-    self.values['js'] = utils.GetJsFile('index')
+    self.values['js'] = utils.GetJsFilesWithBase(['index'])
     self.response.out.write(
         base.JINJA_ENV.get_template('index.html').render(self.values))
 
