@@ -90,7 +90,7 @@ def GetCategoryList(classifier_type, categories):
     the list of categories.
   """
   if classifier_type == classifiers.none:
-    return ['']
+    return [utils.DEFAULT_CATEGORY]
   elif classifier_type == classifiers.finite:
     return categories
   elif (classifier_type == classifiers.numeric or

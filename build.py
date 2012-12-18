@@ -75,6 +75,8 @@ for root, dirs, files in os.walk(os.getcwd()):
     full_filename = os.path.join(root) + '/' + fn
     if full_filename.find(OUT_DIR) > 0:
       continue
+    if full_filename.find('static/templates') != -1
+      continue
     # Do not process files in third_party.
     if full_filename.find('third_party') != -1 or full_filename.find('.git') != -1:
       continue
