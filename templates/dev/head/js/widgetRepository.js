@@ -1,5 +1,6 @@
 function Widgets($scope, $http) {
   $scope.widgetDataUrl = '/widgets/repository/data/';
+  $scope.currentActiveInput = '';
 
   $scope.loadPage = function(data) {
     console.log(data);
@@ -7,7 +8,7 @@ function Widgets($scope, $http) {
     for (var i = 0; i < data.widgets.length; ++i) {
       var widgetCode = data.widgets[i];
       $scope.$apply();
-      $scope.fillFrame('widget-' + i, widgetCode.raw);  
+      $scope.fillFrame('widget-' + i, widgetCode.raw);
     }
   };
 
@@ -24,7 +25,49 @@ function Widgets($scope, $http) {
   $scope.fillFrame = function(domId, widgetCode) {
     var F = $('#' + domId);
     F[0].contentWindow.document.write(widgetCode);
-  }
+  };
+
+  $scope.setActiveInput = function(newActiveInput) {
+    $scope.currentActiveInput = newActiveInput;
+  };
+
+  $scope.clearActiveInputs = function() {
+    $scope.currentActiveInput = '';
+  };
+
+  $scope.createNewWidget = function() {
+    $scope.setActiveInput('addWidget');
+  };
+
+  $scope.saveWidget = function(widgetCode) {
+    $scope.addContentToIframe('widgetPreview', widgetCode);
+
+    // TODO(sll): This does not update the view value when widgetCode is
+    // called from the repository. Fix this.
+    $scope.widgetCode = widgetCode;
+    // TODO(sll): Escape widgetCode first!
+    // TODO(sll): Need to ensure that anything stored server-side cannot lead
+    //     to malicious behavior (e.g. the user could do his/her own POST
+    //     request). Get a security review done on this feature.
+
+    var request = $.param(
+        {'raw': JSON.stringify(widgetCode),
+         'name': $scope.newWidgetName
+        },
+        true
+    );
+
+    $http.post(
+      '/widgets/repository/',
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(widgetData) {
+      // Check that the data has been saved correctly.
+      console.log(widgetData);
+      $('#widgetTabs a:first').tab('show');
+      $scope.clearActiveInputs();
+    });
+  };
 }
 
 /**

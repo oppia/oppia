@@ -4,7 +4,7 @@
 
           <div id="editorWindow" ng-show="stateId">
             <a class="close" ng-click="closeEditorWindow()">&times;</a>
-            
+
             <button ng-click="changeMode('text')">Use YAML text editor (experimental)</button>
 
             <h4>Content displayed to the reader</h4>
@@ -90,7 +90,7 @@
                           </button>
                         </div>
                         <div class="tab-pane active" id="repository">
-                          <iframe src="/widgets/repository/" width="100%" height="400px" frameborder="0"></iframe>
+                          <iframe src="/widgets/repository?iframed=true" width="100%" height="400px" frameborder="0"></iframe>
                         </div>
                       </div>
                     </div>

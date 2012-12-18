@@ -18,10 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json, logging, os
 import jinja2, webapp2
-import feconf, models, utils
-
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR + 'widgets/')))
+import base, feconf, models, utils
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -52,10 +49,46 @@ class WidgetRepositoryPage(BaseHandler):
 
   def get(self):  # pylint: disable-msg=C6409
     """Returns the widget repository page."""
-    self.response.out.write(jinja_env.get_template('widgets.html').render({
+    self.values = {
         'css': utils.GetCssFile('oppia'),
         'js': utils.GetJsFilesWithBase(['widgetRepository']),
-    }))
+    }
+    if self.request.get('iframed') == 'true':
+      self.values['iframed'] = True
+    self.response.out.write(
+        base.JINJA_ENV.get_template('widgets/widgets.html').render(self.values))
+
+  def post(self, widget_id=None):  # pylint: disable-msg=C6409
+    """Saves or edits a generic widget uploaded by a content creator."""
+    logging.info(widget_id)
+    raw = self.request.get('raw')
+    name = self.request.get('name')
+    if not raw:
+      raise self.InvalidInputException('No widget code supplied')
+    if not name:
+      raise self.InvalidInputException('No widget name supplied')
+
+    # TODO(sll): Make sure this JS is clean!
+    raw = json.loads(raw)
+
+    logging.info(self.request.arguments())
+    if not widget_id:
+      # TODO(sll): Figure out what to pass into the hashing function.
+      widget_hash_id = utils.GetNewId(models.GenericWidget, 'temp_hash_id')
+      # TODO(sll): Add a proper name here.
+      widget = models.GenericWidget(
+          hash_id=widget_hash_id, raw=raw, name=name)
+      widget.put()
+    else:
+      widget = utils.GetEntity(models.GenericWidget, widget_id)
+      if not widget:
+        raise self.InvalidInputException(
+            'No generic widget found with id %s' % widget_id)
+      if 'raw' in self.request.arguments():
+        widget.raw = raw
+      widget.put()
+    response = {'widgetId': widget.hash_id, 'raw': widget.raw}
+    self.response.out.write(json.dumps(response))
 
 
 class WidgetRepositoryHandler(BaseHandler):
@@ -96,9 +129,16 @@ class Widget(BaseHandler):
   def post(self, widget_id=None):  # pylint: disable-msg=C6409
     """Saves or edits a widget uploaded by a content creator."""
     logging.info(widget_id)
+    raw = self.request.get('raw')
+    name = self.request.get('name')
+    if not raw:
+      raise self.InvalidInputException('No widget code supplied')
+    if not name:
+      raise self.InvalidInputException('No widget name supplied')
+
     # TODO(sll): Make sure this JS is clean!
-    if self.request.get('raw'):
-      raw = json.loads(self.request.get('raw'))
+    raw = json.loads(raw)
+
     logging.info(self.request.arguments())
     if not widget_id:
       # TODO(sll): Figure out what to pass into the hashing function.
@@ -108,8 +148,8 @@ class Widget(BaseHandler):
     else:
       widget = utils.GetEntity(models.Widget, widget_id)
       if not widget:
-        self.JsonError('No widget found with id %s' % widget_id)
-        return
+        raise self.InvalidInputException(
+            'No widget found with id %s' % widget_id)
       if 'raw' in self.request.arguments():
         widget.raw = raw
       widget.put()

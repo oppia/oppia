@@ -31,10 +31,6 @@ class Widget(ndb.Model):
   """A specific HTML/JS/CSS widget."""
   # The id of the widget.
   hash_id = ndb.StringProperty(required=True)
-  # The widget html.
-  html = ndb.TextProperty()
-  # The widget JavaScript.
-  js = ndb.TextProperty()
   # The raw widget code.
   raw = ndb.TextProperty()
 

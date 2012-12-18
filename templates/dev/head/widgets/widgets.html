@@ -1,37 +1,60 @@
-<!DOCTYPE html>
-<html ng-app="oppia">
-<head>
-  <meta charset=utf-8>
-  <title>Oppia Widget Repository</title>
+{% extends "base.html" %}
 
-  <link rel="stylesheet" href="/third_party/bootstrap/css/bootstrap.css">
-  <!-- The next line should be added before bootstrap-responsive.css: see
-      http://twitter.github.com/bootstrap/components.html#navbar -->
-  <style type="text/css" media="screen">{{css}}</style>
-  <link rel="stylesheet" href="/third_party/bootstrap/css/bootstrap-responsive.css">
-  <link rel="stylesheet" href="/third_party/angular-ui/build/angular-ui.css">
-
-  <script src="/third_party/jquery/jquery.min.js"></script>
-  <script src="/third_party/jqueryui/jquery-ui.min.js"></script>
-  <script src="/third_party/angularjs/angular.min.js"></script>
-  <script src="/third_party/angularjs/angular-sanitize.min.js"></script>
-  <script src="/third_party/angular-ui/build/angular-ui.js"></script>
-
-</head>
-<body ng-controller="Widgets">
+{% block content %}
+<div ng-controller="Widgets">
   <ul class="thumbnails">
     <!-- placeholder for real data on explorations -->
     <li ng-repeat="widget in widgets" class="span3">
       <div class="thumbnail">
+        {% if not iframed %}
+          <h5><[widget.name]></h5>
+        {% endif %}
         <iframe id="widget-<[$index]>" src="" width="100%"></iframe>
         <center>
-          <button ng-click="selectWidget(widget)">
-            <[widget.name]>
-          </button>
+          {% if iframed %}
+            <button ng-click="selectWidget(widget)">
+              <[widget.name]>
+            </button>
+          {% endif %}
         </center>
       </div>
     </li>
   </ul>
-  <script type="text/javascript">{{js}}</script>
-</body>
-</html>
+
+  {% if not iframed %}
+    Add a new widget:
+    <form name="addWidget" ng-hide="currentActiveInput == 'addWidget'" ng-submit="createNewWidget()">
+      <input type="text" ng-model="newWidgetName">
+      <input type="submit" value="Create Widget">
+    </form>
+
+    <div ng-show="currentActiveInput == 'addWidget'">
+      <h4>Add code for a new widget
+        <button type="button" ng-click="clearActiveInputs()">
+          Cancel
+        </button>
+      </h4>
+
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#code">Code</a></li>
+        <li><a data-toggle="tab" href="#preview">Preview</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="code">
+          Add code for a widget:
+          <textarea class="oppia-code" ng-model="widgetCode" rows="10">
+          </textarea>
+          <button type="button" ng-click="saveWidget(widgetCode)">
+            Save and Preview
+          </button>
+        </div>
+        <div class="tab-pane" id="preview">
+          <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
+        </div>
+      </div>
+    </div>
+
+   </div>
+  {% endif %}
+</div>
+{% endblock %}
