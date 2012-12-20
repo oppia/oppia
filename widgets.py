@@ -21,30 +21,7 @@ import jinja2, webapp2
 import base, feconf, models, utils
 
 
-class BaseHandler(webapp2.RequestHandler):
-  """Base class for all handlers in this file."""
-
-  def error(self, code):  # pylint: disable-msg=C6409
-    super(BaseHandler, self).error(code)
-    self.response.out.write('Resource not found.')
-    return
-
-  def DescriptiveError(self, code, error_message):
-    """Displays a simple error page to the content creator."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write('Error: ' + str(error_message))
-    return
-
-  def JsonError(self, error_message, code=404):
-    """Used to handle error messages in JSON returns."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write(json.dumps({'error': str(error_message)}))
-    return
-
-
-class WidgetRepositoryPage(BaseHandler):
+class WidgetRepositoryPage(base.BaseHandler):
   """Displays the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -91,7 +68,7 @@ class WidgetRepositoryPage(BaseHandler):
     self.response.out.write(json.dumps(response))
 
 
-class WidgetRepositoryHandler(BaseHandler):
+class WidgetRepositoryHandler(base.BaseHandler):
   """Provides data to populate the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -105,7 +82,7 @@ class WidgetRepositoryHandler(BaseHandler):
     self.response.out.write(json.dumps({'widgets': response}))
 
 
-class Widget(BaseHandler):
+class Widget(base.BaseHandler):
   """Handles individual widget uploads, edits and retrievals."""
 
   def get(self, widget_id):  # pylint: disable-msg=C6409

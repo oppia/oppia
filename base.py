@@ -47,12 +47,6 @@ class BaseHandler(webapp2.RequestHandler):
     else:
       self.values['login_url'] = users.create_login_url(self.request.uri)
 
-  def JsonError(self, error_message, code=404):
-    """Used to handle error messages in JSON returns."""
-    super(BaseHandler, self).error(code)
-    logging.error('%s: %s', code, error_message)
-    self.response.out.write(json.dumps({'error': str(error_message)}))
-
   def handle_exception(self, exception, debug_mode):
     """Overwrites the default exception handler."""
     logging.info(''.join(traceback.format_exception(*sys.exc_info())))
