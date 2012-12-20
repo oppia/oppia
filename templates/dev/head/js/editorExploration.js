@@ -374,7 +374,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.textCode = data.text_code;
     initJsPlumb();
     drawStateGraph($scope.states);
-    $scope.getStateDataFromBackend($scope.stateId);
+    stateData.getData($scope.stateId);
   });
 
   // Clears modal window data when it is closed.
@@ -482,7 +482,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }
     for (var id in $scope.states) {
       if (id != $scope.stateId && $scope.states[id]['desc'] == newStateName) {
-        $scope.getStateDataFromBackend(id);
+        stateData.getData(id);
         return;
       }
     }
@@ -523,21 +523,13 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
                 $scope.saveStateChange('states');
               } else {
                 // The content creator added a state from the state list.
-                $scope.getStateDataFromBackend(data.stateId);
+                stateData.getData(data.stateId);
               }
             }).error(function(data) {
               $scope.addStateLoading = false;
               warningsData.addWarning(
                   'Server error when adding state: ' + data.error);
             });
-  };
-
-  /**
-   * Gets the data needed to populate the editor of a particular state.
-   * @param {string} stateId The id of the state to get the data for.
-   */
-  $scope.getStateDataFromBackend = function(stateId) {
-    stateData.getData(stateId);
   };
 
   /**
@@ -1157,7 +1149,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       title,
       color,
       function() {
-        $scope.getStateDataFromBackend(stateId);
+        $('#editorViewTab a[href="#stateEditor"]').tab('show');
+        stateData.getData(stateId);
       },
       function() {
         $scope.deleteState(stateId);
