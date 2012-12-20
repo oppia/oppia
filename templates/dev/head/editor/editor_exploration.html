@@ -4,7 +4,7 @@
   <div ng-controller="EditorExploration" ng-cloak>
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
-        <div class="span3">
+        <div class="span12">
           <form ng-submit="saveQuestionName()">
             <h3 class="oppia-editable-name" ng-hide="activeInputData.name == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationDesc]> </h3>
             <span ng-show="activeInputData.name == 'questionName'">
@@ -24,37 +24,47 @@
 
           <br><br><br>
 
-          <form ng-submit="addState(newStateDesc, false)">
-            <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>
-            <datalist id="states">
-              <option ng-repeat="(id, properties) in states | orderBy:'properties.desc':true" value="<[properties.desc]>"></option>
-            </datalist>
-            <div class="oppia-loading" ng-show="addStateLoading"></div>
-          </form>
+          <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#graph">Graph</a></li>
+            <li><a data-toggle="tab" href="#stateEditor">State Editor</a></li>
+          </ul>
 
-          {% include 'editor/editor_graph.html' %}
+          <div class="tab-content">
+            <div class="tab-pane active" id="graph">
 
-        </div>
+              <form ng-submit="addState(newStateDesc, false)">
+                <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>
+                <datalist id="states">
+                  <option ng-repeat="(id, properties) in states | orderBy:'properties.desc':true" value="<[properties.desc]>"></option>
+                </datalist>
+                <div class="oppia-loading" ng-show="addStateLoading"></div>
+              </form>
+              {% include 'editor/editor_graph.html' %}
+            </div>
 
-        <div class="span9">
-          <form ng-submit="saveStateName()">
-            <h3>
-              <span class="oppia-editable-name" ng-hide="activeInputData.name == 'stateName'" ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
-              <span ng-show="activeInputData.name == 'stateName'">
-                <input type="text" ng-model="stateName">
-                <input type="submit" value="Save">
-              </span>
-            </h3>
-          </form>
+            <div class="tab-pane" id="stateEditor">
 
+              <form ng-submit="saveStateName()">
+                <h3>
+                  <span class="oppia-editable-name" ng-hide="activeInputData.name == 'stateName'"
+                        ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
+                  <span ng-show="activeInputData.name == 'stateName'">
+                    <input type="text" ng-model="stateName">
+                    <input type="submit" value="Save">
+                  </span>
+                </h3>
+              </form>
 
-          <div ng-view></div>
+              <div ng-view></div>
 
-          <div ng-show="inputType != 'none' && getMode() == 'gui'">
-            <div angular-html-bind="finiteCode"></div>
-            <div angular-html-bind="numericCode"></div>
-            <div angular-html-bind="setCode"></div>
-            <div angular-html-bind="textCode"></div>
+              <div ng-show="inputType != 'none' && getMode() == 'gui'">
+                <div angular-html-bind="finiteCode"></div>
+                <div angular-html-bind="numericCode"></div>
+                <div angular-html-bind="setCode"></div>
+                <div angular-html-bind="textCode"></div>
+              </div>
+
+            </div>
           </div>
         </div>
 
