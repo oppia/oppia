@@ -31,13 +31,13 @@ var YAML_EDITOR_URL = '/text'
 // TODO(sll): console.log is not supported in IE. Fix before launch.
 // TODO(sll): CSS3 selectors of the form [..] aren't supported in all browsers.
 
-var DEFAULT_CATEGORY_NAME = 'All other inputs';
+var DEFAULT_CATEGORY_NAME = 'Default';
 var DEFAULT_DESTS = {
     'finite': [],
     'none': [{'category': '', 'dest': END_DEST, 'text': ''}],
-    'numeric': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}],
-    'set': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}],
-    'text': [{'category': 'All other inputs', 'dest': END_DEST, 'text': ''}]
+    'numeric': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}],
+    'set': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}],
+    'text': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}]
 };
 // The following list maps input views to classifiers.
 var CLASSIFIER_MAPPING = {

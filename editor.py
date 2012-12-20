@@ -313,7 +313,7 @@ class StatePage(BaseHandler):
         'content': [{text['type']: text['value']} for text in state.text],
         'input_type': {'name': state.input_view.get().name},
         'answers': [
-            {category_list[i] if category_list[i] != 'All other inputs' else 'default':
+            {category_list[i]:
                 {'text': state.action_sets[i].get().text,
                  'dest': (state.action_sets[i].get().dest.get().name
                           if state.action_sets[i].get().dest else 'END')}

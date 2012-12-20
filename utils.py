@@ -21,7 +21,7 @@ import base, feconf, models
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-DEFAULT_CATEGORY = 'All other inputs'
+DEFAULT_CATEGORY = 'Default'
 
 
 def Enum(*sequential, **names):

@@ -1,7 +1,7 @@
 <div class="classifier" ng-show="classifier == 'numeric'" ng-controller="NumericClassifierEditor">
 
   <div ng-repeat="action in states[stateId].dests" class="oppia-category-block">
-    <a class="close" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'All other inputs'">
+    <a class="close" ng-click="deleteCategory($index)" ng-show="states[stateId]['dests'][$index].category != 'Default'">
       &times;
     </a>
 

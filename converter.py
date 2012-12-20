@@ -96,8 +96,8 @@ def ValidateState(description):
     return False, 'Expected only a single \'answer\' for a state with no input'
 
   if description['input_type']['name'] != 'multiple_choice':
-    if description['answers'][-1].keys() != ['default']:
-      return False, 'The last category of the answers array should be \'default\''
+    if description['answers'][-1].keys() != ['Default']:
+      return False, 'The last category of the answers array should be \'Default\''
 
   return True, ''
 
