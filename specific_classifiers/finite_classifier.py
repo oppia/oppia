@@ -18,7 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
 
-import utils
+import base
 
 
 class FiniteClassifier(object):
@@ -33,7 +33,7 @@ class FiniteClassifier(object):
       params: not used.
 
     Raises:
-      InvalidInputError, if response is not a number between 0 and the length
+      InvalidInputException, if response is not a number between 0 and the length
           of categories, inclusive.
 
     Returns:
@@ -45,7 +45,7 @@ class FiniteClassifier(object):
     logging.info(response)
     logging.info(isinstance(response, int))
     if not isinstance(response, int):
-      raise utils.InvalidInputError(
+      raise base.InvalidInputException(
           'Input ' + str(response) + ' is not a valid category.')
 
     logging.info(categories)
@@ -53,6 +53,6 @@ class FiniteClassifier(object):
     if response >= 0 and response < len(categories):
       return response
     else:
-      raise utils.InvalidInputError(
+      raise base.InvalidInputException(
           'Input %s is not a valid category for a finite classifier given by %s'
           % (response, categories))

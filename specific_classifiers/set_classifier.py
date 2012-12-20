@@ -21,7 +21,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 import logging
 
-import utils
+import base, utils
 
 
 class SetClassifier(object):
@@ -39,17 +39,15 @@ class SetClassifier(object):
             - S contains LIST (i.e., it contains ALL elements in LIST)
             - S excludes LIST (i.e., it does not contain ANY element in LIST)
           where LIST is a JSON-encoded list.
-      params: not used.
 
     Raises:
-      InvalidInputError, if response is not a valid JSON-encoded list.
+      InvalidInputException, if response is not a valid JSON-encoded list.
       InvalidCategoryError, if some element of categories is invalid.
-      InvalidParamError, if params is not a valid JSON-encoded list.
 
     Returns:
-      - the 0-based index of the first element in params which is satisfied
+      - the 0-based index of the first element in categories which is satisfied
         by response, if one exists. Otherwise, returns the number of elements
-        in params.
+        in categories.
     """
     # Validate 'response'.
     logging.info(response)
@@ -58,7 +56,7 @@ class SetClassifier(object):
       assert type(response) is list
       response_set = set(response)
     except (ValueError, AssertionError):
-      raise utils.InvalidInputError('%s is not a valid set input.', response)
+      raise base.InvalidInputException('%s is not a valid set input.', response)
 
     logging.info(categories)
     for index, category in enumerate(categories):

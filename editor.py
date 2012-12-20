@@ -402,7 +402,7 @@ class StateHandler(BaseHandler):
               action_set.dest_exploration = dest_exploration.key
               action_set.dest = dest_exploration.init_state
             except utils.EntityIdNotFoundError, e:
-              logging.error(
+              raise self.InvalidInputException(
                   'Destination exploration for state %s not found. Error: %s',
                   state.name, e)
           else:
@@ -412,7 +412,7 @@ class StateHandler(BaseHandler):
               action_set.dest_exploration = None
               action_set.dest = dest_state.key
             except utils.EntityIdNotFoundError, e:
-              logging.error(
+              raise self.InvalidInputException(
                   'Destination exploration for state %s not found. Error: %s',
                   state.name, e)
         action_set.put()
@@ -459,10 +459,6 @@ class Image(base.BaseHandler):
 
     Args:
       image_id: string representing the image id.
-
-    Raises:
-      utils.EntityIdNotFoundError, if an id is not supplied or no image with
-      this id exists.
     """
     image = utils.GetEntity(models.Image, image_id)
     if image:

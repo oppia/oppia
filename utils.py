@@ -32,28 +32,13 @@ def Enum(*sequential, **names):
 input_views = Enum('none', 'multiple_choice', 'int', 'set', 'text', 'finished')
 
 
-class InvalidInputError(Exception):
-  """Error class for when invalid input is entered into a classifier."""
-  pass
-
-
 class InvalidCategoryError(Exception):
   """Error class for when an invalid category is passed into a classifier."""
   pass
 
 
-class InvalidParamError(Exception):
-  """Error class for when an invalid parameter is passed into a classifier."""
-  pass
-
-
 class EntityIdNotFoundError(Exception):
   """Error class for when a story/question/state ID is not in the datastore."""
-  pass
-
-
-class InvalidStoryError(Exception):
-  """Error class for when a story is not yet ready for viewing."""
   pass
 
 
@@ -249,15 +234,15 @@ def ParseContentIntoHtml(content_array, block_number):
     the HTML string representing the array.
 
   Raises:
-    InvalidInputError: if content has no 'type' attribute, or an invalid 'type'
-        attribute.
+    InvalidInputException: if content has no 'type' attribute, or an invalid
+        'type' attribute.
   """
   html = ''
   widget_array = []
   widget_counter = 0
   for content in content_array:
     if 'type' not in content:
-      raise InvalidInputError(
+      raise InvalidInputException(
           'Content type for content_array %s does not exist', content_array)
     if content['type'] == 'widget':
       widget = GetEntity(models.Widget, content['value'])
@@ -271,7 +256,7 @@ def ParseContentIntoHtml(content_array, block_number):
       html += base.JINJA_ENV.get_template('content.html').render({
           'type': content['type'], 'value': content['value']})
     else:
-      raise InvalidInputError('Invalid content type %s', content['type'])
+      raise InvalidInputException('Invalid content type %s', content['type'])
   return html, widget_array
 
 

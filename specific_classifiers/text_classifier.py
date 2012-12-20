@@ -20,7 +20,7 @@ __author__ = 'yanamal@google.com (Yana Malysheva)'
 
 import logging
 
-import utils
+import base, utils
 
 
 class TextClassifier(object):
@@ -39,7 +39,7 @@ class TextClassifier(object):
       params: not used.
 
     Raises:
-      InvalidInputError, if response is not a string.
+      InvalidInputException, if response is not a string.
       InvalidCategoryError, if some element of categories is invalid.
 
     Returns:

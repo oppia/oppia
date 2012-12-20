@@ -20,7 +20,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
 
-import utils
+import base, utils
 
 
 class NumericClassifier(object):
@@ -37,7 +37,7 @@ class NumericClassifier(object):
       params: not used.
 
     Raises:
-      InvalidInputError, if response is not a number.
+      InvalidInputException, if response is not a number.
       InvalidCategoryError, if some element of categories is invalid.
 
     Returns:
@@ -50,7 +50,7 @@ class NumericClassifier(object):
     try:
       response = float(response)
     except ValueError:
-      raise utils.InvalidInputError(
+      raise base.InvalidInputException(
           '%s is not a valid numeric input.', str(response))
 
     logging.info(categories)
