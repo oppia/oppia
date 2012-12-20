@@ -9,10 +9,10 @@
           ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category')">
       <span class="oppia-editable-name">Answer:</span>
       <span ng-class="getCategoryClass(states[stateId]['dests'][$index].category)"
-            ng-hide="currentActiveInput == classifier + '.' + $index + '.category'">
+            ng-hide="activeInputData.name == classifier + '.' + $index + '.category'">
         <[states[stateId]['dests'][$index].category]>
       </span>
-      <span ng-show="currentActiveInput == classifier + '.' + $index + '.category'">
+      <span ng-show="activeInputData.name == classifier + '.' + $index + '.category'">
         <input type="text" ng-model="states[stateId]['dests'][$index].tempCategoryName" autofocus required>
         <a class="char-button" ng-click="addChar('±', $index)">±</a>
         <a class="char-button" ng-click="addChar('≤', $index)">≤</a>
@@ -22,11 +22,11 @@
     </form>
 
     <span class="oppia-editable-name"
-          ng-hide="currentActiveInput == classifier + '.' + $index + '.dest'"
+          ng-hide="activeInputData.name == classifier + '.' + $index + '.dest'"
           ng-click="initializeNewActiveInput(classifier + '.' + $index + '.dest')">
       <[getDestDescription(states[stateId]['dests'][$index].dest)]>
     </span>
-    <span ng-show="currentActiveInput == classifier + '.' + $index + '.dest'">
+    <span ng-show="activeInputData.name == classifier + '.' + $index + '.dest'">
       <form ng-submit="saveDest($index, newNumericDestData)">
         Destination:
         <input type="text" size="40" list="destinations" ng-model="newNumericDestData" placeholder="Type name of state, or '[Q' for questions" autofocus required>
@@ -49,7 +49,7 @@
   <br>
   <button type="button" class="add-button" ng-click="initializeNewActiveInput(classifier + '.dummy.category')">Add new answer category</button>
   <br><br>
-  <div class="oppia-category-block" ng-show="currentActiveInput == classifier + '.dummy.category'">
+  <div class="oppia-category-block" ng-show="activeInputData.name == classifier + '.dummy.category'">
     <a class="close" ng-click="hideDummyCategory()">&times;</a>
 
     <form ng-submit="testNewDummyName()">

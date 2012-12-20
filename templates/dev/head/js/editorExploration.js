@@ -27,7 +27,7 @@ var GUI_EDITOR_URL = '/gui'
 var YAML_EDITOR_URL = '/text'
 
 // TODO(sll): Move all strings to the top of the file, particularly
-// warning messages and $scope.currentActiveInput.
+// warning messages and activeInputData.name.
 // TODO(sll): console.log is not supported in IE. Fix before launch.
 // TODO(sll): CSS3 selectors of the form [..] aren't supported in all browsers.
 
@@ -315,7 +315,7 @@ oppia.directive('sortable', function($compile) {
 
 
 function EditorExploration($scope, $http, $timeout, $location, $routeParams,
-    stateData, explorationData, warningsData) {
+    stateData, explorationData, warningsData, activeInputData) {
   $scope.getMode = function() {
     if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
       return GUI_EDITOR_URL.substring(1);
@@ -386,23 +386,16 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
   $scope.closeModalWindow();
 
-  // There are many input fields in the view that get displayed when a button
-  // is clicked, and we want only one of these to be active at a time. The
-  // following variable stores the name of the field that is currently active.
-  // TODO(sll): on-blur, this value should revert to '' unless the user has
-  // clicked inside another input box.
-  $scope.currentActiveInput = '';
-
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active
     // input, if any, first. If it is bad input, display a warning and cancel
     // the effects of the old change. But, for now, each case is handled
     // specially.
-    console.log('Current Active Input: ' + $scope.currentActiveInput);
+    console.log('Current Active Input: ' + activeInputData.name);
     console.log($scope.stateId);
-    if ($scope.currentActiveInput == 'stateName') {
+    if (activeInputData.name == 'stateName') {
       $scope.saveStateName();
-    } else if ($scope.currentActiveInput == 'questionName') {
+    } else if (activeInputData.name == 'questionName') {
       $scope.saveQuestionName();
     }
 
@@ -420,12 +413,12 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       }
     }
 
-    $scope.currentActiveInput = (newActiveInput || '');
+    activeInputData.name = (newActiveInput || '');
     // TODO(sll): Initialize the newly displayed field.
   };
 
   $scope.clearActiveInputs = function() {
-    $scope.currentActiveInput = '';
+    activeInputData.name = '';
   };
 
   /**
@@ -1337,7 +1330,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location',
-    '$routeParams', 'stateDataFactory', 'explorationDataFactory', 'warningsData'];
+    '$routeParams', 'stateDataFactory', 'explorationDataFactory', 'warningsData',
+    'activeInputData'];
 
 
 function YamlEditor($scope, $http, stateData, explorationData, warningsData) {

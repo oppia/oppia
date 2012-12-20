@@ -165,7 +165,7 @@ var SET_CATEGORY_PREFIXES = {
     'excludes': 'S excludes '
 };
 
-function SetClassifierEditor($scope) {
+function SetClassifierEditor($scope, activeInputData) {
   $scope.hideCategoryInput = function() {
     console.log($scope);
     $scope.clearActiveInputs();
@@ -189,12 +189,12 @@ function SetClassifierEditor($scope) {
     return readableName ? readableName + JSON.stringify(tmpSet) : '';
   };
 
-  $scope.getReadablePrefixFromActiveInput = function(currentActiveInput) {
-    var array = currentActiveInput.split('.');
+  $scope.getReadablePrefixFromActiveInput = function() {
+    var array = activeInputData.name.split('.');
     if (array[0] != 'set')
       return '';
     if (array.length != 4 || array[2] != 'category') {
-      console.log('Error: unexpected currentActiveInput ' + currentActiveInput);
+      console.log('Error: unexpected activeInputData.name ' + activeInputData.name);
     }
     return $scope.getReadablePrefix(array[3]);
   };
@@ -207,10 +207,10 @@ function SetClassifierEditor($scope) {
     }
   };
 
-  $scope.addCategory = function(currentActiveInput, tmpSet) {
-    var array = currentActiveInput.split('.');
+  $scope.addCategory = function(tmpSet) {
+    var array = activeInputData.name.split('.');
     if (array.length != 4 || array[0] != 'set' || array[2] != 'category') {
-      console.log('Error: unexpected currentActiveInput ' + currentActiveInput);
+      console.log('Error: unexpected activeInputData.name ' + activeInputData.name);
     }
 
     var newCategoryName = $scope.getSetCategoryName(array[3], tmpSet);
@@ -227,10 +227,10 @@ function SetClassifierEditor($scope) {
     $scope.hideCategoryInput();
   };
 
-  $scope.saveCategoryName = function(categoryId, currentActiveInput, tmpSet) {
-    var array = currentActiveInput.split('.');
+  $scope.saveCategoryName = function(categoryId, tmpSet) {
+    var array = activeInputData.name.split('.');
     if (array.length != 4 || array[0] != 'set' || array[2] != 'category') {
-      console.log('Error: unexpected currentActiveInput ' + currentActiveInput);
+      console.log('Error: unexpected activeInputData.name ' + activeInputData.name);
     }
 
     var newCategoryName = $scope.getSetCategoryName(array[3], tmpSet);
@@ -302,5 +302,5 @@ function TextClassifierEditor($scope) {
  */
 FiniteClassifierEditor.$inject = ['$scope'];
 NumericClassifierEditor.$inject = ['$scope', 'warningsData'];
-SetClassifierEditor.$inject = ['$scope'];
+SetClassifierEditor.$inject = ['$scope', 'activeInputData'];
 TextClassifierEditor.$inject = ['$scope'];

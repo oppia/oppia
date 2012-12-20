@@ -8,13 +8,13 @@
     <p>
       <span class="oppia-editable-name">Answer:</span>
       <span ng-class="getCategoryClass(states[stateId]['dests'][$index].category)"
-            ng-hide="$parent.currentActiveInput.indexOf(classifier + '.' + $index + '.category') == 0"
+            ng-hide="activeInputData.name.indexOf(classifier + '.' + $index + '.category') == 0"
             ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category')">
         <[states[stateId]['dests'][$index].category]>
       </span>
 
-      <div ng-show="$parent.currentActiveInput.indexOf(classifier + '.' + $index + '.category') == 0">
-        <span ng-show="$parent.currentActiveInput == classifier + '.' + $index + '.category'">
+      <div ng-show="activeInputData.name.indexOf(classifier + '.' + $index + '.category') == 0">
+        <span ng-show="activeInputData.name == classifier + '.' + $index + '.category'">
           <a class="oppia-set-button oppia-set-button-extra"
              ng-click="initializeNewActiveInput(classifier + '.' + $index + '.category.extra')">
           </a>
@@ -33,8 +33,8 @@
           <button type="button" ng-click="hideCategoryInput()">Cancel</button>
         </span>
 
-        <div ng-show="$parent.currentActiveInput.indexOf(classifier + '.' + $index + '.category.') == 0">
-          <[getReadablePrefixFromActiveInput($parent.currentActiveInput)]>
+        <div ng-show="activeInputData.name.indexOf(classifier + '.' + $index + '.category.') == 0">
+          <[getReadablePrefixFromActiveInput()]>
           <[$parent.tmpSet]>
           <ul>
             <li ng-repeat="tmpElement in $parent.tmpSet">
@@ -48,17 +48,17 @@
             <input type="submit" value="+">
           </form>
 
-          <button type="button" ng-click="saveCategoryName($index, $parent.currentActiveInput, $parent.tmpSet)">Submit</button>
+          <button type="button" ng-click="saveCategoryName($index, $parent.tmpSet)">Submit</button>
           <button type="button" ng-click="hideCategoryInput()">Cancel</button>
         </div>
       </div>
     </p>
 
-    <span class="oppia-editable-name" ng-hide="$parent.currentActiveInput == classifier + '.' + $index + '.dest'"
+    <span class="oppia-editable-name" ng-hide="activeInputData.name == classifier + '.' + $index + '.dest'"
           ng-click="initializeNewActiveInput(classifier + '.' + $index + '.dest')">
       <[getDestDescription(states[stateId]['dests'][$index].dest)]>
     </span>
-    <span ng-show="$parent.currentActiveInput == classifier + '.' + $index + '.dest'">
+    <span ng-show="activeInputData.name == classifier + '.' + $index + '.dest'">
       <form ng-submit="saveDest($index, newSetDestData)">
         Destination:
         <input type="text" size="40" list="destinations" ng-model="newSetDestData" placeholder="Type name of state, or '[Q' for questions" autofocus required>
@@ -81,9 +81,9 @@
   <br>
   <button type="button" class="add-button" ng-click="initializeNewActiveInput(classifier + '.dummy.category')">Add new answer</button>
   <br><br>
-  <div class="oppia-category-block" ng-show="currentActiveInput.indexOf(classifier + '.dummy.category') == 0">
+  <div class="oppia-category-block" ng-show="activeInputData.name.indexOf(classifier + '.dummy.category') == 0">
     <a class="close" ng-click="hideCategoryInput()">&times;</a>
-    <span ng-show="currentActiveInput == classifier + '.dummy.category'">
+    <span ng-show="activeInputData.name == classifier + '.dummy.category'">
       <a class="oppia-set-button oppia-set-button-extra" ng-click="initializeNewActiveInput(classifier + '.dummy.category.extra')"></a>
       <a class="oppia-set-button oppia-set-button-incomplete" ng-click="initializeNewActiveInput(classifier + '.dummy.category.incomplete')"></a>
       <a class="oppia-set-button oppia-set-button-equal" ng-click="initializeNewActiveInput(classifier + '.dummy.category.equal')"></a>
@@ -91,8 +91,8 @@
       <a class="oppia-set-button oppia-set-button-excludes" ng-click="initializeNewActiveInput(classifier + '.dummy.category.excludes')"></a>
     </span>
 
-    <div ng-show="currentActiveInput.indexOf(classifier + '.dummy.category.') == 0">
-      <[getReadablePrefixFromActiveInput(currentActiveInput)]>
+    <div ng-show="activeInputData.name.indexOf(classifier + '.dummy.category.') == 0">
+      <[getReadablePrefixFromActiveInput()]>
       <[tmpSet]>
       <ul>
         <li ng-repeat="tmpElement in tmpSet">
@@ -104,7 +104,7 @@
         <input type="text" ng-model="newTmpElement" placeholder="Add Element" autofocus required>
         <input type="submit" value="+">
       </form>
-      <button type="button" ng-click="addCategory(currentActiveInput, tmpSet)">Submit</button>
+      <button type="button" ng-click="addCategory(tmpSet)">Submit</button>
     </div>
   </div>
 </div>

@@ -38,9 +38,37 @@ oppia.factory('warningsData', function($rootScope) {
   return warningsData;
 });
 
+// Factory for handling the current active input. In general, there are many
+// input fields in the view that get displayed when a button is clicked, and we
+// want only one of these to be active at a time.
+// TODO(sll): on-blur, this value should revert to '' unless the user has
+// clicked inside another input box.
+oppia.factory('activeInputData', function($rootScope) {
+  var activeInputData = {
+    name: '',
+    scope: null,
+    teardown: null
+  };
+
+  activeInputData.changeActiveInput = function(name, scope, setup, teardown) {
+    activeInputData.teardown(activeInputData.scope);
+    activeInputData.name = name;
+    activeInputData.scope = scope;
+    activeInputData.teardown = teardown;
+    scope.setup();
+  };
+
+  activeInputData.clearActiveInput = function() {
+    activeInputData.changeActiveInput('', null, null, null);
+  };
+
+  return activeInputData;
+});
+
 // Global utility methods.
-function Base($scope, $timeout, warningsData) {
+function Base($scope, $timeout, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
+  $scope.activeInputData = activeInputData;
 
   /**
    * Adds content to an iframe.
@@ -133,4 +161,4 @@ oppia.directive('angularHtmlBind', function($compile) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$timeout', 'warningsData'];
+Base.$inject = ['$scope', '$timeout', 'warningsData', 'activeInputData'];

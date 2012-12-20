@@ -6,8 +6,8 @@
       <div class="oppia-content row-fluid">
         <div class="span3">
           <form ng-submit="saveQuestionName()">
-            <h3 class="oppia-editable-name" ng-hide="currentActiveInput == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationDesc]> </h3>
-            <span ng-show="currentActiveInput == 'questionName'">
+            <h3 class="oppia-editable-name" ng-hide="activeInputData.name == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationDesc]> </h3>
+            <span ng-show="activeInputData.name == 'questionName'">
               <input type="text" ng-model="explorationDesc" required>
               <input type="submit" value="Save">
             </span>
@@ -39,8 +39,8 @@
         <div class="span9">
           <form ng-submit="saveStateName()">
             <h3>
-              <span class="oppia-editable-name" ng-hide="currentActiveInput == 'stateName'" ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
-              <span ng-show="currentActiveInput == 'stateName'">
+              <span class="oppia-editable-name" ng-hide="activeInputData.name == 'stateName'" ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
+              <span ng-show="activeInputData.name == 'stateName'">
                 <input type="text" ng-model="stateName">
                 <input type="submit" value="Save">
               </span>

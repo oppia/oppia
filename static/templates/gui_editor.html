@@ -24,7 +24,7 @@
                     newlines should be converted into <br>'s. Tags like < and >
                     also need to be HTML-ified. Maybe use a contenteditable? -->
                     <div ng-switch-when="text">
-                      <ng-switch on="currentActiveInput == 'stateContent.' + $index">
+                      <ng-switch on="activeInputData.name == 'stateContent.' + $index">
                         <div ng-switch-when="true">
                           <textarea rows="5" ng-model="item.value" unfocus-state-text="clearActiveInputs()"></textarea>
                         </div>
@@ -116,11 +116,11 @@
             <div>
               <div ng-show="inputType == 'none'">
                 <div>
-                  <span class="oppia-editable-name" ng-hide="currentActiveInput == 'none.0.dest'" ng-click="currentActiveInput = 'none.0.dest'">
+                  <span class="oppia-editable-name" ng-hide="activeInputData.name == 'none.0.dest'" ng-click="activeInputData.name = 'none.0.dest'">
                     <[getDestDescription(states[stateId]['dests'][0].dest)]>
                   </span>
 
-                  <span ng-show="currentActiveInput == 'none.0.dest'">
+                  <span ng-show="activeInputData.name == 'none.0.dest'">
                     <form ng-submit="saveDest(0, newNoneDestData)">
                       Destination:
                       <input type="none" size="40" list="destinations" ng-model="newNoneDestData" placeholder="Type name of state, or '[Q' for questions" required>
@@ -138,7 +138,7 @@
 
                   <div>
                     <h5>Or, pick an input view:</h5>
-                    <select ng-model="newInputType" id="newInputType" ng-change="changeInputType(newInputType)" ng-hide="currentActiveInput == 'none.0.dest'">
+                    <select ng-model="newInputType" id="newInputType" ng-change="changeInputType(newInputType)" ng-hide="activeInputData.name == 'none.0.dest'">
                       <option value="multiple_choice">Multiple Choice</option>
                       <option value="int">Integer</option>
                       <option value="set">Set</option>
@@ -155,10 +155,10 @@
                   <label for="textData">
                     <h5>In response to the reader's answer, display the text:</h5>
                   </label>
-                  <textarea rows="10" cols="50" ng-model="textData" id="textData"> </textarea>
+                  <textarea rows="10" cols="50" ng-model="textData" id="textData"></textarea>
                   <p>
                     <button ng-click="saveText()">Save</button>
-                 </p>
+                  </p>
                 </div>
               </div>
             </div>
