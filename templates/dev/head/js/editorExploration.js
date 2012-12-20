@@ -191,7 +191,7 @@ oppia.directive('imageUpload', function($exceptionHandler) {
   };
 });
 
-oppia.directive('unfocusstateContent', function() {
+oppia.directive('unfocusstateContent', function(activeInputData) {
   return {
     restrict: 'A',
     link: function(scope, element, attribs) {
@@ -200,14 +200,14 @@ oppia.directive('unfocusstateContent', function() {
         scope.stateContent[scope.$index] = scope.item;
         scope.$apply(attribs['unfocusstateContent']);
         scope.saveStateChange('stateContent');
-        scope.currentActiveInput = '';
+        activeInputData.clear();
       });
     }
   };
 });
 
 // Makes the palette icons draggable.
-oppia.directive('oppiaPaletteIcon', function($compile) {
+oppia.directive('oppiaPaletteIcon', function($compile, activeInputData) {
   return {
     restrict: 'C',
     link: function(scope, element, attrs) {
@@ -216,7 +216,7 @@ oppia.directive('oppiaPaletteIcon', function($compile) {
         helper: 'clone',
         revert: 'invalid',
         start: function(event, ui) {
-          scope.clearActiveInputs();
+          activeInputData.clear();
           scope.$apply();
         },
         zIndex: 3000
@@ -235,7 +235,7 @@ oppia.directive('oppiaPaletteDroppable', function($compile, warningsData) {
         activeClass: 'oppia-droppable-active',
         drop: function(event, ui) {
           if ($(ui.draggable).hasClass('oppia-palette-text')) {
-            scope.currentActiveInput = 'stateContent.' + scope.stateContent.length;
+            activeInputData.name = 'stateContent.' + scope.stateContent.length;
             scope.stateContent.push({type: 'text', value: ''});
           } else if ($(ui.draggable).hasClass('oppia-palette-image')) {
             scope.stateContent.push({type: 'image', value: ''});
@@ -417,10 +417,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     // TODO(sll): Initialize the newly displayed field.
   };
 
-  $scope.clearActiveInputs = function() {
-    activeInputData.name = '';
-  };
-
   /**
    * Checks if a new user-entered field is a duplicate of one that already
    * exists in a given object.
@@ -507,7 +503,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
                 $scope.inlineNewSetStateDesc = '';
                 $scope.inlineNewTextStateDesc = '';
                 $scope.closeModalWindow();
-                $scope.clearActiveInputs();
+                activeInputData.clear();
 
                 var oldDest =
                     $scope.states[$scope.stateId].dests[categoryId].dest;
@@ -610,7 +606,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       warningsData.addWarning(data.error || 'Error updating exploration.');
     });
 
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 
   $scope.saveStateName = function() {
@@ -627,7 +623,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     editStateVertexName($scope.stateId, $scope.stateName);
     $scope.saveStateChange('states');
     $scope.saveStateChange('stateName');
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 
   $scope.deleteCategory = function(categoryId) {
@@ -733,7 +729,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }
 
     $scope.saveStateChange('states');
-    $scope.clearActiveInputs();
+    activeInputData.clear();
     drawStateGraph($scope.states);
   };
 
@@ -744,7 +740,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   $scope.saveStateChange = function(property) {
     if (!$scope.stateId)
       return;
-    $scope.clearActiveInputs();
+    activeInputData.clear();
 
     var requestParameters = {state_id: $scope.stateId};
 
@@ -881,7 +877,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       $scope.stateContent[index].value = videoId[2];
       $scope.saveStateChange('stateContent');
     }
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 
   $scope.deleteVideo = function(index) {
@@ -895,7 +891,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
   $scope.saveImage = function(index) {
     $('#newImageForm')[0].reset();
-    $scope.clearActiveInputs();
+    activeInputData.clear();
     image = $scope.image;
 
     if (!image || !image.type.match('image.*')) {
@@ -992,7 +988,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       $scope.stateContent[index].value = widgetData.widgetId;
       $scope.saveStateChange('stateContent');
       // TODO(sll): Display multiple widget div's here.
-      $scope.clearActiveInputs();
+      activeInputData.clear();
       console.log($scope.stateContent);
     });
   };

@@ -1,6 +1,5 @@
-function Widgets($scope, $http) {
+function Widgets($scope, $http, activeInputData) {
   $scope.widgetDataUrl = '/widgets/repository/data/';
-  $scope.currentActiveInput = '';
 
   $scope.loadPage = function(data) {
     console.log(data);
@@ -28,11 +27,7 @@ function Widgets($scope, $http) {
   };
 
   $scope.setActiveInput = function(newActiveInput) {
-    $scope.currentActiveInput = newActiveInput;
-  };
-
-  $scope.clearActiveInputs = function() {
-    $scope.currentActiveInput = '';
+    activeInputData.name = newActiveInput;
   };
 
   $scope.createNewWidget = function() {
@@ -65,7 +60,7 @@ function Widgets($scope, $http) {
       // Check that the data has been saved correctly.
       console.log(widgetData);
       $('#widgetTabs a:first').tab('show');
-      $scope.clearActiveInputs();
+      activeInputData.clear();
     });
   };
 }
@@ -73,4 +68,4 @@ function Widgets($scope, $http) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Widgets.$inject = ['$scope', '$http'];
+Widgets.$inject = ['$scope', '$http', 'activeInputData'];

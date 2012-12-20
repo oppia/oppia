@@ -51,14 +51,18 @@ oppia.factory('activeInputData', function($rootScope) {
   };
 
   activeInputData.changeActiveInput = function(name, scope, setup, teardown) {
-    activeInputData.teardown(activeInputData.scope);
+    if (activeInputData.teardown) {
+      activeInputData.teardown(activeInputData.scope);
+    }
     activeInputData.name = name;
     activeInputData.scope = scope;
     activeInputData.teardown = teardown;
-    scope.setup();
+    if (setup) {
+      setup(scope);
+    }
   };
 
-  activeInputData.clearActiveInput = function() {
+  activeInputData.clear = function() {
     activeInputData.changeActiveInput('', null, null, null);
   };
 

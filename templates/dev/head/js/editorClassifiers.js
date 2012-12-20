@@ -19,7 +19,7 @@
  */
 
 // Code for the finite classifier editor.
-function FiniteClassifierEditor($scope) {
+function FiniteClassifierEditor($scope, activeInputData) {
   $scope.addCategory = function() {
     if (!$scope.isValidEntityName($scope.newCategoryName, true))
       return;
@@ -46,13 +46,13 @@ function FiniteClassifierEditor($scope) {
 
     $scope.states[$scope.stateId].dests[categoryId].category = newCategoryName;
     $scope.saveStateChange('states');
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 }
 
 
 // Code for the numeric classifier editor.
-function NumericClassifierEditor($scope, warningsData) {
+function NumericClassifierEditor($scope, activeInputData, warningsData) {
   var OPERATOR_REGEXP = /^(\<\=|\>\=|\<|\>|\=|≤|≥)?$/;
   var FLOAT_REGEXP = /^-?\d+(\.?\d+)*$/;
   var TOL_REGEXP = /^±$/;
@@ -103,7 +103,7 @@ function NumericClassifierEditor($scope, warningsData) {
 
   $scope.hideDummyCategory = function() {
     $scope.newDummyCategoryName = '';
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 
   // Adds a character to the appropriate category name editor.
@@ -151,7 +151,7 @@ function NumericClassifierEditor($scope, warningsData) {
     $scope.states[$scope.stateId]['dests'][categoryId].category =
         newCategoryName;
     $scope.saveStateChange('states');
-    $scope.clearActiveInputs();
+    activeInputData.clear();
   };
 }
 
@@ -168,7 +168,7 @@ var SET_CATEGORY_PREFIXES = {
 function SetClassifierEditor($scope, activeInputData) {
   $scope.hideCategoryInput = function() {
     console.log($scope);
-    $scope.clearActiveInputs();
+    activeInputData.clear();
     $scope.tmpSet = [];
     $scope.newTmpElement = '';
   };
@@ -247,10 +247,10 @@ function SetClassifierEditor($scope, activeInputData) {
 }
 
 //Code for text classifier editor.
-function TextClassifierEditor($scope) {
+function TextClassifierEditor($scope, activeInputData) {
   $scope.hideCategoryInput = function() {
     console.log($scope);
-    $scope.clearActiveInputs();
+    activeInputData.clear();
     $scope.newTmpCategory = '';
     $scope.newTmpType = 'Answer contains';
   };
@@ -300,7 +300,7 @@ function TextClassifierEditor($scope) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-FiniteClassifierEditor.$inject = ['$scope'];
-NumericClassifierEditor.$inject = ['$scope', 'warningsData'];
+FiniteClassifierEditor.$inject = ['$scope', 'activeInputData'];
+NumericClassifierEditor.$inject = ['$scope', 'activeInputData', 'warningsData'];
 SetClassifierEditor.$inject = ['$scope', 'activeInputData'];
-TextClassifierEditor.$inject = ['$scope'];
+TextClassifierEditor.$inject = ['$scope', 'activeInputData'];
