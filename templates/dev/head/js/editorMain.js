@@ -1,4 +1,4 @@
-function EditorMain($scope, $http) {
+function EditorMain($scope, $http, warningsData) {
   /**
    * Creates a new exploration.
    */
@@ -11,7 +11,7 @@ function EditorMain($scope, $http) {
               console.log(data);
               window.location = '/create/' + data.explorationId;
             }).error(function(data) {
-              $scope.addWarning(data.error ? data.error :
+              warningsData.addWarning(data.error ? data.error :
                     'Error: Could not add new exploration.');
             });
   };
@@ -20,4 +20,4 @@ function EditorMain($scope, $http) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorMain.$inject = ['$scope', '$http'];
+EditorMain.$inject = ['$scope', '$http', 'warningsData'];

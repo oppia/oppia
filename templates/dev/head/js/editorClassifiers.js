@@ -52,7 +52,7 @@ function FiniteClassifierEditor($scope) {
 
 
 // Code for the numeric classifier editor.
-function NumericClassifierEditor($scope) {
+function NumericClassifierEditor($scope, warningsData) {
   var OPERATOR_REGEXP = /^(\<\=|\>\=|\<|\>|\=|≤|≥)?$/;
   var FLOAT_REGEXP = /^-?\d+(\.?\d+)*$/;
   var TOL_REGEXP = /^±$/;
@@ -66,13 +66,13 @@ function NumericClassifierEditor($scope) {
     // Remove all whitespace.
     input = input.replace(/\s/g, '');
     if (!input) {
-      $scope.addWarning('Please enter a non-empty category name.');
+      warningsData.addWarning('Please enter a non-empty category name.');
       return null;
     }
 
     var parsedInput = FLOAT_NUMERIC_REGEXP.exec(input);
     if (!parsedInput) {
-      $scope.addWarning('Invalid category name: ' + input);
+      warningsData.addWarning('Invalid category name: ' + input);
       return null;
     }
 
@@ -95,7 +95,7 @@ function NumericClassifierEditor($scope) {
       $scope.addCategory(normalizedCategory);
       $scope.hideDummyCategory();
     } else {
-      $scope.addWarning(
+      warningsData.addWarning(
           'Invalid category name: ' + $scope.newDummyCategoryName);
       $scope.hideDummyCategory();
     }
@@ -301,6 +301,6 @@ function TextClassifierEditor($scope) {
  * Injects dependencies in a way that is preserved by minification.
  */
 FiniteClassifierEditor.$inject = ['$scope'];
-NumericClassifierEditor.$inject = ['$scope'];
+NumericClassifierEditor.$inject = ['$scope', 'warningsData'];
 SetClassifierEditor.$inject = ['$scope'];
 TextClassifierEditor.$inject = ['$scope'];

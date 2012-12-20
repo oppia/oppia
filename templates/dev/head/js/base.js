@@ -14,20 +14,33 @@ oppia.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
-// Global utility methods.
-function Base($scope, $timeout) {
-  $scope.warnings = [];
+// Factory for handling warnings.
+oppia.factory('warningsData', function($rootScope) {
+  var warningsData = {warnings: []};
 
   /**
    * Adds a warning message to the butterbar.
    * @param {string} warning The warning message to display.
    */
-  // TODO(sll): Queue up these warnings, and show them one at a time.
-  // Maybe log them too?
-  $scope.addWarning = function(warning) {
+  warningsData.addWarning = function(warning) {
     console.log('WARNING: ' + warning);
-    $scope.warnings.push(warning);
+    warningsData.warnings.push(warning);
   };
+
+  /**
+   * Deletes the warning at a given index.
+   * @param {int} index The index of the warning to delete.
+   */
+  warningsData.deleteWarning = function(index) {
+    warningsData.warnings.splice(index, 1);
+  }
+
+  return warningsData;
+});
+
+// Global utility methods.
+function Base($scope, $timeout, warningsData) {
+  $scope.warningsData = warningsData;
 
   /**
    * Adds content to an iframe.
@@ -56,7 +69,7 @@ function Base($scope, $timeout) {
   $scope.isValidEntityName = function(input, showWarnings) {
     if (!input) {
       if (showWarnings) {
-        $scope.addWarning('Please enter a non-empty name.');
+        warningsData.addWarning('Please enter a non-empty name.');
       }
       return false;
     }
@@ -68,13 +81,13 @@ function Base($scope, $timeout) {
     // used in the auto-suggest boxes to identify chapters, questions, etc.
     if (input[0] == '[') {
       if (showWarnings) {
-        $scope.addWarning('Names should not start with a \'[\'.');
+        warningsData.addWarning('Names should not start with a \'[\'.');
       }
       return false;
     }
     if (!ALPHANUMERIC_REGEXP.regexp.test(input)) {
       if (showWarnings) {
-        $scope.addWarning(ALPHANUMERIC_REGEXP.warning);
+        warningsData.addWarning(ALPHANUMERIC_REGEXP.warning);
       }
       return false;
     }
@@ -120,4 +133,4 @@ oppia.directive('angularHtmlBind', function($compile) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$timeout'];
+Base.$inject = ['$scope', '$timeout', 'warningsData'];

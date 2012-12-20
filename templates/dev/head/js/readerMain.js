@@ -1,4 +1,4 @@
-function ReaderMain($scope, $http) {
+function ReaderMain($scope, $http, warningsData) {
   $scope.currentUrl = document.URL;
 
   /**
@@ -22,7 +22,7 @@ function ReaderMain($scope, $http) {
               console.log(data);
               window.location = '/create/' + data.explorationId;
             }).error(function(data) {
-              $scope.addWarning(data.error ? data.error :
+              warningsData.addWarning(data.error ? data.error :
                     'Error: Could not add new exploration.');
             });
   };
@@ -31,4 +31,4 @@ function ReaderMain($scope, $http) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ReaderMain.$inject = ['$scope', '$http'];
+ReaderMain.$inject = ['$scope', '$http', 'warningsData'];

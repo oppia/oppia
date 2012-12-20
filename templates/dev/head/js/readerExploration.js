@@ -1,4 +1,4 @@
-function ReaderExploration($scope, $http, $timeout) {
+function ReaderExploration($scope, $http, $timeout, warningsData) {
   // The pathname is expected to be: /[exploration_id]
   var pathnameArray = window.location.pathname.split('/');
   $scope.explorationId = pathnameArray[2];
@@ -28,7 +28,7 @@ function ReaderExploration($scope, $http, $timeout) {
         $scope.explorationTitle = data.title;
         $scope.loadPage(data);
       }).error(function(data) {
-        $scope.addWarning(
+        warningsData.addWarning(
             data.error || 'There was an error loading the story.');
       });
 
@@ -88,6 +88,6 @@ function SetCtrl($scope, $http) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ReaderExploration.$inject = ['$scope', '$http', '$timeout'];
+ReaderExploration.$inject = ['$scope', '$http', '$timeout', 'warningsData'];
 SetCtrl.$inject = ['$scope', '$http'];
 

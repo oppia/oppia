@@ -71,7 +71,7 @@ oppia.config(['$routeProvider', function($routeProvider) {
 }]);
 
 
-oppia.factory('explorationDataFactory', function($rootScope, $http) {
+oppia.factory('explorationDataFactory', function($rootScope, $http, warningsData) {
   // Put exploration variables here.
   var explorationData = {};
 
@@ -90,9 +90,7 @@ oppia.factory('explorationDataFactory', function($rootScope, $http) {
 
       obj.broadcastExploration();
     }).error(function(data) {
-      $rootScope.$broadcast('warning');
-      // TODO(sll): Broadcast the warning.
-      // $rootScope.addWarning('Server error: ' + data.error);
+      warningsData.addWarning('Server error: ' + data.error);
     });
   };
 
@@ -104,7 +102,7 @@ oppia.factory('explorationDataFactory', function($rootScope, $http) {
 });
 
 
-oppia.factory('stateDataFactory', function($rootScope, $http) {
+oppia.factory('stateDataFactory', function($rootScope, $http, warningsData) {
   // Put state variables here.
   var stateData = {};
 
@@ -136,9 +134,7 @@ oppia.factory('stateDataFactory', function($rootScope, $http) {
               obj.broadcastState();
             }).
             error(function(data) {
-              $rootScope.$broadcast('warning');
-              // TODO(sll): Broadcast the warning.
-              // $rootScope.addWarning('Server error: ' + data.error);
+              warningsData.addWarning('Server error: ' + data.error);
             });
   };
 
@@ -230,7 +226,7 @@ oppia.directive('oppiaPaletteIcon', function($compile) {
 });
 
 // Allows palette icons to be dropped.
-oppia.directive('oppiaPaletteDroppable', function($compile) {
+oppia.directive('oppiaPaletteDroppable', function($compile, warningsData) {
   return {
     restrict: 'C',
     link: function(scope, element, attrs) {
@@ -248,9 +244,7 @@ oppia.directive('oppiaPaletteDroppable', function($compile) {
           } else if ($(ui.draggable).hasClass('oppia-palette-widget')) {
             scope.stateText.push({type: 'widget', value: ''});
           } else {
-            scope.addWarning('Unknown palette icon.');
-            console.log('ERROR: Unknown palette icon:');
-            console.log(ui);
+            warningsData.addWarning('Unknown palette icon.');
             return;
           }
           scope.$apply();
@@ -321,7 +315,7 @@ oppia.directive('sortable', function($compile) {
 
 
 function EditorExploration($scope, $http, $timeout, $location, $routeParams,
-    stateData, explorationData) {
+    stateData, explorationData, warningsData) {
   $scope.getMode = function() {
     if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
       return GUI_EDITOR_URL.substring(1);
@@ -339,7 +333,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     } else if (mode == YAML_EDITOR_URL.substring(1)) {
       $location.path(YAML_EDITOR_URL + '/' + $scope.stateId);
     } else {
-      $scope.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
+      warningsData.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
     }
   };
 
@@ -471,7 +465,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   $scope.isDuplicateArrayInput = function(array, field, index, newInput) {
     for (var i = 0; i < array.length; ++i) {
       if (i != index && array[i][field] == newInput) {
-        $scope.addWarning(
+        warningsData.addWarning(
             'The name \'' + String(newInput) + '\' is already in use.');
         return true;
       }
@@ -486,11 +480,11 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     // States may not start with '[', since that label is reserved for
     // '[Chapter]', '[Question]', etc.
     if (newStateName && newStateName[0] == '[') {
-      $scope.addWarning('State names may not start with \'[\'.');
+      warningsData.addWarning('State names may not start with \'[\'.');
       return;
     }
     if (newStateName.toUpperCase() == 'END') {
-      $scope.addWarning('Please choose a state name that is not \'END\'.');
+      warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
     }
     for (var id in $scope.states) {
@@ -540,7 +534,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
               }
             }).error(function(data) {
               $scope.addStateLoading = false;
-              $scope.addWarning(
+              warningsData.addWarning(
                   'Server error when adding state: ' + data.error);
             });
   };
@@ -594,7 +588,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
                 $scope.widgetCode = data.raw;
                 $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
               }).error(function(data) {
-                $scope.addWarning(
+                warningsData.addWarning(
                     'Widget could not be loaded: ' + String(data.error));
               });
         }
@@ -610,7 +604,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       return;
     if ($scope.isDuplicateInput($scope.questions, 'desc',
             $scope.explorationId, $scope.explorationDesc)) {
-      $scope.addWarning('The name \'' + $scope.explorationDesc +
+      warningsData.addWarning('The name \'' + $scope.explorationDesc +
                         '\' is already in use.');
       return;
     }
@@ -628,7 +622,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       $scope.saveQuestionNameLoading = false;
     }).error(function(data) {
       $scope.saveQuestionNameLoading = false;
-      $scope.addWarning(data.error || 'Error updating exploration.');
+      warningsData.addWarning(data.error || 'Error updating exploration.');
     });
 
     $scope.clearActiveInputs();
@@ -639,7 +633,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       return;
     if ($scope.isDuplicateInput(
             $scope.states, 'desc', $scope.stateId, $scope.stateName)) {
-      $scope.addWarning(
+      warningsData.addWarning(
           'The name \'' + $scope.stateName + '\' is already in use.');
       return;
     }
@@ -715,7 +709,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
   $scope.saveDest = function(categoryId, destName) {
     if (!destName) {
-      $scope.addWarning('Please choose a destination.');
+      warningsData.addWarning('Please choose a destination.');
       return;
     }
 
@@ -783,7 +777,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       requestParameters['input_type'] = $scope.inputType;
       if ($scope.classifier != 'none' &&
           $scope.states[$scope.stateId]['dests'].length == 0) {
-        $scope.addWarning(
+        warningsData.addWarning(
             'Interactive questions should have at least one category.');
         $scope.changeInputType('none');
         return;
@@ -813,7 +807,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       console.log('Changes saved successfully.');
       drawStateGraph($scope.states);
     }).error(function(data) {
-      $scope.addWarning(data.error || 'Error communicating with server.');
+      warningsData.addWarning(data.error || 'Error communicating with server.');
     });
   };
 
@@ -838,7 +832,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
     $scope.classifier = CLASSIFIER_MAPPING[$scope.inputType];
     if (!$scope.classifier) {
-      $scope.addWarning('Invalid input type: ' + $scope.inputType);
+      warningsData.addWarning('Invalid input type: ' + $scope.inputType);
       $scope.classifier = 'none';
     }
 
@@ -881,7 +875,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
                      videoRegexp2.exec(videoLink) ||
                      videoRegexp3.exec(videoLink));
       if (!videoId) {
-        $scope.addWarning(
+        warningsData.addWarning(
             'Could not parse this video link. Please use a YouTube video.');
         return;
       }
@@ -896,7 +890,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
             $scope.stateText[index].value = videoId[2];
             $scope.saveStateChange('stateText');
           }).error(function(data) {
-            $scope.addWarning('This is not a valid YouTube video id.');
+            warningsData.addWarning('This is not a valid YouTube video id.');
           });
       */
       $scope.stateText[index].value = videoId[2];
@@ -920,7 +914,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     image = $scope.image;
 
     if (!image || !image.type.match('image.*')) {
-      $scope.addWarning('This file is not recognized as an image.');
+      warningsData.addWarning('This file is not recognized as an image.');
       return;
     }
 
@@ -944,13 +938,13 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
               $scope.saveStateChange('stateText');
             });
           } else {
-            $scope.addWarning(
+            warningsData.addWarning(
                 'There was an error saving your image. Please retry later.');
           }
           $('#uploadImageLoading').hide();
         },
         error: function(data) {
-          $scope.addWarning(data.error || 'Error communicating with server.');
+          warningsData.addWarning(data.error || 'Error communicating with server.');
           $('#uploadImageLoading').hide();
         }
     });
@@ -1032,7 +1026,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   // deletion.
   $scope.deleteState = function(stateId) {
     if (stateId == $scope.initStateId) {
-      $scope.addWarning('Deleting the initial state of a question is not ' +
+      warningsData.addWarning('Deleting the initial state of a question is not ' +
           'supported. Perhaps edit it instead?');
       return;
     }
@@ -1059,7 +1053,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         }
       }
       if (edgesDeleted) {
-        $scope.addWarning(
+        warningsData.addWarning(
             'The categories of some states now no longer have destinations.');
       }
 
@@ -1067,7 +1061,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       $scope.saveStateChange('states');
       drawStateGraph($scope.states);
     }).error(function(data) {
-      $scope.addWarning(data.error || 'Error communicating with server.');
+      warningsData.addWarning(data.error || 'Error communicating with server.');
     });
   };
 
@@ -1083,7 +1077,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
               $scope.isPublic = true;
             }).
             error(function(data) {
-              $scope.addWarning('Error publishing exploration: ' + data.error);
+              warningsData.addWarning('Error publishing exploration: ' + data.error);
             });
   };
 
@@ -1343,10 +1337,10 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location',
-    '$routeParams', 'stateDataFactory', 'explorationDataFactory'];
+    '$routeParams', 'stateDataFactory', 'explorationDataFactory', 'warningsData'];
 
 
-function YamlEditor($scope, $http, stateData, explorationData) {
+function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
   // The pathname should be: .../create/{exploration_id}/[state_id]
   var pathnameArray = window.location.pathname.split('/');
   $scope.$parent.explorationId = pathnameArray[2];
@@ -1376,7 +1370,7 @@ function YamlEditor($scope, $http, stateData, explorationData) {
               // update from the backend.
               stateData.getData($scope.$parent.stateId);
             }).error(function(data) {
-              $scope.addWarning(data.error ||
+              warningsData.addWarning(data.error ||
                   'Error: Could not add new state.');
             });
   };
@@ -1385,4 +1379,4 @@ function YamlEditor($scope, $http, stateData, explorationData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory', 'explorationDataFactory'];
+YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory', 'explorationDataFactory', 'warningsData'];
