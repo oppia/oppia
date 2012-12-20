@@ -196,7 +196,7 @@ class ImportPage(editor.BaseHandler):
         action_set_list.append(action_set.key)
 
     state.input_view = input_view.key
-    state.text = content
+    state.content = content
     state.action_sets = action_set_list
     state.put()
 

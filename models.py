@@ -74,8 +74,8 @@ class State(ndb.Model):
   hash_id = ndb.StringProperty(required=True)
   # Human-readable name for the state.
   name = ndb.StringProperty(default='Activity 1')
-  # The text given to the reader in this state.
-  text = ndb.JsonProperty(repeated=True)
+  # The content displayed to the reader in this state.
+  content = ndb.JsonProperty(repeated=True)
   # The input view corresponding to this state.
   input_view = ndb.KeyProperty(kind=InputView, required=True)
   # The categories (different buckets) associated with this state's classifier.

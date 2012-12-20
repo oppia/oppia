@@ -88,7 +88,7 @@ class ExplorationHandler(base.BaseHandler):
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     logging.info(exploration.init_state)
     init_state = exploration.init_state.get()
-    init_html, init_widgets = utils.ParseContentIntoHtml(init_state.text, 0)
+    init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
     self.data_values.update({
         'block_number': 0,
         'html': init_html,
@@ -164,7 +164,7 @@ class ExplorationHandler(base.BaseHandler):
       # Append text for the new state only if the new and old states differ.
       if old_state.hash_id != state.hash_id:
         state_html, state_widgets = utils.ParseContentIntoHtml(
-            state.text, block_number)
+            state.content, block_number)
         html_output += state_html
         widget_output.append(state_widgets)
 
