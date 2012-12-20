@@ -205,5 +205,5 @@ class ImportPage(editor.BaseHandler):
         'explorationId': exploration_id,
         'inputType': input_view.name,
         'state': {'desc': state.name, 'dests': dests_array},
-        'stateText': content,
+        'stateContent': content,
     }))

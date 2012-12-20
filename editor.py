@@ -154,7 +154,7 @@ class ExplorationPage(BaseHandler):
         'inputType': state.input_view.get().name,
         'stateId': state.hash_id,
         'stateName': state.name,
-        'stateText': state.content,
+        'stateContent': state.content,
     }))
 
   def put(self, exploration_id):  # pylint: disable-msg=C6409
@@ -285,7 +285,7 @@ class StatePage(BaseHandler):
         'inputType': state.input_view.get().name,
         'stateId': state.hash_id,
         'stateName': state.name,
-        'stateText': state.content,
+        'stateContent': state.content,
         'yaml': '',
     }
 
@@ -310,7 +310,7 @@ class StatePage(BaseHandler):
       values['actions'].append(action)
 
     values['yaml'] = yaml.safe_dump({
-        'content': [{content['type']: content['value']} for content in state.content],
+        'content': state.content,
         'input_type': {'name': state.input_view.get().name},
         'answers': [
             {category_list[i]:
@@ -344,10 +344,11 @@ class StateHandler(BaseHandler):
       state.name = state_name
       state.put()
 
-    if self.request.get('state_text'):
-      state_content = json.loads(self.request.get('state_text'))
+    if self.request.get('state_content'):
+      state_content = json.loads(self.request.get('state_content'))
       # Remove empty content.
-      state.content = [item for item in state_content if item['value']]
+      state.content = [{item['type']: item['value']} for item in state_content
+                       if item['value']]
 
     if self.request.get('input_type'):
       # TODO(sll): Check whether the given input_type is a valid one.

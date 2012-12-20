@@ -126,7 +126,7 @@ oppia.factory('stateDataFactory', function($rootScope, $http, warningsData) {
               obj.data = data;
               console.log(data);
               obj.stateName = data.stateName;
-              obj.stateText = data.stateText;
+              obj.stateContent = data.stateContent;
               obj.inputType = data.inputType;
               obj.classifier = data.classifier;
               obj.yaml = data.yaml;
@@ -191,15 +191,15 @@ oppia.directive('imageUpload', function($exceptionHandler) {
   };
 });
 
-oppia.directive('unfocusStateText', function() {
+oppia.directive('unfocusstateContent', function() {
   return {
     restrict: 'A',
     link: function(scope, element, attribs) {
       element[0].focus();
       element.bind('blur', function() {
-        scope.stateText[scope.$index] = scope.item;
-        scope.$apply(attribs['unfocusStateText']);
-        scope.saveStateChange('stateText');
+        scope.stateContent[scope.$index] = scope.item;
+        scope.$apply(attribs['unfocusstateContent']);
+        scope.saveStateChange('stateContent');
         scope.currentActiveInput = '';
       });
     }
@@ -235,14 +235,14 @@ oppia.directive('oppiaPaletteDroppable', function($compile, warningsData) {
         activeClass: 'oppia-droppable-active',
         drop: function(event, ui) {
           if ($(ui.draggable).hasClass('oppia-palette-text')) {
-            scope.currentActiveInput = 'stateText.' + scope.stateText.length;
-            scope.stateText.push({type: 'text', value: ''});
+            scope.currentActiveInput = 'stateContent.' + scope.stateContent.length;
+            scope.stateContent.push({type: 'text', value: ''});
           } else if ($(ui.draggable).hasClass('oppia-palette-image')) {
-            scope.stateText.push({type: 'image', value: ''});
+            scope.stateContent.push({type: 'image', value: ''});
           } else if ($(ui.draggable).hasClass('oppia-palette-video')) {
-            scope.stateText.push({type: 'video', value: ''});
+            scope.stateContent.push({type: 'video', value: ''});
           } else if ($(ui.draggable).hasClass('oppia-palette-widget')) {
-            scope.stateText.push({type: 'widget', value: ''});
+            scope.stateContent.push({type: 'widget', value: ''});
           } else {
             warningsData.addWarning('Unknown palette icon.');
             return;
@@ -254,7 +254,7 @@ oppia.directive('oppiaPaletteDroppable', function($compile, warningsData) {
   };
 });
 
-// Allows stateText items to be trashed.
+// Allows stateContent items to be trashed.
 oppia.directive('oppiaItemDroppable', function($compile) {
   return {
     restrict: 'C',
@@ -263,19 +263,19 @@ oppia.directive('oppiaItemDroppable', function($compile) {
         accept: '.oppia-state-text-item',
         hoverClass: 'oppia-droppable-trash-active',
         drop: function(event, ui) {
-          for (var i = 0; i < scope.stateText.length; ++i) {
+          for (var i = 0; i < scope.stateContent.length; ++i) {
             if ($(ui.draggable).hasClass('item-' + i)) {
-              // TODO(sll): Using just scope.stateText.splice(i, 1) doesn't
+              // TODO(sll): Using just scope.stateContent.splice(i, 1) doesn't
               // work, because the other objects in the array get randomly
               // arranged. Find out why, or refactor the following into a
               // different splice() method and use that throughout.
-              var tempStateText = [];
-              for (var j = 0; j < scope.stateText.length; ++j) {
+              var tempstateContent = [];
+              for (var j = 0; j < scope.stateContent.length; ++j) {
                 if (i != j) {
-                  tempStateText.push(scope.stateText[j]);
+                  tempstateContent.push(scope.stateContent[j]);
                 }
               }
-              scope.$parent.stateText = tempStateText;
+              scope.$parent.stateContent = tempstateContent;
               return;
             }
           }
@@ -298,13 +298,13 @@ oppia.directive('sortable', function($compile) {
         stop: function(event, ui) {
           if ($(ui.item).hasClass('oppia-state-text-item')) {
             // This prevents a collision with the itemDroppable trashing.
-            for (var i = 0; i < scope.stateText.length; ++i) {
-              if (scope.stateText[i] == undefined) {
-                scope.stateText.splice(i, 1);
+            for (var i = 0; i < scope.stateContent.length; ++i) {
+              if (scope.stateContent[i] == undefined) {
+                scope.stateContent.splice(i, 1);
                 --i;
               }
             }
-            scope.saveStateChange('stateText');
+            scope.saveStateChange('stateContent');
             scope.$apply();
           }
         }
@@ -341,7 +341,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   $scope.clearStateVariables = function() {
     $scope.stateId = '';
     $scope.stateName = '';
-    $scope.stateText = [];
+    $scope.stateContent = [];
     $scope.inputType = '';
     $scope.classifier = '';
     $scope.console = '';
@@ -557,7 +557,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     var prevStateId = $scope.stateId;
     $scope.closeModalWindow();
     $scope.stateId = data.stateId;
-    var variableList = ['stateName', 'stateText', 'inputType', 'classifier',
+    var variableList = ['stateName', 'stateContent', 'inputType', 'classifier',
                         'states'];
     for (var i = 0; i < variableList.length; ++i) {
       // Exclude 'states', because it is not returned from the backend.
@@ -578,11 +578,11 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
       // If a widget exists, show its compiled version and populate the widget
       // view fields.
-      for (var i = 0; i < $scope.stateText.length; ++i) {
-        if ($scope.stateText[i].type == 'widget') {
+      for (var i = 0; i < $scope.stateContent.length; ++i) {
+        if ($scope.stateContent[i].type == 'widget') {
           var widgetFrameId = 'widgetPreview' + i;
-          // Get the widget with id $scope.stateText[i].value
-          $http.get('/widgets/' + $scope.stateText[i].value).
+          // Get the widget with id $scope.stateContent[i].value
+          $http.get('/widgets/' + $scope.stateContent[i].value).
               success(function(data) {
                 console.log(data);
                 $scope.widgetCode = data.raw;
@@ -765,14 +765,14 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
     if (property == 'stateName') {
       requestParameters['state_name'] = $scope.stateName;
-    } else if (property == 'stateText') {
-      // Remove null values from $scope.stateText.
-      $scope.tempStateText = [];
-      for (var i = 0; i < $scope.stateText.length; ++i) {
-        if ($scope.stateText[i]['value'])
-          $scope.tempStateText.push($scope.stateText[i]);
+    } else if (property == 'stateContent') {
+      // Remove null values from $scope.stateContent.
+      $scope.tempstateContent = [];
+      for (var i = 0; i < $scope.stateContent.length; ++i) {
+        if ($scope.stateContent[i]['value'])
+          $scope.tempstateContent.push($scope.stateContent[i]);
       }
-      requestParameters['state_text'] = JSON.stringify($scope.tempStateText);
+      requestParameters['state_content'] = JSON.stringify($scope.tempstateContent);
     } else if (property == 'inputType' || property == 'states') {
       requestParameters['input_type'] = $scope.inputType;
       if ($scope.classifier != 'none' &&
@@ -887,21 +887,21 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       /*
       $http.get('https://gdata.youtube.com/feeds/api/videos/' + videoId[2], '').
           success(function(data) {
-            $scope.stateText[index].value = videoId[2];
-            $scope.saveStateChange('stateText');
+            $scope.stateContent[index].value = videoId[2];
+            $scope.saveStateChange('stateContent');
           }).error(function(data) {
             warningsData.addWarning('This is not a valid YouTube video id.');
           });
       */
-      $scope.stateText[index].value = videoId[2];
-      $scope.saveStateChange('stateText');
+      $scope.stateContent[index].value = videoId[2];
+      $scope.saveStateChange('stateContent');
     }
     $scope.clearActiveInputs();
   };
 
   $scope.deleteVideo = function(index) {
-    $scope.stateText[index].value = '';
-    $scope.saveStateChange('stateText');
+    $scope.stateContent[index].value = '';
+    $scope.saveStateChange('stateContent');
   };
 
   $scope.setActiveImage = function(image) {
@@ -934,8 +934,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
           data = jQuery.parseJSON(data);
           if (data.image_id) {
             $scope.$apply(function() {
-              $scope.stateText[index].value = data.image_id;
-              $scope.saveStateChange('stateText');
+              $scope.stateContent[index].value = data.image_id;
+              $scope.saveStateChange('stateContent');
             });
           } else {
             warningsData.addWarning(
@@ -952,8 +952,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
   $scope.deleteImage = function(index) {
     // TODO(sll): Send a delete request to the backend datastore.
-    $scope.stateText[index].value = '';
-    $scope.saveStateChange('stateText');
+    $scope.stateContent[index].value = '';
+    $scope.saveStateChange('stateContent');
   };
 
   // Receive messages from the widget repository.
@@ -964,8 +964,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     // Send arg.data.raw to the preview. Change tab to preview. Save code in backend.
 
     var index = -1;
-    for (var i = 0; i < $scope.stateText.length; ++i) {
-      if ($scope.stateText[i].type == 'widget') {
+    for (var i = 0; i < $scope.stateContent.length; ++i) {
+      if ($scope.stateContent[i].type == 'widget') {
         index = i;
         break;
       }
@@ -993,7 +993,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         {'raw': JSON.stringify(widgetCode)},
         true
     );
-    var widgetId = $scope.stateText[index].value || '';
+    var widgetId = $scope.stateContent[index].value || '';
     console.log(widgetId);
 
     $http.post(
@@ -1004,17 +1004,17 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       // Check that the data has been saved correctly.
       console.log(widgetData);
       $('#widgetTabs' + index + ' a:first').tab('show');
-      $scope.stateText[index].value = widgetData.widgetId;
-      $scope.saveStateChange('stateText');
+      $scope.stateContent[index].value = widgetData.widgetId;
+      $scope.saveStateChange('stateContent');
       // TODO(sll): Display multiple widget div's here.
       $scope.clearActiveInputs();
-      console.log($scope.stateText);
+      console.log($scope.stateContent);
     });
   };
 
-  $scope.isWidgetInStateText = function() {
-    for (var i = 0; i < $scope.stateText.length; ++i) {
-      if ($scope.stateText[i] && $scope.stateText[i]['type'] == 'widget') {
+  $scope.isWidgetInstateContent = function() {
+    for (var i = 0; i < $scope.stateContent.length; ++i) {
+      if ($scope.stateContent[i] && $scope.stateContent[i]['type'] == 'widget') {
         return true;
       }
     }
@@ -1362,7 +1362,7 @@ function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.$parent.states[$scope.$parent.stateId] = data.state;
-              $scope.$parent.stateText = data.stateText;
+              $scope.$parent.stateContent = data.stateContent;
               $scope.$parent.inputType = data.inputType;
               $scope.$parent.classifier = data.classifier;
 
