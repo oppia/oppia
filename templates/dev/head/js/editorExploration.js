@@ -418,48 +418,19 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   };
 
   /**
-   * Checks if a new user-entered field is a duplicate of one that already
-   * exists in a given object.
-   * @param {object} object The object to be iterated over.
-   * @param {string} field The variable name corresponding to the field that
-   *     will store the new input.
-   * @param {string} currentKey The value of the key for which a new input is
-   *     being given.
-   * @param {string} newInput The new input whose existence in the object is
-   *     being checked.
-   * @return {bool} true if the input is already in the list under a key that is
-   *     not currentKey; false otherwise.
+   * Makes this exploration public.
    */
-  $scope.isDuplicateInput = function(object, field, currentKey, newInput) {
-    for (var key in object) {
-      if (key != currentKey && object[key][field] == newInput) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a new user-entered field is a duplicate of one that already
-   * exists a given array.
-   * @param {array} array The array to be iterated over.
-   * @param {string} field The variable name corresponding to the field that
-   *     will store the new input.
-   * @param {string} index The index for which a new input is being given.
-   * @param {string} newInput The new input whose existence in the array is
-   *     being checked.
-   * @return {bool} true if the input is already in the list under a key that is
-   *     not index; false otherwise.
-   */
-  $scope.isDuplicateArrayInput = function(array, field, index, newInput) {
-    for (var i = 0; i < array.length; ++i) {
-      if (i != index && array[i][field] == newInput) {
-        warningsData.addWarning(
-            'The name \'' + String(newInput) + '\' is already in use.');
-        return true;
-      }
-    }
-    return false;
+  $scope.makePublic = function() {
+    console.log('Publishing exploration');
+    $http.put(
+        $scope.explorationUrl, '',
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              $scope.isPublic = true;
+            }).
+            error(function(data) {
+              warningsData.addWarning('Error publishing exploration: ' + data.error);
+            });
   };
 
   // Adds a new state to the list of states, and updates the backend.
@@ -625,6 +596,11 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.saveStateChange('stateName');
     activeInputData.clear();
   };
+
+
+
+
+
 
   $scope.deleteCategory = function(categoryId) {
     // TODO(wilsonhong): Modify the following to remove the edge corresponding
@@ -829,10 +805,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     drawStateGraph($scope.states);
   };
 
-  $scope.closeEditorWindow = function() {
-    $scope.stateId = '';
-  };
-
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
       // The content creator has added a new video link. Extract its ID.
@@ -1012,8 +984,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       return;
     }
 
-    // TODO(sll): Figure out if the next line messes up the browser history.
-    $scope.closeEditorWindow();
     $scope.clearStateVariables();
 
     $http.delete(
@@ -1041,27 +1011,12 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
       delete $scope.states[stateId];
       $scope.saveStateChange('states');
       drawStateGraph($scope.states);
+
+      stateData.getData($scope.initStateId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
   };
-
-  /**
-   * Makes this exploration public.
-   */
-  $scope.makePublic = function() {
-    console.log('Publishing exploration');
-    $http.put(
-        $scope.explorationUrl, '',
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              $scope.isPublic = true;
-            }).
-            error(function(data) {
-              warningsData.addWarning('Error publishing exploration: ' + data.error);
-            });
-  };
-
 
   /************************************************
    * Code for the state graph.
