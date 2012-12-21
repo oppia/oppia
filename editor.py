@@ -451,6 +451,15 @@ class StateHandler(BaseHandler):
     exploration.put()
 
 
+class TemplateHandler(base.BaseHandler):
+  """Retrieves an editor template."""
+
+  def get(self, template_type):
+    """Handles GET requests."""
+    self.response.out.write(base.JINJA_ENV.get_template(
+        'editor/views/%s_editor.html' % template_type).render({}))
+
+
 class Image(base.BaseHandler):
   """Handles image uploads and retrievals."""
 
