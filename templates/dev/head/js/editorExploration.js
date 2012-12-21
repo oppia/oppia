@@ -193,14 +193,14 @@ oppia.directive('imageUpload', function($exceptionHandler) {
   };
 });
 
-oppia.directive('unfocusstateContent', function(activeInputData) {
+oppia.directive('unfocusStateContent', function(activeInputData) {
   return {
     restrict: 'A',
     link: function(scope, element, attribs) {
       element[0].focus();
       element.bind('blur', function() {
         scope.stateContent[scope.$index] = scope.item;
-        scope.$apply(attribs['unfocusstateContent']);
+        scope.$apply(attribs['unfocusStateContent']);
         scope.saveStateChange('stateContent');
         activeInputData.clear();
       });

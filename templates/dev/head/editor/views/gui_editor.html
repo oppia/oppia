@@ -20,7 +20,7 @@
                 <div ng-switch-when="text">
                   <ng-switch on="activeInputData.name == 'stateContent.' + $index">
                     <div ng-switch-when="true">
-                      <textarea rows="5" ng-model="item.value" unfocus-state-text="activeInputData.clear()"></textarea>
+                      <textarea rows="5" ng-model="item.value" unfocus-state-content="activeInputData.clear()"></textarea>
                     </div>
                     <div ng-switch-default ng-click="initializeNewActiveInput('stateContent.' + $index)">
                       <ng-switch on="item.value == ''">
