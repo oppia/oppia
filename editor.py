@@ -123,7 +123,8 @@ class ExplorationPage(BaseHandler):
 
     self.values.update({
         'js': utils.GetJsFilesWithBase(
-            ['editorExploration', 'editorClassifiers', 'editorGraph']),
+            ['editorExploration', 'editorClassifiers', 'editorGraph',
+             'guiEditor', 'yamlEditor']),
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
@@ -206,7 +207,6 @@ class ExplorationHandler(BaseHandler):
       state_list[state.hash_id] = {'desc': state.name,
                                    'dests': state_destinations}
 
-    DIR_PREFIX = 'classifier_editors/'
     self.data_values.update({
         'exploration_id': exploration.hash_id,
         'init_state_id': exploration.init_state.get().hash_id,
@@ -215,10 +215,6 @@ class ExplorationHandler(BaseHandler):
         'metadata': exploration.metadata,
         'mode': EDITOR_MODE,
         'state_list': state_list,
-        'finite_code': utils.GetFileContents('%s/finite.html' % DIR_PREFIX),
-        'numeric_code': utils.GetFileContents('%s/numeric.html' % DIR_PREFIX),
-        'set_code': utils.GetFileContents('%s/set.html' % DIR_PREFIX),
-        'text_code': utils.GetFileContents('%s/text.html' % DIR_PREFIX),
     })
     self.response.out.write(json.dumps(self.data_values))
 
@@ -252,15 +248,11 @@ class StatePage(BaseHandler):
     """
     user, exploration = self.GetUserAndExploration(exploration_id)
 
-    DIR_PREFIX = 'classifier_editors/'
     self.values.update({
         'js': utils.GetJsFilesWithBase(
-            ['editorExploration', 'editorClassifiers', 'editorGraph']),
+            ['editorExploration', 'editorClassifiers', 'editorGraph',
+             'guiEditor', 'yamlEditor']),
         'mode': EDITOR_MODE,
-        'finite_code': utils.GetFileContents('%s/finite.html' % DIR_PREFIX),
-        'numeric_code': utils.GetFileContents('%s/numeric.html' % DIR_PREFIX),
-        'set_code': utils.GetFileContents('%s/set.html' % DIR_PREFIX),
-        'text_code': utils.GetFileContents('%s/text.html' % DIR_PREFIX),
     })
     self.response.out.write(
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(
