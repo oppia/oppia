@@ -513,28 +513,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     console.log($scope.states);
     console.log(data);
 
-    if ($scope.getMode() == 'gui') {
-      $location.path(GUI_EDITOR_URL + '/' + $scope.stateId);
-
-      // If a widget exists, show its compiled version and populate the widget
-      // view fields.
-      for (var i = 0; i < $scope.stateContent.length; ++i) {
-        if ($scope.stateContent[i].type == 'widget') {
-          var widgetFrameId = 'widgetPreview' + i;
-          // Get the widget with id $scope.stateContent[i].value
-          $http.get('/widgets/' + $scope.stateContent[i].value).
-              success(function(data) {
-                console.log(data);
-                $scope.widgetCode = data.raw;
-                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-              }).error(function(data) {
-                warningsData.addWarning(
-                    'Widget could not be loaded: ' + String(data.error));
-              });
-        }
-      }
-    }
-
     // Changes the active node in the graph.
     drawStateGraph($scope.states);
   });

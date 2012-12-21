@@ -1,4 +1,32 @@
 function GuiEditor($scope, $http, stateData, explorationData, warningsData, activeInputData) {
+  /**
+   * Sets up the state editor, given its data from the backend.
+   * @param {Object} data Data received from the backend about the state.
+   */
+  $scope.$on('stateData', function() {
+    if ($scope.getMode() == 'gui') {
+      $location.path(GUI_EDITOR_URL + '/' + $scope.stateId);
+
+      // If a widget exists, show its compiled version and populate the widget
+      // view fields.
+      for (var i = 0; i < $scope.stateContent.length; ++i) {
+        if ($scope.stateContent[i].type == 'widget') {
+          var widgetFrameId = 'widgetPreview' + i;
+          // Get the widget with id $scope.stateContent[i].value
+          $http.get('/widgets/' + $scope.stateContent[i].value).
+              success(function(data) {
+                console.log(data);
+                $scope.widgetCode = data.raw;
+                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
+              }).error(function(data) {
+                warningsData.addWarning(
+                    'Widget could not be loaded: ' + String(data.error));
+              });
+        }
+      }
+    }
+  });
+
   // Clears modal window data when it is closed.
   $scope.closeModalWindow = function() {
     $scope.isModalWindowActive = false;
