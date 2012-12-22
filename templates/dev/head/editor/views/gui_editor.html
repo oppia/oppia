@@ -144,18 +144,6 @@
             {% include 'classifier_editors/text.html' %}
           </div>
 
-          <div id="oppia-popup" ng-show="isModalWindowActive">
-            <a class="close" ng-click="closeModalWindow()">&times;</a>
-            <div id="textInput">
-              <label for="textData">
-                <h5>In response to the reader's answer, display the text:</h5>
-              </label>
-              <textarea rows="10" cols="50" ng-model="textData" id="textData"></textarea>
-              <p>
-                <button ng-click="saveText()">Save</button>
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

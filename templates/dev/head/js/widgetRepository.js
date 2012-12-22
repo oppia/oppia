@@ -64,10 +64,6 @@ function WidgetRepository($scope, $http, activeInputData) {
     // TODO(sll): This does not update the view value when widgetCode is
     // called from the repository. Fix this.
     $scope.widgetCode = widgetCode;
-    // TODO(sll): Escape widgetCode first!
-    // TODO(sll): Need to ensure that anything stored server-side cannot lead
-    //     to malicious behavior (e.g. the user could do his/her own POST
-    //     request). Get a security review done on this feature.
 
     var newWidget = {
         'raw': JSON.stringify(widgetCode),

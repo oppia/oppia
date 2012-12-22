@@ -462,7 +462,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
                 $scope.inlineNewNumericStateDesc = '';
                 $scope.inlineNewSetStateDesc = '';
                 $scope.inlineNewTextStateDesc = '';
-                $scope.closeModalWindow();
                 activeInputData.clear();
 
                 var oldDest =

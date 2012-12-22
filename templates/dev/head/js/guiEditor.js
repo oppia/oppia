@@ -1,18 +1,13 @@
 function GuiEditor($scope, $http, stateData, explorationData, warningsData, activeInputData) {
-  /**
-   * Sets up the state editor, given its data from the backend.
-   * @param {Object} data Data received from the backend about the state.
-   */
+  // Sets up the state editor, given its data from the backend.
   $scope.$on('stateData', function() {
     // If a widget exists, show its compiled version and populate the widget
     // view fields.
     for (var i = 0; i < $scope.stateContent.length; ++i) {
       if ($scope.stateContent[i].type == 'widget') {
         var widgetFrameId = 'widgetPreview' + i;
-        // Get the widget with id $scope.stateContent[i].value
         $http.get('/widgets/' + $scope.stateContent[i].value).
             success(function(data) {
-              console.log(data);
               $scope.widgetCode = data.raw;
               $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
             }).error(function(data) {
@@ -23,43 +18,17 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     }
   });
 
-  // Clears modal window data when it is closed.
-  $scope.closeModalWindow = function() {
-    $scope.isModalWindowActive = false;
-    $scope.activeModalCategoryId = '';
-    $scope.textData = '';
-  };
-
-  $scope.closeModalWindow();
-
   $scope.deleteCategory = function(categoryId) {
-    // TODO(wilsonhong): Modify the following to remove the edge corresponding
-    // to the specific category ID from the graph (rather than a generic edge
-    // from the start node to the destination node).
     $scope.states[$scope.stateId]['dests'].splice(categoryId, 1);
     $scope.saveStateChange('states');
     drawStateGraph($scope.states);
   };
 
-  $scope.showEditorModal = function(actionType, categoryId) {
-    // TODO(sll): Get this modal dialog to show up next to the button that was
-    // clicked. Do this by getting the DOM object, and the clicked position
-    // from it using $(buttonElement).position().left,
-    // $(buttonElement).position().top.
-
-    $scope.isModalWindowActive = true;
-    $('.editorInput').hide();
-    $('#' + actionType + 'Input').show();
-    $('.firstInputField').focus();
-
-    if (actionType != 'view') {
-      $scope.activeModalCategoryId = categoryId;
-      if ($scope.states[$scope.stateId]['dests'][categoryId][actionType]) {
-        if (actionType === 'text') {
-          $scope[actionType + 'Data'] =
-              $scope.states[$scope.stateId]['dests'][categoryId][actionType];
-        }
-      }
+  $scope.showFeedbackEditor = function(activeInput, categoryId) {
+    $scope.initializeNewActiveInput(activeInput);
+    if ($scope.states[$scope.stateId]['dests'][categoryId]['text']) {
+      $scope['textData'] =
+          $scope.states[$scope.stateId]['dests'][categoryId]['text'];
     }
   };
 
@@ -87,11 +56,9 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     return categoryName != DEFAULT_CATEGORY_NAME ? 'category-name' : '';
   };
 
-  $scope.saveText = function() {
-    var categoryId = $scope.activeModalCategoryId;
-    $scope.states[$scope.stateId]['dests'][categoryId]['text'] = $scope.textData;
+  $scope.saveText = function(textData, categoryId) {
+    $scope.states[$scope.stateId]['dests'][categoryId]['text'] = textData;
     $scope.saveStateChange('states');
-    $scope.closeModalWindow();
   };
 
   $scope.saveDest = function(categoryId, destName) {
@@ -208,7 +175,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
    *     creator.
    */
   $scope.changeInputType = function(newInputType) {
-    $scope.closeModalWindow();
     $scope.inputType = newInputType;
     if (!$scope.inputType) {
       $scope.inputType = 'none';

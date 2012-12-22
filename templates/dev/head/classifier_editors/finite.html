@@ -34,11 +34,22 @@
       </form>
     </span>
 
-    <p ng-click="showEditorModal('text', $index)">
+    <p ng-click="showFeedbackEditor(classifier + '.' + $index + '.text', $index)">
       <span class="oppia-editable-name">Feedback:</span>
       <span ng-hide="action.text">[Add feedback]</span>
       <span ng-show="action.text" ng-bind-html="action.text | truncate"></span>
+
+      <div id="textInput" ng-show="activeInputData.name == classifier + '.' + $index + '.text'">
+        <label for="textData">
+          <h5>In response to the reader's answer, display the text:</h5>
+        </label>
+        <textarea rows="10" cols="50" ng-model="textData" id="textData"></textarea>
+        <p>
+          <button ng-click="saveText(textData, $index)">Save</button>
+        </p>
+      </div>
     </p>
+
   </div>
 
   <div class="input-view-name">
