@@ -103,9 +103,10 @@ urls = [
     (r'/imagehandler/(%s)/?' % r, editor.Image),
 
     (r'/widgets/?', widgets.Widget),
-    (r'/widgets/repository/?', widgets.WidgetRepositoryPage),
     (r'/widgets/(%s)/?' % r, widgets.Widget),
-    (r'/widgets/repository/data/?', widgets.WidgetRepositoryHandler),
+
+    (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
+    (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
 
     # 404 error handler.
     (r'/.*', Error404Handler),

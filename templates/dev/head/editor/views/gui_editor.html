@@ -9,7 +9,6 @@
         </center>
         <div>
           <ul ui-sortable ng-model="stateContent" class="sortable oppia-state-text-list">
-            <!--TODO(sll): When these are moved around, the containing boxes get smaller. Why?-->
             <li ng-repeat="item in stateContent" class="oppia-state-text-item" ng-class="'item-' + $index">
               <ng-switch on="item.type">
                 <!-- TODO(sll): In the following, stateContent should store the
@@ -83,7 +82,7 @@
                       </button>
                     </div>
                     <div class="tab-pane active" id="repository">
-                      <iframe src="/widgets/repository?iframed=true" width="100%" height="400px" frameborder="0"></iframe>
+                      <iframe src="/widgetrepository?iframed=true" width="100%" height="400px" frameborder="0"></iframe>
                     </div>
                   </div>
                 </div>

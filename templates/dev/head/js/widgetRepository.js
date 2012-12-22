@@ -1,5 +1,5 @@
 function Widgets($scope, $http, activeInputData) {
-  $scope.widgetDataUrl = '/widgets/repository/data/';
+  $scope.widgetDataUrl = '/widgetrepository/data/';
 
   $scope.loadPage = function(data) {
     console.log(data);
@@ -26,12 +26,8 @@ function Widgets($scope, $http, activeInputData) {
     F[0].contentWindow.document.write(widgetCode);
   };
 
-  $scope.setActiveInput = function(newActiveInput) {
-    activeInputData.name = newActiveInput;
-  };
-
   $scope.createNewWidget = function() {
-    $scope.setActiveInput('addWidget');
+    activeInputData.name = 'addWidget';
   };
 
   $scope.saveWidget = function(widgetCode) {
@@ -53,7 +49,7 @@ function Widgets($scope, $http, activeInputData) {
     );
 
     $http.post(
-      '/widgets/repository/',
+      '/widgetrepository/',
       request,
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {

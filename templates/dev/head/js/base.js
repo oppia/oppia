@@ -1,5 +1,6 @@
 // TODO(sll): The ['ui', 'ngSanitize'] dependencies are only needed for
-// editorQuestion.js. Find a way to make them load only for that page.
+// editorExploration.js (possibly just the GuiEditor, in fact). Find a way to
+// make them load only for that page.
 var oppia = angular.module('oppia', ['ui', 'ngSanitize']);
 var editorUrl = '/editor/';
 var ALPHANUMERIC_REGEXP = {
