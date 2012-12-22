@@ -42,6 +42,7 @@ class WidgetRepositoryPage(base.BaseHandler):
     # TODO(sll): check if the user is an admin.
     raw = self.request.get('raw')
     name = self.request.get('name')
+    params = json.loads(self.request.get('params'))
     if not raw:
       raise self.InvalidInputException('No widget code supplied')
     if not name:
@@ -52,7 +53,7 @@ class WidgetRepositoryPage(base.BaseHandler):
 
     widget_hash_id = utils.GetNewId(models.GenericWidget, name)
     widget = models.GenericWidget(
-        hash_id=widget_hash_id, raw=raw, name=name)
+        hash_id=widget_hash_id, raw=raw, name=name, params=params)
     widget.put()
 
   def put(self, widget_id=None):
@@ -86,7 +87,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
         'raw': '<div style="color: blue;">This text is blue</div>'})
     for widget in generic_widgets:
       response.append({'hash_id': widget.hash_id, 'name': widget.name,
-                       'raw': widget.raw})
+                       'raw': widget.raw, 'params': widget.params})
     self.response.out.write(json.dumps({'widgets': response}))
 
 

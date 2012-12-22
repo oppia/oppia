@@ -45,14 +45,8 @@ class GenericWidget(ndb.Model):
   blurb = ndb.TextProperty()
   # The raw code for the generic widget.
   raw = ndb.TextProperty()
-  # List of parameters to be supplied to the generic widget.
-  params = ndb.StringProperty(repeated=True)
-  # Definitions of these parameters.
-  param_defns = ndb.TextProperty(repeated=True)
-  # Types of these parameters (string, int, etc.).
-  param_types = ndb.StringProperty(repeated=True)
-  # Default values for these parameters.
-  default_args = ndb.StringProperty(repeated=True)
+  # Parameter names, definitions, types and default arguments for this widget.
+  params = ndb.JsonProperty(repeated=True)
 
 
 class InputView(ndb.Model):
