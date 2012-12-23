@@ -228,7 +228,7 @@ oppia.directive('oppiaPaletteIcon', function($compile, activeInputData) {
 });
 
 // Allows palette icons to be dropped.
-oppia.directive('oppiaPaletteDroppable', function($compile, warningsData) {
+oppia.directive('oppiaPaletteDroppable', function($compile, warningsData, activeInputData) {
   return {
     restrict: 'C',
     link: function(scope, element, attrs) {

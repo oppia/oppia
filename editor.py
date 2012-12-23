@@ -271,13 +271,19 @@ class StatePage(BaseHandler):
     """
     user, exploration = self.GetUserAndExploration(exploration_id)
     state = utils.GetEntity(models.State, state_id)
+    content = []
+    for item in state.content:
+      if len(state.content) > 1:
+        logging.error('Invalid item in content of state %s' % state_id)
+      for k, v in item:
+        content.append({'type': k, 'value': v})
     values = {
         'actions': [],
         'classifier': state.input_view.get().classifier,
         'inputType': state.input_view.get().name,
         'stateId': state.hash_id,
         'stateName': state.name,
-        'stateContent': state.content,
+        'stateContent': content,
         'yaml': '',
     }
 
