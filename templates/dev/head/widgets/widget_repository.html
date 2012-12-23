@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div ng-controller="WidgetRepository">
+  <br>
+  <div class="tabbable tabs-left">
+    <ul class="nav nav-tabs">
+      <li ng-repeat="(category, widgetList) in widgets">
+        <a data-toggle="tab" href="'#' + category"><[category]></a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div ng-repeat="(category, widgetList) in widgets" class="tab-pane active" id="category">
+        <div class="container-fluid">
+          <div class="row-fluid">
+
+            <ul class="thumbnails">
+              <li ng-repeat="widget in widgetList" class="span3">
+                <div class="thumbnail">
+
+                  <h5><[widget.name]></h5>
+                  <i><[widget.blurb]></i>
+                  <a ng-click="showModal($index)" ng-show="widget.params.length > 0">Customize</a>
+
+                  {% if not iframed %}
+
+                    <ul class="nav nav-tabs">
+                      <li class="active"><a data-toggle="tab" href="#preview-<[$index]>">Preview</a></li>
+                      <li><a data-toggle="tab" href="#code-<[$index]>">Code</a></li>
+                    </ul>
+                    <div class="tab-content">
+                      <div class="tab-pane active" id="preview-<[$index]>">
+                        <iframe id="widget-<[$index]>" width="100%" frameborder="0"></iframe>
+                      </div>
+                      <div class="tab-pane" id="code-<[$index]>">
+                        <textarea class="oppia-code" ng-model="widget.raw" rows="10" readonly>
+                        </textarea>
+                      </div>
+                    </div>
+                    {% if admin %}
+                      <!-- TODO(sll): Implement this. -->
+                      <button ng-click="editWidget()">Edit this widget</button>
+                    {% endif %}
+
+                  {% else %}
+
+                    <iframe id="widget-<[$index]>" frameborder="0" width="100%"></iframe>
+                    <center>
+                      <button ng-click="selectWidget(widget)">
+                        Use <[widget.name]>
+                      </button>
+                    </center>
+
+                  {% endif %}
+
+                </div>
+              </li>
+            </ul>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <br><br>
+
+      {% if admin and not iframed %}
+        <div ng-hide="activeInputData.name == 'addWidget'">
+          Add a new widget:
+          <form name="addWidget" ng-hide="currentActiveInput == 'addWidget'" ng-submit="createNewWidget()">
+            <!--Add error checking here. This cannot be empty.-->
+            <input type="text" ng-model="newWidgetName">
+            in category:
+            <input type="text" ng-model="newWidgetCategory">
+            <br>
+            Description:
+            <textarea ng-model="newWidgetBlurb">
+            </textarea>
+            <input type="submit" value="Create Widget">
+          </form>
+        </div>
+
+        <div ng-show="activeInputData.name.substring(0, 9) == 'newWidget'">
+          <h4>Add code for <[newWidgetName]>
+            <button type="button" ng-click="activeInputData.clear()">
+              Cancel
+            </button>
+          </h4>
+
+          <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#code">Code</a></li>
+            <li><a data-toggle="tab" href="#preview">Preview</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="code">
+
+              Widget parameters:
+              <div ng-repeat="param in widgetParams">
+                <ul>
+                  <li>Name: <[param.name]></li>
+                  <li>Description: <[param.description]></li>
+                  <li>Type: <[param.type]></li>
+                  <li>Default value: <[param.default]></li>
+                </ul>
+              </div>
+
+              <button ng-hide="activeInputData.name.substring(0, 21) == 'newWidget.widgetParam'" ng-click="addParam()">Add parameter</button>
+              <div ng-show="activeInputData.name.substring(0, 21) == 'newWidget.widgetParam'">
+                <ul>
+                  <li>Name: <input type="text" ng-model="newParamName"></li>
+                  <li>Description: <input type="text" ng-model="newParamDescription"></li>
+                  <li>Type: <input type="text" ng-model="newParamType"></li>
+                  <li>Default value: <input type="text" ng-model="newParamDefault"></li>
+                </ul>
+                <button ng-click="saveParam()">Save parameter</button>
+              </div>
+
+              Add code for a widget:
+              <textarea class="oppia-code" ng-model="widgetCode" rows="10">
+              </textarea>
+
+              <button type="button" ng-click="saveWidget(widgetCode)">
+                Save and Preview
+              </button>
+            </div>
+            <div class="tab-pane" id="preview">
+              <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
+            </div>
+          </div>
+        </div>
+
+       </div>
+      {% endif %}
+
+
+      <div ui-modal class="fade" id="customizeModal" ng-model="modalShown">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            &times;
+          </button>
+          <h3 id="customizeModalLabel">Customize this widget</h3>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            Enter parameters below to customize your widget:
+          </p>
+          <form>
+            <div ng-repeat="param in widgets[modalIndex].params">
+              <[param.name]>: <input type="text">
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <a class="btn">Submit</a>
+          <!--TODO(sll): why is the close button not working?-->
+          <a class="btn" data-dismiss="modal">Close</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
