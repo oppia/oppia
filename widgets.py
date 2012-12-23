@@ -114,7 +114,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
 
 class Widget(base.BaseHandler):
-  """Handles individual widget uploads, edits and retrievals."""
+  """Handles individual (non-generic) widget uploads, edits and retrievals."""
 
   def get(self, widget_id):  # pylint: disable-msg=C6409
     """Handles GET requests.
