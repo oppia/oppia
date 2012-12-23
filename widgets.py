@@ -43,9 +43,14 @@ class WidgetRepositoryPage(base.BaseHandler):
     if not users.is_current_user_admin():
       raise self.UnauthorizedUserException('Insufficient privileges to create a new generic widget.')
 
-    raw = self.request.get('raw')
-    name = self.request.get('name')
-    category = self.request.get('category')
+    widget_data = self.request.get('widget')
+    if not widget_data:
+      raise self.InvalidInputException('No widget supplied')
+    widget_data = json.loads(widget_data)
+
+    raw = widget_data['raw']
+    name = widget_data['name']
+    category = widget_data['category']
     if not raw:
       raise self.InvalidInputException('No widget code supplied')
     if not name:
@@ -53,36 +58,39 @@ class WidgetRepositoryPage(base.BaseHandler):
     if not category:
       raise self.InvalidInputException('No widget category supplied')
 
-    blurb = self.request.get('blurb')
-    params = json.loads(self.request.get('params'))
-    # TODO(sll): Make sure this JS is clean!
-    raw = json.loads(raw)
+    blurb = widget_data['blurb']
+    params = widget_data['params']
 
     widget_hash_id = utils.GetNewId(models.GenericWidget, name)
-    widget = models.GenericWidget(
-        hash_id=widget_hash_id, raw=raw, name=name, params=params, category=category, blurb=blurb)
-    widget.put()
+    widget_data['id'] = widget_hash_id
 
-  def put(self, widget_id=None):
+    widget = models.GenericWidget(
+        hash_id=widget_hash_id, raw=raw, name=name, params=params,
+        category=category, blurb=blurb)
+    widget.put()
+    self.response.out.write(json.dumps({'widget': widget_data}))
+
+  def put(self):
     """Updates a generic widget."""
     if not users.is_current_user_admin():
-      raise self.UnauthorizedUserException('Insufficient privileges to create a new generic widget.')
-    if not widget_id:
-      raise self.InvalidInputException('No widget id supplied')
+      raise self.UnauthorizedUserException('Insufficient privileges to edit a generic widget.')
 
-    raw = self.request.get('raw')
-    if not raw:
-      raise self.InvalidInputException('No widget code supplied')
+    widget_data = self.request.get('widget')
+    if not widget_data:
+      raise self.InvalidInputException('No widget supplied')
+    widget_data = json.loads(widget_data)
 
-    # TODO(sll): Make sure this JS is clean!
-    raw = json.loads(raw)
-
-    widget = utils.GetEntity(models.GenericWidget, widget_id)
+    widget = utils.GetEntity(models.GenericWidget, widget_data['id'])
     if not widget:
       raise self.InvalidInputException(
-          'No generic widget found with id %s' % widget_id)
-    widget.raw = raw
+          'No generic widget found with id %s' % widget_data['id'])
+    widget.raw = widget_data['raw']
+    widget.name = widget_data['name']
+    widget.blurb = widget_data['blurb']
+    widget.params = widget_data['params']
+    widget.category = widget_data['category']
     widget.put()
+    self.response.out.write(json.dumps({'widget': widget_data}))
 
 
 class WidgetRepositoryHandler(base.BaseHandler):
@@ -95,11 +103,13 @@ class WidgetRepositoryHandler(base.BaseHandler):
       if widget.category in response:
         response[widget.category].append(
             {'hash_id': widget.hash_id, 'name': widget.name,
-             'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb})
+             'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb,
+             'category': widget.category, 'id': widget.hash_id})
       else:
         response[widget.category] = [{
             'hash_id': widget.hash_id, 'name': widget.name,
-            'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb}]
+            'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb,
+            'category': widget.category, 'id': widget.hash_id}]
     self.response.out.write(json.dumps({'widgets': response}))
 
 

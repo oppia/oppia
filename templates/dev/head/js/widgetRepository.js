@@ -2,13 +2,21 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.widgetDataUrl = '/widgetrepository/data/';
   $scope.widgetParams = [];
 
+  $scope.fillFrame = function(domId, widgetCode) {
+    var F = $('#' + domId);
+    // TODO(sll): Clear this before writing anything.
+    F[0].contentWindow.document.write(widgetCode);
+  };
+
   $scope.loadPage = function(data) {
     console.log(data);
     $scope.widgets = data.widgets;
-    for (var i = 0; i < data.widgets.length; ++i) {
-      var widgetCode = data.widgets[i];
-      $scope.$apply();
-      $scope.fillFrame('widget-' + i, widgetCode.raw);
+    for (category in data.widgets) {
+      for (var i = 0; i < $scope.widgets[category].length; ++i) {
+        var widgetCode = $scope.widgets[category][i].raw;
+        $scope.$apply();
+        $scope.fillFrame('widget-' + category + '-' + i, widgetCode);
+      }
     }
   };
 
@@ -18,21 +26,12 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.loadPage(data);
   });
 
-  /**
-   * Displays a modal allowing customization of the widget's parameters.
-   * @param {string} id The id of the widget to customize.
-   */
-  $scope.showModal = function(id) {
-     $scope.modalIndex = id;
-     $('#customizeModal').modal();
-  };
-
   $scope.addParam = function(index) {
-    activeInputData.name = 'newWidget.widgetParam.' + $scope.widgetParams.length;
+    activeInputData.name = 'modalWidget.widgetParam.' + $scope.widgetParams.length;
   };
 
-  $scope.saveParam = function() {
-    $scope.widgetParams.push({
+  $scope.saveParam = function(params) {
+    params.push({
         'name': $scope.newParamName, 'description': $scope.newParamDescription,
         'type': $scope.newParamType, 'default': $scope.newParamDefault
     });
@@ -40,42 +39,63 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.newParamDescription = '';
     $scope.newParamType = '';
     $scope.newParamDefault = '';
-    activeInputData.name = 'newWidget';
+    activeInputData.name = 'modalWidget';
   };
 
-  $scope.selectWidget = function(widget) {
-    window.parent.postMessage(widget, '*');
+  $('#editWidgetModal').on('hidden', function () {
+    $scope.newWidgetIsBeingAdded = false;
+  })
+
+  $scope.editWidget = function(widget) {
+    $('#editWidgetModal').modal();
+    $scope.modalWidget = widget;
   };
 
-  $scope.fillFrame = function(domId, widgetCode) {
-    var F = $('#' + domId);
-    F[0].contentWindow.document.write(widgetCode);
-  };
+  $scope.closeEditorModal = function(widget) {
+    if (widget) {
+      var request = $.param(
+        {'widget': JSON.stringify(widget)},
+        true
+      );
 
-  $scope.createNewWidget = function() {
-    activeInputData.name = 'newWidget';
-  };
-
-  $scope.saveWidget = function(widgetCode) {
-    $scope.addContentToIframe('widgetPreview', widgetCode);
-
-    // TODO(sll): Check that the name and widgetCode are non-empty.
-
-    // TODO(sll): This does not update the view value when widgetCode is
-    // called from the repository. Fix this.
-    $scope.widgetCode = widgetCode;
-
-    var newWidget = {
-        'raw': JSON.stringify(widgetCode),
-        'name': $scope.newWidgetName,
-        'category': $scope.newWidgetCategory,
-        'params': JSON.stringify($scope.widgetParams),
-        'blurb': $scope.newWidgetBlurb
+      $http.put(
+        '/widgetrepository/',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      ).success(function(widgetData) {
+        console.log('Data saved successfully');
+        console.log(widgetData);
+        var category = widgetData.widget.category;
+        for (var i = 0; i < $scope.widgets[category].length; ++i) {
+          if ($scope.widgets[category][i].name == widgetData.widget.name) {
+            var widgetCode = $scope.widgets[category][i].raw;
+            $scope.$apply();
+            $scope.fillFrame('widget-' + category + '-' + i, widgetCode);
+          }
+        }
+      });
     }
+  };
+
+  $scope.previewModalWidget = function(widgetCode) {
+    $scope.addContentToIframe('modalPreview', widgetCode);
+    $('#modalTabs a[href="#preview"]').tab('show');
+  };
+
+  $scope.addWidget = function() {
+    $scope.newWidgetIsBeingAdded = true;
+    $('#editWidgetModal').modal();
+    $scope.modalWidget = {params: [], blurb: '', name: '', raw: '', category: ''};
+  };
+
+  $scope.saveNewWidget = function(widget) {
+    console.log(widget);
+    // TODO(sll): Check that the name, raw and category are non-empty.
+    // Also, check that the name is not a duplicate.
 
     var request = $.param(
-        newWidget,
-        true
+      {'widget': JSON.stringify(widget)},
+      true
     );
 
     $http.post(
@@ -83,21 +103,28 @@ function WidgetRepository($scope, $http, activeInputData) {
       request,
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
-      // Check that the data has been saved correctly.
-      console.log(widgetData);
-      if ($scope.newWidgetCategory in $scope.widgets) {
-        $scope.widgets[$scope.newWidgetCategory].push({
-            'raw': widgetCode, 'name': $scope.newWidgetName, 'params': $scope.widgetParams,
-            'blurb': $scope.newWidgetBlurb
-        });
+      $('#editWidgetModal').modal('hide');
+      if (widgetData.widget.category in $scope.widgets) {
+        $scope.widgets[widgetData.widget.category].push(widgetData.widget);
       } else {
-        $scope.widgets[$scope.newWidgetCategory] = [{
-            'raw': widgetCode, 'name': $scope.newWidgetName, 'params': $scope.widgetParams,
-            'blurb': $scope.newWidgetBlurb
-        }];
+        $scope.widgets[widgetData.widget.category] = [widgetData.widget];
       }
       activeInputData.clear();
     });
+  };
+
+
+  /**
+   * Displays a modal allowing customization of the widget's parameters.
+   * @param {string} id The id of the widget to customize.
+   */
+  $scope.showCustomizeModal = function(id) {
+     $scope.modalIndex = id;
+     $('#customizeModal').modal();
+  };
+
+  $scope.selectWidget = function(widget) {
+    window.parent.postMessage(widget, '*');
   };
 }
 
