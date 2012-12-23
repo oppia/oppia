@@ -106,65 +106,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     drawStateGraph($scope.states);
   };
 
-  /**
-   * Saves a change to a state property.
-   * @param {String} property The state property to be saved.
-   */
-  $scope.saveStateChange = function(property) {
-    if (!$scope.stateId)
-      return;
-    activeInputData.clear();
-
-    var requestParameters = {state_id: $scope.stateId};
-
-    if (property == 'stateName') {
-      requestParameters['state_name'] = $scope.stateName;
-    } else if (property == 'stateContent') {
-      // Remove null values from $scope.stateContent.
-      $scope.tempstateContent = [];
-      for (var i = 0; i < $scope.stateContent.length; ++i) {
-        if ($scope.stateContent[i]['value'])
-          $scope.tempstateContent.push($scope.stateContent[i]);
-      }
-      requestParameters['state_content'] = JSON.stringify($scope.tempstateContent);
-    } else if (property == 'inputType' || property == 'states') {
-      requestParameters['input_type'] = $scope.inputType;
-      if ($scope.classifier != 'none' &&
-          $scope.states[$scope.stateId]['dests'].length == 0) {
-        warningsData.addWarning(
-            'Interactive questions should have at least one category.');
-        $scope.changeInputType('none');
-        return;
-      }
-
-      var actionsForBackend = $scope.states[$scope.stateId].dests;
-      console.log(actionsForBackend);
-      for (var ind = 0;
-           ind < $scope.states[$scope.stateId]['dests'].length; ++ind) {
-        actionsForBackend[ind]['category'] =
-            $scope.states[$scope.stateId]['dests'][ind].category;
-        actionsForBackend[ind]['dest'] =
-            $scope.states[$scope.stateId]['dests'][ind].dest;
-      }
-      requestParameters['actions'] = JSON.stringify(actionsForBackend);
-    }
-
-    var request = $.param(requestParameters, true);
-    console.log('REQUEST');
-    console.log(request);
-
-    $http.put(
-        $scope.explorationUrl + '/' + $scope.stateId + '/data',
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      console.log('Changes saved successfully.');
-      drawStateGraph($scope.states);
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
-  };
-
   $scope.getReadableInputType = function(inputType) {
     return HUMAN_READABLE_INPUT_TYPE_MAPPING[inputType];
   };

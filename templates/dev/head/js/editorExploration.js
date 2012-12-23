@@ -606,6 +606,66 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     });
   };
 
+
+  /**
+   * Saves a change to a state property.
+   * @param {String} property The state property to be saved.
+   */
+  $scope.saveStateChange = function(property) {
+    if (!$scope.stateId)
+      return;
+    activeInputData.clear();
+
+    if ($scope.classifier != 'none' &&
+        $scope.states[$scope.stateId]['dests'].length == 0) {
+      warningsData.addWarning(
+          'Interactive questions should have at least one category.');
+      $scope.changeInputType('none');
+      return;
+    }
+
+    // Remove null values from $scope.stateContent.
+    $scope.tempstateContent = [];
+    for (var i = 0; i < $scope.stateContent.length; ++i) {
+      if ($scope.stateContent[i]['value'])
+        $scope.tempstateContent.push($scope.stateContent[i]);
+    }
+
+    var actionsForBackend = $scope.states[$scope.stateId].dests;
+    for (var ind = 0;
+         ind < $scope.states[$scope.stateId]['dests'].length; ++ind) {
+      actionsForBackend[ind]['category'] =
+          $scope.states[$scope.stateId]['dests'][ind].category;
+      actionsForBackend[ind]['dest'] =
+          $scope.states[$scope.stateId]['dests'][ind].dest;
+    }
+
+    var requestParameters = {
+        state_id: $scope.stateId,
+        state_name: $scope.stateName,
+        state_content: JSON.stringify($scope.tempstateContent),
+        input_type: $scope.inputType,
+        actions: JSON.stringify(actionsForBackend)
+    };
+
+    var request = $.param(requestParameters, true);
+    console.log('REQUEST');
+    console.log(request);
+
+    $http.put(
+        $scope.explorationUrl + '/' + $scope.stateId + '/data',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+      console.log('Changes saved successfully.');
+      stateData.getData($scope.stateId);
+      drawStateGraph($scope.states);
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error communicating with server.');
+    });
+  };
+
+
   /************************************************
    * Code for the state graph.
    ***********************************************/
