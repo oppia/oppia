@@ -68,7 +68,9 @@ function WidgetRepository($scope, $http, activeInputData) {
     var newWidget = {
         'raw': JSON.stringify(widgetCode),
         'name': $scope.newWidgetName,
-        'params': JSON.stringify($scope.widgetParams)
+        'category': $scope.newWidgetCategory,
+        'params': JSON.stringify($scope.widgetParams),
+        'blurb': $scope.newWidgetBlurb
     }
 
     var request = $.param(
@@ -83,9 +85,17 @@ function WidgetRepository($scope, $http, activeInputData) {
     ).success(function(widgetData) {
       // Check that the data has been saved correctly.
       console.log(widgetData);
-      $scope.widgets.push({
-        'raw': widgetCode, 'name': $scope.newWidgetName, 'params': $scope.widgetParams
-      });
+      if ($scope.newWidgetCategory in $scope.widgets) {
+        $scope.widgets[$scope.newWidgetCategory].push({
+            'raw': widgetCode, 'name': $scope.newWidgetName, 'params': $scope.widgetParams,
+            'blurb': $scope.newWidgetBlurb
+        });
+      } else {
+        $scope.widgets[$scope.newWidgetCategory] = [{
+            'raw': widgetCode, 'name': $scope.newWidgetName, 'params': $scope.widgetParams,
+            'blurb': $scope.newWidgetBlurb
+        }];
+      }
       activeInputData.clear();
     });
   };

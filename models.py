@@ -41,6 +41,8 @@ class GenericWidget(ndb.Model):
   hash_id = ndb.StringProperty(required=True)
   # The name of the generic widget.
   name = ndb.StringProperty(required=True)
+  # The category to which this widget belongs.
+  category = ndb.StringProperty(required=True)
   # The description of the generic widget.
   blurb = ndb.TextProperty()
   # The raw code for the generic widget.

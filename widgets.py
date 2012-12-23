@@ -20,47 +20,56 @@ import json, logging, os
 import jinja2, webapp2
 import base, feconf, models, utils
 
+from google.appengine.api import users
+
 
 class WidgetRepositoryPage(base.BaseHandler):
   """Displays the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
     """Returns the widget repository page."""
-    self.values = {
-        'css': utils.GetCssFile('oppia'),
+    self.values.update({
         'js': utils.GetJsFilesWithBase(['widgetRepository']),
-    }
+    })
     if self.request.get('iframed') == 'true':
       self.values['iframed'] = True
-    # TODO(sll): check if the user is an admin, and add an 'admin': True parameter
-    # to values if so.
+    if users.is_current_user_admin():
+      self.values['admin'] = True
     self.response.out.write(
-        base.JINJA_ENV.get_template('widgets/widgets.html').render(self.values))
+        base.JINJA_ENV.get_template('widgets/widget_repository.html').render(self.values))
 
   def post(self):  # pylint: disable-msg=C6409
     """Creates a new generic widget."""
-    # TODO(sll): check if the user is an admin.
+    if not users.is_current_user_admin():
+      raise self.UnauthorizedUserException('Insufficient privileges to create a new generic widget.')
+
     raw = self.request.get('raw')
     name = self.request.get('name')
-    params = json.loads(self.request.get('params'))
+    category = self.request.get('category')
     if not raw:
       raise self.InvalidInputException('No widget code supplied')
     if not name:
       raise self.InvalidInputException('No widget name supplied')
+    if not category:
+      raise self.InvalidInputException('No widget category supplied')
 
+    blurb = self.request.get('blurb')
+    params = json.loads(self.request.get('params'))
     # TODO(sll): Make sure this JS is clean!
     raw = json.loads(raw)
 
     widget_hash_id = utils.GetNewId(models.GenericWidget, name)
     widget = models.GenericWidget(
-        hash_id=widget_hash_id, raw=raw, name=name, params=params)
+        hash_id=widget_hash_id, raw=raw, name=name, params=params, category=category, blurb=blurb)
     widget.put()
 
   def put(self, widget_id=None):
     """Updates a generic widget."""
-    # TODO(sll): check if the user is an admin.
+    if not users.is_current_user_admin():
+      raise self.UnauthorizedUserException('Insufficient privileges to create a new generic widget.')
     if not widget_id:
       raise self.InvalidInputException('No widget id supplied')
+
     raw = self.request.get('raw')
     if not raw:
       raise self.InvalidInputException('No widget code supplied')
@@ -81,13 +90,16 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
   def get(self):  # pylint: disable-msg=C6409
     generic_widgets = models.GenericWidget.query()
-    response = []
-    # TODO(sll): The following line is here for testing, and should be removed.
-    response.append({'hash_id': 'abcd', 'name': 'Colored text',
-        'raw': '<div style="color: blue;">This text is blue</div>'})
+    response = {}
     for widget in generic_widgets:
-      response.append({'hash_id': widget.hash_id, 'name': widget.name,
-                       'raw': widget.raw, 'params': widget.params})
+      if widget.category in response:
+        response[widget.category].append(
+            {'hash_id': widget.hash_id, 'name': widget.name,
+             'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb})
+      else:
+        response[widget.category] = [{
+            'hash_id': widget.hash_id, 'name': widget.name,
+            'raw': widget.raw, 'params': widget.params, 'blurb': widget.blurb}]
     self.response.out.write(json.dumps({'widgets': response}))
 
 

@@ -100,7 +100,7 @@ find . -iname "*.pyc" -exec rm -f {} \;
 
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
---address=0.0.0.0 --port=8080 ."
+--address=0.0.0.0 --port=8080 --clear_datastore ."
 
 sleep 3
 

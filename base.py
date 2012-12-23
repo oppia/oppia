@@ -46,6 +46,7 @@ class BaseHandler(webapp2.RequestHandler):
       self.data_values.update({'user': str(user)})
     else:
       self.values['login_url'] = users.create_login_url(self.request.uri)
+      self.data_values['login_url'] = users.create_login_url(self.request.uri)
 
   def handle_exception(self, exception, debug_mode):
     """Overwrites the default exception handler."""
