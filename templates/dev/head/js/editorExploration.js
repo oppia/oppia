@@ -507,12 +507,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     // Update the states using the actions variable.
     $scope.states[$scope.stateId].dests = data.actions;
 
-    console.log('States for editor');
-    console.log(data.actions);
-    console.log($scope.states);
-    console.log(data);
-
-    // Changes the active node in the graph.
     drawStateGraph($scope.states);
   });
 
