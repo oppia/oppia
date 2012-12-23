@@ -11,6 +11,7 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.loadPage = function(data) {
     console.log(data);
     $scope.widgets = data.widgets;
+    // Display previews of each widget.
     for (category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
         var widgetCode = $scope.widgets[category][i].raw;
@@ -22,7 +23,6 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   // Initializes the widget list using data from the server.
   $http.get($scope.widgetDataUrl).success(function(data) {
-    console.log(data);
     $scope.loadPage(data);
   });
 
@@ -42,9 +42,15 @@ function WidgetRepository($scope, $http, activeInputData) {
     activeInputData.name = 'modalWidget';
   };
 
+  // Clears the "new widget" indication when the modal window is closed.
   $('#editWidgetModal').on('hidden', function () {
     $scope.newWidgetIsBeingAdded = false;
-  })
+  });
+
+  // Inserts content into the preview tab just before it is shown.
+  $('#modalTabs a[href="#preview"]').on('show', function (e) {
+    $scope.addContentToIframe('modalPreview', $scope.modalWidget.raw);
+  });
 
   $scope.editWidget = function(widget) {
     $('#editWidgetModal').modal();
@@ -63,8 +69,6 @@ function WidgetRepository($scope, $http, activeInputData) {
         request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       ).success(function(widgetData) {
-        console.log('Data saved successfully');
-        console.log(widgetData);
         var category = widgetData.widget.category;
         for (var i = 0; i < $scope.widgets[category].length; ++i) {
           if ($scope.widgets[category][i].name == widgetData.widget.name) {
@@ -77,14 +81,10 @@ function WidgetRepository($scope, $http, activeInputData) {
     }
   };
 
-  $scope.previewModalWidget = function(widgetCode) {
-    $scope.addContentToIframe('modalPreview', widgetCode);
-    $('#modalTabs a[href="#preview"]').tab('show');
-  };
-
   $scope.addWidget = function() {
     $scope.newWidgetIsBeingAdded = true;
     $('#editWidgetModal').modal();
+    $('#modalTabs a[href="#code"]').tab('show');
     $scope.modalWidget = {params: [], blurb: '', name: '', raw: '', category: ''};
   };
 
