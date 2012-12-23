@@ -62,10 +62,10 @@ def ValidateState(description):
       return False, 'Invalid key: %s' % key
 
   for item in description['content']:
-    if len(item) != 1:
+    if len(item) != 2:
       return False, 'Invalid content item: %s' % item
     for key in item:
-      if key not in ['text', 'image', 'video', 'widget']:
+      if key not in ['type', 'value']:
         return False, 'Invalid key in content array: %s' % key
 
   for key in description['input_type']:
