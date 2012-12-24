@@ -194,49 +194,13 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     $scope.saveStateChange('stateContent');
   };
 
-  $scope.setActiveImage = function(image) {
-    $scope.image = image;
-  };
-
-  $scope.saveImage = function(index) {
-    $('#newImageForm')[0].reset();
+  $scope.saveStateContentImage = function(index) {
     activeInputData.clear();
-    image = $scope.image;
-
-    if (!image || !image.type.match('image.*')) {
-      warningsData.addWarning('This file is not recognized as an image.');
-      return;
-    }
-
-    $('#uploadImageLoading').show();
-    // The content creator has uploaded an image.
-    var form = new FormData();
-    form.append('image', image);
-
-    $.ajax({
-        url: '/imagehandler/',
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        datatype: 'json',
-        success: function(data) {
-          data = jQuery.parseJSON(data);
-          if (data.image_id) {
-            $scope.$apply(function() {
-              $scope.stateContent[index].value = data.image_id;
-              $scope.saveStateChange('stateContent');
-            });
-          } else {
-            warningsData.addWarning(
-                'There was an error saving your image. Please retry later.');
-          }
-          $('#uploadImageLoading').hide();
-        },
-        error: function(data) {
-          warningsData.addWarning(data.error || 'Error communicating with server.');
-          $('#uploadImageLoading').hide();
-        }
+    $scope.saveImage(function(data) {
+        $scope.stateContent[index].value = data.image_id;
+        console.log('IMAGEID');
+        console.log(data.image_id);
+        $scope.saveStateChange('stateContent');
     });
   };
 

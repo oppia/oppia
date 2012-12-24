@@ -171,6 +171,43 @@ function Base($scope, $timeout, warningsData, activeInputData) {
     }
     return false;
   };
+
+  $scope.saveImage = function(successCallback) {
+    $('#newImageForm')[0].reset();
+    image = $scope.image;
+
+    if (!image || !image.type.match('image.*')) {
+      warningsData.addWarning('This file is not recognized as an image.');
+      return;
+    }
+
+    // The content creator has uploaded an image.
+    var form = new FormData();
+    form.append('image', image);
+
+    $.ajax({
+        url: '/imagehandler/',
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        datatype: 'json',
+        success: function(data) {
+          data = jQuery.parseJSON(data);
+          if (data.image_id) {
+            console.log(data.image_id);
+            $scope.$apply(successCallback(data));
+          }
+        },
+        error: function(data) {
+          warningsData.addWarning(data.error || 'Error communicating with server.');
+        }
+    });
+  };
+
+  $scope.setActiveImage = function(image) {
+    $scope.image = image;
+  };
 }
 
 oppia.directive('mustBeValidString', function($timeout) {
@@ -205,6 +242,26 @@ oppia.directive('angularHtmlBind', function($compile) {
         $compile(elm.contents())(scope);
       }
     });
+  };
+});
+
+oppia.directive('imageUpload', function($exceptionHandler) {
+  return {
+    compile: function(tplElm, tplAttr) {
+      return function(scope, elm, attr) {
+        var input = angular.element(elm[0]);
+
+        // evaluate the expression when file changed (user selects a file)
+        input.bind('change', function() {
+          try {
+            scope.$eval(attr.openFiles, {$files: input[0].files});
+            scope.setActiveImage(input[0].files[0]);
+          } catch (e) {
+            $exceptionHandler(e);
+          }
+        });
+      };
+    }
   };
 });
 

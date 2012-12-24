@@ -25,7 +25,11 @@
                   <li class="span3">
                     <div class="thumbnail">
                       <a href="/create/{{exploration.hash_id}}">
-                        <img src="http://placehold.it/300x200" alt="Image placeholder">
+                        {% if exploration.image_id %}
+                          <img src="/imagehandler/{{exploration.image_id}}" class="oppia-large-image"></img>
+                        {% else %}
+                          <img src="http://placehold.it/300x200" alt="Image placeholder">
+                        {% endif %}
                       </a>
                       <h5>{{exploration.title}}</h5>
                       {% if not exploration.is_public %}

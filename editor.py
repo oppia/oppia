@@ -164,10 +164,15 @@ class ExplorationPage(BaseHandler):
       exploration_id: string representing the exploration id.
     """
     user, exploration = self.GetUserAndExploration(exploration_id)
+    for key in self.request.arguments():
+      if key not in ['is_public', 'category', 'title', 'image_id']:
+        raise self.InvalidInputException(
+            '%s is not a valid editable property of an exploration' % key)
+
     is_public = self.request.get('is_public')
     category = self.request.get('category')
     title = self.request.get('title')
-    logging.info(self.request.arguments())
+    image_id = self.request.get('image_id')
 
     if is_public:
       exploration.is_public = True
@@ -175,6 +180,8 @@ class ExplorationPage(BaseHandler):
       exploration.category = category
     if title:
       exploration.title = title
+    if 'image_id' in self.request.arguments():  # NB: image_id can be null
+      exploration.image_id = image_id
     exploration.put()
 
 
@@ -220,6 +227,7 @@ class ExplorationHandler(BaseHandler):
         'exploration_id': exploration.hash_id,
         'init_state_id': exploration.init_state.get().hash_id,
         'is_public': exploration.is_public,
+        'image_id': exploration.image_id,
         'category': exploration.category,
         'title': exploration.title,
         'owner': str(exploration.owner),

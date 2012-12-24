@@ -152,6 +152,9 @@ textarea.oppia-code {
 .oppia-small-image {
   height: 50px;
 }
+.oppia-large-image {
+  height: 100px;
+}
 
 .oppia-thumbnail {
   position: relative;

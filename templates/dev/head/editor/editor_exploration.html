@@ -6,17 +6,12 @@
       <div class="oppia-content row-fluid">
         <div class="span12">
 
-          <h3 class="oppia-editable-name" ng-hide="activeInputData.name == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationTitle]> </h3>
-          <span ng-show="activeInputData.name == 'questionName'">
-            <input type="text" ng-model="explorationTitle" ng-model-onblur required>
-            <input type="submit" value="Close" ng-click="activeInputData.clear()">
-          </span>
-
-          <span ng-show="isPublic" class="label label-info">
-            Published
-          </span>
-
-          <br><br>
+          <h3>
+            <[explorationTitle]>
+            <span ng-show="isPublic" class="label label-info">
+              Published
+            </span>
+          </h3>
 
           <ul class="nav nav-tabs" id="editorViewTab">
             <li><a data-toggle="tab" href="#metadata">Metadata</a></li>
@@ -26,13 +21,30 @@
 
           <div class="tab-content">
             <div class="tab-pane" id="metadata">
-              <p>
-                Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
-              </p>
 
-              <p>
-                Image preview: (To be added)
-              </p>
+              <div>
+                Title: <input type="text" ng-model="explorationTitle" ng-model-onblur>
+              </div>
+
+              <div>
+                Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+              </div>
+
+              <div>
+                Image preview:
+                <ng-switch on="!explorationImageId">
+                  <div ng-switch-when="true" class="oppia-placeholder">
+                    <form id="newImageForm">
+                      <input type="file" id="newImage" name="newImage" image-upload="true">
+                      <button type="button" ng-click="saveExplorationImage()">Save</button>
+                    </form>
+                  </div>
+                  <div ng-switch-default>
+                    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>"></img>
+                    <button ng-click="deleteExplorationImage()">Delete image</button>
+                  </div>
+                </ng-switch>
+              </div>
 
               <div ng-hide="isPublic">
                 <button type="button" ng-click="makePublic()">
@@ -40,7 +52,9 @@
                 </button>
                 (irreversible)
               </div>
+
             </div>
+
             <div class="tab-pane active" id="graph">
 
               <form ng-submit="addState(newStateDesc, false)">

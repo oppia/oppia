@@ -169,26 +169,6 @@ oppia.run(function($rootScope) {
   });
 });
 
-oppia.directive('imageUpload', function($exceptionHandler) {
-  return {
-    compile: function(tplElm, tplAttr) {
-      return function(scope, elm, attr) {
-        var input = angular.element(elm[0]);
-
-        // evaluate the expression when file changed (user selects a file)
-        input.bind('change', function() {
-          try {
-            scope.$eval(attr.openFiles, {$files: input[0].files});
-            scope.setActiveImage(input[0].files[0]);
-          } catch (e) {
-            $exceptionHandler(e);
-          }
-        });
-      };
-    }
-  };
-});
-
 oppia.directive('unfocusStateContent', function(activeInputData) {
   return {
     restrict: 'A',
@@ -367,6 +347,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.states = explorationData.states;
     console.log('Data for exploration page:');
     console.log(data);
+    $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
     $scope.questions = data.exploration_list;
@@ -390,8 +371,19 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
    * Makes this exploration public.
    */
   $scope.makePublic = function() {
-    $scope.isPublic = true;
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
+  };
+
+  $scope.deleteExplorationImage = function() {
+    $scope.saveExplorationProperty('explorationImageId', 'image_id', null, $scope.explorationImageId);
+  };
+
+  $scope.saveExplorationImage = function() {
+    activeInputData.clear();
+    $scope.saveImage(function(data) {
+        $scope.explorationImageId = data.image_id;
+        $scope.saveExplorationProperty('explorationImageId', 'image_id', $scope.explorationImageId, null);
+    });
   };
 
   /**
@@ -416,6 +408,12 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         $scope.explorationUrl,
         request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              if (frontendName == 'isPublic' || frontendName == 'explorationImageId') {
+                $scope[frontendName] = newValue;
+              }
+              console.log('PUT request succeeded');
+            }).
             error(function(data) {
               warningsData.addWarning(
                   'Error modifying exploration properties: ' + data.error);

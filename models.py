@@ -103,8 +103,8 @@ class Exploration(ndb.Model):
   states = ndb.KeyProperty(kind=State, repeated=True)
   # Whether this exploration is publicly viewable.
   is_public = ndb.BooleanProperty(default=False)
-  # An image that gives a preview of the exploration.
-  image = ndb.BlobProperty()
+  # The id for the image to show as a preview of the exploration.
+  image_id = ndb.StringProperty()
 
 
 class AugmentedUser(ndb.Model):
