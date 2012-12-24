@@ -65,29 +65,27 @@
                 </div>
                 <div ng-switch-when="widget">
                   <ng-switch on="item.value == ''">
+
                     <div ng-switch-when="true">
+                      <iframe src="/widgetrepository?iframed=true" width="100%" height="400px" frameborder="0"></iframe>
+                    </div>
+
+                    <div ng-switch-default>
                       <ul class="nav nav-tabs" id="widgetTabs<[$index]>">
-                        <li><a data-toggle="tab" href="#preview" ng-click="selectTab('preview')">Preview</a></li>
+                        <li class="active"><a data-toggle="tab" href="#preview">Preview</a></li>
                         <li><a data-toggle="tab" href="#code">Code</a></li>
-                        <li class="active"><a data-toggle="tab" href="#repository">Repository</a></li>
                       </ul>
                       <div class="tab-content">
-                        <div class="tab-pane" id="preview">
+                        <div class="tab-pane active" id="preview">
                           <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
                         </div>
                         <div class="tab-pane" id="code">
                           <textarea class="oppia-code" ng-model="widgetCode" rows="10" readonly>
                           </textarea>
                         </div>
-                        <div class="tab-pane active" id="repository">
-                          <iframe src="/widgetrepository?iframed=true" width="100%" height="400px" frameborder="0"></iframe>
-                        </div>
                       </div>
                     </div>
 
-                    <div ng-switch-default>
-                      <iframe id="widgetPreview<[$index]>" width="80%" frameborder="0"></iframe>
-                    </div>
                   </ng-switch>
                 </div>
               </ng-switch>
