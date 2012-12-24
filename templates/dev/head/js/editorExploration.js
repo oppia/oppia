@@ -58,17 +58,13 @@ var HUMAN_READABLE_INPUT_TYPE_MAPPING = {
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
       when(YAML_EDITOR_URL,
-           {templateUrl: '/templates/yaml',
-            controller: YamlEditor}).
+           {templateUrl: '/templates/yaml', controller: YamlEditor}).
       when(YAML_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/yaml',
-            controller: YamlEditor}).
+           {templateUrl: '/templates/yaml', controller: YamlEditor}).
       when(GUI_EDITOR_URL,
-           {templateUrl: '/templates/gui',
-            controller: GuiEditor}).
+           {templateUrl: '/templates/gui', controller: GuiEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/gui',
-            controller: GuiEditor}).
+           {templateUrl: '/templates/gui', controller: GuiEditor}).
       otherwise({redirectTo: GUI_EDITOR_URL});
 }]);
 
@@ -356,18 +352,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }
   };
 
-  // Initialize data associated with the current state.
-  $scope.clearStateVariables = function() {
-    $scope.stateId = '';
-    $scope.stateName = '';
-    $scope.stateContent = [];
-    $scope.inputType = '';
-    $scope.classifier = '';
-    $scope.console = '';
-    $scope.widgetCode = '';
-  };
-
-  $scope.clearStateVariables();
+  $scope.stateContent = [];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var pathnameArray = window.location.pathname.split('/');
@@ -405,7 +390,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
    * Makes this exploration public.
    */
   $scope.makePublic = function() {
-    console.log('Publishing exploration');
     $scope.isPublic = true;
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
   };
@@ -582,8 +566,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
           'supported. Perhaps edit it instead?');
       return;
     }
-
-    $scope.clearStateVariables();
 
     $http.delete(
         $scope.explorationUrl + '/' + stateId + '/data', '',

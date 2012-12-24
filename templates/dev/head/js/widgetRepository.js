@@ -4,12 +4,12 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   $scope.fillFrame = function(domId, widgetCode) {
     var F = $('#' + domId);
-    // TODO(sll): Clear this before writing anything.
+    F[0].contentWindow.document.open();
     F[0].contentWindow.document.write(widgetCode);
+    F[0].contentWindow.document.close();
   };
 
   $scope.loadPage = function(data) {
-    console.log(data);
     $scope.widgets = data.widgets;
     // Display previews of each widget.
     for (category in data.widgets) {

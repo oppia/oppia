@@ -220,7 +220,6 @@ class ExplorationHandler(BaseHandler):
         'exploration_id': exploration.hash_id,
         'init_state_id': exploration.init_state.get().hash_id,
         'is_public': exploration.is_public,
-        'js': utils.GetJsFilesWithBase(['editorExploration', 'editorGraph']),
         'category': exploration.category,
         'title': exploration.title,
         'owner': str(exploration.owner),
