@@ -418,8 +418,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     console.log($scope.stateId);
     if (activeInputData.name == 'stateName') {
       $scope.saveStateName();
-    } else if (activeInputData.name == 'questionName') {
-      $scope.saveQuestionName();
     }
 
     var inputArray = newActiveInput.split('.');
@@ -571,28 +569,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
               $scope.explorationTitle = oldValue;
             });
   });
-
-  // TODO(sll): Remove this method.
-  $scope.saveQuestionName = function() {
-    if (!$scope.isValidEntityName($scope.explorationTitle, true))
-      return;
-    if ($scope.isDuplicateInput($scope.questions, 'desc',
-            $scope.explorationId, $scope.explorationTitle)) {
-      warningsData.addWarning('The name \'' + $scope.explorationTitle +
-                        '\' is already in use.');
-      return;
-    }
-
-    $http.put(
-        $scope.explorationUrl + '/data/',
-        'exploration_name=' + encodeURIComponent($scope.explorationTitle),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).error(function(data) {
-      warningsData.addWarning(data.error || 'Error updating exploration.');
-    });
-
-    activeInputData.clear();
-  };
 
   $scope.saveStateName = function() {
     if (!$scope.isValidEntityName($scope.stateName, true))
