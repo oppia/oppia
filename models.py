@@ -91,7 +91,7 @@ class Exploration(ndb.Model):
   # A hash_id to show in the browser.
   hash_id = ndb.StringProperty(required=True)
   # The original creator of this exploration.
-  owner = ndb.UserProperty(required=True)
+  owner = ndb.UserProperty()
   # The category this exploration belongs to.
   # TODO(sll): Should this be a 'repeated' property?
   category = ndb.StringProperty(required=True)
@@ -103,6 +103,8 @@ class Exploration(ndb.Model):
   states = ndb.KeyProperty(kind=State, repeated=True)
   # Whether this exploration is publicly viewable.
   is_public = ndb.BooleanProperty(default=False)
+  # An image that gives a preview of the exploration.
+  image = ndb.BlobProperty()
 
 
 class AugmentedUser(ndb.Model):

@@ -316,6 +316,23 @@ oppia.directive('sortable', function($compile) {
 });
 
 
+// override the default input to update on blur
+oppia.directive('ngModelOnblur', function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, elm, attr, ngModelCtrl) {
+      if (attr.type === 'radio' || attr.type === 'checkbox') return;
+        elm.unbind('input').unbind('keydown').unbind('change');
+        elm.bind('blur', function() {
+          scope.$apply(function() {
+          ngModelCtrl.$setViewValue(elm.val());
+        });
+      });
+    }
+  };
+});
+
 function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
   $scope.getMode = function() {
@@ -365,7 +382,8 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.states = explorationData.states;
     console.log('Data for exploration page:');
     console.log(data);
-    $scope.explorationDesc = data.title;
+    $scope.explorationTitle = data.title;
+    $scope.explorationCategory = data.category;
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.stateId = $routeParams.stateId || $scope.initStateId;
@@ -373,6 +391,22 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     initJsPlumb();
     drawStateGraph($scope.states);
     stateData.getData($scope.stateId);
+  });
+
+  $scope.$watch('explorationCategory', function(newValue, oldValue) {
+    var requestParameters = {
+        category: newValue
+    };
+
+    var request = $.param(requestParameters, true);
+    $http.put(
+        $scope.explorationUrl,
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            error(function(data) {
+              warningsData.addWarning('Error changing exploration category: ' + data.error);
+              $scope.explorationCategory = oldValue;
+            });
   });
 
   $scope.initializeNewActiveInput = function(newActiveInput) {
@@ -411,8 +445,16 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
    */
   $scope.makePublic = function() {
     console.log('Publishing exploration');
+
+    var requestParameters = {
+        is_public: true
+    };
+
+    var request = $.param(requestParameters, true);
+
     $http.put(
-        $scope.explorationUrl, '',
+        $scope.explorationUrl,
+        request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.isPublic = true;
@@ -510,29 +552,42 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     drawStateGraph($scope.states);
   });
 
+  $scope.$watch('explorationTitle', function(newValue, oldValue) {
+    if (oldValue && !$scope.isValidEntityName($scope.explorationTitle, true)) {
+      $scope.explorationTitle = oldValue;
+      return;
+    }
+    var requestParameters = {
+        title: newValue
+    };
+
+    var request = $.param(requestParameters, true);
+    $http.put(
+        $scope.explorationUrl,
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            error(function(data) {
+              warningsData.addWarning('Error changing exploration title: ' + data.error);
+              $scope.explorationTitle = oldValue;
+            });
+  });
+
+  // TODO(sll): Remove this method.
   $scope.saveQuestionName = function() {
-    if (!$scope.isValidEntityName($scope.explorationDesc, true))
+    if (!$scope.isValidEntityName($scope.explorationTitle, true))
       return;
     if ($scope.isDuplicateInput($scope.questions, 'desc',
-            $scope.explorationId, $scope.explorationDesc)) {
-      warningsData.addWarning('The name \'' + $scope.explorationDesc +
+            $scope.explorationId, $scope.explorationTitle)) {
+      warningsData.addWarning('The name \'' + $scope.explorationTitle +
                         '\' is already in use.');
       return;
     }
 
-    // Note that the change is already saved in $scope.explorationDesc
-    // by virtue of Angular JS magic.
-
-    // Send this change directly to the backend (don't save in local storage).
-    $scope.saveQuestionNameLoading = true;
     $http.put(
         $scope.explorationUrl + '/data/',
-        'exploration_name=' + encodeURIComponent($scope.explorationDesc),
+        'exploration_name=' + encodeURIComponent($scope.explorationTitle),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      $scope.saveQuestionNameLoading = false;
-    }).error(function(data) {
-      $scope.saveQuestionNameLoading = false;
+    ).error(function(data) {
       warningsData.addWarning(data.error || 'Error updating exploration.');
     });
 

@@ -5,31 +5,42 @@
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
         <div class="span12">
-          <form ng-submit="saveQuestionName()">
-            <h3 class="oppia-editable-name" ng-hide="activeInputData.name == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationDesc]> </h3>
-            <span ng-show="activeInputData.name == 'questionName'">
-              <input type="text" ng-model="explorationDesc" required>
-              <input type="submit" value="Save">
-            </span>
-            <span class="oppia-loading" ng-show="saveQuestionNameLoading"></span>
-          </form>
 
-          <span ng-show="isPublic" class="label label-info">Published</span>
-          <div ng-hide="isPublic">
-            <button type="button" ng-click="makePublic()">
-              Publish
-            </button>
-            (irreversible)
-          </div>
+          <h3 class="oppia-editable-name" ng-hide="activeInputData.name == 'questionName'" ng-click="initializeNewActiveInput('questionName')"> <[explorationTitle]> </h3>
+          <span ng-show="activeInputData.name == 'questionName'">
+            <input type="text" ng-model="explorationTitle" ng-model-onblur required>
+            <input type="submit" value="Close" ng-click="activeInputData.clear()">
+          </span>
 
-          <br><br><br>
+          <span ng-show="isPublic" class="label label-info">
+            Published
+          </span>
+
+          <br><br>
 
           <ul class="nav nav-tabs" id="editorViewTab">
+            <li><a data-toggle="tab" href="#metadata">Metadata</a></li>
             <li class="active"><a data-toggle="tab" href="#graph">Graph</a></li>
             <li><a data-toggle="tab" href="#stateEditor">State Editor</a></li>
           </ul>
 
           <div class="tab-content">
+            <div class="tab-pane" id="metadata">
+              <p>
+                Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+              </p>
+
+              <p>
+                Image preview: (To be added)
+              </p>
+
+              <div ng-hide="isPublic">
+                <button type="button" ng-click="makePublic()">
+                  Publish
+                </button>
+                (irreversible)
+              </div>
+            </div>
             <div class="tab-pane active" id="graph">
 
               <form ng-submit="addState(newStateDesc, false)">

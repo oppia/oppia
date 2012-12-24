@@ -158,13 +158,22 @@ class ExplorationPage(BaseHandler):
     }))
 
   def put(self, exploration_id):  # pylint: disable-msg=C6409
-    """Makes an exploration public.
+    """Updates properties of an exploration.
 
     Args:
       exploration_id: string representing the exploration id.
     """
     user, exploration = self.GetUserAndExploration(exploration_id)
-    exploration.is_public = True
+    is_public = self.request.get('is_public')
+    category = self.request.get('category')
+    title = self.request.get('title')
+
+    if is_public:
+      exploration.is_public = True
+    if category:
+      exploration.category = category
+    if title:
+      exploration.title = title
     exploration.put()
 
 
