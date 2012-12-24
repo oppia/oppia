@@ -394,9 +394,38 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    var requestParameters = {
-        category: newValue
-    };
+    $scope.saveExplorationProperty('explorationCategory', 'category', newValue, oldValue);
+  });
+
+  $scope.$watch('explorationTitle', function(newValue, oldValue) {
+    $scope.saveExplorationProperty('explorationTitle', 'title', newValue, oldValue);
+  });
+
+  /**
+   * Makes this exploration public.
+   */
+  $scope.makePublic = function() {
+    console.log('Publishing exploration');
+    $scope.isPublic = true;
+    $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
+  };
+
+  /**
+   * Saves a property of an exploration (e.g. title, category, etc.)
+   * @param {string} frontendName The frontend name of the property to save (e.g. explorationTitle, explorationCategory)
+   * @param {string} backendName The backend name of the property (e.g. title, category)
+   * @param {string} newValue The new value of the property
+   * @param {string} oldValue The previous value of the property
+   */
+  $scope.saveExplorationProperty = function(frontendName, backendName, newValue, oldValue) {
+    if (oldValue && !$scope.isValidEntityName($scope[frontendName], true)) {
+      $scope[frontendName] = oldValue;
+      return;
+    }
+    var requestParameters = {}
+    requestParameters[backendName] = newValue;
+
+    activeInputData.clear();
 
     var request = $.param(requestParameters, true);
     $http.put(
@@ -404,10 +433,11 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             error(function(data) {
-              warningsData.addWarning('Error changing exploration category: ' + data.error);
-              $scope.explorationCategory = oldValue;
+              warningsData.addWarning(
+                  'Error modifying exploration properties: ' + data.error);
+              $scope[frontendName] = oldValue;
             });
-  });
+  };
 
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active
@@ -436,30 +466,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
     activeInputData.name = (newActiveInput || '');
     // TODO(sll): Initialize the newly displayed field.
-  };
-
-  /**
-   * Makes this exploration public.
-   */
-  $scope.makePublic = function() {
-    console.log('Publishing exploration');
-
-    var requestParameters = {
-        is_public: true
-    };
-
-    var request = $.param(requestParameters, true);
-
-    $http.put(
-        $scope.explorationUrl,
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              $scope.isPublic = true;
-            }).
-            error(function(data) {
-              warningsData.addWarning('Error publishing exploration: ' + data.error);
-            });
   };
 
   // Adds a new state to the list of states, and updates the backend.
@@ -548,26 +554,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.states[$scope.stateId].dests = data.actions;
 
     drawStateGraph($scope.states);
-  });
-
-  $scope.$watch('explorationTitle', function(newValue, oldValue) {
-    if (oldValue && !$scope.isValidEntityName($scope.explorationTitle, true)) {
-      $scope.explorationTitle = oldValue;
-      return;
-    }
-    var requestParameters = {
-        title: newValue
-    };
-
-    var request = $.param(requestParameters, true);
-    $http.put(
-        $scope.explorationUrl,
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            error(function(data) {
-              warningsData.addWarning('Error changing exploration title: ' + data.error);
-              $scope.explorationTitle = oldValue;
-            });
   });
 
   $scope.saveStateName = function() {

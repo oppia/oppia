@@ -167,6 +167,7 @@ class ExplorationPage(BaseHandler):
     is_public = self.request.get('is_public')
     category = self.request.get('category')
     title = self.request.get('title')
+    logging.info(self.request.arguments())
 
     if is_public:
       exploration.is_public = True
@@ -227,20 +228,6 @@ class ExplorationHandler(BaseHandler):
         'state_list': state_list,
     })
     self.response.out.write(json.dumps(self.data_values))
-
-  def put(self, exploration_id):  # pylint: disable-msg=C6409
-    """Updates the name of an exploration.
-
-    Args:
-      exploration_id: string representing the exploration id.
-    """
-    user, exploration = self.GetUserAndExploration(exploration_id)
-
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
-    exploration_name = self.request.get('exploration_name')
-    if exploration_name:
-      exploration.title = exploration_name
-      exploration.put()
 
 
 class StatePage(BaseHandler):
