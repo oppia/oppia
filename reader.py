@@ -34,8 +34,7 @@ class MainPage(base.BaseHandler):
     categories = {}
     for exploration in models.Exploration.query().filter(
         models.Exploration.is_public == True):
-      category_name = exploration.metadata.get(
-          'category', DEFAULT_CATALOG_CATEGORY_NAME)
+      category_name = exploration.category
 
       if not categories.get(category_name):
         categories[category_name] = {'explorations': [exploration]}

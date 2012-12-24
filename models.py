@@ -90,8 +90,11 @@ class Exploration(ndb.Model):
   """An exploration (which is made up of several states)."""
   # A hash_id to show in the browser.
   hash_id = ndb.StringProperty(required=True)
-  # Metadata for this exploration (name, category, etc.)
-  metadata = ndb.JsonProperty()
+  # The original creator of this exploration.
+  owner = ndb.UserProperty(required=True)
+  # The category this exploration belongs to.
+  # TODO(sll): Should this be a 'repeated' property?
+  category = ndb.StringProperty(required=True)
   # What this exploration is called.
   title = ndb.StringProperty(default='New exploration')
   # The state which forms the start of this exploration.

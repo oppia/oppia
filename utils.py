@@ -289,7 +289,7 @@ def CreateNewExploration(user, title='New Exploration', id=None):
 
   exploration = models.Exploration(
       hash_id=exploration_hash_id, init_state=fake_state_key,
-      metadata={'title': title, 'owner': str(user)})
+      owner=user, category='No category')
   if title:
     exploration.title = title
   exploration.put()

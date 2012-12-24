@@ -27,8 +27,8 @@
                       <a href="/create/{{exploration.hash_id}}">
                         <img src="http://placehold.it/300x200" alt="Image placeholder">
                       </a>
-                      <h5>{{exploration.metadata.title}}</h5>
-                      {% if not exploration.metadata.is_public %}
+                      <h5>{{exploration.title}}</h5>
+                      {% if not exploration.is_public %}
                         <span>Draft</span>
                       {% endif %}
                     </div>
@@ -46,7 +46,9 @@
       <br>
 
       <p ng-controller="EditorMain">
-        <a class="btn btn-large btn-success" ng-click="createNewExploration()">Create New Exploration</a>
+        <a class="btn btn-large btn-success" ng-click="createNewExploration()">
+          Create New Exploration
+        </a>
       </p>
     </div>
 

@@ -365,7 +365,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.states = explorationData.states;
     console.log('Data for exploration page:');
     console.log(data);
-    $scope.explorationDesc = data.metadata.title;
+    $scope.explorationDesc = data.title;
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.stateId = $routeParams.stateId || $scope.initStateId;

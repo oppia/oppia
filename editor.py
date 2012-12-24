@@ -81,8 +81,7 @@ class MainPage(BaseHandler):
     categories = {}
     for exploration_key in augmented_user.editable_explorations:
       exploration = exploration_key.get()
-      category_name = exploration.metadata.get(
-          'category', reader.DEFAULT_CATALOG_CATEGORY_NAME)
+      category_name = exploration.category
       if not categories.get(category_name):
         categories[category_name] = {'explorations': [exploration]}
       else:
@@ -212,7 +211,9 @@ class ExplorationHandler(BaseHandler):
         'init_state_id': exploration.init_state.get().hash_id,
         'is_public': exploration.is_public,
         'js': utils.GetJsFilesWithBase(['editorExploration', 'editorGraph']),
-        'metadata': exploration.metadata,
+        'category': exploration.category,
+        'title': exploration.title,
+        'owner': str(exploration.owner),
         'mode': EDITOR_MODE,
         'state_list': state_list,
     })
@@ -229,7 +230,7 @@ class ExplorationHandler(BaseHandler):
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     exploration_name = self.request.get('exploration_name')
     if exploration_name:
-      exploration.metadata['title'] = exploration_name
+      exploration.title = exploration_name
       exploration.put()
 
 
