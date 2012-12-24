@@ -20,7 +20,7 @@
 
                   <h5><[widget.name]></h5>
                   <i><[widget.blurb]></i>
-                  <a ng-click="showCustomizeModal($index)" ng-show="widget.params.length > 0">Customize</a>
+                  <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">Customize</a>
 
                   <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
 
@@ -28,7 +28,7 @@
                     <button ng-click="editWidget(widget)">Edit this widget</button>
                   {% else %}
                     <center>
-                      <button ng-click="selectWidget(widget)">
+                      <button ng-click="selectWidget(category, $index)">
                         Use <[widget.name]>
                       </button>
                     </center>
@@ -138,15 +138,14 @@
         Enter parameters below to customize your widget:
       </p>
       <form>
-        <div ng-repeat="param in widgets[modalIndex].params">
-          <[param.name]>: <input type="text">
+        <div ng-repeat="param in widgets[customizeCategory][customizeIndex].params">
+          <[param.name]>: <input type="text" placeholder="<[param.default]>" ng-model="customizedParams[param.name]">
         </div>
       </form>
     </div>
     <div class="modal-footer">
-      <a class="btn">Submit</a>
-      <!--TODO(sll): why is the close button not working?-->
-      <a class="btn" data-dismiss="modal">Close</a>
+      <a class="btn" ng-click="submitCustomization()">Submit</a>
+      <a class="btn" data-dismiss="modal" ng-click="closeCustomizeModal()">Close</a>
     </div>
   </div>
 

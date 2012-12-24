@@ -212,11 +212,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
-    console.log(arg);
-    // Save the code. TODO(sll): fix this, the $scope is wrong.
-    console.log(arg.data.raw);
-    // Send arg.data.raw to the preview. Change tab to preview. Save code in backend.
-
     var index = -1;
     for (var i = 0; i < $scope.stateContent.length; ++i) {
       if ($scope.stateContent[i].type == 'widget') {
@@ -229,7 +224,7 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
       return;
     }
 
-    $scope.saveWidget(arg.data.raw, index);
+    $scope.saveWidget(arg.data, index);
   });
 
   $scope.saveWidget = function(widgetCode, index) {

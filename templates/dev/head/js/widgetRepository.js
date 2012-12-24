@@ -5,20 +5,39 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.fillFrame = function(domId, widgetCode) {
     var F = $('#' + domId);
     F[0].contentWindow.document.open();
+    console.log(widgetCode);
     F[0].contentWindow.document.write(widgetCode);
     F[0].contentWindow.document.close();
   };
 
   $scope.loadPage = function(data) {
     $scope.widgets = data.widgets;
+    console.log(data);
     // Display previews of each widget.
     for (category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
-        var widgetCode = $scope.widgets[category][i].raw;
+        var rawCode = $scope.widgets[category][i].raw;
         $scope.$apply();
-        $scope.fillFrame('widget-' + category + '-' + i, widgetCode);
+        $scope.fillFrame(
+            'widget-' + category + '-' + i,
+            $scope.createPreamble($scope.widgets[category][i].params, null) + rawCode);
       }
     }
+  };
+
+  // Creates the initial JavaScript for a widget, based on the parameters in
+  // params.
+  $scope.createPreamble = function(params, customValues) {
+    var result = '<script>';
+    for (var i = 0; i < params.length; i++) {
+      var val = params[i]['default'];
+      if (customValues && (params[i].name in customValues)) {
+        val = customValues[params[i].name];
+      }
+      result += 'var ' + params[i].name + ' = ' + val + ';\n';
+    }
+    result += '<\/script>';
+    return result;
   };
 
   // Initializes the widget list using data from the server.
@@ -49,7 +68,9 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   // Inserts content into the preview tab just before it is shown.
   $('#modalTabs a[href="#preview"]').on('show', function (e) {
-    $scope.addContentToIframe('modalPreview', $scope.modalWidget.raw);
+    $scope.addContentToIframe(
+      'modalPreview',
+      $scope.createPreamble($scope.modalWidget.params, null) + $scope.modalWidget.raw);
   });
 
   $scope.editWidget = function(widget) {
@@ -116,15 +137,42 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   /**
    * Displays a modal allowing customization of the widget's parameters.
-   * @param {string} id The id of the widget to customize.
+   * @param {string} category The category of the widget to customize.
+   * @param {string} index The index of the widget in this category.
    */
-  $scope.showCustomizeModal = function(id) {
-     $scope.modalIndex = id;
-     $('#customizeModal').modal();
+  $scope.showCustomizeModal = function(category, index) {
+    $scope.customizeCategory = category;
+    $scope.customizeIndex = index;
+    // TODO(sll): Have a global customizedParams for each widget id, which retains
+    // state between successive invocations of the customize modal.
+    $scope.customizedParams = [];
+    $('#customizeModal').modal();
   };
 
-  $scope.selectWidget = function(widget) {
-    window.parent.postMessage(widget, '*');
+  $scope.submitCustomization = function() {
+    var category = $scope.customizeCategory;
+    var index = $scope.customizeIndex;
+    console.log($scope.customizedParams);
+    // Display the new widget, but DO NOT save the code.
+    var newRawCode = $scope.createPreamble(
+        $scope.widgets[category][index].params, $scope.customizedParams) +
+        $scope.widgets[category][index].raw;
+    $scope.$apply();
+    $scope.fillFrame('widget-' + category + '-' + index, newRawCode);
+    $scope.closeCustomizeModal();
+  };
+
+  $scope.closeCustomizeModal = function() {
+    $scope.customizeCategory = '';
+    $scope.customizeIndex = '';
+    $('#customizeModal').modal('hide');
+  };
+
+  $scope.selectWidget = function(category, index) {
+    var rawCode = $scope.createPreamble(
+        $scope.widgets[category][index].params, $scope.customizedParams) +
+        $scope.widgets[category][index].raw;
+    window.parent.postMessage(rawCode, '*');
   };
 }
 
