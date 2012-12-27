@@ -206,43 +206,6 @@ textarea.oppia-code {
 }
 
 
-/* Palette styles */
-
-.oppia-palette {
-  border-color: black;
-  border-style: solid;
-  border-width: 0 0 0 1px;
-  height: 100%;
-  margin: 0 2px 0 0;
-  width: 50px;
-}
-.oppia-palette-icon {
-  background: url(/images/palette-sprites.png) no-repeat 0 0;
-  cursor: move;
-  height: 48px;
-  margin: 3px;
-  width: 48px;
-}
-.oppia-palette-image {
-  background-position: 0 -144px;
-}
-.oppia-palette-widget {
-  background-position: 0 0;
-}
-.oppia-palette-text {
-  background-position: 0 -48px;
-}
-.oppia-palette-video {
-  background-position: 0 -96px;
-}
-.oppia-palette-trash {
-  background: url(/images/trash.png) no-repeat 0 0;
-  height: 48px;
-  margin: 300px 3px 0 3px;
-  width: 48px;
-}
-
-
 /* Category editor styles */
 
 .oppia-category-block {
@@ -318,4 +281,20 @@ text.shadow {
   stroke: #fff;
   stroke-width: 3px;
   stroke-opacity: .8;
+}
+
+
+/* Styles for the indented tree graph. */
+
+.node rect {
+  cursor: pointer;
+  fill: #fff;
+  fill-opacity: .5;
+  stroke: #3182bd;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+  pointer-events: none;
 }

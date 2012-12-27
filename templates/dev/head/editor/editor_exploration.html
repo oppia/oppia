@@ -14,57 +14,61 @@
           </h3>
 
           <ul class="nav nav-tabs" id="editorViewTab">
-            <li><a data-toggle="tab" href="#metadata">Metadata</a></li>
-            <li class="active"><a data-toggle="tab" href="#graph">Graph</a></li>
+            <li class="active"><a data-toggle="tab" href="#explorationEditor">Exploration Editor</a></li>
             <li><a data-toggle="tab" href="#stateEditor">State Editor</a></li>
           </ul>
 
           <div class="tab-content">
-            <div class="tab-pane" id="metadata">
+            <div class="tab-pane active" id="explorationEditor">
 
-              <div>
-                Title: <input type="text" ng-model="explorationTitle" ng-model-onblur>
-              </div>
+              <div class="container-fluid">
+                <div class="row-fluid">
 
-              <div>
-                Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
-              </div>
+                  <div class="span4">
+                    <div>
+                      Title: <input type="text" ng-model="explorationTitle" ng-model-onblur>
+                    </div>
 
-              <div>
-                Image preview:
-                <ng-switch on="!explorationImageId">
-                  <div ng-switch-when="true" class="oppia-placeholder">
-                    <form id="newImageForm">
-                      <input type="file" id="newImage" name="newImage" image-upload="true">
-                      <button type="button" ng-click="saveExplorationImage()">Save</button>
+                    <div>
+                      Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+                    </div>
+
+                    <div>
+                      Image preview:
+                      <ng-switch on="!explorationImageId">
+                        <div ng-switch-when="true" class="oppia-placeholder">
+                          <form id="newImageForm">
+                            <input type="file" id="newImage" name="newImage" image-upload="true">
+                            <button type="button" ng-click="saveExplorationImage()">Save</button>
+                          </form>
+                        </div>
+                        <div ng-switch-default>
+                          <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>"></img>
+                          <button ng-click="deleteExplorationImage()">Delete image</button>
+                        </div>
+                      </ng-switch>
+                    </div>
+
+                    <div ng-hide="isPublic">
+                      <button type="button" ng-click="makePublic()">
+                        Publish
+                      </button>
+                      (irreversible)
+                    </div>
+                  </div>
+
+                  <div class="span8">
+                    <form ng-submit="addState(newStateDesc, false)">
+                      <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>
+                      <datalist id="states">
+                        <option ng-repeat="(id, properties) in states | orderBy:'properties.desc':true" value="<[properties.desc]>"></option>
+                      </datalist>
+                      <div class="oppia-loading" ng-show="addStateLoading"></div>
                     </form>
+                    {% include 'editor/editor_graph.html' %}
                   </div>
-                  <div ng-switch-default>
-                    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>"></img>
-                    <button ng-click="deleteExplorationImage()">Delete image</button>
-                  </div>
-                </ng-switch>
+                </div>
               </div>
-
-              <div ng-hide="isPublic">
-                <button type="button" ng-click="makePublic()">
-                  Publish
-                </button>
-                (irreversible)
-              </div>
-
-            </div>
-
-            <div class="tab-pane active" id="graph">
-
-              <form ng-submit="addState(newStateDesc, false)">
-                <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>
-                <datalist id="states">
-                  <option ng-repeat="(id, properties) in states | orderBy:'properties.desc':true" value="<[properties.desc]>"></option>
-                </datalist>
-                <div class="oppia-loading" ng-show="addStateLoading"></div>
-              </form>
-              {% include 'editor/editor_graph.html' %}
             </div>
 
             <div class="tab-pane" id="stateEditor">

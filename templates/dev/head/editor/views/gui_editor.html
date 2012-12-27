@@ -4,12 +4,10 @@
       <div id="editorWindow" ng-show="stateId">
         <button ng-click="changeMode('text')">Use YAML text editor</button>
         <h4>Content displayed to the reader</h4>
-        <center class="alert alert-info" ng-show="stateContent.length == 0">
-          To add content, drag an icon from the palette on the right into the box below.
-        </center>
         <div>
           <ul ui-sortable ng-model="stateContent" class="sortable oppia-state-text-list">
             <li ng-repeat="item in stateContent" class="oppia-state-text-item" ng-class="'item-' + $index">
+              <a ng-click="deleteContent($index)" class="pull-right">Delete</a>
               <ng-switch on="item.type">
                 <!-- TODO(sll): In the following, stateContent should store the
                 raw HTML. When the user clicks to edit, the textarea should
@@ -91,9 +89,14 @@
               </ng-switch>
             </li>
           </ul>
-          <center class="oppia-add-content-box oppia-palette-droppable">
-            Drag Content Here
+
+          <center class="oppia-add-content-box">
+            <button ng-click="addContent('text')">Add text</button>
+            <button ng-click="addContent('image')">Add image</button>
+            <button ng-click="addContent('video')">Add video</button>
+            <button ng-click="addContent('widget')" ng-hide="isWidgetInStateContent()">Add widget</button>
           </center>
+
           <br>
           <br>
         </div>
@@ -146,19 +149,6 @@
             {% include 'classifier_editors/text.html' %}
           </div>
 
-        </div>
-      </div>
-    </div>
-    <div class="span2">
-      <div class="oppia-palette pull-right" ng-show="stateId">
-        <div class="oppia-palette-text oppia-palette-icon" title="Add text"></div>
-        <div class="oppia-palette-image oppia-palette-icon" title="Add image"></div>
-        <div class="oppia-palette-video oppia-palette-icon" title="Add video"></div>
-        <div class="oppia-palette-widget oppia-palette-icon" title="Add interactive widget" ng-hide="isWidgetInstateContent()"></div>
-       <!-- The outer div below is needed to make the background color appear
-       behind the image. -->
-        <div class="oppia-item-droppable">
-          <div class="oppia-palette-trash"></div>
         </div>
       </div>
     </div>

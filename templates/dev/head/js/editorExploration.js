@@ -22,7 +22,6 @@ var END_DEST = '-1';
 var QN_DEST_PREFIX = 'q-';
 // TODO(sll): Internationalize these.
 var END_STRING = 'END';
-var NEW_QUESTION_STRING = 'New question';
 var GUI_EDITOR_URL = '/gui'
 var YAML_EDITOR_URL = '/text'
 
@@ -472,7 +471,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         $scope.states[$scope.stateId]['dests'].length == 0) {
       warningsData.addWarning(
           'Interactive questions should have at least one category.');
-      $scope.changeInputType('none');
       return;
     }
 
