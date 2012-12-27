@@ -1,3 +1,143 @@
+oppia.directive('unfocusStateContent', function(activeInputData) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attribs) {
+      element[0].focus();
+      element.bind('blur', function() {
+        scope.stateContent[scope.$index] = scope.item;
+        scope.$apply(attribs['unfocusStateContent']);
+        scope.saveStateChange('stateContent');
+        activeInputData.clear();
+      });
+    }
+  };
+});
+
+// Makes the palette icons draggable.
+oppia.directive('oppiaPaletteIcon', function($compile, activeInputData) {
+  return {
+    restrict: 'C',
+    link: function(scope, element, attrs) {
+      $(element).draggable({
+        containment: 'window',
+        helper: 'clone',
+        revert: 'invalid',
+        start: function(event, ui) {
+          activeInputData.clear();
+          scope.$apply();
+        },
+        zIndex: 3000
+      });
+    }
+  };
+});
+
+// Allows palette icons to be dropped.
+oppia.directive('oppiaPaletteDroppable', function($compile, warningsData, activeInputData) {
+  return {
+    restrict: 'C',
+    link: function(scope, element, attrs) {
+      $(element).droppable({
+        accept: '.oppia-palette-icon',
+        activeClass: 'oppia-droppable-active',
+        drop: function(event, ui) {
+          if ($(ui.draggable).hasClass('oppia-palette-text')) {
+            activeInputData.name = 'stateContent.' + scope.stateContent.length;
+            scope.stateContent.push({type: 'text', value: ''});
+          } else if ($(ui.draggable).hasClass('oppia-palette-image')) {
+            scope.stateContent.push({type: 'image', value: ''});
+          } else if ($(ui.draggable).hasClass('oppia-palette-video')) {
+            scope.stateContent.push({type: 'video', value: ''});
+          } else if ($(ui.draggable).hasClass('oppia-palette-widget')) {
+            scope.stateContent.push({type: 'widget', value: ''});
+          } else {
+            warningsData.addWarning('Unknown palette icon.');
+            return;
+          }
+          scope.$apply();
+        }
+      });
+    }
+  };
+});
+
+// Allows stateContent items to be trashed.
+oppia.directive('oppiaItemDroppable', function($compile) {
+  return {
+    restrict: 'C',
+    link: function(scope, element, attrs) {
+      $(element).droppable({
+        accept: '.oppia-state-text-item',
+        hoverClass: 'oppia-droppable-trash-active',
+        drop: function(event, ui) {
+          for (var i = 0; i < scope.stateContent.length; ++i) {
+            if ($(ui.draggable).hasClass('item-' + i)) {
+              // TODO(sll): Using just scope.stateContent.splice(i, 1) doesn't
+              // work, because the other objects in the array get randomly
+              // arranged. Find out why, or refactor the following into a
+              // different splice() method and use that throughout.
+              var tempstateContent = [];
+              for (var j = 0; j < scope.stateContent.length; ++j) {
+                if (i != j) {
+                  tempstateContent.push(scope.stateContent[j]);
+                }
+              }
+              scope.$parent.stateContent = tempstateContent;
+              return;
+            }
+          }
+        },
+        tolerance: 'touch'
+      });
+    }
+  };
+});
+
+// Makes the corresponding elements sortable.
+// TODO(sll): This directive doesn't actually update the underlying array,
+// so ui-sortable still needs to be used. Try and fix this.
+oppia.directive('sortable', function($compile) {
+  return {
+    restrict: 'C',
+    link: function(scope, element, attrs) {
+      $(element).sortable({
+        scroll: false,
+        stop: function(event, ui) {
+          if ($(ui.item).hasClass('oppia-state-text-item')) {
+            // This prevents a collision with the itemDroppable trashing.
+            for (var i = 0; i < scope.stateContent.length; ++i) {
+              if (scope.stateContent[i] == undefined) {
+                scope.stateContent.splice(i, 1);
+                --i;
+              }
+            }
+            scope.saveStateChange('stateContent');
+            scope.$apply();
+          }
+        }
+      });
+    }
+  };
+});
+
+
+// override the default input to update on blur
+oppia.directive('ngModelOnblur', function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, elm, attr, ngModelCtrl) {
+      if (attr.type === 'radio' || attr.type === 'checkbox') return;
+        elm.unbind('input').unbind('keydown').unbind('change');
+        elm.bind('blur', function() {
+          scope.$apply(function() {
+          ngModelCtrl.$setViewValue(elm.val());
+        });
+      });
+    }
+  };
+});
+
 function GuiEditor($scope, $http, stateData, explorationData, warningsData, activeInputData) {
   // Sets up the state editor, given its data from the backend.
   $scope.$on('stateData', function() {
