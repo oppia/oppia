@@ -85,7 +85,7 @@ echo Checking whether d3.js is installed in third_party
 if [ ! -d "third_party/d3js" ]; then
   echo Installing d3.js
   mkdir -p third_party/d3js/
-  wget http://d3js.org/d3.v2.min.js -O third_party/d3js/d3.min.js
+  wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
 fi
 
 echo Checking whether jsplumb is installed in third_party
