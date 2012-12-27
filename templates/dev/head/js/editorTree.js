@@ -19,7 +19,7 @@
 function EditorTree($scope, $http, explorationData) {
   // When the exploration data is loaded, construct the tree.
   $scope.$on('explorationData', function() {
-    $scope.data = $scope.reformatResponse(
+    $scope.treeData = $scope.reformatResponse(
         explorationData.states, explorationData.initState);
   });
 
@@ -54,6 +54,10 @@ function EditorTree($scope, $http, explorationData) {
     $scope.NODES = $.extend(true, {}, NODES, '');
     return NODES;
   };
+
+  $scope.updateTree = function(tree) {
+
+  };
 };
 
 
@@ -62,8 +66,9 @@ oppia.directive('stateTreeViz', function () {
   var w = 960,
       h = 800,
       barHeight = 20,
-      barWidth = w * .8,
+      barWidth = w * .3,
       i = 0,
+      root,
       duration = 400;
 
   return {
@@ -92,10 +97,15 @@ oppia.directive('stateTreeViz', function () {
           return;
         }
 
+        newVal.x0 = 0;
+        newVal.y0 = 0;
+
+        scope.updateTree(root = newVal);
+      });
+
+      scope.updateTree = function(newVal) {
+
         var source = newVal;
-        source.x0 = 0;
-        source.y0 = 0;
-        var root = source;
 
         // Compute the flattened node list. TODO use d3.layout.hierarchy.
         var nodes = tree.nodes(root);
@@ -130,6 +140,7 @@ oppia.directive('stateTreeViz', function () {
                 d.children = d._children;
                 d._children = null;
               }
+              scope.updateTree(d);
             });
 
         nodeEnter.append("svg:text")
@@ -194,7 +205,9 @@ oppia.directive('stateTreeViz', function () {
           d.y0 = d.y;
         });
 
-      });
+      };
+
+
     }
   }
 });
