@@ -1,4 +1,4 @@
-<div id="oppia-state-graph-container">
+<div ng-controller="EditorGraph" id="oppia-state-graph-container">
   <div id="oppia-state-graph-canvas">
   </div>
 </div>
@@ -8,7 +8,7 @@
 <br>
 <br>
 
-<div ng-controller="EditorGraph" style="display: none">
+<div ng-controller="EditorTree" style="display: none">
   <[NODES]>
   <state-graph-viz val="data" grouped="grouped">
   </state-graph-viz>

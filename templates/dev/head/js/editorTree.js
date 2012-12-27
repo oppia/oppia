@@ -16,26 +16,48 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function EditorGraph($scope, $http, explorationData) {
-  // When the exploration data is loaded, construct the graph.
+function EditorTree($scope, $http, explorationData) {
+  // When the exploration data is loaded, construct the tree.
   $scope.$on('explorationData', function() {
     $scope.data = $scope.reformatResponse(
         explorationData.states, explorationData.initState);
   });
+
+  $scope.dfs = function(currStateId, seen, states, priorCategory) {
+    var thisState = {'name': states[currStateId].desc, 'children': []};
+    if (priorCategory) {
+      thisState['name'] = priorCategory + ': ' + states[currStateId].desc;
+    }
+    for (var i = 0; i < states[currStateId].dests.length; ++i) {
+      var destStateId = states[currStateId].dests[i].dest;
+      var category = states[currStateId].dests[i].category;
+      if (destStateId == '-1') {
+        thisState['children'].push(
+            {'name': category + ': END', 'size': 100});
+      } else if (seen[destStateId]) {
+        thisState['children'].push(
+            {'name': category + ': ' + states[destStateId].desc, 'size': 100});
+      } else {
+        seen[destStateId] = true;
+        thisState['children'].push($scope.dfs(destStateId, seen, states, category));
+      }
+    }
+    return thisState;
+  };
 
   // Reformat the model into a response that is processable by d3.js.
   $scope.reformatResponse = function(states, initState) {
     var seen = {};
     seen[initState] = true;
 
-    var NODES = {};
+    var NODES = $scope.dfs(initState, seen, states);
     $scope.NODES = $.extend(true, {}, NODES, '');
     return NODES;
   };
 };
 
 
-oppia.directive('stateGraphViz', function () {
+oppia.directive('stateTreeViz', function () {
   // constants
   var w = 960,
       h = 800,
@@ -180,4 +202,4 @@ oppia.directive('stateGraphViz', function () {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorGraph.$inject = ['$scope', '$http', 'explorationDataFactory'];
+EditorTree.$inject = ['$scope', '$http', 'explorationDataFactory'];

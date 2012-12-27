@@ -123,7 +123,7 @@ class ExplorationPage(BaseHandler):
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
-             'guiEditor', 'yamlEditor']),
+             'editorTree', 'guiEditor', 'yamlEditor']),
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
@@ -255,7 +255,7 @@ class StatePage(BaseHandler):
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
-             'guiEditor', 'yamlEditor']),
+             'editorTree', 'guiEditor', 'yamlEditor']),
         'mode': EDITOR_MODE,
     })
     self.response.out.write(
