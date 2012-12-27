@@ -46,17 +46,10 @@ function EditorTree($scope, $http, explorationData) {
   };
 
   // Reformat the model into a response that is processable by d3.js.
-  $scope.reformatResponse = function(states, initState) {
+  $scope.reformatResponse = function(states, initStateId) {
     var seen = {};
-    seen[initState] = true;
-
-    var NODES = $scope.dfs(initState, seen, states);
-    $scope.NODES = $.extend(true, {}, NODES, '');
-    return NODES;
-  };
-
-  $scope.updateTree = function(tree) {
-
+    seen[initStateId] = true;
+    return $scope.dfs(initStateId, seen, states);
   };
 };
 
@@ -104,7 +97,6 @@ oppia.directive('stateTreeViz', function () {
       });
 
       scope.updateTree = function(newVal) {
-
         var source = newVal;
 
         // Compute the flattened node list. TODO use d3.layout.hierarchy.

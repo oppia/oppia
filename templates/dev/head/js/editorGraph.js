@@ -19,18 +19,73 @@
 function EditorGraph($scope, $http, explorationData) {
   // When the exploration data is loaded, construct the graph.
   $scope.$on('explorationData', function() {
-    $scope.data = $scope.reformatResponse(
+    $scope.graphData = $scope.reformatResponse(
         explorationData.states, explorationData.initState);
   });
 
   // Reformat the model into a response that is processable by d3.js.
-  $scope.reformatResponse = function(states, initState) {
-    var seen = {};
-    seen[initState] = true;
+  $scope.reformatResponse = function(states, initStateId) {
+    var nodes = {};
+    for (var state in states) {
+      nodes[state] = {name: states[state].desc};
+    }
+    nodes[initStateId].depth = 0;
 
-    var NODES = {};
-    $scope.NODES = $.extend(true, {}, NODES, '');
-    return NODES;
+    var maxLevel = 0;
+    var seenNodes = [initStateId];
+    var queue = [initStateId];
+    var HORIZ_SPACING = 100;
+    var VERT_SPACING = 200;
+    var maxXDistPerLevel = {0: 50};
+    nodes[initStateId].y0 = 0;
+    nodes[initStateId].x0 = 50;
+
+    while (queue.length > 0) {
+      var currNode = queue[0];
+      queue.shift();
+      if (currNode in states) {
+        for (var i = 0; i < states[currNode].dests.length; i++) {
+          // Assign levels to nodes only when they are first encountered.
+          if (seenNodes.indexOf(states[currNode].dests[i].dest) == -1) {
+            seenNodes.push(states[currNode].dests[i].dest);
+            nodes[states[currNode].dests[i].dest].depth = nodes[currNode].depth + 1;
+            nodes[states[currNode].dests[i].dest].y0 = nodes[currNode].y0 + VERT_SPACING;
+            if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
+              nodes[states[currNode].dests[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
+              maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
+            } else {
+              nodes[states[currNode].dests[i].dest].x0 = 50;
+              maxXDistPerLevel[nodes[currNode].depth + 1] = 50;
+            }
+            maxLevel = Math.max(maxLevel, nodes[currNode].depth + 1);
+            queue.push(states[currNode].dests[i].dest);
+          }
+        }
+      }
+    }
+
+    var idCount = 0;
+    var nodeList = [];
+    for (var node in nodes) {
+      var nodeMap = nodes[node];
+      nodeMap['hashId'] = node;
+      nodeMap['id'] = idCount;
+      nodes[node]['id'] = idCount;
+      idCount++;
+      nodeList.push(nodeMap);
+    }
+
+    console.log(nodes);
+
+    var links = [];
+    for (var state in states) {
+      for (var i = 0; i < states[state].dests.length; i++) {
+        links.push({source: nodeList[nodes[state].id], target: nodeList[nodes[states[state].dests[i].dest].id], name: states[state].dests[i].category});
+      }
+    }
+    console.log(links);
+
+    return {nodes: nodeList, links: links};
   };
 };
 
@@ -38,9 +93,7 @@ function EditorGraph($scope, $http, explorationData) {
 oppia.directive('stateGraphViz', function () {
   // constants
   var w = 960,
-      h = 800,
-      barHeight = 20,
-      barWidth = w * .8,
+      h = 400,
       i = 0,
       duration = 400;
 
@@ -51,10 +104,6 @@ oppia.directive('stateGraphViz', function () {
       grouped: '='
     },
     link: function (scope, element, attrs) {
-      var tree = d3.layout.tree().size([h, 100]);
-      var diagonal = d3.svg.diagonal()
-          .projection(function(d) { return [d.y, d.x]; });
-
       var vis = d3.select(element[0]).append("svg:svg")
           .attr("width", w)
           .attr("height", h)
@@ -71,107 +120,73 @@ oppia.directive('stateGraphViz', function () {
         }
 
         var source = newVal;
-        source.x0 = 0;
-        source.y0 = 0;
-        var root = source;
-
-        // Compute the flattened node list. TODO use d3.layout.hierarchy.
-        var nodes = tree.nodes(root);
-
-        // Compute the "layout".
-        nodes.forEach(function(n, i) {
-          n.x = i * barHeight;
-        });
+        var nodes = source.nodes;
+        var links = source.links;
 
         // Update the nodes…
         var node = vis.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
         var nodeEnter = node.enter().append("svg:g")
-            .attr("class", "node")
-            .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-            .style("opacity", 1e-6);
+            .attr("class", "node");
 
         // Enter any new nodes at the parent's previous position.
-        nodeEnter.append("svg:rect")
-            .attr("y", -barHeight / 2)
-            .attr("height", barHeight)
-            .attr("width", barWidth)
+        nodeEnter.append("svg:circle")
+            .attr("cy", function(d) { return d.y0; })
+            .attr("cx", function(d) { return d.x0; })
+            .attr("r", 30)
             .style("fill", function(d) {
+              // TODO(sll): Break into cases based on whether it's an END state, the current state, etc.
               return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
             })
             .on("click", function (d) {
-              if (d.children) {
-                d._children = d.children;
-                d.children = null;
-              } else {
-                d.children = d._children;
-                d._children = null;
-              }
+              // TODO(sll): Open the corresponding state editor.
             });
 
         nodeEnter.append("svg:text")
-            .attr("dy", 3.5)
-            .attr("dx", 5.5)
+            .attr("dy", function(d) { return d.y0; })
+            .attr("dx", function(d) { return d.x0; })
             .text(function(d) { return d.name; });
 
-        // Transition nodes to their new position.
-        nodeEnter.transition()
-            .duration(duration)
-            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-            .style("opacity", 1);
-
-        node.transition()
-            .duration(duration)
-            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-            .style("opacity", 1)
-          .select("rect")
-            .style("fill", function(d) {
-              return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
-            });
-
-        // Transition exiting nodes to the parent's new position.
-        node.exit().transition()
-            .duration(duration)
-            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-            .style("opacity", 1e-6)
-            .remove();
+        // Parameters for drawing a circle.
+        var radius = 40;
+        var angle = d3.scale.linear()
+            .domain([0, 49])
+            .range([0, 2 * Math.PI]);
+        var circle = d3.svg.line.radial()
+            .interpolate("basis")
+            .tension(0)
+            .radius(radius)
+            .angle(function(d, i) { return angle(i); });
 
         // Update the links…
         var link = vis.selectAll("path.link")
-            .data(tree.links(nodes), function(d) { return d.target.id; });
+            .data(links, function(d) { console.log(d); return d; });
 
-        // Enter any new links at the parent's previous position.
+        var lineFunction = d3.svg.line()
+                           .x(function(d) { return d.x; })
+                           .y(function(d) { return d.y; })
+                           .interpolate("monotone");
+
+        // TODO(sll): Add arrowheads.
         link.enter().insert("svg:path", "g")
+            .style("stroke-width", function(d) { return 5; })
+            .style("stroke", "red")
             .attr("class", "link")
             .attr("d", function(d) {
-              var o = {x: source.x0, y: source.y0};
-              return diagonal({source: o, target: o});
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return circle(d3.range(50));
+              }
+              var endpoints = [{x: d.source.x0, y: d.source.y0},
+                               {x: 0.5*(d.source.x0 + d.target.x0) + 50, y: 0.5*(d.source.y0 + d.target.y0) - 50},
+                               {x: d.target.x0, y: d.target.y0}];
+              return lineFunction(endpoints);
             })
-          .transition()
-            .duration(duration)
-            .attr("d", diagonal);
-
-        // Transition links to their new position.
-        link.transition()
-            .duration(duration)
-            .attr("d", diagonal);
-
-        // Transition exiting nodes to the parent's new position.
-        link.exit().transition()
-            .duration(duration)
-            .attr("d", function(d) {
-              var o = {x: source.x, y: source.y};
-              return diagonal({source: o, target: o});
-            })
-            .remove();
-
-        // Stash the old positions for transition.
-        nodes.forEach(function(d) {
-          d.x0 = d.x;
-          d.y0 = d.y;
-        });
-
+            .attr("transform", function(d) {
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return "translate(" + (d.source.x0) + ", " + (d.source.y0 + radius) + ")";
+              }
+            });
       });
     }
   }
