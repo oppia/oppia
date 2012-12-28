@@ -1,17 +1,10 @@
 <ul class="nav nav-tabs">
-  <li class="active">
-    <a href="#oldGraph" data-toggle="tab">Old Graph</a>
-  </li>
-  <li><a href="#newGraph" data-toggle="tab">New Graph</a></li>
+  <li class="active"><a href="#graph" data-toggle="tab">Graph</a></li>
   <li><a href="#tree" data-toggle="tab">Tree</a></li>
 </ul>
 
 <div class="tab-content">
-  <div class="tab-pane active" id="oldGraph">
-    <div id="oppia-state-graph-canvas">
-    </div>
-  </div>
-  <div class="tab-pane" id="newGraph">
+  <div class="tab-pane active" id="graph">
     <div ng-controller="EditorGraph">
       <state-graph-viz val="graphData" grouped="grouped">
       </state-graph-viz>

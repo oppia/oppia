@@ -81,7 +81,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
   $scope.deleteCategory = function(categoryId) {
     $scope.states[$scope.stateId]['dests'].splice(categoryId, 1);
     $scope.saveStateChange('states');
-    drawStateGraph($scope.states);
   };
 
   $scope.showFeedbackEditor = function(activeInput, categoryId) {
@@ -163,7 +162,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
 
     $scope.saveStateChange('states');
     activeInputData.clear();
-    drawStateGraph($scope.states);
   };
 
   $scope.getReadableInputType = function(inputType) {
@@ -198,8 +196,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     if ($scope.classifier != 'finite') {
       $scope.saveStateChange('states');
     }
-    // Update the graph.
-    drawStateGraph($scope.states);
   };
 
   $scope.hideVideoInputDialog = function(videoLink, index) {

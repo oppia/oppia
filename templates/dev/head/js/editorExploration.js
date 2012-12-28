@@ -217,8 +217,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.stateId = $routeParams.stateId || $scope.initStateId;
     $scope.isPublic = data.is_public;
-    initJsPlumb();
-    drawStateGraph($scope.states);
     stateData.getData($scope.stateId);
   });
 
@@ -397,8 +395,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }
     // Update the states using the actions variable.
     $scope.states[$scope.stateId].dests = data.actions;
-
-    drawStateGraph($scope.states);
   });
 
   $scope.saveStateName = function() {
@@ -452,9 +448,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
       delete $scope.states[stateId];
       $scope.saveStateChange('states');
-      drawStateGraph($scope.states);
-
-      stateData.getData($scope.initStateId);
+      explorationData.getData();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
@@ -515,258 +509,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
-  };
-
-
-  /************************************************
-   * Code for the state graph.
-   ***********************************************/
-  var stateCanvas = $('#oppia-state-graph-canvas');
-  var vertexIds = [];
-  var clickDelay = 500;
-  // Depth of each node in the graph.
-  var levelMap = {};
-  // Maximum depth of a node in the graph.
-  var maxLevel = 0;
-  // Number of nodes already in a given row.
-  var rowCount = {};
-
-  initJsPlumb = function() {
-    jsPlumb.Defaults.PaintStyle = {
-      lineWidth: 2,
-      strokeStyle: 'red'
-    };
-  };
-
-  /**
-   * Draws the graph of states.
-   * @param {Object} states An object containing all the data (destinations
-   *     and category names) needed to draw the state graph.
-   */
-  drawStateGraph = function(states) {
-    // Clear the canvas.
-    jsPlumb.reset();
-    stateCanvas.html('');
-    // Determine positions of the state vertices using breadth-first search.
-    vertexIds = [];
-    levelMap = {};
-    levelMap[$scope.initStateId] = 0;
-    maxLevel = 0;
-    var seenNodes = [$scope.initStateId];
-    var queue = [$scope.initStateId];
-    while (queue.length > 0) {
-      var currNode = queue[0];
-      queue.shift();
-      if (currNode in states) {
-        for (var i = 0; i < states[currNode].dests.length; i++) {
-          // Assign levels to nodes only when they are first encountered.
-          if (seenNodes.indexOf(states[currNode].dests[i].dest) == -1) {
-            seenNodes.push(states[currNode].dests[i].dest);
-            levelMap[states[currNode].dests[i].dest] = levelMap[currNode] + 1;
-            maxLevel = Math.max(maxLevel, levelMap[currNode] + 1);
-            queue.push(states[currNode].dests[i].dest);
-          }
-        }
-      }
-    }
-    console.log(levelMap);
-    // Initialize rowCount.
-    for (var i = 0; i <= maxLevel + 1; ++i) {
-      rowCount[i] = 0;
-    }
-    // Create State vertices
-    for (var id in states) {
-      createStateVertex(id, states[id].desc);
-    }
-    // Add edges for each vertex
-    for (var id in states) {
-      createEdgesForStateVertex(id, states[id].dests);
-    }
-  };
-
-  /**
-   * Creates a new 'ordinary' state node (i.e., not an END or question node) in
-   * the graph.
-   * @param {string} stateId The id of the node to be created.
-   * @param {string} title The text to be displayed in this node.
-   */
-  createStateVertex = function(stateId, title) {
-    var color = 'whitesmoke';
-    if (!(stateId in levelMap)) {
-      // This state is not reachable from the initial state.
-      color = '#FEEFB3';
-    }
-    createVertex(stateId,
-      title,
-      color,
-      function() {
-        $('#editorViewTab a[href="#stateEditor"]').tab('show');
-        stateData.getData(stateId);
-      },
-      function() {
-        $scope.deleteState(stateId);
-      }
-    );
-  };
-
-  /**
-   * Creates a new graph node with a given color and on-click action.
-   * @param {string} id The id of the node to be created.
-   * @param {string} title The text to be displayed in this node.
-   * @param {string} color The color of the node to be created.
-   * @param {function} clickCallback The method that should be called when the
-   *     graph node is clicked.
-   * @param {function} deleteCallback The method that should be called when
-   *     the graph node is deleted.
-   */
-  createVertex = function(id, title, color, clickCallback, deleteCallback) {
-    var last, diff, moved;
-    var canEdit = (id != END_DEST);
-    var canDelete = canEdit && (id.toString().indexOf(QN_DEST_PREFIX) != 0 &&
-        id != $scope.initStateId);
-
-    var vertexId = getVertexId(id);
-    if (vertexIds.indexOf(vertexId) != -1) {
-      // Vertex already existed
-      console.log('Vertex exist! ' + id);
-      return;
-    }
-
-    var $del = $('<div/>')
-    .addClass('oppia-state-graph-vertex-delete')
-    .html('&times;')
-    .click(function() {
-      if (deleteCallback) {
-        deleteCallback();
-      }
-    });
-
-    var $info = $('<div/>')
-    .addClass('oppia-state-graph-vertex-info')
-    .html('<p>' + title + '</p>');
-    if (canEdit) {
-      $info
-      .addClass('oppia-state-graph-vertex-info-editable')
-      .click(function() {
-        if (!moved && diff < clickDelay) {
-          if (clickCallback) {
-            clickCallback();
-          }
-        }
-      });
-    }
-
-    var vertexIndex = vertexIds.length;
-    var depth = id in levelMap ? levelMap[id] : maxLevel + 1;
-    var $vertex = $('<div/>', {id: vertexId})
-    .css({
-      'background-color': color,
-      'border': '2px solid black',
-      'border-radius': '50%',
-      'left': (80 * rowCount[depth]) + 'px',
-      'opacity': 0.8,
-      'padding': '8px',
-      'position': 'absolute', // Necessary to make div draggable
-      'top': (140 * depth) + 'px',
-      'z-index': 2 // Yeah! its a magic number I know ;)
-    })
-    .bind('mousedown', function(e) {
-      last = e.timeStamp;
-      moved = false;
-    })
-    .bind('mouseup mousemove', function(e) {
-      if (e.type == 'mousemove') {
-        moved = true;
-        return;
-      }
-      diff = e.timeStamp - last;
-    })
-    .prepend($info)
-    .prepend(canDelete ? $del : null)
-    .appendTo(stateCanvas);
-
-    // Highlight unreachable nodes, the starting node, and the current node.
-    if (!(id in levelMap)) {
-      $vertex.attr('title', 'This node is unreachable from the start node.');
-    }
-    if (id == $scope.initStateId) {
-      $vertex.attr('title', 'This is the starting node.');
-      $vertex.css('border-radius', '20%');
-    }
-    if (id == $scope.stateId) {
-      $vertex.css('border', '5px solid blue');
-    }
-
-    rowCount[depth]++;
-    jsPlumb.draggable($vertex);
-
-    vertexIds.push(vertexId);
-  };
-
-  /**
-   * Modifies the name of a graph node.
-   * @param {string} stateId The id of the node whose name is to be modified.
-   * @param {string} stateName The new text that should be shown in this node.
-   */
-  editStateVertexName = function(stateId, stateName) {
-    $('#' + getVertexId(stateId)).html('<p>' + stateName + '</p>');
-  };
-
-  createEdgesForStateVertex = function(stateId, dests) {
-    for (var i = 0; i < dests.length; ++i) {
-      createEdge(stateId, dests[i].dest, dests[i].category);
-    }
-  };
-
-  createEdge = function(srcId, destId, label) {
-    var srcVertexId = getVertexId(srcId);
-    if (vertexIds.indexOf(srcVertexId) == -1) {
-      console.log('Edge source should be create first! ' + srcId);
-      return;
-    }
-
-    var destVertexId = getVertexId(destId);
-    if (vertexIds.indexOf(destVertexId) == -1) {
-      if (destId.indexOf(QN_DEST_PREFIX) === 0) {
-        var questionId = destId.substring(2);
-        createVertex(destId,
-            '<a>[Question] ' + $scope.questions[questionId].desc + '</a>',
-            'lightblue',
-            function() {
-              window.location = $scope.explorationUrl + '/' + questionId;
-            },
-            null);
-      } else if (destId == END_DEST) {
-        createVertex(END_DEST, END_STRING, 'olive', null, null);
-      } else {
-        console.log('Edge destination is invalid! ' + destId);
-        return;
-      }
-    }
-
-    var srcIndex = vertexIds.indexOf(srcVertexId);
-    var destIndex = vertexIds.indexOf(destVertexId);
-
-    var connectInfo = {
-      source: $('#' + srcVertexId),
-      target: $('#' + destVertexId),
-      connector: ['StateMachine', {'curviness': 0}],
-      endpoint: ['Dot', {radius: 2}],
-      anchor: 'Continuous',
-      overlays: [
-        ['Arrow', {
-          location: 1,
-          length: 14,
-          foldback: 0.8}],
-        ['Label', {label: label, location: 0.35 }]
-      ]
-    };
-
-    jsPlumb.connect(connectInfo).setDetachable(true);
-  };
-
-  getVertexId = function(id) {
-    return 'vertexID' + id;
   };
 }
 
