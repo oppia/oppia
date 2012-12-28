@@ -273,7 +273,7 @@ circle {
 }
 
 text {
-  font: 10px sans-serif;
+  font: 20px sans-serif;
   pointer-events: none;
 }
 
@@ -294,7 +294,3 @@ text.shadow {
   stroke-width: 1.5px;
 }
 
-.node text {
-  font: 10px sans-serif;
-  pointer-events: none;
-}

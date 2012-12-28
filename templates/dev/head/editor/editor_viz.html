@@ -1,15 +1,24 @@
-<div ng-controller="EditorGraph" id="oppia-state-graph-container" >
-  <div id="oppia-state-graph-canvas">
+<ul class="nav nav-tabs">
+  <li><a class="active" href="#oldGraph" data-toggle="tab">Old Graph</a></li>
+  <li><a href="#newGraph" data-toggle="tab">New Graph</a></li>
+  <li><a href="#tree" data-toggle="tab">Tree</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="oldGraph">
+    <div id="oppia-state-graph-canvas">
+    </div>
   </div>
-
-  <br><br><br><br><br><br><br><br><br><br><br>
-
-  <state-graph-viz val="graphData" grouped="grouped">
-  </state-graph-viz>
-
-</div>
-
-<div ng-controller="EditorTree">
-  <state-tree-viz val="treeData" grouped="grouped">
-  </state-tree-viz>
+  <div class="tab-pane" id="newGraph">
+    <div ng-controller="EditorGraph" id="oppia-state-graph-container" >
+      <state-graph-viz val="graphData" grouped="grouped">
+      </state-graph-viz>
+    </div>
+  </div>
+  <div class="tab-pane" id="tree">
+    <div ng-controller="EditorTree">
+      <state-tree-viz val="treeData" grouped="grouped">
+      </state-tree-viz>
+    </div>
+  </div>
 </div>

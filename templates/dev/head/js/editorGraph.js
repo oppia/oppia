@@ -123,6 +123,73 @@ oppia.directive('stateGraphViz', function () {
         var nodes = source.nodes;
         var links = source.links;
 
+
+        // Update the links…
+        var link = vis.selectAll("path.link")
+            .data(links, function(d) { console.log(d); return d; });
+
+        vis.append("svg:defs").selectAll('marker')
+            .data(['arrowhead'])
+          .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 25)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+          .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "red");
+
+        var linkEnter = link.enter().append("svg:g")
+            .attr("class", "link");
+
+        linkEnter.insert("svg:path", "g")
+            .style("stroke-width", 3)
+            .style("stroke", "red")
+            .attr("class", "link")
+            .attr("d", function(d) {
+              // Uncomment the following if self-edges should be displayed.
+              /*
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return circle(d3.range(50));
+              }
+              */
+
+              // Elliptical arcs.
+              var dx = d.target.x0 - d.source.x0,
+                  dy = d.target.y0 - d.source.y0,
+                  dr = Math.sqrt(dx * dx + dy * dy);
+              return "M" + d.source.x0 + "," + d.source.y0 + "A" + dr + "," + dr + " 0 0,1 " + d.target.x0 + "," + d.target.y0;
+            })
+            .attr("transform", function(d) {
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return "translate(" + (d.source.x0) + ", " + (d.source.y0 + radius) + ")";
+              }
+            })
+            .attr("marker-end", function(d) {
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return '';
+              } else {
+                return "url(#arrowhead)";
+              }
+            });
+
+        linkEnter.append("svg:text")
+            .attr("dy", function(d) { return d.source.y0*0.5 + d.target.y0*0.5; })
+            .attr("dx", function(d) { return d.source.x0*0.5 + d.target.x0*0.5; })
+            .attr('color', 'black')
+            .text(function(d) {
+              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
+                return '';
+              }
+              return d.name;
+            });
+
+
+
+
         // Update the nodes…
         var node = vis.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
@@ -136,6 +203,7 @@ oppia.directive('stateGraphViz', function () {
             .attr("cx", function(d) { return d.x0; })
             .attr("r", 30)
             .style("fill", function(d) {
+              return "beige";
               // TODO(sll): Break into cases based on whether it's an END state, the current state, etc.
               return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
             })
@@ -159,34 +227,6 @@ oppia.directive('stateGraphViz', function () {
             .radius(radius)
             .angle(function(d, i) { return angle(i); });
 
-        // Update the links…
-        var link = vis.selectAll("path.link")
-            .data(links, function(d) { console.log(d); return d; });
-
-        var lineFunction = d3.svg.line()
-                           .x(function(d) { return d.x; })
-                           .y(function(d) { return d.y; })
-                           .interpolate("monotone");
-
-        // TODO(sll): Add arrowheads.
-        link.enter().insert("svg:path", "g")
-            .style("stroke-width", function(d) { return 5; })
-            .style("stroke", "red")
-            .attr("class", "link")
-            .attr("d", function(d) {
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return circle(d3.range(50));
-              }
-              var endpoints = [{x: d.source.x0, y: d.source.y0},
-                               {x: 0.5*(d.source.x0 + d.target.x0) + 50, y: 0.5*(d.source.y0 + d.target.y0) - 50},
-                               {x: d.target.x0, y: d.target.y0}];
-              return lineFunction(endpoints);
-            })
-            .attr("transform", function(d) {
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return "translate(" + (d.source.x0) + ", " + (d.source.y0 + radius) + ")";
-              }
-            });
       });
     }
   }

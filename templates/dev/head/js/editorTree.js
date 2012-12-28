@@ -58,7 +58,7 @@ oppia.directive('stateTreeViz', function () {
   // constants
   var w = 960,
       h = 800,
-      barHeight = 20,
+      barHeight = 30,
       barWidth = w * .3,
       i = 0,
       root,
