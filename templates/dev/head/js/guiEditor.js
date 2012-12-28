@@ -59,6 +59,9 @@ oppia.directive('ngModelOnblur', function() {
 });
 
 function GuiEditor($scope, $http, stateData, explorationData, warningsData, activeInputData) {
+  // Switch to the stateEditor tab when this controller is activated.
+  $('#editorViewTab a[href="#stateEditor"]').tab('show');
+
   // Sets up the state editor, given its data from the backend.
   $scope.$on('stateData', function() {
     // If a widget exists, show its compiled version and populate the widget

@@ -3,6 +3,7 @@
 // make them load only for that page.
 var oppia = angular.module('oppia', ['ui', 'ngSanitize']);
 var editorUrl = '/editor/';
+var pathnameArray = window.location.pathname.split('/');
 var ALPHANUMERIC_REGEXP = {
     'regexp': /^[ A-Za-z0-9\.\?\,\+\(\)\[\]\;\!\'\"\:_-]+$/,
     'warning': 'Invalid input. Please use a non-empty ' +
@@ -71,7 +72,7 @@ oppia.factory('activeInputData', function($rootScope) {
 });
 
 // Global utility methods.
-function Base($scope, $timeout, warningsData, activeInputData) {
+function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
@@ -268,4 +269,4 @@ oppia.directive('imageUpload', function($exceptionHandler) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$timeout', 'warningsData', 'activeInputData'];
+Base.$inject = ['$scope', '$timeout', '$rootScope', 'warningsData', 'activeInputData'];

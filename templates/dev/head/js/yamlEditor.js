@@ -1,6 +1,8 @@
 function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
+  // Switch to the stateEditor tab when this controller is activated.
+  $('#editorViewTab a[href="#stateEditor"]').tab('show');
+
   // The pathname should be: .../create/{exploration_id}/[state_id]
-  var pathnameArray = window.location.pathname.split('/');
   $scope.$parent.explorationId = pathnameArray[2];
 
   // Initializes the YAML textarea using data from the backend.

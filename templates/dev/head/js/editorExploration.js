@@ -64,7 +64,8 @@ oppia.config(['$routeProvider', function($routeProvider) {
            {templateUrl: '/templates/gui', controller: GuiEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/templates/gui', controller: GuiEditor}).
-      otherwise({redirectTo: GUI_EDITOR_URL});
+      when('/', {}).
+      otherwise({redirectTo: '/'});
 }]);
 
 
@@ -73,9 +74,7 @@ oppia.factory('explorationData', function($rootScope, $http, warningsData) {
   var explorationData = {};
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
-  var pathnameArray = window.location.pathname.split('/');
-  var explorationId = pathnameArray[2];
-  var explorationUrl = '/create/' + explorationId;
+  var explorationUrl = '/create/' + pathnameArray[2];
 
   explorationData.getData = function() {
     var obj = this;
@@ -104,9 +103,7 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
   var stateData = {};
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
-  var pathnameArray = window.location.pathname.split('/');
-  var explorationId = pathnameArray[2];
-  var explorationUrl = '/create/' + explorationId;
+  var explorationUrl = '/create/' + pathnameArray[2];
 
   /**
    * Gets the data for a particular state.
@@ -172,8 +169,15 @@ oppia.run(function($rootScope) {
 });
 
 
-function EditorExploration($scope, $http, $timeout, $location, $routeParams,
+function EditorExploration($scope, $http, $location, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
+
+  /********************************************
+  * Methods affecting the URL location hash.
+  ********************************************/
+  /**
+   * Gets the current mode from the URL location hash.
+   */
   $scope.getMode = function() {
     if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
       return GUI_EDITOR_URL.substring(1);
@@ -184,6 +188,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 
   /**
    * Changes the editor mode.
+   * @param {string} mode The state editor mode to switch to (currently, gui or text).
    */
   $scope.changeMode = function(mode) {
     if (mode == GUI_EDITOR_URL.substring(1)) {
@@ -195,10 +200,24 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     }
   };
 
+  // Changes the location hash when the editorView tab is changed.
+  $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
+    console.log(e.target.hash);
+    if (e.target.hash == '#stateEditor') {
+      $scope.changeMode($scope.getMode());
+    } else {
+      $location.path('');
+    }
+    $scope.$apply();
+  });
+
+
+  /**********************************************************
+   * Called on initial load of the exploration editor page.
+   *********************************************************/
   $scope.stateContent = [];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
-  var pathnameArray = window.location.pathname.split('/');
   $scope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
 
@@ -228,9 +247,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
     $scope.saveExplorationProperty('explorationTitle', 'title', newValue, oldValue);
   });
 
-  /**
-   * Makes this exploration public.
-   */
   $scope.makePublic = function() {
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
   };
@@ -515,6 +531,6 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location',
+EditorExploration.$inject = ['$scope', '$http', '$location',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
