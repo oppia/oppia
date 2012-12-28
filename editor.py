@@ -295,8 +295,8 @@ class StatePage(BaseHandler):
         action_set = models.ActionSet(category_index=i)
         action_set.put()
         state.action_sets.append(action_set.key)
-      # The default destination is the same state.
-      action = {'category': category_list[i], 'dest': state.hash_id}
+
+      action = {'category': category_list[i], 'dest': '-1'}
       if action_set.text:
         action['text'] = action_set.text
       if action_set.dest_exploration:

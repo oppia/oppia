@@ -122,6 +122,9 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
             success(function(data) {
               obj.data = data;
               console.log(data);
+              for (var i =0 ;i < data.actions.length; i++) {
+                console.log(data.actions[i].dest);
+              }
               obj.stateName = data.stateName;
               obj.stateContent = data.stateContent;
               obj.inputType = data.inputType;

@@ -264,14 +264,13 @@ textarea.oppia-code {
 }
 
 .oppia-graph-viz circle {
-  cursor: pointer;
   fill: #ccc;
   stroke: #333;
   stroke-width: 1.5px;
 }
 
 .oppia-graph-viz text {
-  font: 20px sans-serif;
+  font: 15px sans-serif;
   pointer-events: none;
 }
 
@@ -288,6 +287,10 @@ textarea.oppia-code {
   stroke-width: 0px;
 }
 
+.oppia-graph-viz .clickable {
+  cursor: pointer;
+}
+
 /* Styles for the indented tree visualization. */
 
 .oppia-tree-viz path.link {
@@ -297,7 +300,7 @@ textarea.oppia-code {
 }
 
 .oppia-tree-viz text {
-  font: 20px sans-serif;
+  font: 15px sans-serif;
   pointer-events: none;
 }
 
@@ -314,4 +317,3 @@ textarea.oppia-code {
   stroke: #3182bd;
   stroke-width: 1.5px;
 }
-

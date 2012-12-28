@@ -25,31 +25,35 @@ function EditorGraph($scope, $http, explorationData) {
 
   // Reformat the model into a response that is processable by d3.js.
   $scope.reformatResponse = function(states, initStateId) {
+    var SENTINEL_DEPTH = 3000;
+    var VERT_OFFSET = 10;
+    var HORIZ_SPACING = 100;
+    var VERT_SPACING = 100;
     var nodes = {};
+    nodes['-1'] = {name: 'END', depth: SENTINEL_DEPTH, reachable: false};
     for (var state in states) {
-      nodes[state] = {name: states[state].desc};
+      nodes[state] = {name: states[state].desc, depth: SENTINEL_DEPTH, reachable: false};
     }
     nodes[initStateId].depth = 0;
 
-    var maxLevel = 0;
+    var maxDepth = 0;
     var seenNodes = [initStateId];
     var queue = [initStateId];
-    var HORIZ_SPACING = 100;
-    var VERT_SPACING = 200;
     var maxXDistPerLevel = {0: 50};
-    nodes[initStateId].y0 = 10;
+    nodes[initStateId].y0 = VERT_OFFSET;
     nodes[initStateId].x0 = 50;
 
     while (queue.length > 0) {
       var currNode = queue[0];
       queue.shift();
+      nodes[currNode].reachable = true;
       if (currNode in states) {
         for (var i = 0; i < states[currNode].dests.length; i++) {
           // Assign levels to nodes only when they are first encountered.
           if (seenNodes.indexOf(states[currNode].dests[i].dest) == -1) {
             seenNodes.push(states[currNode].dests[i].dest);
             nodes[states[currNode].dests[i].dest].depth = nodes[currNode].depth + 1;
-            nodes[states[currNode].dests[i].dest].y0 = nodes[currNode].y0 + VERT_SPACING;
+            nodes[states[currNode].dests[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
             if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
               nodes[states[currNode].dests[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
               maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
@@ -57,13 +61,24 @@ function EditorGraph($scope, $http, explorationData) {
               nodes[states[currNode].dests[i].dest].x0 = 50;
               maxXDistPerLevel[nodes[currNode].depth + 1] = 50;
             }
-            maxLevel = Math.max(maxLevel, nodes[currNode].depth + 1);
+            maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
             queue.push(states[currNode].dests[i].dest);
           }
         }
       }
     }
 
+    var horizPositionForLastRow = 50;
+    for (var node in nodes) {
+      if (nodes[node].depth == SENTINEL_DEPTH) {
+        nodes[node].depth = maxDepth + 1;
+        nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
+        nodes[node].x0 = horizPositionForLastRow;
+        horizPositionForLastRow += HORIZ_SPACING;
+      }
+    }
+
+    // Assign unique IDs to each node.
     var idCount = 0;
     var nodeList = [];
     for (var node in nodes) {
@@ -75,6 +90,7 @@ function EditorGraph($scope, $http, explorationData) {
       nodeList.push(nodeMap);
     }
 
+    console.log('NODES');
     console.log(nodes);
 
     var links = [];
@@ -194,10 +210,24 @@ oppia.directive('stateGraphViz', function (stateData) {
             .attr("cy", function(d) { return d.y0; })
             .attr("cx", function(d) { return d.x0; })
             .attr("r", 30)
+            .attr("class", function(d) {
+              if (d.hashId != '-1') {
+                return "clickable";
+              }
+            })
             .style("fill", function(d) {
-              return "beige";
+              if (d.reachable == false) {
+                return "pink";
+              } else if (d.hashId == '-1') {
+                return "olive";
+              } else {
+                return "beige";
+              }
             })
             .on("click", function (d) {
+              if (d.hashId == '-1') {
+                return;
+              }
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
               stateData.getData(d.hashId);
             });
@@ -207,11 +237,13 @@ oppia.directive('stateGraphViz', function (stateData) {
             .attr("dx", function(d) { return d.x0; })
             .text(function(d) { return d.name; });
 
+        // Add a "delete node" handler.
         nodeEnter.append("svg:rect")
             .attr("y", function(d) { return d.y0; })
             .attr("x", function(d) { return d.x0; })
             .attr("height", 20)
             .attr("width", 20)
+            .attr("opacity", 0)
             .attr("transform", function(d) { return "translate(" + (20) + "," + (-30) + ")"; })
             .attr("stroke-width", "0")
             .on("click", function (d) {
@@ -225,7 +257,7 @@ oppia.directive('stateGraphViz', function (stateData) {
             .attr("dy", function(d) { return d.y0 - 20; })
             .attr("dx", function(d) { return d.x0 + 20; })
             .text(function(d) {
-              if (d.hashId == initStateId) {
+              if (d.hashId == initStateId || d.hashId == '-1') {
                 return;
               }
               return 'x';
