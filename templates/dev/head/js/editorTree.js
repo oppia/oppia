@@ -24,7 +24,7 @@ function EditorTree($scope, $http, explorationData) {
   });
 
   $scope.dfs = function(currStateId, seen, states, priorCategory) {
-    var thisState = {'name': states[currStateId].desc, 'children': []};
+    var thisState = {'name': states[currStateId].desc, 'children': [], 'hashId': currStateId};
     if (priorCategory) {
       thisState['name'] = priorCategory + ': ' + states[currStateId].desc;
     }
@@ -36,7 +36,7 @@ function EditorTree($scope, $http, explorationData) {
             {'name': category + ': END', 'size': 100});
       } else if (seen[destStateId]) {
         thisState['children'].push(
-            {'name': category + ': ' + states[destStateId].desc, 'size': 100});
+            {'name': category + ': ' + states[destStateId].desc, 'size': 100, 'hashId': destStateId});
       } else {
         seen[destStateId] = true;
         thisState['children'].push($scope.dfs(destStateId, seen, states, category));
@@ -54,7 +54,7 @@ function EditorTree($scope, $http, explorationData) {
 };
 
 
-oppia.directive('stateTreeViz', function () {
+oppia.directive('stateTreeViz', function (stateData) {
   // constants
   var w = 960,
       h = 800,
@@ -133,6 +133,30 @@ oppia.directive('stateTreeViz', function () {
                 d._children = null;
               }
               scope.updateTree(d);
+            });
+
+        // Append a click handler that will open the state editor window.
+        nodeEnter.append("svg:rect")
+            .attr("y", -barHeight / 2)
+            .attr("height", barHeight)
+            .attr("width", 50)
+            .attr("transform", function(d) { return "translate(" + (barWidth - 50) + "," + 0 + ")"; })
+            .style("fill", function(d) {
+              return 'hashId' in d ? 'grey': '';
+            })
+            .on("click", function (d) {
+              if (!('hashId' in d)) {
+                return;
+              }
+              $('#editorViewTab a[href="#stateEditor"]').tab('show');
+              stateData.getData(d.hashId);
+            });
+
+        nodeEnter.append("svg:text")
+            .attr("dy", 3.5)
+            .attr("dx", barWidth - 45)
+            .text(function(d) {
+              return 'hashId' in d ? "Edit" : "";
             });
 
         nodeEnter.append("svg:text")
