@@ -90,7 +90,7 @@ function EditorGraph($scope, $http, explorationData) {
 };
 
 
-oppia.directive('stateGraphViz', function (stateDataFactory) {
+oppia.directive('stateGraphViz', function (stateData) {
   // constants
   var w = 960,
       h = 400,
@@ -207,7 +207,7 @@ oppia.directive('stateGraphViz', function (stateDataFactory) {
             })
             .on("click", function (d) {
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
-              stateDataFactory.getData(d.hashId);
+              stateData.getData(d.hashId);
             });
 
         nodeEnter.append("svg:text")
@@ -234,4 +234,4 @@ oppia.directive('stateGraphViz', function (stateDataFactory) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorGraph.$inject = ['$scope', '$http', 'explorationDataFactory'];
+EditorGraph.$inject = ['$scope', '$http', 'explorationData'];

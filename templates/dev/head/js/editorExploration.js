@@ -68,7 +68,7 @@ oppia.config(['$routeProvider', function($routeProvider) {
 }]);
 
 
-oppia.factory('explorationDataFactory', function($rootScope, $http, warningsData) {
+oppia.factory('explorationData', function($rootScope, $http, warningsData) {
   // Put exploration variables here.
   var explorationData = {};
 
@@ -99,7 +99,7 @@ oppia.factory('explorationDataFactory', function($rootScope, $http, warningsData
 });
 
 
-oppia.factory('stateDataFactory', function($rootScope, $http, warningsData) {
+oppia.factory('stateData', function($rootScope, $http, warningsData) {
   // Put state variables here.
   var stateData = {};
 
@@ -772,5 +772,5 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = ['$scope', '$http', '$timeout', '$location',
-    '$routeParams', 'stateDataFactory', 'explorationDataFactory', 'warningsData',
+    '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];

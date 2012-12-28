@@ -207,4 +207,4 @@ oppia.directive('stateTreeViz', function () {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorTree.$inject = ['$scope', '$http', 'explorationDataFactory'];
+EditorTree.$inject = ['$scope', '$http', 'explorationData'];

@@ -368,5 +368,5 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', 'stateDataFactory',
-    'explorationDataFactory', 'warningsData', 'activeInputData'];
+GuiEditor.$inject = ['$scope', '$http', 'stateData',
+    'explorationData', 'warningsData', 'activeInputData'];

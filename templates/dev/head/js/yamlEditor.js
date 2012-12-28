@@ -34,4 +34,4 @@ function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
   };
 }
 
-YamlEditor.$inject = ['$scope', '$http', 'stateDataFactory', 'explorationDataFactory', 'warningsData'];
+YamlEditor.$inject = ['$scope', '$http', 'stateData', 'explorationData', 'warningsData'];
