@@ -90,7 +90,7 @@ function EditorGraph($scope, $http, explorationData) {
 };
 
 
-oppia.directive('stateGraphViz', function () {
+oppia.directive('stateGraphViz', function (stateDataFactory) {
   // constants
   var w = 960,
       h = 400,
@@ -204,11 +204,10 @@ oppia.directive('stateGraphViz', function () {
             .attr("r", 30)
             .style("fill", function(d) {
               return "beige";
-              // TODO(sll): Break into cases based on whether it's an END state, the current state, etc.
-              return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
             })
             .on("click", function (d) {
-              // TODO(sll): Open the corresponding state editor.
+              $('#editorViewTab a[href="#stateEditor"]').tab('show');
+              stateDataFactory.getData(d.hashId);
             });
 
         nodeEnter.append("svg:text")
