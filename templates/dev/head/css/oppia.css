@@ -179,9 +179,6 @@ textarea.oppia-code {
 
 /* Graph styles */
 
-#oppia-state-graph-container {
-  padding-top: 70px;
-}
 #oppia-state-graph-canvas {
   padding-top: 40px;
   position: absolute;
@@ -258,35 +255,59 @@ textarea.oppia-code {
 }
 
 
-/* Styles for the force-directed graph (temporary). */
+/* Styles for the state graph vizualization. */
 
-path.link {
+.oppia-graph-viz path.link {
   fill: none;
   stroke: #666;
   stroke-width: 1.5px;
 }
 
-circle {
+.oppia-graph-viz circle {
+  cursor: pointer;
   fill: #ccc;
   stroke: #333;
   stroke-width: 1.5px;
 }
 
-text {
+.oppia-graph-viz text {
   font: 20px sans-serif;
   pointer-events: none;
 }
 
-text.shadow {
+.oppia-graph-viz text.shadow {
   stroke: #fff;
   stroke-width: 3px;
   stroke-opacity: .8;
 }
 
+.oppia-graph-viz .node rect {
+  cursor: pointer;
+  fill: #fff;
+  fill-opacity: .5;
+  stroke-width: 0px;
+}
 
-/* Styles for the indented tree graph. */
+/* Styles for the indented tree visualization. */
 
-.node rect {
+.oppia-tree-viz path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+.oppia-tree-viz text {
+  font: 20px sans-serif;
+  pointer-events: none;
+}
+
+.oppia-tree-viz text.shadow {
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-opacity: .8;
+}
+
+.oppia-tree-viz .node rect {
   cursor: pointer;
   fill: #fff;
   fill-opacity: .5;

@@ -37,7 +37,7 @@ function EditorGraph($scope, $http, explorationData) {
     var HORIZ_SPACING = 100;
     var VERT_SPACING = 200;
     var maxXDistPerLevel = {0: 50};
-    nodes[initStateId].y0 = 50;
+    nodes[initStateId].y0 = 10;
     nodes[initStateId].x0 = 50;
 
     while (queue.length > 0) {
@@ -107,6 +107,7 @@ oppia.directive('stateGraphViz', function (stateData) {
       var vis = d3.select(element[0]).append("svg:svg")
           .attr("width", w)
           .attr("height", h)
+          .attr("class", "oppia-graph-viz")
         .append("svg:g")
           .attr("transform", "translate(20,30)");
 
@@ -127,7 +128,7 @@ oppia.directive('stateGraphViz', function (stateData) {
 
         // Update the links
         var link = vis.selectAll("path.link")
-            .data(links, function(d) { console.log(d); return d; });
+            .data(links, function(d) { return d; });
 
         vis.append("svg:defs").selectAll('marker')
             .data(['arrowhead'])
@@ -179,7 +180,9 @@ oppia.directive('stateGraphViz', function (stateData) {
 
 
 
-        // Update the nodes…
+        // Update the nodes
+        // TODO(sll): Make the initial node a diamond shape, and adjust colors of
+        //     END nodes, and put a blue border around the current node.
         var node = vis.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
 

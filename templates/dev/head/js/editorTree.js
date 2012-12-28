@@ -78,6 +78,7 @@ oppia.directive('stateTreeViz', function (stateData) {
       var vis = d3.select(element[0]).append("svg:svg")
           .attr("width", w)
           .attr("height", h)
+          .attr("class", "oppia-tree-viz")
         .append("svg:g")
           .attr("transform", "translate(20,30)");
 
