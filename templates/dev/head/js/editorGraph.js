@@ -37,7 +37,7 @@ function EditorGraph($scope, $http, explorationData) {
     var HORIZ_SPACING = 100;
     var VERT_SPACING = 200;
     var maxXDistPerLevel = {0: 50};
-    nodes[initStateId].y0 = 0;
+    nodes[initStateId].y0 = 50;
     nodes[initStateId].x0 = 50;
 
     while (queue.length > 0) {
@@ -85,7 +85,7 @@ function EditorGraph($scope, $http, explorationData) {
     }
     console.log(links);
 
-    return {nodes: nodeList, links: links};
+    return {nodes: nodeList, links: links, initStateId: initStateId};
   };
 };
 
@@ -122,9 +122,10 @@ oppia.directive('stateGraphViz', function (stateData) {
         var source = newVal;
         var nodes = source.nodes;
         var links = source.links;
+        var initStateId = source.initStateId;
 
 
-        // Update the links…
+        // Update the links
         var link = vis.selectAll("path.link")
             .data(links, function(d) { console.log(d); return d; });
 
@@ -150,23 +151,11 @@ oppia.directive('stateGraphViz', function (stateData) {
             .style("stroke", "red")
             .attr("class", "link")
             .attr("d", function(d) {
-              // Uncomment the following if self-edges should be displayed.
-              /*
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return circle(d3.range(50));
-              }
-              */
-
-              // Elliptical arcs.
+              // Draw elliptical arcs.
               var dx = d.target.x0 - d.source.x0,
                   dy = d.target.y0 - d.source.y0,
                   dr = Math.sqrt(dx * dx + dy * dy);
               return "M" + d.source.x0 + "," + d.source.y0 + "A" + dr + "," + dr + " 0 0,1 " + d.target.x0 + "," + d.target.y0;
-            })
-            .attr("transform", function(d) {
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return "translate(" + (d.source.x0) + ", " + (d.source.y0 + radius) + ")";
-              }
             })
             .attr("marker-end", function(d) {
               if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
@@ -215,17 +204,29 @@ oppia.directive('stateGraphViz', function (stateData) {
             .attr("dx", function(d) { return d.x0; })
             .text(function(d) { return d.name; });
 
-        // Parameters for drawing a circle.
-        var radius = 40;
-        var angle = d3.scale.linear()
-            .domain([0, 49])
-            .range([0, 2 * Math.PI]);
-        var circle = d3.svg.line.radial()
-            .interpolate("basis")
-            .tension(0)
-            .radius(radius)
-            .angle(function(d, i) { return angle(i); });
+        nodeEnter.append("svg:rect")
+            .attr("y", function(d) { return d.y0; })
+            .attr("x", function(d) { return d.x0; })
+            .attr("height", 20)
+            .attr("width", 20)
+            .attr("transform", function(d) { return "translate(" + (20) + "," + (-30) + ")"; })
+            .attr("stroke-width", "0")
+            .on("click", function (d) {
+              if (d.hashId == initStateId) {
+                return;
+              }
+              scope.$parent.$parent.deleteState(d.hashId);
+            });
 
+        nodeEnter.append("svg:text")
+            .attr("dy", function(d) { return d.y0 - 20; })
+            .attr("dx", function(d) { return d.x0 + 20; })
+            .text(function(d) {
+              if (d.hashId == initStateId) {
+                return;
+              }
+              return 'x';
+            });
       });
     }
   }
