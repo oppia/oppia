@@ -26,7 +26,7 @@ function EditorGraph($scope, $http, explorationData) {
   // Reformat the model into a response that is processable by d3.js.
   $scope.reformatResponse = function(states, initStateId) {
     var SENTINEL_DEPTH = 3000;
-    var VERT_OFFSET = 10;
+    var VERT_OFFSET = 20;
     var HORIZ_SPACING = 100;
     var VERT_SPACING = 100;
     var nodes = {};
@@ -197,19 +197,24 @@ oppia.directive('stateGraphViz', function (stateData) {
 
 
         // Update the nodes
-        // TODO(sll): Make the initial node a diamond shape, and adjust colors of
-        //     END nodes, and put a blue border around the current node.
+        // TODO(sll): Put a blue border around the current node.
         var node = vis.selectAll("g.node")
             .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
         var nodeEnter = node.enter().append("svg:g")
             .attr("class", "node");
 
-        // Enter any new nodes at the parent's previous position.
+        // Add nodes to the canvas.
         nodeEnter.append("svg:circle")
             .attr("cy", function(d) { return d.y0; })
             .attr("cx", function(d) { return d.x0; })
-            .attr("r", 30)
+            .attr("r", function(d) {
+              if (d.hashId == initStateId) {
+                return 40;
+              } else {
+                return 30;
+              }
+            })
             .attr("class", function(d) {
               if (d.hashId != '-1') {
                 return "clickable";

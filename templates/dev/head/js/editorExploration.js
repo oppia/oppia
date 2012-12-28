@@ -511,8 +511,7 @@ function EditorExploration($scope, $http, $timeout, $location, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes saved successfully.');
-      stateData.getData($scope.stateId);
-      drawStateGraph($scope.states);
+      explorationData.getData();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
