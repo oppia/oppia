@@ -342,9 +342,8 @@ class StateHandler(BaseHandler):
 
     if self.request.get('state_content'):
       state_content = json.loads(self.request.get('state_content'))
-      # Remove empty content.
       state.content = [{'type': item['type'], 'value': item['value']}
-                       for item in state_content if item['value']]
+                       for item in state_content]
 
     if self.request.get('input_type'):
       # TODO(sll): Check whether the given input_type is a valid one.

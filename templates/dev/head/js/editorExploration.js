@@ -487,13 +487,6 @@ function EditorExploration($scope, $http, $location, $routeParams,
       return;
     }
 
-    // Remove null values from $scope.stateContent.
-    $scope.tempstateContent = [];
-    for (var i = 0; i < $scope.stateContent.length; ++i) {
-      if ($scope.stateContent[i]['value'])
-        $scope.tempstateContent.push($scope.stateContent[i]);
-    }
-
     var actionsForBackend = $scope.states[$scope.stateId].dests;
     for (var ind = 0;
          ind < $scope.states[$scope.stateId]['dests'].length; ++ind) {
@@ -506,7 +499,7 @@ function EditorExploration($scope, $http, $location, $routeParams,
     var requestParameters = {
         state_id: $scope.stateId,
         state_name: $scope.stateName,
-        state_content: JSON.stringify($scope.tempstateContent),
+        state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
         actions: JSON.stringify(actionsForBackend)
     };

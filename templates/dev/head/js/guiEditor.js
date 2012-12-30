@@ -69,14 +69,16 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     for (var i = 0; i < $scope.stateContent.length; ++i) {
       if ($scope.stateContent[i].type == 'widget') {
         var widgetFrameId = 'widgetPreview' + i;
-        $http.get('/widgets/' + $scope.stateContent[i].value).
-            success(function(data) {
-              $scope.widgetCode = data.raw;
-              $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-            }).error(function(data) {
-              warningsData.addWarning(
-                  'Widget could not be loaded: ' + String(data.error));
-            });
+        if ($scope.stateContent[i].value) {
+          $http.get('/widgets/' + $scope.stateContent[i].value).
+              success(function(data) {
+                $scope.widgetCode = data.raw;
+                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
+              }).error(function(data) {
+                warningsData.addWarning(
+                    'Widget could not be loaded: ' + String(data.error));
+              });
+        }
       }
     }
   });
@@ -324,16 +326,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
   });
 
   $scope.saveWidget = function(widgetCode, index) {
-    $scope.addContentToIframe('widgetPreview' + index, widgetCode);
-
-    // TODO(sll): This does not update the view value when widgetCode is
-    // called from the repository. Fix this.
-    $scope.widgetCode = widgetCode;
-    // TODO(sll): Escape widgetCode first!
-    // TODO(sll): Need to ensure that anything stored server-side cannot lead
-    //     to malicious behavior (e.g. the user could do his/her own POST
-    //     request). Get a security review done on this feature.
-
     var request = $.param(
         {'raw': JSON.stringify(widgetCode)},
         true
@@ -350,6 +342,9 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
       console.log(widgetData);
       $('#widgetTabs' + index + ' a:first').tab('show');
       $scope.stateContent[index].value = widgetData.widgetId;
+      $scope.$apply();
+      $scope.addContentToIframe('widgetPreview' + index, widgetCode);
+      $scope.widgetCode = widgetCode;
       $scope.saveStateChange('stateContent');
       // TODO(sll): Display multiple widget div's here.
       activeInputData.clear();
