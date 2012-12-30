@@ -59,58 +59,63 @@
       <h3 ng-show="newWidgetIsBeingAdded">Add new widget</h3>
       <h3 ng-hide="newWidgetIsBeingAdded">Edit this widget</h3>
     </div>
-    <div class="modal-body">
-      <div>
-        <!--Add error checking here. This cannot be empty.-->
-        Name: <input type="text" ng-model="modalWidget.name">
-      </div>
-      <div>
-        Category: <input type="text" ng-model="modalWidget.category">
-      </div>
-      <div>
-        Description:
-        <textarea ng-model="modalWidget.blurb">
-        </textarea>
-      </div>
 
-      <ul class="nav nav-tabs" id="modalTabs">
-        <li class="active"><a data-toggle="tab" href="#code">Code</a></li>
-        <li><a data-toggle="tab" href="#preview">Preview</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="code">
-          Widget parameters:
-          <div ng-repeat="param in modalWidget.params">
-            <ul>
-              <li>Name: <[param.name]></li>
-              <li>Description: <[param.description]></li>
-              <li>Type: <[param.type]></li>
-              <li>Default value: <[param.default]></li>
-            </ul>
-          </div>
-          <button ng-hide="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'" ng-click="addParam()">Add parameter</button>
-          <div ng-show="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'">
-            <ul>
-              <li>Name: <input type="text" ng-model="newParamName"></li>
-              <li>Description: <input type="text" ng-model="newParamDescription"></li>
-              <li>Type: <input type="text" ng-model="newParamType"></li>
-              <li>Default value: <input type="text" ng-model="newParamDefault"></li>
-            </ul>
-            <button ng-click="saveParam(modalWidget.params)">Save parameter</button>
-          </div>
-
-          <textarea class="oppia-code" ng-model="modalWidget.raw" rows="10">
+    <form name="saveWidgetForm" ng-submit="saveNewWidget(modalWidget)">
+      <div class="modal-body">
+        <div>
+          Name: <input type="text" ng-model="modalWidget.name" name="newWidgetName" required not-duplicate-widget>
+          <span ng-show="saveWidgetForm.newWidgetName.$error.notDuplicateWidget" class="alert">
+            This widget name is already in use.
+          </span>
+        </div>
+        <div>
+          Category: <input type="text" ng-model="modalWidget.category" required>
+        </div>
+        <div>
+          Description:
+          <textarea ng-model="modalWidget.blurb" required>
           </textarea>
         </div>
-        <div class="tab-pane" id="preview">
-          <iframe id="modalPreview" width="100%" frameborder="0"></iframe>
+
+        <ul class="nav nav-tabs" id="modalTabs">
+          <li class="active"><a data-toggle="tab" href="#code">Code</a></li>
+          <li><a data-toggle="tab" href="#preview">Preview</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="code">
+            Widget parameters:
+            <div ng-repeat="param in modalWidget.params">
+              <ul>
+                <li>Name: <[param.name]></li>
+                <li>Description: <[param.description]></li>
+                <li>Type: <[param.type]></li>
+                <li>Default value: <[param.default]></li>
+              </ul>
+            </div>
+            <button ng-hide="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'" ng-click="addParam()">Add parameter</button>
+            <div ng-show="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'">
+              <ul>
+                <li>Name: <input type="text" ng-model="newParamName"></li>
+                <li>Description: <input type="text" ng-model="newParamDescription"></li>
+                <li>Type: <input type="text" ng-model="newParamType"></li>
+                <li>Default value: <input type="text" ng-model="newParamDefault"></li>
+              </ul>
+              <button ng-click="saveParam(modalWidget.params)">Save parameter</button>
+            </div>
+
+            <textarea class="oppia-code" ng-model="modalWidget.raw" rows="10" required>
+            </textarea>
+          </div>
+          <div class="tab-pane" id="preview">
+            <iframe id="modalPreview" width="100%" frameborder="0"></iframe>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="modal-footer" ng-show="newWidgetIsBeingAdded">
-      <a class="btn" ng-click="saveNewWidget(modalWidget)">Save</a>
-    </div>
+      <div class="modal-footer" ng-show="newWidgetIsBeingAdded">
+        <input type="submit" class="btn" value="Save">
+      </div>
+    </form>
 
   </div>
 

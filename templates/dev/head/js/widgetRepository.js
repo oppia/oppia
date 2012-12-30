@@ -1,3 +1,23 @@
+oppia.directive('notDuplicateWidget', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$parsers.unshift(function(viewValue) {
+        for (category in scope.widgets) {
+          for (var i = 0; i < scope.widgets[category].length; ++i) {
+            if (scope.widgets[category][i].name == viewValue) {
+              ctrl.$setValidity('notDuplicateWidget', false);
+              return undefined;
+            }
+          }
+        }
+        ctrl.$setValidity('notDuplicateWidget', true);
+        return viewValue;
+      });
+    }
+  };
+});
+
 function WidgetRepository($scope, $http, activeInputData) {
   $scope.widgetDataUrl = '/widgetrepository/data/';
   $scope.widgetParams = [];
@@ -110,10 +130,6 @@ function WidgetRepository($scope, $http, activeInputData) {
   };
 
   $scope.saveNewWidget = function(widget) {
-    console.log(widget);
-    // TODO(sll): Check that the name, raw and category are non-empty.
-    // Also, check that the name is not a duplicate.
-
     var request = $.param(
       {'widget': JSON.stringify(widget)},
       true
