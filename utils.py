@@ -245,13 +245,17 @@ def ParseContentIntoHtml(content_array, block_number):
       raise InvalidInputException(
           'Content type for content_array %s does not exist', content_array)
     if content['type'] == 'widget':
-      widget = GetEntity(models.Widget, content['value'])
-      widget_counter += 1
-      html += base.JINJA_ENV.get_template('content.html').render({
-          'type': content['type'], 'blockIndex': block_number,
-          'index': widget_counter})
-      widget_array.append({'blockIndex': block_number, 'index': widget_counter,
-          'code': widget.raw})
+      try:
+        widget = GetEntity(models.Widget, content['value'])
+        widget_counter += 1
+        html += base.JINJA_ENV.get_template('content.html').render({
+            'type': content['type'], 'blockIndex': block_number,
+            'index': widget_counter})
+        widget_array.append({'blockIndex': block_number, 'index': widget_counter,
+            'code': widget.raw})
+      except EntityIdNotFoundError:
+        # Ignore empty widget content.
+        pass
     elif (content['type'] in ['text', 'image', 'video']):
       html += base.JINJA_ENV.get_template('content.html').render({
           'type': content['type'], 'value': content['value']})

@@ -1,8 +1,21 @@
 function ReaderExploration($scope, $http, $timeout, warningsData) {
   // The pathname is expected to be: /[exploration_id]
-  var pathnameArray = window.location.pathname.split('/');
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
+
+  // Initializes the story page using data from the server.
+  $scope.initializePage = function() {
+    $http.get($scope.explorationDataUrl)
+        .success(function(data) {
+          $scope.explorationTitle = data.title;
+          $scope.loadPage(data);
+        }).error(function(data) {
+          warningsData.addWarning(
+              data.error || 'There was an error loading the story.');
+        });
+  };
+
+  $scope.initializePage();
 
   $scope.loadPage = function(data) {
     console.log(data);
@@ -21,16 +34,6 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
           data.widgets[0].index, data.widgets[0].code);
     }
   };
-
-  // Initializes the story page using data from the server.
-  $http.get($scope.explorationDataUrl)
-      .success(function(data) {
-        $scope.explorationTitle = data.title;
-        $scope.loadPage(data);
-      }).error(function(data) {
-        warningsData.addWarning(
-            data.error || 'There was an error loading the story.');
-      });
 
   $scope.submitAnswer = function() {
     $http.post(
