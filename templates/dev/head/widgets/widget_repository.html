@@ -88,17 +88,32 @@
               <ul>
                 <li>Name: <[param.name]></li>
                 <li>Description: <[param.description]></li>
-                <li>Type: <[param.type]></li>
+                <li>Type:
+                  <select ng-model="param.type">
+                    <option value="boolean">boolean</option>
+                    <option value="number">number</option>
+                    <option value="string">string</option>
+                  </select>
+                </li>
                 <li>Default value: <[param.default]></li>
               </ul>
             </div>
             <button ng-hide="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'" ng-click="addParam()">Add parameter</button>
             <div ng-show="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'">
               <ul>
-                <li>Name: <input type="text" ng-model="newParamName"></li>
-                <li>Description: <input type="text" ng-model="newParamDescription"></li>
-                <li>Type: <input type="text" ng-model="newParamType"></li>
-                <li>Default value: <input type="text" ng-model="newParamDefault"></li>
+                <li>Name: <input type="text" ng-model="newParamName" required></li>
+                <li>Description: <input type="text" ng-model="newParamDescription" required></li>
+                <li>Type:
+                  <select ng-model="newParamType" required>
+                    <option value="boolean">boolean</option>
+                    <option value="number">number</option>
+                    <option value="string">string</option>
+                  </select>
+                </li>
+                <li>Default value: <input type="text" ng-model="newParamDefault" name="newParamDefault" ui-validate="{hasCorrectType: checkHasCorrectType}"></li>
+                <span ng-show="saveWidgetForm.newParamDefault.$error.hasCorrectType" class="alert">
+                  This default value is not of the required type.
+                </span>
               </ul>
               <button ng-click="saveParam(modalWidget.params)">Save parameter</button>
             </div>

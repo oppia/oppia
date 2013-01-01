@@ -129,6 +129,15 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.modalWidget = {params: [], blurb: '', name: '', raw: '', category: ''};
   };
 
+  $scope.checkHasCorrectType = function(viewValue) {
+    if (($scope.newParamType == 'boolean' && viewValue != 'true' && viewValue != 'false') ||
+        ($scope.newParamType == 'number' && (isNaN(parseFloat(Number(viewValue))) || !isFinite(Number(viewValue)))) ||
+        ($scope.newParamType == 'string' && typeof String(viewValue) != 'string')) {
+      return false;
+    }
+    return true;
+  };
+
   $scope.saveNewWidget = function(widget) {
     var request = $.param(
       {'widget': JSON.stringify(widget)},
