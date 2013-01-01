@@ -125,6 +125,7 @@ class ActionSet(ndb.Model):
   # dest_exploration and dest are specified, dest_exploration takes precedence. But
   # dest should equal dest_exploration.init_state.
   # TODO(sll): Implement automatic checking of this constraint.
+  # TODO(sll): What happens to this if the destination exploration is deleted?
   dest_exploration = ndb.KeyProperty(kind=Exploration)
   # The destination state id that the reader should be sent to. It is None if
   # this action leads to an END state.

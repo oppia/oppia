@@ -184,6 +184,26 @@ class ExplorationPage(BaseHandler):
       exploration.image_id = image_id
     exploration.put()
 
+  def delete(self, exploration_id):
+    """Deletes an exploration.
+
+    Args:
+      exploration_id: string representing the exploration id.
+    """
+    user, exploration = self.GetUserAndExploration(exploration_id)
+    for state_key in exploration.states:
+      for action_set_key in state_key.get().action_sets:
+        action_set_key.delete()
+      state_key.delete()
+
+    augmented_users = models.AugmentedUser.query().filter(
+        models.AugmentedUser.editable_explorations == exploration.key)
+    for augmented_user in augmented_users:
+      augmented_user.editable_explorations.remove(exploration.key)
+      augmented_user.put()
+
+    exploration.key.delete()
+
 
 class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""

@@ -519,6 +519,13 @@ function EditorExploration($scope, $http, $location, $routeParams,
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
   };
+
+  $scope.deleteExploration = function() {
+    $http.delete($scope.explorationUrl)
+    .success(function(data) {
+      window.location = '/create/';
+    });
+  };
 }
 
 /**
