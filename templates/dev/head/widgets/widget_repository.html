@@ -48,11 +48,10 @@
   <div ui-modal class="fade" id="editWidgetModal" ng-model="editWidgetModal">
     <div class="modal-header">
       <button ng-hide="newWidgetIsBeingAdded" type="button" class="close" data-dismiss="modal" aria-hidden="true"
-              ng-click="closeEditorModal(modalWidget)">
+              ng-click="saveEditedWidget(modalWidget)">
         &times;
       </button>
-      <button ng-show="newWidgetIsBeingAdded" type="button" class="close" data-dismiss="modal" aria-hidden="true"
-              ng-click="closeEditorModal()">
+      <button ng-show="newWidgetIsBeingAdded" type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;
       </button>
 
@@ -63,17 +62,17 @@
     <form name="saveWidgetForm" ng-submit="saveNewWidget(modalWidget)">
       <div class="modal-body">
         <div>
-          Name: <input type="text" ng-model="modalWidget.name" name="newWidgetName" required not-duplicate-widget>
+          Name: <input type="text" ng-model="modalWidget.name" name="newWidgetName" not-duplicate-widget>
           <span ng-show="saveWidgetForm.newWidgetName.$error.notDuplicateWidget" class="alert">
             This widget name is already in use.
           </span>
         </div>
         <div>
-          Category: <input type="text" ng-model="modalWidget.category" required>
+          Category: <input type="text" ng-model="modalWidget.category">
         </div>
         <div>
           Description:
-          <textarea ng-model="modalWidget.blurb" required>
+          <textarea ng-model="modalWidget.blurb">
           </textarea>
         </div>
 
@@ -84,38 +83,86 @@
         <div class="tab-content">
           <div class="tab-pane active" id="code">
             Widget parameters:
-            <div ng-repeat="param in modalWidget.params">
-              <ul>
-                <li>Name: <[param.name]></li>
-                <li>Description: <[param.description]></li>
-                <li>Type:
+            <ul ng-repeat="param in modalWidget.params">
+              <li ng-hide="activeInputData.name == 'modalWidget.widgetParam.' + $index" ng-click="initializeWidgetParamEditor($index)">
+                <[param.name]> (<[param.type]>): <[param.default]>
+              </li>
+
+              <div ng-show="activeInputData.name == 'modalWidget.widgetParam.' + $index" style="border: 1px solid black">
+                <span>Name: <input type="text" ng-model="param.name"></span>
+                <span>Type:
                   <select ng-model="param.type">
                     <option value="boolean">boolean</option>
                     <option value="number">number</option>
                     <option value="string">string</option>
                   </select>
-                </li>
-                <li>Default value: <[param.default]></li>
-              </ul>
-            </div>
-            <button ng-hide="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'" ng-click="addParam()">Add parameter</button>
-            <div ng-show="activeInputData.name.substring(0, 23) == 'modalWidget.widgetParam'">
-              <ul>
-                <li>Name: <input type="text" ng-model="newParamName" required></li>
-                <li>Description: <input type="text" ng-model="newParamDescription" required></li>
-                <li>Type:
-                  <select ng-model="newParamType" required>
-                    <option value="boolean">boolean</option>
-                    <option value="number">number</option>
-                    <option value="string">string</option>
-                  </select>
-                </li>
-                <li>Default value: <input type="text" ng-model="newParamDefault" name="newParamDefault" ui-validate="{hasCorrectType: checkHasCorrectType}"></li>
-                <span ng-show="saveWidgetForm.newParamDefault.$error.hasCorrectType" class="alert">
-                  This default value is not of the required type.
                 </span>
-              </ul>
-              <button ng-click="saveParam(modalWidget.params)">Save parameter</button>
+                <br>
+                <div>Description: <input type="text" ng-model="param.description"></div>
+                <span>Default value:
+                  <span ng-switch on="param.type">
+                    <span ng-switch-when="boolean">
+                      <label class="radio inline">
+                        <input ng-model="param.default" value="true" type="radio">
+                        True
+                      </label>
+                      <label class="radio inline">
+                        <input ng-model="param.default" value="false" type="radio">
+                        False
+                      </label>
+                    </span>
+                    <span ng-switch-when="number">
+                      <input type="number" ng-model="param.default">
+                    </span>
+                    <span ng-switch-default>
+                      <input type="text" ng-model="param.default">
+                    </span>
+                  </span>
+                </span>
+                <br>
+                <button type="button" ng-click="hideWidgetParamEditor()">Close</button>
+                <button type="button" class="btn btn-danger" ng-click="deleteParam(modalWidget, $index)">Delete Parameter</button>
+              </div>
+
+            </ul>
+
+            <button type="button" ng-hide="activeInputData.name == 'modalWidget.widgetParam.' + modalWidget.params.length" ng-click="addParam(modalWidget)">
+              Add parameter
+            </button>
+
+            <div ng-show="activeInputData.name == 'modalWidget.widgetParam.' + modalWidget.params.length">
+              <span>Name: <input type="text" ng-model="newParamName"></span>
+              <span>Type:
+                <select ng-model="newParamType">
+                  <option value="boolean">boolean</option>
+                  <option value="number">number</option>
+                  <option value="string">string</option>
+                </select>
+              </span>
+              <br>
+              <div>Description: <input type="text" ng-model="newParamDescription"></div>
+              <span>Default value:
+                <span ng-switch on="newParamType">
+                  <span ng-switch-when="boolean">
+                    <label class="radio inline">
+                      <input ng-model="newParamDefault" value="true" type="radio">
+                      True
+                    </label>
+                    <label class="radio inline">
+                      <input ng-model="newParamDefault" value="false" type="radio">
+                      False
+                    </label>
+                  </span>
+                  <span ng-switch-when="number">
+                    <input type="number" ng-model="newParamDefault">
+                  </span>
+                  <span ng-switch-default>
+                    <input type="text" ng-model="newParamDefault">
+                  </span>
+                </span>
+              </span>
+              <br>
+              <button type="button" ng-click="saveParam(modalWidget)">Save parameter</button>
             </div>
 
             <textarea class="oppia-code" ng-model="modalWidget.raw" rows="10" required>
@@ -160,7 +207,25 @@
       </p>
       <form>
         <div ng-repeat="param in widgets[customizeCategory][customizeIndex].params">
-          <[param.name]>: <input type="text" placeholder="<[param.default]>" ng-model="customizedParams[param.name]">
+          <[param.name]>:
+          <span ng-switch on="param.type">
+            <span ng-switch-when="boolean">
+              <label class="radio inline">
+                <input ng-model="customizedParams[param.name]" value="true" type="radio">
+                True
+              </label>
+              <label class="radio inline">
+                <input ng-model="customizedParams[param.name]" value="false" type="radio">
+                False
+              </label>
+            </span>
+            <span ng-switch-when="number">
+              <input type="number" ng-model="customizedParams[param.name]" placeholder="<[param.default]>">
+            </span>
+            <span ng-switch-default>
+              <input type="text" ng-model="customizedParams[param.name]" placeholder="<[param.default]>">
+            </span>
+          </span>
         </div>
       </form>
     </div>

@@ -54,7 +54,11 @@ function WidgetRepository($scope, $http, activeInputData) {
       if (customValues && (params[i].name in customValues)) {
         val = customValues[params[i].name];
       }
-      result += 'var ' + params[i].name + ' = ' + val + ';\n';
+      if (params[i].type == 'string') {
+        result += 'var ' + params[i].name + ' = \'' + val + '\';\n';
+      } else {
+        result += 'var ' + params[i].name + ' = ' + val + ';\n';
+      }
     }
     result += '<\/script>';
     return result;
@@ -65,12 +69,12 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.loadPage(data);
   });
 
-  $scope.addParam = function(index) {
-    activeInputData.name = 'modalWidget.widgetParam.' + $scope.widgetParams.length;
+  $scope.addParam = function(widget) {
+    activeInputData.name = 'modalWidget.widgetParam.' + widget.params.length;
   };
 
-  $scope.saveParam = function(params) {
-    params.push({
+  $scope.saveParam = function(widget) {
+    widget.params.push({
         'name': $scope.newParamName, 'description': $scope.newParamDescription,
         'type': $scope.newParamType, 'default': $scope.newParamDefault
     });
@@ -79,6 +83,17 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.newParamType = '';
     $scope.newParamDefault = '';
     activeInputData.name = 'modalWidget';
+    if (!$scope.newWidgetIsBeingAdded) {
+      $scope.saveEditedWidget(widget);
+    }
+  };
+
+  $scope.deleteParam = function(widget, index) {
+    widget.params.splice(index, 1);
+    activeInputData.name = 'modalWidget';
+    if (!$scope.newWidgetIsBeingAdded) {
+      $scope.saveEditedWidget(widget);
+    }
   };
 
   // Clears the "new widget" indication when the modal window is closed.
@@ -98,7 +113,7 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.modalWidget = widget;
   };
 
-  $scope.closeEditorModal = function(widget) {
+  $scope.saveEditedWidget = function(widget) {
     if (widget) {
       var request = $.param(
         {'widget': JSON.stringify(widget)},
@@ -127,15 +142,6 @@ function WidgetRepository($scope, $http, activeInputData) {
     $('#editWidgetModal').modal();
     $('#modalTabs a[href="#code"]').tab('show');
     $scope.modalWidget = {params: [], blurb: '', name: '', raw: '', category: ''};
-  };
-
-  $scope.checkHasCorrectType = function(viewValue) {
-    if (($scope.newParamType == 'boolean' && viewValue != 'true' && viewValue != 'false') ||
-        ($scope.newParamType == 'number' && (isNaN(parseFloat(Number(viewValue))) || !isFinite(Number(viewValue)))) ||
-        ($scope.newParamType == 'string' && typeof String(viewValue) != 'string')) {
-      return false;
-    }
-    return true;
   };
 
   $scope.saveNewWidget = function(widget) {
@@ -198,6 +204,14 @@ function WidgetRepository($scope, $http, activeInputData) {
         $scope.widgets[category][index].params, $scope.customizedParams) +
         $scope.widgets[category][index].raw;
     window.parent.postMessage(rawCode, '*');
+  };
+
+  $scope.initializeWidgetParamEditor = function(index) {
+    activeInputData.name = 'modalWidget.widgetParam.' + index;
+  };
+
+  $scope.hideWidgetParamEditor = function(index) {
+    activeInputData.name = 'modalWidget';
   };
 }
 

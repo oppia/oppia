@@ -48,18 +48,18 @@ class WidgetRepositoryPage(base.BaseHandler):
       raise self.InvalidInputException('No widget supplied')
     widget_data = json.loads(widget_data)
 
-    if raw not in widget_data:
+    if 'raw' not in widget_data:
       raise self.InvalidInputException('No widget code supplied')
-    if name not in widget_data:
+    if 'name' not in widget_data:
       raise self.InvalidInputException('No widget name supplied')
-    if category not in widget_data:
+    if 'category' not in widget_data:
       raise self.InvalidInputException('No widget category supplied')
 
     raw = widget_data['raw']
     name = widget_data['name']
     category = widget_data['category']
     if utils.CheckExistenceOfName(models.GenericWidget, name):
-      raise self.InvalidInputException('A widget with name %s already exists' % s)
+      raise self.InvalidInputException('A widget with name %s already exists' % name)
 
     blurb = widget_data['blurb']
     params = widget_data['params']
