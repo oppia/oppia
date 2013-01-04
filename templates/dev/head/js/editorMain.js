@@ -4,7 +4,7 @@ function EditorMain($scope, $http, warningsData) {
    */
   $scope.createNewExploration = function() {
     $http.get(
-        'create_new',
+        '/create_new',
         '',
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
