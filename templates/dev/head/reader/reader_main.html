@@ -18,16 +18,20 @@
               <h4>{{category}}</h4>
               <hr>
               <ul class="thumbnails">
-                <!-- placeholder for real data on explorations -->
                 {% for exploration in categories[category].explorations %}
                   <li class="span3">
                     <div class="thumbnail">
                       <a href="/learn/{{exploration.hash_id}}">
-                        <img src="http://placehold.it/300x200" alt="Image placeholder">
+                        {% if exploration.image_id %}
+                          <img src="/imagehandler/{{exploration.image_id}}" class="oppia-large-image"></img>
+                        {% else %}
+                          <img src="http://placehold.it/300x200" alt="Image placeholder">
+                        {% endif %}
                       </a>
                       <div>
                         <h5>{{exploration.title}}</h5>
                         <a ng-click="showModal('{{exploration.hash_id}}')">Embed</a>
+                      </div>
                     </div>
                   </li>
                 {% endfor %}
