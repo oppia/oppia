@@ -157,13 +157,7 @@ class ImportPage(editor.BaseHandler):
     # TODO(sll): Deal with input_view.widget here (and handle its verification above).
     dests_array = []
 
-    content = []
-    for dic in description['content']:
-      content_item = {}
-      for key, val in dic.iteritems():
-        content_item['type'] = key
-        content_item['value'] = val
-        content.append(content_item)
+    content = description['content']
 
     # Retrieve the actions corresponding to this state.
     category_list = classifiers.GetCategoryList(
