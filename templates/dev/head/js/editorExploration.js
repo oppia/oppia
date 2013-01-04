@@ -424,7 +424,6 @@ function EditorExploration($scope, $http, $location, $routeParams,
     }
 
     $scope.states[$scope.stateId].desc = $scope.stateName;
-    editStateVertexName($scope.stateId, $scope.stateName);
     $scope.saveStateChange('states');
     $scope.saveStateChange('stateName');
     activeInputData.clear();

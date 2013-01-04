@@ -29,6 +29,7 @@ function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
               // TODO(sll): Try and do this refresh without requiring an
               // update from the backend.
               stateData.getData($scope.$parent.stateId);
+              explorationData.getData();
             }).error(function(data) {
               warningsData.addWarning(data.error ||
                   'Error: Could not add new state.');
