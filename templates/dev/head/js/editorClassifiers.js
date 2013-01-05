@@ -258,7 +258,7 @@ function TextClassifierEditor($scope, activeInputData) {
     //currently normalizing all text to be lowercase
     //so that comparisons aren't case-sensistive
     newCategoryText = $scope.normalizeText(newCategoryText);
-    var newCategoryName = newCategoryType + ' "' + newCategoryText + '"';
+    var newCategoryName = 'Answer ' + newCategoryType + ' "' + newCategoryText + '"';
     if (!newCategoryName || $scope.isDuplicateArrayInput(
             $scope.states[$scope.stateId]['dests'],
             'category', null, newCategoryName))
