@@ -20,6 +20,12 @@
           <option ng-selected="states[stateId]['dests'][$index].category.indexOf('Answer does not contain') == 0">
             Answer does not contain
           </option>
+          <option ng-selected="states[stateId]['dests'][$index].category.indexOf('Answer starts with') == 0">
+            Answer starts with
+          </option>
+          <option ng-selected="states[stateId]['dests'][$index].category.indexOf('Answer does not start with') == 0">
+            Answer does not start with
+          </option>
         </select>
         <input type="text" ng-model="newTmpCategory" placeholder="Add text" autofocus required>
         <input type="submit" value="Save">
@@ -72,6 +78,8 @@
       <select ng-model="newTmpType" required>
         <option ng-selected="true">contains</option>
         <option>does not contain</option>
+        <option>starts with</option>
+        <option>does not start with</option>
       </select>
       <input type="text" ng-model="newTmpCategory" placeholder="Add text" autofocus required>
       <input type="submit" value="Submit">
