@@ -64,7 +64,7 @@ oppia.config(['$routeProvider', function($routeProvider) {
            {templateUrl: '/templates/gui', controller: GuiEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/templates/gui', controller: GuiEditor}).
-      when('/', {}).
+      when('/', {templateUrl: '/templates/yaml', controller: ExplorationTab}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -168,6 +168,11 @@ oppia.run(function($rootScope) {
   });
 });
 
+
+function ExplorationTab($scope) {
+  // Changes the tab to the Exploration Editor view.
+  $('#editorViewTab a[href="#explorationEditor"]').tab('show');
+};
 
 function EditorExploration($scope, $http, $location, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
@@ -533,3 +538,4 @@ function EditorExploration($scope, $http, $location, $routeParams,
 EditorExploration.$inject = ['$scope', '$http', '$location',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
+ExplorationTab.$inject = ['$scope'];
