@@ -12,9 +12,18 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
   exit 1
 fi
 
-RUNTIME_HOME=/tmp/oppia/internal/runtime
+RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME
+
+echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
+if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
+  echo Installing Google App Engine
+  mkdir -p $GOOGLE_APP_ENGINE_HOME
+  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
+  unzip gae-download.zip -d $RUNTIME_HOME/
+  rm gae-download.zip
+fi
 
 echo Checking whether angular-ui is installed in third_party
 if [ ! -d "third_party/angular-ui" ]; then
@@ -42,21 +51,6 @@ if [ ! -d "third_party/closure-compiler" ]; then
   wget http://closure-compiler.googlecode.com/files/compiler-latest.zip -O closure-compiler-download.zip
   unzip closure-compiler-download.zip -d third_party/closure-compiler
   rm closure-compiler-download.zip
-fi
-
-echo Checking whether GAE is installed in third_party
-if [ ! -d "third_party/google_appengine" ]; then
-  echo Installing Google App Engine
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
-  unzip gae-download.zip -d third_party
-  rm gae-download.zip
-fi
-
-echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
-if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
-  echo Copying GAE to runtime folder
-  mkdir -p $GOOGLE_APP_ENGINE_HOME/
-  cp -r third_party/google_appengine/* $GOOGLE_APP_ENGINE_HOME/
 fi
 
 echo Checking whether jquery is installed in third_party
