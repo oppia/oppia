@@ -192,7 +192,7 @@ function EditorExploration($scope, $http, $location, $routeParams,
   };
 
   /**
-   * Changes the editor mode.
+   * Changes the state editor mode.
    * @param {string} mode The state editor mode to switch to (currently, gui or text).
    */
   $scope.changeMode = function(mode) {
@@ -212,6 +212,7 @@ function EditorExploration($scope, $http, $location, $routeParams,
       $scope.changeMode($scope.getMode());
     } else {
       $location.path('');
+      explorationData.getData();
     }
     $scope.$apply();
   });
@@ -518,7 +519,6 @@ function EditorExploration($scope, $http, $location, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes saved successfully.');
-      explorationData.getData();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
