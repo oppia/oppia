@@ -82,7 +82,8 @@
         </ul>
         <div class="tab-content">
           <div class="tab-pane active" id="code">
-            Widget parameters:
+            Widget parameters (you can refer to these in your code as {{ "{{param_name}}" }}; do not
+            use {{ "{{" }} and {{ "}}" }} anywhere else)
             <ul ng-repeat="param in modalWidget.params">
               <li ng-hide="activeInputData.name == 'modalWidget.widgetParam.' + $index" ng-click="initializeWidgetParamEditor($index)">
                 <[param.name]> (<[param.type]>): <[param.default]>
@@ -145,19 +146,19 @@
                 <span ng-switch on="newParamType">
                   <span ng-switch-when="boolean">
                     <label class="radio inline">
-                      <input ng-model="newParamDefault" value="true" type="radio">
+                      <input ng-model="$parent.newParamDefault" value="true" type="radio">
                       True
                     </label>
                     <label class="radio inline">
-                      <input ng-model="newParamDefault" value="false" type="radio">
+                      <input ng-model="$parent.newParamDefault" value="false" type="radio">
                       False
                     </label>
                   </span>
                   <span ng-switch-when="number">
-                    <input type="number" ng-model="newParamDefault">
+                    <input type="number" ng-model="$parent.newParamDefault">
                   </span>
                   <span ng-switch-default>
-                    <input type="text" ng-model="newParamDefault">
+                    <input type="text" ng-model="$parent.newParamDefault">
                   </span>
                 </span>
               </span>

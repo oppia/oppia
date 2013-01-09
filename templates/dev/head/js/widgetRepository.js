@@ -40,27 +40,27 @@ function WidgetRepository($scope, $http, activeInputData) {
         $scope.$apply();
         $scope.fillFrame(
             'widget-' + category + '-' + i,
-            $scope.createPreamble($scope.widgets[category][i].params, null) + rawCode);
+            $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
       }
     }
   };
 
-  // Creates the initial JavaScript for a widget, based on the parameters in
-  // params.
-  $scope.createPreamble = function(params, customValues) {
-    var result = '<script>';
+  // Creates the final, parameterized code for a widget.
+  $scope.createCustomizedCode = function(params, customValues, rawCode) {
+    var result = rawCode;
     for (var i = 0; i < params.length; i++) {
       var val = params[i]['default'];
       if (customValues && (params[i].name in customValues)) {
         val = customValues[params[i].name];
       }
-      if (params[i].type == 'string') {
-        result += 'var ' + params[i].name + ' = \'' + val + '\';\n';
-      } else {
-        result += 'var ' + params[i].name + ' = ' + val + ';\n';
-      }
+      // TODO(sll): Figure out whether to add single quotes around a string
+      // using "formattedVal = '\'' + val + '\''". Currently we don't.
+      var formattedVal = val;
+      // The following regex matches {{, then arbitrary whitespace, then the
+      // parameter name, then arbitrary whitespace, then }}.
+      result = result.replace(
+          new RegExp('{{\\s*' + params[i].name + '\\s*}}', 'g'), formattedVal);
     }
-    result += '<\/script>';
     return result;
   };
 
@@ -78,6 +78,7 @@ function WidgetRepository($scope, $http, activeInputData) {
         'name': $scope.newParamName, 'description': $scope.newParamDescription,
         'type': $scope.newParamType, 'default': $scope.newParamDefault
     });
+    console.log(widget.params);
     $scope.newParamName = '';
     $scope.newParamDescription = '';
     $scope.newParamType = '';
@@ -105,7 +106,7 @@ function WidgetRepository($scope, $http, activeInputData) {
   $('#modalTabs a[href="#preview"]').on('show', function (e) {
     $scope.addContentToIframe(
       'modalPreview',
-      $scope.createPreamble($scope.modalWidget.params, null) + $scope.modalWidget.raw);
+      $scope.createCustomizedCode($scope.modalWidget.params, null, $scope.modalWidget.raw));
   });
 
   $scope.editWidget = function(widget) {
@@ -128,9 +129,11 @@ function WidgetRepository($scope, $http, activeInputData) {
         var category = widgetData.widget.category;
         for (var i = 0; i < $scope.widgets[category].length; ++i) {
           if ($scope.widgets[category][i].name == widgetData.widget.name) {
-            var widgetCode = $scope.widgets[category][i].raw;
+            var rawCode = $scope.widgets[category][i].raw;
             $scope.$apply();
-            $scope.fillFrame('widget-' + category + '-' + i, widgetCode);
+            $scope.fillFrame(
+                'widget-' + category + '-' + i,
+                $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
           }
         }
       });
@@ -185,11 +188,11 @@ function WidgetRepository($scope, $http, activeInputData) {
     var index = $scope.customizeIndex;
     console.log($scope.customizedParams);
     // Display the new widget, but DO NOT save the code.
-    var newRawCode = $scope.createPreamble(
-        $scope.widgets[category][index].params, $scope.customizedParams) +
-        $scope.widgets[category][index].raw;
+    var customizedCode = $scope.createCustomizedCode(
+        $scope.widgets[category][index].params, $scope.customizedParams,
+        $scope.widgets[category][index].raw);
     $scope.$apply();
-    $scope.fillFrame('widget-' + category + '-' + index, newRawCode);
+    $scope.fillFrame('widget-' + category + '-' + index, customizedCode);
     $scope.closeCustomizeModal();
   };
 
@@ -200,10 +203,10 @@ function WidgetRepository($scope, $http, activeInputData) {
   };
 
   $scope.selectWidget = function(category, index) {
-    var rawCode = $scope.createPreamble(
-        $scope.widgets[category][index].params, $scope.customizedParams) +
-        $scope.widgets[category][index].raw;
-    window.parent.postMessage(rawCode, '*');
+    var customizedCode = $scope.createCustomizedCode(
+        $scope.widgets[category][index].params, $scope.customizedParams,
+        $scope.widgets[category][index].raw);
+    window.parent.postMessage(customizedCode, '*');
   };
 
   $scope.initializeWidgetParamEditor = function(index) {
