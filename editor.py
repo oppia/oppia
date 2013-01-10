@@ -26,6 +26,28 @@ EDITOR_MODE = 'editor'
 END_DEST = '-1'
 
 
+def GetStateAsDict(state):
+  """Gets a Python dict representation of a state."""
+  category_list = classifiers.GetCategoryList(
+        state.input_view.get().classifier, state.classifier_categories)
+  return {
+      'content': state.content,
+      'input_type': {'name': state.input_view.get().name},
+      'answers': [
+          {category_list[i]:
+              {'text': state.action_sets[i].get().text,
+               'dest': (state.action_sets[i].get().dest.get().name
+                        if state.action_sets[i].get().dest else 'END')}
+           }
+          for i in range(len(state.action_sets))],
+  }
+
+
+def GetYamlFromDict(dictionary):
+  """Gets the YAML representation of a dict."""
+  return yaml.safe_dump(dictionary, default_flow_style=False)
+
+
 class BaseHandler(base.BaseHandler):
   """Common methods for editor handlers."""
 
@@ -257,6 +279,25 @@ class ExplorationHandler(BaseHandler):
     self.response.out.write(json.dumps(self.data_values))
 
 
+class ExplorationDownloadHandler(BaseHandler):
+  """Downloads an exploration as a YAML file."""
+
+  def get(self, exploration_id):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user, exploration = self.GetUserAndExploration(exploration_id)
+    filename = str('oppia-%s' % exploration.title)
+
+    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.headers['Content-Disposition'] = (
+        'attachment; filename=%s.txt' % filename)
+    # TODO(sll): Cache the YAML file.
+    exploration_dict = {}
+    for state_key in exploration.states:
+      state = state_key.get()
+      exploration_dict[state.name] = GetStateAsDict(state)
+    self.response.out.write(GetYamlFromDict(exploration_dict))
+
+
 class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
@@ -325,18 +366,7 @@ class StatePage(BaseHandler):
         action['dest'] = action_set.dest.get().hash_id
       values['actions'].append(action)
 
-    values['yaml'] = yaml.safe_dump({
-        'content': state.content,
-        'input_type': {'name': state.input_view.get().name},
-        'answers': [
-            {category_list[i]:
-                {'text': state.action_sets[i].get().text,
-                 'dest': (state.action_sets[i].get().dest.get().name
-                          if state.action_sets[i].get().dest else 'END')}
-            }
-            for i in range(len(state.action_sets))],
-    }, default_flow_style=False)
-
+    values['yaml'] = GetYamlFromDict(GetStateAsDict(state))
     self.response.out.write(json.dumps(values))
 
 
@@ -466,6 +496,8 @@ class StateHandler(BaseHandler):
     exploration.put()
 
 
+
+# TODO(sll): Move the next two classes to a different file.
 class TemplateHandler(base.BaseHandler):
   """Retrieves an editor template."""
 

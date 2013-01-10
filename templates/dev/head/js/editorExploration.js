@@ -253,6 +253,13 @@ function EditorExploration($scope, $http, $location, $routeParams,
     $scope.saveExplorationProperty('explorationTitle', 'title', newValue, oldValue);
   });
 
+  /**
+   * Downloads the YAML representation of an exploration.
+   */
+  $scope.downloadExploration = function() {
+    document.location = '/create/download/' + $scope.explorationId;
+  };
+
   $scope.makePublic = function() {
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
   };

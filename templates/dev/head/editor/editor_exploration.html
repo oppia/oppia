@@ -57,12 +57,22 @@
                       </ng-switch>
                     </div>
 
+                    <div>
+                      <button type="button" ng-click="downloadExploration()">
+                        Download Exploration
+                      </button>
+                    </div>
+
+                    <br><br><br>
+
                     <div ng-hide="isPublic">
                       <button type="button" ng-click="makePublic()">
-                        Publish
+                        Publish Exploration
                       </button>
                       (irreversible)
                     </div>
+
+                    <br>
 
                     <div>
                       <button type="button" class="btn btn-danger" ng-click="deleteExploration()">
