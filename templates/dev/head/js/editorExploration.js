@@ -181,13 +181,14 @@ function EditorExploration($scope, $http, $location, $routeParams,
   * Methods affecting the URL location hash.
   ********************************************/
   /**
-   * Gets the current mode from the URL location hash.
+   * Gets the current mode from the URL location hash, with the GUI mode being
+   * the default.
    */
   $scope.getMode = function() {
-    if ($location.$$url.substring(0, GUI_EDITOR_URL.length) == GUI_EDITOR_URL) {
-      return GUI_EDITOR_URL.substring(1);
-    } else {
+    if ($location.$$url.substring(0, YAML_EDITOR_URL.length) == YAML_EDITOR_URL) {
       return YAML_EDITOR_URL.substring(1);
+    } else {
+      return GUI_EDITOR_URL.substring(1);
     }
   };
 
