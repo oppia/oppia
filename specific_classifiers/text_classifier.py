@@ -55,9 +55,6 @@ class TextClassifier(object):
     logging.info(categories)
     for index, category in enumerate(categories):
       logging.info(category)
-      logging.info(self.GetCategoryText(category))
-      logging.info(response)
-      logging.info(response.startswith(self.GetCategoryText(category)))
       if category.startswith('Answer contains'):
         if response.find(self.GetCategoryText(category)) != -1:
           return index
@@ -69,6 +66,12 @@ class TextClassifier(object):
           return index
       elif category.startswith('Answer does not start with'):
         if not response.startswith(self.GetCategoryText(category)):
+          return index
+      elif category.startswith('Answer is exactly'):
+        if response == self.GetCategoryText(category):
+          return index
+      elif category.startswith('Answer is not exactly'):
+        if response != self.GetCategoryText(category):
           return index
       else:
         raise utils.InvalidCategoryError(
