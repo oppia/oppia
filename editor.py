@@ -405,24 +405,18 @@ class StateHandler(BaseHandler):
 
     if self.request.get('actions'):
       actions = json.loads(self.request.get('actions'))
-      logging.info(actions)
-      classifier_categories = []
+      classifier_categories = [action['category'] for action in actions]
+
       input_view = state.input_view.get()
-      if input_view.name != 'none':
-        for action in actions:
-          classifier_categories.append(action['category'])
-      if (input_view.classifier != 'none' and
-          input_view.classifier != 'finite'):
-        if classifier_categories[-1] != utils.DEFAULT_CATEGORY:
+      if (input_view.classifier not in ['none', 'finite'] and
+              classifier_categories[-1] != utils.DEFAULT_CATEGORY):
           raise utils.InvalidCategoryError(
               'The last category in %s should be "%s".',
-              str(classifier_categories), utils.DEFAULT_CATEGORY)
-        classifier_categories.pop()
+              classifier_categories, utils.DEFAULT_CATEGORY)
       state.classifier_categories = classifier_categories
 
       # Retrieve the actions corresponding to this state.
-      num_categories = classifiers.GetNumCategories(
-          state.input_view.get().classifier, state.classifier_categories)
+      num_categories = len(state.classifier_categories)
       while len(state.action_sets) > num_categories:
         state.action_sets[-1].delete()
         state.action_sets = state.action_sets[:-1]

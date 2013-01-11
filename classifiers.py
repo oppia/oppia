@@ -55,29 +55,6 @@ def Classify(classifier_type, response, categories, params=None):
     logging.error('Unrecognized classifier type %s', str(classifier_type))
 
 
-def GetNumCategories(classifier_type, categories):
-  """Gets the number of categories, excluding the one for invalid input.
-
-  Args:
-    classifier_type: a string denoting the type of the classifier (e.g. numeric)
-    categories: the list of categories defined by the content creator that the
-        classifier can pick from
-
-  Returns:
-    the number of categories.
-  """
-  if classifier_type == classifiers.none:
-    return 1
-  elif classifier_type == classifiers.finite:
-    return len(categories)
-  elif (classifier_type == classifiers.numeric or
-        classifier_type == classifiers.set or
-        classifier_type == classifiers.text):
-    return len(categories) + 1
-  else:
-    logging.error('Unrecognized classifier type %s', str(classifier_type))
-
-
 def GetCategoryList(classifier_type, categories):
   """Gets the list of categories, excluding the one for invalid input.
 
