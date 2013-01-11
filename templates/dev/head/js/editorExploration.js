@@ -500,22 +500,12 @@ function EditorExploration($scope, $http, $location, $routeParams,
       return;
     }
 
-    var actionsForBackend = $scope.states[$scope.stateId].dests;
-    for (var ind = 0;
-         ind < $scope.states[$scope.stateId]['dests'].length; ++ind) {
-      actionsForBackend[ind]['category'] =
-          $scope.states[$scope.stateId]['dests'][ind].category;
-      actionsForBackend[ind]['dest'] =
-          $scope.states[$scope.stateId]['dests'][ind].dest;
-    }
-    console.log(actionsForBackend);
-
     var requestParameters = {
         state_id: $scope.stateId,
         state_name: $scope.stateName,
         state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
-        actions: JSON.stringify(actionsForBackend)
+        actions: JSON.stringify($scope.states[$scope.stateId].dests)
     };
 
     var request = $.param(requestParameters, true);
