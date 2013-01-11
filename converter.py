@@ -130,12 +130,10 @@ class ImportPage(editor.BaseHandler):
         base.JINJA_ENV.get_template('editor/editor_converter.html').render(self.values))
 
   def put(self, exploration_id):  # pylint: disable-msg=C6409
-    """Creates an exploration from a YAML file.
+    """Creates an exploration from a YAML file."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
+
     state_id = self.request.get('state_id')
     if not state_id:
       raise self.InvalidInputException('No state id received.')
@@ -159,9 +157,7 @@ class ImportPage(editor.BaseHandler):
 
     content = description['content']
 
-    # Retrieve the actions corresponding to this state.
-    category_list = state.classifier_categories
-
+    category_list = []
     action_set_list = []
     for index in range(len(description['answers'])):
       dests_array_item = {}
@@ -178,6 +174,7 @@ class ImportPage(editor.BaseHandler):
             dest_state = utils.CreateNewState(exploration, dest_name)
             dest_key = dest_state.key
 
+        category_list.append(key)
         dests_array_item['category'] = category_list[index]
         dests_array_item['text'] = val['text']
         dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
@@ -190,6 +187,7 @@ class ImportPage(editor.BaseHandler):
 
     state.input_view = input_view.key
     state.content = content
+    state.classifier_categories = category_list
     state.action_sets = action_set_list
     state.put()
 
