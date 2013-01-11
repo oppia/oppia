@@ -109,7 +109,7 @@ function EditorGraph($scope, $http, explorationData) {
 oppia.directive('stateGraphViz', function (stateData) {
   // constants
   var w = 960,
-      h = 400,
+      h = 4000,
       i = 0,
       duration = 400;
 

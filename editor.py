@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import datetime, json, logging, os, yaml
+import datetime, json, logging, os
 import base, classifiers, feconf, main, models, reader, utils
 
 from google.appengine.api import users
@@ -42,50 +42,45 @@ def GetStateAsDict(state):
   }
 
 
-def GetYamlFromDict(dictionary):
-  """Gets the YAML representation of a dict."""
-  return yaml.safe_dump(dictionary, default_flow_style=False)
-
-
 class BaseHandler(base.BaseHandler):
   """Common methods for editor handlers."""
 
   def CheckAuth(self, user, exploration):
-    """Checks if the user has credentials to access the given exploration.
+    """Checks if the user has edit access to the given exploration."""
 
-    Args:
-        user: the current user
-        exploration: the exploration
-
-    Returns:
-        True, if the user has edit access to the given exploration; False otherwise.
-    """
     return exploration.key in utils.GetAugmentedUser(user).editable_explorations
 
-  def GetUserAndExploration(self, exploration_id):
-    """Returns the user and exploration id if the user has the right credentials.
+  def GetUser(self):
+    """Returns the user, or throws self.NotLoggedInException if there isn't one."""
 
-    Args:
-        exploration_id: the id of the exploration
+    user = users.get_current_user()
+    if not user:
+      raise self.NotLoggedInException
+    return user
+
+  def GetUserAndExploration(self, exploration_id, state_id=None):
+    """Returns the user and exploration id if the user has the right credentials.
 
     Returns:
         The user and exploration instance, if the user is authorized to edit this
-        exploration.
+        exploration. Also, the state instance, if one is supplied.
 
     Raises:
         self.NotLoggedInException: if there is no current user.
         self.UnauthorizedUserException: if the user exists but does not have the
             right credentials.
     """
-    user = users.get_current_user()
-    if not user:
-      raise self.NotLoggedInException('Please log in.')
 
+    user = self.GetUser()
     exploration = utils.GetEntity(models.Exploration, exploration_id)
     if not self.CheckAuth(user, exploration):
       raise self.UnauthorizedUserException(
           'User %s does not have the credentials to edit this exploration.' % user)
-    return user, exploration
+    if not state_id:
+      return user, exploration
+
+    state = utils.GetEntity(models.State, state_id)
+    return user, exploration, state
 
 
 class MainPage(BaseHandler):
@@ -93,10 +88,8 @@ class MainPage(BaseHandler):
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
+
+    user = self.GetUser()
     augmented_user = utils.GetAugmentedUser(user)
 
     categories = {}
@@ -106,7 +99,6 @@ class MainPage(BaseHandler):
       if not categories.get(category_name):
         categories[category_name] = {'explorations': [exploration]}
       else:
-        # TODO(sll): make the following 'exploration' more explicit
         categories[category_name]['explorations'].append(exploration)
 
     self.values.update({
@@ -123,11 +115,8 @@ class NewExploration(BaseHandler):
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
 
+    user = self.GetUser()
     exploration = utils.CreateNewExploration(user)
     self.response.out.write(json.dumps({
         'explorationId': exploration.hash_id,
@@ -139,8 +128,8 @@ class ExplorationPage(BaseHandler):
 
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    user, exploration = self.GetUserAndExploration(exploration_id)
 
+    user, exploration = self.GetUserAndExploration(exploration_id)
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
@@ -151,14 +140,9 @@ class ExplorationPage(BaseHandler):
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
   def post(self, exploration_id):  # pylint: disable-msg=C6409
-    """Adds a new state.
+    """Adds a new state to the given exploration."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
-
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
     state_name = self.request.get('state_name')
     if not state_name:
       raise self.InvalidInputException('Please specify a state name.')
@@ -179,11 +163,8 @@ class ExplorationPage(BaseHandler):
     }))
 
   def put(self, exploration_id):  # pylint: disable-msg=C6409
-    """Updates properties of an exploration.
+    """Updates properties of the given exploration."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
     for key in self.request.arguments():
       if key not in ['is_public', 'category', 'title', 'image_id']:
@@ -206,11 +187,8 @@ class ExplorationPage(BaseHandler):
     exploration.put()
 
   def delete(self, exploration_id):
-    """Deletes an exploration.
+    """Deletes the given exploration."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
     for state_key in exploration.states:
       for action_set_key in state_key.get().action_sets:
@@ -230,11 +208,8 @@ class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
 
   def get(self, exploration_id):  # pylint: disable-msg=C6409
-    """Gets the question name and state list for a question page.
+    """Gets the question name and state list for a question page."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
 
     state_list = {}
@@ -293,24 +268,16 @@ class ExplorationDownloadHandler(BaseHandler):
     for state_key in exploration.states:
       state = state_key.get()
       exploration_dict[state.name] = GetStateAsDict(state)
-    self.response.out.write(GetYamlFromDict(exploration_dict))
+    self.response.out.write(utils.GetYamlFromDict(exploration_dict))
 
 
 class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
-  def get(self, exploration_id, state_id):  # pylint: disable-msg=C6409
-    """Gets a generic page representing an exploration.
+  def get(self, exploration_id, unused_state_id):  # pylint: disable-msg=C6409
+    """Gets a generic page representing an exploration with a list of states."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-      state_id: string representing the state id (not used).
-
-    Returns:
-      a generic page that represents an exploration with a list of states.
-    """
     user, exploration = self.GetUserAndExploration(exploration_id)
-
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
@@ -322,18 +289,9 @@ class StatePage(BaseHandler):
             self.values))
 
   def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
-    """Called when a state is initialized for editing.
+    """Called when a state is initialized for editing. Returns state properties as JSON."""
 
-    Args:
-      exploration_id: string representing the exploration id.
-      state_id: string representing the state id.
-
-    Returns:
-      parameters describing properties of the state (its id, name, text,
-      input_type and actions).
-    """
-    user, exploration = self.GetUserAndExploration(exploration_id)
-    state = utils.GetEntity(models.State, state_id)
+    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
     values = {
         'actions': [],
         'classifier': state.input_view.get().classifier,
@@ -363,7 +321,7 @@ class StatePage(BaseHandler):
         action['dest'] = action_set.dest.get().hash_id
       values['actions'].append(action)
 
-    values['yaml'] = GetYamlFromDict(GetStateAsDict(state))
+    values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
     self.response.out.write(json.dumps(values))
 
 
@@ -372,10 +330,13 @@ class StateHandler(BaseHandler):
 
   def put(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
-    user, exploration = self.GetUserAndExploration(exploration_id)
-    state = utils.GetEntity(models.State, state_id)
+    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
 
     state_name = self.request.get('state_name')
+    state_content_json = self.request.get('state_content')
+    input_type = self.request.get('input_type')
+    actions_json = self.request.get('actions')
+
     if state_name:
       # Replace the state name with this one, after checking validity.
       if state_name == 'END':
@@ -387,21 +348,21 @@ class StateHandler(BaseHandler):
       state.name = state_name
       state.put()
 
-    if self.request.get('state_content'):
-      state_content = json.loads(self.request.get('state_content'))
+    if state_content_json:
+      state_content = json.loads(state_content_json)
       state.content = [{'type': item['type'], 'value': item['value']}
                        for item in state_content]
 
-    if self.request.get('input_type'):
-      # TODO(sll): Check whether the given input_type is a valid one.
-      state.input_view = models.InputView.gql(
-          'WHERE name = :name', name=self.request.get('input_type')).get().key
+    if input_type:
+      input_view = models.InputView.gql(
+          'WHERE name = :name', name=input_type).get()
+      if input_view is None:
+        raise self.InvalidInputException('Invalid input type: %s', input_type)
+      state.input_view = input_view.key
 
-    # TODO(sll): Check whether the editor has rights to make this change.
     # TODO(sll): Check that 'actions' is properly formatted.
-
-    if self.request.get('actions'):
-      actions = json.loads(self.request.get('actions'))
+    if actions_json:
+      actions = json.loads(actions_json)
       classifier_categories = [action['category'] for action in actions]
 
       input_view = state.input_view.get()
@@ -461,8 +422,7 @@ class StateHandler(BaseHandler):
 
   def delete(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Deletes the state with id state_id."""
-    user, exploration = self.GetUserAndExploration(exploration_id)
-    state = utils.GetEntity(models.State, state_id)
+    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
 
     # Do not allow deletion of initial states.
     if exploration.init_state == state.key:

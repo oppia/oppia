@@ -500,17 +500,13 @@ function EditorExploration($scope, $http, $location, $routeParams,
       return;
     }
 
-    var requestParameters = {
+    var request = $.param({
         state_id: $scope.stateId,
         state_name: $scope.stateName,
         state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
         actions: JSON.stringify($scope.states[$scope.stateId].dests)
-    };
-
-    var request = $.param(requestParameters, true);
-    console.log('REQUEST');
-    console.log(request);
+    }, true);
 
     $http.put(
         $scope.explorationUrl + '/' + $scope.stateId + '/data',

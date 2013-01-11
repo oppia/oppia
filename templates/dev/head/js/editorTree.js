@@ -57,7 +57,7 @@ function EditorTree($scope, $http, explorationData) {
 oppia.directive('stateTreeViz', function (stateData) {
   // constants
   var w = 960,
-      h = 800,
+      h = 4000,
       barHeight = 30,
       barWidth = w * .3,
       i = 0,

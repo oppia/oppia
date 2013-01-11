@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64, datetime, hashlib, json, logging, os
+import base64, datetime, hashlib, json, logging, os, yaml
 import base, feconf, models
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -331,3 +331,8 @@ def CreateNewState(exploration, state_name):
   exploration.states.append(state.key)
   exploration.put()
   return state
+
+
+def GetYamlFromDict(dictionary):
+  """Gets the YAML representation of a dict."""
+  return yaml.safe_dump(dictionary, default_flow_style=False)
