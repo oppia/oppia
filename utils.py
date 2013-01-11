@@ -299,7 +299,8 @@ def CreateNewExploration(user, title='New Exploration', id=None):
   exploration.put()
   new_init_state = models.State(
       hash_id=state_hash_id, input_view=none_input_view.key,
-      action_sets=[none_action_set.key], parent=exploration.key)
+      action_sets=[none_action_set.key], parent=exploration.key,
+      classifier_categories=[DEFAULT_CATEGORY])
   new_init_state.put()
 
   # Replace the fake key with its real counterpart.
@@ -322,7 +323,8 @@ def CreateNewState(exploration, state_name):
   none_action_set.put()
   state = models.State(
       name=state_name, hash_id=state_hash_id, input_view=none_input_view.key,
-      action_sets=[none_action_set.key], parent=exploration.key)
+      action_sets=[none_action_set.key], parent=exploration.key,
+      classifier_categories=[DEFAULT_CATEGORY])
   state.put()
   none_action_set.dest = state.key
   none_action_set.put()

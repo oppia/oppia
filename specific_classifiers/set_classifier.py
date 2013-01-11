@@ -60,6 +60,11 @@ class SetClassifier(object):
 
     logging.info(categories)
     for index, category in enumerate(categories):
+      if index == len(categories) - 1:
+        # This is the default category. None of the other categories match,
+        # so return its index.
+        return index
+
       logging.info(category)
       # TODO(sll): Provide more helpful error messages in the validation.
       if category.startswith('S has elements not in '):
@@ -88,9 +93,6 @@ class SetClassifier(object):
       else:
         raise utils.InvalidCategoryError(
             '%s is not a valid contained list.' % category)
-
-    # None of the categories match, so return the default category.
-    return len(categories)
 
   def ParseSetCategory(self, prefix, category):
     """Strips the prefix from the input string and makes the rest into a set.

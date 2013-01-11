@@ -160,8 +160,7 @@ class ImportPage(editor.BaseHandler):
     content = description['content']
 
     # Retrieve the actions corresponding to this state.
-    category_list = classifiers.GetCategoryList(
-        state.input_view.get().classifier, state.classifier_categories)
+    category_list = state.classifier_categories
 
     action_set_list = []
     for index in range(len(description['answers'])):

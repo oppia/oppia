@@ -28,8 +28,7 @@ END_DEST = '-1'
 
 def GetStateAsDict(state):
   """Gets a Python dict representation of a state."""
-  category_list = classifiers.GetCategoryList(
-        state.input_view.get().classifier, state.classifier_categories)
+  category_list = state.classifier_categories
   return {
       'content': state.content,
       'input_type': {'name': state.input_view.get().name},
@@ -242,8 +241,7 @@ class ExplorationHandler(BaseHandler):
     for state_key in exploration.states:
       state = state_key.get()
       state_destinations = []
-      category_list = classifiers.GetCategoryList(
-          state.input_view.get().classifier, state.classifier_categories)
+      category_list = state.classifier_categories
       for i in range(len(category_list)):
         try:
           action_set = state.action_sets[i].get()
@@ -347,8 +345,7 @@ class StatePage(BaseHandler):
     }
 
     # Retrieve the actions corresponding to this state.
-    category_list = classifiers.GetCategoryList(
-        state.input_view.get().classifier, state.classifier_categories)
+    category_list = state.classifier_categories
     for i in range(len(category_list)):
       try:
         action_set = state.action_sets[i].get()

@@ -54,7 +54,11 @@ class TextClassifier(object):
     #try to find a matching category
     logging.info(categories)
     for index, category in enumerate(categories):
-      logging.info(category)
+      if index == len(categories) - 1:
+        # This is the default category. None of the other categories match,
+        # so return its index.
+        return index
+
       if category.startswith('Answer contains'):
         if response.find(self.GetCategoryText(category)) != -1:
           return index
@@ -77,9 +81,6 @@ class TextClassifier(object):
         raise utils.InvalidCategoryError(
             ('%s is not a valid category type: could not '
              'determine how to compare response to string' % category))
-
-    # None of the categories match, so return the default category.
-    return len(categories)
 
   def GetCategoryText(self, category):
     itxt = category.find('"')

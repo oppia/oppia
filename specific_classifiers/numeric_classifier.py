@@ -55,7 +55,11 @@ class NumericClassifier(object):
 
     logging.info(categories)
     for index, category in enumerate(categories):
-      logging.info(category)
+      if index == len(categories) - 1:
+        # This is the default category. None of the other categories match,
+        # so return its index.
+        return index
+
       # TODO(sll): Provide more helpful error messages in the validation.
       category_error = ('%s at index %s is not a valid numeric category.' %
                         (category.encode('utf-8'), index))
@@ -92,6 +96,3 @@ class NumericClassifier(object):
             (op == '>' and response > category_array[1]) or
             (op == '<' and response < category_array[1])):
           return index
-
-    # None of the categories match, so return the default category.
-    return len(categories)
