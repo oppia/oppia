@@ -508,6 +508,7 @@ function EditorExploration($scope, $http, $location, $routeParams,
       actionsForBackend[ind]['dest'] =
           $scope.states[$scope.stateId]['dests'][ind].dest;
     }
+    console.log(actionsForBackend);
 
     var requestParameters = {
         state_id: $scope.stateId,

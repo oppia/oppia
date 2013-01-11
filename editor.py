@@ -405,6 +405,7 @@ class StateHandler(BaseHandler):
 
     if self.request.get('actions'):
       actions = json.loads(self.request.get('actions'))
+      logging.info(actions)
       classifier_categories = []
       input_view = state.input_view.get()
       if input_view.name != 'none':
@@ -422,6 +423,9 @@ class StateHandler(BaseHandler):
       # Retrieve the actions corresponding to this state.
       num_categories = classifiers.GetNumCategories(
           state.input_view.get().classifier, state.classifier_categories)
+      while len(state.action_sets) > num_categories:
+        state.action_sets[-1].delete()
+        state.action_sets = state.action_sets[:-1]
       for i in range(num_categories):
         try:
           action_set = state.action_sets[i].get()
