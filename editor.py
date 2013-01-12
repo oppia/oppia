@@ -113,11 +113,14 @@ class MainPage(BaseHandler):
 class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
-  def get(self):  # pylint: disable-msg=C6409
+  def post(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
 
     user = self.GetUser()
-    exploration = utils.CreateNewExploration(user)
+    title = self.request.get('title')
+    category = self.request.get('category')
+
+    exploration = utils.CreateNewExploration(user, title=title, category=category)
     self.response.out.write(json.dumps({
         'explorationId': exploration.hash_id,
     }))

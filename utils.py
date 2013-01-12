@@ -274,7 +274,7 @@ def GetAugmentedUser(user):
   return augmented_user
 
 
-def CreateNewExploration(user, title='New Exploration', id=None):
+def CreateNewExploration(user, title='New Exploration', category='No category', id=None):
   """Creates and returns a new exploration."""
   if id:
     exploration_hash_id = id
@@ -293,7 +293,7 @@ def CreateNewExploration(user, title='New Exploration', id=None):
 
   exploration = models.Exploration(
       hash_id=exploration_hash_id, init_state=fake_state_key,
-      owner=user, category='No category')
+      owner=user, category=category)
   if title:
     exploration.title = title
   exploration.put()
