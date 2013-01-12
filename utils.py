@@ -479,3 +479,37 @@ def ModifyStateUsingDict(exploration, state, state_dict):
   state.classifier_categories = category_list
   state.action_sets = action_set_list
   state.put()
+
+
+def CreateExplorationFromYaml(yaml, user, title, category, id):
+  """Creates an exploration from a YAML file."""
+
+  yaml = yaml.strip()
+  # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
+  init_state_name = yaml[0 : yaml.find(':\n')]
+  logging.info(init_state_name)
+  if not init_state_name:
+    raise self.InvalidInputException(
+        'Invalid YAML file: the initial state name cannot be identified')
+
+  exploration = CreateNewExploration(
+      user, title=title, category=category, init_state_name=init_state_name, id=id)
+  yaml_description = GetDictFromYaml(yaml)
+
+  # Create all the states first.
+  for state_name, unused_state_description in yaml_description.iteritems():
+    if state_name == init_state_name:
+      continue
+    else:
+      if CheckExistenceOfName(models.State, state_name, exploration):
+        raise self.InvalidInputException(
+            'Invalid YAML file: contains duplicate state names %s' % state_name)
+      state = CreateNewState(exploration, state_name)
+
+  for state_name, state_description in yaml_description.iteritems():
+    logging.info(state_name)
+    state = models.State.query(ancestor=exploration.key).filter(
+        models.State.name == state_name).get()
+    ModifyStateUsingDict(exploration, state, state_description)
+
+  return exploration

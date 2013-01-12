@@ -39,7 +39,6 @@ class MainPage(base.BaseHandler):
       if not categories.get(category_name):
         categories[category_name] = {'explorations': [exploration]}
       else:
-        # TODO(sll): make the following 'exploration' more explicit
         categories[category_name]['explorations'].append(exploration)
 
     self.values.update({

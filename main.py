@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,8 +59,10 @@ class MainPage(base.BaseHandler):
     try:
       exploration = utils.GetEntity(models.Exploration, '0')
     except:
-      # TODO(sll): Populate the data for this sample exploration.
-      utils.CreateNewExploration(None, title='Demo 1', id='0')
+      with open('samples/hola.yaml') as f:
+        yaml = f.read().decode('utf-8')
+      exploration = utils.CreateExplorationFromYaml(
+          yaml=yaml, user=None, title='Demo: ¡Hola!', category='Languages', id='0')
 
     try:
       exploration = utils.GetEntity(models.Exploration, '1')
