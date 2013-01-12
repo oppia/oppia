@@ -264,10 +264,15 @@ class ExplorationDownloadHandler(BaseHandler):
     self.response.headers['Content-Disposition'] = (
         'attachment; filename=%s.txt' % filename)
     # TODO(sll): Cache the YAML file.
+    init_dict = {}
     exploration_dict = {}
     for state_key in exploration.states:
       state = state_key.get()
-      exploration_dict[state.name] = GetStateAsDict(state)
+      if exploration.init_state.get().hash_id == state.hash_id:
+        init_dict[state.name] = GetStateAsDict(state)
+      else:
+        exploration_dict[state.name] = GetStateAsDict(state)
+    self.response.out.write(utils.GetYamlFromDict(init_dict))
     self.response.out.write(utils.GetYamlFromDict(exploration_dict))
 
 
