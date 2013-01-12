@@ -8,10 +8,13 @@ function EditorMain($scope, $http, warningsData) {
     $('#newExplorationModal').modal('hide');
   };
 
+  // TODO(sll): Change the YAML file input to a file upload, rather than
+  // a textarea.
   $scope.createNewExploration = function() {
     var request = $.param({
         title: $scope.newExplorationTitle,
-        category: $scope.newExplorationCategory
+        category: $scope.newExplorationCategory,
+        yaml: $scope.newExplorationYaml
     }, true);
 
     $http.post(
@@ -21,6 +24,7 @@ function EditorMain($scope, $http, warningsData) {
             success(function(data) {
               $scope.newExplorationTitle = '';
               $scope.newExplorationCategory = '';
+              $scope.newExplorationYaml = '';
               window.location = '/create/' + data.explorationId;
             }).error(function(data) {
               warningsData.addWarning(data.error ? data.error :

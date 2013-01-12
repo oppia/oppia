@@ -16,8 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import datetime, json, logging, os
-import base, classifiers, feconf, main, models, reader, utils
+import datetime, json, logging, os, yaml
+import base, classifiers, converter, feconf, main, models, reader, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -114,13 +114,42 @@ class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
   def post(self):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
+    """Handles POST requests."""
 
     user = self.GetUser()
     title = self.request.get('title')
     category = self.request.get('category')
+    yaml = self.request.get('yaml')
+    if yaml:
+      yaml = yaml.strip()
+      # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
+      init_state_name = yaml[0 : yaml.find(':\n')]
+      logging.info(init_state_name)
+      if not init_state_name:
+        raise self.InvalidInputException(
+            'Invalid YAML file: the initial state name cannot be identified')
 
-    exploration = utils.CreateNewExploration(user, title=title, category=category)
+      exploration = utils.CreateNewExploration(
+          user, title=title, category=category, init_state_name=init_state_name)
+      yaml_description = utils.GetDictFromYaml(yaml)
+
+      # Create all the states first.
+      for state_name, unused_state_description in yaml_description.iteritems():
+        if state_name == init_state_name:
+          continue
+        else:
+          if utils.CheckExistenceOfName(models.State, state_name, exploration):
+            raise self.InvalidInputException(
+                'Invalid YAML file: contains duplicate state names %s' % state_name)
+          state = utils.CreateNewState(exploration, state_name)
+
+      for state_name, state_description in yaml_description.iteritems():
+        state = models.State.query(ancestor=exploration.key).filter(
+            models.State.name == state_name).get()
+        utils.ModifyStateUsingDict(exploration, state, state_description)
+    else:
+      exploration = utils.CreateNewExploration(user, title=title, category=category)
+
     self.response.out.write(json.dumps({
         'explorationId': exploration.hash_id,
     }))
@@ -153,7 +182,8 @@ class ExplorationPage(BaseHandler):
     # Check that the state_name has not been taken.
     if utils.CheckExistenceOfName(models.State, state_name, exploration):
       raise self.InvalidInputException(
-          'A state called %s already exists' % state_name)
+          'Duplicate state name for exploration %s: %s' %
+          (exploration.title, state_name))
 
     state = utils.CreateNewState(exploration, state_name)
 

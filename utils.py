@@ -274,13 +274,14 @@ def GetAugmentedUser(user):
   return augmented_user
 
 
-def CreateNewExploration(user, title='New Exploration', category='No category', id=None):
+def CreateNewExploration(user, title='New Exploration', category='No category',
+    id=None, init_state_name='Activity 1'):
   """Creates and returns a new exploration."""
   if id:
     exploration_hash_id = id
   else:
     exploration_hash_id = GetNewId(models.Exploration, title)
-  state_hash_id = GetNewId(models.State, 'Initial state')
+  state_hash_id = GetNewId(models.State, init_state_name)
 
   # Create a fake state key temporarily for initialization of the question.
   # TODO(sll): Do this in a transaction so it doesn't break other things.
@@ -300,7 +301,8 @@ def CreateNewExploration(user, title='New Exploration', category='No category', 
   new_init_state = models.State(
       hash_id=state_hash_id, input_view=none_input_view.key,
       action_sets=[none_action_set.key], parent=exploration.key,
-      classifier_categories=[DEFAULT_CATEGORY])
+      classifier_categories=[DEFAULT_CATEGORY],
+      name=init_state_name)
   new_init_state.put()
 
   # Replace the fake key with its real counterpart.
@@ -336,3 +338,144 @@ def CreateNewState(exploration, state_name):
 def GetYamlFromDict(dictionary):
   """Gets the YAML representation of a dict."""
   return yaml.safe_dump(dictionary, default_flow_style=False)
+
+
+def GetDictFromYaml(yaml_file):
+  """Gets the dict representation of a YAML file."""
+  try:
+    return yaml.safe_load(yaml_file)
+  except yaml.YAMLError as e:
+    raise InvalidInputException(e)
+
+
+def VerifyState(description):
+  """Verifies a state representation.
+
+  This enforces the following constraints:
+  - The only accepted fields are ['answers', 'content', 'input_type'].
+  - Permitted subfields of 'content' are ['text', 'image', 'video', 'widget'].
+  - Permitted subfields of 'input_type' are ['name', 'widget'].
+  - Each item in 'answers' must have exactly one key, and the corresponding
+    value must also have a 'dest'. The 'text' field is optional and defaults to ''.
+  - Each item in 'answers' should have a unique key.
+  - 'content' is optional and defaults to [].
+  - input_type.name is optional and defaults to 'none'. If it exists, it must be
+    one of ['none', 'multiple_choice', 'int', 'set', 'text'].
+    - If input_type.name == 'none' and there is more than one answer category, an
+      error is thrown. The name of the answer category can be anything; it is
+      ignored.
+  - input_type.widget is optional and defaults to the default for the given
+        input type.
+  - If input_type != 'multiple_choice' then answers.default.dest must exist, and
+    be the last one in the list.
+  - If input_type == 'multiple_choice' then 'answers' must not be non-empty.
+  """
+  logging.info(description)
+  if 'answers' not in description or len(description['answers']) == 0:
+    return False, 'No answer choices supplied'
+
+  if 'content' not in description:
+    description['content'] = []
+  if 'input_type' not in description:
+    description['input_type'] = {'name': 'none'}
+
+  if 'name' not in description['input_type']:
+    return False, 'input_type should have a \'name\' attribute'
+
+  for key in description:
+    if key not in ['answers', 'content', 'input_type']:
+      return False, 'Invalid key: %s' % key
+
+  for item in description['content']:
+    if len(item) != 2:
+      return False, 'Invalid content item: %s' % item
+    for key in item:
+      if key not in ['type', 'value']:
+        return False, 'Invalid key in content array: %s' % key
+
+  for key in description['input_type']:
+    if key not in ['name', 'widget']:
+      return False, 'Invalid key in input_type: %s' % key
+
+  if (description['input_type']['name'] not in
+      ['none', 'multiple_choice', 'int', 'set', 'text']):
+    return False, 'Invalid key in input_type.name: %s' % description['input_type']['name']
+
+  for item in description['answers']:
+    if len(item) != 1:
+      return False, 'Invalid answer item: %s' % item
+    key = item.keys()[0]
+    val = item.values()[0]
+    if 'dest' not in val or not val['dest']:
+      return False, 'Each answer should contain a \'dest\' attribute'
+    if 'text' not in val:
+      item[key]['text'] = ''
+
+  # Check uniqueness of keys in 'answers'
+  answer_keys = sorted([item.keys()[0] for item in description['answers']])
+  for i in range(len(answer_keys) - 1):
+    if answer_keys[i] == answer_keys[i+1]:
+      return False, 'Answer key %s appears more than once' % answer_keys[i]
+
+  if description['input_type']['name'] == 'none' and len(description['answers']) > 1:
+    return False, 'Expected only a single \'answer\' for a state with no input'
+
+  if description['input_type']['name'] != 'multiple_choice':
+    if description['answers'][-1].keys() != ['Default']:
+      return False, 'The last category of the answers array should be \'Default\''
+
+  return True, ''
+
+
+def ModifyStateUsingDict(exploration, state, state_dict):
+  """Modifies the properties of a state using values from a dictionary."""
+
+  is_valid, error_log = VerifyState(state_dict)
+  if not is_valid:
+    raise self.InvalidInputException(error_log)
+
+  # Delete the old actions.
+  for action_key in state.action_sets:
+    action_key.delete()
+  state.action_sets = []
+
+  input_view_name = state_dict['input_type']['name']
+  input_view = models.InputView.gql(
+      'WHERE name = :name', name=input_view_name).get()
+  # TODO(sll): Deal with input_view.widget here (and handle its verification above).
+  dests_array = []
+
+  content = state_dict['content']
+
+  category_list = []
+  action_set_list = []
+  for index in range(len(state_dict['answers'])):
+    dests_array_item = {}
+    for key, val in state_dict['answers'][index].iteritems():
+      dest_name = val['dest']
+      dest_key = None
+      if dest_name != 'END':
+        # Use the state with this destination name, if it exists.
+        dest_state = models.State.query(ancestor=exploration.key).filter(
+            models.State.name == dest_name).get()
+        if dest_state:
+          dest_key = dest_state.key
+        else:
+          dest_state = CreateNewState(exploration, dest_name)
+          dest_key = dest_state.key
+
+      category_list.append(key)
+      dests_array_item['category'] = category_list[index]
+      dests_array_item['text'] = val['text']
+      dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
+      dests_array.append(dests_array_item)
+      action_set = models.ActionSet(
+          category_index=index, text=val['text'], dest=dest_key)
+      action_set.put()
+      action_set_list.append(action_set.key)
+
+  state.input_view = input_view.key
+  state.content = content
+  state.classifier_categories = category_list
+  state.action_sets = action_set_list
+  state.put()

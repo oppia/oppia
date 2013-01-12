@@ -296,8 +296,6 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
     activeInputData.clear();
     $scope.saveImage(function(data) {
         $scope.stateContent[index].value = data.image_id;
-        console.log('IMAGEID');
-        console.log(data.image_id);
         $scope.saveStateChange('stateContent');
     });
   };
