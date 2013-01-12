@@ -1,61 +1,84 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div>
+<div ng-controller="EditorMain">
 
-    <form class="oppia-form-search pull-right">
-      <div class="add-on">
-        <input type="text" placeholder="Search" class="input-medium search-query">
-        <i class="icon-search"></i>
-      </div>
-    </form>
-
-    <div class="oppia-content">
-      <h2> Explorations I can edit</h2>
-
-      {% if categories %}
-        <center>
-          {% for category in categories %}
-            <div class="oppia-class-category">
-              <h4>{{category}}</h4>
-              <hr>
-              <ul class="thumbnails">
-                <!-- placeholder for real data on explorations -->
-                {% for exploration in categories[category].explorations %}
-                  <li class="span3">
-                    <div class="thumbnail">
-                      <a href="/create/{{exploration.hash_id}}">
-                        {% if exploration.image_id %}
-                          <img src="/imagehandler/{{exploration.image_id}}" class="oppia-large-image"></img>
-                        {% else %}
-                          <img src="http://placehold.it/300x200" alt="Image placeholder">
-                        {% endif %}
-                      </a>
-                      <h5>{{exploration.title}}</h5>
-                      {% if not exploration.is_public %}
-                        <span>Draft</span>
-                      {% endif %}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endfor %}
-        </center>
-      {% else %}
-        You haven't created any explorations yet.
-      {% endif %}
-
-      <br>
-      <br>
-
-      <p ng-controller="EditorMain">
-        <a class="btn btn-large btn-success" ng-click="createNewExploration()">
-          Create New Exploration
-        </a>
-      </p>
+  <form class="oppia-form-search pull-right">
+    <div class="add-on">
+      <input type="text" placeholder="Search" class="input-medium search-query">
+      <i class="icon-search"></i>
     </div>
+  </form>
 
+  <div class="oppia-content">
+    <h2> Explorations I can edit</h2>
+    {% if categories %}
+      <center>
+        {% for category in categories %}
+          <div class="oppia-class-category">
+            <h4>{{category}}</h4>
+            <hr>
+            <ul class="thumbnails">
+              <!-- placeholder for real data on explorations -->
+              {% for exploration in categories[category].explorations %}
+                <li class="span3">
+                  <div class="thumbnail">
+                    <a href="/create/{{exploration.hash_id}}">
+                      {% if exploration.image_id %}
+                        <img src="/imagehandler/{{exploration.image_id}}" class="oppia-large-image"></img>
+                      {% else %}
+                        <img src="http://placehold.it/300x200" alt="Image placeholder">
+                      {% endif %}
+                    </a>
+                    <h5>{{exploration.title}}</h5>
+                    {% if not exploration.is_public %}
+                      <span>Draft</span>
+                    {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </center>
+    {% else %}
+      You haven't created any explorations yet.
+    {% endif %}
+
+    <br>
+    <br>
+
+    <p>
+      <a class="btn btn-large btn-success" ng-click="openNewExplorationModal()">
+        Create New Exploration
+      </a>
+    </p>
   </div>
+
+  <form name="createNewExplorationForm" ng-submit="createNewExploration()">
+    <div ui-modal class="fade" id="newExplorationModal" ng-model="modalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="customizeModalLabel">Add New Exploration</h3>
+      </div>
+      <div class="modal-body">
+        <div>
+          Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle">
+        </div>
+        <div>
+          Category: <input type="text" ng-model="newExplorationCategory">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <input type="submit" class="btn" value="Save">
+        <a class="btn" data-dismiss="modal" ng-click="closeNewExplorationModal()">Close</a>
+      </div>
+    </div>
+  </form>
+
+</div>
 {% endblock %}
 
