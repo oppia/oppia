@@ -1,13 +1,9 @@
-<div>
-  <br>
+<form ng-submit="submitAnswer()">
   <div ng-repeat="category in categories">
     <label class="radio">
       <input type="radio" class="answer" name="answer" value="<[$index]>" id="<[$index]>" required>
       <[category]>
     </label>
   </div>
-</div>
-
-<div>
-  <button type="button" ng-click="submitAnswer()">Submit</button>
-</div>
+  <button type="submit">Submit</button>
+</form>

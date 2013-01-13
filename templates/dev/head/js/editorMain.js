@@ -11,10 +11,11 @@ function EditorMain($scope, $http, warningsData) {
   // TODO(sll): Change the YAML file input to a file upload, rather than
   // a textarea.
   $scope.createNewExploration = function() {
+    console.log($scope.newExplorationYaml);
     var request = $.param({
-        title: $scope.newExplorationTitle,
-        category: $scope.newExplorationCategory,
-        yaml: $scope.newExplorationYaml
+        title: $scope.newExplorationTitle || '',
+        category: $scope.newExplorationCategory || '',
+        yaml: $scope.newExplorationYaml || ''
     }, true);
 
     $http.post(

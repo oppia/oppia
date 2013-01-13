@@ -1,6 +1,5 @@
 {% if type == 'text' %}
   <div>{{value}}</div>
-  <br>
 {% elif type == 'image' %}
   <div>
     <img ng-src="/imagehandler/{{value}}">
@@ -12,11 +11,9 @@
             frameborder="0" allowfullscreen>
     </iframe>
   </center>
-  <br>
 {% elif type == 'widget' %}
   <iframe id="widgetCompiled{{blockIndex}}-{{index}}" width="100%"
    height="400" frameborder="0">
   </iframe>
-  <br>
   <br>
 {% endif %}
