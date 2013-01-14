@@ -1,6 +1,11 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:400,600,700';
 
+html {
+  height: 100%;
+}
+
 body {
+  height: 100%;
   margin: 0 auto;
 }
 
@@ -38,14 +43,21 @@ textarea.oppia-code {
   padding-right: 20px;
 }
 
-.navbar-bottom.oppia-navbar {
-  top: 0;
-  width: 100%;
+.oppia-holder {
+  min-height: 100%;
+  position: relative;
+}
+
+.oppia-main-body {
+  padding-bottom: 20px;  /* Height of footer */
 }
 
 div.oppia-footer {
   border-top: 1px solid lightgrey;
-  margin: 60px auto 0 auto;
+  bottom: 0;
+  height: 20px;
+  position: absolute;
+  width: 100%;
 }
 
 .oppia-exploration {

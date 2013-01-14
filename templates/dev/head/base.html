@@ -25,59 +25,67 @@
   </head>
 
   <body ng-controller="Base">
-    {% if not iframed %}
-      <!-- nav bar -->
-      <div class="navbar navbar-static-top oppia-navbar">
-        <div class="navbar-inner">
-          <div class="container">
-            <a class="brand" href="/">Oppia</a>
-            <ul class="nav">
-              <li {% if mode == 'reader' %} class="active" {% endif %}>
-                <a href="/learn">Learn</a>
-              </li>
-              <li {% if mode == 'editor' %} class="active" {% endif %}>
-                <a href="/create">Create</a>
-              </li>
-            </ul>
-            <ul class="nav pull-right">
-              {% if user %}
-                <li>
-                  <span class="navbar-text">{{user}}</span>
-                </li>
-                <li>
-                  <a href="{{logout_url}}">Logout</a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="{{login_url}}">Login</a>
-                </li>
-              {% endif %}
-            </ul>
+    <div class="oppia-holder">
+      <div class="oppia-main-body">
+        {% if not iframed %}
+          <!-- nav bar -->
+          <div class="navbar navbar-static-top oppia-navbar">
+            <div class="navbar-inner">
+              <div class="container">
+                <a class="brand" href="/">Oppia</a>
+                <ul class="nav">
+                  <li {% if mode == 'reader' %} class="active" {% endif %}>
+                    <a href="/learn">Learn</a>
+                  </li>
+                  <li {% if mode == 'editor' %} class="active" {% endif %}>
+                    <a href="/create">Create</a>
+                  </li>
+                </ul>
+                <ul class="nav pull-right">
+                  {% if user %}
+                    <li>
+                      <span class="navbar-text">{{user}}</span>
+                    </li>
+                    <li>
+                      <a href="{{logout_url}}">Logout</a>
+                    </li>
+                  {% else %}
+                    <li>
+                      <a href="{{login_url}}">Login</a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
           </div>
+        {% endif %}
+
+        <div ng-cloak>
+          <div ng-repeat="warning in warningsData.warnings">
+            <p class="alert alert-block">
+              <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+              <strong>Warning!</strong>
+              <[warning]>
+            </p>
+          </div>
+          {% block content %}{% endblock %}
         </div>
       </div>
-    {% endif %}
 
-    <div ng-cloak>
-      <div ng-repeat="warning in warningsData.warnings">
-        <p class="alert alert-block">
-          <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-          <strong>Warning!</strong>
-          <[warning]>
-        </p>
-      </div>
-      {% block content %}{% endblock %}
-    </div>
+      <br><br>
 
-    <div class="navbar navbar-bottom oppia-footer">
-      <ul class="nav">
-        <li>
-          <a href="/about">About Oppia</a>
-        </li>
-        <li>
-          <a href="/terms">Terms</a>
-        </li>
-      </ul>
+      {% if not iframed %}
+        <div class="navbar oppia-footer">
+          <ul class="nav">
+            <li>
+             <a href="/about">About Oppia</a>
+            </li>
+            <li>
+              <a href="/terms">Terms</a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
     </div>
 
     <script type="text/javascript">{{js}}</script>
