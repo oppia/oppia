@@ -251,7 +251,9 @@ oppia.directive('stateGraphViz', function (stateData) {
               }
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
               stateData.getData(d.hashId);
-            });
+            })
+            .append("svg:title")
+            .text(function(d) { return d.name; });
 
         nodeEnter.append("svg:text")
             .attr("dx", function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
