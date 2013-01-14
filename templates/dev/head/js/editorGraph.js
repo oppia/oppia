@@ -123,7 +123,6 @@ oppia.directive('stateGraphViz', function (stateData) {
     },
     link: function (scope, element, attrs) {
 
-
       scope.truncate = function(text) {
         if (text.length > MAX_CATEGORY_LENGTH) {
           return text.substring(0, MAX_CATEGORY_LENGTH - 3) + '...';

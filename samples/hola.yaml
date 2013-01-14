@@ -22,10 +22,10 @@ Hola:
     name: text
 Adios:
   answers:
-  - Answer Answer contains "adios":
+  - Answer contains "adios":
       dest: Adios
       text: Don't forget your accent marks next time!
-  - "Answer Answer contains \"adi\xF3s\"":
+  - "Answer contains \"adi\xF3s\"":
       dest: END
       text: ''
   - Default:
