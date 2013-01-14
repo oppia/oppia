@@ -130,12 +130,12 @@ Supermercado:
   answers:
   - Ventanas:
       dest: Supermercado
-      text: "\xA1\xBFVentanas en un supermerado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
+      text: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
         \ can't buy windows in a supermarket. If you need more help, select \"I don't\
         \ know\""
   - Coches:
       dest: Supermercado
-      text: "\xA1\xBFCoches en un supermerado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
+      text: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
         \ can't buy cars in a supermarket. If you need more help, select \"I don't\
         \ know\""
   - Manzanas:
