@@ -75,7 +75,7 @@
                     <br>
 
                     <div>
-                      <button type="button" class="btn btn-danger" ng-click="deleteExploration()">
+                      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteExplorationModal">
                         Delete Exploration
                       </button>
                       (irreversible)
@@ -118,6 +118,27 @@
 
       </div>
     </div>
+
+
+    <div ui-modal class="fade" id="deleteExplorationModal" ng-model="modalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="deleteExplorationModalLabel">Delete Exploration</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          Really delete this exploration? This action cannot be reversed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" ng-click="deleteExploration()">Delete</a>
+        <button type="button" class="btn" data-dismiss="modal">Cancel</a>
+      </div>
+    </div>
+
   </div>
 
 {% endblock %}
+  </div>
