@@ -90,23 +90,19 @@ function EditorGraph($scope, $http, explorationData) {
       nodeList.push(nodeMap);
     }
 
-    console.log('NODES');
-    console.log(nodes);
-
     var links = [];
     for (var state in states) {
       for (var i = 0; i < states[state].dests.length; i++) {
         links.push({source: nodeList[nodes[state].id], target: nodeList[nodes[states[state].dests[i].dest].id], name: states[state].dests[i].category});
       }
     }
-    console.log(links);
 
     return {nodes: nodeList, links: links, initStateId: initStateId};
   };
 };
 
 
-oppia.directive('stateGraphViz', function (stateData) {
+oppia.directive('stateGraphViz', function (stateData, $location) {
   // constants
   var w = 960,
       h = 4000,
@@ -121,8 +117,7 @@ oppia.directive('stateGraphViz', function (stateData) {
       val: '=',
       grouped: '='
     },
-    link: function (scope, element, attrs) {
-
+    link: function(scope, element, attrs) {
       scope.truncate = function(text) {
         if (text.length > MAX_CATEGORY_LENGTH) {
           return text.substring(0, MAX_CATEGORY_LENGTH - 3) + '...';
@@ -130,7 +125,6 @@ oppia.directive('stateGraphViz', function (stateData) {
           return text;
         }
       };
-
 
       var vis = d3.select(element[0]).append("svg:svg")
           .attr("width", w)
@@ -249,8 +243,8 @@ oppia.directive('stateGraphViz', function (stateData) {
               if (d.hashId == '-1') {
                 return;
               }
+              scope.$parent.$parent.stateId = d.hashId;
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
-              stateData.getData(d.hashId);
             })
             .append("svg:title")
             .text(function(d) { return d.name; });

@@ -1,4 +1,5 @@
-function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
+function YamlEditor($scope, $http, $routeParams, stateData, explorationData, warningsData) {
+  $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
   $('#editorViewTab a[href="#stateEditor"]').tab('show');
 
@@ -34,4 +35,4 @@ function YamlEditor($scope, $http, stateData, explorationData, warningsData) {
   };
 }
 
-YamlEditor.$inject = ['$scope', '$http', 'stateData', 'explorationData', 'warningsData'];
+YamlEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData', 'explorationData', 'warningsData'];

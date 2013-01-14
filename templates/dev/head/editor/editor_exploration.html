@@ -97,7 +97,7 @@
               </div>
             </div>
 
-            <div class="tab-pane" id="stateEditor">
+            <div class="tab-pane" id="stateEditor" ng-cloak>
 
               <form ng-submit="saveStateName()">
                 <h3>
@@ -110,7 +110,7 @@
                 </h3>
               </form>
 
-              <div ng-view></div>
+              <div ng-view ng-cloak></div>
 
             </div>
           </div>

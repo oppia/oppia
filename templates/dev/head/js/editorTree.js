@@ -143,7 +143,9 @@ oppia.directive('stateTreeViz', function (stateData) {
                 d._children = null;
               }
               scope.updateTree(d);
-            });
+            })
+            .append("svg:title")
+            .text(function(d) { return d.name; });
 
         // Append a click handler that will open the state editor window.
         nodeEnter.append("svg:rect")
@@ -158,8 +160,8 @@ oppia.directive('stateTreeViz', function (stateData) {
               if (!('hashId' in d)) {
                 return;
               }
+              scope.$parent.$parent.stateId = d.hashId;
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
-              stateData.getData(d.hashId);
             });
 
         nodeEnter.append("svg:text")

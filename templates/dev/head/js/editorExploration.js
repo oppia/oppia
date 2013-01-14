@@ -56,15 +56,11 @@ var HUMAN_READABLE_INPUT_TYPE_MAPPING = {
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-      when(YAML_EDITOR_URL,
-           {templateUrl: '/templates/yaml', controller: YamlEditor}).
       when(YAML_EDITOR_URL + '/:stateId',
            {templateUrl: '/templates/yaml', controller: YamlEditor}).
-      when(GUI_EDITOR_URL,
-           {templateUrl: '/templates/gui', controller: GuiEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/templates/gui', controller: GuiEditor}).
-      when('/', {templateUrl: '/templates/yaml', controller: ExplorationTab}).
+      when('/', {templateUrl: '/templates/gui', controller: ExplorationTab}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -119,9 +115,6 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
             success(function(data) {
               obj.data = data;
               console.log(data);
-              for (var i =0 ;i < data.actions.length; i++) {
-                console.log(data.actions[i].dest);
-              }
               obj.stateName = data.stateName;
               obj.stateContent = data.stateContent;
               obj.inputType = data.inputType;
@@ -174,7 +167,7 @@ function ExplorationTab($scope) {
   $('#editorViewTab a[href="#explorationEditor"]').tab('show');
 };
 
-function EditorExploration($scope, $http, $location, $routeParams,
+function EditorExploration($scope, $http, $location, $route, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
 
   /********************************************
@@ -210,18 +203,23 @@ function EditorExploration($scope, $http, $location, $routeParams,
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
     console.log(e.target.hash);
     if (e.target.hash == '#stateEditor') {
+      console.log($scope.stateId);
+      if (!$scope.stateId) {
+        $scope.stateId = $scope.initStateId;
+      }
       $scope.changeMode($scope.getMode());
+      stateData.getData($scope.stateId);
     } else {
       $location.path('');
       explorationData.getData();
     }
-    $scope.$apply();
   });
 
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
    *********************************************************/
+  var explorationFullyLoaded = false;
   $scope.stateContent = [];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
@@ -241,12 +239,15 @@ function EditorExploration($scope, $http, $location, $routeParams,
     $scope.explorationCategory = data.category;
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
-    $scope.stateId = $routeParams.stateId || $scope.initStateId;
     $scope.isPublic = data.is_public;
-    stateData.getData($scope.stateId);
+    explorationFullyLoaded = true;
+    if ($scope.stateId) {
+      stateData.getData($scope.stateId);
+    }
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
+    console.log(explorationFullyLoaded);
     $scope.saveExplorationProperty('explorationCategory', 'category', newValue, oldValue);
   });
 
@@ -266,25 +267,31 @@ function EditorExploration($scope, $http, $location, $routeParams,
   };
 
   $scope.deleteExplorationImage = function() {
-    $scope.saveExplorationProperty('explorationImageId', 'image_id', null, $scope.explorationImageId);
+    $scope.saveExplorationProperty(
+        'explorationImageId', 'image_id', null, $scope.explorationImageId);
   };
 
   $scope.saveExplorationImage = function() {
     activeInputData.clear();
     $scope.saveImage(function(data) {
         $scope.explorationImageId = data.image_id;
-        $scope.saveExplorationProperty('explorationImageId', 'image_id', $scope.explorationImageId, null);
+        $scope.saveExplorationProperty(
+            'explorationImageId', 'image_id', $scope.explorationImageId, null);
     });
   };
 
   /**
    * Saves a property of an exploration (e.g. title, category, etc.)
-   * @param {string} frontendName The frontend name of the property to save (e.g. explorationTitle, explorationCategory)
+   * @param {string} frontendName The frontend name of the property to save
+   *     (e.g. explorationTitle, explorationCategory)
    * @param {string} backendName The backend name of the property (e.g. title, category)
    * @param {string} newValue The new value of the property
    * @param {string} oldValue The previous value of the property
    */
   $scope.saveExplorationProperty = function(frontendName, backendName, newValue, oldValue) {
+    if (!explorationFullyLoaded) {
+      return;
+    }
     if (oldValue && !$scope.isValidEntityName($scope[frontendName], true)) {
       $scope[frontendName] = oldValue;
       return;
@@ -530,7 +537,7 @@ function EditorExploration($scope, $http, $location, $routeParams,
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$location',
+EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
 ExplorationTab.$inject = ['$scope'];

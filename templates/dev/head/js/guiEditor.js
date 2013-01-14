@@ -40,25 +40,8 @@ oppia.directive('sortable', function($compile) {
   };
 });
 
-
-// override the default input to update on blur
-oppia.directive('ngModelOnblur', function() {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    link: function(scope, elm, attr, ngModelCtrl) {
-      if (attr.type === 'radio' || attr.type === 'checkbox') return;
-        elm.unbind('input').unbind('keydown').unbind('change');
-        elm.bind('blur', function() {
-          scope.$apply(function() {
-          ngModelCtrl.$setViewValue(elm.val());
-        });
-      });
-    }
-  };
-});
-
-function GuiEditor($scope, $http, stateData, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warningsData, activeInputData) {
+  $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
   $('#editorViewTab a[href="#stateEditor"]').tab('show');
 
@@ -360,5 +343,5 @@ function GuiEditor($scope, $http, stateData, explorationData, warningsData, acti
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', 'stateData',
+GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData',
     'explorationData', 'warningsData', 'activeInputData'];
