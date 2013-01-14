@@ -481,7 +481,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
   state.put()
 
 
-def CreateExplorationFromYaml(yaml, user, title, category, id):
+def CreateExplorationFromYaml(yaml, user, title, category, id=None):
   """Creates an exploration from a YAML file."""
 
   yaml = yaml.strip()
