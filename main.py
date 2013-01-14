@@ -45,6 +45,7 @@ class AboutPage(base.BaseHandler):
     self.values['idea_contributors'] = [
         'Alex Kauffmann',
         'Catherine Colman',
+        'Neil Fraser',
         'Pavel Simakov',
         'Peter Norvig',
         'Phil Wagner',
