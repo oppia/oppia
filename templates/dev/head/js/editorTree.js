@@ -23,20 +23,29 @@ function EditorTree($scope, $http, explorationData) {
         explorationData.states, explorationData.initState);
   });
 
+  $scope.truncate = function(text) {
+    if (text.length > 40) {
+      return text.substring(0, 37) + '...';
+    } else {
+      return text;
+    }
+  };
+
   $scope.dfs = function(currStateId, seen, states, priorCategory) {
     var thisState = {'name': states[currStateId].desc, 'children': [], 'hashId': currStateId};
     if (priorCategory) {
-      thisState['name'] = priorCategory + ': ' + states[currStateId].desc;
+      thisState['name'] = $scope.truncate(priorCategory) + ': ' + states[currStateId].desc;
     }
     for (var i = 0; i < states[currStateId].dests.length; ++i) {
       var destStateId = states[currStateId].dests[i].dest;
       var category = states[currStateId].dests[i].category;
       if (destStateId == '-1') {
         thisState['children'].push(
-            {'name': category + ': END', 'size': 100});
+            {'name': $scope.truncate(category) + ': END', 'size': 100});
       } else if (seen[destStateId]) {
         thisState['children'].push(
-            {'name': category + ': ' + states[destStateId].desc, 'size': 100, 'hashId': destStateId});
+            {'name': $scope.truncate(category) + ': ' + states[destStateId].desc,
+             'size': 100, 'hashId': destStateId});
       } else {
         seen[destStateId] = true;
         thisState['children'].push($scope.dfs(destStateId, seen, states, category));
@@ -59,7 +68,7 @@ oppia.directive('stateTreeViz', function (stateData) {
   var w = 960,
       h = 4000,
       barHeight = 30,
-      barWidth = w * .3,
+      barWidth = w * .45,
       i = 0,
       root,
       duration = 400;
