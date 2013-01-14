@@ -38,9 +38,14 @@ textarea.oppia-code {
   padding-right: 20px;
 }
 
-.oppia-navbar {
+.navbar-bottom.oppia-navbar {
   top: 0;
   width: 100%;
+}
+
+div.oppia-footer {
+  border-top: 1px solid lightgrey;
+  margin: 60px auto 0 auto;
 }
 
 .oppia-exploration {

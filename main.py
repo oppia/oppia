@@ -55,6 +55,15 @@ class AboutPage(base.BaseHandler):
         base.JINJA_ENV.get_template('about.html').render(self.values))
 
 
+class TermsPage(base.BaseHandler):
+  """Page with terms and conditions."""
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    self.values['js'] = utils.GetJsFilesWithBase([])
+    self.response.out.write(
+        base.JINJA_ENV.get_template('terms.html').render(self.values))
+
+
 class MainPage(base.BaseHandler):
   """Oppia's main page."""
   def InitializeInputViews(self):
@@ -112,6 +121,7 @@ r = '[A-Za-z0-9=_-]+'
 urls = [
     (r'/?', MainPage),
     (r'/about/?', AboutPage),
+    (r'/terms/?', TermsPage),
 
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),

@@ -40,9 +40,6 @@
               </li>
             </ul>
             <ul class="nav pull-right">
-              <li>
-                <a href="/about">About Oppia</a>
-              </li>
               {% if user %}
                 <li>
                   <span class="navbar-text">{{user}}</span>
@@ -71,7 +68,17 @@
       </div>
       {% block content %}{% endblock %}
     </div>
-    <br>
+
+    <div class="navbar navbar-bottom oppia-footer">
+      <ul class="nav">
+        <li>
+          <a href="/about">About Oppia</a>
+        </li>
+        <li>
+          <a href="/terms">Terms</a>
+        </li>
+      </ul>
+    </div>
 
     <script type="text/javascript">{{js}}</script>
   </body>
