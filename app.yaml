@@ -21,6 +21,12 @@ handlers:
 - url: /
   script: main.app
   secure: always
+- url: /about/?
+  script: main.app
+  secure: always
+- url: /terms/?
+  script: main.app
+  secure: always
 - url: /learn(/.*)?
   script: main.app
   secure: always
