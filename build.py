@@ -69,6 +69,8 @@ def ProcessJS(filename, target):
 # Script starts here.
 EnsureDirectoryExists(OUT_DIR)
 for root, dirs, files in os.walk(os.getcwd()):
+  if '.git' in root:
+    continue
   for directory in dirs:
     print 'Processing', os.path.join(root, directory)
   for fn in files:
