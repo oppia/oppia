@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="oppia-content">
+
+    <br>
+
+    <div class="oppia-wide-panel">
+      <div class="oppia-wide-panel-content">
+        <h1>What is Oppia?</h1>
+        <br>
+        <p>
+          Oppia is a web-based tool for creating interactive online activities that enable students to learn by doing. We think that learning-by-doing is more effective and efficient than watching videos or reading texts, since it allows the student to engage more deeply with the activity in a way that videos or books often do not.
+        </p>
+
+        <p>
+          Oppia aims to simulate the one-on-one interaction that a student has with a teacher by capturing and generalizing “interaction dialogues.” For instance, a teacher might ask the student a question, and the student then responds in some way -- by either volunteering an answer, or saying that he/she is stuck. The teacher then responds in a way that would be as helpful to the student as possible. However, the teacher will often not have time to address every individual student’s misconceptions. Furthermore, it usually takes significant effort to figure out an appropriate response that helps the student get unstuck without denying him/her the experience of working through the problem and coming to terms with his/her own misunderstanding. In many cases this effort will have already been expended by another teacher in a different school who is faced with the same question.
+        </p>
+
+        <p>
+          If teachers use Oppia to record such interactions, they can share their knowledge with more students without duplicated effort. Oppia aims to allow any student to experience the benefits of one-on-one teaching by aggregating common interactions and automatically playing the role of the teacher when it can. The teacher is still vital, though: there are still many questions that students will ask which Oppia will not be able to address satisfactorily in the short term. But we hope that having some of the student’s work addressed automatically will lighten the teacher’s load and help him/her focus on the student questions that require a human’s response. Over time, as Oppia becomes able to answer more questions and understand more varied student inputs, we hope that it will become a more useful and valuable resource for students and teachers worldwide.
+        </p>
+      </div>
+    </div>
+    <br>
+
+    <div class="oppia-wide-panel">
+      <div class="oppia-wide-panel-content">
+        <h2>Get in touch!</h2>
+        <p>
+          Have a question about Oppia? You can find us via our Google group
+          <a href="https://groups.google.com/forum/#!forum/oppia">here</a>.
+          If you are interested in playing around with the code, then please check
+          out our <a href="http://code.google.com/p/oppia/">Google code site</a>.
+        </p>
+
+        <br>
+
+        <h2>Credits</h2>
+        <p>
+          Oppia was (and is still being) built by a small group of engineers in their 20% time at Google,
+          including:
+          <ul>
+            {% for name in code_contributors %}
+              <li> {{name}} </li>
+            {% endfor %}
+          </ul>
+        </p>
+
+        <p>
+          We are also very grateful for feedback, ideas and suggestions from the following people:
+            {% for name in idea_contributors[:-1] %}
+              {{name}}{% if name != idea_contributors[-2] %}, {% endif %}
+            {% endfor %}
+            and {{ idea_contributors[-1] }}.
+          </ul>
+        </p>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

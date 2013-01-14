@@ -29,6 +29,32 @@ class Error404Handler(base.BaseHandler):
     self.error(404)
 
 
+class AboutPage(base.BaseHandler):
+  """Page with information about Oppia."""
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    self.values['js'] = utils.GetJsFilesWithBase([])
+    self.values['code_contributors'] = [
+        'Jeremy Emerson',
+        'Manas Tungare',
+        'Sean Lip',
+        'Stephanie Federwisch',
+        'Wilson Hong',
+        'Yana Malysheva',
+    ]
+    self.values['idea_contributors'] = [
+        'Alex Kauffmann',
+        'Catherine Colman',
+        'Pavel Simakov',
+        'Peter Norvig',
+        'Phil Wagner',
+        'Philip Guo',
+        'Reinaldo Aguiar',
+    ]
+    self.response.out.write(
+        base.JINJA_ENV.get_template('about.html').render(self.values))
+
+
 class MainPage(base.BaseHandler):
   """Oppia's main page."""
   def InitializeInputViews(self):
@@ -85,6 +111,7 @@ r = '[A-Za-z0-9=_-]+'
 # Register the URL with the responsible classes
 urls = [
     (r'/?', MainPage),
+    (r'/about/?', AboutPage),
 
     (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
