@@ -19,6 +19,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
 
   $scope.loadPage = function(data) {
     console.log(data);
+    $scope.answer = data.default_answer;
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.html = data.html;
@@ -52,6 +53,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.stateId = data.state_id;
 
     $scope.html += data.html;
+    $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
     $scope.$apply();
@@ -64,27 +66,23 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
 
 
 function SetCtrl($scope, $http) {
-  $scope.answer = [];
-
   $scope.addElement = function() {
-    $scope.answer.push($scope.newElement);
+    $scope.$parent.answer.push($scope.newElement);
     $scope.newElement = '';
-    console.log($scope.answer);
   };
 
   $scope.deleteElement = function(index) {
-    $scope.answer = $scope.answer.splice(index, 1);
+    $scope.$parent.answer.splice(index, 1);
   };
 
   $scope.submitAnswer = function() {
     // Send a JSON version of $scope.answer to the backend.
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        'answer=' + JSON.stringify($scope.answer) +
+        'answer=' + JSON.stringify($scope.$parent.answer) +
             '&block_number=' + JSON.stringify($scope.blockNumber),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage);
-    $scope.answer = [];
   };
 }
 

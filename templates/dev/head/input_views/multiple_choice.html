@@ -1,7 +1,7 @@
 <form ng-submit="submitAnswer()">
   <div ng-repeat="category in categories">
     <label class="radio">
-      <input type="radio" class="answer" name="answer" value="<[$index]>" id="<[$index]>" required>
+      <input type="radio" class="answer" name="answer" ng-model="answer" value="<[$index]>" id="<[$index]>" required>
       <[category]>
     </label>
   </div>

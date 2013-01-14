@@ -34,17 +34,17 @@ function EditorTree($scope, $http, explorationData) {
   $scope.dfs = function(currStateId, seen, states, priorCategory) {
     var thisState = {'name': states[currStateId].desc, 'children': [], 'hashId': currStateId};
     if (priorCategory) {
-      thisState['name'] = $scope.truncate(priorCategory) + ': ' + states[currStateId].desc;
+      thisState['name'] = '[' + $scope.truncate(priorCategory) + '] ' + states[currStateId].desc;
     }
     for (var i = 0; i < states[currStateId].dests.length; ++i) {
       var destStateId = states[currStateId].dests[i].dest;
       var category = states[currStateId].dests[i].category;
       if (destStateId == '-1') {
         thisState['children'].push(
-            {'name': $scope.truncate(category) + ': END', 'size': 100});
+            {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
       } else if (seen[destStateId]) {
         thisState['children'].push(
-            {'name': $scope.truncate(category) + ': ' + states[destStateId].desc,
+            {'name': '[' + $scope.truncate(category) + '] ' + states[destStateId].desc,
              'size': 100, 'hashId': destStateId});
       } else {
         seen[destStateId] = true;

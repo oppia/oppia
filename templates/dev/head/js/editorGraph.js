@@ -27,7 +27,7 @@ function EditorGraph($scope, $http, explorationData) {
   $scope.reformatResponse = function(states, initStateId) {
     var SENTINEL_DEPTH = 3000;
     var VERT_OFFSET = 20;
-    var HORIZ_SPACING = 100;
+    var HORIZ_SPACING = 150;
     var VERT_SPACING = 100;
     var nodes = {};
     nodes['-1'] = {name: 'END', depth: SENTINEL_DEPTH, reachable: false};
@@ -110,8 +110,10 @@ oppia.directive('stateGraphViz', function (stateData) {
   // constants
   var w = 960,
       h = 4000,
-      i = 0,
-      duration = 400;
+      i = 0;
+  var DEFAULT_CIRCLE_RADIUS = 30;
+  // The following variable must be at least 3.
+  var MAX_CATEGORY_LENGTH = 20;
 
   return {
     restrict: 'E',
@@ -120,6 +122,17 @@ oppia.directive('stateGraphViz', function (stateData) {
       grouped: '='
     },
     link: function (scope, element, attrs) {
+
+
+      scope.truncate = function(text) {
+        if (text.length > MAX_CATEGORY_LENGTH) {
+          return text.substring(0, MAX_CATEGORY_LENGTH - 3) + '...';
+        } else {
+          return text;
+        }
+      };
+
+
       var vis = d3.select(element[0]).append("svg:svg")
           .attr("width", w)
           .attr("height", h)
@@ -184,13 +197,17 @@ oppia.directive('stateGraphViz', function (stateData) {
 
         linkEnter.append("svg:text")
             .attr("dy", function(d) { return d.source.y0*0.5 + d.target.y0*0.5; })
-            .attr("dx", function(d) { return d.source.x0*0.5 + d.target.x0*0.5; })
+            .attr("dx", function(d) {
+              return d.source.x0*0.5 + d.target.x0*0.5 - DEFAULT_CIRCLE_RADIUS;
+            })
             .attr('color', 'black')
             .text(function(d) {
               if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
                 return '';
               }
-              return d.name;
+              return '';
+              // TODO(sll): display link text (return d.name) when we can do so
+              // without all the text overlapping.
             });
 
 
@@ -212,7 +229,7 @@ oppia.directive('stateGraphViz', function (stateData) {
               if (d.hashId == initStateId) {
                 return 40;
               } else {
-                return 30;
+                return DEFAULT_CIRCLE_RADIUS;
               }
             })
             .attr("class", function(d) {
@@ -238,9 +255,11 @@ oppia.directive('stateGraphViz', function (stateData) {
             });
 
         nodeEnter.append("svg:text")
+            .attr("dx", function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
             .attr("dy", function(d) { return d.y0; })
-            .attr("dx", function(d) { return d.x0; })
-            .text(function(d) { return d.name; });
+            .text(function(d) { return scope.truncate(d.name); });
+
+
 
         // Add a "delete node" handler.
         nodeEnter.append("svg:rect")
@@ -259,8 +278,8 @@ oppia.directive('stateGraphViz', function (stateData) {
             });
 
         nodeEnter.append("svg:text")
-            .attr("dy", function(d) { return d.y0 - 20; })
             .attr("dx", function(d) { return d.x0 + 20; })
+            .attr("dy", function(d) { return d.y0 - 20; })
             .text(function(d) {
               if (d.hashId == initStateId || d.hashId == '-1') {
                 return;

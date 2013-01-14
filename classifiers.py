@@ -34,6 +34,11 @@ INPUT_CLASSIFIER = {classifiers.none: none_classifier.NoneClassifier,
                     classifiers.set: set_classifier.SetClassifier,
                     classifiers.text: text_classifier.TextClassifier}
 
+DEFAULT_ANSWER = {classifiers.none: '',
+                  classifiers.finite: '',
+                  classifiers.numeric: 0,
+                  classifiers.set: [],
+                  classifiers.text: ''}
 
 def Classify(classifier_type, response, categories, params=None):
   """A general classifier which classifies inputs using given parameters.

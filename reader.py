@@ -89,6 +89,8 @@ class ExplorationHandler(base.BaseHandler):
     init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
     self.data_values.update({
         'block_number': 0,
+        'default_answer': classifiers.DEFAULT_ANSWER[
+            init_state.input_view.get().classifier],
         'html': init_html,
         'input_view': init_state.input_view.get().name,
         'state_id': init_state.hash_id,
@@ -166,6 +168,8 @@ class ExplorationHandler(base.BaseHandler):
         html_output += state_html
         widget_output.append(state_widgets)
 
+    values['default_answer'] = classifiers.DEFAULT_ANSWER[
+        state.input_view.get().classifier]
     values['exploration_id'] = exploration.hash_id
     values['state_id'] = state.hash_id
     values['html'] = html_output
