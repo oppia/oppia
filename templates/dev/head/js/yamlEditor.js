@@ -14,9 +14,8 @@ function YamlEditor($scope, $http, $routeParams, stateData, explorationData, war
    */
   $scope.saveState = function() {
     $http.put(
-        '/create/convert/' + $scope.explorationId,
-        'state_id=' + $scope.stateId +
-            '&yaml_file=' + encodeURIComponent($scope.yaml),
+        '/create/' + $scope.explorationId + '/' + $scope.stateId + '/data/',
+        'yaml_file=' + encodeURIComponent($scope.yaml),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.$parent.states[$scope.stateId] = data.state;

@@ -428,7 +428,11 @@ def VerifyState(description):
 
 
 def ModifyStateUsingDict(exploration, state, state_dict):
-  """Modifies the properties of a state using values from a dictionary."""
+  """Modifies the properties of a state using values from a dictionary.
+
+  Returns:
+    The state's destination array.
+  """
 
   is_valid, error_log = VerifyState(state_dict)
   if not is_valid:
@@ -479,6 +483,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
   state.classifier_categories = category_list
   state.action_sets = action_set_list
   state.put()
+  return dests_array
 
 
 def CreateExplorationFromYaml(yaml, user, title, category, id=None):

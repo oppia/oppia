@@ -17,7 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import datetime, json, logging, os, yaml
-import base, classifiers, converter, feconf, main, models, reader, utils
+import base, classifiers, feconf, main, models, reader, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -345,6 +345,20 @@ class StateHandler(BaseHandler):
   def put(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
     user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
+
+    yaml_file = self.request.get('yaml_file')
+    if yaml_file:
+      # The user has uploaded a YAML file. Process only this action.
+      dests_array = utils.ModifyStateUsingDict(exploration, state, utils.GetDictFromYaml(yaml_file))
+      input_view = state.input_view.get()
+      self.response.out.write(json.dumps({
+          'classifier': input_view.classifier,
+          'explorationId': exploration_id,
+          'inputType': input_view.name,
+          'state': {'desc': state.name, 'dests': dests_array},
+          'stateContent': state.content,
+      }))
+      return
 
     state_name = self.request.get('state_name')
     state_content_json = self.request.get('state_content')
