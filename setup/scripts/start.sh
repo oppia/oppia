@@ -1,7 +1,7 @@
 # Run this script from the oppia root folder:
 #   sh internal/scripts/start.sh
 # The root folder MUST be named 'oppia'.
-# It sets up the third-party files and the local GAE.
+# It sets up the third-party files and the local GAE, and runs tests.
 
 set -e
 
@@ -12,9 +12,12 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
   exit 1
 fi
 
+echo Deleting old *.pyc files
+find . -iname "*.pyc" -exec rm -f {} \;
+
 RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_1_1_1:./third_party/webtest
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
@@ -89,14 +92,62 @@ if [ ! -d "third_party/jsplumb" ]; then
   wget https://jsplumb.googlecode.com/files/jquery.jsPlumb-1.3.15-all.js -O third_party/jsplumb/jsPlumb.js
 fi
 
-echo Deleting old *.pyc files
-find . -iname "*.pyc" -exec rm -f {} \;
+echo Checking if webtest is installed in third_party
+if [ ! -d "third_party/webtest" ]; then
+  echo Installing webtest framework
+  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
+  unzip webtest-download.zip -d third_party
+  rm webtest-download.zip
+  mv third_party/WebTest-1.4.2 third_party/webtest
+fi
+
+echo Checking if coverage is installed in third_party
+if [ ! -d "third_party/coverage" ]; then
+  echo Installing coverage
+  wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
+  tar xvzf coverage.tar.gz -C third_party
+  rm coverage.tar.gz
+  mv third_party/coverage-3.6 third_party/coverage
+fi
+
+echo Checking if coverage is installed on the system
+IS_COVERAGE_INSTALLED=$(python - << EOF
+import sys
+try:
+    import coverage as coverage_module
+except:
+    coverage_module = None
+if coverage_module:
+    sys.stderr.write('Coverage is installed in %s\n' % coverage_module.__path__)
+    print 1
+else:
+    sys.stderr.write('Coverage is NOT installed\n')
+    print 0
+EOF
+)
+
+if [ $IS_COVERAGE_INSTALLED == 0 ]; then
+  echo Installing coverage
+  sudo rm -rf third_party/coverage
+  wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
+  tar xvzf coverage.tar.gz -C third_party
+  rm coverage.tar.gz
+  mv third_party/coverage-3.6 third_party/coverage
+
+  pushd third_party/coverage
+  sudo python setup.py install
+  popd
+  sudo rm -rf third_party/coverage
+fi
+
+coverage run tests/suite.py
+coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*"
 
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
 --address=0.0.0.0 --port=8080 --clear_datastore ."
 
-sleep 3
+sleep 5
 
 echo Opening browser window pointing to an end user interface
 /opt/google/chrome/chrome http://localhost:8080/ &

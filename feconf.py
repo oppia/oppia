@@ -12,7 +12,8 @@ DEBUG = False
 PRODUCTION_MODE = False
 
 # Whether we should serve the development or production experience.
-DEV = (os.environ['SERVER_SOFTWARE'].startswith('Development')
+DEV = (os.environ.get('SERVER_SOFTWARE')
+       and os.environ['SERVER_SOFTWARE'].startswith('Development')
        and not PRODUCTION_MODE)
 
 # The directory containing the HTML/JS/CSS templates.
