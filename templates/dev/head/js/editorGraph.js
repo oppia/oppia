@@ -205,11 +205,10 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
 
 
 
-
         // Update the nodes
         // TODO(sll): Put a blue border around the current node.
         var node = vis.selectAll("g.node")
-            .data(nodes, function(d) { return d.id || (d.id = ++i); });
+            .data(nodes, function(d) { return d.id; });
 
         var nodeEnter = node.enter().append("svg:g")
             .attr("class", "node");
@@ -253,7 +252,6 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
             .attr("dx", function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
             .attr("dy", function(d) { return d.y0; })
             .text(function(d) { return scope.truncate(d.name); });
-
 
 
         // Add a "delete node" handler.
