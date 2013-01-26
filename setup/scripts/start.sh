@@ -92,6 +92,17 @@ if [ ! -d "third_party/jsplumb" ]; then
   wget https://jsplumb.googlecode.com/files/jquery.jsPlumb-1.3.15-all.js -O third_party/jsplumb/jsPlumb.js
 fi
 
+# Set up a local dev instance
+echo Starting GAE development server in a new shell
+gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
+--address=0.0.0.0 --port=8080 --clear_datastore ."
+
+sleep 5
+
+echo Opening browser window pointing to an end user interface
+/opt/google/chrome/chrome http://localhost:8080/ &
+
+# Code for running tests
 echo Checking if webtest is installed in third_party
 if [ ! -d "third_party/webtest" ]; then
   echo Installing webtest framework
@@ -128,28 +139,19 @@ EOF
 
 if [ $IS_COVERAGE_INSTALLED == 0 ]; then
   echo Installing coverage
-  sudo rm -rf third_party/coverage
+  rm -rf third_party/coverage
   wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
   tar xvzf coverage.tar.gz -C third_party
   rm coverage.tar.gz
   mv third_party/coverage-3.6 third_party/coverage
 
   pushd third_party/coverage
-  sudo python setup.py install
+  python setup.py install
   popd
-  sudo rm -rf third_party/coverage
+  rm -rf third_party/coverage
 fi
 
 coverage run tests/suite.py
 coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*"
-
-echo Starting GAE development server in a new shell
-gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
---address=0.0.0.0 --port=8080 --clear_datastore ."
-
-sleep 5
-
-echo Opening browser window pointing to an end user interface
-/opt/google/chrome/chrome http://localhost:8080/ &
 
 echo Done!
