@@ -473,7 +473,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
              ++categoryIndex) {
           if ($scope.states[id].dests[categoryIndex].dest == stateId) {
             $scope.states[id].dests[categoryIndex].dest = id;
-            edgesDeleted++;
+            if (id != stateId) {
+              edgesDeleted++;
+            }
           }
         }
       }
@@ -483,6 +485,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       }
 
       delete $scope.states[stateId];
+      // TODO(sll): This should really be saveExploration() or similar; it should
+      // not require a stateId.
       $scope.saveStateChange('states');
       explorationData.getData();
     }).error(function(data) {

@@ -228,10 +228,10 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
               }
             })
             .style('fill', function(d) {
-              if (d.reachable == false) {
-                return 'pink';
-              } else if (d.hashId == '-1') {
+              if (d.hashId == '-1') {
                 return 'olive';
+              } else if (d.reachable == false) {
+                return 'pink';
               } else {
                 return 'beige';
               }
