@@ -17,13 +17,13 @@ find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_1_1_1:./third_party/webtest
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip -O gae-download.zip
+  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.4.zip -O gae-download.zip
   unzip gae-download.zip -d $RUNTIME_HOME/
   rm gae-download.zip
 fi
