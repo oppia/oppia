@@ -48,7 +48,7 @@ class TextClassifier(object):
         in categories.
     """
     logging.info(response)
-    response = str(response)
+    response = unicode(response)
     response = self.NormalizeText(response)  #normalize student response:
 
     #try to find a matching category
