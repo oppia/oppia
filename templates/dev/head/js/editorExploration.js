@@ -364,7 +364,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
     for (var id in $scope.states) {
       if (id != $scope.stateId && $scope.states[id]['desc'] == newStateName) {
-        stateData.getData(id);
+        warningsData.addWarning('A state with this name already exists.');
         return;
       }
     }
@@ -403,8 +403,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
                 }
                 $scope.saveStateChange('states');
               } else {
-                // The content creator added a state from the state list.
-                stateData.getData(data.stateId);
+                // The content creator added a state from the exploration page.
+                explorationData.getData();
               }
             }).error(function(data) {
               $scope.addStateLoading = false;

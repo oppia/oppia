@@ -147,7 +147,6 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
         var links = source.links;
         var initStateId = source.initStateId;
 
-
         // Update the links
         var link = vis.selectAll("path.link")
             .data(links, function(d) { return d; });
