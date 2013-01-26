@@ -17,6 +17,7 @@ find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
+# Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
