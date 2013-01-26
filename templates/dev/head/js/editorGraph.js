@@ -126,12 +126,12 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
         }
       };
 
-      var vis = d3.select(element[0]).append("svg:svg")
-          .attr("width", w)
-          .attr("height", h)
-          .attr("class", "oppia-graph-viz")
-        .append("svg:g")
-          .attr("transform", "translate(20,30)");
+      var vis = d3.select(element[0]).append('svg:svg')
+          .attr('width', w)
+          .attr('height', h)
+          .attr('class', 'oppia-graph-viz')
+        .append('svg:g')
+          .attr('transform', 'translate(20,30)');
 
       scope.$watch('val', function (newVal, oldVal) {
         // clear the elements inside of the directive
@@ -148,48 +148,48 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
         var initStateId = source.initStateId;
 
         // Update the links
-        var link = vis.selectAll("path.link")
-            .data(links, function(d) { return d; });
+        var link = vis.selectAll('path.link')
+            .data(links);
 
-        vis.append("svg:defs").selectAll('marker')
+        vis.append('svg:defs').selectAll('marker')
             .data(['arrowhead'])
-          .enter().append("svg:marker")
-            .attr("id", String)
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 25)
-            .attr("refY", -1.5)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 6)
-            .attr("orient", "auto")
-          .append("svg:path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .attr("fill", "red");
+          .enter().append('svg:marker')
+            .attr('id', String)
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 25)
+            .attr('refY', -1.5)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 6)
+            .attr('orient', 'auto')
+          .append('svg:path')
+            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('fill', 'red');
 
-        var linkEnter = link.enter().append("svg:g")
-            .attr("class", "link");
+        var linkEnter = link.enter().append('svg:g')
+            .attr('class', 'link');
 
-        linkEnter.insert("svg:path", "g")
-            .style("stroke-width", 3)
-            .style("stroke", "red")
-            .attr("class", "link")
-            .attr("d", function(d) {
+        linkEnter.insert('svg:path', 'g')
+            .style('stroke-width', 3)
+            .style('stroke', 'red')
+            .attr('class', 'link')
+            .attr('d', function(d) {
               // Draw elliptical arcs.
               var dx = d.target.x0 - d.source.x0,
                   dy = d.target.y0 - d.source.y0,
                   dr = Math.sqrt(dx * dx + dy * dy);
-              return "M" + d.source.x0 + "," + d.source.y0 + "A" + dr + "," + dr + " 0 0,1 " + d.target.x0 + "," + d.target.y0;
+              return 'M' + d.source.x0 + ',' + d.source.y0 + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x0 + ',' + d.target.y0;
             })
-            .attr("marker-end", function(d) {
+            .attr('marker-end', function(d) {
               if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
                 return '';
               } else {
-                return "url(#arrowhead)";
+                return 'url(#arrowhead)';
               }
             });
 
-        linkEnter.append("svg:text")
-            .attr("dy", function(d) { return d.source.y0*0.5 + d.target.y0*0.5; })
-            .attr("dx", function(d) {
+        linkEnter.append('svg:text')
+            .attr('dy', function(d) { return d.source.y0*0.5 + d.target.y0*0.5; })
+            .attr('dx', function(d) {
               return d.source.x0*0.5 + d.target.x0*0.5 - DEFAULT_CIRCLE_RADIUS;
             })
             .attr('color', 'black')
@@ -203,75 +203,74 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
             });
 
 
-
         // Update the nodes
         // TODO(sll): Put a blue border around the current node.
-        var node = vis.selectAll("g.node")
+        var node = vis.selectAll('g.node')
             .data(nodes, function(d) { return d.id; });
 
-        var nodeEnter = node.enter().append("svg:g")
-            .attr("class", "node");
+        var nodeEnter = node.enter().append('svg:g')
+            .attr('class', 'node');
 
         // Add nodes to the canvas.
-        nodeEnter.append("svg:circle")
-            .attr("cy", function(d) { return d.y0; })
-            .attr("cx", function(d) { return d.x0; })
-            .attr("r", function(d) {
+        nodeEnter.append('svg:circle')
+            .attr('cy', function(d) { return d.y0; })
+            .attr('cx', function(d) { return d.x0; })
+            .attr('r', function(d) {
               if (d.hashId == initStateId) {
                 return 40;
               } else {
                 return DEFAULT_CIRCLE_RADIUS;
               }
             })
-            .attr("class", function(d) {
+            .attr('class', function(d) {
               if (d.hashId != '-1') {
-                return "clickable";
+                return 'clickable';
               }
             })
-            .style("fill", function(d) {
+            .style('fill', function(d) {
               if (d.reachable == false) {
-                return "pink";
+                return 'pink';
               } else if (d.hashId == '-1') {
-                return "olive";
+                return 'olive';
               } else {
-                return "beige";
+                return 'beige';
               }
             })
-            .on("click", function (d) {
+            .on('click', function (d) {
               if (d.hashId == '-1') {
                 return;
               }
               scope.$parent.$parent.stateId = d.hashId;
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
             })
-            .append("svg:title")
+            .append('svg:title')
             .text(function(d) { return d.name; });
 
-        nodeEnter.append("svg:text")
-            .attr("dx", function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
-            .attr("dy", function(d) { return d.y0; })
+        nodeEnter.append('svg:text')
+            .attr('dx', function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
+            .attr('dy', function(d) { return d.y0; })
             .text(function(d) { return scope.truncate(d.name); });
 
 
-        // Add a "delete node" handler.
-        nodeEnter.append("svg:rect")
-            .attr("y", function(d) { return d.y0; })
-            .attr("x", function(d) { return d.x0; })
-            .attr("height", 20)
-            .attr("width", 20)
-            .attr("opacity", 0)
-            .attr("transform", function(d) { return "translate(" + (20) + "," + (-30) + ")"; })
-            .attr("stroke-width", "0")
-            .on("click", function (d) {
+        // Add a 'delete node' handler.
+        nodeEnter.append('svg:rect')
+            .attr('y', function(d) { return d.y0; })
+            .attr('x', function(d) { return d.x0; })
+            .attr('height', 20)
+            .attr('width', 20)
+            .attr('opacity', 0)
+            .attr('transform', function(d) { return 'translate(' + (20) + ',' + (-30) + ')'; })
+            .attr('stroke-width', '0')
+            .on('click', function (d) {
               if (d.hashId == initStateId) {
                 return;
               }
               scope.$parent.$parent.deleteState(d.hashId);
             });
 
-        nodeEnter.append("svg:text")
-            .attr("dx", function(d) { return d.x0 + 20; })
-            .attr("dy", function(d) { return d.y0 - 20; })
+        nodeEnter.append('svg:text')
+            .attr('dx', function(d) { return d.x0 + 20; })
+            .attr('dy', function(d) { return d.y0 - 20; })
             .text(function(d) {
               if (d.hashId == initStateId || d.hashId == '-1') {
                 return;
