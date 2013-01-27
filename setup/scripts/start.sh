@@ -108,14 +108,10 @@ if [ ! -d "third_party/webtest" ]; then
   mv third_party/WebTest-1.4.2 third_party/webtest
 fi
 
-echo Checking if coverage is installed in third_party
-if [ ! -d "third_party/coverage" ]; then
-  echo Installing coverage
-  wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
-  tar xvzf coverage.tar.gz -C third_party
-  rm coverage.tar.gz
-  mv third_party/coverage-3.6 third_party/coverage
-fi
+
+# Note: you can safely delete all of the following code (up to the end of the
+# file) if it leads to errors on your system. It runs checks to see how well
+# the tests cover the code.
 
 echo Checking if coverage is installed on the system
 IS_COVERAGE_INSTALLED=$(python - << EOF
@@ -133,21 +129,21 @@ else:
 EOF
 )
 
-if [ $IS_COVERAGE_INSTALLED == 0 ]; then
+if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   echo Installing coverage
-  rm -rf third_party/coverage
+  sudo rm -rf third_party/coverage
   wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
   tar xvzf coverage.tar.gz -C third_party
   rm coverage.tar.gz
   mv third_party/coverage-3.6 third_party/coverage
 
-  pushd third_party/coverage
-  python setup.py install
-  popd
-  rm -rf third_party/coverage
+  cd third_party/coverage
+  sudo python setup.py install
+  cd ../../
+  sudo rm -rf third_party/coverage
 fi
 
-coverage run tests/suite.py
+coverage run ./tests/suite.py
 coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*"
 
 echo Done!

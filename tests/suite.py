@@ -21,11 +21,6 @@ import unittest
 
 import webtest
 
-from google.appengine.datastore import datastore_stub_util
-from google.appengine.ext import deferred
-from google.appengine.ext import testbed
-
-
 EXPECTED_TEST_COUNT = 2
 
 
@@ -34,6 +29,8 @@ class BaseTestClass(unittest.TestCase):
 
     def setUp(self):  # pylint: disable-msg=g-bad-name
         # setup an app to be tested
+        from google.appengine.datastore import datastore_stub_util
+        from google.appengine.ext import testbed
         self.testapp = webtest.TestApp(self.getApp())
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -56,6 +53,7 @@ class BaseTestClass(unittest.TestCase):
 
     def execute_all_deferred_tasks(self, queue_name='default'):
         """Executes all pending deferred tasks."""
+        from google.appengine.ext import deferred
         for task in self.taskq.GetTasks(queue_name):
             deferred.run(base64.b64decode(task['body']))
 
