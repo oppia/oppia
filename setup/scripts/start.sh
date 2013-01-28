@@ -19,6 +19,7 @@ RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
+export PYTHONPATH=$PYTHONPATH
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
@@ -84,6 +85,16 @@ if [ ! -d "third_party/d3js" ]; then
   echo Installing d3.js
   mkdir -p third_party/d3js/
   wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
+fi
+
+echo Checking whether wysihtml5 is installed in third_party
+if [ ! -d "third_party/wysihtml5" ]; then
+  echo Installing wysihtml5
+  mkdir -p third_party/wysihtml5/
+  wget https://github.com/xing/wysihtml5/zipball/0.3.0 -O wysihtml5-download.zip
+  unzip wysihtml5-download.zip -d third_party/
+  rm wysihtml5-download.zip
+  mv third_party/xing-wysihtml5-fb0cfe4 third_party/wysihtml5
 fi
 
 
