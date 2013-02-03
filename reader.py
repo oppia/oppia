@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging, os
+import json, logging, os, random
 import base, classifiers, feconf, models, utils
 
 from google.appengine.api import users
@@ -24,30 +24,6 @@ from google.appengine.ext import ndb
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
-
-
-class MainPage(base.BaseHandler):
-  """The reader's main page, which displays a catalog of explorations."""
-
-  def get(self):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
-    categories = {}
-    for exploration in models.Exploration.query().filter(
-        models.Exploration.is_public == True):
-      category_name = exploration.category
-
-      if not categories.get(category_name):
-        categories[category_name] = {'explorations': [exploration]}
-      else:
-        categories[category_name]['explorations'].append(exploration)
-
-    self.values.update({
-        'categories': categories,
-        'js': utils.GetJsFilesWithBase(['readerMain']),
-        'mode': READER_MODE,
-    })
-    self.response.out.write(
-        base.JINJA_ENV.get_template('reader/reader_main.html').render(self.values))
 
 
 class ExplorationPage(base.BaseHandler):
@@ -184,3 +160,16 @@ class ExplorationHandler(base.BaseHandler):
     values['input_template'] = utils.GetInputTemplate(values['input_view'])
     utils.Log(values)
     self.response.out.write(json.dumps(values))
+
+
+class RandomExplorationPage(base.BaseHandler):
+  """Returns the page for a random exploration."""
+
+  def get(self):
+    """Handles GET requests."""
+    explorations = models.Exploration.query().filter(
+        models.Exploration.is_public == True).fetch(100)
+
+    selected_exploration = random.choice(explorations)
+
+    self.redirect('/learn/%s' % selected_exploration.hash_id)

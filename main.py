@@ -21,6 +21,8 @@ __author__ = 'Sean Lip'
 import base, classifiers, editor, feconf, models, os, reader, utils, widgets
 import webapp2
 
+from google.appengine.api import users
+
 
 class Error404Handler(base.BaseHandler):
   """Handles 404 errors."""
@@ -65,6 +67,67 @@ class TermsPage(base.BaseHandler):
         base.JINJA_ENV.get_template('terms.html').render(self.values))
 
 
+class GalleryPage(base.BaseHandler):
+  """The exploration gallery page."""
+
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
+    augmented_user = utils.GetAugmentedUser(user) if user else None
+
+    used_keys = []
+
+    categories = {}
+    for exploration in models.Exploration.query().filter(
+        models.Exploration.is_public == True):
+      category_name = exploration.category
+
+      if augmented_user:
+        can_edit = exploration.key in augmented_user.editable_explorations
+      else:
+        can_edit = False
+
+      used_keys.append(exploration.key)
+
+      if not categories.get(category_name):
+        categories[category_name] = {
+            'explorations': [{
+                'data': exploration,
+                'can_edit': can_edit,
+            }]}
+      else:
+        categories[category_name]['explorations'].append({
+            'data': exploration,
+            'can_edit': can_edit,
+        })
+
+    if augmented_user:
+      for exploration_key in augmented_user.editable_explorations:
+        exploration = exploration_key.get()
+        category_name = exploration.category
+        if not categories.get(category_name):
+          categories[category_name] = {
+              'explorations': [{
+                  'data': exploration,
+                  'can_edit': True,
+              }]}
+        elif exploration.key not in used_keys:
+          categories[category_name]['explorations'].append({
+              'data': exploration,
+              'can_edit': True,
+          })
+
+    self.values.update({
+        'categories': categories,
+        'js': utils.GetJsFilesWithBase(['gallery']),
+        'login_url': users.create_login_url('/gallery'),
+        'mode': 'gallery',
+        'user': user,
+    })
+    self.response.out.write(
+        base.JINJA_ENV.get_template('gallery.html').render(self.values))
+
+
 class MainPage(base.BaseHandler):
   """Oppia's main page."""
   def InitializeInputViews(self):
@@ -98,19 +161,18 @@ class MainPage(base.BaseHandler):
       with open('samples/hola.yaml') as f:
         yaml = f.read().decode('utf-8')
       exploration = utils.CreateExplorationFromYaml(
-          yaml=yaml, user=None, title='Demo: ¡Hola!', category='Languages', id='0')
-
-    try:
-      exploration = utils.GetEntity(models.Exploration, '1')
-    except:
-      # TODO(sll): Populate the data for this sample exploration.
-      utils.CreateNewExploration(None, title='Demo 2', id='1')
+          yaml=yaml, user=None, title='Demo: ¡Hola!', category='Languages',
+          id='0')
+      exploration.is_public = True
+      exploration.put()
 
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     self.InitializeInputViews()
     self.EnsureDefaultExplorationExists()
     self.values['js'] = utils.GetJsFilesWithBase(['index'])
+    self.values['login_url'] = users.create_login_url('/gallery')
+    self.values['user'] = users.get_current_user()
     self.response.out.write(
         base.JINJA_ENV.get_template('index.html').render(self.values))
 
@@ -123,14 +185,14 @@ urls = [
     (r'/?', MainPage),
     (r'/about/?', AboutPage),
     (r'/terms/?', TermsPage),
+    (r'/gallery/?', GalleryPage),
 
-    (r'/learn/?', reader.MainPage),
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
     (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
+    (r'/learn_random/?', reader.RandomExplorationPage),
 
-    (r'/create/?', editor.MainPage),
     (r'/create_new/?', editor.NewExploration),
     (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),

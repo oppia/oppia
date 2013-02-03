@@ -27,6 +27,9 @@ handlers:
 - url: /terms/?
   script: main.app
   secure: always
+- url: /gallery/?
+  script: main.app
+  secure: always
 - url: /learn(/.*)?
   script: main.app
   secure: always

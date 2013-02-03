@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div ng-controller="Gallery">
+    <form class="oppia-form-search pull-right">
+      <div class="add-on">
+        <input type="text" placeholder="Search" class="input-medium search-query">
+        <i class="icon-search"></i>
+      </div>
+    </form>
+
+    <div class="oppia-content">
+      {% if categories %}
+        <h2> Available Explorations</h2>
+        <center>
+          {% for category in categories %}
+            <div class="oppia-class-category">
+              <h4>{{category}}</h4>
+              <hr>
+              <ul class="thumbnails">
+                {% for exploration in categories[category].explorations %}
+                  <li class="span3">
+                    <div class="thumbnail">
+                      <a href="/learn/{{exploration.data.hash_id}}">
+                        {% if exploration.data.image_id %}
+                          <img src="/imagehandler/{{exploration.data.image_id}}" class="oppia-large-image"></img>
+                        {% else %}
+                          <img src="/images/draft.png" alt="Draft Image">
+                        {% endif %}
+                      </a>
+                      <div>
+                        <h5>{{exploration.data.title}}</h5>
+                        <a ng-click="showModal('{{exploration.data.hash_id}}')">Embed</a>
+                        {% if exploration.can_edit %}
+                          | <a href="/create/{{exploration.data.hash_id}}">Edit</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </center>
+      {% endif %}
+
+      <br>
+      <br>
+
+      {% if user %}
+        <p>
+          <a class="btn btn-large btn-success" ng-click="openNewExplorationModal()">
+            Create New Exploration
+          </a>
+        </p>
+      {% else %}
+        <h4>
+          To create new explorations, you must <a href="{{login_url}}">log in</a>.
+        </h4>
+      {% endif %}
+    </div>
+
+
+    {% if user %}
+      <form name="createNewExplorationForm" ng-submit="createNewExploration()">
+        <div ui-modal class="fade" id="newExplorationModal" ng-model="createModalShown">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              &times;
+            </button>
+            <h3 id="customizeModalLabel">Add New Exploration</h3>
+          </div>
+          <div class="modal-body">
+            <div>
+              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus>
+            </div>
+            <div>
+              Category: <input type="text" ng-model="newExplorationCategory">
+            </div>
+            <div>
+              Plaintext file (optional): <textarea ng-model="newExplorationYaml" rows="14"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <input type="submit" class="btn" value="Save">
+            <a class="btn" data-dismiss="modal" ng-click="closeNewExplorationModal()">Close</a>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+
+    <div ui-modal class="fade" id="embedModal" ng-model="embedModalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="embedModalLabel">Embed this exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          You can embed this exploration in a webpage by copying and pasting
+          the following code snippet into the webpage's HTML:
+        </p>
+        <code>
+          &lt;iframe src="<[currentUrl]>/<[currentId]>?hideNavbar=true" width="100%" height="400px" frameborder="0"&gt;
+          &lt;/iframe&gt;
+        </code>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

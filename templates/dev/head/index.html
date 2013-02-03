@@ -13,20 +13,17 @@
 
         <div class="row-fluid">
           <div class="span12">
-            <!-- TODO(sll): replace the iframe exploration ID with a proper demo.
-                 Use an example that encompasses several topics. -->
             <iframe src="/learn/0?iframed=true" width="100%" height="400px"
              frameborder="0"></iframe>
           </div>
-          <div class="span0">
-            <!-- TODO(sll): replace the iframe exploration ID with a proper demo.
-                 Use an example that encompasses several topics. -->
-            <!--
-            <iframe src="/learn/1?iframed=true" width="100%" height="400px"
-             frameborder="0"></iframe>
-            -->
-          </div>
         </div>
+
+        <center>
+          <a href="/gallery" class="btn btn-large btn-success">
+            View more explorations in our gallery
+          </a>
+        </center>
+
       </div>
     </div>
 
@@ -44,7 +41,7 @@
             and help you learn faster and more enjoyably.
           </p>
           <center class="oppia-btn-container">
-            <a class="btn btn-large btn-success" href="/learn">Start learning</a>
+            <a class="btn btn-large btn-success" href="/learn_random">Launch a random exploration</a>
           </center>
         </div>
       </div>
@@ -60,7 +57,12 @@
             other explorations to make them better.
           </p>
           <center class="oppia-btn-container">
-            <a class="btn btn-large btn-success" href="/create">Create an exploration</a>
+            {% if user %}
+              <!-- TODO(sll): Add a flag here to display only explorations that the user can edit. -->
+              <a class="btn btn-large btn-success" href="/gallery">Edit / Create an exploration</a>
+            {% else %}
+              <a class="btn btn-large btn-success" href="{{login_url}}">Edit / Create an exploration</a>
+            {% endif %}
           </center>
           <center>
             <p>(you'll need to log in)</p>

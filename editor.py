@@ -83,33 +83,6 @@ class BaseHandler(base.BaseHandler):
     return user, exploration, state
 
 
-class MainPage(BaseHandler):
-  """The editor's main page, which displays a list of explorations that he/she can edit."""
-
-  def get(self):  # pylint: disable-msg=C6409
-    """Handles GET requests."""
-
-    user = self.GetUser()
-    augmented_user = utils.GetAugmentedUser(user)
-
-    categories = {}
-    for exploration_key in augmented_user.editable_explorations:
-      exploration = exploration_key.get()
-      category_name = exploration.category
-      if not categories.get(category_name):
-        categories[category_name] = {'explorations': [exploration]}
-      else:
-        categories[category_name]['explorations'].append(exploration)
-
-    self.values.update({
-        'categories': categories,
-        'js': utils.GetJsFilesWithBase(['editorMain']),
-        'mode': EDITOR_MODE,
-    })
-    self.response.out.write(
-        base.JINJA_ENV.get_template('editor/editor_main.html').render(self.values))
-
-
 class NewExploration(BaseHandler):
   """Creates a new exploration."""
 

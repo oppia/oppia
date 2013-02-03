@@ -1,4 +1,15 @@
-function EditorMain($scope, $http, warningsData) {
+function Gallery($scope, $http, warningsData) {
+  $scope.currentUrl = document.URL;
+
+  /**
+   * Displays a model explaining how to embed the exploration.
+   * @param {string} id The id of the exploration to be embedded.
+   */
+   $scope.showModal = function(id) {
+     $scope.currentId = id;
+     $('#embedModal').modal();
+   };
+
   $scope.openNewExplorationModal = function() {
     $scope.newExplorationIsBeingAdded = true;
     $('#newExplorationModal').modal();
@@ -37,4 +48,4 @@ function EditorMain($scope, $http, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorMain.$inject = ['$scope', '$http', 'warningsData'];
+Gallery.$inject = ['$scope', '$http', 'warningsData'];
