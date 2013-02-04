@@ -2,60 +2,75 @@
 
 {% block content %}
   <div ng-controller="Gallery">
-    <form class="oppia-form-search pull-right">
-      <div class="add-on">
-        <input type="text" placeholder="Search" class="input-medium search-query">
-        <i class="icon-search"></i>
-      </div>
-    </form>
 
     <div class="oppia-content">
-      <div ng-show="categories">
-        <h2> Available Explorations</h2>
-        <center>
-          <div class="oppia-class-category" ng-repeat="(category, explorations) in categories">
-            <h4><[category]></h4>
-            <hr>
-            <ul class="thumbnails">
-              <li class="span3" ng-repeat="exploration in explorations">
-                <div class="thumbnail">
-                  <a href="/learn/<[exploration.data.hash_id]>">
-                    <span ui-if="exploration.data.image_id">
-                      <img ng-src="/imagehandler/<[exploration.data.image_id]>"
-                           class="oppia-large-image">
-                    </span>
-                    <span ng-hide="exploration.data.image_id">
-                      <img src="/images/draft.png" alt="Draft Image">
-                    </span>
-                  </a>
-                  <div>
-                    <h5><[exploration.data.title]></h5>
-                    <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
-                    <span ui-if="exploration.can_edit">
-                      | <a href="/create/<[exploration.data.hash_id]>">Edit</a>
-                    </span>
-                  </div>
-                </div>
-              </li>
-            </ul>
+      <div class="oppia-gallery-frame">
+
+        <form class="oppia-form-search pull-right">
+          <div class="add-on">
+            <input type="text" placeholder="Search" class="input-medium search-query">
+            <i class="icon-search"></i>
           </div>
-        </center>
+        </form>
+
+        <h2>Available Explorations</h2>
+
+        <div class="tabbable tabs-left" ui-if="categories">
+          <ul class="nav nav-tabs">
+            <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
+              <a data-toggle="tab" href="#<[category]>"><[category]></a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category]>">
+              <div class="container-fluid">
+                <div class="row-fluid">
+
+                  <ul class="thumbnails">
+                    <li ng-repeat="exploration in explorations" class="span3">
+                      <div class="thumbnail">
+                        <a href="/learn/<[exploration.data.hash_id]>">
+                          <span ui-if="exploration.data.image_id">
+                            <img ng-src="/imagehandler/<[exploration.data.image_id]>"
+                                 class="oppia-large-image">
+                          </span>
+                          <span ng-hide="exploration.data.image_id">
+                            <img src="/images/draft.png" alt="Draft Image">
+                          </span>
+                        </a>
+                        <div>
+                          <h5><[exploration.data.title]></h5>
+                          <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
+                          <span ui-if="exploration.can_edit">
+                            | <a href="/create/<[exploration.data.hash_id]>">Edit</a>
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <br>
+
+        {% if user %}
+          <p>
+            <a class="btn btn-large btn-success" ng-click="openNewExplorationModal()">
+              Create New Exploration
+            </a>
+          </p>
+        {% else %}
+          <h4>
+            To create new explorations or edit existing ones, you must <a href="{{login_url}}">log in</a>.
+          </h4>
+        {% endif %}
+
       </div>
-
-      <br>
-      <br>
-
-      {% if user %}
-        <p>
-          <a class="btn btn-large btn-success" ng-click="openNewExplorationModal()">
-            Create New Exploration
-          </a>
-        </p>
-      {% else %}
-        <h4>
-          To create new explorations or edit existing ones, you must <a href="{{login_url}}">log in</a>.
-        </h4>
-      {% endif %}
     </div>
 
 

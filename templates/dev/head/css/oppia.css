@@ -27,16 +27,12 @@ textarea.oppia-code {
   width: 80%;
 }
 
-.oppia-class-category {
+.oppia-gallery-frame {
   border: 3px solid #CCC;
   border-radius: 20px;
   margin: 10px;
+  padding: 10px;
   width: 100%;
-}
-
-.oppia-class-category hr {
-  border-top: 3px double #CCC;
-  margin: 0;
 }
 
 .oppia-form-search {
