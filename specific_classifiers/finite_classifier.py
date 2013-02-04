@@ -18,7 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
 
-import base
+from controllers import base
 
 
 class FiniteClassifier(object):

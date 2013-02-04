@@ -18,10 +18,10 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-import logging
+import json, logging
 
-import base, utils
+from controllers import base
+import utils
 
 
 class SetClassifier(object):

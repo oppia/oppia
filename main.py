@@ -16,7 +16,9 @@
 
 __author__ = 'Sean Lip'
 
-import base, classifiers, editor, feconf, gallery, models, os, pages, reader, resources, utils, widgets
+import classifiers, feconf, models, utils
+from controllers import base, editor, gallery, pages, reader, resources, widgets
+
 import json, webapp2
 
 from google.appengine.api import users

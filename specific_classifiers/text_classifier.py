@@ -20,7 +20,8 @@ __author__ = 'yanamal@google.com (Yana Malysheva)'
 
 import logging
 
-import base, utils
+from controllers import base
+import utils
 
 
 class TextClassifier(object):

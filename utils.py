@@ -17,7 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import base64, datetime, hashlib, json, logging, os, yaml
-import base, feconf, models
+import feconf, models
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -238,7 +238,7 @@ def ParseContentIntoHtml(content_array, block_number):
       try:
         widget = GetEntity(models.Widget, content['value'])
         widget_counter += 1
-        html += base.JINJA_ENV.get_template('content.html').render({
+        html += feconf.JINJA_ENV.get_template('content.html').render({
             'type': content['type'], 'blockIndex': block_number,
             'index': widget_counter})
         widget_array.append({'blockIndex': block_number, 'index': widget_counter,
@@ -247,7 +247,7 @@ def ParseContentIntoHtml(content_array, block_number):
         # Ignore empty widget content.
         pass
     elif (content['type'] in ['text', 'image', 'video']):
-      html += base.JINJA_ENV.get_template('content.html').render({
+      html += feconf.JINJA_ENV.get_template('content.html').render({
           'type': content['type'], 'value': content['value']})
     else:
       raise InvalidInputException('Invalid content type %s', content['type'])

@@ -17,13 +17,15 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json, logging, os
-import jinja2, webapp2
-import base, feconf, models, utils
+from controllers.base import BaseHandler, require_user
+import feconf, models, utils
+
+import webapp2
 
 from google.appengine.api import users
 
 
-class WidgetRepositoryPage(base.BaseHandler):
+class WidgetRepositoryPage(BaseHandler):
   """Displays the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -36,7 +38,7 @@ class WidgetRepositoryPage(base.BaseHandler):
     if users.is_current_user_admin():
       self.values['admin'] = True
     self.response.out.write(
-        base.JINJA_ENV.get_template('widgets/widget_repository.html').render(self.values))
+        feconf.JINJA_ENV.get_template('widgets/widget_repository.html').render(self.values))
 
   def post(self):  # pylint: disable-msg=C6409
     """Creates a new generic widget."""
@@ -96,7 +98,7 @@ class WidgetRepositoryPage(base.BaseHandler):
     self.response.out.write(json.dumps({'widget': widget_data}))
 
 
-class WidgetRepositoryHandler(base.BaseHandler):
+class WidgetRepositoryHandler(BaseHandler):
   """Provides data to populate the widget repository page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -116,7 +118,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
     self.response.out.write(json.dumps({'widgets': response}))
 
 
-class Widget(base.BaseHandler):
+class Widget(BaseHandler):
   """Handles individual (non-generic) widget uploads, edits and retrievals."""
 
   def get(self, widget_id):  # pylint: disable-msg=C6409
@@ -137,7 +139,7 @@ class Widget(base.BaseHandler):
     else:
       self.response.out.write(json.dumps({'error': 'No such widget'}))
 
-  @base.require_user
+  @require_user
   def post(self, widget_id=None):  # pylint: disable-msg=C6409
     """Saves or edits a widget uploaded by a content creator."""
     logging.info(widget_id)

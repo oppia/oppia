@@ -15,13 +15,14 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import base, models, utils
+from controllers.base import BaseHandler
+import feconf, models, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
 
-class GalleryPage(base.BaseHandler):
+class GalleryPage(BaseHandler):
   """The exploration gallery page."""
 
   def get(self):  # pylint: disable-msg=C6409
@@ -31,10 +32,10 @@ class GalleryPage(base.BaseHandler):
         'nav_mode': 'gallery',
     })
     self.response.out.write(
-        base.JINJA_ENV.get_template('gallery.html').render(self.values))
+        feconf.JINJA_ENV.get_template('gallery.html').render(self.values))
 
 
-class GalleryHandler(base.BaseHandler):
+class GalleryHandler(BaseHandler):
   """Provides data for the exploration gallery."""
 
   def get(self):  # pylint: disable-msg=C6409

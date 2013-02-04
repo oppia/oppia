@@ -15,21 +15,22 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import base, models, utils
+from controllers.base import BaseHandler
+import feconf, models, utils
 
 from google.appengine.ext import ndb
 
 
-class TemplateHandler(base.BaseHandler):
+class TemplateHandler(BaseHandler):
   """Retrieves an editor template."""
 
   def get(self, template_type):
     """Handles GET requests."""
-    self.response.out.write(base.JINJA_ENV.get_template(
+    self.response.out.write(feconf.JINJA_ENV.get_template(
         'editor/views/%s_editor.html' % template_type).render({}))
 
 
-class Image(base.BaseHandler):
+class Image(BaseHandler):
   """Handles image uploads and retrievals."""
 
   def get(self, image_id):  # pylint: disable-msg=C6409

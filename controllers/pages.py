@@ -17,13 +17,14 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import base, classifiers, models, utils
+from controllers.base import BaseHandler
+import classifiers, feconf, models, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
 
-class MainPage(base.BaseHandler):
+class MainPage(BaseHandler):
   """Oppia's main page."""
   def InitializeInputViews(self):
     """Loads pre-written input views into the Oppia datastore."""
@@ -69,10 +70,10 @@ class MainPage(base.BaseHandler):
     self.values['login_url'] = users.create_login_url('/gallery')
     self.values['user'] = users.get_current_user()
     self.response.out.write(
-        base.JINJA_ENV.get_template('index.html').render(self.values))
+        feconf.JINJA_ENV.get_template('index.html').render(self.values))
 
 
-class AboutPage(base.BaseHandler):
+class AboutPage(BaseHandler):
   """Page with information about Oppia."""
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
@@ -96,13 +97,13 @@ class AboutPage(base.BaseHandler):
         'Reinaldo Aguiar',
     ]
     self.response.out.write(
-        base.JINJA_ENV.get_template('about.html').render(self.values))
+        feconf.JINJA_ENV.get_template('about.html').render(self.values))
 
 
-class TermsPage(base.BaseHandler):
+class TermsPage(BaseHandler):
   """Page with terms and conditions."""
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     self.values['js'] = utils.GetJsFilesWithBase([])
     self.response.out.write(
-        base.JINJA_ENV.get_template('terms.html').render(self.values))
+        feconf.JINJA_ENV.get_template('terms.html').render(self.values))

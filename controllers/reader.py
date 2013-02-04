@@ -17,7 +17,8 @@
 __author__ = 'Sean Lip'
 
 import json, logging, os, random
-import base, classifiers, feconf, models, utils
+from controllers.base import BaseHandler
+import classifiers, feconf, models, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -26,7 +27,7 @@ DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
 
 
-class ExplorationPage(base.BaseHandler):
+class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
 
   def get(self, exploration_id):  # pylint: disable-msg=C6409
@@ -44,11 +45,11 @@ class ExplorationPage(base.BaseHandler):
     if self.request.get('iframed') == 'true':
       self.values['iframed'] = True
 
-    self.response.out.write(base.JINJA_ENV.get_template(
+    self.response.out.write(feconf.JINJA_ENV.get_template(
         'reader/reader_exploration.html').render(self.values))
 
 
-class ExplorationHandler(base.BaseHandler):
+class ExplorationHandler(BaseHandler):
   """Provides the data for a single exploration."""
 
   def get(self, exploration_id):  # pylint: disable-msg=C6409
@@ -108,11 +109,11 @@ class ExplorationHandler(base.BaseHandler):
     widget_output = []
     # Append reader's response.
     if state.input_view.get().classifier == 'finite':
-      html_output = base.JINJA_ENV.get_template(
+      html_output = feconf.JINJA_ENV.get_template(
           'reader_response.html').render(
               {'response': state.classifier_categories[int(response)]})
     else:
-      html_output = base.JINJA_ENV.get_template(
+      html_output = feconf.JINJA_ENV.get_template(
           'reader_response.html').render({'response': response})
 
     if not action_set.dest:
@@ -162,7 +163,7 @@ class ExplorationHandler(base.BaseHandler):
     self.response.out.write(json.dumps(values))
 
 
-class RandomExplorationPage(base.BaseHandler):
+class RandomExplorationPage(BaseHandler):
   """Returns the page for a random exploration."""
 
   def get(self):

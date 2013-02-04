@@ -20,7 +20,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
 
-import base, utils
+from controllers import base
+import utils
 
 
 class NumericClassifier(object):

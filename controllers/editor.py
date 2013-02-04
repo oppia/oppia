@@ -17,7 +17,8 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import datetime, json, logging, os, yaml
-import base, feconf, main, models, utils
+from controllers.base import BaseHandler, require_editor, require_user
+import feconf, main, models, utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -42,14 +43,10 @@ def GetStateAsDict(state):
   }
 
 
-class BaseHandler(base.BaseHandler):
-  """Common methods for editor handlers."""
-  pass
-
 class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
-  @base.require_user
+  @require_user
   def post(self, user):  # pylint: disable-msg=C6409
     """Handles POST requests."""
 
@@ -70,7 +67,7 @@ class NewExploration(BaseHandler):
 class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
 
-  @base.require_editor
+  @require_editor
   def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     self.values.update({
@@ -80,9 +77,9 @@ class ExplorationPage(BaseHandler):
         'nav_mode': EDITOR_MODE,
     })
     self.response.out.write(
-        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
+        feconf.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
-  @base.require_editor
+  @require_editor
   def post(self, user, exploration):  # pylint: disable-msg=C6409
     """Adds a new state to the given exploration."""
 
@@ -106,7 +103,7 @@ class ExplorationPage(BaseHandler):
         'stateContent': state.content,
     }))
 
-  @base.require_editor
+  @require_editor
   def put(self, user, exploration):  # pylint: disable-msg=C6409
     """Updates properties of the given exploration."""
 
@@ -130,7 +127,7 @@ class ExplorationPage(BaseHandler):
       exploration.image_id = image_id
     exploration.put()
 
-  @base.require_editor
+  @require_editor
   def delete(self, user, exploration):
     """Deletes the given exploration."""
 
@@ -151,7 +148,7 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
 
-  @base.require_editor
+  @require_editor
   def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Gets the question name and state list for a question page."""
 
@@ -198,7 +195,7 @@ class ExplorationHandler(BaseHandler):
 class ExplorationDownloadHandler(BaseHandler):
   """Downloads an exploration as a YAML file."""
 
-  @base.require_editor
+  @require_editor
   def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     filename = str('oppia-%s' % exploration.title)
@@ -222,7 +219,7 @@ class ExplorationDownloadHandler(BaseHandler):
 class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
-  @base.require_editor
+  @require_editor
   def get(self, user, exploration, unused_state):  # pylint: disable-msg=C6409
     """Gets a generic page representing an exploration with a list of states."""
     self.values.update({
@@ -232,10 +229,10 @@ class StatePage(BaseHandler):
         'nav_mode': EDITOR_MODE,
     })
     self.response.out.write(
-        base.JINJA_ENV.get_template('editor/editor_exploration.html').render(
+        feconf.JINJA_ENV.get_template('editor/editor_exploration.html').render(
             self.values))
 
-  @base.require_editor
+  @require_editor
   def post(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Called when a state is initialized for editing. Returns state properties as JSON."""
 
@@ -275,7 +272,7 @@ class StatePage(BaseHandler):
 class StateHandler(BaseHandler):
   """Handles state transactions."""
 
-  @base.require_editor
+  @require_editor
   def put(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
 
@@ -381,7 +378,7 @@ class StateHandler(BaseHandler):
 
     state.put()
 
-  @base.require_editor
+  @require_editor
   def delete(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Deletes the state with id state_id."""
 

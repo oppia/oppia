@@ -17,14 +17,10 @@
 __author__ = 'Sean Lip'
 
 import json, logging, os, sys, traceback
-import jinja2, webapp2
+import webapp2
 import feconf, models, utils
 
 from google.appengine.api import users
-
-
-JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
 def require_user(handler):
