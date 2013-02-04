@@ -18,7 +18,7 @@ __author__ = 'Sean Lip'
 
 import json, logging, os, sys, traceback
 import jinja2, webapp2
-import feconf, utils
+import feconf, models, utils
 
 from google.appengine.api import users
 
@@ -29,14 +29,46 @@ JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
 
 def require_user(handler):
   """Decorator that checks if a user is associated with the current session."""
-  def test_login(self, *args, **kwargs):
+  def test_login(self, **kwargs):
     user = users.get_current_user()
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
       return
-    return handler(self, *args, **kwargs)
+    return handler(self, user, **kwargs)
 
   return test_login
+
+
+def require_editor(handler):
+  """Decorator that checks if the user can edit the given entity."""
+  def test_editor(self, exploration_id, state_id=None, **kwargs):
+    """Returns the user and exploration id if the user has the right credentials.
+
+    Returns:
+        The user and exploration instance, if the user is authorized to edit this
+        exploration. Also, the state instance, if one is supplied.
+
+    Raises:
+        self.NotLoggedInException: if there is no current user.
+        self.UnauthorizedUserException: if the user exists but does not have the
+            right credentials.
+    """
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    exploration = utils.GetEntity(models.Exploration, exploration_id)
+    if not utils.CheckAuthorship(user, exploration):
+      raise self.UnauthorizedUserException(
+          '%s does not have the credentials to edit this exploration.' % user)
+
+    if not state_id:
+      return handler(self, user, exploration, **kwargs)
+    state = utils.GetEntity(models.State, state_id)
+    return handler(self, user, exploration, state, **kwargs)
+
+  return test_editor
 
 
 class BaseHandler(webapp2.RequestHandler):

@@ -109,19 +109,9 @@ def CheckExistenceOfName(entity, name, ancestor=None):
   return True
 
 
-def CheckAuthorship(exploration):
-  """Checks whether the current user has rights to edit this exploration.
-
-  Args:
-    exploration: an exploration.
-
-  Raises:
-    EntityIdNotFoundError: if the current user does not have editing rights to
-        the given exploration.
-  """
-  user = users.get_current_user()
-  if user not in exploration.editors:
-    raise EntityIdNotFoundError('%s is not an editor of this story.' % user)
+def CheckAuthorship(user, exploration):
+  """Checks whether the current user has rights to edit this exploration."""
+  return exploration.key in GetAugmentedUser(user).editable_explorations
 
 
 def GetNewId(entity, entity_name):
@@ -129,7 +119,7 @@ def GetNewId(entity, entity_name):
 
   Args:
     entity: one of models.Exploration or models.State
-    entity_name: string representing the name of the story, question or state
+    entity_name: string representing the name of the entity
 
   Returns:
     string - the id representing the entity

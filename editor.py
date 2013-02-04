@@ -44,53 +44,15 @@ def GetStateAsDict(state):
 
 class BaseHandler(base.BaseHandler):
   """Common methods for editor handlers."""
-
-  def CheckAuth(self, user, exploration):
-    """Checks if the user has edit access to the given exploration."""
-
-    return exploration.key in utils.GetAugmentedUser(user).editable_explorations
-
-  def GetUser(self):
-    """Returns the user, or throws self.NotLoggedInException if there isn't one."""
-
-    user = users.get_current_user()
-    if not user:
-      raise self.NotLoggedInException
-    return user
-
-  def GetUserAndExploration(self, exploration_id, state_id=None):
-    """Returns the user and exploration id if the user has the right credentials.
-
-    Returns:
-        The user and exploration instance, if the user is authorized to edit this
-        exploration. Also, the state instance, if one is supplied.
-
-    Raises:
-        self.NotLoggedInException: if there is no current user.
-        self.UnauthorizedUserException: if the user exists but does not have the
-            right credentials.
-    """
-
-    user = self.GetUser()
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
-    if not self.CheckAuth(user, exploration):
-      raise self.UnauthorizedUserException(
-          'User %s does not have the credentials to edit this exploration.' % user)
-    if not state_id:
-      return user, exploration
-
-    state = utils.GetEntity(models.State, state_id)
-    return user, exploration, state
-
+  pass
 
 class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
   @base.require_user
-  def post(self):  # pylint: disable-msg=C6409
+  def post(self, user):  # pylint: disable-msg=C6409
     """Handles POST requests."""
 
-    user = self.GetUser()
     title = self.request.get('title')
     category = self.request.get('category')
     yaml = self.request.get('yaml')
@@ -108,11 +70,9 @@ class NewExploration(BaseHandler):
 class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
 
-  @base.require_user
-  def get(self, exploration_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-
-    user, exploration = self.GetUserAndExploration(exploration_id)
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
@@ -122,11 +82,10 @@ class ExplorationPage(BaseHandler):
     self.response.out.write(
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
-  @base.require_user
-  def post(self, exploration_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def post(self, user, exploration):  # pylint: disable-msg=C6409
     """Adds a new state to the given exploration."""
 
-    user, exploration = self.GetUserAndExploration(exploration_id)
     state_name = self.request.get('state_name')
     if not state_name:
       raise self.InvalidInputException('Please specify a state name.')
@@ -147,11 +106,10 @@ class ExplorationPage(BaseHandler):
         'stateContent': state.content,
     }))
 
-  @base.require_user
-  def put(self, exploration_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def put(self, user, exploration):  # pylint: disable-msg=C6409
     """Updates properties of the given exploration."""
 
-    user, exploration = self.GetUserAndExploration(exploration_id)
     for key in self.request.arguments():
       if key not in ['is_public', 'category', 'title', 'image_id']:
         raise self.InvalidInputException(
@@ -172,11 +130,10 @@ class ExplorationPage(BaseHandler):
       exploration.image_id = image_id
     exploration.put()
 
-  @base.require_user
-  def delete(self, exploration_id):
+  @base.require_editor
+  def delete(self, user, exploration):
     """Deletes the given exploration."""
 
-    user, exploration = self.GetUserAndExploration(exploration_id)
     for state_key in exploration.states:
       for action_set_key in state_key.get().action_sets:
         action_set_key.delete()
@@ -194,11 +151,9 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
 
-  @base.require_user
-  def get(self, exploration_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Gets the question name and state list for a question page."""
-
-    user, exploration = self.GetUserAndExploration(exploration_id)
 
     state_list = {}
     for state_key in exploration.states:
@@ -243,10 +198,9 @@ class ExplorationHandler(BaseHandler):
 class ExplorationDownloadHandler(BaseHandler):
   """Downloads an exploration as a YAML file."""
 
-  @base.require_user
-  def get(self, exploration_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def get(self, user, exploration):  # pylint: disable-msg=C6409
     """Handles GET requests."""
-    user, exploration = self.GetUserAndExploration(exploration_id)
     filename = str('oppia-%s' % exploration.title)
 
     self.response.headers['Content-Type'] = 'text/plain'
@@ -268,11 +222,9 @@ class ExplorationDownloadHandler(BaseHandler):
 class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
-  @base.require_user
-  def get(self, exploration_id, unused_state_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def get(self, user, exploration, unused_state):  # pylint: disable-msg=C6409
     """Gets a generic page representing an exploration with a list of states."""
-
-    user, exploration = self.GetUserAndExploration(exploration_id)
     self.values.update({
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
@@ -283,11 +235,10 @@ class StatePage(BaseHandler):
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(
             self.values))
 
-  @base.require_user
-  def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def post(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Called when a state is initialized for editing. Returns state properties as JSON."""
 
-    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
     values = {
         'actions': [],
         'classifier': state.input_view.get().classifier,
@@ -324,10 +275,9 @@ class StatePage(BaseHandler):
 class StateHandler(BaseHandler):
   """Handles state transactions."""
 
-  @base.require_user
-  def put(self, exploration_id, state_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def put(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
-    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
 
     yaml_file = self.request.get('yaml_file')
     if yaml_file:
@@ -431,10 +381,9 @@ class StateHandler(BaseHandler):
 
     state.put()
 
-  @base.require_user
-  def delete(self, exploration_id, state_id):  # pylint: disable-msg=C6409
+  @base.require_editor
+  def delete(self, user, exploration, state):  # pylint: disable-msg=C6409
     """Deletes the state with id state_id."""
-    user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
 
     # Do not allow deletion of initial states.
     if exploration.init_state == state.key:
