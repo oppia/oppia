@@ -27,10 +27,13 @@ handlers:
 - url: /terms/?
   script: main.app
   secure: always
-- url: /gallery/?
+- url: /gallery(/data)?/?
   script: main.app
   secure: always
 - url: /learn(/.*)?
+  script: main.app
+  secure: always
+- url: /learn_random/?
   script: main.app
   secure: always
 - url: /create/.*

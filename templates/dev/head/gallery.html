@@ -10,39 +10,37 @@
     </form>
 
     <div class="oppia-content">
-      {% if categories %}
+      <div ng-show="categories">
         <h2> Available Explorations</h2>
         <center>
-          {% for category in categories %}
-            <div class="oppia-class-category">
-              <h4>{{category}}</h4>
-              <hr>
-              <ul class="thumbnails">
-                {% for exploration in categories[category].explorations %}
-                  <li class="span3">
-                    <div class="thumbnail">
-                      <a href="/learn/{{exploration.data.hash_id}}">
-                        {% if exploration.data.image_id %}
-                          <img src="/imagehandler/{{exploration.data.image_id}}" class="oppia-large-image"></img>
-                        {% else %}
-                          <img src="/images/draft.png" alt="Draft Image">
-                        {% endif %}
-                      </a>
-                      <div>
-                        <h5>{{exploration.data.title}}</h5>
-                        <a ng-click="showModal('{{exploration.data.hash_id}}')">Embed</a>
-                        {% if exploration.can_edit %}
-                          | <a href="/create/{{exploration.data.hash_id}}">Edit</a>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endfor %}
+          <div class="oppia-class-category" ng-repeat="(category, explorations) in categories">
+            <h4><[category]></h4>
+            <hr>
+            <ul class="thumbnails">
+              <li class="span3" ng-repeat="exploration in explorations">
+                <div class="thumbnail">
+                  <a href="/learn/<[exploration.data.hash_id]>">
+                    <span ui-if="exploration.data.image_id">
+                      <img ng-src="/imagehandler/<[exploration.data.image_id]>"
+                           class="oppia-large-image">
+                    </span>
+                    <span ng-hide="exploration.data.image_id">
+                      <img src="/images/draft.png" alt="Draft Image">
+                    </span>
+                  </a>
+                  <div>
+                    <h5><[exploration.data.title]></h5>
+                    <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
+                    <span ui-if="exploration.can_edit">
+                      | <a href="/create/<[exploration.data.hash_id]>">Edit</a>
+                    </span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
         </center>
-      {% endif %}
+      </div>
 
       <br>
       <br>
@@ -55,7 +53,7 @@
         </p>
       {% else %}
         <h4>
-          To create new explorations, you must <a href="{{login_url}}">log in</a>.
+          To create new explorations or edit existing ones, you must <a href="{{login_url}}">log in</a>.
         </h4>
       {% endif %}
     </div>

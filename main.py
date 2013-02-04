@@ -19,9 +19,10 @@
 __author__ = 'Sean Lip'
 
 import base, classifiers, editor, feconf, models, os, reader, utils, widgets
-import webapp2
+import json, webapp2
 
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 
 class Error404Handler(base.BaseHandler):
@@ -73,6 +74,21 @@ class GalleryPage(base.BaseHandler):
   def get(self):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user = users.get_current_user()
+
+    self.values.update({
+        'js': utils.GetJsFilesWithBase(['gallery']),
+        'mode': 'gallery',
+    })
+    self.response.out.write(
+        base.JINJA_ENV.get_template('gallery.html').render(self.values))
+
+
+class GalleryHandler(base.BaseHandler):
+  """Provides data for the exploration gallery."""
+
+  def get(self):  # pylint: disable-msg=C6409
+    """Handles GET requests."""
+    user = users.get_current_user()
     augmented_user = utils.GetAugmentedUser(user) if user else None
 
     used_keys = []
@@ -90,42 +106,32 @@ class GalleryPage(base.BaseHandler):
       used_keys.append(exploration.key)
 
       if not categories.get(category_name):
-        categories[category_name] = {
-            'explorations': [{
-                'data': exploration,
-                'can_edit': can_edit,
-            }]}
-      else:
-        categories[category_name]['explorations'].append({
-            'data': exploration,
-            'can_edit': can_edit,
-        })
+        categories[category_name] = []
+      categories[category_name].append({
+          'data': exploration.to_dict(
+              exclude=['states', 'init_state', 'owner']),
+          'can_edit': can_edit,
+          'is_owner': user == exploration.owner,
+      })
 
     if augmented_user:
       for exploration_key in augmented_user.editable_explorations:
         exploration = exploration_key.get()
         category_name = exploration.category
         if not categories.get(category_name):
-          categories[category_name] = {
-              'explorations': [{
-                  'data': exploration,
-                  'can_edit': True,
-              }]}
-        elif exploration.key not in used_keys:
-          categories[category_name]['explorations'].append({
-              'data': exploration,
+          categories[category_name] = []
+        if exploration.key not in used_keys:
+          categories[category_name].append({
+              'data': exploration.to_dict(
+                  exclude=['states', 'init_state', 'owner']),
               'can_edit': True,
+              'is_owner': user == exploration.owner,
           })
 
-    self.values.update({
+    self.data_values.update({
         'categories': categories,
-        'js': utils.GetJsFilesWithBase(['gallery']),
-        'login_url': users.create_login_url('/gallery'),
-        'mode': 'gallery',
-        'user': user,
     })
-    self.response.out.write(
-        base.JINJA_ENV.get_template('gallery.html').render(self.values))
+    self.response.out.write(json.dumps(self.data_values))
 
 
 class MainPage(base.BaseHandler):
@@ -186,6 +192,7 @@ urls = [
     (r'/about/?', AboutPage),
     (r'/terms/?', TermsPage),
     (r'/gallery/?', GalleryPage),
+    (r'/gallery/data/?', GalleryHandler),
 
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),

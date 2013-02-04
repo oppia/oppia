@@ -1,5 +1,34 @@
-function Gallery($scope, $http, warningsData) {
+oppia.factory('GalleryData', function($rootScope, $http, warningsData) {
+  var GalleryData = {};
+  var galleryUrl = '/gallery/data/';
+
+  GalleryData.getData = function() {
+    var obj = this;
+    $http.get(galleryUrl).success(function(data) {
+      obj.data = data;
+      obj.broadcastGalleryData();
+    }).error(function(data) {
+      warningsData.addWarning('Server error: ' + data.error);
+    });
+  };
+
+  GalleryData.broadcastGalleryData = function() {
+    $rootScope.$broadcast('galleryData');
+  }
+
+  GalleryData.getData();
+
+  return GalleryData;
+});
+
+
+function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.currentUrl = document.URL;
+
+  $scope.$on('galleryData', function() {
+    console.log(GalleryData.data.categories);
+    $scope.categories = GalleryData.data.categories;
+  });
 
   /**
    * Displays a model explaining how to embed the exploration.
@@ -48,4 +77,4 @@ function Gallery($scope, $http, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', 'warningsData'];
+Gallery.$inject = ['$scope', '$http', 'warningsData', 'GalleryData'];
