@@ -109,6 +109,9 @@ echo Opening browser window pointing to an end user interface
 /opt/google/chrome/chrome http://localhost:8080/ &
 
 
+# Do a build.
+python build.py
+
 # Code for running tests
 echo Checking if webtest is installed in third_party
 if [ ! -d "third_party/webtest" ]; then

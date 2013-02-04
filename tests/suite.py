@@ -14,20 +14,28 @@
 
 __author__ = 'Sean Lip'
 
-import base64
-import os
-import sys
-import unittest
+import base64, os, sys, unittest
 
 import webtest
 
-EXPECTED_TEST_COUNT = 2
+EXPECTED_TEST_COUNT = 3
+
+
+def empty_environ():
+    os.environ['AUTH_DOMAIN'] = 'example.com'
+    os.environ['SERVER_NAME'] = 'localhost'
+    os.environ['HTTP_HOST'] = 'localhost'
+    os.environ['SERVER_PORT'] = '8080'
+    os.environ['USER_EMAIL'] = ''
+    os.environ['USER_ID'] = ''
 
 
 class BaseTestClass(unittest.TestCase):
     """Base class for setting up and tearing down test cases."""
 
     def setUp(self):  # pylint: disable-msg=g-bad-name
+        empty_environ()
+
         # setup an app to be tested
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed

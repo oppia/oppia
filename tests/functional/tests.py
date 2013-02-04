@@ -15,6 +15,7 @@
 __author__ = 'Sean Lip'
 
 import actions
+from actions import assert_contains, assert_equals
 
 class SampleFunctionalTest(actions.TestBase):
     """A sample functional test."""
@@ -24,3 +25,7 @@ class SampleFunctionalTest(actions.TestBase):
 
         assert 2 + 2 == 4
 
+    def test_index_page(self):
+        """Test access to the index page."""
+        response = self.testapp.get('/')
+        assert_equals(response.status_int, 200)
