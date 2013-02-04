@@ -27,6 +27,18 @@ JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), feconf.TEMPLATE_DIR)))
 
 
+def require_user(handler):
+  """Decorator that checks if a user is associated with the current session."""
+  def test_login(self, *args, **kwargs):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+    return handler(self, *args, **kwargs)
+
+  return test_login
+
+
 class BaseHandler(webapp2.RequestHandler):
   """Base class for all Oppia handlers."""
   def __init__(self, *args, **kwargs):

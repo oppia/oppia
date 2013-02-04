@@ -86,6 +86,7 @@ class BaseHandler(base.BaseHandler):
 class NewExploration(BaseHandler):
   """Creates a new exploration."""
 
+  @base.require_user
   def post(self):  # pylint: disable-msg=C6409
     """Handles POST requests."""
 
@@ -107,6 +108,7 @@ class NewExploration(BaseHandler):
 class ExplorationPage(BaseHandler):
   """Page describing a single exploration."""
 
+  @base.require_user
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
 
@@ -120,6 +122,7 @@ class ExplorationPage(BaseHandler):
     self.response.out.write(
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
 
+  @base.require_user
   def post(self, exploration_id):  # pylint: disable-msg=C6409
     """Adds a new state to the given exploration."""
 
@@ -144,6 +147,7 @@ class ExplorationPage(BaseHandler):
         'stateContent': state.content,
     }))
 
+  @base.require_user
   def put(self, exploration_id):  # pylint: disable-msg=C6409
     """Updates properties of the given exploration."""
 
@@ -168,6 +172,7 @@ class ExplorationPage(BaseHandler):
       exploration.image_id = image_id
     exploration.put()
 
+  @base.require_user
   def delete(self, exploration_id):
     """Deletes the given exploration."""
 
@@ -189,6 +194,7 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
   """Page with editor data for a single exploration."""
 
+  @base.require_user
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Gets the question name and state list for a question page."""
 
@@ -237,6 +243,7 @@ class ExplorationHandler(BaseHandler):
 class ExplorationDownloadHandler(BaseHandler):
   """Downloads an exploration as a YAML file."""
 
+  @base.require_user
   def get(self, exploration_id):  # pylint: disable-msg=C6409
     """Handles GET requests."""
     user, exploration = self.GetUserAndExploration(exploration_id)
@@ -261,6 +268,7 @@ class ExplorationDownloadHandler(BaseHandler):
 class StatePage(BaseHandler):
   """Allows content creators to edit a state."""
 
+  @base.require_user
   def get(self, exploration_id, unused_state_id):  # pylint: disable-msg=C6409
     """Gets a generic page representing an exploration with a list of states."""
 
@@ -275,6 +283,7 @@ class StatePage(BaseHandler):
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(
             self.values))
 
+  @base.require_user
   def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Called when a state is initialized for editing. Returns state properties as JSON."""
 
@@ -315,6 +324,7 @@ class StatePage(BaseHandler):
 class StateHandler(BaseHandler):
   """Handles state transactions."""
 
+  @base.require_user
   def put(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Saves updates to a state."""
     user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)
@@ -421,6 +431,7 @@ class StateHandler(BaseHandler):
 
     state.put()
 
+  @base.require_user
   def delete(self, exploration_id, state_id):  # pylint: disable-msg=C6409
     """Deletes the state with id state_id."""
     user, exploration, state = self.GetUserAndExploration(exploration_id, state_id)

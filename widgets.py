@@ -137,6 +137,7 @@ class Widget(base.BaseHandler):
     else:
       self.response.out.write(json.dumps({'error': 'No such widget'}))
 
+  @base.require_user
   def post(self, widget_id=None):  # pylint: disable-msg=C6409
     """Saves or edits a widget uploaded by a content creator."""
     logging.info(widget_id)
