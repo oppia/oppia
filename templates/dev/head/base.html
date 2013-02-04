@@ -35,15 +35,15 @@
               <div class="container">
                 <a class="brand" href="/">Oppia</a>
                 <ul class="nav">
-                  <li {% if mode == 'gallery' %} class="active" {% endif %}>
+                  <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
                     <a href="/gallery">Gallery</a>
                   </li>
-                  {% if mode == 'reader' %}
+                  {% if nav_mode == 'reader' %}
                     <li class="active">
                       <a href="">Learn</a>
                     </li>
                   {% endif %}
-                  {% if mode == 'editor' %}
+                  {% if nav_mode == 'editor' %}
                     <li class="active">
                       <a href="">Create</a>
                     </li>

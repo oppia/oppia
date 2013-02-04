@@ -77,7 +77,7 @@ class GalleryPage(base.BaseHandler):
 
     self.values.update({
         'js': utils.GetJsFilesWithBase(['gallery']),
-        'mode': 'gallery',
+        'nav_mode': 'gallery',
     })
     self.response.out.write(
         base.JINJA_ENV.get_template('gallery.html').render(self.values))

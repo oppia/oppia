@@ -115,7 +115,7 @@ class ExplorationPage(BaseHandler):
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
              'editorTree', 'guiEditor', 'yamlEditor']),
-        'mode': EDITOR_MODE,
+        'nav_mode': EDITOR_MODE,
     })
     self.response.out.write(
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(self.values))
@@ -228,7 +228,7 @@ class ExplorationHandler(BaseHandler):
         'category': exploration.category,
         'title': exploration.title,
         'owner': str(exploration.owner),
-        'mode': EDITOR_MODE,
+        'nav_mode': EDITOR_MODE,
         'state_list': state_list,
     })
     self.response.out.write(json.dumps(self.data_values))
@@ -269,7 +269,7 @@ class StatePage(BaseHandler):
         'js': utils.GetJsFilesWithBase(
             ['editorExploration', 'editorClassifiers', 'editorGraph',
              'editorTree', 'guiEditor', 'yamlEditor']),
-        'mode': EDITOR_MODE,
+        'nav_mode': EDITOR_MODE,
     })
     self.response.out.write(
         base.JINJA_ENV.get_template('editor/editor_exploration.html').render(

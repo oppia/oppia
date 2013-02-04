@@ -37,7 +37,7 @@ class ExplorationPage(base.BaseHandler):
     """
     self.values.update({
         'js': utils.GetJsFilesWithBase(['readerExploration']),
-        'mode': READER_MODE,
+        'nav_mode': READER_MODE,
     })
 
     # The following is needed for embedding Oppia explorations in other pages.
