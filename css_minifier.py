@@ -20,6 +20,6 @@ import re
 
 
 def MinifyCSS(css, output_file_object):
-  """Collapse whitespace in CSS file."""
-  css = re.sub(r'\s+', ' ', css)
-  output_file_object.write(css)
+    """Collapse whitespace in CSS file."""
+    css = re.sub(r'\s+', ' ', css)
+    output_file_object.write(css)

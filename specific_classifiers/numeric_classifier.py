@@ -25,75 +25,74 @@ import utils
 
 
 class NumericClassifier(object):
-  """Classifies numeric inputs."""
+    """Classifies numeric inputs."""
 
-  def Classify(self, response, categories, params=None):
-    """Classifies numeric responses.
+    def Classify(self, response, categories, params=None):
+        """Classifies numeric responses.
 
-    Args:
-      response: a number representing the student's response.
-      categories: a list of strings of the form 'OP NUMBER (± NUMBER)' where
-          OP is ≤|≥|=|<|> and NUMBER is a decimal number. The second NUMBER, if
-          it exists, must be non-negative.
-      params: not used.
+        Args:
+            response: a number representing the student's response.
+            categories: a list of strings of the form 'OP NUMBER (± NUMBER)'
+                where OP is ≤|≥|=|<|> and NUMBER is a decimal number. The second
+                NUMBER, if it exists, must be non-negative.
+            params: not used.
 
-    Raises:
-      InvalidInputException, if response is not a number.
-      InvalidCategoryError, if some element of categories is invalid.
+        Raises:
+            InvalidInputException, if response is not a number.
+            InvalidCategoryError, if some element of categories is invalid.
 
-    Returns:
-      - the 0-based index of the first element in categories which is satisfied
-        by response, if one exists. Otherwise, returns the number of elements
-        in categories.
-    """
-    # Validate 'response'.
-    logging.info(response)
-    try:
-      response = float(response)
-    except ValueError:
-      raise base.InvalidInputException(
-          '%s is not a valid numeric input.', str(response))
+        Returns:
+            - the 0-based index of the first element in categories which is
+                satisfied by response, if one exists. Otherwise, returns the
+                number of elements in categories.
+        """
+        # Validate 'response'.
+        logging.info(response)
+        try:
+            response = float(response)
+        except ValueError:
+            raise base.InvalidInputException(
+                '%s is not a valid numeric input.', response)
 
-    logging.info(categories)
-    for index, category in enumerate(categories):
-      if index == len(categories) - 1:
-        # This is the default category. None of the other categories match,
-        # so return its index.
-        return index
+        logging.info(categories)
+        for index, category in enumerate(categories):
+            if index == len(categories) - 1:
+                # This is the default category. None of the other categories
+                # match, so return its index.
+                return index
 
-      # TODO(sll): Provide more helpful error messages in the validation.
-      category_error = ('%s at index %s is not a valid numeric category.' %
-                        (category.encode('utf-8'), index))
-      category_array = category.split()
-      if len(category_array) != 2 and len(category_array) != 4:
-        raise utils.InvalidCategoryError('%s', category_error)
+            # TODO(sll): Provide more helpful error messages in the validation.
+            category_error = (
+                '%s at index %s is not a valid numeric category.' %
+                (category.encode('utf-8'), index))
+            category_array = category.split()
+            if len(category_array) != 2 and len(category_array) != 4:
+                raise utils.InvalidCategoryError('%s', category_error)
 
-      try:
-        op = category_array[0].encode('utf-8')
-        category_array[1] = float(category_array[1])
-        if (op != '=' and op != '<' and op != '>' and
-            op != '≤' and op != '≥'):
-          raise utils.InvalidCategoryError(category_error)
-        if len(category_array) == 4:
-          if category_array[2].encode('utf-8') != '±':
-            raise utils.InvalidCategoryError(category_error)
-          category_array[3] = float(category_array[3])
-          if category_array[3] < 0:
-            raise utils.InvalidCategoryError(category_error)
-      except (utils.InvalidCategoryError, ValueError):
-        raise utils.InvalidCategoryError(category_error)
+            try:
+                op = category_array[0].encode('utf-8')
+                category_array[1] = float(category_array[1])
+                if op not in ['=', '<', '>', '≤', '≥']:
+                    raise utils.InvalidCategoryError(category_error)
+                if len(category_array) == 4:
+                    if category_array[2].encode('utf-8') != '±':
+                        raise utils.InvalidCategoryError(category_error)
+                    category_array[3] = float(category_array[3])
+                    if category_array[3] < 0:
+                        raise utils.InvalidCategoryError(category_error)
+            except (utils.InvalidCategoryError, ValueError):
+                raise utils.InvalidCategoryError(category_error)
 
-      # Check whether this category matches the response.
-      if op == '=':
-        if response == category_array[1]:
-          return index
-        elif (len(category_array) == 4 and
-              category_array[1] - category_array[3] <= response and
-              category_array[1] + category_array[3] >= response):
-          return index
-      else:
-        if ((op == '≥' and response >= category_array[1]) or
-            (op == '≤' and response <= category_array[1]) or
-            (op == '>' and response > category_array[1]) or
-            (op == '<' and response < category_array[1])):
-          return index
+            # Check whether this category matches the response.
+            if op == '=':
+                if response == category_array[1]:
+                    return index
+                elif (len(category_array) == 4 and
+                      category_array[1] - category_array[3] <= response and
+                      category_array[1] + category_array[3] >= response):
+                    return index
+            elif ((op == '≥' and response >= category_array[1]) or
+                  (op == '≤' and response <= category_array[1]) or
+                  (op == '>' and response > category_array[1]) or
+                  (op == '<' and response < category_array[1])):
+                return index

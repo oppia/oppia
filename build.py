@@ -16,7 +16,6 @@
 
 import os
 import re
-from subprocess import call
 
 import css_minifier
 
@@ -28,62 +27,62 @@ CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
 
 
 def EnsureDirectoryExists(f):
-  d = os.path.dirname(f)
-  if not os.path.exists(d):
-    os.makedirs(d)
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
 
 def GetTarget(filename):
-  return filename.replace(HEAD_DIR, OUT_DIR)
+    return filename.replace(HEAD_DIR, OUT_DIR)
 
 
 def ProcessHtml(filename, target):
-  f = open(filename, 'r')
-  content = f.read()
-  content = REMOVE_WS(' ', content)
-  EnsureDirectoryExists(target)
-  d = open(target, 'w+')
-  d.write(content)
+    f = open(filename, 'r')
+    content = f.read()
+    content = REMOVE_WS(' ', content)
+    EnsureDirectoryExists(target)
+    d = open(target, 'w+')
+    d.write(content)
 
 
 def ProcessCSS(filename, target):
-  f = open(filename, 'r')
-  EnsureDirectoryExists(target)
-  d = open(target, 'w+')
-  css_minifier.MinifyCSS(f.read(), d)
-  return
+    f = open(filename, 'r')
+    EnsureDirectoryExists(target)
+    d = open(target, 'w+')
+    css_minifier.MinifyCSS(f.read(), d)
+    return
 
 
 def ProcessJS(filename, target):
-  EnsureDirectoryExists(target)
-  # TODO(sll): Reinstate the following once it can handle 'delete'.
-  # cmd = CLOSURE_COMPILER + filename + ' --js_output_file ' + target
-  # call(cmd, shell=True)
-  f = open(filename, 'r')
-  content = f.read()
-  d = open(target, 'w+')
-  d.write(content)
-  return
+    EnsureDirectoryExists(target)
+    # TODO(sll): Reinstate the following once it can handle 'delete'.
+    # cmd = CLOSURE_COMPILER + filename + ' --js_output_file ' + target
+    # call(cmd, shell=True)
+    f = open(filename, 'r')
+    content = f.read()
+    d = open(target, 'w+')
+    d.write(content)
+    return
 
 
 # Script starts here.
 EnsureDirectoryExists(OUT_DIR)
 for root, dirs, files in os.walk(os.getcwd()):
-  if '.git' in root:
-    continue
-  for directory in dirs:
-    print 'Processing', os.path.join(root, directory)
-  for fn in files:
-    full_filename = os.path.join(root) + '/' + fn
-    if full_filename.find(OUT_DIR) > 0:
-      continue
-    # Do not process files in third_party.
-    if full_filename.find('third_party') != -1 or full_filename.find('.git') != -1:
-      continue
-    target_filename = GetTarget(full_filename)
-    if fn.endswith('.html'):
-      ProcessHtml(full_filename, target_filename)
-    if fn.endswith('.css'):
-      ProcessCSS(full_filename, target_filename)
-    if fn.endswith('.js'):
-      ProcessJS(full_filename, target_filename)
+    if '.git' in root:
+        continue
+    for directory in dirs:
+        print 'Processing', os.path.join(root, directory)
+    for fn in files:
+        full_filename = os.path.join(root) + '/' + fn
+        if full_filename.find(OUT_DIR) > 0:
+            continue
+        # Do not process files in third_party.
+        if any(key in full_filename for key in ['third_party', '.git']):
+            continue
+        target_filename = GetTarget(full_filename)
+        if fn.endswith('.html'):
+            ProcessHtml(full_filename, target_filename)
+        if fn.endswith('.css'):
+            ProcessCSS(full_filename, target_filename)
+        if fn.endswith('.js'):
+            ProcessJS(full_filename, target_filename)

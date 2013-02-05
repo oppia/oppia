@@ -40,21 +40,22 @@ DEFAULT_ANSWER = {classifiers.none: '',
                   classifiers.set: [],
                   classifiers.text: ''}
 
+
 def Classify(classifier_type, response, categories, params=None):
-  """A general classifier which classifies inputs using given parameters.
+    """A general classifier which classifies inputs using given parameters.
 
-  Args:
-    classifier_type: a string denoting the type of the classifier (e.g. numeric)
-    response: the input received from the reader
-    categories: the list of categories defined by the content creator that the
-        classifier can pick from
-    params: the list of additional parameters to be passed to the classifier.
+    Args:
+        classifier_type: a string denoting the classifier type (e.g. 'numeric')
+        response: the input received from the reader
+        categories: the list of categories defined by the content creator that
+            the classifier can pick from
+        params: the list of additional params to be passed to the classifier.
 
-  Returns:
-    the number of the category into which the response is classified.
-  """
-  classifier = INPUT_CLASSIFIER[str(classifier_type)]()
-  if classifier:
-    return classifier.Classify(response, categories, params)
-  else:
-    logging.error('Unrecognized classifier type %s', str(classifier_type))
+    Returns:
+        the number of the category into which the response is classified.
+    """
+    classifier = INPUT_CLASSIFIER[str(classifier_type)]()
+    if classifier:
+        return classifier.Classify(response, categories, params)
+    else:
+        logging.error('Unrecognized classifier type %s', str(classifier_type))

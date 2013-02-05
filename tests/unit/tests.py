@@ -24,4 +24,3 @@ class SampleUnitTest(unittest.TestCase):
         """A sample test."""
 
         assert 3 + 3 == 6
-

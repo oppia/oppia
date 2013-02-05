@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging, os, sys, traceback
+import json, logging, sys, traceback
 import webapp2
 import feconf, models, utils
 
@@ -24,99 +24,102 @@ from google.appengine.api import users
 
 
 def require_user(handler):
-  """Decorator that checks if a user is associated with the current session."""
-  def test_login(self, **kwargs):
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-    return handler(self, user, **kwargs)
+    """Decorator that checks if a user is associated to the current session."""
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in."""
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
+        return handler(self, user, **kwargs)
 
-  return test_login
+    return test_login
 
 
 def require_editor(handler):
-  """Decorator that checks if the user can edit the given entity."""
-  def test_editor(self, exploration_id, state_id=None, **kwargs):
-    """Returns the user and exploration id if the user has the right credentials.
+    """Decorator that checks if the user can edit the given entity."""
+    def test_editor(self, exploration_id, state_id=None, **kwargs):
+        """Gets the user and exploration id if the user can edit it.
 
-    Returns:
-        The user and exploration instance, if the user is authorized to edit this
-        exploration. Also, the state instance, if one is supplied.
+        Returns:
+                The user and exploration instance, if the user is authorized to edit this
+                exploration. Also, the state instance, if one is supplied.
 
-    Raises:
-        self.NotLoggedInException: if there is no current user.
-        self.UnauthorizedUserException: if the user exists but does not have the
-            right credentials.
-    """
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
+        Raises:
+                self.NotLoggedInException: if there is no current user.
+                self.UnauthorizedUserException: if the user exists but does not have the
+                        right credentials.
+        """
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
 
-    exploration = utils.GetEntity(models.Exploration, exploration_id)
-    if not utils.CheckAuthorship(user, exploration):
-      raise self.UnauthorizedUserException(
-          '%s does not have the credentials to edit this exploration.' % user)
+        exploration = utils.GetEntity(models.Exploration, exploration_id)
+        if not utils.CheckAuthorship(user, exploration):
+            raise self.UnauthorizedUserException(
+                '%s does not have the credentials to edit this exploration.',
+                user)
 
-    if not state_id:
-      return handler(self, user, exploration, **kwargs)
-    state = utils.GetEntity(models.State, state_id)
-    return handler(self, user, exploration, state, **kwargs)
+        if not state_id:
+            return handler(self, user, exploration, **kwargs)
+        state = utils.GetEntity(models.State, state_id)
+        return handler(self, user, exploration, state, **kwargs)
 
-  return test_editor
+    return test_editor
 
 
 class BaseHandler(webapp2.RequestHandler):
-  """Base class for all Oppia handlers."""
-  def __init__(self, *args, **kwargs):
-    webapp2.RequestHandler.__init__(self, *args, **kwargs)
-    self.values = {
-        'css': utils.GetCssFile('oppia'),
-        'debug': feconf.DEBUG,
-    }
-    self.data_values = {'debug': feconf.DEBUG}
+    """Base class for all Oppia handlers."""
+    def __init__(self, *args, **kwargs):
+        webapp2.RequestHandler.__init__(self, *args, **kwargs)
+        self.values = {
+            'css': utils.GetCssFile('oppia'),
+            'debug': feconf.DEBUG,
+        }
+        self.data_values = {'debug': feconf.DEBUG}
 
-    user = users.get_current_user()
-    if user:
-      self.values.update({
-          'logout_url': users.create_logout_url(self.request.uri),
-          'user': str(user),
-      })
-      self.data_values.update({'user': str(user)})
-    else:
-      self.values['login_url'] = users.create_login_url(self.request.uri)
-      self.data_values['login_url'] = users.create_login_url(self.request.uri)
+        user = users.get_current_user()
+        if user:
+            self.values.update({
+                'logout_url': users.create_logout_url(self.request.uri),
+                'user': str(user),
+            })
+            self.data_values.update({'user': str(user)})
+        else:
+            login_url = users.create_login_url(self.request.uri)
+            self.values['login_url'] = login_url
+            self.data_values['login_url'] = login_url
 
-  def handle_exception(self, exception, debug_mode):
-    """Overwrites the default exception handler."""
-    logging.info(''.join(traceback.format_exception(*sys.exc_info())))
-    logging.error('Exception raised: %s' % exception)
+    def handle_exception(self, exception, debug_mode):
+        """Overwrites the default exception handler."""
+        logging.info(''.join(traceback.format_exception(*sys.exc_info())))
+        logging.error('Exception raised: %s', exception)
 
-    if isinstance(exception, self.NotLoggedInException):
-      self.redirect(users.create_login_url(self.request.uri))
-      return
+        if isinstance(exception, self.NotLoggedInException):
+            self.redirect(users.create_login_url(self.request.uri))
+            return
 
-    if isinstance(exception, self.UnauthorizedUserException):
-      self.error(401)
-      self.response.out.write(json.dumps(
-          {'code': '401 Unauthorized', 'error': str(exception)}))
-      return
+        if isinstance(exception, self.UnauthorizedUserException):
+            self.error(401)
+            self.response.out.write(json.dumps(
+                {'code': '401 Unauthorized', 'error': str(exception)}))
+            return
 
-    if isinstance(exception, self.InvalidInputException):
-      self.error(400)
-      self.response.out.write(json.dumps(
-          {'code': '400 Bad Request', 'error': str(exception)}))
-      return
+        if isinstance(exception, self.InvalidInputException):
+            self.error(400)
+            self.response.out.write(json.dumps(
+                {'code': '400 Bad Request', 'error': str(exception)}))
+            return
 
-    webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
-    logging.error('Exception was not handled: %s' % exception)
+        webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
+        logging.error('Exception was not handled: %s', exception)
 
-  class UnauthorizedUserException(Exception):
-    """Error class for unauthorized access."""
+    class UnauthorizedUserException(Exception):
+        """Error class for unauthorized access."""
 
-  class NotLoggedInException(Exception):
-    """Error class for users that are not logged in (error code 401)."""
+    class NotLoggedInException(Exception):
+        """Error class for users that are not logged in (error code 401)."""
 
-  class InvalidInputException(Exception):
-    """Error class for invalid input on the user's side (error code 400)."""
+    class InvalidInputException(Exception):
+        """Error class for invalid input on the user's side (error code 400)."""

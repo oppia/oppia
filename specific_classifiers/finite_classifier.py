@@ -22,37 +22,37 @@ from controllers import base
 
 
 class FiniteClassifier(object):
-  """Classifies 'finite' inputs."""
+    """Classifies 'finite' inputs."""
 
-  def Classify(self, response, categories, params=None):
-    """Classifies responses into one of finitely many categories.
+    def Classify(self, response, categories, params=None):
+        """Classifies responses into one of finitely many categories.
 
-    Args:
-      response: a number representing the student's response category.
-      categories: a list where each element represents a category.
-      params: not used.
+        Args:
+            response: a number representing the student's response category.
+            categories: a list where each element represents a category.
+            params: not used.
 
-    Raises:
-      InvalidInputException, if response is not a number between 0 and the length
-          of categories, inclusive.
+        Raises:
+            InvalidInputException, if response is not a number between 0 and the
+                length of categories, inclusive.
 
-    Returns:
-      response, if it is a number between 0 and len(categories) - 1,
-         inclusive.
-    """
-    # Validate 'response'.
-    response = int(response)
-    logging.info(response)
-    logging.info(isinstance(response, int))
-    if not isinstance(response, int):
-      raise base.InvalidInputException(
-          'Input ' + str(response) + ' is not a valid category.')
+        Returns:
+            response, if it is a number between 0 and len(categories) - 1,
+                inclusive.
+        """
+        # Validate 'response'.
+        response = int(response)
+        logging.info(response)
+        logging.info(isinstance(response, int))
+        if not isinstance(response, int):
+            raise base.InvalidInputException(
+                    'Input ' + str(response) + ' is not a valid category.')
 
-    logging.info(categories)
+        logging.info(categories)
 
-    if response >= 0 and response < len(categories):
-      return response
-    else:
-      raise base.InvalidInputException(
-          'Input %s is not a valid category for a finite classifier given by %s'
-          % (response, categories))
+        if response >= 0 and response < len(categories):
+            return response
+        else:
+            raise base.InvalidInputException(
+                'Input %s is not a valid category for a finite classifier '
+                'given by %s' % (response, categories))

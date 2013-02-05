@@ -15,7 +15,8 @@
 __author__ = 'Sean Lip'
 
 import actions
-from actions import assert_contains, assert_equals
+from actions import assert_equals
+
 
 class SampleFunctionalTest(actions.TestBase):
     """A sample functional test."""

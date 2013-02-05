@@ -18,8 +18,7 @@ __author__ = 'Sean Lip'
 
 
 class NoneClassifier(object):
-  """Classifies 'none' inputs."""
+    """Classifies 'none' inputs."""
 
-  def Classify(self, response, categories, params):
-    return 0
-
+    def Classify(self, response, categories, params):
+        return 0

@@ -16,20 +16,17 @@
 
 __author__ = 'Sean Lip'
 
-import classifiers, feconf, models, utils
+import feconf
 from controllers import base, editor, gallery, pages, reader, resources, widgets
 
-import json, webapp2
-
-from google.appengine.api import users
-from google.appengine.ext import ndb
+import webapp2
 
 
 class Error404Handler(base.BaseHandler):
-  """Handles 404 errors."""
+    """Handles 404 errors."""
 
-  def get(self):  # pylint: disable-msg=C6409
-    self.error(404)
+    def get(self):  # pylint: disable-msg=C6409
+        self.error(404)
 
 
 # Regex for base64 hash_id encoding
@@ -37,38 +34,38 @@ r = '[A-Za-z0-9=_-]+'
 
 # Register the URL with the responsible classes
 urls = [
-    (r'/?', pages.MainPage),
-    (r'/about/?', pages.AboutPage),
-    (r'/terms/?', pages.TermsPage),
+        (r'/?', pages.MainPage),
+        (r'/about/?', pages.AboutPage),
+        (r'/terms/?', pages.TermsPage),
 
-    (r'/gallery/?', gallery.GalleryPage),
-    (r'/gallery/data/?', gallery.GalleryHandler),
+        (r'/gallery/?', gallery.GalleryPage),
+        (r'/gallery/data/?', gallery.GalleryHandler),
 
-    (r'/learn/(%s)/?' % r, reader.ExplorationPage),
-    (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
-    # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
-    (r'/learn_random/?', reader.RandomExplorationPage),
+        (r'/learn/(%s)/?' % r, reader.ExplorationPage),
+        (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
+        # TODO(sll): there is a potential collision here if the state_id is 'data'.
+        (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
+        (r'/learn_random/?', reader.RandomExplorationPage),
 
-    (r'/create_new/?', editor.NewExploration),
-    (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
-    (r'/create/(%s)/?' % r, editor.ExplorationPage),
-    (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
-    # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
-    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
+        (r'/create_new/?', editor.NewExploration),
+        (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
+        (r'/create/(%s)/?' % r, editor.ExplorationPage),
+        (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
+        # TODO(sll): there is a potential collision here if the state_id is 'data'.
+        (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
+        (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
-    (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-    (r'/imagehandler/?', resources.Image),
-    (r'/imagehandler/(%s)/?' % r, resources.Image),
+        (r'/templates/(%s)/?' % r, resources.TemplateHandler),
+        (r'/imagehandler/?', resources.Image),
+        (r'/imagehandler/(%s)/?' % r, resources.Image),
 
-    (r'/widgets/?', widgets.Widget),
-    (r'/widgets/(%s)/?' % r, widgets.Widget),
-    (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
-    (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
+        (r'/widgets/?', widgets.Widget),
+        (r'/widgets/(%s)/?' % r, widgets.Widget),
+        (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
+        (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
 
-    # 404 error handler.
-    (r'/.*', Error404Handler),
+        # 404 error handler.
+        (r'/.*', Error404Handler),
 ]
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)

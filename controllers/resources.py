@@ -18,44 +18,43 @@ import json
 from controllers.base import BaseHandler
 import feconf, models, utils
 
-from google.appengine.ext import ndb
-
 
 class TemplateHandler(BaseHandler):
-  """Retrieves an editor template."""
+    """Retrieves an editor template."""
 
-  def get(self, template_type):
-    """Handles GET requests."""
-    self.response.out.write(feconf.JINJA_ENV.get_template(
-        'editor/views/%s_editor.html' % template_type).render({}))
+    def get(self, template_type):
+        """Handles GET requests."""
+        self.response.out.write(feconf.JINJA_ENV.get_template(
+            'editor/views/%s_editor.html' % template_type).render({}))
 
 
 class Image(BaseHandler):
-  """Handles image uploads and retrievals."""
+    """Handles image uploads and retrievals."""
 
-  def get(self, image_id):  # pylint: disable-msg=C6409
-    """Returns an image.
+    def get(self, image_id):  # pylint: disable-msg=C6409
+        """Returns an image.
 
-    Args:
-      image_id: string representing the image id.
-    """
-    image = utils.GetEntity(models.Image, image_id)
-    if image:
-      # TODO(sll): Support other image types.
-      self.response.headers['Content-Type'] = 'image/png'
-      self.response.out.write(image.image)
-    else:
-      self.response.out.write('No image')
+        Args:
+            image_id: string representing the image id.
+        """
+        image = utils.GetEntity(models.Image, image_id)
+        if image:
+            # TODO(sll): Support other image types.
+            self.response.headers['Content-Type'] = 'image/png'
+            self.response.out.write(image.image)
+        else:
+            self.response.out.write('No image')
 
-  def post(self):  # pylint: disable-msg=C6409
-    """Saves an image uploaded by a content creator."""
-    # TODO(sll): Check that the image is really an image.
-    image = self.request.get('image')
-    if image:
-      image_hash_id = utils.GetNewId(models.Image, image)
-      image_entity = models.Image(hash_id=image_hash_id, image=image)
-      image_entity.put()
-      self.response.out.write(json.dumps({'image_id': image_entity.hash_id}))
-    else:
-      raise self.InvalidInputException('No image supplied')
-      return
+    def post(self):  # pylint: disable-msg=C6409
+        """Saves an image uploaded by a content creator."""
+        # TODO(sll): Check that the image is really an image.
+        image = self.request.get('image')
+        if image:
+            image_hash_id = utils.GetNewId(models.Image, image)
+            image_entity = models.Image(hash_id=image_hash_id, image=image)
+            image_entity.put()
+            self.response.out.write(json.dumps(
+                {'image_id': image_entity.hash_id}))
+        else:
+            raise self.InvalidInputException('No image supplied')
+            return
