@@ -18,15 +18,23 @@ import actions
 from actions import assert_equals
 
 
-class SampleFunctionalTest(actions.TestBase):
-    """A sample functional test."""
-
-    def test_sample(self):
-        """A sample test."""
-
-        assert 2 + 2 == 4
+class TestPermissions(actions.TestBase):
+    """Test access to various pages."""
 
     def test_index_page(self):
         """Test access to the index page."""
         response = self.testapp.get('/')
         assert_equals(response.status_int, 200)
+
+    def test_simple_pages(self):
+        """Test access to the about and terms pages."""
+        response = self.testapp.get('/terms/')
+        assert_equals(response.status_int, 200)
+
+        response = self.testapp.get('/about/')
+        assert_equals(response.status_int, 200)
+
+    def test_editor_page(self):
+        """Test access to editor pages for the sample exploration."""
+        response = self.testapp.get('/create/0/')
+        assert_equals(response.status_int, 302)
