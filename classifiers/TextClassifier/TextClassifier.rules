@@ -1,0 +1,13 @@
+{{x}}: Equals(x)
+'{{x}}': Equals(x)
+= {{x}}: Equals(x)
+= '{{x}}': Equals(x)
+== {{x}}: Equals(x)
+== '{{x}}': Equals(x)
+is '{{x}}': Equals(x)
+equals '{{x}}': Equals(x)
+
+starts with '{{x}}': StartsWith(x)
+
+contains '{{x}}': Contains(x)
+includes '{{x}}': Contains(x)

@@ -1,0 +1,20 @@
+{{x}}: Equals(x)
+= {{x}}: Equals(x)
+== {{x}}: Equals(x)
+is {{x}}: Equals(x)
+
+is less than {{x}}: LessThan(x)
+< {{x}}: LessThan(x)
+
+is greater than {{x}}: GreaterThan(x)
+> {{x}}: GreaterThan(x)
+
+≤ {{x}}: LessThanOrEqualTo(x)
+<= {{x}}: LessThanOrEqualTo(x)
+
+≥ {{x}}: GreaterThanOrEqualTo(x)
+>= {{x}}: GreaterThanOrEqualTo(x)
+
+is within {{tol}} of {{x}}: InclusiveBetween(x-tol, x+tol)
+is between {{a}} and {{b}}: InclusiveBetween(a, b)
+is in [a, b]: InclusiveBetween(a, b)
