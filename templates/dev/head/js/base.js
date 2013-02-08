@@ -16,6 +16,12 @@ oppia.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+oppia.filter('spacesToUnderscores', function() {
+  return function(input) {
+    return input.trim().replace(' ', '_');
+  }
+});
+
 // Factory for handling warnings.
 oppia.factory('warningsData', function($rootScope) {
   var warningsData = {warnings: []};

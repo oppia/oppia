@@ -66,18 +66,23 @@ class GalleryHandler(BaseHandler):
             })
 
         if augmented_user:
+            MY_EXPLORATIONS = 'My Explorations'
+            categories[MY_EXPLORATIONS] = []
             for exploration_key in augmented_user.editable_explorations:
                 exploration = exploration_key.get()
-                category_name = exploration.category
-                if not categories.get(category_name):
-                    categories[category_name] = []
                 if exploration.key not in used_keys:
-                    categories[category_name].append({
+                    exploration_data = {
                         'data': exploration.to_dict(
                             exclude=['states', 'init_state', 'owner']),
                         'can_edit': True,
                         'is_owner': user == exploration.owner,
-                    })
+                    }
+                    categories[MY_EXPLORATIONS].append(exploration_data)
+
+                    # Also, add this exploration to the relevant category.
+                    if not categories.get(exploration.category):
+                        categories[exploration.category] = []
+                    categories[exploration.category].append(exploration_data)
 
         self.data_values.update({
             'categories': categories,
