@@ -1,0 +1,20 @@
+# The system name for this widget.
+class: Continue
+
+# The human-readable name of the widget.
+name: Continue (Default widget)
+# The category the widget falls under in the widget repository.
+category: Interactive
+# A description of the widget.
+description: |
+  A button allowing the user to continue to the next section of the lesson.
+
+# Actions that the reader can perform on this widget which trigger a feedback
+# interaction.
+actions:
+  - type: submit
+    classifier: None
+
+# Customization parameters and their default values.
+params: {}
+

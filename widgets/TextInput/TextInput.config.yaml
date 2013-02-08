@@ -1,0 +1,20 @@
+# The system name for this widget.
+class: TextInput
+
+# The human-readable name of the widget.
+name: Text input
+# The category the widget falls under in the widget repository.
+category: Interactive
+# A description of the widget.
+description: |
+  A text input widget that can accept and classify strings.
+
+# Actions that the reader can perform on this widget which trigger a feedback
+# interaction.
+actions:
+  - type: submit
+    classifier: TextClassifier
+
+# Customization parameters and their default values.
+params:
+  placeholder: 'Type your answer here.'
