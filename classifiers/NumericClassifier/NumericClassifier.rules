@@ -17,4 +17,4 @@ is greater than {{x}}: GreaterThan(x)
 
 is within {{tol}} of {{x}}: InclusiveBetween(x-tol, x+tol)
 is between {{a}} and {{b}}: InclusiveBetween(a, b)
-is in [a, b]: InclusiveBetween(a, b)
+is in [{{a}}, {{b}}]: InclusiveBetween(a, b)
