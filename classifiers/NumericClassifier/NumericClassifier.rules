@@ -1,20 +1,7 @@
-{{x}}: Equals(x)
-= {{x}}: Equals(x)
-== {{x}}: Equals(x)
-is {{x}}: Equals(x)
-
-is less than {{x}}: LessThan(x)
-< {{x}}: LessThan(x)
-
-is greater than {{x}}: GreaterThan(x)
-> {{x}}: GreaterThan(x)
-
-≤ {{x}}: LessThanOrEqualTo(x)
-<= {{x}}: LessThanOrEqualTo(x)
-
-≥ {{x}}: GreaterThanOrEqualTo(x)
->= {{x}}: GreaterThanOrEqualTo(x)
-
-is within {{tol}} of {{x}}: InclusiveBetween(x-tol, x+tol)
-is between {{a}} and {{b}}: InclusiveBetween(a, b)
-is in [{{a}}, {{b}}]: InclusiveBetween(a, b)
+Answer is equal to {{x}}: Equals(x)
+Answer is less than {{x}}: LessThan(x)
+Answer is greater than {{x}}: GreaterThan(x)
+Answer is less than or equal to {{x}}: LessThanOrEqualTo(x)
+Answer is greater than or equal to {{x}}: GreaterThanOrEqualTo(x)
+Answer is between {{a}} and {{b}}, inclusive: IsInclusivelyBetween(a, b)
+Answer is within {{tol}} of {{x}}: IsWithinTolerance(tol, x)
