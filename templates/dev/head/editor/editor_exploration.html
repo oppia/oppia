@@ -113,9 +113,14 @@
               <div ng-view ng-cloak></div>
 
               <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished.-->
-              <div style="display: none">
-                <iframe id="interactiveWidgetPreview" ng-controller="InteractiveWidgetPreview" frameborder="0">
+              <div class="oppia-interactive-widget-preview" style="display: none">
+                <iframe id="interactiveWidgetPreview" ng-controller="InteractiveWidgetPreview" frameborder="0" width="90%">
                 </iframe>
+                <hr>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#interactiveWidgetModal">
+                  Use a different interactive widget
+                </button>
+              </a>
               </div>
 
             </div>
@@ -126,7 +131,7 @@
     </div>
 
 
-    <div ui-modal class="fade" id="deleteExplorationModal" ng-model="modalShown">
+    <div ui-modal class="fade" id="deleteExplorationModal" ng-model="deleteExplorationModalShown">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
           &times;
@@ -144,7 +149,22 @@
       </div>
     </div>
 
+
+    <div ui-modal class="fade" id="interactiveWidgetModal" ng-model="interactiveWidgetModalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="interactiveWidgetModalLabel">Choose an Interactive Widget</h3>
+      </div>
+      <div class="modal-body">
+        <iframe src="/widgetrepository?iframed=true&interactive=true" width="100%" height="400px" frameborder="0"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Cancel</a>
+      </div>
+    </div>
+
   </div>
 
 {% endblock %}
-  </div>
