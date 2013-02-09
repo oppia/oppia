@@ -33,54 +33,7 @@
                 <div class="row-fluid">
 
                   <div class="span4">
-                    <div>
-                      Title: <input type="text" ng-model="explorationTitle" ng-model-onblur>
-                    </div>
-
-                    <div>
-                      Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
-                    </div>
-
-                    <div>
-                      Image preview:
-                      <ng-switch on="!explorationImageId">
-                        <div ng-switch-when="true" class="oppia-placeholder">
-                          <form id="newImageForm">
-                            <input type="file" id="newImage" name="newImage" image-upload="true">
-                            <button type="button" ng-click="saveExplorationImage()">Save</button>
-                          </form>
-                        </div>
-                        <div ng-switch-default>
-                          <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>"></img>
-                          <button ng-click="deleteExplorationImage()">Delete image</button>
-                        </div>
-                      </ng-switch>
-                    </div>
-
-                    <div>
-                      <button type="button" ng-click="downloadExploration()">
-                        Download Exploration
-                      </button>
-                    </div>
-
-                    <br><br><br>
-
-                    <div ng-hide="isPublic">
-                      <button type="button" ng-click="makePublic()">
-                        Publish Exploration
-                      </button>
-                      (irreversible)
-                    </div>
-
-                    <br>
-
-                    <div>
-                      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteExplorationModal">
-                        Delete Exploration
-                      </button>
-                      (irreversible)
-                    </div>
-
+                    {% include 'editor/editor_metadata.html' %}
                   </div>
 
                   <div class="span7">
