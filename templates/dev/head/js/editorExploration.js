@@ -538,6 +538,22 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 }
 
+function InteractiveWidgetPreview($scope, $http) {
+  $scope.fillFrame = function(domId, widgetCode) {
+    var F = $('#' + domId);
+    console.log('a');
+    console.log(F);
+    F[0].contentWindow.document.open();
+    F[0].contentWindow.document.write(widgetCode);
+    F[0].contentWindow.document.close();
+  };
+
+  $http.get('/interactive_widgets/Continue').success(function(data) {
+    console.log('test');
+    $scope.fillFrame('interactiveWidgetPreview', data.widget.raw);
+  });
+}
+
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
@@ -545,3 +561,4 @@ EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
 ExplorationTab.$inject = ['$scope'];
+InteractiveWidgetPreview.$inject = ['$scope', '$http'];

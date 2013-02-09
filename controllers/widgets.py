@@ -164,3 +164,25 @@ class Widget(BaseHandler):
             widget.put()
         response = {'widgetId': widget.hash_id, 'raw': widget.raw}
         self.response.out.write(json.dumps(response))
+
+
+INTERACTIVE_WIDGET_LIST = ['Continue', 'NumericInput', 'TextInput']
+
+class InteractiveWidget(BaseHandler):
+    """Handles requests relating to interactive widgets."""
+
+    def get(self, widget_class):
+        """Gets interactive widget code from the file system."""
+   
+        import os
+        logging.info(os.getcwd())
+        widget_html = 'This widget is not available.'
+        widget_js = ''
+        if widget_class in INTERACTIVE_WIDGET_LIST:
+            with open('widgets/%s/%s.html' % (widget_class, widget_class)) as f:
+                widget_html = f.read().decode('utf-8')
+            with open('widgets/%s/%s.js' % (widget_class, widget_class)) as f:
+                widget_js = '<script>%s</script>' % f.read().decode('utf-8')
+    
+        response = {'widget': {'raw': '\n'.join([widget_html, widget_js])}}
+        self.response.out.write(json.dumps(response))

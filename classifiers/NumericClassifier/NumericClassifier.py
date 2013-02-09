@@ -28,6 +28,6 @@ def IsInclusivelyBetween(answer, a, b):
     return answer >= a and answer <= b
 
 
-def IsWithinToleranc(answer, tol, x):
+def IsWithinTolerance(answer, tol, x):
     """Answer is within {{tol}} of {{x}}, inclusive."""
     return IsInclusivelyBetween(answer, tol - x, tol + x)

@@ -112,6 +112,12 @@
 
               <div ng-view ng-cloak></div>
 
+              <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished.-->
+              <div style="display: none">
+                <iframe id="interactiveWidgetPreview" ng-controller="InteractiveWidgetPreview" frameborder="0">
+                </iframe>
+              </div>
+
             </div>
           </div>
         </div>
