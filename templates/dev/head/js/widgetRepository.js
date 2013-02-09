@@ -64,8 +64,13 @@ function WidgetRepository($scope, $http, activeInputData) {
     return result;
   };
 
+  var dataUrl = $scope.widgetDataUrl;
+  if ('interactive' in WidgetRepositoryConfig) {
+    dataUrl += '?interactive=true';
+  }
+
   // Initializes the widget list using data from the server.
-  $http.get($scope.widgetDataUrl).success(function(data) {
+  $http.get(dataUrl).success(function(data) {
     $scope.loadPage(data);
   });
 
