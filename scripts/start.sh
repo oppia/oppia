@@ -77,6 +77,7 @@ if [ ! -d "third_party/angularjs" ]; then
   echo Installing AngularJS and angular-sanitize
   mkdir -p third_party/angularjs/
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/angularjs/angular-resource.min.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
 fi
 
