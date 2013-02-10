@@ -66,13 +66,43 @@
               <div ng-view ng-cloak></div>
 
               <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished.-->
-              <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview" style="display: none;">
+              <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview" style="display: none">
                 <iframe id="interactiveWidgetPreview" frameborder="0" width="90%">
                 </iframe>
+
                 <hr>
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#customizeWidgetModal">
+                  Customize this widget
+                </button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#interactiveWidgetModal">
                   Use a different interactive widget
                 </button>
+
+                <hr>
+
+                <h3>Rules</h3>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRuleModal">
+                  Add rule
+                </button>
+
+
+                <div ui-modal class="fade" id="customizeWidgetModal" ng-model="customizeWidgetModalShown">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                      &times;
+                    </button>
+                    <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
+                  </div>
+                  <div class="modal-body">
+                    <!-- TODO(sll): Code this. -->
+                    TODO
+                    <[interactiveWidget]>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Save</a>
+                  </div>
+                </div>
 
                 <div ui-modal class="fade" id="interactiveWidgetModal" ng-model="interactiveWidgetModalShown">
                   <div class="modal-header">
