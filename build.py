@@ -72,6 +72,8 @@ for root, dirs, files in os.walk(os.getcwd()):
         continue
     for directory in dirs:
         print 'Processing', os.path.join(root, directory)
+    if 'oppia/third_party' in root or 'oppia/widgets' in root:
+        continue
     for fn in files:
         full_filename = os.path.join(root) + '/' + fn
         if full_filename.find(OUT_DIR) > 0:

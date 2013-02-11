@@ -1,13 +1,13 @@
-def Equals(_answer, x):
+def Equals(answer, x):
     """Answer is equal to {{x}}."""
-    return _answer == x
+    return answer == x
 
 
-def StartsWith(_answer, x):
+def StartsWith(answer, x):
     """Answer starts with {{x}}."""
-    return _answer.startswith(x)
+    return answer.startswith(x)
 
 
-def Contains(_answer, x):
+def Contains(answer, x):
     """Answer contains {{x}}."""
-    return _answer.find(x) != -1
+    return answer.find(x) != -1

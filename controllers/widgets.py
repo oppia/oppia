@@ -23,6 +23,8 @@ import feconf, models, utils
 from google.appengine.api import users
 
 
+INTERACTIVE_WIDGET_LIST = ['Continue', 'NumericInput', 'TextInput']
+
 class WidgetRepositoryPage(BaseHandler):
     """Displays the widget repository page."""
 
@@ -33,6 +35,8 @@ class WidgetRepositoryPage(BaseHandler):
         })
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
+        if self.request.get('interactive') == 'true':
+            self.values['interactive'] = True
         if users.is_current_user_admin():
             self.values['admin'] = True
         self.response.out.write(feconf.JINJA_ENV.get_template(
@@ -102,7 +106,19 @@ class WidgetRepositoryPage(BaseHandler):
 class WidgetRepositoryHandler(BaseHandler):
     """Provides data to populate the widget repository page."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get_interactive_widgets(self):
+        """Load interactive widgets from the file system."""
+        response = {}
+        for widget_class in INTERACTIVE_WIDGET_LIST:
+            widget = InteractiveWidget.get_interactive_widget(widget_class)
+            category = widget['category']
+            if category not in response:
+                response[category] = []
+            response[category].append(widget)
+        return response
+
+    def get_non_interactive_widgets(self):
+        """Load non-interactive widgets."""
         generic_widgets = models.GenericWidget.query()
         response = {}
         for widget in generic_widgets:
@@ -114,6 +130,15 @@ class WidgetRepositoryHandler(BaseHandler):
                 'blurb': widget.blurb, 'category': widget.category,
                 'id': widget.hash_id
             })
+        return response
+
+    def get(self):  # pylint: disable-msg=C6409
+        """Handles GET requests."""
+        if self.request.get('interactive') == 'true':
+            response = self.get_interactive_widgets()
+        else:
+            response = self.get_non_interactive_widgets()
+
         self.response.out.write(json.dumps({'widgets': response}))
 
 
@@ -164,3 +189,37 @@ class Widget(BaseHandler):
             widget.put()
         response = {'widgetId': widget.hash_id, 'raw': widget.raw}
         self.response.out.write(json.dumps(response))
+
+
+class InteractiveWidget(BaseHandler):
+    """Handles requests relating to interactive widgets."""
+
+    @classmethod
+    def get_interactive_widget(cls, widget_class):
+        """Gets interactive widget code from the file system."""
+        widget = {}
+        with open('widgets/%s/%s.config.yaml' % (widget_class, widget_class)) as f:
+            widget = utils.GetDictFromYaml(f.read().decode('utf-8'))
+
+        widget_html = 'This widget is not available.'
+        widget_js = ''
+        if widget_class in INTERACTIVE_WIDGET_LIST:
+            with open('widgets/%s/%s.html' % (widget_class, widget_class)) as f:
+                widget_html = f.read().decode('utf-8')
+            # For now, remove the interactivity.
+            # with open('widgets/%s/%s.js' % (widget_class, widget_class)) as f:
+            #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')
+
+        category = widget['category']
+        return {
+            'name': widget['name'],
+            'raw': '\n'.join([widget_html, widget_js]),
+            'blurb': widget['description'],
+            'category': category,
+            'params': [],
+        }
+
+    def get(self, widget_class):
+        """Handles GET requests."""
+        response = self.get_interactive_widget(widget_class)
+        self.response.out.write(json.dumps({'widget': response}))

@@ -153,6 +153,12 @@ div.oppia-footer {
   content: ' ✎';
 }
 
+.oppia-interactive-widget-preview {
+  border: 1px solid black;
+  padding: 5px;
+  width: 80%;
+} 
+
 .oppia-droppable-active {
   background: lightyellow;
 }

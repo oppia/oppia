@@ -18,11 +18,11 @@
         <div class="tabbable tabs-left" ui-if="categories">
           <ul class="nav nav-tabs">
             <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
-              <a data-toggle="tab" href="#<[category]>"><[category]></a>
+              <a data-toggle="tab" href="#<[category|spacesToUnderscores]>"><[category]></a>
             </li>
           </ul>
           <div class="tab-content">
-            <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category]>">
+            <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
               <div class="container-fluid">
                 <div class="row-fluid">
 

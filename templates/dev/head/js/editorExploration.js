@@ -22,8 +22,8 @@ var END_DEST = '-1';
 var QN_DEST_PREFIX = 'q-';
 // TODO(sll): Internationalize these.
 var END_STRING = 'END';
-var GUI_EDITOR_URL = '/gui'
-var YAML_EDITOR_URL = '/text'
+var GUI_EDITOR_URL = '/gui';
+var YAML_EDITOR_URL = '/text';
 
 // TODO(sll): Move all strings to the top of the file, particularly
 // warning messages and activeInputData.name.
@@ -64,31 +64,43 @@ oppia.config(['$routeProvider', function($routeProvider) {
       otherwise({redirectTo: '/'});
 }]);
 
-
-oppia.factory('explorationData', function($rootScope, $http, warningsData) {
+oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData) {
   // Put exploration variables here.
   var explorationData = {};
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
+  var Exploration = $resource('/create/:explorationId/data');
 
   explorationData.getData = function() {
-    var obj = this;
     console.log('Getting exploration data');
-    $http.get(explorationUrl + '/data').success(function(data) {
-      obj.data = data;
-      obj.states = data.state_list;
-      obj.initState = data.init_state_id;
 
-      obj.broadcastExploration();
-    }).error(function(data) {
-      warningsData.addWarning('Server error: ' + data.error);
-    });
+/*
+  TODO(sll): Reinstate the commented-out code below once we have implemented
+  setData(), which updates the frontend version.
+
+    if (explorationData.hasOwnProperty('data')) {
+      explorationData.broadcastExploration();
+    } else {
+*/
+      // Retrieve data from the server.
+      console.log('Retrieving exploration data from the server');
+      explorationData.data = Exploration.get(
+        {explorationId: pathnameArray[2]}, function() {
+          console.log(explorationData);
+
+          explorationData.broadcastExploration();
+        }, function(errorResponse) {
+          warningsData.addWarning('Server error: ' + errorResponse.error);
+        });
+  /*
+    }
+  */
   };
 
   explorationData.broadcastExploration = function() {
     $rootScope.$broadcast('explorationData');
-  }
+  };
 
   return explorationData;
 });
@@ -130,7 +142,7 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
 
   stateData.broadcastState = function() {
     $rootScope.$broadcast('stateData');
-  }
+  };
 
   return stateData;
 });
@@ -150,7 +162,7 @@ oppia.filter('truncate', function() {
       return input;
     else
       return String(input).substring(0, length - suffix.length) + suffix;
-  }
+  };
 });
 
 // Receive events from the iframed widget repository.
@@ -165,7 +177,7 @@ oppia.run(function($rootScope) {
 function ExplorationTab($scope) {
   // Changes the tab to the Exploration Editor view.
   $('#editorViewTab a[href="#explorationEditor"]').tab('show');
-};
+}
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
@@ -231,7 +243,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   $scope.$on('explorationData', function() {
     var data = explorationData.data;
-    $scope.states = explorationData.states;
+    $scope.states = data.state_list;
     console.log('Data for exploration page:');
     console.log(data);
     $scope.explorationImageId = data.image_id;
@@ -298,7 +310,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       $scope[frontendName] = oldValue;
       return;
     }
-    var requestParameters = {}
+    var requestParameters = {};
     requestParameters[backendName] = newValue;
 
     activeInputData.clear();
@@ -534,9 +546,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.deleteExploration = function() {
-    $http.delete($scope.explorationUrl)
+    $http['delete']($scope.explorationUrl)
     .success(function(data) {
-      window.location = '/create/';
+      window.location = '/gallery/';
     });
   };
 
@@ -591,6 +603,38 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 }
 
+function InteractiveWidgetPreview($scope, $http, stateData) {
+  $scope.fillFrame = function(domId, widgetCode) {
+    var F = $('#' + domId);
+    F[0].contentWindow.document.open();
+    F[0].contentWindow.document.write(widgetCode);
+    F[0].contentWindow.document.close();
+  };
+
+  $scope.$on('stateData', function() {
+    var data = stateData.data;
+
+    $http.get('/interactive_widgets/' + data.interactive_widget).success(
+      function(data) {
+        $scope.fillFrame('interactiveWidgetPreview', data.widget.raw);
+        $scope.interactiveWidget = data.widget;
+      }
+    );
+  });
+
+  $('#interactiveWidgetModal').on('hide', function() {
+    // Reload the iframe.
+    var F = $('#interactiveWidgetRepository');
+    F[0].src = F[0].src;
+  });
+
+  // Receive messages from the widget repository.
+  $scope.$on('message', function(event, arg) {
+    $scope.fillFrame('interactiveWidgetPreview', arg.data);
+    $('#interactiveWidgetModal').modal('hide');
+  });
+}
+
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
@@ -598,3 +642,4 @@ EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
 ExplorationTab.$inject = ['$scope'];
+InteractiveWidgetPreview.$inject = ['$scope', '$http', 'stateData'];

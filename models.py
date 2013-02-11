@@ -83,6 +83,17 @@ class State(ndb.Model):
     # Additional parameters that will be passed to the classification code
     # together with the student input (such as a canonical set for set input).
     classifier_params = ndb.StringProperty(repeated=True)
+    # The name of the interactive widget class for this state.
+    interactive_widget = ndb.StringProperty(default='Continue')
+    # Ruleset for the interactive widget, stored as a list of tuples. Each tuple
+    # represents an answer category, and contains three elements:
+    # - the Python code to check whether the answer satisfies the category
+    # - the destination state or exploration
+    # - feedback text
+    interactive_ruleset = ndb.JsonProperty(repeated=True)
+    # Parameter overrides for the interactive widget view, stored as key-value
+    # pairs.
+    interactive_params = ndb.JsonProperty()
 
 class Parameter(ndb.Model):
     """A parameter definition for an exploration."""

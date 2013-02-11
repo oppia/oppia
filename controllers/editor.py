@@ -236,13 +236,13 @@ class StatePage(BaseHandler):
         """Returns the properties of a state when it is opened for editing."""
 
         values = {
-                'actions': [],
-                'classifier': state.input_view.get().classifier,
-                'inputType': state.input_view.get().name,
-                'stateId': state.hash_id,
-                'stateName': state.name,
-                'stateContent': state.content,
-                'yaml': '',
+            'actions': [],
+            'classifier': state.input_view.get().classifier,
+            'inputType': state.input_view.get().name,
+            'stateId': state.hash_id,
+            'stateName': state.name,
+            'stateContent': state.content,
+            'yaml': '',
         }
 
         # Retrieve the actions corresponding to this state.
@@ -266,6 +266,10 @@ class StatePage(BaseHandler):
             values['actions'].append(action)
 
         values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
+        values['interactive_widget'] = state.interactive_widget
+        values['interactive_ruleset'] = state.interactive_ruleset
+        values['interactive_params'] = state.interactive_params
+
         self.response.out.write(json.dumps(values))
 
 

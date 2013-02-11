@@ -77,6 +77,7 @@ if [ ! -d "third_party/angularjs" ]; then
   echo Installing AngularJS and angular-sanitize
   mkdir -p third_party/angularjs/
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/angularjs/angular-resource.min.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
 fi
 
@@ -85,16 +86,6 @@ if [ ! -d "third_party/d3js" ]; then
   echo Installing d3.js
   mkdir -p third_party/d3js/
   wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
-fi
-
-echo Checking whether wysihtml5 is installed in third_party
-if [ ! -d "third_party/wysihtml5" ]; then
-  echo Installing wysihtml5
-  mkdir -p third_party/wysihtml5/
-  wget https://github.com/xing/wysihtml5/zipball/0.3.0 -O wysihtml5-download.zip
-  unzip wysihtml5-download.zip -d third_party/
-  rm wysihtml5-download.zip
-  mv third_party/xing-wysihtml5-fb0cfe4 third_party/wysihtml5
 fi
 
 
