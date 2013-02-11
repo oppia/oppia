@@ -240,6 +240,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
+    //$scope.parameters = data.parameters;//TODO(yanamal): get parameters from serever side
+    $scope.parameters = [];
     explorationFullyLoaded = true;
     if ($scope.stateId) {
       stateData.getData($scope.stateId);
@@ -430,6 +432,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope[variableList[i]] = data[variableList[i]];
       }
     }
+    $scope.paramChanges = [];//TODO(yanamal): actually take them from back end; change to be per-dest
     // Update the states using the actions variable.
     $scope.states[$scope.stateId].dests = data.actions;
   });
@@ -535,6 +538,56 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     .success(function(data) {
       window.location = '/create/';
     });
+  };
+
+  // logic for parameter definition interface
+
+  // reset and/or initialize variables used for parameter input
+  $scope.resetParamInput = function() {
+    console.log($scope);
+    activeInputData.clear();
+    $scope.tmpVals = [];
+    $scope.tmpName = '';
+    $scope.newTmpElement = '';
+  };
+
+  $scope.resetParamInput();
+ 
+  // add a new element to the list of possible starting values for the parameter being edited
+  $scope.addNewTmpElement = function() {
+    console.log($scope.newTmpElement);
+    if ($scope.newTmpElement) {
+      $scope.tmpVals.push($scope.newTmpElement);
+      $scope.newTmpElement = '';
+    }
+  };
+
+  /**
+   * add a new parameter
+   * @param {String} paramName the name of the parameter being added
+   * @param {Array} paramVals list of initial values the parameter could take 
+   */
+  $scope.addParameter = function(paramName, paramVals) {
+    // Verify that the active input was the parameter input, as expected
+    if (activeInputData.name != 'exploration.dummy.parameter') {
+      console.log('Error: unexpected activeInputData.name ' + activeInputData.name);
+    }
+    //TODO(yanamal): require name and at least one starting value?
+    // Add the new parameter to the list
+    $scope.parameters.push({name: paramName, values: paramVals});
+    console.log($scope.parameters);
+    // Save the parameter property TODO(yanamal)
+    // Reset and hide the input field
+    $scope.resetParamInput();
+  };
+   
+  /**
+   * delete a  parameter
+   * @param {number} index the index of the parameter to be deleted
+   */
+  $scope.deleteParameter = function(index) {
+    $scope.parameters.splice(index, 1);
+    // TODO(yanamal): save to server-side
   };
 }
 

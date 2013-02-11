@@ -341,6 +341,39 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     }
     return false;
   };
+
+  //logic for parameter change interface
+
+  //reset and/or initialize variables for parameter change input
+  $scope.resetParamChangeInput = function() {
+    console.log($scope);
+    activeInputData.clear();
+    $scope.tmpParamName = '';
+    $scope.tmpNewValue = '';
+    $scope.tmpLiteral = ''; //new value literal, if parameter is to be changed to a literal value
+  }
+
+  $scope.resetParamChangeInput();
+
+  $scope.addParamChange = function(paramName, paramVal, valLiteral) {
+    // Verify that the active input was the parameter input, as expected TODO(yanamal)
+    // Add the new change to the list
+    if(paramVal == 'newval') { //changing param to a new literal value
+      $scope.paramChanges.push({name: paramName, newVal: valLiteral})
+    }
+    else { //changing to a computed value - either value of another var, or student input
+      $scope.paramChanges.push({name: paramName, newVal: '{{'+paramVal+'}}'});
+    }
+    console.log($scope.paramChanges);
+    // Save the parameter property TODO(yanamal)
+    // Reset and hide the input field
+    $scope.resetParamChangeInput();
+  }
+  
+  $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
+    $scope.paramChanges.splice(paramIndex, 1)
+    // TODO(yanamal): save to server-side
+  }
 }
 
 GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData',

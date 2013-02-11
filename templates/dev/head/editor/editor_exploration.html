@@ -58,6 +58,35 @@
                     </div>
 
                     <div>
+                      Parameters
+                      <div ng-repeat="param in parameters" class="oppia-category-block">
+                        <a class="close" ng-click="deleteParameter($index)"> 
+                          &times;
+                        </a>
+                        <span class="oppia-editable-name">Parameter Name: <[param.name]></span><br>
+                        <span class="oppia-editable-name">Possible starting values: <[param.values]></span>
+                      </div>
+                      <br>
+                      <button type="button" class="add-button" ng-hide="activeInputData.name.indexOf('exploration.dummy.parameter') == 0" ng-click="initializeNewActiveInput('exploration.dummy.parameter')">Add parameter</button>
+                      <br>
+                      <div class="oppia-category-block" ng-show="activeInputData.name.indexOf('exploration.dummy.parameter') == 0">
+                        Parameter Name: <input type="text" ng-model="tmpName" ng-model-onblur><br>
+                        Possible starting values: <[tmpVals]>
+                        <ul>
+                          <li ng-repeat="tmpElement in tmpVals">
+                            <[tmpElement]>
+                            <button type="button" ng-click="tmpVals.splice($index, 1)">&times;</button>
+                          </li>
+                        </ul>
+                        <form ng-submit="addNewTmpElement()">
+                          <input type="text" ng-model="newTmpElement" placeholder="Add Value" autofocus required>
+                          <input type="submit" value="+">
+                        </form>
+                        <button type="button" ng-click="addParameter(tmpName, tmpVals)">Submit</button>
+                      </div>
+                    </div>
+
+                    <div>
                       <button type="button" ng-click="downloadExploration()">
                         Download Exploration
                       </button>

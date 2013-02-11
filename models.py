@@ -84,6 +84,14 @@ class State(ndb.Model):
     # together with the student input (such as a canonical set for set input).
     classifier_params = ndb.StringProperty(repeated=True)
 
+class Parameter(ndb.Model):
+    """A parameter definition for an exploration."""
+    # The name of the parameter
+    name = ndb.StringProperty(required=True)
+    # The possible starting values to choose from
+    starting_values = ndb.StringProperty(repeated=True)
+
+
 
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(ndb.Model):
@@ -101,6 +109,8 @@ class Exploration(ndb.Model):
     init_state = ndb.KeyProperty(kind=State, required=True)
     # The list of states this exploration consists of.
     states = ndb.KeyProperty(kind=State, repeated=True)
+    # The list of parameters associated with this exploration
+    parameters = ndb.KeyProperty(kind=Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
