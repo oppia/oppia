@@ -1,7 +1,22 @@
-Answer is equal to {{x}}: Equals(x)
-Answer is less than {{x}}: LessThan(x)
-Answer is greater than {{x}}: GreaterThan(x)
-Answer is less than or equal to {{x}}: LessThanOrEqualTo(x)
-Answer is greater than or equal to {{x}}: GreaterThanOrEqualTo(x)
-Answer is between {{a}} and {{b}}, inclusive: IsInclusivelyBetween(a, b)
-Answer is within {{tol}} of {{x}}: IsWithinTolerance(tol, x)
+Answer is equal to {{x | IsNumber}}:
+  classifier: Equals(x)
+
+Answer is less than {{x | IsReal}}:
+  classifier: IsLessThan(x)
+
+Answer is greater than {{x | IsReal}}:
+  classifier: IsGreaterThan(x)
+
+Answer is less than or equal to {{x | IsReal}}:
+  classifier: IsLessThanOrEqualTo(x)
+
+Answer is greater than or equal to {{x | IsReal}}:
+  classifier: IsGreaterThanOrEqualTo(x)
+
+Answer is between {{a | IsReal}} and {{b | IsReal}}, inclusive:
+  classifier: IsInclusivelyBetween(a, b)
+  checks:
+  - IsLessThanOrEqualTo(a, b)
+
+Answer is within {{tol | IsReal}} of {{x | IsReal}}:
+  classifier: IsWithinTolerance(tol, x)

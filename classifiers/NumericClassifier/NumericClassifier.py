@@ -1,33 +1,46 @@
-def Equals(answer, x):
-    """Answer is equal to {{x}}."""
-    return answer == x
+import numbers
 
 
-def IsLessThan(answer, x):
-    """Answer is less than {{x}}."""
-    return answer < x
+def IsNumber(val):
+    """The given value should be a number."""
+    return isinstance(val, numbers.Number)
 
 
-def IsGreaterThan(answer, x):
-    """Answer is greater than {{x}}."""
-    return answer > x
+def IsReal(val):
+    """The given value should be a real number."""
+    return isinstance(val, numbers.Real)
 
 
-def IsLessThanOrEqualTo(answer, x):
-    """Answer is less than or equal to {{x}}."""
-    return answer <= x
+def Equals(val, x):
+    """The given value should be equal to {{x}}."""
+    return val == x
 
 
-def IsGreaterThanOrEqualTo(answer, x):
-    """Answer is greater than or equal to {{x}}."""
-    return answer >= x
+def IsLessThan(val, x):
+    """The given value should be less than {{x}}."""
+    return val < x
 
 
-def IsInclusivelyBetween(answer, a, b):
-    """Answer is between {{a}} and {{b}}, inclusive."""
-    return answer >= a and answer <= b
+def IsGreaterThan(val, x):
+    """The given value should be greater than {{x}}."""
+    return val > x
 
 
-def IsWithinTolerance(answer, tol, x):
-    """Answer is within {{tol}} of {{x}}, inclusive."""
-    return IsInclusivelyBetween(answer, tol - x, tol + x)
+def IsLessThanOrEqualTo(val, x):
+    """The given value should be less than or equal to {{x}}."""
+    return val <= x
+
+
+def IsGreaterThanOrEqualTo(val, x):
+    """The given value should be greater than or equal to {{x}}."""
+    return val >= x
+
+
+def IsInclusivelyBetween(val, a, b):
+    """The given value should be between {{a}} and {{b}}, inclusive."""
+    return val >= a and val <= b
+
+
+def IsWithinTolerance(val, tol, x):
+    """The given value should be within {{tol}} of {{x}}, inclusive."""
+    return IsInclusivelyBetween(val, tol - x, tol + x)
