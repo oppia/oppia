@@ -44,7 +44,7 @@ class GenericWidget(ndb.Model):
     # The category to which this widget belongs.
     category = ndb.StringProperty(required=True)
     # The description of the generic widget.
-    blurb = ndb.TextProperty()
+    description = ndb.TextProperty()
     # The raw code for the generic widget.
     raw = ndb.TextProperty()
     # Parameter names, definitions, types and default arguments for this widget.
@@ -83,7 +83,7 @@ class State(ndb.Model):
     # Additional parameters that will be passed to the classification code
     # together with the student input (such as a canonical set for set input).
     classifier_params = ndb.StringProperty(repeated=True)
-    # The name of the interactive widget class for this state.
+    # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
     # Ruleset for the interactive widget, stored as a list of tuples. Each tuple
     # represents an answer category, and contains three elements:

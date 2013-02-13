@@ -149,7 +149,9 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.newWidgetIsBeingAdded = true;
     $('#editWidgetModal').modal();
     $('#modalTabs a[href="#code"]').tab('show');
-    $scope.modalWidget = {params: [], blurb: '', name: '', raw: '', category: ''};
+    $scope.modalWidget = {
+      params: [], description: '', name: '', raw: '', category: ''
+    };
   };
 
   $scope.saveNewWidget = function(widget) {
@@ -211,7 +213,12 @@ function WidgetRepository($scope, $http, activeInputData) {
     var customizedCode = $scope.createCustomizedCode(
         $scope.widgets[category][index].params, $scope.customizedParams,
         $scope.widgets[category][index].raw);
-    window.parent.postMessage(customizedCode, '*');
+    var data = {
+      raw: customizedCode,
+      widget: $scope.widgets[category][index]
+    }
+
+    window.parent.postMessage(data, '*');
   };
 
   $scope.initializeWidgetParamEditor = function(index) {

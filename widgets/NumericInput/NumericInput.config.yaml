@@ -1,5 +1,5 @@
 # The system name for this widget.
-class: NumericInput
+id: NumericInput
 
 # The human-readable name of the widget.
 name: Numeric input

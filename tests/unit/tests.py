@@ -20,13 +20,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.api import users
 
-class SampleUnitTest(unittest.TestCase):
-    """A sample unit test."""
-
-    def test_sample(self):
-        """A sample test."""
-
-        assert 3 + 3 == 6
 
 class ModelsUnitTests(unittest.TestCase):
     """Test models.py."""
@@ -42,33 +35,33 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_Image_Class(self):
         """Test Image Class."""
-	o = models.Image()
+        o = models.Image()
         o.hash_id = "The hash id"
         o.image = "The image"
-	self.assertEquals(o.hash_id, "The hash id")
-	self.assertEquals(o.image, "The image")
+        self.assertEquals(o.hash_id, "The hash id")
+        self.assertEquals(o.image, "The image")
 
     def test_Widget_Class(self):
         """Test Widget Class."""
         o = models.Widget()
         o.hash_id = "The hash id"
         o.raw = "Some code here"
-	self.assertEqual(o.hash_id, "The hash id")
-	self.assertEqual(o.raw, "Some code here")
+        self.assertEqual(o.hash_id, "The hash id")
+        self.assertEqual(o.raw, "Some code here")
 
     def test_GenericWidget_Class(self):
         """Test GenericWidget Class."""
         o = models.GenericWidget()
         o.hash_id = "The hash id"
         o.name = "The name"
-        o.category = "The cagetory"
-        o.blurb = "The blurb"
+        o.category = "The category"
+        o.description = "The description"
         o.raw = "Some code here"
         o.prams = "Some JsonProperties here"
         self.assertEqual(o.hash_id, "The hash id")
         self.assertEqual(o.name, "The name")
-        self.assertEqual(o.category, "The cagetory")
-        self.assertEqual(o.blurb, "The blurb")
+        self.assertEqual(o.category, "The category")
+        self.assertEqual(o.description, "The description")
         self.assertEqual(o.raw, "Some code here")
         self.assertEqual(o.prams, "Some JsonProperties here")
 
@@ -81,7 +74,7 @@ class ModelsUnitTests(unittest.TestCase):
         self.assertEqual(o.name, "The name")
         self.assertEqual(o.classifier, "none")
         self.assertEqual(o.html, "The inner html")
-    
+
     def test_State_Class(self):
         """Test State Class."""
         o = models.State()
@@ -100,7 +93,6 @@ class ModelsUnitTests(unittest.TestCase):
         self.assertEqual(o.action_sets, [ndb.Key(models.ActionSet, 2)])
         self.assertEqual(o.classifier_params, ["The params"])
 
-    
     def test_Exploration_Class(self):
         """Test Exploration Class."""
         u = users.get_current_user()

@@ -1,5 +1,5 @@
 # The system name for this widget.
-class: Continue
+id: Continue
 
 # The human-readable name of the widget.
 name: Continue (Default widget)

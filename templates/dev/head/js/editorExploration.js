@@ -531,7 +531,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         state_name: $scope.stateName,
         state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
-        actions: JSON.stringify($scope.states[$scope.stateId].dests)
+        actions: JSON.stringify($scope.states[$scope.stateId].dests),
+        interactive_widget: $scope.interactiveWidget,
+        interactive_params: JSON.stringify($scope.interactiveParams)
     }, true);
 
     $http.put(
@@ -564,7 +566,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.resetParamInput();
- 
+
   // add a new element to the list of possible starting values for the parameter being edited
   $scope.addNewTmpElement = function() {
     console.log($scope.newTmpElement);
@@ -577,7 +579,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   /**
    * add a new parameter
    * @param {String} paramName the name of the parameter being added
-   * @param {Array} paramVals list of initial values the parameter could take 
+   * @param {Array} paramVals list of initial values the parameter could take
    */
   $scope.addParameter = function(paramName, paramVals) {
     // Verify that the active input was the parameter input, as expected
@@ -592,7 +594,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     // Reset and hide the input field
     $scope.resetParamInput();
   };
-   
+
   /**
    * delete a  parameter
    * @param {number} index the index of the parameter to be deleted
@@ -614,10 +616,10 @@ function InteractiveWidgetPreview($scope, $http, stateData) {
   $scope.$on('stateData', function() {
     var data = stateData.data;
 
-    $http.get('/interactive_widgets/' + data.interactive_widget).success(
-      function(data) {
-        $scope.fillFrame('interactiveWidgetPreview', data.widget.raw);
-        $scope.interactiveWidget = data.widget;
+    $http.get('/interactive_widgets/' + data.interactiveWidget).success(
+      function(widgetData) {
+        $scope.fillFrame('interactiveWidgetPreview', widgetData.widget.raw);
+        $scope.$parent.interactiveWidget = widgetData.widget;
       }
     );
   });
@@ -630,9 +632,17 @@ function InteractiveWidgetPreview($scope, $http, stateData) {
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
-    $scope.fillFrame('interactiveWidgetPreview', arg.data);
+    $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
+    $scope.$parent.interactiveWidget = arg.data.widget;
+    $scope.saveInteractiveWidget($scope.interactiveWidget.id, {});
   });
+
+  $scope.saveInteractiveWidget = function(widgetId, params) {
+    $scope.$parent.interactiveWidget = widgetId;
+    $scope.$parent.interactiveParams = params;
+    $scope.saveStateChange('interactiveWidget');
+  }
 }
 
 /**

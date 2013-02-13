@@ -303,7 +303,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
       return;
     }
 
-    $scope.saveWidget(arg.data, index);
+    $scope.saveWidget(arg.data.raw, index);
   });
 
   $scope.saveWidget = function(widgetCode, index) {
@@ -369,7 +369,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     // Reset and hide the input field
     $scope.resetParamChangeInput();
   }
-  
+
   $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
     $scope.paramChanges.splice(paramIndex, 1)
     // TODO(yanamal): save to server-side

@@ -22,7 +22,7 @@
                 <div class="thumbnail">
 
                   <h5><[widget.name]></h5>
-                  <i><[widget.blurb]></i>
+                  <i><[widget.description]></i>
                   <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">Customize</a>
 
                   <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
@@ -74,7 +74,7 @@
         </div>
         <div>
           Description:
-          <textarea ng-model="modalWidget.blurb">
+          <textarea ng-model="modalWidget.description">
           </textarea>
         </div>
 

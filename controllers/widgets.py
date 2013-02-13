@@ -67,15 +67,15 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.InvalidInputException(
                 'A widget with name %s already exists' % name)
 
-        blurb = widget_data['blurb']
+        description = widget_data['description']
         params = widget_data['params']
 
         widget_hash_id = utils.GetNewId(models.GenericWidget, name)
         widget_data['id'] = widget_hash_id
 
         widget = models.GenericWidget(
-                hash_id=widget_hash_id, raw=raw, name=name, params=params,
-                category=category, blurb=blurb)
+            hash_id=widget_hash_id, raw=raw, name=name, params=params,
+            category=category, description=description)
         widget.put()
         self.response.out.write(json.dumps({'widget': widget_data}))
 
@@ -96,7 +96,7 @@ class WidgetRepositoryPage(BaseHandler):
                 'No generic widget found with id %s' % widget_data['id'])
         widget.raw = widget_data['raw']
         widget.name = widget_data['name']
-        widget.blurb = widget_data['blurb']
+        widget.description = widget_data['description']
         widget.params = widget_data['params']
         widget.category = widget_data['category']
         widget.put()
@@ -109,8 +109,8 @@ class WidgetRepositoryHandler(BaseHandler):
     def get_interactive_widgets(self):
         """Load interactive widgets from the file system."""
         response = {}
-        for widget_class in INTERACTIVE_WIDGET_LIST:
-            widget = InteractiveWidget.get_interactive_widget(widget_class)
+        for widget_id in INTERACTIVE_WIDGET_LIST:
+            widget = InteractiveWidget.get_interactive_widget(widget_id)
             category = widget['category']
             if category not in response:
                 response[category] = []
@@ -127,7 +127,7 @@ class WidgetRepositoryHandler(BaseHandler):
             response[widget.category].append({
                 'hash_id': widget.hash_id, 'name': widget.name,
                 'raw': widget.raw, 'params': widget.params,
-                'blurb': widget.blurb, 'category': widget.category,
+                'description': widget.description, 'category': widget.category,
                 'id': widget.hash_id
             })
         return response
@@ -195,31 +195,33 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_class):
+    def get_interactive_widget(cls, widget_id):
         """Gets interactive widget code from the file system."""
         widget = {}
-        with open('widgets/%s/%s.config.yaml' % (widget_class, widget_class)) as f:
+        with open('widgets/%s/%s.config.yaml' %
+                  (widget_id, widget_id)) as f:
             widget = utils.GetDictFromYaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
         widget_js = ''
-        if widget_class in INTERACTIVE_WIDGET_LIST:
-            with open('widgets/%s/%s.html' % (widget_class, widget_class)) as f:
+        if widget_id in INTERACTIVE_WIDGET_LIST:
+            with open('widgets/%s/%s.html' % (widget_id, widget_id)) as f:
                 widget_html = f.read().decode('utf-8')
             # For now, remove the interactivity.
-            # with open('widgets/%s/%s.js' % (widget_class, widget_class)) as f:
+            # with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
             #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')
 
-        category = widget['category']
-        return {
-            'name': widget['name'],
-            'raw': '\n'.join([widget_html, widget_js]),
-            'blurb': widget['description'],
-            'category': category,
-            'params': [],
-        }
+        widget['raw'] = '\n'.join([widget_html, widget_js])
+        for action in widget['actions']:
+            classifier = action['classifier']
+            if classifier and classifier != 'None':
+                with open('classifiers/%s/%s.rules' %
+                          (classifier, classifier)) as f:
+                    action['rules'] = utils.GetDictFromYaml(
+                        f.read().decode('utf-8'))
+        return widget
 
-    def get(self, widget_class):
+    def get(self, widget_id):
         """Handles GET requests."""
-        response = self.get_interactive_widget(widget_class)
+        response = self.get_interactive_widget(widget_id)
         self.response.out.write(json.dumps({'widget': response}))

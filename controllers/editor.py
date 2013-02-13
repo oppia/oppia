@@ -239,6 +239,9 @@ class StatePage(BaseHandler):
             'actions': [],
             'classifier': state.input_view.get().classifier,
             'inputType': state.input_view.get().name,
+            'interactiveWidget': state.interactive_widget,
+            'interactiveRuleset': state.interactive_ruleset,
+            'interactiveParams': state.interactive_params,
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
@@ -266,9 +269,6 @@ class StatePage(BaseHandler):
             values['actions'].append(action)
 
         values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
-        values['interactive_widget'] = state.interactive_widget
-        values['interactive_ruleset'] = state.interactive_ruleset
-        values['interactive_params'] = state.interactive_params
 
         self.response.out.write(json.dumps(values))
 
@@ -296,6 +296,8 @@ class StateHandler(BaseHandler):
             return
 
         state_name = self.request.get('state_name')
+        interactive_widget = self.request.get('interactive_widget')
+        interactive_params_json = self.request.get('interactive_params')
         state_content_json = self.request.get('state_content')
         input_type = self.request.get('input_type')
         actions_json = self.request.get('actions')
@@ -311,6 +313,12 @@ class StateHandler(BaseHandler):
             state.name = state_name
             state.put()
 
+        if interactive_widget:
+            state.interactive_widget = interactive_widget
+
+        if interactive_params_json:
+            state.interactive_params = json.loads(interactive_params_json)
+
         if state_content_json:
             state_content = json.loads(state_content_json)
             state.content = [{'type': item['type'], 'value': item['value']}
@@ -320,7 +328,8 @@ class StateHandler(BaseHandler):
             input_view = models.InputView.gql(
                 'WHERE name = :name', name=input_type).get()
             if input_view is None:
-                raise self.InvalidInputException('Invalid input type: %s', input_type)
+                raise self.InvalidInputException(
+                    'Invalid input type: %s', input_type)
             state.input_view = input_view.key
 
         # TODO(sll): Check that 'actions' is properly formatted.
