@@ -157,7 +157,7 @@ div.oppia-footer {
   border: 1px solid black;
   padding: 5px;
   width: 80%;
-} 
+}
 
 .oppia-droppable-active {
   background: lightyellow;
@@ -343,4 +343,9 @@ div.oppia-footer {
   fill-opacity: .5;
   stroke: #3182bd;
   stroke-width: 1.5px;
+}
+
+/* Rules for interactive widgets */
+.oppia-rule {
+  height: 30px;
 }

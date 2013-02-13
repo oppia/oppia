@@ -82,10 +82,13 @@
                 <hr>
 
                 <h3>Rules</h3>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRuleModal">
-                  Add rule
-                </button>
-
+                <div ng-repeat="action in interactiveWidget.actions">
+                  <h4><[action.type]></h4>
+                  <button type="button" class="btn btn-primary" data-toggle="modal"
+                          data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
+                    Add rule
+                  </button>
+                </div>
 
                 <div ui-modal class="fade" id="customizeWidgetModal" ng-model="customizeWidgetModalShown">
                   <div class="modal-header">
@@ -109,7 +112,9 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                       &times;
                     </button>
-                    <h3 id="interactiveWidgetModalLabel">Choose an Interactive Widget</h3>
+                    <h3 id="interactiveWidgetModalLabel">
+                      Choose an Interactive Widget
+                    </h3>
                   </div>
                   <div class="modal-body">
                     <iframe src="/widgetrepository?iframed=true&interactive=true" width="100%" height="400px" frameborder="0"
@@ -117,7 +122,9 @@
                     </iframe>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">Cancel</a>
+                    <button type="button" class="btn" data-dismiss="modal">
+                      Cancel
+                    </button>
                   </div>
                 </div>
 
@@ -129,12 +136,42 @@
                     <h3 id="addRuleModalLabel">Add Rule</h3>
                   </div>
                   <div class="modal-body">
-                    <!-- TODO(sll): Code this. -->
-                    <[interactiveWidget]>
-                    TODO
+                    <h4><[addRuleAction.type]></h4>
+
+                    <div ng-hide="addRuleActionRule">
+                      <div ng-repeat="(rule, attrs) in addRuleAction.rules"
+                           class="oppia-rule">
+                        <span ng-bind-html="rule | bracesToText"></span>
+                        <button type="button" class="pull-right"
+                                ng-click="selectRule(rule, attrs)">
+                          Select
+                        </button>
+                      </div>
+                    </div>
+
+                    <div ng-show="addRuleActionRule">
+                      <span angular-html-bind="addRuleActionRule | bracesToInput"></span>
+                    </div>
+
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">Save</a>
+
+                    <div ng-hide="addRuleActionRule">
+                      <button type="button" class="btn" data-dismiss="modal">
+                        Cancel
+                      </button>
+                    </div>
+
+                    <div ng-show="addRuleActionRule">
+                      <button type="button" class="btn" data-dismiss="modal">
+                        Save
+                      </button>
+                      <button type="button" class="btn"
+                              ng-click="deselectAllRules()">
+                        Cancel
+                      </button>
+                    </div>
+
                   </div>
                 </div>
 

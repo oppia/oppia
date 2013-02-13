@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json, logging
+import json
 from controllers.base import BaseHandler, require_user
 import feconf, models, utils
 
@@ -166,7 +166,6 @@ class Widget(BaseHandler):
     @require_user
     def post(self, widget_id=None):  # pylint: disable-msg=C6409
         """Saves or edits a widget uploaded by a content creator."""
-        logging.info(widget_id)
         raw = self.request.get('raw')
         if not raw:
             raise self.InvalidInputException('No widget code supplied')
@@ -219,6 +218,7 @@ class InteractiveWidget(BaseHandler):
                           (classifier, classifier)) as f:
                     action['rules'] = utils.GetDictFromYaml(
                         f.read().decode('utf-8'))
+
         return widget
 
     def get(self, widget_id):

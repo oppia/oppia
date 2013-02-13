@@ -165,6 +165,37 @@ oppia.filter('truncate', function() {
   };
 });
 
+// Filter that changes {{...}} tags into INPUT indicators.
+oppia.filter('bracesToText', function() {
+  return function(input) {
+    if (!input) {
+      return '';
+    }
+    var pattern = /{{\s*(\w+)\s*(\|\s*\w+\s*)?}}/g;
+    return input.replace(pattern, '<code>INPUT</code>');
+  };
+});
+
+// Filter that changes {{...}} tags into input fields.
+oppia.filter('bracesToInput', function() {
+  return function(input) {
+    if (!input) {
+      return '';
+    }
+    var pattern = /{{\s*(\w+)\s*(\|\s*\w+\s*)?}}/;
+    while (true) {
+      if (!input.match(pattern)) {
+        break;
+      }
+      var varName = input.match(pattern)[1];
+      input = input.replace(
+          pattern,
+          '<input type="text" ng-model="addRuleActionInputs.' + varName + '">');
+    }
+    return input;
+  };
+});
+
 // Receive events from the iframed widget repository.
 oppia.run(function($rootScope) {
   window.addEventListener('message', function(event) {
@@ -532,7 +563,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
         actions: JSON.stringify($scope.states[$scope.stateId].dests),
-        interactive_widget: $scope.interactiveWidget,
+        interactive_widget: $scope.interactiveWidget.id,
         interactive_params: JSON.stringify($scope.interactiveParams)
     }, true);
 
@@ -605,13 +636,15 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 }
 
-function InteractiveWidgetPreview($scope, $http, stateData) {
+function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsData) {
   $scope.fillFrame = function(domId, widgetCode) {
     var F = $('#' + domId);
     F[0].contentWindow.document.open();
     F[0].contentWindow.document.write(widgetCode);
     F[0].contentWindow.document.close();
   };
+
+  $scope.interactiveRuleset = [];
 
   $scope.$on('stateData', function() {
     var data = stateData.data;
@@ -622,6 +655,56 @@ function InteractiveWidgetPreview($scope, $http, stateData) {
         $scope.$parent.interactiveWidget = widgetData.widget;
       }
     );
+  });
+
+  $scope.openAddRuleModal = function(action) {
+    $scope.addRuleAction = action;
+    $scope.addRuleActionInputs = [];
+  };
+
+  $scope.selectRule = function(rule, attrs) {
+    $scope.addRuleActionRule = rule;
+    $scope.addRuleActionAttrs = attrs;
+  };
+
+  $scope.deselectAllRules = function() {
+    $scope.addRuleActionRule = null;
+    $scope.addRuleActionAttrs = null;
+    $scope.addRuleActionInputs = [];
+  };
+
+  $('#addRuleModal').on('hide', function() {
+    if ($scope.addRuleActionRule) {
+      var classifierFunc = $scope.addRuleActionAttrs.classifier.replace(' ', '');
+      var firstBracket = classifierFunc.indexOf('(');
+      var result = classifierFunc.substring(0, firstBracket + 1);
+
+      var lastString = classifierFunc.substring(firstBracket + 1);
+      lastString = lastString.substring(0, lastString.length - 1);
+      var params = lastString.split(',');
+      for (var i = 0; i < params.length; ++i) {
+        if (!($scope.addRuleActionInputs.hasOwnProperty(params[i]))) {
+          // TODO(sll): This needs to be more robust, e.g. it should detect if
+          // the parameter is a literal value.
+          warningsData.addWarning(
+              'Parameter ' + params[i] + ' could not be replaced.');
+        } else {
+          if (i != 0) {
+            result += ',';
+          }
+          result += $scope.addRuleActionInputs[params[i]];
+        }
+      }
+      result += ')';
+
+      // TODO(sll): Save the formatted rule ('result') in the ruleset, and
+      // save the ruleset to the backend. Retrieve the ruleset when this
+      // controller is loaded.
+      console.log(result);
+    }
+
+    $scope.addRuleAction = null;
+    $scope.deselectAllRules();
   });
 
   $('#interactiveWidgetModal').on('hide', function() {
@@ -635,11 +718,11 @@ function InteractiveWidgetPreview($scope, $http, stateData) {
     $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
     $scope.$parent.interactiveWidget = arg.data.widget;
-    $scope.saveInteractiveWidget($scope.interactiveWidget.id, {});
+    $scope.saveInteractiveWidget($scope.interactiveWidget, {});
   });
 
-  $scope.saveInteractiveWidget = function(widgetId, params) {
-    $scope.$parent.interactiveWidget = widgetId;
+  $scope.saveInteractiveWidget = function(widget, params) {
+    $scope.$parent.interactiveWidget = widget;
     $scope.$parent.interactiveParams = params;
     $scope.saveStateChange('interactiveWidget');
   }
@@ -652,4 +735,5 @@ EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'stateData', 'explorationData', 'warningsData',
     'activeInputData'];
 ExplorationTab.$inject = ['$scope'];
-InteractiveWidgetPreview.$inject = ['$scope', '$http', 'stateData'];
+InteractiveWidgetPreview.$inject = ['$scope', '$http', '$compile', 'stateData',
+    'warningsData'];
