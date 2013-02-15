@@ -24,6 +24,7 @@ import classifiers
 from controllers.base import BaseHandler
 import feconf
 from models.models import Exploration, State
+from models.stats import EventHandler, STATS_ENUMS
 import utils
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
@@ -61,8 +62,8 @@ class ExplorationHandler(BaseHandler):
         Args:
             exploration_id: string representing the exploration id.
         """
-        # TODO(sll): This should send a complete state machine to the frontend.
-        # All interaction would happen client-side.
+        # TODO(sll): Maybe this should send a complete state machine to the
+        # frontend, and all interaction would happen client-side?
         exploration = utils.GetEntity(Exploration, exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
@@ -82,6 +83,9 @@ class ExplorationHandler(BaseHandler):
         if self.data_values['input_view'] == utils.input_views.multiple_choice:
             self.data_values['categories'] = init_state.classifier_categories
         self.response.out.write(json.dumps(self.data_values))
+
+        EventHandler.record_event(
+            STATS_ENUMS.exploration_visited, exploration_id)
 
     def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
         """Handles feedback interactions with readers.

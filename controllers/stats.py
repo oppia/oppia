@@ -16,6 +16,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 from controllers.base import BaseHandler, require_editor
 import feconf
+from models.stats import Statistics, STATS_ENUMS
 import utils
 
 
@@ -26,8 +27,13 @@ class StatsHandler(BaseHandler):
     def get(self, unused_user, exploration):  # pylint: disable-msg=C6409
         """Displays the statistics page for the given exploration."""
 
+        num_visits = Statistics.get_stats(
+            STATS_ENUMS.exploration_visited, exploration.hash_id)
+
         self.values.update({
-            'js': utils.GetJsFilesWithBase(['stats'])
+            'js': utils.GetJsFilesWithBase(['stats']),
+            'num_visits': num_visits,
         })
+
         self.response.out.write(feconf.JINJA_ENV.get_template(
             'stats.html').render(self.values))
