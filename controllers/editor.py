@@ -327,8 +327,7 @@ class StateHandler(BaseHandler):
         if interactive_ruleset_json:
             state.interactive_ruleset = json.loads(interactive_ruleset_json)
             # TODO(sll): Do additional calculations here to get the actual
-            # Python rule, as well as the various feedback actions and parameter
-            # changes.
+            # Python rule, as well as the parameter changes.
 
         if state_content_json:
             state_content = json.loads(state_content_json)

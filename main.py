@@ -34,41 +34,41 @@ r = '[A-Za-z0-9=_-]+'
 
 # Register the URL with the responsible classes
 urls = [
-        (r'/?', pages.MainPage),
-        (r'/about/?', pages.AboutPage),
-        (r'/terms/?', pages.TermsPage),
+    (r'/?', pages.MainPage),
+    (r'/about/?', pages.AboutPage),
+    (r'/terms/?', pages.TermsPage),
 
-        (r'/gallery/?', gallery.GalleryPage),
-        (r'/gallery/data/?', gallery.GalleryHandler),
+    (r'/gallery/?', gallery.GalleryPage),
+    (r'/gallery/data/?', gallery.GalleryHandler),
 
-        (r'/learn/(%s)/?' % r, reader.ExplorationPage),
-        (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
-        # TODO(sll): there is a potential collision here if the state_id is 'data'.
-        (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
-        (r'/learn_random/?', reader.RandomExplorationPage),
+    (r'/learn/(%s)/?' % r, reader.ExplorationPage),
+    (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
+    # TODO(sll): there is a potential collision here if the state_id is 'data'.
+    (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
+    (r'/learn_random/?', reader.RandomExplorationPage),
 
-        (r'/create_new/?', editor.NewExploration),
-        (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
-        (r'/create/(%s)/?' % r, editor.ExplorationPage),
-        (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
-        # TODO(sll): there is a potential collision here if the state_id is 'data'.
-        (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
-        (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
+    (r'/create_new/?', editor.NewExploration),
+    (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
+    (r'/create/(%s)/?' % r, editor.ExplorationPage),
+    (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
+    # TODO(sll): there is a potential collision here if the state_id is 'data'.
+    (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
+    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
-        (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-        (r'/imagehandler/?', resources.ImageHandler),
-        (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
+    (r'/templates/(%s)/?' % r, resources.TemplateHandler),
+    (r'/imagehandler/?', resources.ImageHandler),
+    (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
 
-        (r'/widgets/?', widgets.Widget),
-        (r'/widgets/(%s)/?' % r, widgets.Widget),
-        (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
-        (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
-        (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidget),
+    (r'/widgets/?', widgets.Widget),
+    (r'/widgets/(%s)/?' % r, widgets.Widget),
+    (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
+    (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
+    (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidget),
 
-        (r'/stats/(%s)/?' % r, stats.StatsHandler),
+    (r'/stats/(%s)/?' % r, stats.StatsHandler),
 
-        # 404 error handler.
-        (r'/.*', Error404Handler),
+    # 404 error handler.
+    (r'/.*', Error404Handler),
 ]
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)

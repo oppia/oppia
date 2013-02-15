@@ -65,8 +65,8 @@
 
               <div ng-view ng-cloak></div>
 
-              <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished and the old model removed.-->
-              <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview" style="">
+              <h2>New Widget Interface (experimental, incomplete)</h2>
+              <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview">
                 <iframe id="interactiveWidgetPreview" frameborder="0" width="90%">
                 </iframe>
 
@@ -86,7 +86,7 @@
                   <h4><[action.type]></h4>
                   <ul>
                     <li ng-repeat="rule in interactiveRuleset">
-                      <[rule | parameterizeRule ]>
+                      <[rule | parameterizeRule ]>: (<[rule.dest]>, <[rule.feedback]>)
                     </li>
                   </ul>
                   <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -156,6 +156,25 @@
 
                     <div ng-show="addRuleActionRule">
                       <span angular-html-bind="addRuleActionRule | bracesToInput"></span>
+
+                      <hr>
+
+                      <div>
+                        Destination:
+                        <input type="text" size="40" list="destinations" ng-model="addRuleActionDest" placeholder="Name of destination state" required>
+                        <datalist id="destinations">
+                          <option ng-repeat="(id, properties) in states" value="<[properties.desc]>"></option>
+                          <option value="END"></option>
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <p>In response to the reader's answer, display the text:</p>
+                        <textarea rows="10" cols="50" ng-model="addRuleActionFeedback"></textarea>
+                      </div>
+
+                      <!-- TODO(sll): Add a section for parameter changes here. -->
+
                     </div>
 
                   </div>

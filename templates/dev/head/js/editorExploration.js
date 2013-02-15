@@ -183,14 +183,20 @@ oppia.filter('bracesToInput', function() {
       return '';
     }
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var index = 0;
     while (true) {
       if (!input.match(pattern)) {
         break;
       }
       var varName = input.match(pattern)[1];
+      var tail = '>';
+      if (index === 0) {
+        tail = 'autofocus>';
+      }
       input = input.replace(
           pattern,
-          '<input type="text" ng-model="addRuleActionInputs.' + varName + '">');
+          '<input type="text" ng-model="addRuleActionInputs.' + varName + '"' + tail);
+      index++;
     }
     return input;
   };
@@ -693,18 +699,21 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $scope.openAddRuleModal = function(action) {
     $scope.addRuleAction = action;
-    $scope.addRuleActionInputs = {};
   };
 
   $scope.selectRule = function(rule, attrs) {
+    $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;
     $scope.addRuleActionAttrs = attrs;
+    $scope.addRuleActionDest = $scope.stateName;
   };
 
   $scope.deselectAllRules = function() {
     $scope.addRuleActionRule = null;
     $scope.addRuleActionAttrs = null;
     $scope.addRuleActionInputs = {};
+    $scope.addRuleActionDest = null;
+    $scope.addRuleActionFeedback = null;
   };
 
   $('#addRuleModal').on('hide', function() {
@@ -712,13 +721,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       console.log($scope.addRuleActionRule);
       console.log($scope.addRuleActionAttrs);
       console.log($scope.addRuleActionInputs);
-
-      $scope.$parent.interactiveRuleset.push({
-          rule: $scope.addRuleActionRule,
-          inputs: $scope.addRuleActionInputs
-      });
-
-      $scope.saveInteractiveWidget();
 
       // TODO(sll): Move all of the following parsing to the backend.
       var classifierFunc = $scope.addRuleActionAttrs.classifier.replace(' ', '');
@@ -728,12 +730,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       var lastString = classifierFunc.substring(firstBracket + 1);
       lastString = lastString.substring(0, lastString.length - 1);
       var params = lastString.split(',');
+      var bad = false;
       for (var i = 0; i < params.length; ++i) {
         if (!($scope.addRuleActionInputs.hasOwnProperty(params[i]))) {
           // TODO(sll): This needs to be more robust, e.g. it should detect if
           // the parameter is a literal value.
           warningsData.addWarning(
               'Parameter ' + params[i] + ' could not be replaced.');
+          bad = true;
         } else {
           if (i !== 0) {
             result += ',';
@@ -741,8 +745,19 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
           result += $scope.addRuleActionInputs[params[i]];
         }
       }
+
       result += ')';
       console.log(result);
+
+      if (!bad) {
+        $scope.$parent.interactiveRuleset.push({
+            rule: $scope.addRuleActionRule,
+            inputs: $scope.addRuleActionInputs,
+            dest: $scope.addRuleActionDest,
+            feedback: $scope.addRuleActionFeedback
+        });
+        $scope.saveInteractiveWidget();
+      }
     }
 
     $scope.addRuleAction = null;
@@ -768,9 +783,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   });
 
   $scope.saveInteractiveWidget = function() {
-    console.log($scope.interactiveWidget);
-    console.log($scope.interactiveParams);
-    console.log($scope.interactiveRuleset);
     $scope.saveStateChange('interactiveWidget');
   };
 }
