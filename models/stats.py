@@ -28,7 +28,7 @@ class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def record_event(cls, event_name, entity_id):
+    def record_event(cls, event_name, entity_id, extra_info=''):
         """Updates statistics based on recorded events."""
 
         if event_name == STATS_ENUMS.exploration_visited:
@@ -36,7 +36,7 @@ class EventHandler(object):
             cls._inc(event_key)
         if event_name == STATS_ENUMS.default_case_hit:
             event_key = 'default.%s' % entity_id
-            cls._inc(event_key)
+            cls._add(event_key, extra_info)
         if event_name == STATS_ENUMS.exploration_completed:
             event_key = 'c.%s' % entity_id
             cls._inc(event_key)
@@ -50,6 +50,15 @@ class EventHandler(object):
         counter.value += 1
         counter.put()
 
+    @classmethod
+    def _add(cls, event_key):
+        """Increments the counter corresponding to an event key."""
+        journal = Journal.get_or_insert(event_key, name=event_key)
+        if not journal:
+            journal = Journal(id=event_key, name=event_key)
+        journal.value.append(value) 
+        journal.put()
+
 
 class Counter(ndb.Model):
     """An integer-valued counter."""
@@ -57,6 +66,14 @@ class Counter(ndb.Model):
     name = ndb.StringProperty()
     # The value of the property.
     value = ndb.IntegerProperty(default=0)
+
+
+class Journal(ndb.Model):
+   """A list of values."""
+   # The name of the list
+   name = ndb.StringProperty()
+   # The list of values
+   values = ndb.StringProperty(repeated=True)
 
 
 class Statistics(object):
@@ -72,3 +89,17 @@ class Statistics(object):
             if not counter:
                 return 0
             return counter.value
+
+        if event_name == STATS_ENUMS.exploration_completed:
+            event_key = 'c.%s' % entity_id
+            counter = Counter.get_by_id(event_key)
+            if not counter:
+                return 0
+            return counter.value
+
+        if event_name == STATS_ENUMS.default_case_hit:
+            event_key = 'default.%s' % entity_id
+            journal = Journal.get_by_id(event_key)
+            if not journal:
+                return []
+            return journal.values
