@@ -1,0 +1,21 @@
+# The system name for this widget.
+id: MusicStaff
+
+# The human-readable name of the widget.
+name: Music staff
+# The category the widget falls under in the widget repository.
+category: Interactive
+# A description of the widget.
+description: |
+  A music staff widget that allows notes to be added and adjusted
+  using the up and down arrow keys. (NOTE: Does not work yet.)
+
+# Actions that the reader can perform on this widget which trigger a feedback
+# interaction.
+actions:
+  - type: submit
+    classifier: ListClassifier
+
+# Customization parameters and their default values.
+params: {}
+

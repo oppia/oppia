@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
+import os
 
 from controllers.base import BaseHandler, require_user
 import feconf
@@ -24,9 +25,6 @@ from models.models import GenericWidget, Widget
 import utils
 
 from google.appengine.api import users
-
-
-INTERACTIVE_WIDGET_LIST = ['Continue', 'NumericInput', 'TextInput']
 
 
 class WidgetRepositoryPage(BaseHandler):
@@ -113,7 +111,7 @@ class WidgetRepositoryHandler(BaseHandler):
     def get_interactive_widgets(self):
         """Load interactive widgets from the file system."""
         response = {}
-        for widget_id in INTERACTIVE_WIDGET_LIST:
+        for widget_id in os.listdir('widgets/'):
             widget = InteractiveWidget.get_interactive_widget(widget_id)
             category = widget['category']
             if category not in response:
@@ -207,9 +205,10 @@ class InteractiveWidget(BaseHandler):
 
         widget_html = 'This widget is not available.'
         widget_js = ''
-        if widget_id in INTERACTIVE_WIDGET_LIST:
-            with open('widgets/%s/%s.html' % (widget_id, widget_id)) as f:
-                widget_html = f.read().decode('utf-8')
+        if widget_id in os.listdir('widgets'):
+            html_file = '%s/%s.html' % (widget_id, widget_id)
+            widget_html = feconf.WIDGET_JINJA_ENV.get_template(
+                html_file).render({'root': 'widgets/%s/static' % widget_id})
             # For now, remove the interactivity.
             # with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
             #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')

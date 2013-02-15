@@ -18,6 +18,10 @@ handlers:
 - url: /third_party
   static_dir: third_party
   secure: always
+- url: /widgets/(.*)/static
+  static_files: widgets/\1/static
+  upload: widgets/(.*)/static
+  secure: always
 - url: /.*
   script: main.app
   secure: always

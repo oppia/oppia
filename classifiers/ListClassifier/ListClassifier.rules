@@ -1,0 +1,5 @@
+Answer is equal to {{x | IsList}}:
+  classifier: Equals(x)
+
+Answer shares a common prefix with {{x | IsList}}:
+  classifier: HasNonemptyCommonPrefix(x)

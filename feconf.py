@@ -23,3 +23,7 @@ TEMPLATE_DIR = 'templates/dev/head/' if DEV else 'templates/prod/head/'
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), TEMPLATE_DIR)))
+
+# The jinja environment used for loading widget previews.
+WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
+    os.path.join(os.path.dirname(__file__), 'widgets/')))
