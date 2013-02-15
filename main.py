@@ -56,8 +56,8 @@ urls = [
         (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
         (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-        (r'/imagehandler/?', resources.Image),
-        (r'/imagehandler/(%s)/?' % r, resources.Image),
+        (r'/imagehandler/?', resources.ImageHandler),
+        (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
 
         (r'/widgets/?', widgets.Widget),
         (r'/widgets/(%s)/?' % r, widgets.Widget),

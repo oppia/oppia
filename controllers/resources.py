@@ -30,7 +30,7 @@ class TemplateHandler(BaseHandler):
             'editor/views/%s_editor.html' % template_type).render({}))
 
 
-class Image(BaseHandler):
+class ImageHandler(BaseHandler):
     """Handles image uploads and retrievals."""
 
     def get(self, image_id):  # pylint: disable-msg=C6409
