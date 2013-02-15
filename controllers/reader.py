@@ -133,6 +133,8 @@ class ExplorationHandler(BaseHandler):
                     [{'type': 'text', 'value': action_set.text}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
+                EventHandler.record_event(
+                    STATS_ENUMS.exploration_completed, exploration_id)
         else:
             if action_set.dest_exploration:
                 self.redirect('/learn/%s' % action_set.dest_exploration)
