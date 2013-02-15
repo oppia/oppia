@@ -101,6 +101,7 @@ class ExplorationHandler(BaseHandler):
         old_state = state
         # The reader's answer.
         response = self.request.get('answer')
+        EventHandler.record_event(STATS_ENUMS.default_case_hit, exploration_id, response)
         # The 0-based index of the last content block already on the page.
         block_number = int(self.request.get('block_number'))
         category = classifiers.Classify(
@@ -133,8 +134,8 @@ class ExplorationHandler(BaseHandler):
                     [{'type': 'text', 'value': action_set.text}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
-                EventHandler.record_event(
-                    STATS_ENUMS.exploration_completed, exploration_id)
+            EventHandler.record_event(
+                STATS_ENUMS.exploration_completed, exploration_id)
         else:
             if action_set.dest_exploration:
                 self.redirect('/learn/%s' % action_set.dest_exploration)
