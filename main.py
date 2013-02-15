@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from controllers import base, editor, gallery, pages, reader, resources, widgets
+from controllers import base, editor, gallery, pages, reader, resources, stats, widgets
 
 import webapp2
 
@@ -64,6 +64,8 @@ urls = [
         (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
         (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
         (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidget),
+
+        (r'/stats/(%s)/?' % r, stats.StatsHandler),
 
         # 404 error handler.
         (r'/.*', Error404Handler),
