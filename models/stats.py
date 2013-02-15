@@ -21,7 +21,7 @@ from google.appengine.ext import ndb
 from utils import Enum
 
 
-STATS_ENUMS = Enum('exploration_visited')
+STATS_ENUMS = Enum('exploration_visited', 'default_case_hit', 'exploration_completed')
 
 
 class EventHandler(object):
@@ -33,6 +33,12 @@ class EventHandler(object):
 
         if event_name == STATS_ENUMS.exploration_visited:
             event_key = 'e.%s' % entity_id
+            cls._inc(event_key)
+        if event_name == STATS_ENUMS.default_case_hit:
+            event_key = 'default.%s' % entity_id
+            cls._inc(event_key)
+        if event_name == STATS_ENUMS.exploration_completed:
+            event_key = 'c.%s' % entity_id
             cls._inc(event_key)
 
     @classmethod
