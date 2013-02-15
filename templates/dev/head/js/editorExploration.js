@@ -171,7 +171,7 @@ oppia.filter('bracesToText', function() {
     if (!input) {
       return '';
     }
-    var pattern = /{{\s*(\w+)\s*(\|\s*\w+\s*)?}}/g;
+    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
     return input.replace(pattern, '<code>INPUT</code>');
   };
 });
@@ -182,7 +182,7 @@ oppia.filter('bracesToInput', function() {
     if (!input) {
       return '';
     }
-    var pattern = /{{\s*(\w+)\s*(\|\s*\w+\s*)?}}/;
+    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (true) {
       if (!input.match(pattern)) {
         break;
@@ -193,6 +193,26 @@ oppia.filter('bracesToInput', function() {
           '<input type="text" ng-model="addRuleActionInputs.' + varName + '">');
     }
     return input;
+  };
+});
+
+// Filter that changes {{...}} tags into the corresponding parameter values.
+oppia.filter('parameterizeRule', function() {
+  return function(input) {
+    if (!input) {
+      return '';
+    }
+    var rule = input.rule;
+    var inputs = input.inputs;
+    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    while (true) {
+      if (!rule.match(pattern)) {
+        break;
+      }
+      var varName = rule.match(pattern)[1];
+      rule = rule.replace(pattern, inputs[varName]);
+    }
+    return rule;
   };
 });
 
@@ -551,21 +571,31 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     activeInputData.clear();
 
     if ($scope.classifier != 'none' &&
-        $scope.states[$scope.stateId]['dests'].length == 0) {
+        $scope.states[$scope.stateId]['dests'].length === 0) {
       warningsData.addWarning(
           'Interactive questions should have at least one category.');
       return;
     }
 
-    var request = $.param({
+    var requestParams = {
         state_id: $scope.stateId,
         state_name: $scope.stateName,
-        state_content: JSON.stringify($scope.stateContent),
         input_type: $scope.inputType,
         actions: JSON.stringify($scope.states[$scope.stateId].dests),
-        interactive_widget: $scope.interactiveWidget.id,
-        interactive_params: JSON.stringify($scope.interactiveParams)
-    }, true);
+        interactive_widget: $scope.interactiveWidget.id
+    };
+
+    if ($scope.stateContent) {
+      requestParams['state_content'] = JSON.stringify($scope.stateContent);
+    }
+    if ($scope.interactiveParams) {
+      requestParams['interactive_params'] = JSON.stringify($scope.interactiveParams);
+    }
+    if ($scope.interactiveRuleset) {
+      requestParams['interactive_ruleset'] = JSON.stringify($scope.interactiveRuleset);
+    }
+
+    var request = $.param(requestParams, true);
 
     $http.put(
         $scope.explorationUrl + '/' + $scope.stateId + '/data',
@@ -644,10 +674,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     F[0].contentWindow.document.close();
   };
 
-  $scope.interactiveRuleset = [];
+  // Stores rules in the form of dicts with two keys: 'rule' (the raw rule
+  // string) and 'inputs' (a list of parameters).
+  $scope.$parent.interactiveRuleset = [];
 
   $scope.$on('stateData', function() {
     var data = stateData.data;
+    $scope.$parent.interactiveRuleset = data.interactiveRuleset;
+    $scope.$parent.interactiveParams = data.interactiveParams;
 
     $http.get('/interactive_widgets/' + data.interactiveWidget).success(
       function(widgetData) {
@@ -659,7 +693,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $scope.openAddRuleModal = function(action) {
     $scope.addRuleAction = action;
-    $scope.addRuleActionInputs = [];
+    $scope.addRuleActionInputs = {};
   };
 
   $scope.selectRule = function(rule, attrs) {
@@ -670,11 +704,23 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   $scope.deselectAllRules = function() {
     $scope.addRuleActionRule = null;
     $scope.addRuleActionAttrs = null;
-    $scope.addRuleActionInputs = [];
+    $scope.addRuleActionInputs = {};
   };
 
   $('#addRuleModal').on('hide', function() {
     if ($scope.addRuleActionRule) {
+      console.log($scope.addRuleActionRule);
+      console.log($scope.addRuleActionAttrs);
+      console.log($scope.addRuleActionInputs);
+
+      $scope.$parent.interactiveRuleset.push({
+          rule: $scope.addRuleActionRule,
+          inputs: $scope.addRuleActionInputs
+      });
+
+      $scope.saveInteractiveWidget();
+
+      // TODO(sll): Move all of the following parsing to the backend.
       var classifierFunc = $scope.addRuleActionAttrs.classifier.replace(' ', '');
       var firstBracket = classifierFunc.indexOf('(');
       var result = classifierFunc.substring(0, firstBracket + 1);
@@ -689,17 +735,13 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
           warningsData.addWarning(
               'Parameter ' + params[i] + ' could not be replaced.');
         } else {
-          if (i != 0) {
+          if (i !== 0) {
             result += ',';
           }
           result += $scope.addRuleActionInputs[params[i]];
         }
       }
       result += ')';
-
-      // TODO(sll): Save the formatted rule ('result') in the ruleset, and
-      // save the ruleset to the backend. Retrieve the ruleset when this
-      // controller is loaded.
       console.log(result);
     }
 
@@ -717,15 +759,20 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   $scope.$on('message', function(event, arg) {
     $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    $scope.$parent.interactiveWidget = arg.data.widget;
-    $scope.saveInteractiveWidget($scope.interactiveWidget, {});
+    if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
+      $scope.$parent.interactiveWidget = arg.data.widget;
+      $scope.$parent.interactiveParams = {};
+      $scope.$parent.interactiveRuleset = [];
+    }
+    $scope.saveInteractiveWidget();
   });
 
-  $scope.saveInteractiveWidget = function(widget, params) {
-    $scope.$parent.interactiveWidget = widget;
-    $scope.$parent.interactiveParams = params;
+  $scope.saveInteractiveWidget = function() {
+    console.log($scope.interactiveWidget);
+    console.log($scope.interactiveParams);
+    console.log($scope.interactiveRuleset);
     $scope.saveStateChange('interactiveWidget');
-  }
+  };
 }
 
 /**

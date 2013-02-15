@@ -302,6 +302,7 @@ class StateHandler(BaseHandler):
         state_name = self.request.get('state_name')
         interactive_widget = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
+        interactive_ruleset_json = self.request.get('interactive_ruleset')
         state_content_json = self.request.get('state_content')
         input_type = self.request.get('input_type')
         actions_json = self.request.get('actions')
@@ -322,6 +323,12 @@ class StateHandler(BaseHandler):
 
         if interactive_params_json:
             state.interactive_params = json.loads(interactive_params_json)
+
+        if interactive_ruleset_json:
+            state.interactive_ruleset = json.loads(interactive_ruleset_json)
+            # TODO(sll): Do additional calculations here to get the actual
+            # Python rule, as well as the various feedback actions and parameter
+            # changes.
 
         if state_content_json:
             state_content = json.loads(state_content_json)

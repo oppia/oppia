@@ -94,10 +94,14 @@ class State(ndb.Model):
     # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
     # Ruleset for the interactive widget, stored as a list of tuples. Each tuple
-    # represents an answer category, and contains three elements:
-    # - the Python code to check whether the answer satisfies the category
+    # represents an answer category, and contains six elements:
+    # - the raw classification rule
+    # - parameters for that classification rule
+    # - the actual Python code to check whether the answer satisfies the category
     # - the destination state or exploration
     # - feedback text
+    # - parameter changes
+    # TODO(sll): The first two of these are implemented. Implement the rest.
     interactive_ruleset = ndb.JsonProperty(repeated=True)
     # Parameter overrides for the interactive widget view, stored as key-value
     # pairs.

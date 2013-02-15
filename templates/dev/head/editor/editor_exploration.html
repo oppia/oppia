@@ -65,7 +65,7 @@
 
               <div ng-view ng-cloak></div>
 
-              <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished.-->
+              <!--TODO(sll): Remove the 'display: none' attribute when the interactive widget preview is finished and the old model removed.-->
               <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview" style="display: none">
                 <iframe id="interactiveWidgetPreview" frameborder="0" width="90%">
                 </iframe>
@@ -84,6 +84,11 @@
                 <h3>Rules</h3>
                 <div ng-repeat="action in interactiveWidget.actions">
                   <h4><[action.type]></h4>
+                  <ul>
+                    <li ng-repeat="rule in interactiveRuleset">
+                      <[rule | parameterizeRule ]>
+                    </li>
+                  </ul>
                   <button type="button" class="btn btn-primary" data-toggle="modal"
                           data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
                     Add rule
@@ -103,7 +108,7 @@
                     <[interactiveWidget]>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">Save</a>
+                    <button type="button" class="btn" data-dismiss="modal">Save</button>
                   </div>
                 </div>
 
@@ -198,8 +203,8 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" ng-click="deleteExploration()">Delete</a>
-        <button type="button" class="btn" data-dismiss="modal">Cancel</a>
+        <button type="button" class="btn" ng-click="deleteExploration()">Delete</button>
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
       </div>
     </div>
 
