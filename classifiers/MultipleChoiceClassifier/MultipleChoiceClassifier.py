@@ -6,8 +6,3 @@ def IsNonnegativeInt(val):
 def Equals(val, x):
     """The given value should be equal to {{x}}."""
     return val == x
-
-
-def DoesNotEqual(val, x):
-    """The given value should not equal {{x}}."""
-    return val != x

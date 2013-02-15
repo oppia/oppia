@@ -1,10 +1,6 @@
 def IsSet(val):
     """The given value should be a list with unique elements."""
-    if not isinstance(val, list) and not isinstance(val, tuple):
-        return False
-    if len(set(val)) != len(val):
-        return False
-    return True
+    return isinstance(val, list) and len(set(val)) == len(val)
 
 
 def Equals(val, x):
