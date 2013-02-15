@@ -12,17 +12,17 @@
 
 """Unit tests for Oppia."""
 
-__author__ = 'Sean Lip'
+__author__ = 'Jeremy Emerson'
 
 import unittest
-import models
+from models.models import AugmentedUser, ActionSet, Exploration, GenericWidget, Image, InputView, State, Widget
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.api import users
 
 
 class ModelsUnitTests(unittest.TestCase):
-    """Test models.py."""
+    """Test models."""
 
     def setUp(self):
         self.testbed = testbed.Testbed()
@@ -35,7 +35,7 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_Image_Class(self):
         """Test Image Class."""
-        o = models.Image()
+        o = Image()
         o.hash_id = "The hash id"
         o.image = "The image"
         self.assertEquals(o.hash_id, "The hash id")
@@ -43,7 +43,7 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_Widget_Class(self):
         """Test Widget Class."""
-        o = models.Widget()
+        o = Widget()
         o.hash_id = "The hash id"
         o.raw = "Some code here"
         self.assertEqual(o.hash_id, "The hash id")
@@ -51,7 +51,7 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_GenericWidget_Class(self):
         """Test GenericWidget Class."""
-        o = models.GenericWidget()
+        o = GenericWidget()
         o.hash_id = "The hash id"
         o.name = "The name"
         o.category = "The category"
@@ -67,7 +67,7 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_InputView_Class(self):
         """Test InputViewWidget Class."""
-        o = models.InputView()
+        o = InputView()
         o.name = "The name"
         o.classifier = "none"
         o.html = "The inner html"
@@ -77,60 +77,60 @@ class ModelsUnitTests(unittest.TestCase):
 
     def test_State_Class(self):
         """Test State Class."""
-        o = models.State()
+        o = State()
         o.hash_id = "The hash id"
         o.name = "The name"
         o.content = ["The content"]
-        o.input_view = ndb.Key(models.InputView, 1)
+        o.input_view = ndb.Key(InputView, 1)
         o.classifier_categories = ["The categories"]
-        o.action_sets = [ndb.Key(models.ActionSet, 2)]
+        o.action_sets = [ndb.Key(ActionSet, 2)]
         o.classifier_params = ["The params"]
         self.assertEqual(o.hash_id, "The hash id")
         self.assertEqual(o.name, "The name")
         self.assertEqual(o.content, ["The content"])
-        self.assertEqual(o.input_view, ndb.Key(models.InputView, 1))
+        self.assertEqual(o.input_view, ndb.Key(InputView, 1))
         self.assertEqual(o.classifier_categories, ["The categories"])
-        self.assertEqual(o.action_sets, [ndb.Key(models.ActionSet, 2)])
+        self.assertEqual(o.action_sets, [ndb.Key(ActionSet, 2)])
         self.assertEqual(o.classifier_params, ["The params"])
 
     def test_Exploration_Class(self):
         """Test Exploration Class."""
         u = users.get_current_user()
-        o = models.Exploration()
+        o = Exploration()
         o.hash_id = "The hash id"
         o.owner = u
         o.category = "The category"
         o.title = "The title"
-        o.init_state = ndb.Key(models.State, 3)
-        o.states = [ndb.Key(models.State, 4)]
+        o.init_state = ndb.Key(State, 3)
+        o.states = [ndb.Key(State, 4)]
         o.is_public = False
         o.image_id = "The image id"
         self.assertEqual(o.hash_id, "The hash id")
         self.assertEqual(o.owner, u)
         self.assertEqual(o.category, "The category")
         self.assertEqual(o.title, "The title")
-        self.assertEqual(o.init_state, ndb.Key(models.State, 3))
-        self.assertEqual(o.states, [ndb.Key(models.State, 4)])
+        self.assertEqual(o.init_state, ndb.Key(State, 3))
+        self.assertEqual(o.states, [ndb.Key(State, 4)])
         self.assertEqual(o.is_public, False)
         self.assertEqual(o.image_id, "The image id")
 
     def test_AugmentedUser_Class(self):
         """Test AugmentedUser Class."""
         u = users.get_current_user()
-        o = models.AugmentedUser()
+        o = AugmentedUser()
         o.user = u
-        o.states = [ndb.Key(models.Exploration, 5)]
+        o.states = [ndb.Key(Exploration, 5)]
         self.assertEqual(o.user, u)
-        self.assertEqual(o.states, [ndb.Key(models.Exploration, 5)])
+        self.assertEqual(o.states, [ndb.Key(Exploration, 5)])
 
     def test_ActionSet_Class(self):
         """Test ActionSet Class."""
-        o = models.AugmentedUser()
+        o = AugmentedUser()
         o.category_index = 1
         o.text = "The text"
-        o.dest_exploration = ndb.Key(models.Exploration, 6)
-        o.dest = ndb.Key(models.State, 7)
+        o.dest_exploration = ndb.Key(Exploration, 6)
+        o.dest = ndb.Key(State, 7)
         self.assertEqual(o.category_index, 1)
         self.assertEqual(o.text, "The text")
-        self.assertEqual(o.dest_exploration, ndb.Key(models.Exploration, 6))
-        self.assertEqual(o.dest, ndb.Key(models.State, 7))
+        self.assertEqual(o.dest_exploration, ndb.Key(Exploration, 6))
+        self.assertEqual(o.dest, ndb.Key(State, 7))

@@ -16,9 +16,15 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging, sys, traceback
+import json
+import logging
+import sys
+import traceback
 import webapp2
-import feconf, models, utils
+
+import feconf
+from models.models import Exploration, State
+import utils
 
 from google.appengine.api import users
 
@@ -55,7 +61,7 @@ def require_editor(handler):
             self.redirect(users.create_login_url(self.request.uri))
             return
 
-        exploration = utils.GetEntity(models.Exploration, exploration_id)
+        exploration = utils.GetEntity(Exploration, exploration_id)
         if not utils.CheckAuthorship(user, exploration):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
@@ -63,7 +69,7 @@ def require_editor(handler):
 
         if not state_id:
             return handler(self, user, exploration, **kwargs)
-        state = utils.GetEntity(models.State, state_id)
+        state = utils.GetEntity(State, state_id)
         return handler(self, user, exploration, state, **kwargs)
 
     return test_editor

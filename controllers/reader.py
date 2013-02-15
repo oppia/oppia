@@ -16,9 +16,15 @@
 
 __author__ = 'Sean Lip'
 
-import json, logging, random
+import json
+import logging
+import random
+
+import classifiers
 from controllers.base import BaseHandler
-import classifiers, feconf, models, utils
+import feconf
+from models.models import Exploration, State
+import utils
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
@@ -57,7 +63,7 @@ class ExplorationHandler(BaseHandler):
         """
         # TODO(sll): This should send a complete state machine to the frontend.
         # All interaction would happen client-side.
-        exploration = utils.GetEntity(models.Exploration, exploration_id)
+        exploration = utils.GetEntity(Exploration, exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
@@ -86,8 +92,8 @@ class ExplorationHandler(BaseHandler):
         """
         values = {'error': []}
 
-        exploration = utils.GetEntity(models.Exploration, exploration_id)
-        state = utils.GetEntity(models.State, state_id)
+        exploration = utils.GetEntity(Exploration, exploration_id)
+        state = utils.GetEntity(State, state_id)
         old_state = state
         # The reader's answer.
         response = self.request.get('answer')
@@ -168,8 +174,8 @@ class RandomExplorationPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        explorations = models.Exploration.query().filter(
-            models.Exploration.is_public == True).fetch(100)
+        explorations = Exploration.query().filter(
+            Exploration.is_public == True).fetch(100)
 
         selected_exploration = random.choice(explorations)
 

@@ -16,8 +16,14 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64, hashlib, json, logging, yaml
-import feconf, models
+import base64
+import hashlib
+import json
+import logging
+import yaml
+
+import feconf
+from models.models import ActionSet, AugmentedUser, Exploration, InputView, State, Widget
 from google.appengine.ext import ndb
 
 DEFAULT_CATEGORY = 'Default'
@@ -61,10 +67,10 @@ def Log(message):
 
 # TODO(sll): Consider refactoring this to include ancestors.
 def GetEntity(entity, entity_id):
-    """Gets the story, question or state corresponding to a given id.
+    """Gets the entity corresponding to a given id.
 
     Args:
-        entity: one of models.Exploration or models.State
+        entity: the name of the entity's class.
         entity_id: string representing the entity id.
 
     Returns:
@@ -87,7 +93,7 @@ def CheckExistenceOfName(entity, name, ancestor=None):
     """Checks whether an entity with the given name and ancestor already exists.
 
     Args:
-        entity: one of models.Exploration or models.State
+        entity: the name of the entity's class.
         name: string representing the entity name.
         ancestor: the ancestor entity, if applicable.
 
@@ -105,7 +111,7 @@ def CheckExistenceOfName(entity, name, ancestor=None):
         entity = entity.query(ancestor=ancestor.key).filter(
                 entity.name == name).get()
     else:
-        if entity == models.State:
+        if entity == State:
             raise KeyError('Queries for state entities must include ancestors.')
         else:
             entity = entity.query().filter(entity.name == name).get()
@@ -123,7 +129,7 @@ def GetNewId(entity, entity_name):
     """Gets a new id for an entity, based on its name.
 
     Args:
-        entity: one of models.Exploration or models.State
+        entity: the name of the entity's class.
         entity_name: string representing the name of the entity
 
     Returns:
@@ -242,7 +248,7 @@ def ParseContentIntoHtml(content_array, block_number):
                 content_array)
         if content['type'] == 'widget':
             try:
-                widget = GetEntity(models.Widget, content['value'])
+                widget = GetEntity(Widget, content['value'])
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template('content.html').render({
                     'type': content['type'], 'blockIndex': block_number,
@@ -265,10 +271,10 @@ def ParseContentIntoHtml(content_array, block_number):
 
 def GetAugmentedUser(user):
     """Gets the corresponding AugmentedUser, creating a new one if it doesn't exist."""
-    augmented_user = models.AugmentedUser.query().filter(
-        models.AugmentedUser.user == user).get()
+    augmented_user = AugmentedUser.query().filter(
+        AugmentedUser.user == user).get()
     if not augmented_user:
-        augmented_user = models.AugmentedUser(user=user)
+        augmented_user = AugmentedUser(user=user)
         augmented_user.put()
     return augmented_user
 
@@ -279,25 +285,25 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
     if id:
         exploration_hash_id = id
     else:
-        exploration_hash_id = GetNewId(models.Exploration, title)
-    state_hash_id = GetNewId(models.State, init_state_name)
+        exploration_hash_id = GetNewId(Exploration, title)
+    state_hash_id = GetNewId(State, init_state_name)
 
     # Create a fake state key temporarily for initialization of the question.
     # TODO(sll): Do this in a transaction so it doesn't break other things.
-    fake_state_key = ndb.Key(models.State, state_hash_id)
+    fake_state_key = ndb.Key(State, state_hash_id)
 
-    none_input_view = models.InputView.gql(
+    none_input_view = InputView.gql(
         'WHERE name = :name', name='none').get()
-    none_action_set = models.ActionSet(category_index=0, dest=None)
+    none_action_set = ActionSet(category_index=0, dest=None)
     none_action_set.put()
 
-    exploration = models.Exploration(
+    exploration = Exploration(
         hash_id=exploration_hash_id, init_state=fake_state_key,
         owner=user, category=category)
     if title:
         exploration.title = title
     exploration.put()
-    new_init_state = models.State(
+    new_init_state = State(
         hash_id=state_hash_id, input_view=none_input_view.key,
         action_sets=[none_action_set.key], parent=exploration.key,
         classifier_categories=[DEFAULT_CATEGORY],
@@ -317,12 +323,12 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
 
 def CreateNewState(exploration, state_name):
     """Creates and returns a new state."""
-    state_hash_id = GetNewId(models.State, state_name)
-    none_input_view = models.InputView.gql(
+    state_hash_id = GetNewId(State, state_name)
+    none_input_view = InputView.gql(
         'WHERE name = :name', name='none').get()
-    none_action_set = models.ActionSet(category_index=0)
+    none_action_set = ActionSet(category_index=0)
     none_action_set.put()
-    state = models.State(
+    state = State(
         name=state_name, hash_id=state_hash_id, input_view=none_input_view.key,
         action_sets=[none_action_set.key], parent=exploration.key,
         classifier_categories=[DEFAULT_CATEGORY])
@@ -446,7 +452,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
     state.action_sets = []
 
     input_view_name = state_dict['input_type']['name']
-    input_view = models.InputView.gql(
+    input_view = InputView.gql(
         'WHERE name = :name', name=input_view_name).get()
     # TODO(sll): Deal with input_view.widget here (and handle its verification
     # above).
@@ -463,9 +469,9 @@ def ModifyStateUsingDict(exploration, state, state_dict):
             dest_key = None
             if dest_name != 'END':
                 # Use the state with this destination name, if it exists.
-                dest_state = models.State.query(
+                dest_state = State.query(
                     ancestor=exploration.key).filter(
-                        models.State.name == dest_name).get()
+                        State.name == dest_name).get()
                 if dest_state:
                     dest_key = dest_state.key
                 else:
@@ -477,7 +483,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
             dests_array_item['text'] = val['text']
             dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
             dests_array.append(dests_array_item)
-            action_set = models.ActionSet(
+            action_set = ActionSet(
                 category_index=index, text=val['text'], dest=dest_key)
             action_set.put()
             action_set_list.append(action_set.key)
@@ -511,7 +517,7 @@ def CreateExplorationFromYaml(yaml, user, title, category, id=None):
         if state_name == init_state_name:
             continue
         else:
-            if CheckExistenceOfName(models.State, state_name, exploration):
+            if CheckExistenceOfName(State, state_name, exploration):
                 raise InvalidInputException(
                     'Invalid YAML file: contains duplicate state names %s' %
                     state_name)
@@ -519,8 +525,8 @@ def CreateExplorationFromYaml(yaml, user, title, category, id=None):
 
     for state_name, state_description in yaml_description.iteritems():
         logging.info(state_name)
-        state = models.State.query(ancestor=exploration.key).filter(
-            models.State.name == state_name).get()
+        state = State.query(ancestor=exploration.key).filter(
+            State.name == state_name).get()
         ModifyStateUsingDict(exploration, state, state_description)
 
     return exploration

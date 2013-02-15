@@ -16,9 +16,13 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json, logging
+import json
+import logging
+
 from controllers.base import BaseHandler, require_editor, require_user
-import feconf, models, utils
+import feconf
+from models.models import ActionSet, AugmentedUser, Exploration, InputView, State
+import utils
 
 EDITOR_MODE = 'editor'
 END_DEST = '-1'
@@ -86,7 +90,7 @@ class ExplorationPage(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         # Check that the state_name has not been taken.
-        if utils.CheckExistenceOfName(models.State, state_name, exploration):
+        if utils.CheckExistenceOfName(State, state_name, exploration):
             raise self.InvalidInputException(
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
@@ -134,8 +138,8 @@ class ExplorationPage(BaseHandler):
                 action_set_key.delete()
             state_key.delete()
 
-        augmented_users = models.AugmentedUser.query().filter(
-            models.AugmentedUser.editable_explorations == exploration.key)
+        augmented_users = AugmentedUser.query().filter(
+            AugmentedUser.editable_explorations == exploration.key)
         for augmented_user in augmented_users:
             augmented_user.editable_explorations.remove(exploration.key)
             augmented_user.put()
@@ -161,7 +165,7 @@ class ExplorationHandler(BaseHandler):
                 except IndexError:
                     logging.error('action_sets %s has no element at index %s',
                                   state.action_sets, i)
-                    action_set = models.ActionSet(
+                    action_set = ActionSet(
                         category_index=i, dest=state.key)
                     action_set.put()
                     state.action_sets.append(action_set.key)
@@ -254,7 +258,7 @@ class StatePage(BaseHandler):
             try:
                 action_set = state.action_sets[i].get()
             except IndexError:
-                action_set = models.ActionSet(category_index=i)
+                action_set = ActionSet(category_index=i)
                 action_set.put()
                 state.action_sets.append(action_set.key)
 
@@ -307,7 +311,7 @@ class StateHandler(BaseHandler):
             if state_name == 'END':
                 raise self.InvalidInputException('Invalid state name: END')
             if (state_name != state.name and utils.CheckExistenceOfName(
-                models.State, state_name, exploration)):
+                State, state_name, exploration)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
             state.name = state_name
@@ -325,7 +329,7 @@ class StateHandler(BaseHandler):
                              for item in state_content]
 
         if input_type:
-            input_view = models.InputView.gql(
+            input_view = InputView.gql(
                 'WHERE name = :name', name=input_type).get()
             if input_view is None:
                 raise self.InvalidInputException(
@@ -354,7 +358,7 @@ class StateHandler(BaseHandler):
                 try:
                     action_set = state.action_sets[i].get()
                 except IndexError, e:
-                    action_set = models.ActionSet(category_index=i)
+                    action_set = ActionSet(category_index=i)
                     action_set.put()
                     state.action_sets.append(action_set.key)
                 # TODO(sll): If the user deletes a category, make sure that the action
@@ -371,7 +375,7 @@ class StateHandler(BaseHandler):
                     elif str(actions[i]['dest']).startswith('q-'):
                         try:
                             dest_exploration = utils.GetEntity(
-                                models.Exploration, actions[i]['dest'][2:])
+                                Exploration, actions[i]['dest'][2:])
                             action_set.dest_exploration = dest_exploration.key
                             action_set.dest = dest_exploration.init_state
                         except utils.EntityIdNotFoundError, e:
@@ -381,7 +385,7 @@ class StateHandler(BaseHandler):
                     else:
                         try:
                             dest_state = utils.GetEntity(
-                                models.State, actions[i]['dest'])
+                                State, actions[i]['dest'])
                             action_set.dest_exploration = None
                             action_set.dest = dest_state.key
                         except utils.EntityIdNotFoundError, e:
@@ -404,12 +408,12 @@ class StateHandler(BaseHandler):
 
         # Find all action_sets whose dest is the state to be deleted, and change
         # their destinations to the END state.
-        incoming_action_sets = models.ActionSet.query().filter(
-            models.ActionSet.dest == state.key)
+        incoming_action_sets = ActionSet.query().filter(
+            ActionSet.dest == state.key)
         for action_set in incoming_action_sets:
             # Find the incoming state.
-            origin_state = models.State.query().filter(
-                models.State.action_sets == action_set.key).get()
+            origin_state = State.query().filter(
+                State.action_sets == action_set.key).get()
             action_set.dest = origin_state.key
             action_set.put()
 

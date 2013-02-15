@@ -16,7 +16,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 from controllers.base import BaseHandler
-import feconf, models, utils
+import feconf
+from models.models import Exploration
+import utils
 
 from google.appengine.api import users
 
@@ -45,8 +47,8 @@ class GalleryHandler(BaseHandler):
         used_keys = []
 
         categories = {}
-        for exploration in models.Exploration.query().filter(
-                models.Exploration.is_public == True):
+        for exploration in Exploration.query().filter(
+                Exploration.is_public == True):
             category_name = exploration.category
 
             if augmented_user:

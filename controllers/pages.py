@@ -16,8 +16,11 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import classifiers
 from controllers.base import BaseHandler
-import classifiers, feconf, models, utils
+import feconf
+from models.models import Exploration, InputView
+import utils
 
 from google.appengine.api import users
 
@@ -41,8 +44,8 @@ class MainPage(BaseHandler):
                            classifiers.classifiers.text]
         for i in range(len(input_view_list)):
             name = input_view_list[i]
-            if not models.InputView.gql('WHERE name = :name', name=name).get():
-                input_view = models.InputView(
+            if not InputView.gql('WHERE name = :name', name=name).get():
+                input_view = InputView(
                     name=name, classifier=classifier_list[i],
                     html=utils.GetFileContents('/input_views/%s.html' % name))
                 input_view.put()
@@ -50,7 +53,7 @@ class MainPage(BaseHandler):
     def EnsureDefaultExplorationExists(self):
         """Add the default explorations, if they don't already exist."""
         try:
-            exploration = utils.GetEntity(models.Exploration, '0')
+            exploration = utils.GetEntity(Exploration, '0')
         except:
             with open('samples/hola.yaml') as f:
                 yaml = f.read().decode('utf-8')

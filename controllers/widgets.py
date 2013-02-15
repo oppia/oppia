@@ -17,13 +17,17 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
+
 from controllers.base import BaseHandler, require_user
-import feconf, models, utils
+import feconf
+from models.models import GenericWidget, Widget
+import utils
 
 from google.appengine.api import users
 
 
 INTERACTIVE_WIDGET_LIST = ['Continue', 'NumericInput', 'TextInput']
+
 
 class WidgetRepositoryPage(BaseHandler):
     """Displays the widget repository page."""
@@ -63,17 +67,17 @@ class WidgetRepositoryPage(BaseHandler):
         raw = widget_data['raw']
         name = widget_data['name']
         category = widget_data['category']
-        if utils.CheckExistenceOfName(models.GenericWidget, name):
+        if utils.CheckExistenceOfName(GenericWidget, name):
             raise self.InvalidInputException(
                 'A widget with name %s already exists' % name)
 
         description = widget_data['description']
         params = widget_data['params']
 
-        widget_hash_id = utils.GetNewId(models.GenericWidget, name)
+        widget_hash_id = utils.GetNewId(GenericWidget, name)
         widget_data['id'] = widget_hash_id
 
-        widget = models.GenericWidget(
+        widget = GenericWidget(
             hash_id=widget_hash_id, raw=raw, name=name, params=params,
             category=category, description=description)
         widget.put()
@@ -90,7 +94,7 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.InvalidInputException('No widget supplied')
         widget_data = json.loads(widget_data)
 
-        widget = utils.GetEntity(models.GenericWidget, widget_data['id'])
+        widget = utils.GetEntity(GenericWidget, widget_data['id'])
         if not widget:
             raise self.InvalidInputException(
                 'No generic widget found with id %s' % widget_data['id'])
@@ -119,7 +123,7 @@ class WidgetRepositoryHandler(BaseHandler):
 
     def get_non_interactive_widgets(self):
         """Load non-interactive widgets."""
-        generic_widgets = models.GenericWidget.query()
+        generic_widgets = GenericWidget.query()
         response = {}
         for widget in generic_widgets:
             if widget.category not in response:
@@ -155,7 +159,7 @@ class Widget(BaseHandler):
             utils.EntityIdNotFoundError, if an id is not supplied or no widget
             with this id exists.
         """
-        widget = utils.GetEntity(models.Widget, widget_id)
+        widget = utils.GetEntity(Widget, widget_id)
         if widget:
             self.response.out.write(json.dumps({
                 'raw': widget.raw,
@@ -175,11 +179,11 @@ class Widget(BaseHandler):
 
         # TODO(sll): Rewrite the following.
         if not widget_id:
-            widget_hash_id = utils.GetNewId(models.Widget, 'temp_hash_id')
-            widget = models.Widget(hash_id=widget_hash_id, raw=raw)
+            widget_hash_id = utils.GetNewId(Widget, 'temp_hash_id')
+            widget = Widget(hash_id=widget_hash_id, raw=raw)
             widget.put()
         else:
-            widget = utils.GetEntity(models.Widget, widget_id)
+            widget = utils.GetEntity(Widget, widget_id)
             if not widget:
                 raise self.InvalidInputException(
                     'No widget found with id %s' % widget_id)

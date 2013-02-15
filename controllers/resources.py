@@ -16,7 +16,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 from controllers.base import BaseHandler
-import feconf, models, utils
+import feconf
+from models.models import Image
+import utils
 
 
 class TemplateHandler(BaseHandler):
@@ -37,7 +39,7 @@ class Image(BaseHandler):
         Args:
             image_id: string representing the image id.
         """
-        image = utils.GetEntity(models.Image, image_id)
+        image = utils.GetEntity(Image, image_id)
         if image:
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = 'image/png'
@@ -50,8 +52,8 @@ class Image(BaseHandler):
         # TODO(sll): Check that the image is really an image.
         image = self.request.get('image')
         if image:
-            image_hash_id = utils.GetNewId(models.Image, image)
-            image_entity = models.Image(hash_id=image_hash_id, image=image)
+            image_hash_id = utils.GetNewId(Image, image)
+            image_entity = Image(hash_id=image_hash_id, image=image)
             image_entity.put()
             self.response.out.write(json.dumps(
                 {'image_id': image_entity.hash_id}))
