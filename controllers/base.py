@@ -48,13 +48,13 @@ def require_editor(handler):
         """Gets the user and exploration id if the user can edit it.
 
         Returns:
-                The user and exploration instance, if the user is authorized to edit this
-                exploration. Also, the state instance, if one is supplied.
+            The user and exploration instance, if the user is authorized to edit
+            this exploration. Also, the state instance, if one is supplied.
 
         Raises:
-                self.NotLoggedInException: if there is no current user.
-                self.UnauthorizedUserException: if the user exists but does not have the
-                        right credentials.
+            self.NotLoggedInException: if there is no current user.
+            self.UnauthorizedUserException: if the user exists but does not have
+                the right credentials.
         """
         user = users.get_current_user()
         if not user:
@@ -77,8 +77,11 @@ def require_editor(handler):
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
-    def __init__(self, *args, **kwargs):
-        webapp2.RequestHandler.__init__(self, *args, **kwargs)
+    def __init__(self, request, response):
+        # Set self.request, self.response and self.app.
+        self.initialize(request, response)
+
+        # Initializes the return dicts for the handlers.
         self.values = {
             'css': utils.GetCssFile('oppia'),
             'debug': feconf.DEBUG,
