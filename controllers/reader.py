@@ -59,11 +59,7 @@ class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
 
     def get(self, exploration_id):  # pylint: disable-msg=C6409
-        """Populates the data on the individual exploration page.
-
-        Args:
-            exploration_id: string representing the exploration id.
-        """
+        """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         exploration = utils.GetEntity(Exploration, exploration_id)
@@ -92,12 +88,7 @@ class ExplorationHandler(BaseHandler):
         EventHandler.record_exploration_visited(exploration_id)
 
     def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
-        """Handles feedback interactions with readers.
-
-        Args:
-            exploration_id: string representing the exploration id.
-            state_id: string representing the state id.
-        """
+        """Handles feedback interactions with readers."""
         values = {'error': []}
 
         exploration = utils.GetEntity(Exploration, exploration_id)
@@ -122,13 +113,24 @@ class ExplorationHandler(BaseHandler):
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)
 
+        logging.info(classifier_module)
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
                 EventHandler.record_default_case_hit(exploration_id, answer)
 
             assert rule['code']
+            logging.info(rule['code'])
+            logging.info(state.interactive_rulesets['submit'])
 
-            if eval(rule['code']) == True:
+            if rule['code'] == 'True':
+                dest = rule['dest']
+                feedback = rule['feedback']
+                break
+
+            # Add the 'answer' variable, and prepend classifier.
+            code = 'Classifier.' + rule['code'].replace('(', '(answer,')
+            logging.info(code)
+            if eval(code) == True:
                 dest = rule['dest']
                 feedback = rule['feedback']
                 break

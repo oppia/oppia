@@ -99,7 +99,7 @@ def CheckExistenceOfName(entity, name, ancestor=None):
 
     Raises:
         EntityIdNotFoundError: If no entity name is supplied.
-        KeyError: If a non-story entity is queried and no ancestor is supplied.
+        KeyError: If a state entity is queried and no ancestor is supplied.
     """
     entity_type = entity.__name__.lower()
     if not name:
@@ -115,6 +115,26 @@ def CheckExistenceOfName(entity, name, ancestor=None):
     if not entity:
         return False
     return True
+
+
+def GetStateByName(name, exploration):
+    """Gets the state with this name in this exploration.
+
+    Args:
+        name: string representing the entity name.
+        exploration: the exploration to which this state belongs
+
+    Returns:
+        the state, if it exists; None otherwise.
+    """
+    if not name:
+        raise EntityIdNotFoundError('No state name supplied')
+    if exploration:
+        state = State.query(ancestor=exploration.key).filter(
+            State.name == name).get()
+    else:
+        raise KeyError('Queries for state entities must include ancestors.')
+    return state
 
 
 def CheckAuthorship(user, exploration):
@@ -331,83 +351,81 @@ def GetDictFromYaml(yaml_file):
 
 
 def VerifyState(description):
-    """Verifies a state representation.
+    """Verifies a state representation without referencing other states.
 
     This enforces the following constraints:
-    - The only accepted fields are ['answers', 'content', 'input_type'].
-    - Permitted subfields of 'content' are ['text', 'image', 'video', 'widget'].
-    - Permitted subfields of 'input_type' are ['name', 'widget'].
-    - Each item in 'answers' must have exactly one key, and the corresponding
-        value must also have a 'dest'. The 'text' field is optional and defaults
-        to ''.
-    - Each item in 'answers' should have a unique key.
-    - 'content' is optional and defaults to [].
-    - input_type.name is optional and defaults to 'none'. If it exists, it must
-        be one of ['none', 'multiple_choice', 'int', 'set', 'text'].
-        - If input_type.name == 'none' and there is more than one answer
-            category, an error is thrown. The name of the answer category can be
-            anything; it is ignored.
-    - input_type.widget is optional and defaults to the default for the given
-        input type.
-    - If input_type != 'multiple_choice' then answers.default.dest must exist,
-        and be the last one in the list.
-    - If input_type == 'multiple_choice' then 'answers' must not be non-empty.
+    - The only permitted fields are ['content', 'widget'].
+        - 'content' is optional and defaults to [].
+        - 'widget' must be present.
+    - Each item in the 'content' array must have the keys ['type', 'value'].
+        - The type must be one of ['text', 'image', 'video', 'widget'].
+    - Permitted subfields of 'widget' are ['id', 'params', 'rules'].
+        - The field 'id' is mandatory, and must correspond to an actual widget
+            in the widgets/ directory.
+    - Each ruleset in ['widget']['rules'] must have a non-empty array value, and
+        each value should contain at least the fields ['code', 'dest'].
+        - For all values except the last one, the 'code' field should correspond
+            to a valid rule for the widget's classifier. [NOT IMPLEMENTED YET]
+        - For the last value in each ruleset, the 'code' field should equal
+            'True'.
     """
-    logging.info(description)
-    if 'answers' not in description or len(description['answers']) == 0:
-        return False, 'No answer choices supplied'
+    # Check the main keys.
+    for key in description:
+        if key not in ['content', 'widget']:
+            return False, 'Invalid key: %s' % key
 
     if 'content' not in description:
         description['content'] = []
-    if 'input_type' not in description:
-        description['input_type'] = {'name': 'none'}
+    if 'widget' not in description:
+        return False, 'Missing key: \'widget\''
 
-    if 'name' not in description['input_type']:
-        return False, 'input_type should have a \'name\' attribute'
-
-    for key in description:
-        if key not in ['answers', 'content', 'input_type']:
-            return False, 'Invalid key: %s' % key
-
+    # Validate 'content'.
     for item in description['content']:
         if len(item) != 2:
             return False, 'Invalid content item: %s' % item
         for key in item:
             if key not in ['type', 'value']:
                 return False, 'Invalid key in content array: %s' % key
+        if item['type'] not in ['text', 'image', 'video', 'widget']:
+            return False, 'Invalid item type in content array: %s' % item['type']
 
-    for key in description['input_type']:
-        if key not in ['name', 'widget']:
-            return False, 'Invalid key in input_type: %s' % key
+    # Validate 'widget'.
+    for key in description['widget']:
+        if key not in ['id', 'params', 'rules']:
+            return False, 'Invalid key in widget: %s' % key
+    if 'id' not in description['widget']:
+        return False, 'No widget id supplied'
 
-    if (description['input_type']['name'] not in
-            ['none', 'multiple_choice', 'int', 'set', 'text']):
-        return False, ('Invalid key in input_type.name: %s' %
-                       description['input_type']['name'])
+    # Check that the widget_id refers to an actual widget.
+    widget_id = description['widget']['id']
+    try:
+        with open('widgets/%s/%s.config.yaml' % (widget_id, widget_id)):
+            pass
+    except IOError:
+        return False, 'No widget with widget id %s exists.' % widget_id
 
-    for item in description['answers']:
-        if len(item) != 1:
-            return False, 'Invalid answer item: %s' % item
-        key = item.keys()[0]
-        val = item.values()[0]
-        if 'dest' not in val or not val['dest']:
-            return False, 'Each answer should contain a \'dest\' attribute'
-        if 'text' not in val:
-            item[key]['text'] = ''
+    # Check each of the rulesets.
+    if 'rules' in description['widget']:
+        rulesets = description['widget']['rules']
+        for ruleset_name in rulesets:
+            rules = rulesets[ruleset_name]
+            if not rules:
+                return False, 'No rules supplied for ruleset %s' % ruleset_name
 
-    # Check uniqueness of keys in 'answers'
-    answer_keys = sorted([item.keys()[0] for item in description['answers']])
-    for i in range(len(answer_keys) - 1):
-        if answer_keys[i] == answer_keys[i + 1]:
-            return False, 'Answer key %s appears more than once' % answer_keys[i]
+            for ind, rule in enumerate(rules):
+                if 'code' not in rule:
+                    return False, 'Rule %s is missing a \'code\' field.' % ind
+                if 'dest' not in rule:
+                    return False, 'Rule %s is missing a destination.' % ind
 
-    if (description['input_type']['name'] == 'none' and
-        len(description['answers']) > 1):
-        return False, 'Expected only one \'answer\' for a state with no input'
-
-    if description['input_type']['name'] != 'multiple_choice':
-        if description['answers'][-1].keys() != ['Default']:
-            return False, 'The last category of answers[] should be \'Default\''
+                if ind == len(rules) - 1:
+                    rule['code'] = str(rule['code'])
+                    if rule['code'] != 'True':
+                        return False, 'The \'code\' field of the last rule should be \'True\''
+                else:
+                    # TODO(sll): Check that the rule corresponds to a valid one
+                    # from the relevant classifier.
+                    pass
 
     return True, ''
 
@@ -416,60 +434,43 @@ def ModifyStateUsingDict(exploration, state, state_dict):
     """Modifies the properties of a state using values from a dictionary.
 
     Returns:
-        The state's destination array.
+        The modified state.
     """
 
     is_valid, error_log = VerifyState(state_dict)
     if not is_valid:
         raise InvalidInputException(error_log)
 
-    # Delete the old actions.
-    # for action_key in state.action_sets:
-    #     action_key.delete()
-    # state.action_sets = []
+    state.content = state_dict['content']
+    state.interactive_widget = state_dict['widget']['id']
+    if 'params' in state_dict['widget']:
+        state.interactive_params = state_dict['widget']['params']
 
-    # input_view_name = state_dict['input_type']['name']
-    # input_view = InputView.gql(
-    #     'WHERE name = :name', name=input_view_name).get()
-    # TODO(sll): Deal with input_view.widget here (and handle its verification
-    # above).
-    dests_array = []
+    rulesets_dict = {'submit': []}
 
-    content = state_dict['content']
+    for rule in state_dict['widget']['rules']['submit']:
+        rule_dict = {'code': rule['code']}
+        if 'feedback' in rule:
+            rule_dict['feedback'] = rule['feedback']
+        else:
+            rule_dict['feedback'] = None
+        if rule['dest'] == 'END':
+            rule_dict['dest'] = '-1'
+        else:
+            dest_state = GetStateByName(rule['dest'], exploration)
+            if dest_state:
+                rule_dict['dest'] = dest_state.hash_id
+            else:
+                raise Exception('Invalid dest: %s' % rule['dest'])
+        # TODO(sll): Extract 'inputs' and 'rule' from the code.
+        # TODO(yanamal): Add param_changes here.
 
-    # category_list = []
-    # action_set_list = []
-    for index in range(len(state_dict['answers'])):
-        dests_array_item = {}
-        for key, val in state_dict['answers'][index].iteritems():
-            dest_name = val['dest']
-            dest_key = None
-            if dest_name != 'END':
-                # Use the state with this destination name, if it exists.
-                dest_state = State.query(
-                    ancestor=exploration.key).filter(
-                        State.name == dest_name).get()
-                if dest_state:
-                    dest_key = dest_state.key
-                else:
-                    dest_state = CreateNewState(exploration, dest_name)
-                    dest_key = dest_state.key
+        rulesets_dict['submit'].append(rule_dict)
 
-            # category_list.append(key)
-            # dests_array_item['category'] = category_list[index]
-            dests_array_item['text'] = val['text']
-            dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
-            dests_array.append(dests_array_item)
-            # action_set = ActionSet(
-            #     category_index=index, text=val['text'], dest=dest_key)
-            # action_set.put()
-            # action_set_list.append(action_set.key)
+    state.interactive_rulesets = rulesets_dict
 
-    state.content = content
-    # state.classifier_categories = category_list
-    # state.action_sets = action_set_list
     state.put()
-    return dests_array
+    return state
 
 
 def CreateExplorationFromYaml(yaml, user, title, category, id=None):
@@ -500,9 +501,7 @@ def CreateExplorationFromYaml(yaml, user, title, category, id=None):
             state = CreateNewState(exploration, state_name)
 
     for state_name, state_description in yaml_description.iteritems():
-        logging.info(state_name)
-        state = State.query(ancestor=exploration.key).filter(
-            State.name == state_name).get()
+        state = GetStateByName(state_name, exploration)
         ModifyStateUsingDict(exploration, state, state_description)
 
     return exploration

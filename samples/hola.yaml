@@ -1,156 +1,183 @@
 Hola:
-  answers:
-  - Answer is exactly "hola!":
-      dest: Me llamo
-      text: 'Don''t forget: Spanish uses inverted exclamation points at the beginning
-        of sentences as well as the ending exclamation point.'
-  - Answer contains "hola":
-      dest: Me llamo
-      text: ''
-  - Default:
-      dest: Hola
-      text: 'Hola means Hello.
-
-        <br><br>
-
-        Say Hello back.'
   content:
   - type: text
     value: "Let's speak Spanish. If you ever don't understand what is being said,\
       \ just type or select \"I don't know\"\n<br><br>\n\xA1Hola!"
-  input_type:
-    name: text
+
+  widget:
+    id: TextInput
+    params: {}
+    rules:
+      submit:
+      - code: Equals('hola!')
+        dest: Me llamo
+        feedback: 'Don''t forget: Spanish uses inverted exclamation points at the beginning
+            of sentences as well as the ending exclamation point.'
+      - code: Contains('hola')
+        dest: Me llamo
+        feedback: ''
+      - code: True
+        dest: Hola
+        feedback: 'Hola means Hello. <br><br> Say Hello back (in Spanish).'
+
 Adios:
-  answers:
-  - Answer contains "adios":
-      dest: Adios
-      text: Don't forget your accent marks next time!
-  - "Answer contains \"adi\xF3s\"":
-      dest: END
-      text: ''
-  - Default:
-      dest: Adios
-      text: Say goodbye
   content:
   - type: text
     value: "\xA1Ay! \xBF\xA150 pesos para una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
       \xA1Adi\xF3s!"
-  input_type:
-    name: text
+
+  widget:
+    id: TextInput
+    params: {}
+    rules:
+      submit:
+      - code: Contains('adios')
+        dest: Adios
+        feedback: Don't forget your accent marks next time!
+      - code: Contains('adi\xF3s')
+        dest: END
+        feedback: ''
+      - code: True
+        dest: Adios
+        feedback: Say goodbye
+
 Colores:
-  answers:
-  - negro y azul:
-      dest: Colores
-      text: Apples aren't black unless they are rotten...and they aren't blue
-  - anaranjado y blanco:
-      dest: Colores
-      text: Orange and white...not quite
-  - rojo y verde:
-      dest: Adios
-      text: "\xA1S\xED! Las manzanas son rojas y verdes."
-  - amarillo y gris:
-      dest: Colores
-      text: Yellow and gray? Apples?
-  - I don't know:
-      dest: Colores
-      text: 'Colores is easy to translate.
+  content:
+  - type: text
+    value: "\xBFDe qu\xE9 colores son las manzanas?"
+
+  widget:
+    id: MultipleChoiceInput
+    params:
+      choices:
+      - negro y azul
+      - anaranjado y blanco
+      - rojo y verde
+      - amarillo y gris
+      - I don't know
+    rules:
+      submit:
+      - code: Equals(0)
+        dest: Colores
+        feedback: Apples aren't black unless they are rotten...and they aren't blue
+      - code: Equals(1)
+        dest: Colores
+        feedback: Orange and white...not quite
+      - code: Equals(2)
+        dest: Adios
+        feedback: \xA1S\xED! Las manzanas son rojas y verdes.
+      - code: Equals(3)
+        dest: Colores
+        feedback: Yellow and gray? Apples?
+      - code: True
+        dest: Colores
+        feedback: 'Colores is easy to translate.
 
         <br>manzanas is apples.<br>
 
         So this is asking, what colors are apples?'
-  content:
-  - type: text
-    value: "\xBFDe qu\xE9 colores son las manzanas?"
-  input_type:
-    name: multiple_choice
+
 Como meaning:
-  answers:
-  - Answer is exactly "what is your name?":
-      dest: Me llamo
-      text: 'Yes!
-
-        <br>So, let''s try this again...Introduce yourself.'
-  - Answer is exactly "what do you call yourself?":
-      dest: Me llamo
-      text: 'Great!
-
-        <br>So, let''s try this again...Introduce yourself.'
-  - Default:
-      dest: Me llamo
-      text: 'So this means "What is your name?"
-
-        <br>So, let''s try this again...Introduce yourself.'
   content:
   - type: text
     value: "So, \"te llamas\" looks a lot like \"me llamo.\"\n<br>And this sentence\
       \ is a question.\n<br>What would \"\xBFC\xF3mo te llamas?\" mean?"
-  input_type:
-    name: text
+
+  widget:
+    id: TextInput
+    rules:
+      submit:
+      - code: Equals('what is your name?')
+        dest: Me llamo
+        feedback: 'Yes!
+
+        <br>So, let''s try this again...Introduce yourself.'
+      - code: Equals('what do you call yourself?')
+        dest: Me llamo
+        feedback: 'Great!
+
+        <br>So, let''s try this again...Introduce yourself.'
+      - code: True
+        dest: Me llamo
+        feedback: 'So this means "What is your name?"
+
+        <br>So, let''s try this again...Introduce yourself.'
+
 Me llamo:
-  answers:
-  - Answer starts with "me llamo es":
-      dest: Me llamo
-      text: You've got one too many verbs.
-  - Answer starts with "me llamo":
-      dest: Supermercado
-      text: ''
-  - Answer starts with "mi nombre es":
-      dest: Supermercado
-      text: ''
-  - Default:
-      dest: Me llamo meaning
-      text: ''
   content:
   - type: text
     value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas?"
-  input_type:
-    name: text
-Me llamo meaning:
-  answers:
-  - Answer is exactly "my name is":
-      dest: Como meaning
-      text: That's right!
-  - Answer is exactly "i am called":
-      dest: Como meaning
-      text: Literally, yes, but it can also be translated as "My name is."
-  - Answer is exactly "i call myself":
-      dest: Como meaning
-      text: Literally, yes, but it can also be translated as "My name is."
-  - Default:
-      dest: Como meaning
-      text: 'Me llamo means "My name is"
 
-        <br>So "Me llamo Oppia" means "My name is Oppia".'
+  widget:
+    id: TextInput
+    rules:
+      submit:
+      - code: StartsWith('me llamo es')
+        dest: Me llamo
+        feedback: You've got one too many verbs.
+      - code: StartsWith('me llamo')
+        dest: Supermercado
+      - code: StartsWith('mi nombre es')
+        dest: Supermercado
+      - code: True
+        dest: Me llamo meaning
+
+Me llamo meaning:
   content:
   - type: text
     value: So what does "Me llamo" mean?
-  input_type:
-    name: text
+
+  widget:
+    id: TextInput
+    rules:
+      submit:
+      - code: Equals('my name is')
+        dest: Como meaning
+        feedback: That's right!
+      - code: Equals('i am called')
+        dest: Como meaning
+        feedback: Literally, yes, but it can also be translated as "My name is."
+      - code: Equals('i call myself')
+        dest: Como meaning
+        feedback: Literally, yes, but it can also be translated as "My name is."
+      - code: True
+        dest: Como meaning
+        feedback: 'Me llamo means "My name is"
+
+          <br>So "Me llamo Oppia" means "My name is Oppia".'
+
 Supermercado:
-  answers:
-  - Ventanas:
-      dest: Supermercado
-      text: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
-        \ can't buy windows in a supermarket. If you need more help, select \"I don't\
-        \ know\""
-  - Coches:
-      dest: Supermercado
-      text: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
-        \ can't buy cars in a supermarket. If you need more help, select \"I don't\
-        \ know\""
-  - Manzanas:
-      dest: Colores
-      text: ''
-  - I don't know:
-      dest: Supermercado
-      text: 'Supermercado is supermarket.
-
-        <br><br>
-
-        What can you buy at a supermarket?'
   content:
   - type: text
     value: "\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
       ?"
-  input_type:
-    name: multiple_choice
+
+  widget:
+    id: MultipleChoiceInput
+    params:
+      choices:
+      - Ventanas
+      - Coches
+      - Manzanas
+      - I don't know
+    rules:
+      submit:
+      - code: Equals(0)
+        dest: Supermercado
+        feedback: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
+        \ can't buy windows in a supermarket. If you need more help, select \"I don't\
+        \ know\""
+      - code: Equals(1)
+        dest: Supermercado
+        feedback: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
+        \ can't buy cars in a supermarket. If you need more help, select \"I don't\
+        \ know\""
+      - code: Equals(2)
+        dest: Colores
+      - code: True
+        dest: Supermercado
+        feedback: 'Supermercado is supermarket.
+
+          <br><br>
+
+          What can you buy at a supermarket?'

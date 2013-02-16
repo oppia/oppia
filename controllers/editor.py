@@ -257,13 +257,13 @@ class StateHandler(BaseHandler):
         yaml_file = self.request.get('yaml_file')
         if yaml_file:
             # The user has uploaded a YAML file. Process only this action.
-            dests_array = utils.ModifyStateUsingDict(
+            state = utils.ModifyStateUsingDict(
                 exploration, state, utils.GetDictFromYaml(yaml_file))
-            # input_view = state.input_view.get()
+            dests_array = []
+            for rule in state.interactive_rulesets['submit']:
+                dests_array.append(rule['dest'])
             self.response.out.write(json.dumps({
-                # 'classifier': input_view.classifier,
                 'explorationId': exploration.hash_id,
-                # 'inputType': input_view.name,
                 'state': {'desc': state.name, 'dests': dests_array},
                 'stateContent': state.content,
             }))
@@ -313,12 +313,9 @@ class StateHandler(BaseHandler):
 
                 classifier_func = rule['attrs']['classifier'].replace(' ', '')
                 first_bracket = classifier_func.find('(')
-                result = 'Classifier.' + classifier_func[: first_bracket + 1]
+                result = classifier_func[: first_bracket + 1]
 
-                # Add the 'answer' variable.
-                result += 'answer'
-    
-                params = classifier_func[first_bracket + 1 : -1].split(',')
+                params = classifier_func[first_bracket + 1: -1].split(',')
                 for param in params:
                     if param not in rule['inputs']:
                         raise self.InvalidInputException(
@@ -332,7 +329,7 @@ class StateHandler(BaseHandler):
                     # parameter replacements, etc.)
                     result += '\'' + rule['inputs'][param] + '\''
                 result += ')'
-                rule['code'] = result
+
                 logging.info(result)
 
         if state_content_json:
