@@ -21,7 +21,8 @@ import logging
 
 from controllers.base import BaseHandler, require_editor, require_user
 import feconf
-from models.models import AugmentedUser, Exploration, State
+from models.models import AugmentedUser
+from models.state import State
 import utils
 
 EDITOR_MODE = 'editor'

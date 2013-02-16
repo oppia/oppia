@@ -24,7 +24,8 @@ import random
 from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
 import feconf
-from models.models import Exploration, State
+from models.exploration import Exploration
+from models.state import State
 from models.stats import EventHandler
 import utils
 

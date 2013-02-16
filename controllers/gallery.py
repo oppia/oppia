@@ -17,7 +17,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 from controllers.base import BaseHandler
 import feconf
-from models.models import Exploration
+from models.exploration import Exploration
 import utils
 
 from google.appengine.api import users

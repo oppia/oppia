@@ -23,7 +23,9 @@ import logging
 import yaml
 
 import feconf
-from models.models import AugmentedUser, Exploration, State, Widget
+from models.models import AugmentedUser, Widget
+from models.exploration import Exploration
+from models.state import State
 from google.appengine.ext import ndb
 
 DEFAULT_CATEGORY = 'Default'

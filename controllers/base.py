@@ -23,7 +23,8 @@ import traceback
 import webapp2
 
 import feconf
-from models.models import Exploration, State
+from models.exploration import Exploration
+from models.state import State
 import utils
 
 from google.appengine.api import users

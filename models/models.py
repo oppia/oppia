@@ -18,6 +18,8 @@ __author__ = 'Sean Lip'
 
 from google.appengine.ext import ndb
 
+from exploration import Exploration
+
 
 class Image(ndb.Model):
     """An image."""
@@ -49,66 +51,6 @@ class GenericWidget(ndb.Model):
     raw = ndb.TextProperty()
     # Parameter names, definitions, types and default arguments for this widget.
     params = ndb.JsonProperty(repeated=True)
-
-
-class Parameter(ndb.Model):
-    """A parameter definition for an exploration."""
-    # The name of the parameter
-    name = ndb.StringProperty(required=True)
-    # The possible starting values to choose from
-    starting_values = ndb.StringProperty(repeated=True)
-
-
-class State(ndb.Model):
-    """A state. (An exploration is composed of many states.)"""
-    # NB: This element's parent should be an Exploration.
-    # A hash_id to show in the browser.
-    hash_id = ndb.StringProperty(required=True)
-    # Human-readable name for the state.
-    name = ndb.StringProperty(default='Activity 1')
-    # The content displayed to the reader in this state.
-    content = ndb.JsonProperty(repeated=True)
-    # The id of the interactive widget class for this state.
-    interactive_widget = ndb.StringProperty(default='Continue')
-    # Rulesets for the interactive widget. Each ruleset is a key-value pair: the key
-    # is the name of the reader's action (submit, click, etc.) and the value is a list
-    # of rules, each represented as a dict with six elements:
-    # - rule: the raw classification rule
-    # - inputs: parameters for that classification rule
-    # - code: the actual Python code to check whether the answer satisfies the category
-    # - dest: the destination state name (not id)
-    # - feedback: feedback text
-    # - param_changes: parameter changes
-    # TODO(yanamal): Implement the parameter changes parts (the rest are done).
-    # TODO(sll): Add validation.
-    interactive_rulesets = ndb.JsonProperty(default={'submit': []})
-    # Parameter overrides for the interactive widget view, stored as key-value
-    # pairs.
-    interactive_params = ndb.JsonProperty(default={})
-
-
-# TODO(sll): Add an anyone-can-edit mode.
-class Exploration(ndb.Model):
-    """An exploration (which is made up of several states)."""
-    # A hash_id to show in the browser.
-    hash_id = ndb.StringProperty(required=True)
-    # The original creator of this exploration.
-    owner = ndb.UserProperty()
-    # The category this exploration belongs to.
-    # TODO(sll): Should this be a 'repeated' property?
-    category = ndb.StringProperty(required=True)
-    # What this exploration is called.
-    title = ndb.StringProperty(default='New exploration')
-    # The state which forms the start of this exploration.
-    init_state = ndb.KeyProperty(kind=State, required=True)
-    # The list of states this exploration consists of.
-    states = ndb.KeyProperty(kind=State, repeated=True)
-    # The list of parameters associated with this exploration
-    parameters = ndb.KeyProperty(kind=Parameter, repeated=True)
-    # Whether this exploration is publicly viewable.
-    is_public = ndb.BooleanProperty(default=False)
-    # The id for the image to show as a preview of the exploration.
-    image_id = ndb.StringProperty()
 
 
 class AugmentedUser(ndb.Model):

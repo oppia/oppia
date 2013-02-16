@@ -15,7 +15,9 @@
 __author__ = 'Jeremy Emerson'
 
 import unittest
-from models.models import AugmentedUser, Exploration, GenericWidget, Image, State, Widget
+from models.exploration import Exploration
+from models.models import AugmentedUser, GenericWidget, Image, Widget
+from models.state import State
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.api import users

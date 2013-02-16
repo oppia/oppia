@@ -12,7 +12,11 @@
 
 """Common actions used in Oppia functional tests."""
 
-import feconf, main, suite
+import feconf
+import main
+import suite
+
+import logging
 import os
 
 
@@ -24,8 +28,8 @@ class ShouldHaveFailedByNow(Exception):
 class TestBase(suite.BaseTestClass):
     """Contains methods common to all tests."""
     def getApp(self):
-    	feconf.DEBUG = True
-    	return main.app
+        feconf.DEBUG = True
+        return main.app
 
     def setUp(self):  # pylint: disable-msg=g-bad-name
         super(TestBase, self).setUp()

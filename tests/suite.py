@@ -14,7 +14,10 @@
 
 __author__ = 'Sean Lip'
 
-import base64, os, sys, unittest
+import base64
+import os
+import sys
+import unittest
 
 import webtest
 
