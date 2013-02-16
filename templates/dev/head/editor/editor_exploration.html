@@ -82,26 +82,24 @@
                 <hr>
 
                 <h3>Rules</h3>
-                <div ng-repeat="action in interactiveWidget.actions">
-                  <h4><[action.type]></h4>
+                <div ng-repeat="(action, properties) in interactiveWidget.actions">
+                  <h4><[action]></h4>
                   <ul>
                     <li ng-repeat="rule in interactiveRulesets[action]">
-                      <[rule | parameterizeRule ]>: (<[rule.dest]>, <[rule.feedback]>)
+                      <[rule | parameterizeRule]>: (<[rule.dest]>, <[rule.feedback]>)
                       <span class="pull-right">
                         <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
                           Edit
-                        </a> |
-                        <span ng-show="$index != 0">
-                          <a ng-click="swapRules(action, $index, $index - 1)"> ⇑ </a>
-                          |
+                        </a>
+                        <span ng-show="$index != 0 && $index != interactiveRulesets[action].length - 1">
+                          | <a ng-click="swapRules(action, $index, $index - 1)"> ⇑ </a>
+                        </span>
+                        <span ng-show="$index < interactiveRulesets[action].length - 2">
+                          | <a ng-click="swapRules(action, $index, $index + 1)"> ⇓ </a>
                         </span>
                         <span ng-show="$index != interactiveRulesets[action].length - 1">
-                          <a ng-click="swapRules(action, $index, $index + 1)"> ⇓ </a>
-                          |
+                          | <a ng-click="deleteRule(action, $index)"> Delete </a>
                         </span>
-                        <a ng-click="deleteRule(action, $index)">
-                          Delete
-                        </a>
                       </span>
                     </li>
                   </ul>
@@ -162,7 +160,7 @@
                     <h4><[addRuleAction.type]></h4>
 
                     <div ng-hide="addRuleActionRule">
-                      <div ng-repeat="(rule, attrs) in addRuleAction.rules"
+                      <div ng-repeat="(rule, attrs) in interactiveWidget.actions[addRuleAction].rules"
                            class="oppia-rule">
                         <span ng-bind-html="rule | bracesToText"></span>
                         <button type="button" class="pull-right"

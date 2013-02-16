@@ -307,7 +307,15 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
         hash_id=state_hash_id, input_view=none_input_view.key,
         action_sets=[none_action_set.key], parent=exploration.key,
         classifier_categories=[DEFAULT_CATEGORY],
-        name=init_state_name)
+        name=init_state_name,
+        interactive_rulesets={'submit': [{
+            'rule': 'Default',
+            'params': {},
+            'code': '',
+            'dest': init_state_name,
+            'feedback': '',
+            'param_changes': [],
+        }]})
     new_init_state.put()
 
     # Replace the fake key with its real counterpart.
@@ -331,7 +339,15 @@ def CreateNewState(exploration, state_name):
     state = State(
         name=state_name, hash_id=state_hash_id, input_view=none_input_view.key,
         action_sets=[none_action_set.key], parent=exploration.key,
-        classifier_categories=[DEFAULT_CATEGORY])
+        classifier_categories=[DEFAULT_CATEGORY],
+        interactive_rulesets={'submit': [{
+            'rule': 'Default',
+            'params': {},
+            'code': '',
+            'dest': state_name,
+            'feedback': '',
+            'param_changes': [],
+        }]})
     state.put()
     none_action_set.dest = state.key
     none_action_set.put()

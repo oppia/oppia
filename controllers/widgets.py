@@ -214,14 +214,13 @@ class InteractiveWidget(BaseHandler):
             #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
-        for action in widget['actions']:
-            classifier = action['classifier']
+        for action, properties in widget['actions'].iteritems():
+            classifier = properties['classifier']
             if classifier and classifier != 'None':
                 with open('classifiers/%s/%s.rules' %
                           (classifier, classifier)) as f:
-                    action['rules'] = utils.GetDictFromYaml(
+                    properties['rules'] = utils.GetDictFromYaml(
                         f.read().decode('utf-8'))
-
         return widget
 
     def get(self, widget_id):

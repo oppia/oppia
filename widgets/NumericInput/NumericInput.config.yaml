@@ -13,7 +13,7 @@ description: |
 # Actions that the reader can perform on this widget which trigger a feedback
 # interaction.
 actions:
-  - type: submit
+  submit:
     classifier: NumericClassifier
 
 # Customization parameters and their default values.

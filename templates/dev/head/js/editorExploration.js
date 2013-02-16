@@ -744,7 +744,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       console.log($scope.addRuleActionAttrs);
       console.log($scope.addRuleActionInputs);
 
+      var bad = false;
       // TODO(sll): Move all of the following parsing to the backend.
+      /*
       var classifierFunc = $scope.addRuleActionAttrs.classifier.replace(' ', '');
       var firstBracket = classifierFunc.indexOf('(');
       var result = classifierFunc.substring(0, firstBracket + 1);
@@ -752,7 +754,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       var lastString = classifierFunc.substring(firstBracket + 1);
       lastString = lastString.substring(0, lastString.length - 1);
       var params = lastString.split(',');
-      var bad = false;
       for (var i = 0; i < params.length; ++i) {
         if (!($scope.addRuleActionInputs.hasOwnProperty(params[i]))) {
           // TODO(sll): This needs to be more robust, e.g. it should detect if
@@ -770,6 +771,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
       result += ')';
       console.log(result);
+      */
 
       if (!bad) {
         var finalRuleset = {
@@ -784,10 +786,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
           $scope.$parent.interactiveRulesets[$scope.addRuleAction] = [];
         }
 
-        if ($scope.addRuleActionIndex) {
-          $scope.$parent.interactiveRulesets[$scope.addRuleAction][$scope.addRuleActionIndex] = finalRuleset;
+        var rules = $scope.$parent.interactiveRulesets[$scope.addRuleAction];
+
+        if ($scope.addRuleActionIndex != null) {
+          rules[$scope.addRuleActionIndex] = finalRuleset;
         } else {
-          $scope.$parent.interactiveRulesets[$scope.addRuleAction].push(finalRuleset);
+          rules.splice(rules.length - 1, 0, finalRuleset);
         }
         $scope.saveInteractiveWidget();
       }
@@ -823,7 +827,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
       $scope.$parent.interactiveWidget = arg.data.widget;
       $scope.$parent.interactiveParams = {};
-      $scope.$parent.interactiveRulesets = {};
+      $scope.$parent.interactiveRulesets = {'submit': [{
+          'rule': 'Default',
+          'attrs': {},
+          'inputs': {},
+          'dest': $scope.stateName,
+          'feedback': '',
+          'paramChanges': []
+      }]};
     }
     $scope.saveInteractiveWidget();
   });

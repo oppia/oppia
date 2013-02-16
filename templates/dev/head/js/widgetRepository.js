@@ -25,7 +25,6 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.fillFrame = function(domId, widgetCode) {
     var F = $('#' + domId);
     F[0].contentWindow.document.open();
-    console.log(widgetCode);
     F[0].contentWindow.document.write(widgetCode);
     F[0].contentWindow.document.close();
   };
@@ -83,7 +82,6 @@ function WidgetRepository($scope, $http, activeInputData) {
         'name': $scope.newParamName, 'description': $scope.newParamDescription,
         'type': $scope.newParamType, 'default': $scope.newParamDefault
     });
-    console.log(widget.params);
     $scope.newParamName = '';
     $scope.newParamDescription = '';
     $scope.newParamType = '';

@@ -107,7 +107,7 @@ class State(ndb.Model):
     interactive_rulesets = ndb.JsonProperty()
     # Parameter overrides for the interactive widget view, stored as key-value
     # pairs.
-    interactive_params = ndb.JsonProperty()
+    interactive_params = ndb.JsonProperty(default={})
 
 
 # TODO(sll): Add an anyone-can-edit mode.
