@@ -21,7 +21,6 @@ import json
 import logging
 import random
 
-import classifiers_old
 from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
 import feconf
@@ -86,7 +85,8 @@ class ExplorationHandler(BaseHandler):
         if init_state.interactive_widget in DEFAULT_ANSWERS:
             self.data_values['default_answer'] = DEFAULT_ANSWERS[init_state.interactive_widget]
         if init_state.interactive_widget == 'MultipleChoiceInput':
-            self.data_values['categories'] = init_state.classifier_categories
+            # self.data_values['categories'] = init_state.classifier_categories
+            pass
         self.response.out.write(json.dumps(self.data_values))
 
         EventHandler.record_exploration_visited(exploration_id)
@@ -138,9 +138,10 @@ class ExplorationHandler(BaseHandler):
         html_output, widget_output = '', []
         # Append reader's answer.
         if interactive_widget_properties['classifier'] == 'MultipleChoiceClassifier':
-            html_output = feconf.JINJA_ENV.get_template(
-                'reader_response.html').render(
-                    {'response': state.classifier_categories[int(answer)]})
+            # html_output = feconf.JINJA_ENV.get_template(
+            #     'reader_response.html').render(
+            #         {'response': state.classifier_categories[int(answer)]})
+            pass
         else:
             html_output = feconf.JINJA_ENV.get_template(
                 'reader_response.html').render({'response': answer})
@@ -178,7 +179,8 @@ class ExplorationHandler(BaseHandler):
         values['block_number'] = block_number + 1
         if dest:
             if state.interactive_widget == 'MultipleChoiceInput':
-                values['categories'] = state.classifier_categories
+                # values['categories'] = state.classifier_categories
+                pass
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
         if dest != '-1':

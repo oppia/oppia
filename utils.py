@@ -23,7 +23,7 @@ import logging
 import yaml
 
 import feconf
-from models.models import ActionSet, AugmentedUser, Exploration, InputView, State, Widget
+from models.models import AugmentedUser, Exploration, State, Widget
 from google.appengine.ext import ndb
 
 DEFAULT_CATEGORY = 'Default'
@@ -32,9 +32,6 @@ DEFAULT_CATEGORY = 'Default'
 def Enum(*sequential, **names):
     enums = dict(zip(sequential, sequential), **names)
     return type('Enum', (), enums)
-
-
-input_views = Enum('none', 'multiple_choice', 'int', 'set', 'text', 'finished')
 
 
 class InvalidCategoryError(Exception):
@@ -183,18 +180,6 @@ def GetJsFilesWithBase(filenames):
     return GetJsFiles(['base'] + filenames)
 
 
-def GetJsFileWithClassifiers(filename):
-    """Gets the contents of a JS file, and append JS for the classifier editors.
-
-    Args:
-        filename: the name of a JS file (without the '.js' suffix).
-
-    Returns:
-        the JS file contents.
-    """
-    return GetJsFiles(['base', filename, 'editorClassifiers'])
-
-
 def GetCssFile(filename):
     """Gets the contents of a CSS file.
 
@@ -289,13 +274,12 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
     new_init_state = State(
         hash_id=state_hash_id,
         parent=exploration.key,
-        classifier_categories=[DEFAULT_CATEGORY],
         name=init_state_name,
         interactive_rulesets={'submit': [{
             'rule': 'Default',
             'params': {},
             'code': '',
-            'dest': init_state_name,
+            'dest': state_hash_id,
             'feedback': '',
             'param_changes': [],
         }]})
@@ -317,12 +301,11 @@ def CreateNewState(exploration, state_name):
     state_hash_id = GetNewId(State, state_name)
     state = State(
         name=state_name, hash_id=state_hash_id, parent=exploration.key,
-        classifier_categories=[DEFAULT_CATEGORY],
         interactive_rulesets={'submit': [{
             'rule': 'Default',
             'params': {},
             'code': '',
-            'dest': state_name,
+            'dest': state_hash_id,
             'feedback': '',
             'param_changes': [],
         }]})
@@ -441,21 +424,21 @@ def ModifyStateUsingDict(exploration, state, state_dict):
         raise InvalidInputException(error_log)
 
     # Delete the old actions.
-    for action_key in state.action_sets:
-        action_key.delete()
-    state.action_sets = []
+    # for action_key in state.action_sets:
+    #     action_key.delete()
+    # state.action_sets = []
 
-    input_view_name = state_dict['input_type']['name']
-    input_view = InputView.gql(
-        'WHERE name = :name', name=input_view_name).get()
+    # input_view_name = state_dict['input_type']['name']
+    # input_view = InputView.gql(
+    #     'WHERE name = :name', name=input_view_name).get()
     # TODO(sll): Deal with input_view.widget here (and handle its verification
     # above).
     dests_array = []
 
     content = state_dict['content']
 
-    category_list = []
-    action_set_list = []
+    # category_list = []
+    # action_set_list = []
     for index in range(len(state_dict['answers'])):
         dests_array_item = {}
         for key, val in state_dict['answers'][index].iteritems():
@@ -472,19 +455,19 @@ def ModifyStateUsingDict(exploration, state, state_dict):
                     dest_state = CreateNewState(exploration, dest_name)
                     dest_key = dest_state.key
 
-            category_list.append(key)
-            dests_array_item['category'] = category_list[index]
+            # category_list.append(key)
+            # dests_array_item['category'] = category_list[index]
             dests_array_item['text'] = val['text']
             dests_array_item['dest'] = dest_state.hash_id if dest_key else '-1'
             dests_array.append(dests_array_item)
-            action_set = ActionSet(
-                category_index=index, text=val['text'], dest=dest_key)
-            action_set.put()
-            action_set_list.append(action_set.key)
+            # action_set = ActionSet(
+            #     category_index=index, text=val['text'], dest=dest_key)
+            # action_set.put()
+            # action_set_list.append(action_set.key)
 
     state.content = content
-    state.classifier_categories = category_list
-    state.action_sets = action_set_list
+    # state.classifier_categories = category_list
+    # state.action_sets = action_set_list
     state.put()
     return dests_array
 

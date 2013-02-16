@@ -804,7 +804,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
           'rule': 'Default',
           'attrs': {},
           'inputs': {},
-          'dest': $scope.stateName,
+          'dest': $scope.stateId,
           'feedback': '',
           'paramChanges': []
       }]};

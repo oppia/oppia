@@ -66,21 +66,12 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     }
   });
 
-  $scope.deleteCategory = function(categoryId) {
-    $scope.states[$scope.stateId]['dests'].splice(categoryId, 1);
-    $scope.saveStateChange('states');
-  };
-
   $scope.showFeedbackEditor = function(activeInput, categoryId) {
     $scope.initializeNewActiveInput(activeInput);
     if ($scope.states[$scope.stateId]['dests'][categoryId]['text']) {
       $scope['textData'] =
           $scope.states[$scope.stateId]['dests'][categoryId]['text'];
     }
-  };
-
-  $scope.getTextDescription = function(text) {
-    return text ? 'Feedback: ' + text : '';
   };
 
   $scope.getDestDescription = function(dest) {
@@ -121,18 +112,8 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
       found = true;
       $scope.states[$scope.stateId]['dests'][categoryId].dest = END_DEST;
     }
-    // If destName is a question, find the id in questions.
-    if (destName.indexOf('[Question] ') == 0) {
-      destName = destName.substring(11);
-      for (var id in $scope.questions) {
-        if ($scope.questions[id].desc == destName) {
-          found = true;
-          $scope.states[$scope.stateId]['dests'][categoryId].dest = 'q-' + id;
-          break;
-        }
-      }
-    }
-    // Otherwise, find the id in states.
+
+    // Find the id in states.
     if (!found) {
       for (var id in $scope.states) {
         if ($scope.states[id].desc == destName) {
@@ -154,36 +135,6 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
 
   $scope.getReadableInputType = function(inputType) {
     return HUMAN_READABLE_INPUT_TYPE_MAPPING[inputType];
-  };
-
-  /**
-   * Triggered when the content creator changes the input type.
-   * @param {string} newInputType The input type specified by the content
-   *     creator.
-   */
-  $scope.changeInputType = function(newInputType) {
-    $scope.$parent.inputType = newInputType;
-    if (!$scope.inputType) {
-      $scope.$parent.inputType = 'none';
-    }
-    if ($scope.$parent.inputType == 'none') {
-      $scope.$parent.newInputType = '';
-    }
-
-    $scope.classifier = CLASSIFIER_MAPPING[$scope.inputType];
-    if (!$scope.classifier) {
-      warningsData.addWarning('Invalid input type: ' + $scope.inputType);
-      $scope.$parent.classifier = 'none';
-    }
-
-    console.log($scope.states[$scope.stateId]);
-    // Change $scope.states to the default for the new classifier type.
-    $scope.states[$scope.stateId]['dests'] =
-        DEFAULT_DESTS[$scope.classifier].slice();
-
-    if ($scope.classifier != 'finite') {
-      $scope.saveStateChange('states');
-    }
   };
 
   $scope.hideVideoInputDialog = function(videoLink, index) {

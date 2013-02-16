@@ -51,20 +51,6 @@ class GenericWidget(ndb.Model):
     params = ndb.JsonProperty(repeated=True)
 
 
-class InputView(ndb.Model):
-    """An input view shown to the reader."""
-    # The name of the input view; this name should be unique.
-    # TODO(sll): if AppEngine ever supports unique properties, declare this
-    # property as unique.
-    name = ndb.StringProperty(required=True)
-    # The type of the classifier corresponding to this input view.
-    classifier = ndb.StringProperty(
-        choices=['none', 'finite', 'numeric', 'set', 'text'],
-        default='none')
-    # The HTML snippet used to display this input view.
-    html = ndb.TextProperty()
-
-
 class Parameter(ndb.Model):
     """A parameter definition for an exploration."""
     # The name of the parameter
@@ -82,15 +68,6 @@ class State(ndb.Model):
     name = ndb.StringProperty(default='Activity 1')
     # The content displayed to the reader in this state.
     content = ndb.JsonProperty(repeated=True)
-    # The input view corresponding to this state.
-    input_view = ndb.KeyProperty(kind=InputView)
-    # The categories (different buckets) associated with the state's classifier.
-    classifier_categories = ndb.StringProperty(repeated=True)
-    # The action sets corresponding to the categories associated with the state.
-    action_sets = ndb.KeyProperty(repeated=True)
-    # Additional parameters that will be passed to the classification code
-    # together with the student input (such as a canonical set for set input).
-    classifier_params = ndb.StringProperty(repeated=True)
     # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
     # The classifier corresponding to the interactive widget.
@@ -142,37 +119,3 @@ class AugmentedUser(ndb.Model):
     user = ndb.UserProperty(required=True)
     # The list of explorations that this user has editing rights for.
     editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
-
-
-class ActionSet(ndb.Model):
-    """A set of actions to be performed in a single feedback interaction."""
-    # The response category that corresponds to this set of actions.
-    category_index = ndb.IntegerProperty(required=True)
-    # The text to be added as a response to the reader's input.
-    text = ndb.TextProperty(default='')
-    # The destination exploration id that the reader should be sent to. If both
-    # dest_exploration and dest are specified, dest_exploration takes
-    # precedence. But dest should equal dest_exploration.init_state.
-    # TODO(sll): Implement automatic checking of this constraint.
-    # TODO(sll): What happens to this if the destination exploration is deleted?
-    dest_exploration = ndb.KeyProperty(kind=Exploration)
-    # The destination state id that the reader should be sent to. It is None if
-    # this action leads to an END state.
-    dest = ndb.KeyProperty(kind=State)
-
-
-class ActionSet(ndb.Model):
-    """A set of actions to be performed in a single feedback interaction."""
-    # The response category that corresponds to this set of actions.
-    category_index = ndb.IntegerProperty(required=True)
-    # The text to be added as a response to the reader's input.
-    text = ndb.TextProperty(default='')
-    # The destination exploration id that the reader should be sent to. If both
-    # dest_exploration and dest are specified, dest_exploration takes
-    # precedence. But dest should equal dest_exploration.init_state.
-    # TODO(sll): Implement automatic checking of this constraint.
-    # TODO(sll): What happens to this if the destination exploration is deleted?
-    dest_exploration = ndb.KeyProperty(kind=Exploration)
-    # The destination state id that the reader should be sent to. It is None if
-    # this action leads to an END state.
-    dest = ndb.KeyProperty(kind=State)

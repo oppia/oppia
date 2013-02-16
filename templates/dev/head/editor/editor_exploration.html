@@ -179,9 +179,9 @@
                       <div>
                         Destination:
                         <[addRuleActionDest]>
-                        <input type="text" size="40" list="destinations" ng-model="addRuleActionDest" placeholder="Name of destination state" required>
+                        <input type="text" size="40" list="destinations" ng-model="addRuleActionDest" required>
                         <datalist id="destinations">
-                          <option ng-repeat="(id, properties) in states" value="properties.desc"></option>
+                          <option ng-repeat="(id, properties) in states" value="<[id]>"></option>
                           <option value="END"></option>
                         </datalist>
                       </div>

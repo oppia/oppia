@@ -108,47 +108,7 @@
         </h4>
         <div>
 
-          <div ng-show="inputType == 'none'">
-            <div>
-              <span class="oppia-editable-name" ng-hide="activeInputData.name == 'none.0.dest'"
-                    ng-click="activeInputData.name = 'none.0.dest'">
-                <[getDestDescription(states[stateId]['dests'][0].dest)]>
-              </span>
-              <span ng-show="activeInputData.name == 'none.0.dest'">
-                <form ng-submit="saveDest(0, newNoneDestData)">
-                  Destination:
-                  <input type="none" size="40" list="destinations" ng-model="newNoneDestData"
-                         placeholder="Type name of state, or '[Q' for questions" required>
-                  <datalist id="destinations">
-                    <option ng-repeat="(id, properties) in states" value="<[properties.desc]>"></option>
-                    <option ng-repeat="(id, properties) in questions" value="[Question] <[properties.desc]>"></option>
-                    <option value="END"></option>
-                  </datalist>
-                  <input type="submit" value="Save">
-                </form>
-              </span>
-                {% include 'parameter_change.html' %}
-              <br>
-              <br>
-              <div>
-                <h5>Or, pick an input view:</h5>
-                <select ng-model="newInputType" id="newInputType" ng-change="changeInputType(newInputType)"
-                        ng-hide="activeInputData.name == 'none.0.dest'">
-                  <option value="multiple_choice">Multiple Choice</option>
-                  <option value="int">Integer</option>
-                  <option value="set">Set</option>
-                  <option value="text">Text</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div ng-show="inputType != 'none'">
-            {% include 'classifier_editors/finite.html' %}
-            {% include 'classifier_editors/numeric.html' %}
-            {% include 'classifier_editors/set.html' %}
-            {% include 'classifier_editors/text.html' %}
-          </div>
+        {% include 'parameter_change.html' %}
 
         </div>
       </div>

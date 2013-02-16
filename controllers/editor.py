@@ -21,7 +21,7 @@ import logging
 
 from controllers.base import BaseHandler, require_editor, require_user
 import feconf
-from models.models import ActionSet, AugmentedUser, Exploration, InputView, State
+from models.models import AugmentedUser, Exploration, State
 import utils
 
 EDITOR_MODE = 'editor'
@@ -32,17 +32,17 @@ def GetStateAsDict(state):
     """Gets a Python dict representation of a state."""
     raise Exception('This method must be reimplemented.')
 
-    category_list = state.classifier_categories
+    # category_list = state.classifier_categories
     return {
         'content': state.content,
-        'input_type': {'name': state.input_view.get().name},
-        'answers': [{
-            category_list[i]: {
-                'text': state.action_sets[i].get().text,
-                'dest': (state.action_sets[i].get().dest.get().name
-                         if state.action_sets[i].get().dest else 'END')
-            }
-        } for i in range(len(state.action_sets))],
+        # 'input_type': {'name': state.input_view.get().name},
+        # 'answers': [{
+        #     category_list[i]: {
+        #         'text': state.action_sets[i].get().text,
+        #         'dest': (state.action_sets[i].get().dest.get().name
+        #                  if state.action_sets[i].get().dest else 'END')
+        #     }
+        # } for i in range(len(state.interactive_rulesets['submit']))],
     }
 
 
@@ -76,7 +76,7 @@ class ExplorationPage(BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'js': utils.GetJsFilesWithBase(
-                ['editorExploration', 'editorClassifiers', 'editorTree',
+                ['editorExploration', 'editorTree',
                  'editorGraph', 'guiEditor', 'yamlEditor']),
             'nav_mode': EDITOR_MODE,
         })
@@ -136,8 +136,6 @@ class ExplorationPage(BaseHandler):
         """Deletes the given exploration."""
 
         for state_key in exploration.states:
-            for action_set_key in state_key.get().action_sets:
-                action_set_key.delete()
             state_key.delete()
 
         augmented_users = AugmentedUser.query().filter(
@@ -159,27 +157,9 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_destinations = []
-            category_list = state.classifier_categories
-            for i in range(len(category_list)):
-                try:
-                    action_set = state.action_sets[i].get()
-                except IndexError:
-                    logging.error('action_sets %s has no element at index %s',
-                                  state.action_sets, i)
-                    action_set = ActionSet(
-                        category_index=i, dest=state.key)
-                    action_set.put()
-                    state.action_sets.append(action_set.key)
-                state_destination_map = {'category': category_list[i]}
-                if action_set.dest_exploration:
-                    state_destination_map['dest'] = (
-                        'q-%s' % action_set.dest_exploration.get().hash_id)
-                elif action_set.dest:
-                    state_destination_map['dest'] = action_set.dest.get().hash_id
-                else:
-                    state_destination_map['dest'] = END_DEST
-                state_destinations.append(state_destination_map)
+            ruleset = state.interactive_rulesets['submit']
+            state_destinations = [{'category': rule['rule'], 'dest': rule['dest']}
+                                  for rule in ruleset]
             state_list[state.hash_id] = {
                 'desc': state.name, 'dests': state_destinations
             }
@@ -230,7 +210,7 @@ class StatePage(BaseHandler):
         """Gets a page representing an exploration with a list of states."""
         self.values.update({
             'js': utils.GetJsFilesWithBase(
-                ['editorExploration', 'editorClassifiers', 'editorGraph',
+                ['editorExploration', 'editorGraph',
                  'editorTree', 'guiEditor', 'yamlEditor']),
             'nav_mode': EDITOR_MODE,
         })
@@ -255,23 +235,11 @@ class StatePage(BaseHandler):
         }
 
         # Retrieve the actions corresponding to this state.
-        category_list = state.classifier_categories
-        for i in range(len(category_list)):
-            try:
-                action_set = state.action_sets[i].get()
-            except IndexError:
-                action_set = ActionSet(category_index=i)
-                action_set.put()
-                state.action_sets.append(action_set.key)
-
-            action = {'category': category_list[i], 'dest': '-1'}
-            if action_set.text:
-                action['text'] = action_set.text
-            if action_set.dest_exploration:
-                action['dest'] = (
-                    'q-%s' % action_set.dest_exploration.get().hash_id)
-            elif action_set.dest:
-                action['dest'] = action_set.dest.get().hash_id
+        ruleset = state.interactive_rulesets['submit']
+        for rule in ruleset:
+            action = {'category': rule['rule'], 'dest': rule['dest']}
+            if rule['feedback']:
+                action['feedback'] = rule['feedback']
             values['actions'].append(action)
 
         # values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
@@ -293,7 +261,7 @@ class StateHandler(BaseHandler):
                 exploration, state, utils.GetDictFromYaml(yaml_file))
             # input_view = state.input_view.get()
             self.response.out.write(json.dumps({
-                'classifier': input_view.classifier,
+                # 'classifier': input_view.classifier,
                 'explorationId': exploration.hash_id,
                 # 'inputType': input_view.name,
                 'state': {'desc': state.name, 'dests': dests_array},
@@ -335,14 +303,6 @@ class StateHandler(BaseHandler):
             ruleset = state.interactive_rulesets['submit']
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
-
-                # Change the dest into the state id.
-                # TODO(sll): This should be done in the frontend instead.
-                state_name = rule['dest']
-                if state_name == 'END':
-                    rule['dest'] = '-1'
-                else:
-                    rule['dest'] = State.query().filter(State.name == state_name).get().hash_id
 
                 # Generate the code to be executed.
                 if 'attrs' not in rule or 'classifier' not in rule['attrs']:
@@ -394,18 +354,16 @@ class StateHandler(BaseHandler):
 
         # Find all action_sets whose dest is the state to be deleted, and change
         # their destinations to the END state.
-        incoming_action_sets = ActionSet.query().filter(
-            ActionSet.dest == state.key)
-        for action_set in incoming_action_sets:
-            # Find the incoming state.
-            origin_state = State.query().filter(
-                State.action_sets == action_set.key).get()
-            action_set.dest = origin_state.key
-            action_set.put()
+        # incoming_action_sets = ActionSet.query().filter(ActionSet.dest == state.key)
+        # for action_set in incoming_action_sets:
+        #     origin_state = State.query().filter(
+        #         State.action_sets == action_set.key).get()
+        #     action_set.dest = origin_state.key
+        #     action_set.put()
 
         # Delete all action_sets corresponding to this state.
-        for action_set in state.action_sets:
-            action_set.delete()
+        # for action_set in state.action_sets:
+        #     action_set.delete()
 
         # Delete the state with id state_id.
         state.key.delete()

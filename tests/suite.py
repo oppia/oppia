@@ -18,7 +18,7 @@ import base64, os, sys, unittest
 
 import webtest
 
-EXPECTED_TEST_COUNT = 10
+EXPECTED_TEST_COUNT = 9
 
 
 def empty_environ():
