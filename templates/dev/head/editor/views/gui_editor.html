@@ -100,17 +100,11 @@
           <br>
           <br>
         </div>
-        <h4 ng-show="inputType != 'none'">
-          Interaction: <[getReadableInputType(inputType)]>
-          <span>
-            (<a ng-click="changeInputType('none')">Remove</a>)
-          </span>
-        </h4>
+        
         <div>
-
-        {% include 'parameter_change.html' %}
-
+          {% include 'parameter_change.html' %}
         </div>
+        <br>
       </div>
     </div>
   </div>

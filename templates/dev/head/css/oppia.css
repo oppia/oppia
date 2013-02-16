@@ -154,7 +154,7 @@ div.oppia-footer {
 }
 
 .oppia-interactive-widget-preview {
-  border: 1px solid black;
+  margin-left: 2%;
   padding: 5px;
   width: 80%;
 }

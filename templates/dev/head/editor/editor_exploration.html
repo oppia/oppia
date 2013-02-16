@@ -65,12 +65,10 @@
 
               <div ng-view ng-cloak></div>
 
-              <h2>New Widget Interface (experimental, incomplete)</h2>
               <div class="oppia-interactive-widget-preview" ng-controller="InteractiveWidgetPreview">
-                <iframe id="interactiveWidgetPreview" frameborder="0" width="90%">
+                <h4>Interactive Widget Preview</h4>
+                <iframe id="interactiveWidgetPreview" frameborder="1" width="90%">
                 </iframe>
-
-                <hr>
 
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#customizeWidgetModal">
                   Customize this widget
@@ -81,9 +79,9 @@
 
                 <hr>
 
-                <h3>Rules</h3>
+                <h4>Rules</h4>
                 <div ng-repeat="(action, properties) in interactiveWidget.actions">
-                  <h4><[action]></h4>
+                  <h5>On user <[action]>:</h5>
                   <ul>
                     <li ng-repeat="rule in interactiveRulesets[action]">
                       <[rule | parameterizeRule]>: (<[rule.dest]>, <[rule.feedback]>)
