@@ -51,12 +51,12 @@ class EventHandler(object):
         counter.put()
 
     @classmethod
-    def _add(cls, event_key):
-        """Increments the counter corresponding to an event key."""
+    def _add(cls, event_key, value):
+        """Adds to the list corresponding to an event key."""
         journal = Journal.get_or_insert(event_key, name=event_key)
         if not journal:
             journal = Journal(id=event_key, name=event_key)
-        journal.value.append(value) 
+        journal.values.append(value) 
         journal.put()
 
 
