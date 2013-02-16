@@ -103,7 +103,8 @@
                       </span>
                     </li>
                   </ul>
-                  <button type="button" class="btn btn-primary" data-toggle="modal"
+                  <button ng-show="properties.rules"
+                          type="button" class="btn btn-primary" data-toggle="modal"
                           data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
                     Add rule
                   </button>
@@ -177,9 +178,10 @@
 
                       <div>
                         Destination:
+                        <[addRuleActionDest]>
                         <input type="text" size="40" list="destinations" ng-model="addRuleActionDest" placeholder="Name of destination state" required>
                         <datalist id="destinations">
-                          <option ng-repeat="(id, properties) in states" value="<[properties.desc]>"></option>
+                          <option ng-repeat="(id, properties) in states" value="properties.desc"></option>
                           <option value="END"></option>
                         </datalist>
                       </div>

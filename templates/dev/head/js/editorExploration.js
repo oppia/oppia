@@ -745,33 +745,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       console.log($scope.addRuleActionInputs);
 
       var bad = false;
-      // TODO(sll): Move all of the following parsing to the backend.
-      /*
-      var classifierFunc = $scope.addRuleActionAttrs.classifier.replace(' ', '');
-      var firstBracket = classifierFunc.indexOf('(');
-      var result = classifierFunc.substring(0, firstBracket + 1);
-
-      var lastString = classifierFunc.substring(firstBracket + 1);
-      lastString = lastString.substring(0, lastString.length - 1);
-      var params = lastString.split(',');
-      for (var i = 0; i < params.length; ++i) {
-        if (!($scope.addRuleActionInputs.hasOwnProperty(params[i]))) {
-          // TODO(sll): This needs to be more robust, e.g. it should detect if
-          // the parameter is a literal value.
-          warningsData.addWarning(
-              'Parameter ' + params[i] + ' could not be replaced.');
-          bad = true;
-        } else {
-          if (i !== 0) {
-            result += ',';
-          }
-          result += $scope.addRuleActionInputs[params[i]];
-        }
-      }
-
-      result += ')';
-      console.log(result);
-      */
 
       if (!bad) {
         var finalRuleset = {

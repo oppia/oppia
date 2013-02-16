@@ -28,7 +28,7 @@ class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def record_event(cls, event_name, entity_id, extra_info=''):
+    def _record_event(cls, event_name, entity_id, extra_info=''):
         """Updates statistics based on recorded events."""
 
         if event_name == STATS_ENUMS.exploration_visited:
@@ -40,6 +40,21 @@ class EventHandler(object):
         if event_name == STATS_ENUMS.exploration_completed:
             event_key = 'c.%s' % entity_id
             cls._inc(event_key)
+
+    @classmethod
+    def record_default_case_hit(cls, entity_id, extra_info=''):
+        """Records an event when an answer triggers the default rule."""
+        cls._record_event(STATS_ENUMS.default_case_hit, entity_id, extra_info)
+
+    @classmethod
+    def record_exploration_visited(cls, entity_id):
+        """Records an event when an exploration is visited for the first time."""
+        cls._record_event(STATS_ENUMS.exploration_visited, entity_id)
+
+    @classmethod
+    def record_exploration_completed(cls, entity_id):
+        """Records an event when an exploration is completed."""
+        cls._record_event(STATS_ENUMS.exploration_completed, entity_id)
 
     @classmethod
     def _inc(cls, event_key):

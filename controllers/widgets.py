@@ -196,7 +196,7 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_id):
+    def get_interactive_widget(cls, widget_id, include_js=False):
         """Gets interactive widget code from the file system."""
         widget = {}
         with open('widgets/%s/%s.config.yaml' %
@@ -211,9 +211,9 @@ class InteractiveWidget(BaseHandler):
             widget_params['root'] = 'widgets/%s/static' % widget_id
             widget_html = feconf.WIDGET_JINJA_ENV.get_template(
                 html_file).render(widget_params)
-            # For now, remove the interactivity.
-            # with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
-            #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')
+            if include_js:
+                with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
+                    widget_js = '<script>%s</script>' % f.read().decode('utf-8')
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
         for action, properties in widget['actions'].iteritems():

@@ -23,7 +23,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.html = data.html;
-    $scope.inputTemplate = data.input_template;
+    $scope.inputTemplate = data.interactive_widget_html;
+    // $scope.inputTemplate = data.input_template;   //OLD
     $scope.stateId = data.state_id;
     $scope.title = data.title;
     $scope.widgets = data.widgets;
@@ -49,7 +50,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     console.log(data);
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
-    $scope.inputTemplate = data.input_template;
+    $scope.inputTemplate = data.interactive_widget_html;
     $scope.stateId = data.state_id;
 
     $scope.html += data.html;

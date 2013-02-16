@@ -207,18 +207,6 @@ def GetCssFile(filename):
     return GetFileContents('css/%s.css' % filename)
 
 
-def GetInputTemplate(template_name):
-    """Gets a template for the reader's input view.
-
-    Args:
-        template_name: the name of the template.
-
-    Returns:
-        the corresponding input template.
-    """
-    return GetFileContents('input_views/%s.html' % template_name)
-
-
 def ParseContentIntoHtml(content_array, block_number):
     """Takes a content array and transforms it into HTML.
 
@@ -292,11 +280,6 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
     # TODO(sll): Do this in a transaction so it doesn't break other things.
     fake_state_key = ndb.Key(State, state_hash_id)
 
-    none_input_view = InputView.gql(
-        'WHERE name = :name', name='none').get()
-    none_action_set = ActionSet(category_index=0, dest=None)
-    none_action_set.put()
-
     exploration = Exploration(
         hash_id=exploration_hash_id, init_state=fake_state_key,
         owner=user, category=category)
@@ -304,8 +287,8 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
         exploration.title = title
     exploration.put()
     new_init_state = State(
-        hash_id=state_hash_id, input_view=none_input_view.key,
-        action_sets=[none_action_set.key], parent=exploration.key,
+        hash_id=state_hash_id,
+        parent=exploration.key,
         classifier_categories=[DEFAULT_CATEGORY],
         name=init_state_name,
         interactive_rulesets={'submit': [{
@@ -332,13 +315,8 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
 def CreateNewState(exploration, state_name):
     """Creates and returns a new state."""
     state_hash_id = GetNewId(State, state_name)
-    none_input_view = InputView.gql(
-        'WHERE name = :name', name='none').get()
-    none_action_set = ActionSet(category_index=0)
-    none_action_set.put()
     state = State(
-        name=state_name, hash_id=state_hash_id, input_view=none_input_view.key,
-        action_sets=[none_action_set.key], parent=exploration.key,
+        name=state_name, hash_id=state_hash_id, parent=exploration.key,
         classifier_categories=[DEFAULT_CATEGORY],
         interactive_rulesets={'submit': [{
             'rule': 'Default',
@@ -349,8 +327,6 @@ def CreateNewState(exploration, state_name):
             'param_changes': [],
         }]})
     state.put()
-    none_action_set.dest = state.key
-    none_action_set.put()
     exploration.states.append(state.key)
     exploration.put()
     return state
@@ -364,7 +340,9 @@ def GetYamlFromDict(dictionary):
 def GetDictFromYaml(yaml_file):
     """Gets the dict representation of a YAML file."""
     try:
-        return yaml.safe_load(yaml_file)
+        yaml_dict = yaml.safe_load(yaml_file)
+        assert isinstance(yaml_dict, dict)
+        return yaml_dict
     except yaml.YAMLError as e:
         raise InvalidInputException(e)
 
@@ -504,7 +482,6 @@ def ModifyStateUsingDict(exploration, state, state_dict):
             action_set.put()
             action_set_list.append(action_set.key)
 
-    state.input_view = input_view.key
     state.content = content
     state.classifier_categories = category_list
     state.action_sets = action_set_list

@@ -16,10 +16,9 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import classifiers
 from controllers.base import BaseHandler
 import feconf
-from models.models import Exploration, InputView
+from models.models import Exploration
 import utils
 
 from google.appengine.api import users
@@ -27,28 +26,6 @@ from google.appengine.api import users
 
 class MainPage(BaseHandler):
     """Oppia's main page."""
-    def InitializeInputViews(self):
-        """Loads pre-written input views into the Oppia datastore."""
-        # TODO(sll): This is temporary code that automatically loads input views
-        # into the datastore on startup. Remove it once the bulk upload described
-        # below is implemented.
-        input_view_list = [utils.input_views.none,
-                           utils.input_views.multiple_choice,
-                           utils.input_views.int,
-                           utils.input_views.set,
-                           utils.input_views.text]
-        classifier_list = [classifiers.classifiers.none,
-                           classifiers.classifiers.finite,
-                           classifiers.classifiers.numeric,
-                           classifiers.classifiers.set,
-                           classifiers.classifiers.text]
-        for i in range(len(input_view_list)):
-            name = input_view_list[i]
-            if not InputView.gql('WHERE name = :name', name=name).get():
-                input_view = InputView(
-                    name=name, classifier=classifier_list[i],
-                    html=utils.GetFileContents('/input_views/%s.html' % name))
-                input_view.put()
 
     def EnsureDefaultExplorationExists(self):
         """Add the default explorations, if they don't already exist."""
@@ -65,7 +42,6 @@ class MainPage(BaseHandler):
 
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.InitializeInputViews()
         self.EnsureDefaultExplorationExists()
         self.values['js'] = utils.GetJsFilesWithBase(['index'])
         self.values['login_url'] = users.create_login_url('/gallery')

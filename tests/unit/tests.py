@@ -15,7 +15,7 @@
 __author__ = 'Jeremy Emerson'
 
 import unittest
-from models.models import AugmentedUser, ActionSet, Exploration, GenericWidget, Image, InputView, State, Widget
+from models.models import AugmentedUser, ActionSet, Exploration, GenericWidget, Image, State, Widget
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.api import users
@@ -65,30 +65,18 @@ class ModelsUnitTests(unittest.TestCase):
         self.assertEqual(o.raw, "Some code here")
         self.assertEqual(o.prams, "Some JsonProperties here")
 
-    def test_InputView_Class(self):
-        """Test InputViewWidget Class."""
-        o = InputView()
-        o.name = "The name"
-        o.classifier = "none"
-        o.html = "The inner html"
-        self.assertEqual(o.name, "The name")
-        self.assertEqual(o.classifier, "none")
-        self.assertEqual(o.html, "The inner html")
-
     def test_State_Class(self):
         """Test State Class."""
         o = State()
         o.hash_id = "The hash id"
         o.name = "The name"
         o.content = ["The content"]
-        o.input_view = ndb.Key(InputView, 1)
         o.classifier_categories = ["The categories"]
         o.action_sets = [ndb.Key(ActionSet, 2)]
         o.classifier_params = ["The params"]
         self.assertEqual(o.hash_id, "The hash id")
         self.assertEqual(o.name, "The name")
         self.assertEqual(o.content, ["The content"])
-        self.assertEqual(o.input_view, ndb.Key(InputView, 1))
         self.assertEqual(o.classifier_categories, ["The categories"])
         self.assertEqual(o.action_sets, [ndb.Key(ActionSet, 2)])
         self.assertEqual(o.classifier_params, ["The params"])

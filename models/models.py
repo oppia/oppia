@@ -83,7 +83,7 @@ class State(ndb.Model):
     # The content displayed to the reader in this state.
     content = ndb.JsonProperty(repeated=True)
     # The input view corresponding to this state.
-    input_view = ndb.KeyProperty(kind=InputView, required=True)
+    input_view = ndb.KeyProperty(kind=InputView)
     # The categories (different buckets) associated with the state's classifier.
     classifier_categories = ndb.StringProperty(repeated=True)
     # The action sets corresponding to the categories associated with the state.
@@ -93,15 +93,17 @@ class State(ndb.Model):
     classifier_params = ndb.StringProperty(repeated=True)
     # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
+    # The classifier corresponding to the interactive widget.
+    classifier = ndb.StringProperty()
     # Rulesets for the interactive widget. Each ruleset is a key-value pair: the key
     # is the name of the reader's action (submit, click, etc.) and the value is a list
-    # of tuples. Each tuple represents an answer category, and contains six elements:
-    # - the raw classification rule
-    # - parameters for that classification rule
-    # - the actual Python code to check whether the answer satisfies the category
-    # - the destination state or exploration
-    # - feedback text
-    # - parameter changes
+    # of rules, each represented as a dict with six elements:
+    # - rule: the raw classification rule
+    # - inputs: parameters for that classification rule
+    # - code: the actual Python code to check whether the answer satisfies the category
+    # - dest: the destination state or exploration
+    # - feedback: feedback text
+    # - param_changes: parameter changes
     # TODO(sll): Implement the Python code and parameter changes parts (the rest are done).
     # TODO(sll): Add validation.
     interactive_rulesets = ndb.JsonProperty()

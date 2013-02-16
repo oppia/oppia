@@ -30,6 +30,8 @@ END_DEST = '-1'
 
 def GetStateAsDict(state):
     """Gets a Python dict representation of a state."""
+    raise Exception('This method must be reimplemented.')
+
     category_list = state.classifier_categories
     return {
         'content': state.content,
@@ -98,8 +100,8 @@ class ExplorationPage(BaseHandler):
         state = utils.CreateNewState(exploration, state_name)
 
         self.response.out.write(json.dumps({
-            'classifier': state.input_view.get().classifier,
-            'inputType': state.input_view.get().name,
+            # 'classifier': state.input_view.get().classifier,
+            # 'inputType': state.input_view.get().name,
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
@@ -241,8 +243,8 @@ class StatePage(BaseHandler):
 
         values = {
             'actions': [],
-            'classifier': state.input_view.get().classifier,
-            'inputType': state.input_view.get().name,
+            # 'classifier': state.input_view.get().classifier,
+            # 'inputType': state.input_view.get().name,
             'interactiveWidget': state.interactive_widget,
             'interactiveRulesets': state.interactive_rulesets,
             'interactiveParams': state.interactive_params,
@@ -272,7 +274,7 @@ class StatePage(BaseHandler):
                 action['dest'] = action_set.dest.get().hash_id
             values['actions'].append(action)
 
-        values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
+        # values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
 
         self.response.out.write(json.dumps(values))
 
@@ -289,11 +291,11 @@ class StateHandler(BaseHandler):
             # The user has uploaded a YAML file. Process only this action.
             dests_array = utils.ModifyStateUsingDict(
                 exploration, state, utils.GetDictFromYaml(yaml_file))
-            input_view = state.input_view.get()
+            # input_view = state.input_view.get()
             self.response.out.write(json.dumps({
                 'classifier': input_view.classifier,
                 'explorationId': exploration.hash_id,
-                'inputType': input_view.name,
+                # 'inputType': input_view.name,
                 'state': {'desc': state.name, 'dests': dests_array},
                 'stateContent': state.content,
             }))
@@ -304,6 +306,8 @@ class StateHandler(BaseHandler):
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
         state_content_json = self.request.get('state_content')
+
+        # These two fields are obsolete and should be ignored.
         input_type = self.request.get('input_type')
         actions_json = self.request.get('actions')
 
@@ -326,79 +330,55 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets_json:
             state.interactive_rulesets = json.loads(interactive_rulesets_json)
-            # TODO(sll): Do additional calculations here to get the actual
-            # Python rule, as well as the parameter changes.
+            # TODO(sll): Do additional calculations here to get the parameter changes,
+            # if necessary.
+            ruleset = state.interactive_rulesets['submit']
+            for rule_ind in range(len(ruleset)):
+                rule = ruleset[rule_ind]
+
+                # Change the dest into the state id.
+                # TODO(sll): This should be done in the frontend instead.
+                state_name = rule['dest']
+                if state_name == 'END':
+                    rule['dest'] = '-1'
+                else:
+                    rule['dest'] = State.query().filter(State.name == state_name).get().hash_id
+
+                # Generate the code to be executed.
+                if 'attrs' not in rule or 'classifier' not in rule['attrs']:
+                    # This is the default rule.
+                    assert rule_ind == len(ruleset) - 1
+                    rule['code'] = 'True'
+                    continue
+
+                classifier_func = rule['attrs']['classifier'].replace(' ', '')
+                first_bracket = classifier_func.find('(')
+                result = 'Classifier.' + classifier_func[: first_bracket + 1]
+
+                # Add the 'answer' variable.
+                result += 'answer'
+    
+                params = classifier_func[first_bracket + 1 : -1].split(',')
+                for param in params:
+                    if param not in rule['inputs']:
+                        raise self.InvalidInputException(
+                            'Parameter %s could not be replaced.' % param)
+                    result += ','
+
+                    # IMPORTANT TODO(sll): The following is a hack for text input. Should call a 
+                    # pre-converter method to convert the answer and the parameters
+                    # into the appropriate type for the classifier according to the relevant
+                    # validation rules. (Don't forget to escape quotes in strings, handle 
+                    # parameter replacements, etc.)
+                    result += '\'' + rule['inputs'][param] + '\''
+                result += ')'
+                rule['code'] = result
+                logging.info(result)
 
         if state_content_json:
             state_content = json.loads(state_content_json)
             state.content = [{'type': item['type'], 'value': item['value']}
                              for item in state_content]
-
-        if input_type:
-            input_view = InputView.gql(
-                'WHERE name = :name', name=input_type).get()
-            if input_view is None:
-                raise self.InvalidInputException(
-                    'Invalid input type: %s', input_type)
-            state.input_view = input_view.key
-
-        # TODO(sll): Check that 'actions' is properly formatted.
-        if actions_json:
-            actions = json.loads(actions_json)
-            classifier_categories = [action['category'] for action in actions]
-
-            input_view = state.input_view.get()
-            if (input_view.classifier not in ['none', 'finite'] and
-                classifier_categories[-1] != utils.DEFAULT_CATEGORY):
-                raise utils.InvalidCategoryError(
-                    'The last category in %s should be "%s".',
-                    classifier_categories, utils.DEFAULT_CATEGORY)
-            state.classifier_categories = classifier_categories
-
-            # Retrieve the actions corresponding to this state.
-            num_categories = len(state.classifier_categories)
-            while len(state.action_sets) > num_categories:
-                state.action_sets[-1].delete()
-                state.action_sets = state.action_sets[:-1]
-            for i in range(num_categories):
-                try:
-                    action_set = state.action_sets[i].get()
-                except IndexError, e:
-                    action_set = ActionSet(category_index=i)
-                    action_set.put()
-                    state.action_sets.append(action_set.key)
-                # TODO(sll): If the user deletes a category, make sure that the action
-                # set for it is deleted too.
-                # Add each action to the action_set.
-                if 'text' in actions[i]:
-                    action_set.text = actions[i]['text']
-                if 'dest' in actions[i]:
-                    # Note that actions[i]['dest'] is a state's hash_id, or END_DEST
-                    # if this is an END state, or 'q-[exploration_id]' if the destination is
-                    # a different exploration.
-                    if actions[i]['dest'] == END_DEST:
-                        action_set.dest = None
-                    elif str(actions[i]['dest']).startswith('q-'):
-                        try:
-                            dest_exploration = utils.GetEntity(
-                                Exploration, actions[i]['dest'][2:])
-                            action_set.dest_exploration = dest_exploration.key
-                            action_set.dest = dest_exploration.init_state
-                        except utils.EntityIdNotFoundError, e:
-                            raise self.InvalidInputException(
-                                'Destination exploration for state %s not found. Error: %s',
-                                state.name, e)
-                    else:
-                        try:
-                            dest_state = utils.GetEntity(
-                                State, actions[i]['dest'])
-                            action_set.dest_exploration = None
-                            action_set.dest = dest_state.key
-                        except utils.EntityIdNotFoundError, e:
-                            raise self.InvalidInputException(
-                                'Destination exploration for state %s not found. Error: %s',
-                                state.name, e)
-                action_set.put()
 
         state.put()
 

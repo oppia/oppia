@@ -16,19 +16,22 @@
 
 __author__ = 'Sean Lip'
 
+import importlib
 import json
 import logging
 import random
 
-import classifiers
+import classifiers_old
 from controllers.base import BaseHandler
+from controllers.widgets import InteractiveWidget
 import feconf
 from models.models import Exploration, State
-from models.stats import EventHandler, STATS_ENUMS
+from models.stats import EventHandler
 import utils
 
 DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
+DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 
 
 class ExplorationPage(BaseHandler):
@@ -68,24 +71,25 @@ class ExplorationHandler(BaseHandler):
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
+        interactive_widget_html = InteractiveWidget.get_interactive_widget(
+            init_state.interactive_widget, True)['raw']
+
         self.data_values.update({
             'block_number': 0,
-            'default_answer': classifiers.DEFAULT_ANSWER[
-                init_state.input_view.get().classifier],
             'html': init_html,
-            'input_view': init_state.input_view.get().name,
+            'interactive_widget_html': interactive_widget_html,
+            'interactive_params': init_state.interactive_params,
             'state_id': init_state.hash_id,
             'title': exploration.title,
             'widgets': init_widgets,
         })
-        self.data_values['input_template'] = utils.GetInputTemplate(
-            self.data_values['input_view'])
-        if self.data_values['input_view'] == utils.input_views.multiple_choice:
+        if init_state.interactive_widget in DEFAULT_ANSWERS:
+            self.data_values['default_answer'] = DEFAULT_ANSWERS[init_state.interactive_widget]
+        if init_state.interactive_widget == 'MultipleChoiceInput':
             self.data_values['categories'] = init_state.classifier_categories
         self.response.out.write(json.dumps(self.data_values))
 
-        EventHandler.record_event(
-            STATS_ENUMS.exploration_visited, exploration_id)
+        EventHandler.record_exploration_visited(exploration_id)
 
     def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
         """Handles feedback interactions with readers.
@@ -99,56 +103,63 @@ class ExplorationHandler(BaseHandler):
         exploration = utils.GetEntity(Exploration, exploration_id)
         state = utils.GetEntity(State, state_id)
         old_state = state
-        # The reader's answer.
-        response = self.request.get('answer')
-        EventHandler.record_event(STATS_ENUMS.default_case_hit, exploration_id, response)
         # The 0-based index of the last content block already on the page.
         block_number = int(self.request.get('block_number'))
-        category = classifiers.Classify(
-            state.input_view.get().classifier,
-            response,
-            state.classifier_categories)
-        try:
-            action_set = state.action_sets[category].get()
-        except IndexError:
-            # TODO(sll): handle the following error more gracefully. Perhaps use
-            # the default category?
-            logging.error('No action set found for response %s', response)
-            return
 
-        html_output = ''
-        widget_output = []
-        # Append reader's response.
-        if state.input_view.get().classifier == 'finite':
+        # The reader's answer.
+        answer = self.request.get('answer')
+        dest = None
+        feedback = None
+
+        interactive_widget_properties = InteractiveWidget.get_interactive_widget(
+            state.interactive_widget)['actions']['submit']
+
+        if interactive_widget_properties['classifier'] != 'None':
+            # Import the relevant classifier module to be used in eval() below.
+            classifier_module = '.'.join([
+                'classifiers',
+                interactive_widget_properties['classifier'],
+                interactive_widget_properties['classifier']])
+            Classifier = importlib.import_module(classifier_module)
+
+        for ind, rule in enumerate(state.interactive_rulesets['submit']):
+            if ind == len(state.interactive_rulesets['submit']) - 1:
+                EventHandler.record_default_case_hit(exploration_id, answer)
+
+            assert rule['code']
+
+            if eval(rule['code']) == True:
+                dest = rule['dest']
+                feedback = rule['feedback']
+                break
+
+        assert dest
+
+        html_output, widget_output = '', []
+        # Append reader's answer.
+        if interactive_widget_properties['classifier'] == 'MultipleChoiceClassifier':
             html_output = feconf.JINJA_ENV.get_template(
                 'reader_response.html').render(
-                    {'response': state.classifier_categories[int(response)]})
+                    {'response': state.classifier_categories[int(answer)]})
         else:
             html_output = feconf.JINJA_ENV.get_template(
-                'reader_response.html').render({'response': response})
+                'reader_response.html').render({'response': answer})
 
-        if not action_set.dest:
+        if dest == '-1':
             # This leads to a FINISHED state.
-            if action_set.text:
+            if feedback:
                 action_html, action_widgets = utils.ParseContentIntoHtml(
-                    [{'type': 'text', 'value': action_set.text}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
-            EventHandler.record_event(
-                STATS_ENUMS.exploration_completed, exploration_id)
+            EventHandler.record_exploration_completed(exploration_id)
         else:
-            if action_set.dest_exploration:
-                self.redirect('/learn/%s' % action_set.dest_exploration)
-                return
-            else:
-                state = action_set.dest.get()
+            state = utils.GetEntity(State, dest)
 
             # Append Oppia's feedback, if any.
-            # TODO(sll): Rewrite this once the action_set.text becomes a content
-            #     array.
-            if action_set.text:
+            if feedback:
                 action_html, action_widgets = utils.ParseContentIntoHtml(
-                    [{'type': 'text', 'value': action_set.text}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.
@@ -158,20 +169,22 @@ class ExplorationHandler(BaseHandler):
                 html_output += state_html
                 widget_output.append(state_widgets)
 
-        values['default_answer'] = classifiers.DEFAULT_ANSWER[
-                state.input_view.get().classifier]
+        if state.interactive_widget in DEFAULT_ANSWERS:
+            values['default_answer'] = DEFAULT_ANSWERS[state.interactive_widget]
         values['exploration_id'] = exploration.hash_id
         values['state_id'] = state.hash_id
         values['html'] = html_output
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
-        if not action_set.dest:
-            values['input_view'] = utils.input_views.finished
-        else:
-            values['input_view'] = state.input_view.get().name
-            if values['input_view'] == utils.input_views.multiple_choice:
+        if dest:
+            if state.interactive_widget == 'MultipleChoiceInput':
                 values['categories'] = state.classifier_categories
-        values['input_template'] = utils.GetInputTemplate(values['input_view'])
+        values['interactive_widget_html'] = (
+            'Congratulations, you\'ve finished this exploration!')
+        if dest != '-1':
+            values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
+                state.interactive_widget, True)['raw']
+
         utils.Log(values)
         self.response.out.write(json.dumps(values))
 
