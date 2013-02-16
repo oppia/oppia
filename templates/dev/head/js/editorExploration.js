@@ -597,8 +597,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if ($scope.interactiveParams) {
       requestParams['interactive_params'] = JSON.stringify($scope.interactiveParams);
     }
-    if ($scope.interactiveRuleset) {
-      requestParams['interactive_ruleset'] = JSON.stringify($scope.interactiveRuleset);
+    if ($scope.interactiveRulesets) {
+      requestParams['interactive_rulesets'] = JSON.stringify($scope.interactiveRulesets);
     }
 
     var request = $.param(requestParams, true);
@@ -680,13 +680,19 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     F[0].contentWindow.document.close();
   };
 
-  // Stores rules in the form of dicts with two keys: 'rule' (the raw rule
-  // string) and 'inputs' (a list of parameters).
-  $scope.$parent.interactiveRuleset = [];
+  // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
+  // action and the value has several keys:
+  // - 'rule' (the raw rule string)
+  // - 'inputs' (a list of parameters)
+  // - 'attrs' (stuff needed to build the Python classifier code)
+  // - 'dest' (the destination for this rule)
+  // - 'feedback' (any feedback given for this rule)
+  // - 'paramChanges' (parameter changes associated with this rule)
+  $scope.$parent.interactiveRulesets = {};
 
   $scope.$on('stateData', function() {
     var data = stateData.data;
-    $scope.$parent.interactiveRuleset = data.interactiveRuleset;
+    $scope.$parent.interactiveRulesets = data.interactiveRulesets;
     $scope.$parent.interactiveParams = data.interactiveParams;
 
     $http.get('/interactive_widgets/' + data.interactiveWidget).success(
@@ -697,10 +703,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     );
   });
 
-  $scope.openAddRuleModal = function(action) {
-    $scope.addRuleAction = action;
-  };
-
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;
@@ -709,11 +711,31 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   };
 
   $scope.deselectAllRules = function() {
+    $scope.addRuleActionIndex = null;
     $scope.addRuleActionRule = null;
     $scope.addRuleActionAttrs = null;
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
     $scope.addRuleActionFeedback = null;
+  };
+
+  $scope.openAddRuleModal = function(action) {
+    $scope.addRuleModalTitle = 'Add Rule';
+    $scope.addRuleAction = action;
+    $scope.addRuleActionIndex = null;
+  };
+
+  $scope.openEditRuleModal = function(action, index) {
+    $scope.addRuleModalTitle = 'Edit Rule';
+    $scope.addRuleAction = action;
+
+    $scope.addRuleActionIndex = index;
+    var rule = $scope.interactiveRulesets[action][index];
+    $scope.addRuleActionRule = rule.rule;
+    $scope.addRuleActionAttrs = rule.attrs;
+    $scope.addRuleActionInputs = rule.inputs;
+    $scope.addRuleActionDest = rule.dest;
+    $scope.addRuleActionFeedback = rule.feedback;
   };
 
   $('#addRuleModal').on('hide', function() {
@@ -750,12 +772,23 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
       console.log(result);
 
       if (!bad) {
-        $scope.$parent.interactiveRuleset.push({
+        var finalRuleset = {
             rule: $scope.addRuleActionRule,
+            attrs: $scope.addRuleActionAttrs,
             inputs: $scope.addRuleActionInputs,
             dest: $scope.addRuleActionDest,
             feedback: $scope.addRuleActionFeedback
-        });
+        };
+
+        if (!$scope.$parent.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
+          $scope.$parent.interactiveRulesets[$scope.addRuleAction] = [];
+        }
+
+        if ($scope.addRuleActionIndex) {
+          $scope.$parent.interactiveRulesets[$scope.addRuleAction][$scope.addRuleActionIndex] = finalRuleset;
+        } else {
+          $scope.$parent.interactiveRulesets[$scope.addRuleAction].push(finalRuleset);
+        }
         $scope.saveInteractiveWidget();
       }
     }
@@ -763,6 +796,19 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     $scope.addRuleAction = null;
     $scope.deselectAllRules();
   });
+
+  $scope.swapRules = function(action, index1, index2) {
+    $scope.tmpRule = $scope.$parent.interactiveRulesets[action][index1];
+    $scope.$parent.interactiveRulesets[action][index1] = $scope.$parent.interactiveRulesets[action][index2];
+    $scope.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
+
+    $scope.saveInteractiveWidget();
+  };
+
+  $scope.deleteRule = function(action, index) {
+    $scope.$parent.interactiveRulesets[action].splice(index, 1);
+    $scope.saveInteractiveWidget();
+  };
 
   $('#interactiveWidgetModal').on('hide', function() {
     // Reload the iframe.
@@ -777,7 +823,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
       $scope.$parent.interactiveWidget = arg.data.widget;
       $scope.$parent.interactiveParams = {};
-      $scope.$parent.interactiveRuleset = [];
+      $scope.$parent.interactiveRulesets = {};
     }
     $scope.saveInteractiveWidget();
   });

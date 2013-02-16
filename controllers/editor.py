@@ -244,7 +244,7 @@ class StatePage(BaseHandler):
             'classifier': state.input_view.get().classifier,
             'inputType': state.input_view.get().name,
             'interactiveWidget': state.interactive_widget,
-            'interactiveRuleset': state.interactive_ruleset,
+            'interactiveRulesets': state.interactive_rulesets,
             'interactiveParams': state.interactive_params,
             'stateId': state.hash_id,
             'stateName': state.name,
@@ -302,7 +302,7 @@ class StateHandler(BaseHandler):
         state_name = self.request.get('state_name')
         interactive_widget = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
-        interactive_ruleset_json = self.request.get('interactive_ruleset')
+        interactive_rulesets_json = self.request.get('interactive_rulesets')
         state_content_json = self.request.get('state_content')
         input_type = self.request.get('input_type')
         actions_json = self.request.get('actions')
@@ -324,8 +324,8 @@ class StateHandler(BaseHandler):
         if interactive_params_json:
             state.interactive_params = json.loads(interactive_params_json)
 
-        if interactive_ruleset_json:
-            state.interactive_ruleset = json.loads(interactive_ruleset_json)
+        if interactive_rulesets_json:
+            state.interactive_rulesets = json.loads(interactive_rulesets_json)
             # TODO(sll): Do additional calculations here to get the actual
             # Python rule, as well as the parameter changes.
 

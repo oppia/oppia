@@ -85,8 +85,24 @@
                 <div ng-repeat="action in interactiveWidget.actions">
                   <h4><[action.type]></h4>
                   <ul>
-                    <li ng-repeat="rule in interactiveRuleset">
+                    <li ng-repeat="rule in interactiveRulesets[action]">
                       <[rule | parameterizeRule ]>: (<[rule.dest]>, <[rule.feedback]>)
+                      <span class="pull-right">
+                        <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
+                          Edit
+                        </a> |
+                        <span ng-show="$index != 0">
+                          <a ng-click="swapRules(action, $index, $index - 1)"> ⇑ </a>
+                          |
+                        </span>
+                        <span ng-show="$index != interactiveRulesets[action].length - 1">
+                          <a ng-click="swapRules(action, $index, $index + 1)"> ⇓ </a>
+                          |
+                        </span>
+                        <a ng-click="deleteRule(action, $index)">
+                          Delete
+                        </a>
+                      </span>
                     </li>
                   </ul>
                   <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -103,9 +119,11 @@
                     <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
                   </div>
                   <div class="modal-body">
-                    <!-- TODO(sll): Code this. -->
-                    TODO
-                    <[interactiveWidget]>
+                    <h4>[This is work in progress. It doesn't work yet.]</h4>
+                    <div ng-repeat="(key, val) in interactiveWidget.params">
+                      <!-- TODO(sll): Complete this. -->
+                      <[key]>: <input type="text" ng-model="val">
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn" data-dismiss="modal">Save</button>
@@ -138,7 +156,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                       &times;
                     </button>
-                    <h3 id="addRuleModalLabel">Add Rule</h3>
+                    <h3><[addRuleModalTitle]></h3>
                   </div>
                   <div class="modal-body">
                     <h4><[addRuleAction.type]></h4>
@@ -179,23 +197,27 @@
 
                   </div>
                   <div class="modal-footer">
-
-                    <div ng-hide="addRuleActionRule">
-                      <button type="button" class="btn" data-dismiss="modal">
-                        Cancel
-                      </button>
-                    </div>
-
-                    <div ng-show="addRuleActionRule">
+                    <span ng-show="addRuleActionRule">
                       <button type="button" class="btn" data-dismiss="modal">
                         Save
                       </button>
+                    </span>
+
+                    <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
+                    returns to the 'previous' screen only when a new rule is being added. Otherwise, the modal
+                    should just be dismissed. -->
+                    <span ng-show="addRuleActionRule && addRuleActionIndex == null">
                       <button type="button" class="btn"
                               ng-click="deselectAllRules()">
                         Cancel
                       </button>
-                    </div>
+                    </span>
 
+                    <span ng-show="!addRuleActionRule && addRuleActionIndex == null">
+                      <button type="button" class="btn" data-dismiss="modal">
+                        Cancel
+                      </button>
+                    </span>
                   </div>
                 </div>
 
