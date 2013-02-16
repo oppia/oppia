@@ -1,0 +1,21 @@
+# The system name for this widget.
+id: MultipleChoiceInput
+
+# The human-readable name of the widget.
+name: Multiple choice input
+# The category the widget falls under in the widget repository.
+category: Interactive
+# A description of the widget.
+description: |
+  A multiple-choice input widget.
+
+# Actions that the reader can perform on this widget which trigger a feedback
+# interaction.
+actions:
+  submit:
+    classifier: MultipleChoiceClassifier
+
+# Customization parameters and their default values.
+params:
+  choices:
+  - Default choice

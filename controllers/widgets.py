@@ -207,8 +207,10 @@ class InteractiveWidget(BaseHandler):
         widget_js = ''
         if widget_id in os.listdir('widgets'):
             html_file = '%s/%s.html' % (widget_id, widget_id)
+            widget_params = widget['params']
+            widget_params['root'] = 'widgets/%s/static' % widget_id
             widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                html_file).render({'root': 'widgets/%s/static' % widget_id})
+                html_file).render(widget_params)
             # For now, remove the interactivity.
             # with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
             #     widget_js = '<script>%s</script>' % f.read().decode('utf-8')

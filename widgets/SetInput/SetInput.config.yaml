@@ -1,0 +1,19 @@
+# The system name for this widget.
+id: SetInput
+
+# The human-readable name of the widget.
+name: Set input
+# The category the widget falls under in the widget repository.
+category: Interactive
+# A description of the widget.
+description: |
+  A very basic set input widget. (NOTE: Does not work yet.)
+
+# Actions that the reader can perform on this widget which trigger a feedback
+# interaction.
+actions:
+  submit:
+    classifier: SetClassifier
+
+# Customization parameters and their default values.
+params: {}

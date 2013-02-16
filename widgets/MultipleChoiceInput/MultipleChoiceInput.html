@@ -1,0 +1,11 @@
+<div ng-controller="MultipleChoiceInput">
+  <form ng-submit="submitAnswer()">
+  	{% for choice in choices %}
+      <label class="radio">
+        <input type="radio" class="answer" name="answer" ng-model="answer" value="{{loop.index}}" id="{{loop.index}}" required>
+        {{choice}}
+      </label>
+    {% endfor %}
+    <button type="submit">Submit</button>
+  </form>
+</div>
