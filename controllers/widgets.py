@@ -112,6 +112,9 @@ class WidgetRepositoryHandler(BaseHandler):
         """Load interactive widgets from the file system."""
         response = {}
         for widget_id in os.listdir('widgets/'):
+            # TODO(sll): Remove this when third-party imports are handled properly.
+            if widget_id == 'MusicStaff':
+                continue
             widget = InteractiveWidget.get_interactive_widget(widget_id)
             category = widget['category']
             if category not in response:

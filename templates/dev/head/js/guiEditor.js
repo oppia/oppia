@@ -13,6 +13,33 @@ oppia.directive('unfocusStateContent', function(activeInputData) {
   };
 });
 
+// Makes the corresponding elements sortable.
+// TODO(sll): This directive doesn't actually update the underlying array,
+// so ui-sortable still needs to be used. Try and fix this.
+oppia.directive('sortable', function($compile) {
+  return {
+    restrict: 'C',
+    link: function(scope, element, attrs) {
+      $(element).sortable({
+        scroll: false,
+        stop: function(event, ui) {
+          if ($(ui.item).hasClass('oppia-state-text-item')) {
+            // This prevents a collision with the itemDroppable trashing.
+            for (var i = 0; i < scope.stateContent.length; ++i) {
+              if (scope.stateContent[i] === undefined) {
+                scope.stateContent.splice(i, 1);
+                --i;
+              }
+            }
+            scope.saveStateChange('stateContent');
+            scope.$apply();
+          }
+        }
+      });
+    }
+  };
+});
+
 function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.

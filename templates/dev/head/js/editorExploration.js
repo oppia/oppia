@@ -87,7 +87,7 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
   // Put state variables here.
   var stateData = {};
 
-  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  // The pathname should be: .../create/{exploration_id}[#...]
   var explorationUrl = '/create/' + pathnameArray[2];
 
   /**
@@ -104,6 +104,7 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
             success(function(data) {
               obj.data = data;
               console.log(data);
+              obj.stateId = data.stateId;
               obj.stateName = data.stateName;
               obj.stateContent = data.stateContent;
               obj.inputType = data.inputType;
@@ -115,6 +116,40 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
             error(function(data) {
               warningsData.addWarning('Server error: ' + data.error);
             });
+  };
+
+  stateData.get = function(stateId, property) {
+    // Gets a value locally.
+    if (stateData.stateId == stateId && stateData.hasOwnProperty(property)) {
+      return stateData[property];
+    } else {
+      // TODO(sll): This should get a value from explorationData or from the
+      // backend if needed. Maybe periodic pings to the backend are important if
+      // multiple people are editing the same exploration.
+      warningsData.addWarning('Property ' + property + ' not found.');
+    }
+  };
+
+  stateData.put = function(stateId, property, value) {
+    // Saves data locally and puts it into the backend. Sole point of
+    // communication between frontend and backend.
+    // TODO(sll): Implement this fully. It should update the frontend as well
+    // as explorationData and the backend.
+    var requestParams = {};
+    if (property == 'stateName') {
+      requestParams['state_name'] = value;
+    }
+    var request = $.param(requestParams, true);
+
+    $http.put(
+        explorationUrl + '/' + stateId + '/data',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+      console.log('Changes to this state were saved successfully.');
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error communicating with server.');
+    });
   };
 
   stateData.broadcastState = function() {
@@ -215,6 +250,62 @@ function ExplorationTab($scope) {
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
     stateData, explorationData, warningsData, activeInputData) {
+
+  $scope.saveStateName = function() {
+    if (!$scope.isValidEntityName($scope.stateName, true))
+      return;
+    if ($scope.isDuplicateInput(
+            $scope.states, 'desc', $scope.stateId, $scope.stateName)) {
+      warningsData.addWarning(
+          'The name \'' + $scope.stateName + '\' is already in use.');
+      return;
+    }
+
+    $scope.states[$scope.stateId].desc = $scope.stateName;
+    $scope.saveStateChange('states');
+    stateData.put($scope.stateId, 'stateName', $scope.stateName);
+    activeInputData.clear();
+  };
+
+
+  /**
+   * Saves a change to a state property.
+   * @param {String} property The state property to be saved.
+   */
+  $scope.saveStateChange = function(property) {
+    if (!$scope.stateId)
+      return;
+    activeInputData.clear();
+
+    var requestParams = {
+        state_id: $scope.stateId,
+        state_name: $scope.stateName,
+        interactive_widget: $scope.interactiveWidget.id
+    };
+    if ($scope.stateContent) {
+      requestParams['state_content'] = JSON.stringify($scope.stateContent);
+    }
+    if ($scope.interactiveParams) {
+      requestParams['interactive_params'] = JSON.stringify($scope.interactiveParams);
+    }
+    if ($scope.interactiveRulesets) {
+      requestParams['interactive_rulesets'] = JSON.stringify($scope.interactiveRulesets);
+    }
+
+    var request = $.param(requestParams, true);
+
+    $http.put(
+        $scope.explorationUrl + '/' + $scope.stateId + '/data',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+      console.log('Changes saved successfully.');
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error communicating with server.');
+    });
+  };
+
+
 
   /********************************************
   * Methods affecting the URL location hash.
@@ -470,22 +561,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.states[$scope.stateId].dests = data.actions;
   });
 
-  $scope.saveStateName = function() {
-    if (!$scope.isValidEntityName($scope.stateName, true))
-      return;
-    if ($scope.isDuplicateInput(
-            $scope.states, 'desc', $scope.stateId, $scope.stateName)) {
-      warningsData.addWarning(
-          'The name \'' + $scope.stateName + '\' is already in use.');
-      return;
-    }
-
-    $scope.states[$scope.stateId].desc = $scope.stateName;
-    $scope.saveStateChange('states');
-    $scope.saveStateChange('stateName');
-    activeInputData.clear();
-  };
-
   // Deletes the state with id stateId. This action cannot be undone.
   // TODO(sll): Add an 'Are you sure?' prompt. Later, allow undoing of the
   // deletion.
@@ -525,44 +600,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       // not require a stateId.
       $scope.saveStateChange('states');
       explorationData.getData();
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
-  };
-
-
-  /**
-   * Saves a change to a state property.
-   * @param {String} property The state property to be saved.
-   */
-  $scope.saveStateChange = function(property) {
-    if (!$scope.stateId)
-      return;
-    activeInputData.clear();
-
-    var requestParams = {
-        state_id: $scope.stateId,
-        state_name: $scope.stateName,
-        interactive_widget: $scope.interactiveWidget.id
-    };
-    if ($scope.stateContent) {
-      requestParams['state_content'] = JSON.stringify($scope.stateContent);
-    }
-    if ($scope.interactiveParams) {
-      requestParams['interactive_params'] = JSON.stringify($scope.interactiveParams);
-    }
-    if ($scope.interactiveRulesets) {
-      requestParams['interactive_rulesets'] = JSON.stringify($scope.interactiveRulesets);
-    }
-
-    var request = $.param(requestParams, true);
-
-    $http.put(
-        $scope.explorationUrl + '/' + $scope.stateId + '/data',
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      console.log('Changes saved successfully.');
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
@@ -642,17 +679,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   // - 'dest' (the destination for this rule)
   // - 'feedback' (any feedback given for this rule)
   // - 'paramChanges' (parameter changes associated with this rule)
-  $scope.$parent.$parent.interactiveRulesets = {};
+  $scope.$parent.interactiveRulesets = {};
 
   $scope.$on('stateData', function() {
     var data = stateData.data;
-    $scope.$parent.$parent.interactiveRulesets = data.interactiveRulesets;
-    $scope.$parent.$parent.interactiveParams = data.interactiveParams;
+    $scope.$parent.interactiveRulesets = data.interactiveRulesets;
+    $scope.$parent.interactiveParams = data.interactiveParams;
 
     $http.get('/interactive_widgets/' + data.interactiveWidget).success(
       function(widgetData) {
         $scope.fillFrame('interactiveWidgetPreview', widgetData.widget.raw);
-        $scope.$parent.$parent.interactiveWidget = widgetData.widget;
+        $scope.$parent.interactiveWidget = widgetData.widget;
       }
     );
   });
@@ -684,7 +721,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     $scope.addRuleAction = action;
 
     $scope.addRuleActionIndex = index;
-    var rule = $scope.interactiveRulesets[action][index];
+    var rule = $scope.$parent.interactiveRulesets[action][index];
     $scope.addRuleActionRule = rule.rule;
     $scope.addRuleActionAttrs = rule.attrs;
     $scope.addRuleActionInputs = rule.inputs;
@@ -710,7 +747,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
         };
 
         if (!$scope.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
-          $scope.$parent.$parent.interactiveRulesets[$scope.addRuleAction] = [];
+          $scope.$parent.interactiveRulesets[$scope.addRuleAction] = [];
         }
 
         var rules = $scope.interactiveRulesets[$scope.addRuleAction];
@@ -730,15 +767,15 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $scope.swapRules = function(action, index1, index2) {
     $scope.tmpRule = $scope.$parent.interactiveRulesets[action][index1];
-    $scope.$parent.$parent.interactiveRulesets[action][index1] =
+    $scope.$parent.interactiveRulesets[action][index1] =
         $scope.$parent.interactiveRulesets[action][index2];
-    $scope.$parent.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
+    $scope.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();
   };
 
   $scope.deleteRule = function(action, index) {
-    $scope.$parent.$parent.interactiveRulesets[action].splice(index, 1);
+    $scope.$parent.interactiveRulesets[action].splice(index, 1);
     $scope.saveInteractiveWidget();
   };
 
@@ -752,10 +789,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   $scope.$on('message', function(event, arg) {
     $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    if ($scope.interactiveWidget.id != arg.data.widget.id) {
-      $scope.$parent.$parent.interactiveWidget = arg.data.widget;
-      $scope.$parent.$parent.interactiveParams = {};
-      $scope.$parent.$parent.interactiveRulesets = {'submit': [{
+    console.log($scope.$parent.interactiveWidget);
+    if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
+      $scope.$parent.interactiveWidget = arg.data.widget;
+      $scope.$parent.interactiveParams = {};
+      $scope.$parent.interactiveRulesets = {'submit': [{
           'rule': 'Default',
           'attrs': {},
           'inputs': {},
@@ -768,6 +806,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   });
 
   $scope.saveInteractiveWidget = function() {
+    $scope.$parent.$parent.interactiveWidget = $scope.$parent.interactiveWidget;
+    $scope.$parent.$parent.interactiveRulesets = $scope.$parent.interactiveRulesets;
+    $scope.$parent.$parent.interactiveParams = $scope.$parent.interactiveParams;
     $scope.saveStateChange('interactiveWidget');
   };
 }
