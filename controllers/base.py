@@ -31,6 +31,7 @@ from google.appengine.api import users
 
 
 # The JS and CSS code to include in the header of each response.
+# TODO(sll): Cache these so that they aren't recomputed each time.
 JS_LIB_CODE = '\n'.join([
     utils.GetFileContents(feconf.THIRD_PARTY_DIR, filepath)
     for filepath in feconf.THIRD_PARTY_JS_LIBS])
