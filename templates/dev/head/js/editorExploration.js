@@ -49,88 +49,51 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   var explorationUrl = '/create/' + pathnameArray[2];
   var Exploration = $resource('/create/:explorationId/data');
 
-  explorationData.getData = function() {
-    console.log('Getting exploration data');
+  // There should be one GET request made for Exploration when the editor page
+  // is initially loaded. This results in a broadcast that will initialize the
+  // relevant frontend controllers.
+  // Any further GET requests will be state-specific and will be obtained by
+  // calling getStateData(stateId).
+  // Thereafter, any updates to the model would be PUT by calling
+  // saveStateData(). This would send a PUT request to the backend to update the
+  // backend model. On success, it will update the model stored here, too.
 
-/*
-  TODO(sll): Reinstate the commented-out code below once we have implemented
-  setData(), which updates the frontend version.
+  // TODO(sll): Find a fix for multiple users editing the same exploration
+  // concurrently.
 
-    if (explorationData.hasOwnProperty('data')) {
-      explorationData.broadcastExploration();
-    } else {
-*/
-      // Retrieve data from the server.
-      console.log('Retrieving exploration data from the server');
-      explorationData.data = Exploration.get(
-        {explorationId: pathnameArray[2]}, function() {
-          console.log(explorationData);
-
-          explorationData.broadcastExploration();
-        }, function(errorResponse) {
-          warningsData.addWarning('Server error: ' + errorResponse.error);
-        });
-  /*
-    }
-  */
+  explorationData.getData = function(successCallback) {
+    // Retrieve data from the server.
+    console.log('Retrieving exploration data from the server');
+    explorationData.data = Exploration.get(
+      {explorationId: pathnameArray[2]}, function() {
+        explorationData.broadcastExploration();
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        warningsData.addWarning('Server error: ' + errorResponse.error);
+      });
   };
 
   explorationData.broadcastExploration = function() {
+    console.log(explorationData);
     $rootScope.$broadcast('explorationData');
   };
 
-  return explorationData;
-});
-
-
-oppia.factory('stateData', function($rootScope, $http, warningsData) {
-  // Put state variables here.
-  var stateData = {};
-
-  // The pathname should be: .../create/{exploration_id}[#...]
-  var explorationUrl = '/create/' + pathnameArray[2];
-
-  /**
-   * Gets the data for a particular state.
-   * @param {string} stateId The id of the state to get the data for.
-   */
-  // TODO(sll): Get this from the frontend if is already there.
-  stateData.getData = function(stateId) {
-    var obj = this;
-    console.log('Getting state data');
-    $http.post(
-        explorationUrl + '/' + stateId, '',
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              obj.data = data;
-              console.log(data);
-              obj.stateId = data.stateId;
-              obj.stateName = data.stateName;
-              obj.stateContent = data.stateContent;
-              obj.inputType = data.inputType;
-              obj.classifier = data.classifier;
-              obj.yaml = data.yaml;
-
-              obj.broadcastState();
-            }).
-            error(function(data) {
-              warningsData.addWarning('Server error: ' + data.error);
-            });
+  explorationData.getStateData = function(stateId) {
+    // TODO(sll): If it doesn't exist, make a backend call.
+    console.log('Getting state data for state ' + stateId);
+    return explorationData.data.states[stateId];
   };
 
-  stateData.get = function(stateId, property) {
-    // Gets a value locally.
-    if (stateData.stateId == stateId && stateData.hasOwnProperty(property)) {
-      return stateData[property];
-    } else {
-      // TODO(sll): This should get a value from explorationData or from the
-      // backend if needed. Maybe periodic pings to the backend are important if
-      // multiple people are editing the same exploration.
-      warningsData.addWarning('Property ' + property + ' not found.');
-    }
+  explorationData.getStateProperty = function(stateId, property) {
+    console.log('Getting state property ' + property + ' for state ' + stateId);
+    // TODO(sll): If it doesn't exist, make a backend call.
+    // 'property' should be one of stateId, name, widget, dests, content.
+    return explorationData.getStateData(stateId)[property];
   };
 
-  stateData.put = function(stateId, property, value) {
+  explorationData.saveStateProperty = function(stateId, property, value) {
     // Saves data locally and puts it into the backend. Sole point of
     // communication between frontend and backend.
     // TODO(sll): Implement this fully. It should update the frontend as well
@@ -152,11 +115,7 @@ oppia.factory('stateData', function($rootScope, $http, warningsData) {
     });
   };
 
-  stateData.broadcastState = function() {
-    $rootScope.$broadcast('stateData');
-  };
-
-  return stateData;
+  return explorationData;
 });
 
 
@@ -249,21 +208,21 @@ function ExplorationTab($scope) {
 }
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
-    stateData, explorationData, warningsData, activeInputData) {
+    explorationData, warningsData, activeInputData) {
 
   $scope.saveStateName = function() {
     if (!$scope.isValidEntityName($scope.stateName, true))
       return;
     if ($scope.isDuplicateInput(
-            $scope.states, 'desc', $scope.stateId, $scope.stateName)) {
+            $scope.states, 'name', $scope.stateId, $scope.stateName)) {
       warningsData.addWarning(
           'The name \'' + $scope.stateName + '\' is already in use.');
       return;
     }
 
-    $scope.states[$scope.stateId].desc = $scope.stateName;
+    $scope.states[$scope.stateId].name = $scope.stateName;
     $scope.saveStateChange('states');
-    stateData.put($scope.stateId, 'stateName', $scope.stateName);
+    explorationData.saveStateProperty($scope.stateId, 'stateName', $scope.stateName);
     activeInputData.clear();
   };
 
@@ -306,7 +265,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
 
-
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
@@ -345,7 +303,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope.stateId = $scope.initStateId;
       }
       $scope.changeMode($scope.getMode());
-      stateData.getData($scope.stateId);
+      $scope.processStateData(explorationData.getStateData($scope.stateId));
     } else {
       $location.path('');
       explorationData.getData();
@@ -368,20 +326,22 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   $scope.$on('explorationData', function() {
     var data = explorationData.data;
-    $scope.states = data.state_list;
+    $scope.states = data.states;
     console.log('Data for exploration page:');
     console.log(data);
     $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
-    $scope.questions = data.exploration_list;
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
-    //$scope.parameters = data.parameters;//TODO(yanamal): get parameters from serever side
+    //$scope.parameters = data.parameters; //TODO(yanamal): get parameters from server side
     $scope.parameters = [];
     explorationFullyLoaded = true;
+    if (!$scope.stateId) {
+      $scope.stateId = $scope.initStateId;
+    }
     if ($scope.stateId) {
-      stateData.getData($scope.stateId);
+      $scope.processStateData(explorationData.getStateData($scope.stateId));
     }
   });
 
@@ -490,7 +450,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       return;
     }
     for (var id in $scope.states) {
-      if (id != $scope.stateId && $scope.states[id]['desc'] == newStateName) {
+      if (id != $scope.stateId && $scope.states[id]['name'] == newStateName) {
         warningsData.addWarning('A state with this name already exists.');
         return;
       }
@@ -504,7 +464,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             success(function(data) {
               $scope.addStateLoading = false;
               $scope.states[data.stateId] = {
-                  desc: data.stateName,
+                  name: data.stateName,
                   dests: [{'category': '', 'dest': END_DEST, 'text': ''}]
               };
               $scope.saveStateChange('states');
@@ -544,22 +504,14 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    * Sets up the state editor, given its data from the backend.
    * @param {Object} data Data received from the backend about the state.
    */
-  $scope.$on('stateData', function() {
-    var data = stateData.data;
-
-    var prevStateId = $scope.stateId;
+  $scope.processStateData = function(data) {
     $scope.stateId = data.stateId;
-    var variableList = ['stateName', 'stateContent', 'states'];
-    for (var i = 0; i < variableList.length; ++i) {
-      // Exclude 'states', because it is not returned from the backend.
-      if (variableList[i] != 'states') {
-        $scope[variableList[i]] = data[variableList[i]];
-      }
-    }
-    $scope.paramChanges = [];//TODO(yanamal): actually take them from back end; change to be per-dest
-    // Update the states using the actions variable.
-    $scope.states[$scope.stateId].dests = data.actions;
-  });
+    $scope.stateContent = data.content;
+    $scope.stateName = data.name;
+
+    //TODO(yanamal): actually take them from back end; change to be per-dest
+    $scope.paramChanges = [];
+  };
 
   // Deletes the state with id stateId. This action cannot be undone.
   // TODO(sll): Add an 'Are you sure?' prompt. Later, allow undoing of the
@@ -663,13 +615,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 }
 
-function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsData) {
-  $scope.fillFrame = function(domId, widgetCode) {
-    var F = $('#' + domId);
-    F[0].contentWindow.document.open();
-    F[0].contentWindow.document.write(widgetCode);
-    F[0].contentWindow.document.close();
-  };
+function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
+  var data = explorationData.getStateData($scope.stateId);
 
   // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
   // action and the value has several keys:
@@ -679,20 +626,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   // - 'dest' (the destination for this rule)
   // - 'feedback' (any feedback given for this rule)
   // - 'paramChanges' (parameter changes associated with this rule)
-  $scope.$parent.interactiveRulesets = {};
-
-  $scope.$on('stateData', function() {
-    var data = stateData.data;
-    $scope.$parent.interactiveRulesets = data.interactiveRulesets;
-    $scope.$parent.interactiveParams = data.interactiveParams;
-
-    $http.get('/interactive_widgets/' + data.interactiveWidget).success(
-      function(widgetData) {
-        $scope.fillFrame('interactiveWidgetPreview', widgetData.widget.raw);
-        $scope.$parent.interactiveWidget = widgetData.widget;
-      }
-    );
-  });
+  $scope.interactiveRulesets = data.widget.rules;
+  $scope.interactiveParams = data.widget.params;
+  $http.get('/interactive_widgets/' + data.widget.id).success(
+    function(widgetData) {
+      $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
+      $scope.interactiveWidget = widgetData.widget;
+    }
+  );
 
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
@@ -721,7 +662,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
     $scope.addRuleAction = action;
 
     $scope.addRuleActionIndex = index;
-    var rule = $scope.$parent.interactiveRulesets[action][index];
+    var rule = $scope.interactiveRulesets[action][index];
     $scope.addRuleActionRule = rule.rule;
     $scope.addRuleActionAttrs = rule.attrs;
     $scope.addRuleActionInputs = rule.inputs;
@@ -731,11 +672,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $('#addRuleModal').on('hide', function() {
     if ($scope.addRuleActionRule) {
-      console.log($scope.addRuleActionRule);
-      console.log($scope.addRuleActionAttrs);
-      console.log($scope.addRuleActionInputs);
-
       var bad = false;
+      // TODO(sll): Do error-checking here.
 
       if (!bad) {
         var finalRuleset = {
@@ -747,7 +685,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
         };
 
         if (!$scope.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
-          $scope.$parent.interactiveRulesets[$scope.addRuleAction] = [];
+          $scope.interactiveRulesets[$scope.addRuleAction] = [];
         }
 
         var rules = $scope.interactiveRulesets[$scope.addRuleAction];
@@ -766,16 +704,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   });
 
   $scope.swapRules = function(action, index1, index2) {
-    $scope.tmpRule = $scope.$parent.interactiveRulesets[action][index1];
-    $scope.$parent.interactiveRulesets[action][index1] =
-        $scope.$parent.interactiveRulesets[action][index2];
-    $scope.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
+    $scope.tmpRule = $scope.interactiveRulesets[action][index1];
+    $scope.interactiveRulesets[action][index1] =
+        $scope.interactiveRulesets[action][index2];
+    $scope.interactiveRulesets[action][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();
   };
 
   $scope.deleteRule = function(action, index) {
-    $scope.$parent.interactiveRulesets[action].splice(index, 1);
+    $scope.interactiveRulesets[action].splice(index, 1);
     $scope.saveInteractiveWidget();
   };
 
@@ -787,13 +725,13 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
-    $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
+    $scope.addContentToIframe('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    console.log($scope.$parent.interactiveWidget);
-    if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
-      $scope.$parent.interactiveWidget = arg.data.widget;
-      $scope.$parent.interactiveParams = {};
-      $scope.$parent.interactiveRulesets = {'submit': [{
+    console.log($scope.interactiveWidget);
+    if ($scope.interactiveWidget.id != arg.data.widget.id) {
+      $scope.interactiveWidget = arg.data.widget;
+      $scope.interactiveParams = {};
+      $scope.interactiveRulesets = {'submit': [{
           'rule': 'Default',
           'attrs': {},
           'inputs': {},
@@ -806,9 +744,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   });
 
   $scope.saveInteractiveWidget = function() {
-    $scope.$parent.$parent.interactiveWidget = $scope.$parent.interactiveWidget;
-    $scope.$parent.$parent.interactiveRulesets = $scope.$parent.interactiveRulesets;
-    $scope.$parent.$parent.interactiveParams = $scope.$parent.interactiveParams;
+    $scope.$parent.$parent.interactiveWidget = $scope.interactiveWidget;
+    $scope.$parent.$parent.interactiveRulesets = $scope.interactiveRulesets;
+    $scope.$parent.$parent.interactiveParams = $scope.interactiveParams;
     $scope.saveStateChange('interactiveWidget');
   };
 }
@@ -817,8 +755,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
-    '$routeParams', 'stateData', 'explorationData', 'warningsData',
-    'activeInputData'];
+    '$routeParams', 'explorationData', 'warningsData', 'activeInputData'];
 ExplorationTab.$inject = ['$scope'];
-InteractiveWidgetPreview.$inject = ['$scope', '$http', '$compile', 'stateData',
-    'warningsData'];
+InteractiveWidgetPreview.$inject = ['$scope', '$http', '$compile', 'warningsData', 'explorationData'];

@@ -41,7 +41,7 @@ oppia.factory('warningsData', function($rootScope) {
    */
   warningsData.deleteWarning = function(index) {
     warningsData.warnings.splice(index, 1);
-  }
+  };
 
   return warningsData;
 });

@@ -1,13 +1,12 @@
-function YamlEditor($scope, $http, $routeParams, stateData, explorationData, warningsData) {
+function YamlEditor($scope, $http, $routeParams, explorationData, warningsData) {
   $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
   $('#editorViewTab a[href="#stateEditor"]').tab('show');
 
   // Initializes the YAML textarea using data from the backend.
-  stateData.getData($scope.stateId);
-  $scope.$on('stateData', function() {
-    $scope.yaml = stateData.yaml;
-  });
+  var data = explorationData.getStateData($scope.stateId);
+  $scope.processStateData(data);
+  $scope.yaml = data.yaml;
 
   /**
    * Saves the YAML representation of a state.
@@ -26,7 +25,7 @@ function YamlEditor($scope, $http, $routeParams, stateData, explorationData, war
               // TODO(sll): Try and do this refresh without requiring an
               // update from the backend.
               // TODO(sll): Update the exploration and graph view.
-              stateData.getData($scope.stateId);
+              $scope.processStateData(explorationData.getStateData($scope.stateId));
             }).error(function(data) {
               warningsData.addWarning(data.error ||
                   'Error: Could not add new state.');
@@ -34,4 +33,4 @@ function YamlEditor($scope, $http, $routeParams, stateData, explorationData, war
   };
 }
 
-YamlEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData', 'explorationData', 'warningsData'];
+YamlEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData', 'warningsData'];

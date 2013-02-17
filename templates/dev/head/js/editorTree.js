@@ -20,7 +20,7 @@ function EditorTree($scope, $http, explorationData) {
   // When the exploration data is loaded, construct the tree.
   $scope.$on('explorationData', function() {
     $scope.treeData = $scope.reformatResponse(
-        explorationData.data.state_list, explorationData.data.init_state_id);
+        explorationData.data.states, explorationData.data.init_state_id);
   });
 
   $scope.truncate = function(text) {
@@ -32,9 +32,9 @@ function EditorTree($scope, $http, explorationData) {
   };
 
   $scope.dfs = function(currStateId, seen, states, priorCategory) {
-    var thisState = {'name': states[currStateId].desc, 'children': [], 'hashId': currStateId};
+    var thisState = {'name': states[currStateId].name, 'children': [], 'hashId': currStateId};
     if (priorCategory) {
-      thisState['name'] = '[' + $scope.truncate(priorCategory) + '] ' + states[currStateId].desc;
+      thisState['name'] = '[' + $scope.truncate(priorCategory) + '] ' + states[currStateId].name;
     }
     for (var i = 0; i < states[currStateId].dests.length; ++i) {
       var destStateId = states[currStateId].dests[i].dest;
@@ -44,7 +44,7 @@ function EditorTree($scope, $http, explorationData) {
             {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
       } else if (seen[destStateId]) {
         thisState['children'].push(
-            {'name': '[' + $scope.truncate(category) + '] ' + states[destStateId].desc,
+            {'name': '[' + $scope.truncate(category) + '] ' + states[destStateId].name,
              'size': 100, 'hashId': destStateId});
       } else {
         seen[destStateId] = true;
@@ -63,7 +63,7 @@ function EditorTree($scope, $http, explorationData) {
 };
 
 
-oppia.directive('stateTreeViz', function (stateData) {
+oppia.directive('stateTreeViz', function () {
   // constants
   var w = 960,
       h = 4000,

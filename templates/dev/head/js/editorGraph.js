@@ -20,7 +20,7 @@ function EditorGraph($scope, $http, explorationData) {
   // When the exploration data is loaded, construct the graph.
   $scope.$on('explorationData', function() {
     $scope.graphData = $scope.reformatResponse(
-        explorationData.data.state_list, explorationData.data.init_state_id);
+        explorationData.data.states, explorationData.data.init_state_id);
   });
 
   // Reformat the model into a response that is processable by d3.js.
@@ -32,7 +32,7 @@ function EditorGraph($scope, $http, explorationData) {
     var nodes = {};
     nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
     for (var state in states) {
-      nodes[state] = {name: states[state].desc, depth: SENTINEL_DEPTH, reachable: false};
+      nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
     }
     nodes[initStateId].depth = 0;
 
@@ -102,10 +102,10 @@ function EditorGraph($scope, $http, explorationData) {
 
     return {nodes: nodeList, links: links, initStateId: initStateId};
   };
-};
+}
 
 
-oppia.directive('stateGraphViz', function (stateData, $location) {
+oppia.directive('stateGraphViz', function() {
   // constants
   var w = 960,
       h = 4000,
@@ -233,7 +233,7 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
             .style('fill', function(d) {
               if (d.hashId == END_DEST) {
                 return 'olive';
-              } else if (d.reachable == false) {
+              } else if (d.reachable === false) {
                 return 'pink';
               } else {
                 return 'beige';
@@ -282,7 +282,7 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
             });
       });
     }
-  }
+  };
 });
 
 /**

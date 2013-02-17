@@ -40,7 +40,7 @@
                     <form ng-submit="addState(newStateDesc, false)">
                       <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add State" required>
                       <datalist id="states">
-                        <option ng-repeat="(id, properties) in states | orderBy:'properties.desc':true" value="<[properties.desc]>"></option>
+                        <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
                       </datalist>
                       <div class="oppia-loading" ng-show="addStateLoading"></div>
                     </form>

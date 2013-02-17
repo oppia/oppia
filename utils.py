@@ -290,7 +290,7 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
         name=init_state_name,
         interactive_rulesets={'submit': [{
             'rule': 'Default',
-            'params': {},
+            'inputs': {},
             'code': '',
             'dest': state_hash_id,
             'feedback': '',
@@ -316,7 +316,7 @@ def CreateNewState(exploration, state_name):
         name=state_name, hash_id=state_hash_id, parent=exploration.key,
         interactive_rulesets={'submit': [{
             'rule': 'Default',
-            'params': {},
+            'inputs': {},
             'code': '',
             'dest': state_hash_id,
             'feedback': '',

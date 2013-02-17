@@ -22,13 +22,6 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.widgetDataUrl = '/widgetrepository/data/';
   $scope.widgetParams = [];
 
-  $scope.fillFrame = function(domId, widgetCode) {
-    var F = $('#' + domId);
-    F[0].contentWindow.document.open();
-    F[0].contentWindow.document.write(widgetCode);
-    F[0].contentWindow.document.close();
-  };
-
   $scope.loadPage = function(data) {
     $scope.widgets = data.widgets;
     console.log(data);
@@ -37,7 +30,7 @@ function WidgetRepository($scope, $http, activeInputData) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
         var rawCode = $scope.widgets[category][i].raw;
         $scope.$apply();
-        $scope.fillFrame(
+        $scope.addContentToIframe(
             'widget-' + category + '-' + i,
             $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
       }
@@ -134,7 +127,7 @@ function WidgetRepository($scope, $http, activeInputData) {
           if ($scope.widgets[category][i].name == widgetData.widget.name) {
             var rawCode = $scope.widgets[category][i].raw;
             $scope.$apply();
-            $scope.fillFrame(
+            $scope.addContentToIframe(
                 'widget-' + category + '-' + i,
                 $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
           }
@@ -197,7 +190,7 @@ function WidgetRepository($scope, $http, activeInputData) {
         $scope.widgets[category][index].params, $scope.customizedParams,
         $scope.widgets[category][index].raw);
     $scope.$apply();
-    $scope.fillFrame('widget-' + category + '-' + index, customizedCode);
+    $scope.addContentToIframe('widget-' + category + '-' + index, customizedCode);
     $scope.closeCustomizeModal();
   };
 

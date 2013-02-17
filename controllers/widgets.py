@@ -16,13 +16,15 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
+import copy
 import os
 
 from controllers.base import BaseHandler, require_user
 import feconf
 from models.models import GenericWidget, Widget
 import utils
+
+import json
 
 from google.appengine.api import users
 
@@ -210,7 +212,7 @@ class InteractiveWidget(BaseHandler):
         widget_js = ''
         if widget_id in os.listdir('widgets'):
             html_file = '%s/%s.html' % (widget_id, widget_id)
-            widget_params = widget['params']
+            widget_params = copy.deepcopy(widget['params'])
             for key in params:
                 widget_params[key] = params[key]
             widget_params['root'] = 'widgets/%s/static' % widget_id

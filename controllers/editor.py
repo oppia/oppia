@@ -153,9 +153,12 @@ class ExplorationHandler(BaseHandler):
             ruleset = state.interactive_rulesets['submit']
             state_destinations = [{'category': rule['rule'], 'dest': rule['dest']}
                                   for rule in ruleset]
-            state_list[state.hash_id] = {
-                'desc': state.name, 'dests': state_destinations
-            }
+            state_list[state.hash_id] = GetStateAsDict(state)
+            state_list[state.hash_id]['dests'] = state_destinations
+            state_list[state.hash_id]['name'] = state.name
+            state_list[state.hash_id]['stateId'] = state.hash_id
+
+        logging.info(state_list)
 
         self.data_values.update({
             'exploration_id': exploration.hash_id,
@@ -165,8 +168,7 @@ class ExplorationHandler(BaseHandler):
             'category': exploration.category,
             'title': exploration.title,
             'owner': str(exploration.owner),
-            'nav_mode': EDITOR_MODE,
-            'state_list': state_list,
+            'states': state_list,
         })
         self.response.out.write(json.dumps(self.data_values))
 
@@ -255,7 +257,7 @@ class StateHandler(BaseHandler):
                 dests_array.append(rule['dest'])
             self.response.out.write(json.dumps({
                 'explorationId': exploration.hash_id,
-                'state': {'desc': state.name, 'dests': dests_array},
+                'state': {'name': state.name, 'dests': dests_array},
                 'stateContent': state.content,
             }))
             return

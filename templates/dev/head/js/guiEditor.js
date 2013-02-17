@@ -40,31 +40,31 @@ oppia.directive('sortable', function($compile) {
   };
 });
 
-function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
   $('#editorViewTab a[href="#stateEditor"]').tab('show');
 
-  // Sets up the state editor, given its data from the backend.
-  $scope.$on('stateData', function() {
-    // If a widget exists, show its compiled version and populate the widget
-    // view fields.
-    for (var i = 0; i < $scope.stateContent.length; ++i) {
-      if ($scope.stateContent[i].type == 'widget') {
-        var widgetFrameId = 'widgetPreview' + i;
-        if ($scope.stateContent[i].value) {
-          $http.get('/widgets/' + $scope.stateContent[i].value).
-              success(function(data) {
-                $scope.widgetCode = data.raw;
-                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-              }).error(function(data) {
-                warningsData.addWarning(
-                    'Widget could not be loaded: ' + String(data.error));
-              });
-        }
+  // Initializes the GuiEditor.
+  var data = explorationData.getStateData($scope.stateId);
+  $scope.processStateData(data);
+  // If a (non-interactive) widget exists, show its compiled version and populate the widget
+  // view fields.
+  for (var i = 0; i < $scope.stateContent.length; ++i) {
+    if ($scope.stateContent[i].type == 'widget') {
+      var widgetFrameId = 'widgetPreview' + i;
+      if ($scope.stateContent[i].value) {
+        $http.get('/widgets/' + $scope.stateContent[i].value).
+            success(function(data) {
+              $scope.widgetCode = data.raw;
+              $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
+            }).error(function(data) {
+              warningsData.addWarning(
+                  'Widget could not be loaded: ' + String(data.error));
+            });
       }
     }
-  });
+  }
 
   $scope.showFeedbackEditor = function(activeInput, categoryId) {
     $scope.initializeNewActiveInput(activeInput);
@@ -80,11 +80,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     } else if (dest == END_DEST) {
       return 'Destination: END';
     } else if (dest in $scope.states) {
-      return 'Destination: ' + $scope.states[dest].desc;
-    } else if (dest.indexOf(QN_DEST_PREFIX) === 0 &&
-               dest.substring(2) in $scope.questions) {
-      return 'Destination question: ' +
-          $scope.questions[dest.substring(2)].desc;
+      return 'Destination: ' + $scope.states[dest].name;
     } else {
       return '[Error: invalid destination]';
     }
@@ -116,7 +112,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     // Find the id in states.
     if (!found) {
       for (var id in $scope.states) {
-        if ($scope.states[id].desc == destName) {
+        if ($scope.states[id].name == destName) {
           found = true;
           $scope.states[$scope.stateId]['dests'][categoryId].dest = id;
           break;
@@ -323,5 +319,5 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData',
-    'explorationData', 'warningsData', 'activeInputData'];
+GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
+    'warningsData', 'activeInputData'];
