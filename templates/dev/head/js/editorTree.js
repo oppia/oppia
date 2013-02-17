@@ -39,7 +39,7 @@ function EditorTree($scope, $http, explorationData) {
     for (var i = 0; i < states[currStateId].dests.length; ++i) {
       var destStateId = states[currStateId].dests[i].dest;
       var category = states[currStateId].dests[i].category;
-      if (destStateId == '-1') {
+      if (destStateId == END_DEST) {
         thisState['children'].push(
             {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
       } else if (seen[destStateId]) {

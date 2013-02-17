@@ -174,7 +174,7 @@ class ExplorationHandler(BaseHandler):
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
 
-        if dest != '-1':
+        if dest != utils.END_DEST:
             values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
                 state.interactive_widget,
                 params=state.interactive_params,

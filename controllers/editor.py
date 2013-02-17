@@ -95,8 +95,6 @@ class ExplorationPage(BaseHandler):
         state = utils.CreateNewState(exploration, state_name)
 
         self.response.out.write(json.dumps({
-            # 'classifier': state.input_view.get().classifier,
-            # 'inputType': state.input_view.get().name,
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
@@ -274,7 +272,7 @@ class StateHandler(BaseHandler):
 
         if state_name:
             # Replace the state name with this one, after checking validity.
-            if state_name == 'END':
+            if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             if (state_name != state.name and utils.CheckExistenceOfName(
                 State, state_name, exploration)):

@@ -16,6 +16,7 @@
 
 import os
 import re
+import shutil
 
 import css_minifier
 
@@ -67,6 +68,7 @@ def ProcessJS(filename, target):
 
 # Script starts here.
 EnsureDirectoryExists(OUT_DIR)
+shutil.rmtree(OUT_DIR)
 for root, dirs, files in os.walk(os.getcwd()):
     if '.git' in root:
         continue

@@ -30,7 +30,7 @@ function EditorGraph($scope, $http, explorationData) {
     var HORIZ_SPACING = 150;
     var VERT_SPACING = 100;
     var nodes = {};
-    nodes['-1'] = {name: 'END', depth: SENTINEL_DEPTH, reachable: false};
+    nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
     for (var state in states) {
       nodes[state] = {name: states[state].desc, depth: SENTINEL_DEPTH, reachable: false};
     }
@@ -226,12 +226,12 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
               }
             })
             .attr('class', function(d) {
-              if (d.hashId != '-1') {
+              if (d.hashId != END_DEST) {
                 return 'clickable';
               }
             })
             .style('fill', function(d) {
-              if (d.hashId == '-1') {
+              if (d.hashId == END_DEST) {
                 return 'olive';
               } else if (d.reachable == false) {
                 return 'pink';
@@ -240,7 +240,7 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
               }
             })
             .on('click', function (d) {
-              if (d.hashId == '-1') {
+              if (d.hashId == END_DEST) {
                 return;
               }
               scope.$parent.$parent.stateId = d.hashId;
@@ -275,7 +275,7 @@ oppia.directive('stateGraphViz', function (stateData, $location) {
             .attr('dx', function(d) { return d.x0 + 20; })
             .attr('dy', function(d) { return d.y0 - 20; })
             .text(function(d) {
-              if (d.hashId == initStateId || d.hashId == '-1') {
+              if (d.hashId == initStateId || d.hashId == END_DEST) {
                 return;
               }
               return 'x';

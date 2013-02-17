@@ -18,10 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var END_DEST = '-1';
+var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
 // TODO(sll): Internationalize these.
-var END_STRING = 'END';
 var GUI_EDITOR_URL = '/gui';
 var YAML_EDITOR_URL = '/text';
 
@@ -429,7 +428,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       warningsData.addWarning('State names may not start with \'[\'.');
       return;
     }
-    if (newStateName.toUpperCase() == 'END') {
+    if (newStateName.toUpperCase() == END_DEST) {
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
     }

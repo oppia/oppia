@@ -19,7 +19,7 @@ oppia.config(function($interpolateProvider) {
 oppia.filter('spacesToUnderscores', function() {
   return function(input) {
     return input.trim().replace(' ', '_');
-  }
+  };
 });
 
 // Factory for handling warnings.

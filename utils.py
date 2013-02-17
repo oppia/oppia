@@ -29,7 +29,7 @@ from models.state import State
 from google.appengine.ext import ndb
 
 
-END_DEST = '-1'
+END_DEST = 'END'
 
 
 def Enum(*sequential, **names):
@@ -457,8 +457,8 @@ def ModifyStateUsingDict(exploration, state, state_dict):
             rule_dict['feedback'] = rule['feedback']
         else:
             rule_dict['feedback'] = None
-        if rule['dest'] == 'END':
-            rule_dict['dest'] = '-1'
+        if rule['dest'] == END_DEST:
+            rule_dict['dest'] = END_DEST
         else:
             dest_state = GetStateByName(rule['dest'], exploration)
             if dest_state:
