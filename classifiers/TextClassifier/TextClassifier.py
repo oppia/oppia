@@ -1,6 +1,6 @@
 def norm(x):
     """Removes spaces and makes all characters of a string lowercase."""
-    return x.replace(' ', '').lower()
+    return unicode(x).replace(' ', '').lower()
 
 
 def Equals(val, x):

@@ -34,7 +34,7 @@ Adios:
       - code: Contains('adios')
         dest: Adios
         feedback: Don't forget your accent marks next time!
-      - code: Contains('adi\xF3s')
+      - code: Contains(u"adi\xF3s")
         dest: END
         feedback: ''
       - code: True
@@ -65,7 +65,7 @@ Colores:
         feedback: Orange and white...not quite
       - code: Equals(2)
         dest: Adios
-        feedback: \xA1S\xED! Las manzanas son rojas y verdes.
+        feedback: "\xA1S\xED! Las manzanas son rojas y verdes."
       - code: Equals(3)
         dest: Colores
         feedback: Yellow and gray? Apples?

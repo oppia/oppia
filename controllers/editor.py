@@ -26,7 +26,6 @@ from models.state import State
 import utils
 
 EDITOR_MODE = 'editor'
-END_DEST = '-1'
 
 
 def GetStateAsDict(state):
@@ -323,12 +322,13 @@ class StateHandler(BaseHandler):
                             'Parameter %s could not be replaced.' % param)
                     result += ','
 
-                    # IMPORTANT TODO(sll): The following is a hack for text input. Should call a 
-                    # pre-converter method to convert the answer and the parameters
-                    # into the appropriate type for the classifier according to the relevant
-                    # validation rules. (Don't forget to escape quotes in strings, handle 
+                    # IMPORTANT TODO(sll): The following is a hack for text
+                    # input. Should call a pre-converter method to convert the
+                    # answer and the parameters into the appropriate type for
+                    # the classifier according to the relevant validation rules.
+                    # (Don't forget to escape quotes in strings, handle
                     # parameter replacements, etc.)
-                    result += '\'' + rule['inputs'][param] + '\''
+                    result += 'u\'' + rule['inputs'][param] + '\''
                 result += ')'
 
                 logging.info(result)

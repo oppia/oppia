@@ -29,7 +29,6 @@ from models.state import State
 from models.stats import EventHandler
 import utils
 
-DEFAULT_CATALOG_CATEGORY_NAME = 'Miscellaneous'
 READER_MODE = 'reader'
 DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 
@@ -38,11 +37,7 @@ class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
     def get(self, exploration_id):  # pylint: disable-msg=C6409
-        """Handles GET requests.
-
-        Args:
-            exploration_id: string representing the exploration id.
-        """
+        """Handles GET requests."""
         self.values.update({
             'js': utils.GetJsFilesWithBase(['readerExploration']),
             'nav_mode': READER_MODE,
@@ -68,7 +63,10 @@ class ExplorationHandler(BaseHandler):
         init_state = exploration.init_state.get()
         init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
-            init_state.interactive_widget, True)['raw']
+            init_state.interactive_widget,
+            params=init_state.interactive_params,
+            include_js=True
+        )['raw']
 
         self.data_values.update({
             'block_number': 0,
@@ -120,8 +118,6 @@ class ExplorationHandler(BaseHandler):
                 EventHandler.record_default_case_hit(exploration_id, answer)
 
             assert rule['code']
-            logging.info(rule['code'])
-            logging.info(state.interactive_rulesets['submit'])
 
             if rule['code'] == 'True':
                 dest = rule['dest']
@@ -130,7 +126,6 @@ class ExplorationHandler(BaseHandler):
 
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(answer,')
-            logging.info(code)
             if eval(code) == True:
                 dest = rule['dest']
                 feedback = rule['feedback']
@@ -140,16 +135,12 @@ class ExplorationHandler(BaseHandler):
 
         html_output, widget_output = '', []
         # Append reader's answer.
-        if interactive_widget_properties['classifier'] == 'MultipleChoiceClassifier':
-            # html_output = feconf.JINJA_ENV.get_template(
-            #     'reader_response.html').render(
-            #         {'response': state.classifier_categories[int(answer)]})
-            pass
-        else:
-            html_output = feconf.JINJA_ENV.get_template(
-                'reader_response.html').render({'response': answer})
+        html_output = feconf.JINJA_ENV.get_template(
+            'reader_response.html').render({'response': answer})
+        # TODO(sll): if interactive_widget == MultipleChoiceInput, the choice
+        # text should be displayed instead.
 
-        if dest == '-1':
+        if dest == utils.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.ParseContentIntoHtml(
@@ -180,15 +171,14 @@ class ExplorationHandler(BaseHandler):
         values['html'] = html_output
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
-        if dest:
-            if state.interactive_widget == 'MultipleChoiceInput':
-                # values['categories'] = state.classifier_categories
-                pass
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
+
         if dest != '-1':
             values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
-                state.interactive_widget, True)['raw']
+                state.interactive_widget,
+                params=state.interactive_params,
+                include_js=True)['raw']
 
         utils.Log(values)
         self.response.out.write(json.dumps(values))
