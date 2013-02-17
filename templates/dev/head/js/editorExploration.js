@@ -29,8 +29,6 @@ var YAML_EDITOR_URL = '/text';
 // TODO(sll): console.log is not supported in IE. Fix before launch.
 // TODO(sll): CSS3 selectors of the form [..] aren't supported in all browsers.
 
-var DEFAULT_CATEGORY_NAME = 'Default';
-
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
       when(YAML_EDITOR_URL + '/:stateId',
@@ -68,8 +66,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       {explorationId: pathnameArray[2]}, function() {
         explorationData.broadcastExploration();
         if (stateId) {
-          explorationData.stateId = stateId;
-          explorationData.broadcastState();
+          explorationData.broadcastState(stateId);
         }
       }, function(errorResponse) {
         warningsData.addWarning('Server error: ' + errorResponse.error);
@@ -81,8 +78,11 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     $rootScope.$broadcast('explorationData');
   };
 
-  explorationData.broadcastState = function() {
-    console.log(explorationData.data.states[explorationData.stateId]);
+  explorationData.broadcastState = function(stateId) {
+    if (stateId) {
+      explorationData.stateId = stateId;
+    }
+    console.log('Broadcasting data for state ' + explorationData.stateId);
     $rootScope.$broadcast('stateData');
   };
 
@@ -117,88 +117,13 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes to this state were saved successfully.');
-      explorationData.broadcastState();
+      explorationData.broadcastState($scope.stateId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
   };
 
   return explorationData;
-});
-
-
-// Filter that truncates long descriptors.
-// TODO(sll): Strip out HTML tags before truncating.
-oppia.filter('truncate', function() {
-  return function(input, length, suffix) {
-    if (!input)
-      return '';
-    if (isNaN(length))
-      length = 50;
-    if (suffix === undefined)
-      suffix = '...';
-    if (input.length <= length || input.length - suffix.length <= length)
-      return input;
-    else
-      return String(input).substring(0, length - suffix.length) + suffix;
-  };
-});
-
-// Filter that changes {{...}} tags into INPUT indicators.
-oppia.filter('bracesToText', function() {
-  return function(input) {
-    if (!input) {
-      return '';
-    }
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
-    return input.replace(pattern, '<code>INPUT</code>');
-  };
-});
-
-// Filter that changes {{...}} tags into input fields.
-oppia.filter('bracesToInput', function() {
-  return function(input) {
-    if (!input) {
-      return '';
-    }
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var index = 0;
-    while (true) {
-      if (!input.match(pattern)) {
-        break;
-      }
-      var varName = input.match(pattern)[1];
-      var tail = '>';
-      if (index === 0) {
-        tail = 'autofocus>';
-      }
-      input = input.replace(
-          pattern,
-          '<input type="text" ng-model="addRuleActionInputs.' + varName + '"' + tail);
-      index++;
-    }
-    return input;
-  };
-});
-
-// Filter that changes {{...}} tags into the corresponding parameter input values.
-oppia.filter('parameterizeRule', function() {
-  return function(input) {
-    if (!input) {
-      return '';
-    }
-    var rule = input.rule;
-    var inputs = input.inputs;
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    while (true) {
-      if (!rule.match(pattern)) {
-        break;
-      }
-      var varName = rule.match(pattern)[1];
-      rule = rule.replace(pattern, inputs[varName]);
-    }
-    return rule;
-  };
 });
 
 // Receive events from the iframed widget repository.
@@ -246,9 +171,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     var requestParams = {
         state_id: $scope.stateId,
-        state_name: $scope.stateName,
-        interactive_widget: $scope.interactiveWidget.id
+        state_name: $scope.stateName
     };
+    if ($scope.interactiveWidget) {
+      requestParams['interactive_widget'] = $scope.interactiveWidget.id;
+    }
     if ($scope.stateContent) {
       requestParams['state_content'] = JSON.stringify($scope.stateContent);
     }
@@ -306,12 +233,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
     console.log(e.target.hash);
     if (e.target.hash == '#stateEditor') {
-      console.log($scope.stateId);
       if (!$scope.stateId) {
         $scope.stateId = $scope.initStateId;
       }
+      explorationData.stateId = $scope.stateId;
+      explorationData.broadcastState($scope.stateId);
       $scope.changeMode($scope.getMode());
-      $scope.processStateData(explorationData.getStateData($scope.stateId));
     } else {
       $location.path('');
       explorationData.getData();
@@ -334,6 +261,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   $scope.$on('explorationData', function() {
     var data = explorationData.data;
+    $scope.stateId = explorationData.stateId;
     $scope.states = data.states;
     console.log('Data for exploration page:');
     console.log(data);
@@ -471,36 +399,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.addStateLoading = false;
-              $scope.states[data.stateId] = {
-                  name: data.stateName,
-                  dests: [{'category': '', 'dest': END_DEST, 'text': ''}]
-              };
-              $scope.saveStateChange('states');
               $scope.newStateDesc = '';
-              if (changeIsInline) {
-                $scope.inlineNewNoneStateDesc = '';
-                $scope.inlineNewFiniteStateDesc = '';
-                $scope.inlineNewNumericStateDesc = '';
-                $scope.inlineNewSetStateDesc = '';
-                $scope.inlineNewTextStateDesc = '';
-                activeInputData.clear();
-
-                var oldDest =
-                    $scope.states[$scope.stateId].dests[categoryId].dest;
-
-                if (categoryId < $scope.states[$scope.stateId].dests.length) {
-                  $scope.states[$scope.stateId].dests[categoryId].dest =
-                      data.stateId;
-                } else {
-                  console.log(
-                      'ERROR: Invalid category id ' + String(categoryId));
-                  return;
-                }
-                $scope.saveStateChange('states');
-              } else {
-                // The content creator added a state from the exploration page.
-                explorationData.getData();
-              }
+              explorationData.getData();
             }).error(function(data) {
               $scope.addStateLoading = false;
               warningsData.addWarning(
@@ -509,6 +409,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.$on('stateData', function() {
+    $scope.stateId = explorationData.stateId;
     $scope.processStateData(explorationData.getStateData($scope.stateId));
   });
 
@@ -539,30 +440,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope.explorationUrl + '/' + stateId + '/data', '',
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
-      var edgesDeleted = 0;
-      // Remove incoming edges from other states to this state. This must be
-      // done to ensure that $scope.states stays up to date.
-      for (var id in $scope.states) {
-        for (var categoryIndex = 0;
-             categoryIndex < $scope.states[id].dests.length;
-             ++categoryIndex) {
-          if ($scope.states[id].dests[categoryIndex].dest == stateId) {
-            $scope.states[id].dests[categoryIndex].dest = id;
-            if (id != stateId) {
-              edgesDeleted++;
-            }
-          }
-        }
-      }
-      if (edgesDeleted) {
-        warningsData.addWarning(
-            'The categories of some states now no longer have destinations.');
-      }
-
-      delete $scope.states[stateId];
-      // TODO(sll): This should really be saveExploration() or similar; it should
-      // not require a stateId.
-      $scope.saveStateChange('states');
       explorationData.getData();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
@@ -782,6 +659,19 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     }
 
     return destId;
+  };
+
+  // TODO(sll): Use this in the UI.
+  $scope.getDestDescription = function(dest) {
+    if (!dest) {
+      return 'Error: unspecified destination';
+    } else if (dest == END_DEST) {
+      return 'Destination: END';
+    } else if (dest in $scope.states) {
+      return 'Destination: ' + $scope.states[dest].name;
+    } else {
+      return '[Error: invalid destination]';
+    }
   };
 
   $('#interactiveWidgetModal').on('hide', function() {

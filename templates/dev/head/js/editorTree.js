@@ -16,7 +16,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function EditorTree($scope, $http, $filter, explorationData) {
+function EditorTree($scope, $filter, explorationData) {
   // When the exploration data is loaded, construct the tree.
   $scope.$on('explorationData', function() {
     $scope.treeData = $scope.reformatResponse(
@@ -245,4 +245,4 @@ oppia.directive('stateTreeViz', function () {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorTree.$inject = ['$scope', '$http', '$filter', 'explorationData'];
+EditorTree.$inject = ['$scope', '$filter', 'explorationData'];

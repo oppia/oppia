@@ -19,8 +19,6 @@ function YamlEditor($scope, $http, $routeParams, explorationData, warningsData) 
             success(function(data) {
               $scope.$parent.states[$scope.stateId] = data.state;
               $scope.$parent.stateContent = data.stateContent;
-              $scope.$parent.inputType = data.inputType;
-              $scope.$parent.classifier = data.classifier;
 
               // TODO(sll): Try and do this refresh without requiring an
               // update from the backend.

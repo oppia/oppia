@@ -16,7 +16,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function EditorGraph($scope, $http, explorationData) {
+function EditorGraph($scope, $filter, explorationData) {
   // When the exploration data is loaded, construct the graph.
   $scope.$on('explorationData', function() {
     $scope.graphData = $scope.reformatResponse(
@@ -51,21 +51,21 @@ function EditorGraph($scope, $http, explorationData) {
       queue.shift();
       nodes[currNode].reachable = true;
       if (currNode in states) {
-        for (var i = 0; i < states[currNode].dests.length; i++) {
+        for (var i = 0; i < states[currNode].widget.rules.submit.length; i++) {
           // Assign levels to nodes only when they are first encountered.
-          if (seenNodes.indexOf(states[currNode].dests[i].dest) == -1) {
-            seenNodes.push(states[currNode].dests[i].dest);
-            nodes[states[currNode].dests[i].dest].depth = nodes[currNode].depth + 1;
-            nodes[states[currNode].dests[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
+          if (seenNodes.indexOf(states[currNode].widget.rules.submit[i].dest) == -1) {
+            seenNodes.push(states[currNode].widget.rules.submit[i].dest);
+            nodes[states[currNode].widget.rules.submit[i].dest].depth = nodes[currNode].depth + 1;
+            nodes[states[currNode].widget.rules.submit[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
             if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
-              nodes[states[currNode].dests[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
+              nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
               maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
             } else {
-              nodes[states[currNode].dests[i].dest].x0 = 50;
+              nodes[states[currNode].widget.rules.submit[i].dest].x0 = 50;
               maxXDistPerLevel[nodes[currNode].depth + 1] = 50;
             }
             maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
-            queue.push(states[currNode].dests[i].dest);
+            queue.push(states[currNode].widget.rules.submit[i].dest);
           }
         }
       }
@@ -95,8 +95,15 @@ function EditorGraph($scope, $http, explorationData) {
 
     var links = [];
     for (var state in states) {
-      for (var i = 0; i < states[state].dests.length; i++) {
-        links.push({source: nodeList[nodes[state].id], target: nodeList[nodes[states[state].dests[i].dest].id], name: states[state].dests[i].category});
+      for (var i = 0; i < states[state].widget.rules.submit.length; i++) {
+        links.push({
+            source: nodeList[nodes[state].id],
+            target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
+            name: $filter('parameterizeRule')({
+                rule: states[state].widget.rules.submit[i].rule,
+                inputs: states[state].widget.rules.submit[i].inputs
+            })
+        });
       }
     }
 
@@ -105,7 +112,7 @@ function EditorGraph($scope, $http, explorationData) {
 }
 
 
-oppia.directive('stateGraphViz', function() {
+oppia.directive('stateGraphViz', function(explorationData) {
   // constants
   var w = 960,
       h = 4000,
@@ -243,6 +250,7 @@ oppia.directive('stateGraphViz', function() {
               if (d.hashId == END_DEST) {
                 return;
               }
+              explorationData.getStateData(d.hashId);
               scope.$parent.$parent.stateId = d.hashId;
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
             })
@@ -288,4 +296,4 @@ oppia.directive('stateGraphViz', function() {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorGraph.$inject = ['$scope', '$http', 'explorationData'];
+EditorGraph.$inject = ['$scope', '$filter', 'explorationData'];

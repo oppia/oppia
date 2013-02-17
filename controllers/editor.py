@@ -150,15 +150,9 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            ruleset = state.interactive_rulesets['submit']
-            state_destinations = [{'category': rule['rule'], 'dest': rule['dest']}
-                                  for rule in ruleset]
             state_list[state.hash_id] = GetStateAsDict(state)
-            state_list[state.hash_id]['dests'] = state_destinations
             state_list[state.hash_id]['name'] = state.name
             state_list[state.hash_id]['stateId'] = state.hash_id
-
-        logging.info(state_list)
 
         self.data_values.update({
             'exploration_id': exploration.hash_id,
@@ -217,26 +211,14 @@ class StatePage(BaseHandler):
         """Returns the properties of a state when it is opened for editing."""
 
         values = {
-            'actions': [],
             'interactiveWidget': state.interactive_widget,
             'interactiveRulesets': state.interactive_rulesets,
             'interactiveParams': state.interactive_params,
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
-            'yaml': '',
+            'yaml': utils.GetYamlFromDict(GetStateAsDict(state)),
         }
-
-        # Retrieve the actions corresponding to this state.
-        ruleset = state.interactive_rulesets['submit']
-        for rule in ruleset:
-            action = {'category': rule['rule'], 'dest': rule['dest']}
-            if rule['feedback']:
-                action['feedback'] = rule['feedback']
-            values['actions'].append(action)
-
-        values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
-
         self.response.out.write(json.dumps(values))
 
 
@@ -250,14 +232,12 @@ class StateHandler(BaseHandler):
         yaml_file = self.request.get('yaml_file')
         if yaml_file:
             # The user has uploaded a YAML file. Process only this action.
+            # TODO(sll): This needs to have more stuff in it.
             state = utils.ModifyStateUsingDict(
                 exploration, state, utils.GetDictFromYaml(yaml_file))
-            dests_array = []
-            for rule in state.interactive_rulesets['submit']:
-                dests_array.append(rule['dest'])
             self.response.out.write(json.dumps({
                 'explorationId': exploration.hash_id,
-                'state': {'name': state.name, 'dests': dests_array},
+                'state': {'name': state.name},
                 'stateContent': state.content,
             }))
             return
