@@ -268,10 +268,6 @@ class StateHandler(BaseHandler):
         interactive_rulesets_json = self.request.get('interactive_rulesets')
         state_content_json = self.request.get('state_content')
 
-        # These two fields are obsolete and should be ignored.
-        input_type = self.request.get('input_type')
-        actions_json = self.request.get('actions')
-
         if state_name:
             # Replace the state name with this one, after checking validity.
             if state_name == utils.END_DEST:

@@ -16,7 +16,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function EditorTree($scope, $http, explorationData) {
+function EditorTree($scope, $http, $filter, explorationData) {
   // When the exploration data is loaded, construct the tree.
   $scope.$on('explorationData', function() {
     $scope.treeData = $scope.reformatResponse(
@@ -36,9 +36,11 @@ function EditorTree($scope, $http, explorationData) {
     if (priorCategory) {
       thisState['name'] = '[' + $scope.truncate(priorCategory) + '] ' + states[currStateId].name;
     }
-    for (var i = 0; i < states[currStateId].dests.length; ++i) {
-      var destStateId = states[currStateId].dests[i].dest;
-      var category = states[currStateId].dests[i].category;
+    for (var i = 0; i < states[currStateId].widget.rules.submit.length; ++i) {
+      var destStateId = states[currStateId].widget.rules.submit[i].dest;
+      var rule = states[currStateId].widget.rules.submit[i].rule;
+      var inputs = states[currStateId].widget.rules.submit[i].inputs;
+      var category = $filter('parameterizeRule')({rule: rule, inputs: inputs});
       if (destStateId == END_DEST) {
         thisState['children'].push(
             {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
@@ -60,7 +62,7 @@ function EditorTree($scope, $http, explorationData) {
     seen[initStateId] = true;
     return $scope.dfs(initStateId, seen, states);
   };
-};
+}
 
 
 oppia.directive('stateTreeViz', function () {
@@ -68,7 +70,7 @@ oppia.directive('stateTreeViz', function () {
   var w = 960,
       h = 4000,
       barHeight = 30,
-      barWidth = w * .45,
+      barWidth = w * 0.45,
       i = 0,
       root,
       duration = 400;
@@ -237,10 +239,10 @@ oppia.directive('stateTreeViz', function () {
 
 
     }
-  }
+  };
 });
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorTree.$inject = ['$scope', '$http', 'explorationData'];
+EditorTree.$inject = ['$scope', '$http', '$filter', 'explorationData'];

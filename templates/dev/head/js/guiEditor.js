@@ -95,40 +95,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.saveStateChange('states');
   };
 
-  $scope.saveDest = function(categoryId, destName) {
-    if (!destName) {
-      warningsData.addWarning('Please choose a destination.');
-      return;
-    }
-
-    var oldDest = $scope.states[$scope.stateId]['dests'][categoryId].dest;
-
-    var found = false;
-    if (destName.toUpperCase() == END_DEST) {
-      found = true;
-      $scope.states[$scope.stateId]['dests'][categoryId].dest = END_DEST;
-    }
-
-    // Find the id in states.
-    if (!found) {
-      for (var id in $scope.states) {
-        if ($scope.states[id].name == destName) {
-          found = true;
-          $scope.states[$scope.stateId]['dests'][categoryId].dest = id;
-          break;
-        }
-      }
-    }
-
-    if (!found) {
-      $scope.addState(destName, true, categoryId);
-      return;
-    }
-
-    $scope.saveStateChange('states');
-    activeInputData.clear();
-  };
-
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
       // The content creator has added a new video link. Extract its ID.

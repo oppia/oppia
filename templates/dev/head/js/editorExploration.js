@@ -61,14 +61,15 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
 
-  explorationData.getData = function(successCallback) {
+  explorationData.getData = function(stateId) {
     // Retrieve data from the server.
     console.log('Retrieving exploration data from the server');
     explorationData.data = Exploration.get(
       {explorationId: pathnameArray[2]}, function() {
         explorationData.broadcastExploration();
-        if (successCallback) {
-          successCallback();
+        if (stateId) {
+          explorationData.stateId = stateId;
+          explorationData.broadcastState();
         }
       }, function(errorResponse) {
         warningsData.addWarning('Server error: ' + errorResponse.error);
@@ -80,24 +81,30 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     $rootScope.$broadcast('explorationData');
   };
 
-  explorationData.getStateData = function(stateId) {
-    // TODO(sll): If it doesn't exist, make a backend call.
-    console.log('Getting state data for state ' + stateId);
-    return explorationData.data.states[stateId];
+  explorationData.broadcastState = function() {
+    console.log(explorationData.data.states[explorationData.stateId]);
+    $rootScope.$broadcast('stateData');
   };
 
-  explorationData.getStateProperty = function(stateId, property) {
-    console.log('Getting state property ' + property + ' for state ' + stateId);
-    // TODO(sll): If it doesn't exist, make a backend call.
-    // 'property' should be one of stateId, name, widget, dests, content.
-    return explorationData.getStateData(stateId)[property];
+  explorationData.getStateData = function(stateId) {
+    console.log('Getting state data for state ' + stateId);
+    explorationData.stateId = stateId;
+    if (stateId === undefined) {
+      return;
+    }
+    if (stateId in explorationData.data.states) {
+      return explorationData.data.states[stateId];
+    } else {
+      explorationData.getData(stateId);
+    }
   };
 
   explorationData.saveStateProperty = function(stateId, property, value) {
     // Saves data locally and puts it into the backend. Sole point of
     // communication between frontend and backend.
     // TODO(sll): Implement this fully. It should update the frontend as well
-    // as explorationData and the backend.
+    // as explorationData and the backend. Then it broadcasts a stateUpdate
+    // event.
     var requestParams = {};
     if (property == 'stateName') {
       requestParams['state_name'] = value;
@@ -110,6 +117,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes to this state were saved successfully.');
+      explorationData.broadcastState();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
@@ -500,6 +508,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             });
   };
 
+  $scope.$on('stateData', function() {
+    $scope.processStateData(explorationData.getStateData($scope.stateId));
+  });
+
   /**
    * Sets up the state editor, given its data from the backend.
    * @param {Object} data Data received from the backend about the state.
@@ -618,22 +630,32 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
   var data = explorationData.getStateData($scope.stateId);
 
-  // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
-  // action and the value has several keys:
-  // - 'rule' (the raw rule string)
-  // - 'inputs' (a list of parameters)
-  // - 'attrs' (stuff needed to build the Python classifier code)
-  // - 'dest' (the destination for this rule)
-  // - 'feedback' (any feedback given for this rule)
-  // - 'paramChanges' (parameter changes associated with this rule)
-  $scope.interactiveRulesets = data.widget.rules;
-  $scope.interactiveParams = data.widget.params;
-  $http.get('/interactive_widgets/' + data.widget.id).success(
-    function(widgetData) {
-      $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
-      $scope.interactiveWidget = widgetData.widget;
-    }
-  );
+  $scope.$on('stateData', function() {
+    $scope.initInteractiveWidget(explorationData.getStateData($scope.stateId));
+  });
+
+  $scope.initInteractiveWidget = function(data) {
+    // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
+    // action and the value has several keys:
+    // - 'rule' (the raw rule string)
+    // - 'inputs' (a list of parameters)
+    // - 'attrs' (stuff needed to build the Python classifier code)
+    // - 'dest' (the destination for this rule)
+    // - 'feedback' (any feedback given for this rule)
+    // - 'paramChanges' (parameter changes associated with this rule)
+    $scope.interactiveRulesets = data.widget.rules;
+    $scope.interactiveParams = data.widget.params;
+    $http.get('/interactive_widgets/' + data.widget.id).success(
+      function(widgetData) {
+        $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
+        $scope.interactiveWidget = widgetData.widget;
+      }
+    );
+  };
+
+  if (data) {
+    $scope.initInteractiveWidget(data);
+  }
 
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
@@ -680,7 +702,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
             rule: $scope.addRuleActionRule,
             attrs: $scope.addRuleActionAttrs,
             inputs: $scope.addRuleActionInputs,
-            dest: $scope.addRuleActionDest,
+            dest: $scope.convertDestToId($scope.addRuleActionDest),
             feedback: $scope.addRuleActionFeedback
         };
 
@@ -715,6 +737,51 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.deleteRule = function(action, index) {
     $scope.interactiveRulesets[action].splice(index, 1);
     $scope.saveInteractiveWidget();
+  };
+
+  $scope.convertDestToId = function(destName) {
+    if (!destName) {
+      warningsData.addWarning('Please choose a destination.');
+      return;
+    }
+
+    var destId = '';
+
+    var found = false;
+    if (destName.toUpperCase() == END_DEST) {
+      found = true;
+      destId = END_DEST;
+    } else {
+      // Find the id in states.
+      // TODO(sll): The next block of code should not be here. It is for the
+      // case where the destName is actually an id.
+      if (destName in $scope.states) {
+        return destName;
+      }
+
+      for (var id in $scope.states) {
+        if ($scope.states[id].name == destName) {
+          found = true;
+          destId = id;
+          break;
+        }
+      }
+    }
+
+    // TODO(sll): Add the following code, which triggers when the dest id
+    // doesn't exist.
+    // if (!found) {
+    //   $scope.addState(destName, true, categoryId);
+    //   return;
+    // }
+
+    if (!found) {
+      warningsData.addWarning('Invalid destination id.');
+      // TODO(sll): This is probably not the correct thing to return.
+      return destName;
+    }
+
+    return destId;
   };
 
   $('#interactiveWidgetModal').on('hide', function() {
