@@ -30,17 +30,6 @@ import utils
 from google.appengine.api import users
 
 
-# The JS and CSS code to include in the header of each response.
-# TODO(sll): Cache these so that they aren't recomputed each time.
-JS_LIB_CODE = '\n'.join([
-    utils.GetFileContents(feconf.THIRD_PARTY_DIR, filepath)
-    for filepath in feconf.THIRD_PARTY_JS_LIBS])
-
-CSS_LIB_CODE = '\n'.join([
-    utils.GetFileContents('', filepath)
-    for filepath in feconf.ALL_CSS_LIBS])
-
-
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
     def test_login(self, **kwargs):
@@ -93,25 +82,18 @@ class BaseHandler(webapp2.RequestHandler):
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
-        # Initializes the return dicts for the handlers.
+        # Initializes the return dict for the handlers.
         self.values = {
-            'css': CSS_LIB_CODE,
             'debug': feconf.DEBUG,
-            'js_lib_code': JS_LIB_CODE,
         }
-        self.data_values = {'debug': feconf.DEBUG}
 
         user = users.get_current_user()
         if user:
-            self.values.update({
-                'logout_url': users.create_logout_url(self.request.uri),
-                'user': str(user),
-            })
-            self.data_values.update({'user': str(user)})
+            self.values['logout_url'] = (
+                users.create_logout_url(self.request.uri))
+            self.values['user'] = str(user)
         else:
-            login_url = users.create_login_url(self.request.uri)
-            self.values['login_url'] = login_url
-            self.data_values['login_url'] = login_url
+            self.values['login_url'] = users.create_login_url(self.request.uri)
 
     def handle_exception(self, exception, debug_mode):
         """Overwrites the default exception handler."""

@@ -21,6 +21,30 @@ from models.models import Image
 import utils
 
 
+class LibHandler(BaseHandler):
+    """Assembles and returns CSS and JS library code."""
+
+    # The CSS and JS code to include in the header of each response.
+    CSS_LIB_CODE = '\n'.join([
+        utils.GetFileContents('', filepath)
+        for filepath in feconf.ALL_CSS_LIBS])
+
+    JS_LIB_CODE = '\n'.join([
+        utils.GetFileContents(feconf.THIRD_PARTY_DIR, filepath)
+        for filepath in feconf.THIRD_PARTY_JS_LIBS])
+
+    def get(self, lib_type):
+        """Handles GET requests for CSS and JS library code."""
+        if lib_type == 'css':
+            self.response.out.write(self.CSS_LIB_CODE)
+            self.response.headers['Content-Type'] = 'text/css'
+        elif lib_type == 'js':
+            self.response.out.write(self.JS_LIB_CODE)
+            self.response.headers['Content-Type'] = 'application/javascript'
+        else:
+            self.error(404)
+
+
 class TemplateHandler(BaseHandler):
     """Retrieves an editor template."""
 

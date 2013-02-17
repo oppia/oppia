@@ -86,7 +86,7 @@ class GalleryHandler(BaseHandler):
                         categories[exploration.category] = []
                     categories[exploration.category].append(exploration_data)
 
-        self.data_values.update({
+        self.values.update({
             'categories': categories,
         })
-        self.response.out.write(json.dumps(self.data_values))
+        self.response.out.write(json.dumps(self.values))

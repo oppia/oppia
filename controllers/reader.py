@@ -68,7 +68,7 @@ class ExplorationHandler(BaseHandler):
             include_js=True
         )['raw']
 
-        self.data_values.update({
+        self.values.update({
             'block_number': 0,
             'html': init_html,
             'interactive_widget_html': interactive_widget_html,
@@ -78,11 +78,11 @@ class ExplorationHandler(BaseHandler):
             'widgets': init_widgets,
         })
         if init_state.interactive_widget in DEFAULT_ANSWERS:
-            self.data_values['default_answer'] = DEFAULT_ANSWERS[init_state.interactive_widget]
+            self.values['default_answer'] = DEFAULT_ANSWERS[init_state.interactive_widget]
         if init_state.interactive_widget == 'MultipleChoiceInput':
-            # self.data_values['categories'] = init_state.classifier_categories
+            # self.values['categories'] = init_state.classifier_categories
             pass
-        self.response.out.write(json.dumps(self.data_values))
+        self.response.out.write(json.dumps(self.values))
 
         EventHandler.record_exploration_visited(exploration_id)
 

@@ -38,6 +38,11 @@ urls = [
     (r'/about/?', pages.AboutPage),
     (r'/terms/?', pages.TermsPage),
 
+    (r'/lib/(%s)/?' % r, resources.LibHandler),
+    (r'/templates/(%s)/?' % r, resources.TemplateHandler),
+    (r'/imagehandler/?', resources.ImageHandler),
+    (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
+
     (r'/gallery/?', gallery.GalleryPage),
     (r'/gallery/data/?', gallery.GalleryHandler),
 
@@ -54,10 +59,6 @@ urls = [
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
     (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
-
-    (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-    (r'/imagehandler/?', resources.ImageHandler),
-    (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
 
     (r'/widgets/?', widgets.Widget),
     (r'/widgets/(%s)/?' % r, widgets.Widget),

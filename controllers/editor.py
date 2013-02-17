@@ -154,7 +154,7 @@ class ExplorationHandler(BaseHandler):
             state_list[state.hash_id]['name'] = state.name
             state_list[state.hash_id]['stateId'] = state.hash_id
 
-        self.data_values.update({
+        self.values.update({
             'exploration_id': exploration.hash_id,
             'init_state_id': exploration.init_state.get().hash_id,
             'is_public': exploration.is_public,
@@ -164,7 +164,7 @@ class ExplorationHandler(BaseHandler):
             'owner': str(exploration.owner),
             'states': state_list,
         })
-        self.response.out.write(json.dumps(self.data_values))
+        self.response.out.write(json.dumps(self.values))
 
 
 class ExplorationDownloadHandler(BaseHandler):
