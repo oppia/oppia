@@ -36,7 +36,7 @@ class State(ndb.Model):
     # - rule: the raw classification rule
     # - inputs: parameters for that classification rule
     # - code: Python code to check whether the answer satisfies the category
-    # - dest: the destination state name (not id)
+    # - dest: the destination state id
     # - feedback: feedback text
     # - param_changes: parameter changes
     # TODO(yanamal): Implement the parameter changes parts (the rest are done).

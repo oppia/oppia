@@ -153,12 +153,6 @@ div.oppia-footer {
   content: ' ✎';
 }
 
-.oppia-interactive-widget-preview {
-  margin-left: 2%;
-  padding: 5px;
-  width: 80%;
-}
-
 .oppia-droppable-active {
   background: lightyellow;
 }
@@ -345,7 +339,8 @@ div.oppia-footer {
   stroke-width: 1.5px;
 }
 
-/* Rules for interactive widgets */
+/* Styles for interactive widgets */
+
 .oppia-rule {
   height: 30px;
 }

@@ -688,17 +688,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   // - 'dest' (the destination for this rule)
   // - 'feedback' (any feedback given for this rule)
   // - 'paramChanges' (parameter changes associated with this rule)
-  $scope.$parent.interactiveRulesets = {};
+  $scope.$parent.$parent.interactiveRulesets = {};
 
   $scope.$on('stateData', function() {
     var data = stateData.data;
-    $scope.$parent.interactiveRulesets = data.interactiveRulesets;
-    $scope.$parent.interactiveParams = data.interactiveParams;
+    $scope.$parent.$parent.interactiveRulesets = data.interactiveRulesets;
+    $scope.$parent.$parent.interactiveParams = data.interactiveParams;
 
     $http.get('/interactive_widgets/' + data.interactiveWidget).success(
       function(widgetData) {
         $scope.fillFrame('interactiveWidgetPreview', widgetData.widget.raw);
-        $scope.$parent.interactiveWidget = widgetData.widget;
+        $scope.$parent.$parent.interactiveWidget = widgetData.widget;
       }
     );
   });
@@ -755,11 +755,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
             feedback: $scope.addRuleActionFeedback
         };
 
-        if (!$scope.$parent.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
-          $scope.$parent.interactiveRulesets[$scope.addRuleAction] = [];
+        if (!$scope.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
+          $scope.$parent.$parent.interactiveRulesets[$scope.addRuleAction] = [];
         }
 
-        var rules = $scope.$parent.interactiveRulesets[$scope.addRuleAction];
+        var rules = $scope.interactiveRulesets[$scope.addRuleAction];
 
         if ($scope.addRuleActionIndex != null) {
           rules[$scope.addRuleActionIndex] = finalRuleset;
@@ -776,14 +776,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $scope.swapRules = function(action, index1, index2) {
     $scope.tmpRule = $scope.$parent.interactiveRulesets[action][index1];
-    $scope.$parent.interactiveRulesets[action][index1] = $scope.$parent.interactiveRulesets[action][index2];
-    $scope.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
+    $scope.$parent.$parent.interactiveRulesets[action][index1] = $scope.$parent.interactiveRulesets[action][index2];
+    $scope.$parent.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();
   };
 
   $scope.deleteRule = function(action, index) {
-    $scope.$parent.interactiveRulesets[action].splice(index, 1);
+    $scope.$parent.$parent.interactiveRulesets[action].splice(index, 1);
     $scope.saveInteractiveWidget();
   };
 
@@ -797,10 +797,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
   $scope.$on('message', function(event, arg) {
     $scope.fillFrame('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    if ($scope.$parent.interactiveWidget.id != arg.data.widget.id) {
-      $scope.$parent.interactiveWidget = arg.data.widget;
-      $scope.$parent.interactiveParams = {};
-      $scope.$parent.interactiveRulesets = {'submit': [{
+    if ($scope.interactiveWidget.id != arg.data.widget.id) {
+      $scope.$parent.$parent.interactiveWidget = arg.data.widget;
+      $scope.$parent.$parent.interactiveParams = {};
+      $scope.$parent.$parent.interactiveRulesets = {'submit': [{
           'rule': 'Default',
           'attrs': {},
           'inputs': {},

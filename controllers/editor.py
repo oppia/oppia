@@ -30,19 +30,14 @@ EDITOR_MODE = 'editor'
 
 def GetStateAsDict(state):
     """Gets a Python dict representation of a state."""
-    raise Exception('This method must be reimplemented.')
 
-    # category_list = state.classifier_categories
     return {
         'content': state.content,
-        # 'input_type': {'name': state.input_view.get().name},
-        # 'answers': [{
-        #     category_list[i]: {
-        #         'text': state.action_sets[i].get().text,
-        #         'dest': (state.action_sets[i].get().dest.get().name
-        #                  if state.action_sets[i].get().dest else 'END')
-        #     }
-        # } for i in range(len(state.interactive_rulesets['submit']))],
+        'widget': {
+            'id': state.interactive_widget,
+            'params': state.interactive_params,
+            'rules': state.interactive_rulesets,
+        }
     }
 
 
@@ -223,8 +218,6 @@ class StatePage(BaseHandler):
 
         values = {
             'actions': [],
-            # 'classifier': state.input_view.get().classifier,
-            # 'inputType': state.input_view.get().name,
             'interactiveWidget': state.interactive_widget,
             'interactiveRulesets': state.interactive_rulesets,
             'interactiveParams': state.interactive_params,
@@ -242,7 +235,7 @@ class StatePage(BaseHandler):
                 action['feedback'] = rule['feedback']
             values['actions'].append(action)
 
-        # values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
+        values['yaml'] = utils.GetYamlFromDict(GetStateAsDict(state))
 
         self.response.out.write(json.dumps(values))
 
@@ -350,18 +343,19 @@ class StateHandler(BaseHandler):
                 'Cannot delete initial state of an exploration.')
             return
 
-        # Find all action_sets whose dest is the state to be deleted, and change
-        # their destinations to the END state.
-        # incoming_action_sets = ActionSet.query().filter(ActionSet.dest == state.key)
-        # for action_set in incoming_action_sets:
-        #     origin_state = State.query().filter(
-        #         State.action_sets == action_set.key).get()
-        #     action_set.dest = origin_state.key
-        #     action_set.put()
-
-        # Delete all action_sets corresponding to this state.
-        # for action_set in state.action_sets:
-        #     action_set.delete()
+        # Find all dests in this exploration which equal the state to be
+        # deleted, and change them to loop back to their containing state.
+        for state_key in exploration.states:
+            origin_state = state_key.get()
+            changed = False
+            for key in origin_state.interactive_rulesets:
+                rules = origin_state.interactive_rulesets[key]
+                for rule in rules:
+                    if rule['dest'] == state.key:
+                        rule['dest'] = origin_state.key
+                        changed = True
+            if changed:
+                origin_state.put()
 
         # Delete the state with id state_id.
         state.key.delete()
