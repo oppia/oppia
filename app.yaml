@@ -15,8 +15,8 @@ handlers:
 - url: /images
   static_dir: static/images
   secure: always
-- url: /third_party
-  static_dir: third_party
+- url: /img
+  static_dir: third_party/bootstrap/img
   secure: always
 - url: /widgets/(.*)/static
   static_files: widgets/\1/static

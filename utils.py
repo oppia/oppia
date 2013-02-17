@@ -164,17 +164,18 @@ def GetNewId(entity, entity_name):
     return new_id
 
 
-def GetFileContents(filepath):
-    """Gets the contents of a file in the template directories.
+def GetFileContents(root, filepath):
+    """Gets the contents of a file.
 
     Args:
+        root: the path to prepend to the filepath.
         filepath: a path to a HTML, JS or CSS file. It should not include the
                 template/dev/head or template/prod/head prefix.
 
     Returns:
         the file contents.
     """
-    with open(feconf.TEMPLATE_DIR + filepath) as f:
+    with open(root + filepath) as f:
         return f.read().decode('utf-8')
 
 
@@ -188,7 +189,8 @@ def GetJsFiles(filenames):
         the concatenated contents of these JS files.
     """
     return '\n'.join(
-            [GetFileContents('js/%s.js' % filename) for filename in filenames])
+            [GetFileContents(feconf.TEMPLATE_DIR, 'js/%s.js' % filename)
+             for filename in filenames])
 
 
 def GetJsFilesWithBase(filenames):
@@ -201,18 +203,6 @@ def GetJsFilesWithBase(filenames):
         the concatenated contents of these JS files, with base.js prepended.
     """
     return GetJsFiles(['base'] + filenames)
-
-
-def GetCssFile(filename):
-    """Gets the contents of a CSS file.
-
-    Args:
-        filename: The name of a CSS file (without the '.css' suffix).
-
-    Returns:
-        the CSS file contents.
-    """
-    return GetFileContents('css/%s.css' % filename)
 
 
 def ParseContentIntoHtml(content_array, block_number):

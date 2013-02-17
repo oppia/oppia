@@ -30,6 +30,16 @@ import utils
 from google.appengine.api import users
 
 
+# The JS and CSS code to include in the header of each response.
+JS_LIB_CODE = '\n'.join([
+    utils.GetFileContents(feconf.THIRD_PARTY_DIR, filepath)
+    for filepath in feconf.THIRD_PARTY_JS_LIBS])
+
+CSS_LIB_CODE = '\n'.join([
+    utils.GetFileContents('', filepath)
+    for filepath in feconf.ALL_CSS_LIBS])
+
+
 def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
     def test_login(self, **kwargs):
@@ -84,8 +94,9 @@ class BaseHandler(webapp2.RequestHandler):
 
         # Initializes the return dicts for the handlers.
         self.values = {
-            'css': utils.GetCssFile('oppia'),
+            'css': CSS_LIB_CODE,
             'debug': feconf.DEBUG,
+            'js_lib_code': JS_LIB_CODE,
         }
         self.data_values = {'debug': feconf.DEBUG}
 
