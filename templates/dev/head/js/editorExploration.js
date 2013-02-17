@@ -30,28 +30,6 @@ var YAML_EDITOR_URL = '/text';
 // TODO(sll): CSS3 selectors of the form [..] aren't supported in all browsers.
 
 var DEFAULT_CATEGORY_NAME = 'Default';
-var DEFAULT_DESTS = {
-    'finite': [],
-    'none': [{'category': '', 'dest': END_DEST, 'text': ''}],
-    'numeric': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}],
-    'set': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}],
-    'text': [{'category': DEFAULT_CATEGORY_NAME, 'dest': END_DEST, 'text': ''}]
-};
-// The following list maps input views to classifiers.
-var CLASSIFIER_MAPPING = {
-    'int': 'numeric',
-    'multiple_choice': 'finite',
-    'none': 'none',
-    'set': 'set',
-    'text': 'text'
-};
-var HUMAN_READABLE_INPUT_TYPE_MAPPING = {
-    'int': 'Numeric',
-    'multiple_choice': 'Multiple choice',
-    'none': 'none',
-    'set': 'Set',
-    'text': 'Free text'
-};
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
@@ -201,7 +179,7 @@ oppia.filter('bracesToInput', function() {
   };
 });
 
-// Filter that changes {{...}} tags into the corresponding parameter values.
+// Filter that changes {{...}} tags into the corresponding parameter input values.
 oppia.filter('parameterizeRule', function() {
   return function(input) {
     if (!input) {
@@ -401,18 +379,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
 
     var inputArray = newActiveInput.split('.');
-    // The format of the array is [CLASSIFIER_TYPE, CATEGORY_ID, ACTION_TYPE]
-    // if the newActiveInput is a category/dest input field.
-    if (inputArray.length == 3 && inputArray[1] != 'dummy') {
-      var dests = $scope.states[$scope.stateId]['dests'];
-      var categoryId = Number(inputArray[1]);
-      if (inputArray[0] != 'none' && inputArray[0] != 'finite' &&
-          inputArray[2] == 'category' &&
-          dests[categoryId]['category'] == DEFAULT_CATEGORY_NAME) {
-        // If the newActiveInput is a non-editable category, do not proceed.
-        return;
-      }
-    }
 
     activeInputData.name = (newActiveInput || '');
     // TODO(sll): Initialize the newly displayed field.
@@ -446,10 +412,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.addStateLoading = false;
-              // The 'slice' below is needed because it's necessary to clone the
-              // array.
               $scope.states[data.stateId] = {
-                  desc: data.stateName, dests: DEFAULT_DESTS['none'].slice()};
+                  desc: data.stateName,
+                  dests: [{'category': '', 'dest': END_DEST, 'text': ''}]
+              };
               $scope.saveStateChange('states');
               $scope.newStateDesc = '';
               if (changeIsInline) {
@@ -492,8 +458,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     var prevStateId = $scope.stateId;
     $scope.stateId = data.stateId;
-    var variableList = ['stateName', 'stateContent', 'inputType', 'classifier',
-                        'states'];
+    var variableList = ['stateName', 'stateContent', 'states'];
     for (var i = 0; i < variableList.length; ++i) {
       // Exclude 'states', because it is not returned from the backend.
       if (variableList[i] != 'states') {
@@ -575,21 +540,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       return;
     activeInputData.clear();
 
-    if ($scope.classifier != 'none' &&
-        $scope.states[$scope.stateId]['dests'].length === 0) {
-      warningsData.addWarning(
-          'Interactive questions should have at least one category.');
-      return;
-    }
-
     var requestParams = {
         state_id: $scope.stateId,
         state_name: $scope.stateName,
-        input_type: $scope.inputType,
-        actions: JSON.stringify($scope.states[$scope.stateId].dests),
         interactive_widget: $scope.interactiveWidget.id
     };
-
     if ($scope.stateContent) {
       requestParams['state_content'] = JSON.stringify($scope.stateContent);
     }
@@ -760,7 +715,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
         var rules = $scope.interactiveRulesets[$scope.addRuleAction];
 
-        if ($scope.addRuleActionIndex != null) {
+        if ($scope.addRuleActionIndex !== null) {
           rules[$scope.addRuleActionIndex] = finalRuleset;
         } else {
           rules.splice(rules.length - 1, 0, finalRuleset);
@@ -775,7 +730,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, stateData, warningsDa
 
   $scope.swapRules = function(action, index1, index2) {
     $scope.tmpRule = $scope.$parent.interactiveRulesets[action][index1];
-    $scope.$parent.$parent.interactiveRulesets[action][index1] = $scope.$parent.interactiveRulesets[action][index2];
+    $scope.$parent.$parent.interactiveRulesets[action][index1] =
+        $scope.$parent.interactiveRulesets[action][index2];
     $scope.$parent.$parent.interactiveRulesets[action][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();

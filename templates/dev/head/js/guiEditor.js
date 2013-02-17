@@ -13,33 +13,6 @@ oppia.directive('unfocusStateContent', function(activeInputData) {
   };
 });
 
-// Makes the corresponding elements sortable.
-// TODO(sll): This directive doesn't actually update the underlying array,
-// so ui-sortable still needs to be used. Try and fix this.
-oppia.directive('sortable', function($compile) {
-  return {
-    restrict: 'C',
-    link: function(scope, element, attrs) {
-      $(element).sortable({
-        scroll: false,
-        stop: function(event, ui) {
-          if ($(ui.item).hasClass('oppia-state-text-item')) {
-            // This prevents a collision with the itemDroppable trashing.
-            for (var i = 0; i < scope.stateContent.length; ++i) {
-              if (scope.stateContent[i] == undefined) {
-                scope.stateContent.splice(i, 1);
-                --i;
-              }
-            }
-            scope.saveStateChange('stateContent');
-            scope.$apply();
-          }
-        }
-      });
-    }
-  };
-});
-
 function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
@@ -81,7 +54,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
       return 'Destination: END';
     } else if (dest in $scope.states) {
       return 'Destination: ' + $scope.states[dest].desc;
-    } else if (dest.indexOf(QN_DEST_PREFIX) == 0 &&
+    } else if (dest.indexOf(QN_DEST_PREFIX) === 0 &&
                dest.substring(2) in $scope.questions) {
       return 'Destination question: ' +
           $scope.questions[dest.substring(2)].desc;
@@ -133,18 +106,14 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     activeInputData.clear();
   };
 
-  $scope.getReadableInputType = function(inputType) {
-    return HUMAN_READABLE_INPUT_TYPE_MAPPING[inputType];
-  };
-
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
       // The content creator has added a new video link. Extract its ID.
-      if (videoLink.indexOf('http://') == 0)
+      if (videoLink.indexOf('http://') === 0)
         videoLink = videoLink.substring(7);
-      if (videoLink.indexOf('https://') == 0)
+      if (videoLink.indexOf('https://') === 0)
         videoLink = videoLink.substring(8);
-      if (videoLink.indexOf('www.') == 0)
+      if (videoLink.indexOf('www.') === 0)
         videoLink = videoLink.substring(4);
 
       // Note that the second group of each regex must be the videoId in order
@@ -302,7 +271,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     $scope.tmpParamName = '';
     $scope.tmpNewValue = '';
     $scope.tmpLiteral = ''; //new value literal, if parameter is to be changed to a literal value
-  }
+  };
 
   $scope.resetParamChangeInput();
 
@@ -310,7 +279,7 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     // Verify that the active input was the parameter input, as expected TODO(yanamal)
     // Add the new change to the list
     if(paramVal == 'newval') { //changing param to a new literal value
-      $scope.paramChanges.push({name: paramName, newVal: valLiteral})
+      $scope.paramChanges.push({name: paramName, newVal: valLiteral});
     }
     else { //changing to a computed value - either value of another var, or student input
       $scope.paramChanges.push({name: paramName, newVal: '{{'+paramVal+'}}'});
@@ -319,12 +288,12 @@ function GuiEditor($scope, $http, $routeParams, stateData, explorationData, warn
     // Save the parameter property TODO(yanamal)
     // Reset and hide the input field
     $scope.resetParamChangeInput();
-  }
+  };
 
   $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
-    $scope.paramChanges.splice(paramIndex, 1)
+    $scope.paramChanges.splice(paramIndex, 1);
     // TODO(yanamal): save to server-side
-  }
+  };
 }
 
 GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'stateData',
