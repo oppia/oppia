@@ -113,7 +113,7 @@ class WidgetRepositoryHandler(BaseHandler):
     def get_interactive_widgets(self):
         """Load interactive widgets from the file system."""
         response = {}
-        for widget_id in os.listdir('widgets/'):
+        for widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
             # TODO(sll): Remove this when third-party imports are handled properly.
             if widget_id == 'MusicStaff':
                 continue
@@ -204,31 +204,39 @@ class InteractiveWidget(BaseHandler):
     def get_interactive_widget(cls, widget_id, params=[], include_js=False):
         """Gets interactive widget code from the file system."""
         widget = {}
-        with open('widgets/%s/%s.config.yaml' %
-                  (widget_id, widget_id)) as f:
+        with open(os.path.join(
+                feconf.SAMPLE_WIDGETS_DIR,
+                widget_id,
+                '%s.config.yaml' % widget_id)) as f:
             widget = utils.get_dict_from_yaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
         widget_js = ''
-        if widget_id in os.listdir('widgets'):
+        if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
             html_file = '%s/%s.html' % (widget_id, widget_id)
             widget_params = copy.deepcopy(widget['params'])
             for key in params:
                 widget_params[key] = params[key]
-            widget_params['root'] = 'widgets/%s/static' % widget_id
+            widget_params['root'] = os.path.join(
+                feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static')
             widget_html = feconf.WIDGET_JINJA_ENV.get_template(
                 html_file).render(widget_params)
 
             if include_js:
-                with open('widgets/%s/%s.js' % (widget_id, widget_id)) as f:
+                with open(os.path.join(
+                        feconf.SAMPLE_WIDGETS_DIR,
+                        widget_id,
+                        '%s.js' % widget_id)) as f:
                     widget_js = '<script>%s</script>' % f.read().decode('utf-8')
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
         for action, properties in widget['actions'].iteritems():
             classifier = properties['classifier']
             if classifier and classifier != 'None':
-                with open('classifiers/%s/%s.rules' %
-                          (classifier, classifier)) as f:
+                with open(os.path.join(
+                        feconf.SAMPLE_CLASSIFIERS_DIR,
+                        classifier,
+                        '%s.rules' % classifier)) as f:
                     properties['rules'] = utils.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget

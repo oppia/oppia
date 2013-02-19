@@ -23,13 +23,18 @@ TEMPLATE_DIR = 'templates/dev/head/' if DEV else 'templates/prod/head/'
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'third_party/'
 
+# The directories containing sample classifiers, explorations and widgets.
+SAMPLE_CLASSIFIERS_DIR = 'data/classifiers/'
+SAMPLE_EXPLORATIONS_DIR = 'data/explorations/'
+SAMPLE_WIDGETS_DIR = 'data/widgets/'
+
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), TEMPLATE_DIR)))
 
 # The jinja environment used for loading widget previews.
 WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), 'widgets/')))
+    os.path.join(os.path.dirname(__file__), SAMPLE_WIDGETS_DIR)))
 
 # List of filepaths to JS libraries in third_party to include in responses.
 THIRD_PARTY_JS_LIBS = [

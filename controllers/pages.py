@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from controllers.base import BaseHandler
 import feconf
 from models.exploration import Exploration
+import os
 import utils
 
 from google.appengine.api import users
@@ -32,7 +33,8 @@ class MainPage(BaseHandler):
         try:
             exploration = utils.get_entity(Exploration, '0')
         except:
-            with open('samples/hola.yaml') as f:
+            with open(os.path.join(
+                    feconf.SAMPLE_EXPLORATIONS_DIR, 'hola.yaml')) as f:
                 yaml = f.read().decode('utf-8')
             exploration = utils.create_exploration_from_yaml(
                 yaml=yaml, user=None, title='Demo: ¡Hola!',

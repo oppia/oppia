@@ -107,7 +107,7 @@ class ExplorationHandler(BaseHandler):
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
             classifier_module = '.'.join([
-                'classifiers',
+                'data.classifiers',
                 interactive_widget_properties['classifier'],
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)

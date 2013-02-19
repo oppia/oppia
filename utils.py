@@ -20,6 +20,7 @@ import base64
 import hashlib
 import json
 import logging
+import os
 import yaml
 
 import feconf
@@ -354,7 +355,7 @@ def verify_state(description):
         - The type must be one of ['text', 'image', 'video', 'widget'].
     - Permitted subfields of 'widget' are ['id', 'params', 'rules'].
         - The field 'id' is mandatory, and must correspond to an actual widget
-            in the widgets/ directory.
+            in the feconf.SAMPLE_WIDGETS_DIR directory.
     - Each ruleset in ['widget']['rules'] must have a non-empty array value, and
         each value should contain at least the fields ['code', 'dest'].
         - For all values except the last one, the 'code' field should correspond
@@ -392,7 +393,8 @@ def verify_state(description):
     # Check that the widget_id refers to an actual widget.
     widget_id = description['widget']['id']
     try:
-        with open('widgets/%s/%s.config.yaml' % (widget_id, widget_id)):
+        with open(os.path.join(
+                feconf.SAMPLE_WIDGETS_DIR, widget_id, '%s.config.yaml' % widget_id)):
             pass
     except IOError:
         return False, 'No widget with widget id %s exists.' % widget_id
