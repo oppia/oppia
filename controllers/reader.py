@@ -54,6 +54,23 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
 
+    def normalize_classifier_return(self, *args):
+        """Normalizes the return value of a classifier to a two-element tuple.
+
+        Returns:
+          A two-element tuple: a boolean stating whether the category matched,
+              and a dict with additional data.
+        """
+        if len(args) > 2:
+            raise Exception('Invalid classifier return values: %s' % args)
+
+        assert isinstance(args[0], bool)
+        if len(args) == 1:
+            return (args[0], {})
+        else:
+            assert isinstance(args[1], dict)
+            return (args[0], args[1])
+
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
@@ -112,7 +129,7 @@ class ExplorationHandler(BaseHandler):
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)
 
-        logging.info(classifier_module)
+        logging.info(Classifier.__name__)
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
                 EventHandler.record_default_case_hit(exploration_id, answer)
@@ -126,7 +143,10 @@ class ExplorationHandler(BaseHandler):
 
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(answer,')
-            if eval(code) == True:
+            return_value, return_data = (
+                self.normalize_classifier_return(eval(code)))
+
+            if return_value:
                 dest = rule['dest']
                 feedback = rule['feedback']
                 break
