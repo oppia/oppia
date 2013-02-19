@@ -32,10 +32,10 @@ from google.appengine.api import users
 class WidgetRepositoryPage(BaseHandler):
     """Displays the widget repository page."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         """Returns the widget repository page."""
         self.values.update({
-            'js': utils.GetJsFilesWithBase(['widgetRepository']),
+            'js': utils.get_js_files_with_base(['widgetRepository']),
         })
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
@@ -46,7 +46,7 @@ class WidgetRepositoryPage(BaseHandler):
         self.response.out.write(feconf.JINJA_ENV.get_template(
             'widgets/widget_repository.html').render(self.values))
 
-    def post(self):  # pylint: disable-msg=C6409
+    def post(self):
         """Creates a new generic widget."""
         if not users.is_current_user_admin():
             raise self.UnauthorizedUserException(
@@ -67,14 +67,14 @@ class WidgetRepositoryPage(BaseHandler):
         raw = widget_data['raw']
         name = widget_data['name']
         category = widget_data['category']
-        if utils.CheckExistenceOfName(GenericWidget, name):
+        if utils.check_existence_of_name(GenericWidget, name):
             raise self.InvalidInputException(
                 'A widget with name %s already exists' % name)
 
         description = widget_data['description']
         params = widget_data['params']
 
-        widget_hash_id = utils.GetNewId(GenericWidget, name)
+        widget_hash_id = utils.get_new_id(GenericWidget, name)
         widget_data['id'] = widget_hash_id
 
         widget = GenericWidget(
@@ -94,7 +94,7 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.InvalidInputException('No widget supplied')
         widget_data = json.loads(widget_data)
 
-        widget = utils.GetEntity(GenericWidget, widget_data['id'])
+        widget = utils.get_entity(GenericWidget, widget_data['id'])
         if not widget:
             raise self.InvalidInputException(
                 'No generic widget found with id %s' % widget_data['id'])
@@ -149,10 +149,10 @@ class WidgetRepositoryHandler(BaseHandler):
         self.response.out.write(json.dumps({'widgets': response}))
 
 
-class Widget(BaseHandler):
+class WidgetInstance(BaseHandler):
     """Handles individual (non-generic) widget uploads, edits and retrievals."""
 
-    def get(self, widget_id):  # pylint: disable-msg=C6409
+    def get(self, widget_id):
         """Handles GET requests.
 
         Args:
@@ -162,7 +162,7 @@ class Widget(BaseHandler):
             utils.EntityIdNotFoundError, if an id is not supplied or no widget
             with this id exists.
         """
-        widget = utils.GetEntity(Widget, widget_id)
+        widget = utils.get_entity(Widget, widget_id)
         if widget:
             self.response.out.write(json.dumps({
                 'raw': widget.raw,
@@ -171,7 +171,7 @@ class Widget(BaseHandler):
             self.response.out.write(json.dumps({'error': 'No such widget'}))
 
     @require_user
-    def post(self, widget_id=None):  # pylint: disable-msg=C6409
+    def post(self, widget_id=None):
         """Saves or edits a widget uploaded by a content creator."""
         raw = self.request.get('raw')
         if not raw:
@@ -182,11 +182,11 @@ class Widget(BaseHandler):
 
         # TODO(sll): Rewrite the following.
         if not widget_id:
-            widget_hash_id = utils.GetNewId(Widget, 'temp_hash_id')
+            widget_hash_id = utils.get_new_id(Widget, 'temp_hash_id')
             widget = Widget(hash_id=widget_hash_id, raw=raw)
             widget.put()
         else:
-            widget = utils.GetEntity(Widget, widget_id)
+            widget = utils.get_entity(Widget, widget_id)
             if not widget:
                 raise self.InvalidInputException(
                     'No widget found with id %s' % widget_id)
@@ -206,7 +206,7 @@ class InteractiveWidget(BaseHandler):
         widget = {}
         with open('widgets/%s/%s.config.yaml' %
                   (widget_id, widget_id)) as f:
-            widget = utils.GetDictFromYaml(f.read().decode('utf-8'))
+            widget = utils.get_dict_from_yaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
         widget_js = ''
@@ -229,7 +229,7 @@ class InteractiveWidget(BaseHandler):
             if classifier and classifier != 'None':
                 with open('classifiers/%s/%s.rules' %
                           (classifier, classifier)) as f:
-                    properties['rules'] = utils.GetDictFromYaml(
+                    properties['rules'] = utils.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget
 

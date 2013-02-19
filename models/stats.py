@@ -18,10 +18,11 @@ __author__ = 'Sean Lip'
 
 from google.appengine.ext import ndb
 
-from utils import Enum
+import utils
 
 
-STATS_ENUMS = Enum('exploration_visited', 'default_case_hit', 'exploration_completed')
+STATS_ENUMS = utils.create_enum(
+    'exploration_visited', 'default_case_hit', 'exploration_completed')
 
 
 class EventHandler(object):
@@ -71,7 +72,7 @@ class EventHandler(object):
         journal = Journal.get_or_insert(event_key, name=event_key)
         if not journal:
             journal = Journal(id=event_key, name=event_key)
-        journal.values.append(value) 
+        journal.values.append(value)
         journal.put()
 
 
@@ -84,11 +85,11 @@ class Counter(ndb.Model):
 
 
 class Journal(ndb.Model):
-   """A list of values."""
-   # The name of the list
-   name = ndb.StringProperty()
-   # The list of values
-   values = ndb.StringProperty(repeated=True)
+    """A list of values."""
+    # The name of the list
+    name = ndb.StringProperty()
+    # The list of values
+    values = ndb.StringProperty(repeated=True)
 
 
 class Statistics(object):

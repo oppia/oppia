@@ -28,38 +28,25 @@ import utils
 EDITOR_MODE = 'editor'
 
 
-def GetStateAsDict(state):
-    """Gets a Python dict representation of a state."""
-
-    return {
-        'content': state.content,
-        'widget': {
-            'id': state.interactive_widget,
-            'params': state.interactive_params,
-            'rules': state.interactive_rulesets,
-        }
-    }
-
-
 class NewExploration(BaseHandler):
     """Creates a new exploration."""
 
     @require_user
-    def post(self, user):  # pylint: disable-msg=C6409
+    def post(self, user):
         """Handles POST requests."""
 
         title = self.request.get('title')
         category = self.request.get('category')
         yaml = self.request.get('yaml')
         if yaml:
-            exploration = utils.CreateExplorationFromYaml(
+            exploration = utils.create_exploration_from_yaml(
                 yaml=yaml, user=user, title=title, category=category)
         else:
-            exploration = utils.CreateNewExploration(
+            exploration = utils.create_new_exploration(
                 user, title=title, category=category)
 
         self.response.out.write(json.dumps({
-                'explorationId': exploration.hash_id,
+            'explorationId': exploration.hash_id,
         }))
 
 
@@ -67,10 +54,10 @@ class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
     @require_editor
-    def get(self, user, exploration):  # pylint: disable-msg=C6409
+    def get(self, user, exploration):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.GetJsFilesWithBase(
+            'js': utils.get_js_files_with_base(
                 ['editorExploration', 'editorTree',
                  'editorGraph', 'guiEditor', 'yamlEditor']),
             'nav_mode': EDITOR_MODE,
@@ -79,7 +66,7 @@ class ExplorationPage(BaseHandler):
             'editor/editor_exploration.html').render(self.values))
 
     @require_editor
-    def post(self, user, exploration):  # pylint: disable-msg=C6409
+    def post(self, user, exploration):
         """Adds a new state to the given exploration."""
 
         state_name = self.request.get('state_name')
@@ -87,12 +74,12 @@ class ExplorationPage(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         # Check that the state_name has not been taken.
-        if utils.CheckExistenceOfName(State, state_name, exploration):
+        if utils.check_existence_of_name(State, state_name, exploration):
             raise self.InvalidInputException(
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
 
-        state = utils.CreateNewState(exploration, state_name)
+        state = utils.create_new_state(exploration, state_name)
 
         self.response.out.write(json.dumps({
             'stateId': state.hash_id,
@@ -101,7 +88,7 @@ class ExplorationPage(BaseHandler):
         }))
 
     @require_editor
-    def put(self, user, exploration):  # pylint: disable-msg=C6409
+    def put(self, user, exploration):
         """Updates properties of the given exploration."""
 
         for key in self.request.arguments():
@@ -144,13 +131,13 @@ class ExplorationHandler(BaseHandler):
     """Page with editor data for a single exploration."""
 
     @require_editor
-    def get(self, user, exploration):  # pylint: disable-msg=C6409
+    def get(self, user, exploration):
         """Gets the question name and state list for a question page."""
 
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_list[state.hash_id] = GetStateAsDict(state)
+            state_list[state.hash_id] = state.as_dict()
             state_list[state.hash_id]['name'] = state.name
             state_list[state.hash_id]['stateId'] = state.hash_id
 
@@ -171,7 +158,7 @@ class ExplorationDownloadHandler(BaseHandler):
     """Downloads an exploration as a YAML file."""
 
     @require_editor
-    def get(self, user, exploration):  # pylint: disable-msg=C6409
+    def get(self, user, exploration):
         """Handles GET requests."""
         filename = str('oppia-%s' % exploration.title)
 
@@ -184,21 +171,21 @@ class ExplorationDownloadHandler(BaseHandler):
         for state_key in exploration.states:
             state = state_key.get()
             if exploration.init_state.get().hash_id == state.hash_id:
-                init_dict[state.name] = GetStateAsDict(state)
+                init_dict[state.name] = state.as_dict()
             else:
-                exploration_dict[state.name] = GetStateAsDict(state)
-        self.response.out.write(utils.GetYamlFromDict(init_dict))
-        self.response.out.write(utils.GetYamlFromDict(exploration_dict))
+                exploration_dict[state.name] = state.as_dict()
+        self.response.out.write(utils.get_yaml_from_dict(init_dict))
+        self.response.out.write(utils.get_yaml_from_dict(exploration_dict))
 
 
 class StatePage(BaseHandler):
     """Allows content creators to edit a state."""
 
     @require_editor
-    def get(self, user, exploration, unused_state):  # pylint: disable-msg=C6409
+    def get(self, user, exploration, unused_state):
         """Gets a page representing an exploration with a list of states."""
         self.values.update({
-            'js': utils.GetJsFilesWithBase(
+            'js': utils.get_js_files_with_base(
                 ['editorExploration', 'editorGraph',
                  'editorTree', 'guiEditor', 'yamlEditor']),
             'nav_mode': EDITOR_MODE,
@@ -207,7 +194,7 @@ class StatePage(BaseHandler):
             'editor/editor_exploration.html').render(self.values))
 
     @require_editor
-    def post(self, user, exploration, state):  # pylint: disable-msg=C6409
+    def post(self, user, exploration, state):
         """Returns the properties of a state when it is opened for editing."""
 
         values = {
@@ -217,7 +204,7 @@ class StatePage(BaseHandler):
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
-            'yaml': utils.GetYamlFromDict(GetStateAsDict(state)),
+            'yaml': utils.get_yaml_from_dict(state.as_dict()),
         }
         self.response.out.write(json.dumps(values))
 
@@ -226,15 +213,15 @@ class StateHandler(BaseHandler):
     """Handles state transactions."""
 
     @require_editor
-    def put(self, user, exploration, state):  # pylint: disable-msg=C6409
+    def put(self, user, exploration, state):
         """Saves updates to a state."""
 
         yaml_file = self.request.get('yaml_file')
         if yaml_file:
             # The user has uploaded a YAML file. Process only this action.
             # TODO(sll): This needs to have more stuff in it.
-            state = utils.ModifyStateUsingDict(
-                exploration, state, utils.GetDictFromYaml(yaml_file))
+            state = utils.modify_state_using_dict(
+                exploration, state, utils.get_dict_from_yaml(yaml_file))
             self.response.out.write(json.dumps({
                 'explorationId': exploration.hash_id,
                 'state': {'name': state.name},
@@ -252,7 +239,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            if (state_name != state.name and utils.CheckExistenceOfName(
+            if (state_name != state.name and utils.check_existence_of_name(
                 State, state_name, exploration)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
@@ -310,7 +297,7 @@ class StateHandler(BaseHandler):
         state.put()
 
     @require_editor
-    def delete(self, user, exploration, state):  # pylint: disable-msg=C6409
+    def delete(self, user, exploration, state):
         """Deletes the state with id state_id."""
 
         # Do not allow deletion of initial states.

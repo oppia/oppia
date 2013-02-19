@@ -26,11 +26,11 @@ class LibHandler(BaseHandler):
 
     # The CSS and JS code to include in the header of each response.
     CSS_LIB_CODE = '\n'.join([
-        utils.GetFileContents('', filepath)
+        utils.get_file_contents('', filepath)
         for filepath in feconf.ALL_CSS_LIBS])
 
     JS_LIB_CODE = '\n'.join([
-        utils.GetFileContents(feconf.THIRD_PARTY_DIR, filepath)
+        utils.get_file_contents(feconf.THIRD_PARTY_DIR, filepath)
         for filepath in feconf.THIRD_PARTY_JS_LIBS])
 
     def get(self, lib_type):
@@ -57,13 +57,13 @@ class TemplateHandler(BaseHandler):
 class ImageHandler(BaseHandler):
     """Handles image uploads and retrievals."""
 
-    def get(self, image_id):  # pylint: disable-msg=C6409
+    def get(self, image_id):
         """Returns an image.
 
         Args:
             image_id: string representing the image id.
         """
-        image = utils.GetEntity(Image, image_id)
+        image = utils.get_entity(Image, image_id)
         if image:
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = 'image/png'
@@ -71,12 +71,12 @@ class ImageHandler(BaseHandler):
         else:
             self.response.out.write('No image')
 
-    def post(self):  # pylint: disable-msg=C6409
+    def post(self):
         """Saves an image uploaded by a content creator."""
         # TODO(sll): Check that the image is really an image.
         image = self.request.get('image')
         if image:
-            image_hash_id = utils.GetNewId(Image, image)
+            image_hash_id = utils.get_new_id(Image, image)
             image_entity = Image(hash_id=image_hash_id, image=image)
             image_entity.put()
             self.response.out.write(json.dumps(

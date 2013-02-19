@@ -27,14 +27,14 @@ from google.appengine.api import users
 class MainPage(BaseHandler):
     """Oppia's main page."""
 
-    def EnsureDefaultExplorationExists(self):
+    def ensure_default_exploration_exists(self):
         """Add the default explorations, if they don't already exist."""
         try:
-            exploration = utils.GetEntity(Exploration, '0')
+            exploration = utils.get_entity(Exploration, '0')
         except:
             with open('samples/hola.yaml') as f:
                 yaml = f.read().decode('utf-8')
-            exploration = utils.CreateExplorationFromYaml(
+            exploration = utils.create_exploration_from_yaml(
                 yaml=yaml, user=None, title='Demo: ¡Hola!',
                 category='Languages', id='0')
             exploration.is_public = True
@@ -42,8 +42,8 @@ class MainPage(BaseHandler):
 
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.EnsureDefaultExplorationExists()
-        self.values['js'] = utils.GetJsFilesWithBase(['index'])
+        self.ensure_default_exploration_exists()
+        self.values['js'] = utils.get_js_files_with_base(['index'])
         self.values['login_url'] = users.create_login_url('/gallery')
         self.values['user'] = users.get_current_user()
         self.response.out.write(
@@ -54,7 +54,7 @@ class AboutPage(BaseHandler):
     """Page with information about Oppia."""
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.GetJsFilesWithBase([])
+        self.values['js'] = utils.get_js_files_with_base([])
         self.values['code_contributors'] = [
             'Jeremy Emerson',
             'Manas Tungare',
@@ -81,6 +81,6 @@ class TermsPage(BaseHandler):
     """Page with terms and conditions."""
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.GetJsFilesWithBase([])
+        self.values['js'] = utils.get_js_files_with_base([])
         self.response.out.write(
             feconf.JINJA_ENV.get_template('terms.html').render(self.values))

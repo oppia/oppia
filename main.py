@@ -25,7 +25,7 @@ import webapp2
 class Error404Handler(base.BaseHandler):
     """Handles 404 errors."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         self.error(404)
 
 
@@ -60,8 +60,8 @@ urls = [
     (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
-    (r'/widgets/?', widgets.Widget),
-    (r'/widgets/(%s)/?' % r, widgets.Widget),
+    (r'/widgets/?', widgets.WidgetInstance),
+    (r'/widgets/(%s)/?' % r, widgets.WidgetInstance),
     (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
     (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
     (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidget),

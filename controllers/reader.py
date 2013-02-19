@@ -36,10 +36,10 @@ DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
-    def get(self, exploration_id):  # pylint: disable-msg=C6409
+    def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.GetJsFilesWithBase(['readerExploration']),
+            'js': utils.get_js_files_with_base(['readerExploration']),
             'nav_mode': READER_MODE,
         })
 
@@ -54,14 +54,14 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
 
-    def get(self, exploration_id):  # pylint: disable-msg=C6409
+    def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
-        exploration = utils.GetEntity(Exploration, exploration_id)
+        exploration = utils.get_entity(Exploration, exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
-        init_html, init_widgets = utils.ParseContentIntoHtml(init_state.content, 0)
+        init_html, init_widgets = utils.parse_content_into_html(init_state.content, 0)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
             params=init_state.interactive_params,
@@ -86,12 +86,12 @@ class ExplorationHandler(BaseHandler):
 
         EventHandler.record_exploration_visited(exploration_id)
 
-    def post(self, exploration_id, state_id):  # pylint: disable-msg=C6409
+    def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
         values = {'error': []}
 
-        exploration = utils.GetEntity(Exploration, exploration_id)
-        state = utils.GetEntity(State, state_id)
+        exploration = utils.get_entity(Exploration, exploration_id)
+        state = utils.get_entity(State, state_id)
         old_state = state
         # The 0-based index of the last content block already on the page.
         block_number = int(self.request.get('block_number'))
@@ -143,23 +143,23 @@ class ExplorationHandler(BaseHandler):
         if dest == utils.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                action_html, action_widgets = utils.ParseContentIntoHtml(
+                action_html, action_widgets = utils.parse_content_into_html(
                     [{'type': 'text', 'value': feedback}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = utils.GetEntity(State, dest)
+            state = utils.get_entity(State, dest)
 
             # Append Oppia's feedback, if any.
             if feedback:
-                action_html, action_widgets = utils.ParseContentIntoHtml(
+                action_html, action_widgets = utils.parse_content_into_html(
                     [{'type': 'text', 'value': feedback}], block_number)
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.
             if old_state.hash_id != state.hash_id:
-                state_html, state_widgets = utils.ParseContentIntoHtml(
+                state_html, state_widgets = utils.parse_content_into_html(
                         state.content, block_number)
                 html_output += state_html
                 widget_output.append(state_widgets)
@@ -180,7 +180,7 @@ class ExplorationHandler(BaseHandler):
                 params=state.interactive_params,
                 include_js=True)['raw']
 
-        utils.Log(values)
+        logging.info(values)
         self.response.out.write(json.dumps(values))
 
 

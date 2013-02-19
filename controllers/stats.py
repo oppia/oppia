@@ -24,7 +24,7 @@ class StatsHandler(BaseHandler):
     """Handles display of the statistics page for explorations."""
 
     @require_editor
-    def get(self, unused_user, exploration):  # pylint: disable-msg=C6409
+    def get(self, unused_user, exploration):
         """Displays the statistics page for the given exploration."""
 
         num_visits = Statistics.get_stats(
@@ -37,7 +37,7 @@ class StatsHandler(BaseHandler):
             STATS_ENUMS.default_case_hit, exploration.hash_id)
 
         self.values.update({
-            'js': utils.GetJsFilesWithBase(['stats']),
+            'js': utils.get_js_files_with_base(['stats']),
             'num_visits': num_visits,
             'num_comp': num_completions,
             'answers': answers,

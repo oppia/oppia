@@ -32,11 +32,6 @@ from google.appengine.ext import ndb
 END_DEST = 'END'
 
 
-def Enum(*sequential, **names):
-    enums = dict(zip(sequential, sequential), **names)
-    return type('Enum', (), enums)
-
-
 class InvalidCategoryError(Exception):
     """Error class for when an invalid category is passed into a classifier."""
     pass
@@ -52,7 +47,12 @@ class EntityIdNotFoundError(Exception):
     pass
 
 
-def Log(message):
+def create_enum(*sequential, **names):
+    enums = dict(zip(sequential, sequential), **names)
+    return type('Enum', (), enums)
+
+
+def log(message):
     """Logs info messages in development/debug mode.
 
     Args:
@@ -66,7 +66,7 @@ def Log(message):
 
 
 # TODO(sll): Consider refactoring this to include ancestors.
-def GetEntity(entity, entity_id):
+def get_entity(entity, entity_id):
     """Gets the entity corresponding to a given id.
 
     Args:
@@ -89,7 +89,7 @@ def GetEntity(entity, entity_id):
     return entity
 
 
-def CheckExistenceOfName(entity, name, ancestor=None):
+def check_existence_of_name(entity, name, ancestor=None):
     """Checks whether an entity with the given name and ancestor already exists.
 
     Args:
@@ -120,7 +120,7 @@ def CheckExistenceOfName(entity, name, ancestor=None):
     return True
 
 
-def GetStateByName(name, exploration):
+def get_state_by_name(name, exploration):
     """Gets the state with this name in this exploration.
 
     Args:
@@ -140,12 +140,12 @@ def GetStateByName(name, exploration):
     return state
 
 
-def CheckAuthorship(user, exploration):
+def check_authorship(user, exploration):
     """Checks whether the current user has rights to edit this exploration."""
-    return exploration.key in GetAugmentedUser(user).editable_explorations
+    return exploration.key in get_augmented_user(user).editable_explorations
 
 
-def GetNewId(entity, entity_name):
+def get_new_id(entity, entity_name):
     """Gets a new id for an entity, based on its name.
 
     Args:
@@ -164,7 +164,7 @@ def GetNewId(entity, entity_name):
     return new_id
 
 
-def GetFileContents(root, filepath):
+def get_file_contents(root, filepath):
     """Gets the contents of a file.
 
     Args:
@@ -179,7 +179,7 @@ def GetFileContents(root, filepath):
         return f.read().decode('utf-8')
 
 
-def GetJsFiles(filenames):
+def get_js_files(filenames):
     """Gets the concatenated contents of some JS files.
 
     Args:
@@ -189,11 +189,11 @@ def GetJsFiles(filenames):
         the concatenated contents of these JS files.
     """
     return '\n'.join(
-            [GetFileContents(feconf.TEMPLATE_DIR, 'js/%s.js' % filename)
+            [get_file_contents(feconf.TEMPLATE_DIR, 'js/%s.js' % filename)
              for filename in filenames])
 
 
-def GetJsFilesWithBase(filenames):
+def get_js_files_with_base(filenames):
     """Gets the concatenated contents of some JS files, including the base JS.
 
     Args:
@@ -202,10 +202,10 @@ def GetJsFilesWithBase(filenames):
     Returns:
         the concatenated contents of these JS files, with base.js prepended.
     """
-    return GetJsFiles(['base'] + filenames)
+    return get_js_files(['base'] + filenames)
 
 
-def ParseContentIntoHtml(content_array, block_number):
+def parse_content_into_html(content_array, block_number):
     """Takes a content array and transforms it into HTML.
 
     Args:
@@ -234,7 +234,7 @@ def ParseContentIntoHtml(content_array, block_number):
                 content_array)
         if content['type'] == 'widget':
             try:
-                widget = GetEntity(Widget, content['value'])
+                widget = get_entity(Widget, content['value'])
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template('content.html').render({
                     'type': content['type'], 'blockIndex': block_number,
@@ -255,7 +255,7 @@ def ParseContentIntoHtml(content_array, block_number):
     return html, widget_array
 
 
-def GetAugmentedUser(user):
+def get_augmented_user(user):
     """Gets the corresponding AugmentedUser, creating a new one if it doesn't exist."""
     augmented_user = AugmentedUser.query().filter(
         AugmentedUser.user == user).get()
@@ -265,14 +265,14 @@ def GetAugmentedUser(user):
     return augmented_user
 
 
-def CreateNewExploration(user, title='New Exploration', category='No category',
+def create_new_exploration(user, title='New Exploration', category='No category',
         id=None, init_state_name='Activity 1'):
     """Creates and returns a new exploration."""
     if id:
         exploration_hash_id = id
     else:
-        exploration_hash_id = GetNewId(Exploration, title)
-    state_hash_id = GetNewId(State, init_state_name)
+        exploration_hash_id = get_new_id(Exploration, title)
+    state_hash_id = get_new_id(State, init_state_name)
 
     # Create a fake state key temporarily for initialization of the question.
     # TODO(sll): Do this in a transaction so it doesn't break other things.
@@ -303,15 +303,15 @@ def CreateNewExploration(user, title='New Exploration', category='No category',
     exploration.states = [new_init_state.key]
     exploration.put()
     if user:
-        augmented_user = GetAugmentedUser(user)
+        augmented_user = get_augmented_user(user)
         augmented_user.editable_explorations.append(exploration.key)
         augmented_user.put()
     return exploration
 
 
-def CreateNewState(exploration, state_name):
+def create_new_state(exploration, state_name):
     """Creates and returns a new state."""
-    state_hash_id = GetNewId(State, state_name)
+    state_hash_id = get_new_id(State, state_name)
     state = State(
         name=state_name, hash_id=state_hash_id, parent=exploration.key,
         interactive_rulesets={'submit': [{
@@ -328,12 +328,12 @@ def CreateNewState(exploration, state_name):
     return state
 
 
-def GetYamlFromDict(dictionary):
+def get_yaml_from_dict(dictionary):
     """Gets the YAML representation of a dict."""
     return yaml.safe_dump(dictionary, default_flow_style=False)
 
 
-def GetDictFromYaml(yaml_file):
+def get_dict_from_yaml(yaml_file):
     """Gets the dict representation of a YAML file."""
     try:
         yaml_dict = yaml.safe_load(yaml_file)
@@ -343,7 +343,7 @@ def GetDictFromYaml(yaml_file):
         raise InvalidInputException(e)
 
 
-def VerifyState(description):
+def verify_state(description):
     """Verifies a state representation without referencing other states.
 
     This enforces the following constraints:
@@ -423,14 +423,14 @@ def VerifyState(description):
     return True, ''
 
 
-def ModifyStateUsingDict(exploration, state, state_dict):
+def modify_state_using_dict(exploration, state, state_dict):
     """Modifies the properties of a state using values from a dictionary.
 
     Returns:
         The modified state.
     """
 
-    is_valid, error_log = VerifyState(state_dict)
+    is_valid, error_log = verify_state(state_dict)
     if not is_valid:
         raise InvalidInputException(error_log)
 
@@ -450,7 +450,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
         if rule['dest'] == END_DEST:
             rule_dict['dest'] = END_DEST
         else:
-            dest_state = GetStateByName(rule['dest'], exploration)
+            dest_state = get_state_by_name(rule['dest'], exploration)
             if dest_state:
                 rule_dict['dest'] = dest_state.hash_id
             else:
@@ -466,7 +466,7 @@ def ModifyStateUsingDict(exploration, state, state_dict):
     return state
 
 
-def CreateExplorationFromYaml(yaml, user, title, category, id=None):
+def create_exploration_from_yaml(yaml, user, title, category, id=None):
     """Creates an exploration from a YAML file."""
 
     yaml = yaml.strip()
@@ -477,24 +477,24 @@ def CreateExplorationFromYaml(yaml, user, title, category, id=None):
         raise InvalidInputException(
             'Invalid YAML file: the initial state name cannot be identified')
 
-    exploration = CreateNewExploration(
+    exploration = create_new_exploration(
         user, title=title, category=category, init_state_name=init_state_name,
         id=id)
-    yaml_description = GetDictFromYaml(yaml)
+    yaml_description = get_dict_from_yaml(yaml)
 
     # Create all the states first.
     for state_name, unused_state_description in yaml_description.iteritems():
         if state_name == init_state_name:
             continue
         else:
-            if CheckExistenceOfName(State, state_name, exploration):
+            if check_existence_of_name(State, state_name, exploration):
                 raise InvalidInputException(
                     'Invalid YAML file: contains duplicate state names %s' %
                     state_name)
-            state = CreateNewState(exploration, state_name)
+            state = create_new_state(exploration, state_name)
 
     for state_name, state_description in yaml_description.iteritems():
-        state = GetStateByName(state_name, exploration)
-        ModifyStateUsingDict(exploration, state, state_description)
+        state = get_state_by_name(state_name, exploration)
+        modify_state_using_dict(exploration, state, state_description)
 
     return exploration

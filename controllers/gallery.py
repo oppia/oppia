@@ -26,10 +26,10 @@ from google.appengine.api import users
 class GalleryPage(BaseHandler):
     """The exploration gallery page."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.GetJsFilesWithBase(['gallery']),
+            'js': utils.get_js_files_with_base(['gallery']),
             'nav_mode': 'gallery',
         })
         self.response.out.write(
@@ -39,10 +39,10 @@ class GalleryPage(BaseHandler):
 class GalleryHandler(BaseHandler):
     """Provides data for the exploration gallery."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         """Handles GET requests."""
         user = users.get_current_user()
-        augmented_user = utils.GetAugmentedUser(user) if user else None
+        augmented_user = utils.get_augmented_user(user) if user else None
 
         used_keys = []
 

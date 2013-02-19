@@ -45,3 +45,15 @@ class State(ndb.Model):
     # Parameter overrides for the interactive widget view, stored as key-value
     # pairs.
     interactive_params = ndb.JsonProperty(default={})
+
+    def as_dict(self):
+        """Gets a Python dict representation of the state."""
+
+        return {
+            'content': self.content,
+            'widget': {
+                'id': self.interactive_widget,
+                'params': self.interactive_params,
+                'rules': self.interactive_rulesets,
+            }
+        }
