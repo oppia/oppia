@@ -18,9 +18,9 @@ handlers:
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always
-- url: /widgets/(.*)/static
-  static_files: widgets/\1/static
-  upload: widgets/(.*)/static
+- url: /data/widgets/(.*)/static/(.*)
+  static_files: data/widgets/\1/static/\2
+  upload: data/widgets/(.*)/static/(.*)
   secure: always
 - url: /.*
   script: main.app
