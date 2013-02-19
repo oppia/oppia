@@ -176,7 +176,7 @@ def get_file_contents(root, filepath):
     Returns:
         the file contents.
     """
-    with open(root + filepath) as f:
+    with open(os.path.join(root, filepath)) as f:
         return f.read().decode('utf-8')
 
 

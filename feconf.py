@@ -18,15 +18,15 @@ DEV = (os.environ.get('SERVER_SOFTWARE')
        and not PRODUCTION_MODE)
 
 # The directory containing the HTML/JS/CSS templates.
-TEMPLATE_DIR = 'templates/dev/head/' if DEV else 'templates/prod/head/'
+TEMPLATE_DIR = 'templates/dev/head' if DEV else 'templates/prod/head'
 
 # The directory containing third-party files.
-THIRD_PARTY_DIR = 'third_party/'
+THIRD_PARTY_DIR = 'third_party'
 
 # The directories containing sample classifiers, explorations and widgets.
-SAMPLE_CLASSIFIERS_DIR = 'data/classifiers/'
-SAMPLE_EXPLORATIONS_DIR = 'data/explorations/'
-SAMPLE_WIDGETS_DIR = 'data/widgets/'
+SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
+SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
+SAMPLE_WIDGETS_DIR = 'data/widgets'
 
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
@@ -50,8 +50,8 @@ THIRD_PARTY_JS_LIBS = [
 
 # List of filepaths to CSS libraries to include in responses.
 ALL_CSS_LIBS = [
-    THIRD_PARTY_DIR + 'angular-ui/build/angular-ui.css',
-    THIRD_PARTY_DIR + 'bootstrap/css/bootstrap.css',
-    TEMPLATE_DIR + 'css/oppia.css',
-    THIRD_PARTY_DIR + 'bootstrap/css/bootstrap-responsive.css',
+    os.path.join(THIRD_PARTY_DIR, 'angular-ui/build/angular-ui.css'),
+    os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap.css'),
+    os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
+    os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap-responsive.css'),
 ]
