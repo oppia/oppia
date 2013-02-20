@@ -210,14 +210,12 @@ class InteractiveWidget(BaseHandler):
         widget_html = 'This widget is not available.'
         widget_js = ''
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            html_file = '%s/%s.html' % (widget_id, widget_id)
+            html_file = os.path.join(widget_id, '%s.html' % widget_id)
             widget_params = copy.deepcopy(widget['params'])
             for key in params:
                 widget_params[key] = params[key]
-            widget_params['root'] = os.path.join(
-                '..', feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static')
             try:
-                with open(html_file) as f:
+                with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, html_file)) as f:
                     pass
                 widget_html = feconf.WIDGET_JINJA_ENV.get_template(
                     html_file).render(widget_params)
@@ -229,13 +227,17 @@ class InteractiveWidget(BaseHandler):
                             '%s.js' % widget_id)) as f:
                         widget_js = ('<script>%s</script>' %
                                      f.read().decode('utf-8'))
-            except:
+            except IOError:
                 # Serve a link to the static directory in an iframe.
-                html_path = os.path.join(
-                    '/data', 'widgets', widget_id, 'static', '%s.html' % widget_id)
-                widget_html = (
-                    '<iframe src="%s" width="100%%" height="400"></iframe>' %
-                    html_path)
+                try:
+                    html_path = os.path.join(
+                        feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
+                        '%s.html' % widget_id)
+                    widget_html = feconf.JINJA_ENV.get_template(
+                        'iframe.html').render({
+                            'src': os.path.join('/', html_path)})
+                except IOError:
+                    pass
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
         for action, properties in widget['actions'].iteritems():
