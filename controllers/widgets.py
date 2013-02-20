@@ -114,9 +114,6 @@ class WidgetRepositoryHandler(BaseHandler):
         """Load interactive widgets from the file system."""
         response = {}
         for widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            # TODO(sll): Remove this when third-party imports are handled properly.
-            if widget_id == 'MusicStaff':
-                continue
             widget = InteractiveWidget.get_interactive_widget(widget_id)
             category = widget['category']
             if category not in response:
@@ -218,16 +215,27 @@ class InteractiveWidget(BaseHandler):
             for key in params:
                 widget_params[key] = params[key]
             widget_params['root'] = os.path.join(
-                feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static')
-            widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                html_file).render(widget_params)
+                '..', feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static')
+            try:
+                with open(html_file) as f:
+                    pass
+                widget_html = feconf.WIDGET_JINJA_ENV.get_template(
+                    html_file).render(widget_params)
 
-            if include_js:
-                with open(os.path.join(
-                        feconf.SAMPLE_WIDGETS_DIR,
-                        widget_id,
-                        '%s.js' % widget_id)) as f:
-                    widget_js = '<script>%s</script>' % f.read().decode('utf-8')
+                if include_js:
+                    with open(os.path.join(
+                            feconf.SAMPLE_WIDGETS_DIR,
+                            widget_id,
+                            '%s.js' % widget_id)) as f:
+                        widget_js = ('<script>%s</script>' %
+                                     f.read().decode('utf-8'))
+            except:
+                # Serve a link to the static directory in an iframe.
+                html_path = os.path.join(
+                    '/data', 'widgets', widget_id, 'static', '%s.html' % widget_id)
+                widget_html = (
+                    '<iframe src="%s" width="100%%" height="400"></iframe>' %
+                    html_path)
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
         for action, properties in widget['actions'].iteritems():
