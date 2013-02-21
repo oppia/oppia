@@ -229,15 +229,12 @@ class InteractiveWidget(BaseHandler):
                                      f.read().decode('utf-8'))
             except IOError:
                 # Serve a link to the static directory in an iframe.
-                try:
-                    html_path = os.path.join(
-                        feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
-                        '%s.html' % widget_id)
-                    widget_html = feconf.JINJA_ENV.get_template(
-                        'iframe.html').render({
-                            'src': os.path.join('/', html_path)})
-                except IOError:
-                    pass
+                html_path = os.path.join(
+                    feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
+                    '%s.html' % widget_id)
+                widget_html = feconf.JINJA_ENV.get_template(
+                    'iframe.html').render({
+                        'src': os.path.join('/', html_path)})
 
         widget['raw'] = '\n'.join([widget_html, widget_js])
         for action, properties in widget['actions'].iteritems():

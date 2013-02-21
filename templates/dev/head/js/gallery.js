@@ -14,7 +14,7 @@ oppia.factory('GalleryData', function($rootScope, $http, warningsData) {
 
   GalleryData.broadcastGalleryData = function() {
     $rootScope.$broadcast('galleryData');
-  }
+  };
 
   GalleryData.getData();
 
@@ -24,6 +24,7 @@ oppia.factory('GalleryData', function($rootScope, $http, warningsData) {
 
 function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.currentUrl = document.URL;
+  $scope.root = location.protocol + '//' + location.host;
 
   $scope.$on('galleryData', function() {
     console.log(GalleryData.data.categories);
