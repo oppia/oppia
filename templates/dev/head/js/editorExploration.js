@@ -375,12 +375,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   $scope.addState = function(newStateName, changeIsInline, categoryId) {
     if (!$scope.isValidEntityName(newStateName, true))
       return;
-    // States may not start with '[', since that label is reserved for
-    // '[Chapter]', '[Question]', etc.
-    if (newStateName && newStateName[0] == '[') {
-      warningsData.addWarning('State names may not start with \'[\'.');
-      return;
-    }
     if (newStateName.toUpperCase() == END_DEST) {
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;

@@ -17,8 +17,9 @@ textarea.oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
+/* Adds to existing Bootstrap CSS rule. */
 .alert-block {
-  width: 80%
+  width: 80%;
 }
 
 .oppia-content {

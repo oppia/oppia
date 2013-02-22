@@ -51,10 +51,8 @@ class GalleryHandler(BaseHandler):
                 Exploration.is_public == True):
             category_name = exploration.category
 
-            if augmented_user:
-                can_edit = exploration.key in augmented_user.editable_explorations
-            else:
-                can_edit = False
+            can_edit = (augmented_user and
+                        exploration.key in augmented_user.editable_explorations)
 
             used_keys.append(exploration.key)
 
