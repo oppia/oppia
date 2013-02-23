@@ -15,9 +15,12 @@
 __author__ = 'Jeremy Emerson'
 
 import unittest
+import utils
 from models.exploration import Exploration
 from models.models import AugmentedUser, GenericWidget, Image, Widget
 from models.state import State
+from models.parameter import Parameter
+from models.stats import Counter, Journal
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.api import users
@@ -106,3 +109,93 @@ class ModelsUnitTests(unittest.TestCase):
         o.states = [ndb.Key(Exploration, 5)]
         self.assertEqual(o.user, u)
         self.assertEqual(o.states, [ndb.Key(Exploration, 5)])
+
+    def test_Parameter_Class(self):
+        """Test Parameter Class."""
+        o = Parameter()
+        o.name = "The name"
+        o.starting_values = ["The values"]
+        self.assertEqual(o.name, "The name")
+        self.assertEqual(o.starting_values, ["The values"])
+
+    def test_Counter_Class(self):
+        """Test Counter Class."""
+        o = Counter()
+        o.name = "The name"
+        o.value = 2
+        self.assertEqual(o.name, "The name")
+        self.assertEqual(o.value, 2)
+
+    def test_Journal_Class(self):
+        """Test Journal Class."""
+        o = Journal()
+        o.name = "The name"
+        o.values = ["The values"]
+        self.assertEqual(o.name, "The name")
+        self.assertEqual(o.values, ["The values"])
+
+
+class FakeEntity(object):
+
+  def __init__(self, name, hash_id, ancestor=None):
+    self.__name__ = name
+    self.name = name
+    self.hash_id = hash_id
+    self.key = hash_id
+    if ancestor:
+      self.ancestor = ancestor
+    self.param = True
+
+  def query(self, ancestor=None):
+    if not ancestor:
+      return self
+    if self.ancestor.key == ancestor:
+      return self
+    return None
+
+  def filter(self, param):
+    self.param = param
+    return self
+
+  def get(self):
+    if self.param:
+      return self
+    return None
+
+class UtilsUnitTests(unittest.TestCase):
+    """Test utils."""
+
+    def test_create_enum_method(self):
+        """Test create_enum Method."""
+        o = utils.create_enum('first', 'second', 'third')
+        self.assertEqual(o.first, "first")
+        self.assertEqual(o.second, "second")
+        self.assertEqual(o.third, "third")
+        with self.assertRaises(AttributeError):
+          o.fourth
+
+    def test_get_entity_method(self):
+        """Test get_entity Method."""
+        entity = FakeEntity("The_fake_entity", 1)
+        with self.assertRaises(AttributeError):
+          utils.get_entity(None, None)
+        with self.assertRaises(utils.EntityIdNotFoundError):
+          utils.get_entity(entity, None)
+        o = utils.get_entity(entity, 1)
+        self.assertEqual(o.hash_id, 1)
+        with self.assertRaises(utils.EntityIdNotFoundError):
+          utils.get_entity(entity, 2)
+
+    def test_check_esistence_of_name_method(self):
+        """Test check_esistence_of_name Method."""
+        ancestor = FakeEntity("The_ancestor", 2)
+        entity = FakeEntity("The_fake_entity", 1, ancestor)
+        with self.assertRaises(AttributeError):
+          utils.check_existence_of_name(None, None)
+        with self.assertRaises(utils.EntityIdNotFoundError):
+          utils.check_existence_of_name(entity, None)
+        self.assertTrue(utils.check_existence_of_name(entity, "The_fake_entity"))
+        self.assertFalse(utils.check_existence_of_name(entity, "The_not_found_entity"))
+        self.assertTrue(utils.check_existence_of_name(entity, "The_fake_entity", ancestor))
+        with self.assertRaises(KeyError):
+          utils.check_existence_of_name(State, "The_fake_entity", None)
