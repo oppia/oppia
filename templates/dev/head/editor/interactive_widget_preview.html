@@ -17,7 +17,7 @@
     <h5>On user <[action]>:</h5>
     <ul>
       <li ng-repeat="rule in interactiveRulesets[action]">
-        <[rule | parameterizeRule]>: (<[states[rule.dest].name]>, <[rule.feedback]>)
+        <[rule | parameterizeRule]>: (<[getStateName(rule.dest)]>, <[rule.feedback]>)
         <span class="pull-right">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
@@ -108,11 +108,10 @@
         <hr>
         <div>
           Destination:
-          <input type="text" size="40" list="destinations" ng-model="addRuleActionDest" required>
-          <datalist id="destinations">
-            <option ng-repeat="(id, properties) in states" value="<[id]>"></option>
-            <option value="END"></option>
-          </datalist>
+          <select ng-model="addRuleActionDest">
+            <option ng-repeat="(id, properties) in states" value="<[id]>"><[states[id].name]></option>
+            <option value="END">END</option>
+          </select>
         </div>
         <div>
           <p>In response to the reader's answer, display the text:</p>

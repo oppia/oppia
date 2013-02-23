@@ -154,7 +154,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
 
     $scope.states[$scope.stateId].name = $scope.stateName;
-    $scope.saveStateChange('states');
     explorationData.saveStateProperty($scope.stateId, 'stateName', $scope.stateName);
     activeInputData.clear();
   };
@@ -528,6 +527,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.initInteractiveWidget(data);
   }
 
+  $scope.getStateName = function(stateId) {
+    return (stateId === END_DEST ? END_DEST : $scope.states[stateId].name);
+  };
+
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;
@@ -573,7 +576,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
             rule: $scope.addRuleActionRule,
             attrs: $scope.addRuleActionAttrs,
             inputs: $scope.addRuleActionInputs,
-            dest: $scope.convertDestToId($scope.addRuleActionDest),
+            dest: $scope.addRuleActionDest,
             feedback: $scope.addRuleActionFeedback
         };
 
@@ -660,9 +663,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     if (!dest) {
       return 'Error: unspecified destination';
     } else if (dest == END_DEST) {
-      return 'Destination: END';
+      return 'END';
     } else if (dest in $scope.states) {
-      return 'Destination: ' + $scope.states[dest].name;
+      return $scope.states[dest].name;
     } else {
       return '[Error: invalid destination]';
     }
