@@ -137,7 +137,7 @@ class ExplorationHandler(BaseHandler):
             assert rule['code']
 
             if rule['code'] == 'True':
-                dest = rule['dest']
+                dest_id = rule['dest']
                 feedback = rule['feedback']
                 break
 
@@ -147,20 +147,27 @@ class ExplorationHandler(BaseHandler):
                 self.normalize_classifier_return(eval(code)))
 
             if return_value:
-                dest = rule['dest']
+                dest_id = rule['dest']
                 feedback = rule['feedback']
                 break
 
-        assert dest
+        assert dest_id
 
         html_output, widget_output = '', []
+        # TODO(sll): The following is a special-case for multiple choice input,
+        # in which the choice text must be displayed instead of the choice number.
+        # We might need to find a way to do this more generically.
+        if state.interactive_widget == 'MultipleChoiceInput':
+            answer = state.interactive_params['choices'][int(answer)]
+
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
             'reader_response.html').render({'response': answer})
+
         # TODO(sll): if interactive_widget == MultipleChoiceInput, the choice
         # text should be displayed instead.
 
-        if dest == utils.END_DEST:
+        if dest_id == utils.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
@@ -169,7 +176,7 @@ class ExplorationHandler(BaseHandler):
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = utils.get_entity(State, dest)
+            state = utils.get_entity(State, dest_id)
 
             # Append Oppia's feedback, if any.
             if feedback:
@@ -194,7 +201,7 @@ class ExplorationHandler(BaseHandler):
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
 
-        if dest != utils.END_DEST:
+        if dest_id != utils.END_DEST:
             values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
                 state.interactive_widget,
                 params=state.interactive_params,
