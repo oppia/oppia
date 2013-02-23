@@ -34,10 +34,10 @@ echo Checking whether angular-ui is installed in third_party
 if [ ! -d "third_party/angular-ui" ]; then
   echo Installing Angular UI
   mkdir -p third_party/
-  wget https://github.com/angular-ui/angular-ui/archive/v0.3.1.zip -O angular-ui-download.zip
+  wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
   unzip angular-ui-download.zip -d third_party/
   rm angular-ui-download.zip
-  mv third_party/angular-ui-0.3.1 third_party/angular-ui
+  mv third_party/angular-ui-0.4.0 third_party/angular-ui
 fi
 
 echo Checking whether bootstrap is installed in third_party
