@@ -673,19 +673,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return destId;
   };
 
-  // TODO(sll): Use this in the UI.
-  $scope.getDestDescription = function(dest) {
-    if (!dest) {
-      return 'Error: unspecified destination';
-    } else if (dest == END_DEST) {
-      return 'END';
-    } else if (dest in $scope.states) {
-      return $scope.states[dest].name;
-    } else {
-      return '[Error: invalid destination]';
-    }
-  };
-
   $('#interactiveWidgetModal').on('hide', function() {
     // Reload the iframe.
     var F = $('#interactiveWidgetRepository');
