@@ -9,37 +9,67 @@
   <div class="tabbable tabs-left">
     <ul class="nav nav-tabs">
       <li ng-repeat="(category, widgetList) in widgets" ng-class="{active: $index == 0}">
-        <a data-toggle="tab" href="#<[category]>"><[category]></a>
+        <a data-toggle="tab" href="#<[category|spacesToUnderscores]>"><[category]></a>
       </li>
     </ul>
     <div class="tab-content">
-      <div ng-repeat="(category, widgetList) in widgets" class="tab-pane" ng-class="{active: $index == 0}" id="<[category]>">
+      <div ng-repeat="(category, widgetList) in widgets" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
         <div class="container-fluid">
           <div class="row-fluid">
 
-            <ul class="thumbnails">
-              <li ng-repeat="widget in widgetList" class="span3">
-                <div class="thumbnail">
+            {% if iframed %}
 
-                  <h5><[widget.name]></h5>
-                  <i><[widget.description]></i>
-                  <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">Customize</a>
-
-                  <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
-
-                  {% if admin and not iframed %}
-                    <button ng-click="editWidget(widget)">Edit this widget</button>
-                  {% else %}
-                    <center>
-                      <button ng-click="selectWidget(category, $index)">
-                        Use <[widget.name]>
-                      </button>
-                    </center>
-                  {% endif %}
-
+              <div class="accordion" id="accordion2">
+                <div class="accordion-group" ng-repeat="widget in widgetList">
+                  <div class="accordion-heading">
+                    <div style="margin: 10px">
+                      <span class="pull-right">
+                        <a data-toggle="collapse" data-parent="#accordion2" href="#widget<[widget.id]>">
+                          Preview
+                        </a> |
+                        <a ng-click="selectWidget(category, $index)">
+                          Use
+                        </a>
+                      </span>
+  
+                      <h5><[widget.name]></h5>
+                      <i><[widget.description]></i>
+                    </div>
+                  </div>
+                  <div id="widget<[widget.id]>" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                      <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">
+                        Customize
+                      </a>
+                      <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
+                    </div>
+                  </div>
                 </div>
-              </li>
-            </ul>
+              </div>
+
+            {% else %}
+
+              <ul class="thumbnails">
+                <li ng-repeat="widget in widgetList" class="span3">
+                  <div class="thumbnail">
+  
+                    <h5><[widget.name]></h5>
+                    <i><[widget.description]></i>
+                    <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">
+                      Customize
+                    </a>
+  
+                    <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
+  
+                    {% if admin and not iframed %}
+                      <button ng-click="editWidget(widget)">Edit this widget</button>
+                    {% endif %}
+  
+                  </div>
+                </li>
+              </ul>
+
+            {% endif %}
 
         </div>
       </div>

@@ -4,7 +4,7 @@ id: SetInput
 # The human-readable name of the widget.
 name: Set input
 # The category the widget falls under in the widget repository.
-category: Interactive
+category: Unfinished
 # A description of the widget.
 description: |
   A very basic set input widget. (NOTE: Does not work yet.)

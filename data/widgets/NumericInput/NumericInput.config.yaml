@@ -4,7 +4,7 @@ id: NumericInput
 # The human-readable name of the widget.
 name: Numeric input
 # The category the widget falls under in the widget repository.
-category: Interactive
+category: Basic Input
 # A description of the widget.
 description: |
   A numeric input widget that can accept and classify integers and

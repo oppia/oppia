@@ -4,7 +4,7 @@ id: MultipleChoiceInput
 # The human-readable name of the widget.
 name: Multiple choice input
 # The category the widget falls under in the widget repository.
-category: Interactive
+category: Basic Input
 # A description of the widget.
 description: |
   A multiple-choice input widget.

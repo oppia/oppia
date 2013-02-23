@@ -42,11 +42,11 @@
                         </a>
                         <div>
                           <h5><[exploration.data.title]></h5>
-                          <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
                           <span ui-if="exploration.can_edit">
-                            | <a href="/create/<[exploration.data.hash_id]>">Edit</a>
-                            | <a href="/stats/<[exploration.data.hash_id]>">Stats</a>
+                            <a href="/create/<[exploration.data.hash_id]>">Edit</a> |
+                            <a href="/stats/<[exploration.data.hash_id]>">Stats</a> |
                           </span>
+                          <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
                         </div>
                       </div>
                     </li>
