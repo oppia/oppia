@@ -27,6 +27,12 @@ import utils
 
 EDITOR_MODE = 'editor'
 
+#TODO(sll): refactor
+def construct_state_for_frontend(state):
+    state_repr = state.as_dict()
+    state_repr['name'] = state.name
+    state_repr['stateId'] = state.hash_id
+    return state_repr
 
 class NewExploration(BaseHandler):
     """Creates a new exploration."""
@@ -137,9 +143,7 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_list[state.hash_id] = state.as_dict()
-            state_list[state.hash_id]['name'] = state.name
-            state_list[state.hash_id]['stateId'] = state.hash_id
+            state_list[state.hash_id] = construct_state_for_frontend(state)
 
         self.values.update({
             'exploration_id': exploration.hash_id,
@@ -227,15 +231,16 @@ class StateHandler(BaseHandler):
                 'state': {'name': state.name},
                 'stateContent': state.content,
             }))
-            return
+            return   
 
-        state_name = self.request.get('state_name')
-        interactive_widget = self.request.get('interactive_widget')
+        state_name_json = self.request.get('state_name')
+        interactive_widget_json = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
         state_content_json = self.request.get('state_content')
 
-        if state_name:
+        if state_name_json:
+            state_name = json.loads(state_name_json)
             # Replace the state name with this one, after checking validity.
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
@@ -246,8 +251,8 @@ class StateHandler(BaseHandler):
             state.name = state_name
             state.put()
 
-        if interactive_widget:
-            state.interactive_widget = interactive_widget
+        if interactive_widget_json:
+            state.interactive_widget = json.loads(interactive_widget_json)
 
         if interactive_params_json:
             state.interactive_params = json.loads(interactive_params_json)
@@ -295,6 +300,10 @@ class StateHandler(BaseHandler):
                              for item in state_content]
 
         state.put()
+	values = construct_state_for_frontend(state);  
+        self.response.out.write(json.dumps(values))
+
+
 
     @require_editor
     def delete(self, user, exploration, state):
