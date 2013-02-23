@@ -27,12 +27,6 @@ import utils
 
 EDITOR_MODE = 'editor'
 
-#TODO(sll): refactor
-def construct_state_for_frontend(state):
-    state_repr = state.as_dict()
-    state_repr['name'] = state.name
-    state_repr['stateId'] = state.hash_id
-    return state_repr
 
 class NewExploration(BaseHandler):
     """Creates a new exploration."""
@@ -143,7 +137,7 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_list[state.hash_id] = construct_state_for_frontend(state)
+            state_list[state.hash_id] = state.as_dict()
 
         self.values.update({
             'exploration_id': exploration.hash_id,
@@ -175,9 +169,9 @@ class ExplorationDownloadHandler(BaseHandler):
         for state_key in exploration.states:
             state = state_key.get()
             if exploration.init_state.get().hash_id == state.hash_id:
-                init_dict[state.name] = state.as_dict()
+                init_dict[state.name] = state.internals_as_dict()
             else:
-                exploration_dict[state.name] = state.as_dict()
+                exploration_dict[state.name] = state.internals_as_dict()
         self.response.out.write(utils.get_yaml_from_dict(init_dict))
         self.response.out.write(utils.get_yaml_from_dict(exploration_dict))
 
@@ -208,7 +202,7 @@ class StatePage(BaseHandler):
             'stateId': state.hash_id,
             'stateName': state.name,
             'stateContent': state.content,
-            'yaml': utils.get_yaml_from_dict(state.as_dict()),
+            'yaml': utils.get_yaml_from_dict(state.internals_as_dict()),
         }
         self.response.out.write(json.dumps(values))
 
@@ -259,8 +253,9 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets_json:
             state.interactive_rulesets = json.loads(interactive_rulesets_json)
-            # TODO(sll): Do additional calculations here to get the parameter changes,
-            # if necessary.
+
+            # TODO(yanamal): Do additional calculations here to get the parameter
+            # changes, if necessary.
             ruleset = state.interactive_rulesets['submit']
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
@@ -294,14 +289,17 @@ class StateHandler(BaseHandler):
 
                 logging.info(result)
 
+            for action in state.interactive_rulesets:
+                for rule in state.interactive_rulesets[action]:
+                    del rule['attrs']
+
         if state_content_json:
             state_content = json.loads(state_content_json)
             state.content = [{'type': item['type'], 'value': item['value']}
                              for item in state_content]
 
         state.put()
-	values = construct_state_for_frontend(state);  
-        self.response.out.write(json.dumps(values))
+        self.response.out.write(json.dumps(state.as_dict()))
 
 
 

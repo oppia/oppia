@@ -4,7 +4,24 @@
   <div ng-controller="EditorExploration" ng-cloak>
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
+           
         <div class="span12">
+
+          <span class="pull-right" style="margin: 10px 50px 0 0">
+
+            <button ng-hide="isPublic" type="button" ng-click="makePublic()">
+              Publish
+            </button>
+
+            <button type="button" ng-click="downloadExploration()">
+              Download A Copy
+            </button>
+
+            <button type="button" class="btn btn-danger" data-toggle="modal"
+                    data-target="#deleteExplorationModal">
+              Delete
+            </button>
+          </span>
 
           <h3>
             <[explorationTitle]>

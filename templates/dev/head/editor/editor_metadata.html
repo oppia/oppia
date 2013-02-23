@@ -50,27 +50,3 @@
     <button type="button" ng-click="addParameter(tmpName, tmpVals)">Submit</button>
   </div>
 </div>
-
-<div>
-  <button type="button" ng-click="downloadExploration()">
-    Download Exploration
-  </button>
-</div>
-
-<br><br><br>
-
-<div ng-hide="isPublic">
-  <button type="button" ng-click="makePublic()">
-    Publish Exploration
-  </button>
-  (irreversible)
-</div>
-
-<br>
-
-<div>
-  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteExplorationModal">
-    Delete Exploration
-  </button>
-  (irreversible)
-</div>

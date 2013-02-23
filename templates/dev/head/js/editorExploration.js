@@ -420,7 +420,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    * @param {Object} data Data received from the backend about the state.
    */
   $scope.processStateData = function(data) {
-    $scope.stateId = data.stateId;
+    $scope.stateId = explorationData.stateId;
     $scope.stateContent = data.content;
     $scope.stateName = data.name;
 
@@ -636,12 +636,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       destId = END_DEST;
     } else {
       // Find the id in states.
-      // TODO(sll): The next block of code should not be here. It is for the
-      // case where the destName is actually an id.
-      if (destName in $scope.states) {
-        return destName;
-      }
-
       for (var id in $scope.states) {
         if ($scope.states[id].name == destName) {
           found = true;
@@ -660,8 +654,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
     if (!found) {
       warningsData.addWarning('Invalid destination id.');
-      // TODO(sll): This is probably not the correct thing to return.
-      return destName;
+      return destName + '(INVALID)';
     }
 
     return destId;

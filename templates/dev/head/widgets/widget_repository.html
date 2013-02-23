@@ -19,19 +19,18 @@
 
             {% if iframed %}
 
-              <div class="accordion" id="accordion2">
+              <div class="accordion" id="accordion">
                 <div class="accordion-group" ng-repeat="widget in widgetList">
                   <div class="accordion-heading">
                     <div style="margin: 10px">
                       <span class="pull-right">
-                        <a data-toggle="collapse" data-parent="#accordion2" href="#widget<[widget.id]>">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#widget<[widget.id]>">
                           Preview
                         </a> |
                         <a ng-click="selectWidget(category, $index)">
                           Use
                         </a>
                       </span>
-  
                       <h5><[widget.name]></h5>
                       <i><[widget.description]></i>
                     </div>
