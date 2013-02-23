@@ -41,12 +41,20 @@ oppia.config(['$routeProvider', function($routeProvider) {
 
 oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData) {
   // Put exploration variables here.
-  var explorationData = {};
+  var explorationData ={};
+
+  // Valid state properties
+  var valid_state_properties = [
+    'interactive_widget',
+    'interactive_params',
+    'interactive_rulesets',
+    'state_content',
+    'state_name'];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
   var Exploration = $resource('/create/:explorationId/data');
-
+ 
   // There should be one GET request made for Exploration when the editor page
   // is initially loaded. This results in a broadcast that will initialize the
   // relevant frontend controllers.
@@ -83,7 +91,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       explorationData.stateId = stateId;
     }
     console.log('Broadcasting data for state ' + explorationData.stateId);
-    $rootScope.$broadcast('stateData');
+    $rootScope.$broadcast('explorationData');
   };
 
   explorationData.getStateData = function(stateId) {
@@ -98,18 +106,22 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       explorationData.getData(stateId);
     }
   };
-
-  explorationData.saveStateProperty = function(stateId, property, value) {
+  
+  
+  explorationData.saveStateProperty = function(stateId, propertyValueMap) {
     // Saves data locally and puts it into the backend. Sole point of
     // communication between frontend and backend.
     // TODO(sll): Implement this fully. It should update the frontend as well
     // as explorationData and the backend. Then it broadcasts a stateUpdate
     // event.
-    var requestParams = {};
-    if (property == 'stateName') {
-      requestParams['state_name'] = value;
+    for (var property in propertyValueMap) {
+	if (valid_state_properties.indexOf(property) < 0) {
+	    alert("Invalid Property Name:" + property);
+	}
+        propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
     }
-    var request = $.param(requestParams, true);
+
+    var request = $.param(propertyValueMap, true);
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
@@ -117,7 +129,11 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes to this state were saved successfully.');
-      explorationData.broadcastState($scope.stateId);
+      console.log(explorationData.data);
+      console.log('#####DATA####');
+      console.log(data);
+      explorationData.data['states'][stateId] = data;
+      explorationData.broadcastState(stateId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
@@ -153,9 +169,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       return;
     }
 
-    $scope.states[$scope.stateId].name = $scope.stateName;
-    $scope.saveStateChange('states');
-    explorationData.saveStateProperty($scope.stateId, 'stateName', $scope.stateName);
+    explorationData.saveStateProperty($scope.stateId, {'state_name': $scope.stateName});
     activeInputData.clear();
   };
 
@@ -528,6 +542,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.initInteractiveWidget(data);
   }
 
+  $scope.getStateName = function(stateId) {
+    return (stateId === END_DEST ? END_DEST : $scope.states[stateId].name);
+  };
+
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;
@@ -573,7 +591,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
             rule: $scope.addRuleActionRule,
             attrs: $scope.addRuleActionAttrs,
             inputs: $scope.addRuleActionInputs,
-            dest: $scope.convertDestToId($scope.addRuleActionDest),
+            dest: $scope.addRuleActionDest,
             feedback: $scope.addRuleActionFeedback
         };
 
@@ -655,19 +673,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return destId;
   };
 
-  // TODO(sll): Use this in the UI.
-  $scope.getDestDescription = function(dest) {
-    if (!dest) {
-      return 'Error: unspecified destination';
-    } else if (dest == END_DEST) {
-      return 'Destination: END';
-    } else if (dest in $scope.states) {
-      return 'Destination: ' + $scope.states[dest].name;
-    } else {
-      return '[Error: invalid destination]';
-    }
-  };
-
   $('#interactiveWidgetModal').on('hide', function() {
     // Reload the iframe.
     var F = $('#interactiveWidgetRepository');
@@ -695,10 +700,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   });
 
   $scope.saveInteractiveWidget = function() {
-    $scope.$parent.$parent.interactiveWidget = $scope.interactiveWidget;
-    $scope.$parent.$parent.interactiveRulesets = $scope.interactiveRulesets;
-    $scope.$parent.$parent.interactiveParams = $scope.interactiveParams;
-    $scope.saveStateChange('interactiveWidget');
+    explorationData.saveStateProperty($scope.stateId, {
+        // The backend actually just saves the id of the widget.
+        'interactive_widget': $scope.interactiveWidget.id,
+        'interactive_params': $scope.interactiveParams,
+        'interactive_rulesets': $scope.interactiveRulesets
+    });
   };
 }
 
