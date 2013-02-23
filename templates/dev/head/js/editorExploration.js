@@ -44,7 +44,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   var explorationData ={};
 
   // Valid state properties
-  var valid_state_properties = [
+  var validStateProperties = [
     'interactive_widget',
     'interactive_params',
     'interactive_rulesets',
@@ -105,20 +105,17 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     } else {
       explorationData.getData(stateId);
     }
-  };
+  };  
   
-  
+  // Saves data for a given state to the backend, and, on a success callback,
+  // updates the data for that state in the frontend and broadcasts an
+  // 'state updated' event.
   explorationData.saveStateProperty = function(stateId, propertyValueMap) {
-    // Saves data locally and puts it into the backend. Sole point of
-    // communication between frontend and backend.
-    // TODO(sll): Implement this fully. It should update the frontend as well
-    // as explorationData and the backend. Then it broadcasts a stateUpdate
-    // event.
     for (var property in propertyValueMap) {
-	if (valid_state_properties.indexOf(property) < 0) {
-	    alert("Invalid Property Name:" + property);
-	}
-        propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
+      if (validStateProperties.indexOf(property) < 0) {
+        warningsData.addWarning('Invalid property name:' + property);
+      }
+      propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
     }
 
     var request = $.param(propertyValueMap, true);
@@ -129,9 +126,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       console.log('Changes to this state were saved successfully.');
-      console.log(explorationData.data);
-      console.log('#####DATA####');
-      console.log(data);
       explorationData.data['states'][stateId] = data;
       explorationData.broadcastState(stateId);
     }).error(function(data) {

@@ -132,7 +132,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       warningsData.addWarning('Unknown content type ' + contentType + '.');
       return;
     }
-    $scope.saveStateChange('states');
+    $scope.saveStateChange('stateContent');
   };
 
   $scope.deleteContent = function(index) {
@@ -149,7 +149,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
           }
         }
         $scope.$parent.stateContent = tempstateContent;
-        $scope.saveStateChange('states');
+        $scope.saveStateChange('stateContent');
         return;
       }
     }
