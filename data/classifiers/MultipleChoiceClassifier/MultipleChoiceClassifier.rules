@@ -1,2 +1,2 @@
-Answer is equal to {{x | IsNonnegativeInt}}:
-  classifier: Equals(x)
+Answer is equal to {{x|NonnegativeInt}}:
+  classifier: equals(x)

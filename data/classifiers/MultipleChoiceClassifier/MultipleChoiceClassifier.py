@@ -1,13 +1,13 @@
-def norm(val):
-    """Normalizes the input to be a non-negative integer."""
-    return int(val)
-
-
-def IsNonnegativeInt(val):
+def NonnegativeInt(val):
     """The given value should be a non-negative integer."""
-    return isinstance(val, int) and val >= 0
+    try:
+        val = int(val)
+        assert val >= 0
+    except:
+        return None
+    return val
 
 
-def Equals(val, x):
+def equals(val, x):
     """The given value should be equal to {{x}}."""
-    return norm(val) == norm(x)
+    return NonnegativeInt(val) == NonnegativeInt(x)

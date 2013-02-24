@@ -1,18 +1,21 @@
-def norm(x):
+def String(x):
     """Removes spaces and makes all characters of a string lowercase."""
-    return unicode(x).replace(' ', '').lower()
+    try:
+        return unicode(x).replace(' ', '').lower()
+    except:
+        return None
 
 
-def Equals(val, x):
+def equals(val, x):
     """The given value should be equal to {{x}}."""
-    return norm(val) == norm(x)
+    return String(val) == String(x)
 
 
-def StartsWith(val, x):
+def starts_with(val, x):
     """The given string should start with {{x}}."""
-    return norm(val).startswith(norm(x))
+    return String(val).startswith(String(x))
 
 
-def Contains(val, x):
+def contains(val, x):
     """The given string should contain {{x}}."""
-    return norm(val).find(norm(x)) != -1
+    return String(val).find(String(x)) != -1

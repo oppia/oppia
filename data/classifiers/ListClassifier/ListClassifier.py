@@ -1,14 +1,18 @@
-def IsList(val):
+def List(val):
     """The given value should be a list."""
-    return isinstance(val, list)
+    try:
+        assert isinstance(val, list)
+    except:
+        return None
+    return val
 
 
-def Equals(val, x):
+def equals(val, x):
     """The given value and {{x}} should be equal."""
     return val == x
 
 
-def DoesNotEqual(val, x):
+def does_not_equal(val, x):
     """The given value and {{x}} should not be equal.
 
     Returns additional data:
@@ -31,11 +35,8 @@ def DoesNotEqual(val, x):
     i = 0
     while True:
         if i >= len(val) and i >= len(x):
-            if val[i] != x[i]:
-                return True, update_data(data, i, val[i])
-            else:
-                # The two lists are equal.
-                return False, data
+            # The two lists are equal.
+            return False, data
         elif i >= len(val):
             return True, update_data(data, i, None)
             return True, data
@@ -45,6 +46,6 @@ def DoesNotEqual(val, x):
         i += 1
 
 
-def HasNonemptyCommonPrefix(val, x):
+def has_nonempty_common_prefix(val, x):
     """The given value and {{x}} should have a non-empty common prefix."""
     return len(x) > 0 and len(val) > 0 and x[0] == val[0]

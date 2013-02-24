@@ -1,8 +1,8 @@
-Answer is equal to {{x | isString}}:
-  classifier: Equals(x)
+Answer is equal to {{x|String}}:
+  classifier: equals(x)
 
-Answer starts with {{x | isString}}:
-  classifier: StartsWith(x)
+Answer starts with {{x|String}}:
+  classifier: starts_with(x)
 
-Answer contains {{x | isString}}:
-  classifier: Contains(x)
+Answer contains {{x|String}}:
+  classifier: contains(x)

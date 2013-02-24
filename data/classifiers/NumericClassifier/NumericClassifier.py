@@ -1,46 +1,56 @@
 import numbers
 
 
-def IsNumber(val):
+def Number(val):
     """The given value should be a number."""
-    return isinstance(val, numbers.Number)
+    try:
+        val = float(val)
+        assert isinstance(val, numbers.Number)
+    except:
+        return None
+    return val
 
 
-def IsReal(val):
+def Real(val):
     """The given value should be a real number."""
-    return isinstance(val, numbers.Real)
+    try:
+        val = float(val)
+        assert isinstance(val, numbers.Real)
+    except:
+        return None
+    return val
 
 
-def Equals(val, x):
+def equals(val, x):
     """The given value should be equal to {{x}}."""
     return val == x
 
 
-def IsLessThan(val, x):
+def is_less_than(val, x):
     """The given value should be less than {{x}}."""
     return val < x
 
 
-def IsGreaterThan(val, x):
+def is_greater_than(val, x):
     """The given value should be greater than {{x}}."""
     return val > x
 
 
-def IsLessThanOrEqualTo(val, x):
+def is_less_than_or_equal_to(val, x):
     """The given value should be less than or equal to {{x}}."""
     return val <= x
 
 
-def IsGreaterThanOrEqualTo(val, x):
+def is_greater_than_or_equal_to(val, x):
     """The given value should be greater than or equal to {{x}}."""
     return val >= x
 
 
-def IsInclusivelyBetween(val, a, b):
+def is_inclusively_between(val, a, b):
     """The given value should be between {{a}} and {{b}}, inclusive."""
     return val >= a and val <= b
 
 
-def IsWithinTolerance(val, tol, x):
+def is_within_tolerance(val, x, tol):
     """The given value should be within {{tol}} of {{x}}, inclusive."""
-    return IsInclusivelyBetween(val, tol - x, tol + x)
+    return is_inclusively_between(val, x - tol, x + tol)

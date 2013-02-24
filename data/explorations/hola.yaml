@@ -9,11 +9,11 @@ Hola:
     params: {}
     rules:
       submit:
-      - code: Equals('hola!')
+      - code: equals('hola!')
         dest: Me llamo
         feedback: 'Don''t forget: Spanish uses inverted exclamation points at the beginning
             of sentences as well as the ending exclamation point.'
-      - code: Contains('hola')
+      - code: contains('hola')
         dest: Me llamo
         feedback: ''
       - code: True
@@ -31,10 +31,10 @@ Adios:
     params: {}
     rules:
       submit:
-      - code: Contains('adios')
+      - code: contains('adios')
         dest: Adios
         feedback: Don't forget your accent marks next time!
-      - code: Contains(u"adi\xF3s")
+      - code: contains(u"adi\xF3s")
         dest: END
         feedback: ''
       - code: True
@@ -57,16 +57,16 @@ Colores:
       - I don't know
     rules:
       submit:
-      - code: Equals(0)
+      - code: equals(0)
         dest: Colores
         feedback: Apples aren't black unless they are rotten...and they aren't blue
-      - code: Equals(1)
+      - code: equals(1)
         dest: Colores
         feedback: Orange and white...not quite
-      - code: Equals(2)
+      - code: equals(2)
         dest: Adios
         feedback: "\xA1S\xED! Las manzanas son rojas y verdes."
-      - code: Equals(3)
+      - code: equals(3)
         dest: Colores
         feedback: Yellow and gray? Apples?
       - code: True
@@ -87,12 +87,12 @@ Como meaning:
     id: TextInput
     rules:
       submit:
-      - code: Equals('what is your name?')
+      - code: equals('what is your name?')
         dest: Me llamo
         feedback: 'Yes!
 
         <br>So, let''s try this again...Introduce yourself.'
-      - code: Equals('what do you call yourself?')
+      - code: equals('what do you call yourself?')
         dest: Me llamo
         feedback: 'Great!
 
@@ -112,12 +112,12 @@ Me llamo:
     id: TextInput
     rules:
       submit:
-      - code: StartsWith('me llamo es')
+      - code: starts_with('me llamo es')
         dest: Me llamo
         feedback: You've got one too many verbs.
-      - code: StartsWith('me llamo')
+      - code: starts_with('me llamo')
         dest: Supermercado
-      - code: StartsWith('mi nombre es')
+      - code: starts_with('mi nombre es')
         dest: Supermercado
       - code: True
         dest: Me llamo meaning
@@ -131,13 +131,13 @@ Me llamo meaning:
     id: TextInput
     rules:
       submit:
-      - code: Equals('my name is')
+      - code: equals('my name is')
         dest: Como meaning
         feedback: That's right!
-      - code: Equals('i am called')
+      - code: equals('i am called')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
-      - code: Equals('i call myself')
+      - code: equals('i call myself')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
       - code: True
@@ -162,17 +162,17 @@ Supermercado:
       - I don't know
     rules:
       submit:
-      - code: Equals(0)
+      - code: equals(0)
         dest: Supermercado
         feedback: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
         \ can't buy windows in a supermarket. If you need more help, select \"I don't\
         \ know\""
-      - code: Equals(1)
+      - code: equals(1)
         dest: Supermercado
         feedback: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
         \ can't buy cars in a supermarket. If you need more help, select \"I don't\
         \ know\""
-      - code: Equals(2)
+      - code: equals(2)
         dest: Colores
       - code: True
         dest: Supermercado

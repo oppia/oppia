@@ -1,17 +1,17 @@
-Answer is equal to {{x | IsSet}}:
-  classifier: Equals(x)
+Answer is equal to {{x|Set}}:
+  classifier: equals(x)
 
-Answer is a proper subset of {{x | IsSet}}:
-  classifier: IsSubsetOf(x)
+Answer is a proper subset of {{x|Set}}:
+  classifier: is_subset_of(x)
 
-Answer is a proper superset of {{x | IsSet}}:
-  classifier: IsSupersetOf(x)
+Answer is a proper superset of {{x|Set}}:
+  classifier: is_superset_of(x)
 
-Answer has some elements not in {{x | IsSet}}:
-  classifier: HasElementsNotIn(x)
+Answer has some elements not in {{x|Set}}:
+  classifier: has_elements_not_in(x)
 
-Answer omits some elements in {{x | IsSet}}:
-  classifier: OmitsElementsIn(x)
+Answer omits some elements in {{x|Set}}:
+  classifier: omits_elements_in(x)
 
-Answer has no elements in common with {{x | IsSet}}:
-  classifier: IsDisjointFrom(x)
+Answer has no elements in common with {{x|Set}}:
+  classifier: is_disjoint_from(x)

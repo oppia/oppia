@@ -1,8 +1,8 @@
-Answer is equal to {{x | IsList}}:
-  classifier: Equals(x)
+Answer is equal to {{x|List}}:
+  classifier: equals(x)
 
-Answer does not equal {{x | IsList}}:
-  classifier: DoesNotEqual(x)
+Answer does not equal {{x|List}}:
+  classifier: does_not_equal(x)
 
-Answer shares a common prefix with {{x | IsList}}:
-  classifier: HasNonemptyCommonPrefix(x)
+Answer shares a common prefix with {{x|List}}:
+  classifier: has_nonempty_common_prefix(x)
