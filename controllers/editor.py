@@ -289,11 +289,12 @@ class StateHandler(BaseHandler):
                 # TODO(sll): The next line is wrong. It should account for
                 # commas within brackets.
                 params = classifier_func[first_bracket + 1: -1].split(',')
-                for param in params:
+                for index, param in enumerate(params):
                     if param not in rule['inputs']:
                         raise self.InvalidInputException(
                             'Parameter %s could not be replaced.' % param)
-                    result += ','
+                    if index != 0:
+                        result += ','
 
                     # TODO(sll): This normalizer should follow the one specified
                     # in the rule, instead.

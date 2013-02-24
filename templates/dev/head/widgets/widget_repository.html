@@ -19,30 +19,18 @@
 
             {% if iframed %}
 
-              <div class="accordion" id="accordion">
-                <div class="accordion-group" ng-repeat="widget in widgetList">
-                  <div class="accordion-heading">
-                    <div style="margin: 10px">
-                      <span class="pull-right">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#widget<[widget.id]>">
-                          Preview
-                        </a> |
-                        <a ng-click="selectWidget(category, $index)">
-                          Use
-                        </a>
-                      </span>
-                      <h5><[widget.name]></h5>
-                      <i><[widget.description]></i>
-                    </div>
-                  </div>
-                  <div id="widget<[widget.id]>" class="accordion-body collapse">
-                    <div class="accordion-inner">
-                      <a ng-click="showCustomizeModal(category, $index)" ng-show="widget.params.length > 0">
-                        Customize
-                      </a>
-                      <iframe id="widget-<[category]>-<[$index]>" frameborder="0" width="100%"></iframe>
-                    </div>
-                  </div>
+              <div class="accordion-group" ng-repeat="widget in widgetList">
+                <div style="margin: 10px">
+                  <span class="pull-right">
+                    <a ng-click="previewWidget(category, $index)">
+                      Preview
+                    </a> |
+                    <a ng-click="selectWidget(category, $index)">
+                      Use
+                    </a>
+                  </span>
+                  <h5><[widget.name]></h5>
+                  <i><[widget.description]></i>
                 </div>
               </div>
 
@@ -72,6 +60,14 @@
 
         </div>
       </div>
+    </div>
+
+    <div>
+      <h4>Preview</h4>
+      <a ng-click="showCustomizeModal(previewCategory, previewIndex)" ng-show="widget.params.length > 0">
+        Customize
+      </a>
+      <iframe id="widgetPreview" frameborder="0" width="100%"></iframe>
     </div>
   </div>
 

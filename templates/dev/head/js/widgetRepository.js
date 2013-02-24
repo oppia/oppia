@@ -3,7 +3,7 @@ oppia.directive('notDuplicateWidget', function() {
     require: 'ngModel',
     link: function(scope, elm, attrs, ctrl) {
       ctrl.$parsers.unshift(function(viewValue) {
-        for (category in scope.widgets) {
+        for (var category in scope.widgets) {
           for (var i = 0; i < scope.widgets[category].length; ++i) {
             if (scope.widgets[category][i].name == viewValue) {
               ctrl.$setValidity('notDuplicateWidget', false);
@@ -26,7 +26,7 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.widgets = data.widgets;
     console.log(data);
     // Display previews of each widget.
-    for (category in data.widgets) {
+    for (var category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
         var rawCode = $scope.widgets[category][i].raw;
         $scope.$apply();
@@ -166,7 +166,6 @@ function WidgetRepository($scope, $http, activeInputData) {
     });
   };
 
-
   /**
    * Displays a modal allowing customization of the widget's parameters.
    * @param {string} category The category of the widget to customize.
@@ -207,9 +206,20 @@ function WidgetRepository($scope, $http, activeInputData) {
     var data = {
       raw: customizedCode,
       widget: $scope.widgets[category][index]
-    }
+    };
 
     window.parent.postMessage(data, '*');
+  };
+
+  $scope.previewWidget = function(category, index) {
+    $scope.previewCategory = category;
+    $scope.previewIndex = index;
+
+    var rawCode = $scope.widgets[category][index].raw;
+    $scope.addContentToIframe(
+        'widgetPreview',
+        $scope.createCustomizedCode(
+             $scope.widgets[category][index].params, null, rawCode));
   };
 
   $scope.initializeWidgetParamEditor = function(index) {

@@ -41,7 +41,7 @@
     </button>
   </div>
 
-  <div ui-modal class="fade" id="customizeWidgetModal" ng-model="customizeWidgetModalShown">
+  <div class="modal hide fade" id="customizeWidgetModal">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;
@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <div ui-modal class="fade" id="interactiveWidgetModal" ng-model="interactiveWidgetModalShown">
+  <div class="modal hide fade" id="interactiveWidgetModal" style="width: 900px; margin-left: -390px;">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;
@@ -70,7 +70,8 @@
       </h3>
     </div>
     <div class="modal-body">
-      <iframe src="/widgetrepository?iframed=true&interactive=true" width="100%" height="400px" frameborder="0"
+      <iframe src="/widgetrepository?iframed=true&interactive=true"
+              width="100%" height="400px" frameborder="0"
               id="interactiveWidgetRepository">
       </iframe>
     </div>

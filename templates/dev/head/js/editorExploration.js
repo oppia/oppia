@@ -553,7 +553,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;
     $scope.addRuleActionAttrs = attrs;
-    $scope.addRuleActionDest = $scope.stateName;
+    $scope.addRuleActionDest = explorationData.stateId;
   };
 
   $scope.deselectAllRules = function() {
