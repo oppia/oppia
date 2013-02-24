@@ -178,37 +178,6 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.out.write(utils.get_yaml_from_dict(exploration_dict))
 
 
-class StatePage(BaseHandler):
-    """Allows content creators to edit a state."""
-
-    @require_editor
-    def get(self, user, exploration, unused_state):
-        """Gets a page representing an exploration with a list of states."""
-        self.values.update({
-            'js': utils.get_js_files_with_base(
-                ['editorExploration', 'editorGraph',
-                 'editorTree', 'guiEditor', 'yamlEditor']),
-            'nav_mode': EDITOR_MODE,
-        })
-        self.response.out.write(feconf.JINJA_ENV.get_template(
-            'editor/editor_exploration.html').render(self.values))
-
-    @require_editor
-    def post(self, user, exploration, state):
-        """Returns the properties of a state when it is opened for editing."""
-
-        values = {
-            'interactiveWidget': state.interactive_widget,
-            'interactiveRulesets': state.interactive_rulesets,
-            'interactiveParams': state.interactive_params,
-            'stateId': state.hash_id,
-            'stateName': state.name,
-            'stateContent': state.content,
-            'yaml': utils.get_yaml_from_dict(state.internals_as_dict()),
-        }
-        self.response.out.write(json.dumps(values))
-
-
 class StateHandler(BaseHandler):
     """Handles state transactions."""
 
@@ -234,6 +203,8 @@ class StateHandler(BaseHandler):
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
         state_content_json = self.request.get('state_content')
+
+        logging.info(self.request.arguments())
 
         if state_name_json:
             state_name = json.loads(state_name_json)

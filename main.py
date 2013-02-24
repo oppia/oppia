@@ -57,7 +57,6 @@ urls = [
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/create/(%s)/(%s)/?' % (r, r), editor.StatePage),
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
     (r'/widgets/?', widgets.WidgetInstance),
