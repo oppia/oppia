@@ -243,7 +243,7 @@ class InteractiveWidget(BaseHandler):
                 with open(os.path.join(
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,
-                        '%s.rules' % classifier)) as f:
+                        '%sRules.yaml' % classifier)) as f:
                     properties['rules'] = utils.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget

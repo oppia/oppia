@@ -115,7 +115,7 @@ class ExplorationHandler(BaseHandler):
 
         # The reader's answer.
         answer = self.request.get('answer')
-        dest = None
+        dest_id = None
         feedback = None
 
         interactive_widget_properties = InteractiveWidget.get_interactive_widget(
@@ -141,8 +141,12 @@ class ExplorationHandler(BaseHandler):
                 feedback = rule['feedback']
                 break
 
+            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+            if norm_answer is None:
+                # Replace this with a more detailed warning.
+                raise self.InvalidInputException('Invalid input')
             # Add the 'answer' variable, and prepend classifier.
-            code = 'Classifier.' + rule['code'].replace('(', '(answer,')
+            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
             return_value, return_data = (
                 self.normalize_classifier_return(eval(code)))
 
@@ -163,9 +167,6 @@ class ExplorationHandler(BaseHandler):
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
             'reader_response.html').render({'response': answer})
-
-        # TODO(sll): if interactive_widget == MultipleChoiceInput, the choice
-        # text should be displayed instead.
 
         if dest_id == utils.END_DEST:
             # This leads to a FINISHED state.

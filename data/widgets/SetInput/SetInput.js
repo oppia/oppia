@@ -1,7 +1,7 @@
 function SetInput($scope) {
   $scope.submitAnswer = function() {
-  	$scope.$parent.submitAnswer();
-  }
+    $scope.$parent.submitAnswer();
+  };
 
   $scope.addElement = function() {
     $scope.$parent.answer.push($scope.newElement);

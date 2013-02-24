@@ -43,7 +43,11 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
         $('.answer').serialize() +
             '&block_number=' + JSON.stringify($scope.blockNumber),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshPage);
+    ).success($scope.refreshPage)
+    .error(function(data) {
+      warningsData.addWarning(
+        data.error || 'There was an error processing your input.');
+    });
   };
 
   $scope.refreshPage = function(data) {
@@ -62,28 +66,6 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
       $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
           $scope.widgets[0].index, $scope.widgets[0].code);
     }
-  }
-}
-
-
-function SetCtrl($scope, $http) {
-  $scope.addElement = function() {
-    $scope.$parent.answer.push($scope.newElement);
-    $scope.newElement = '';
-  };
-
-  $scope.deleteElement = function(index) {
-    $scope.$parent.answer.splice(index, 1);
-  };
-
-  $scope.submitAnswer = function() {
-    // Send a JSON version of $scope.answer to the backend.
-    $http.post(
-        '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        'answer=' + JSON.stringify($scope.$parent.answer) +
-            '&block_number=' + JSON.stringify($scope.blockNumber),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshPage);
   };
 }
 
@@ -91,5 +73,3 @@ function SetCtrl($scope, $http) {
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = ['$scope', '$http', '$timeout', 'warningsData'];
-SetCtrl.$inject = ['$scope', '$http'];
-
