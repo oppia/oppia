@@ -16,10 +16,12 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import importlib
 import json
 import logging
 
 from controllers.base import BaseHandler, require_editor, require_user
+from controllers.widgets import InteractiveWidget
 import feconf
 from models.models import AugmentedUser
 from models.state import State
@@ -225,7 +227,7 @@ class StateHandler(BaseHandler):
                 'state': {'name': state.name},
                 'stateContent': state.content,
             }))
-            return   
+            return
 
         state_name_json = self.request.get('state_name')
         interactive_widget_json = self.request.get('interactive_widget')
@@ -253,10 +255,23 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets_json:
             state.interactive_rulesets = json.loads(interactive_rulesets_json)
+            logging.info(state.interactive_rulesets)
+            ruleset = state.interactive_rulesets['submit']
+
+            if len(ruleset) > 1:
+                interactive_widget_properties = InteractiveWidget.get_interactive_widget(
+                    state.interactive_widget)['actions']['submit']
+                # Import the relevant classifier module to be used in eval() below.
+                classifier_module = '.'.join([
+                    feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
+                    interactive_widget_properties['classifier'],
+                    interactive_widget_properties['classifier']])
+                Classifier = importlib.import_module(classifier_module)
+            else:
+                assert 'attrs' not in ruleset[0] or 'classifier' not in ruleset[0]['attrs']
 
             # TODO(yanamal): Do additional calculations here to get the parameter
             # changes, if necessary.
-            ruleset = state.interactive_rulesets['submit']
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
 
@@ -271,6 +286,8 @@ class StateHandler(BaseHandler):
                 first_bracket = classifier_func.find('(')
                 result = classifier_func[: first_bracket + 1]
 
+                # TODO(sll): The next line is wrong. It should account for
+                # commas within brackets.
                 params = classifier_func[first_bracket + 1: -1].split(',')
                 for param in params:
                     if param not in rule['inputs']:
@@ -278,20 +295,18 @@ class StateHandler(BaseHandler):
                             'Parameter %s could not be replaced.' % param)
                     result += ','
 
-                    # IMPORTANT TODO(sll): The following is a hack for text
-                    # input. Should call a pre-converter method to convert the
-                    # answer and the parameters into the appropriate type for
-                    # the classifier according to the relevant validation rules.
-                    # (Don't forget to escape quotes in strings, handle
-                    # parameter replacements, etc.)
-                    result += 'u\'' + rule['inputs'][param] + '\''
+                    # TODO(sll): This normalizer should follow the one specified
+                    # in the rule, instead.
+                    normalizer = Classifier.DEFAULT_NORMALIZER
+                    if normalizer.__name__ == 'String':
+                        result += 'u\'' + unicode(normalizer(rule['inputs'][param])) + '\''
+                    else:
+                        result += str(normalizer(rule['inputs'][param]))
+
                 result += ')'
 
                 logging.info(result)
-
-            for action in state.interactive_rulesets:
-                for rule in state.interactive_rulesets[action]:
-                    del rule['attrs']
+                rule['code'] = result
 
         if state_content_json:
             state_content = json.loads(state_content_json)
@@ -300,8 +315,6 @@ class StateHandler(BaseHandler):
 
         state.put()
         self.response.out.write(json.dumps(state.as_dict()))
-
-
 
     @require_editor
     def delete(self, user, exploration, state):

@@ -540,6 +540,15 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return (stateId === END_DEST ? END_DEST : $scope.states[stateId].name);
   };
 
+  $scope.getAllStates = function() {
+    var allStates = [];
+    for (var state in $scope.states) {
+      allStates.push(state);
+    }
+    allStates.push(END_DEST);
+    return allStates;
+  };
+
   $scope.selectRule = function(rule, attrs) {
     $scope.deselectAllRules();
     $scope.addRuleActionRule = rule;

@@ -108,9 +108,8 @@
         <hr>
         <div>
           Destination:
-          <select ng-model="addRuleActionDest">
-            <option ng-repeat="(id, properties) in states" value="<[id]>"><[states[id].name]></option>
-            <option value="END">END</option>
+          <select ng-model="addRuleActionDest" required
+                  ng-options="getStateName(id) for id in getAllStates()">
           </select>
         </div>
         <div>

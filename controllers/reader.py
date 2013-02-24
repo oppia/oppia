@@ -146,7 +146,7 @@ class ExplorationHandler(BaseHandler):
                 # Replace this with a more detailed warning.
                 raise self.InvalidInputException('Invalid input')
             # Add the 'answer' variable, and prepend classifier.
-            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
+            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer')
             return_value, return_data = (
                 self.normalize_classifier_return(eval(code)))
 
