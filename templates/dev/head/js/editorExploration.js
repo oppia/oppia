@@ -45,10 +45,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
   // Valid state properties
   var validStateProperties = [
+    'content',
     'interactive_widget',
     'interactive_params',
     'interactive_rulesets',
-    'state_content',
     'state_name'];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
@@ -105,15 +105,28 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     } else {
       explorationData.getData(stateId);
     }
-  };  
+  };
+
+  explorationData.getStateProperty = function(stateId, property) {
+    // NB: This does not broadcast an event.
+    console.log(
+      'Getting state property ' + property + ' for state ' + stateId);
+    var stateData = explorationData.getStateData(stateId);
+    if (!stateData.hasOwnProperty(property)) {
+      warningsData.addWarning('Invalid property name: ' + property);
+      return;
+    }
+    return stateData[property];
+  };
   
   // Saves data for a given state to the backend, and, on a success callback,
   // updates the data for that state in the frontend and broadcasts an
   // 'state updated' event.
-  explorationData.saveStateProperty = function(stateId, propertyValueMap) {
+  explorationData.saveStateData = function(stateId, propertyValueMap) {
     for (var property in propertyValueMap) {
       if (validStateProperties.indexOf(property) < 0) {
         warningsData.addWarning('Invalid property name:' + property);
+        return;
       }
       propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
     }
@@ -163,48 +176,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       return;
     }
 
-    explorationData.saveStateProperty($scope.stateId, {'state_name': $scope.stateName});
+    explorationData.saveStateData(
+        $scope.stateId, {'state_name': $scope.stateName});
     activeInputData.clear();
-  };
-
-
-  /**
-   * Saves a change to a state property.
-   * @param {String} property The state property to be saved.
-   */
-  $scope.saveStateChange = function(property) {
-    if (!$scope.stateId)
-      return;
-    activeInputData.clear();
-
-    var requestParams = {
-        state_id: $scope.stateId,
-        state_name: $scope.stateName
-    };
-    if ($scope.interactiveWidget) {
-      requestParams['interactive_widget'] = $scope.interactiveWidget.id;
-    }
-    if ($scope.stateContent) {
-      requestParams['state_content'] = JSON.stringify($scope.stateContent);
-    }
-    if ($scope.interactiveParams) {
-      requestParams['interactive_params'] = JSON.stringify($scope.interactiveParams);
-    }
-    if ($scope.interactiveRulesets) {
-      requestParams['interactive_rulesets'] = JSON.stringify($scope.interactiveRulesets);
-    }
-
-    var request = $.param(requestParams, true);
-
-    $http.put(
-        $scope.explorationUrl + '/' + $scope.stateId + '/data',
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      console.log('Changes saved successfully.');
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
   };
 
 
@@ -228,24 +202,21 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    * @param {string} mode The state editor mode to switch to (currently, gui or text).
    */
   $scope.changeMode = function(mode) {
+    console.log('MODE ' + mode);
     if (mode == GUI_EDITOR_URL.substring(1)) {
-      $location.path(GUI_EDITOR_URL + '/' + $scope.stateId);
+      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
     } else if (mode == YAML_EDITOR_URL.substring(1)) {
-      $location.path(YAML_EDITOR_URL + '/' + $scope.stateId);
+      $location.path(YAML_EDITOR_URL + '/' + explorationData.stateId);
     } else {
       warningsData.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
     }
+    $scope.$apply();
   };
 
   // Changes the location hash when the editorView tab is changed.
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
-    console.log(e.target.hash);
     if (e.target.hash == '#stateEditor') {
-      if (!$scope.stateId) {
-        $scope.stateId = $scope.initStateId;
-      }
-      explorationData.stateId = $scope.stateId;
-      explorationData.broadcastState($scope.stateId);
+      explorationData.broadcastState(explorationData.stateId);
       $scope.changeMode($scope.getMode());
     } else {
       $location.path('');
@@ -258,7 +229,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    * Called on initial load of the exploration editor page.
    *********************************************************/
   var explorationFullyLoaded = false;
-  $scope.stateContent = [];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   $scope.explorationId = pathnameArray[2];
@@ -421,7 +391,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    */
   $scope.processStateData = function(data) {
     $scope.stateId = explorationData.stateId;
-    $scope.stateContent = data.content;
     $scope.stateName = data.name;
 
     //TODO(yanamal): actually take them from back end; change to be per-dest
@@ -508,10 +477,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
   var data = explorationData.getStateData($scope.stateId);
-
-  $scope.$on('stateData', function() {
-    $scope.initInteractiveWidget(explorationData.getStateData($scope.stateId));
-  });
 
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
@@ -696,7 +661,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   });
 
   $scope.saveInteractiveWidget = function() {
-    explorationData.saveStateProperty($scope.stateId, {
+    explorationData.saveStateData($scope.stateId, {
         // The backend actually just saves the id of the widget.
         'interactive_widget': $scope.interactiveWidget.id,
         'interactive_params': $scope.interactiveParams,

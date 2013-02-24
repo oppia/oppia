@@ -18,7 +18,7 @@ function YamlEditor($scope, $http, $routeParams, explorationData, warningsData) 
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.$parent.states[$scope.stateId] = data.state;
-              $scope.$parent.stateContent = data.stateContent;
+              $scope.$parent.content = data.content;
 
               // TODO(sll): Try and do this refresh without requiring an
               // update from the backend.

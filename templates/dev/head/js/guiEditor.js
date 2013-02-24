@@ -1,12 +1,13 @@
-oppia.directive('unfocusStateContent', function(activeInputData) {
+oppia.directive('unfocusStateContent', function(activeInputData, explorationData) {
   return {
     restrict: 'A',
     link: function(scope, element, attribs) {
       element[0].focus();
       element.bind('blur', function() {
-        scope.stateContent[scope.$index] = scope.item;
+        var content = explorationData.getStateProperty(scope.stateId, 'content');
+        content[scope.$index] = scope.item;
+        explorationData.saveStateData(scope.stateId, {'content': content});
         scope.$apply(attribs['unfocusStateContent']);
-        scope.saveStateChange('stateContent');
         activeInputData.clear();
       });
     }
@@ -16,7 +17,7 @@ oppia.directive('unfocusStateContent', function(activeInputData) {
 // Makes the corresponding elements sortable.
 // TODO(sll): This directive doesn't actually update the underlying array,
 // so ui-sortable still needs to be used. Try and fix this.
-oppia.directive('sortable', function($compile) {
+oppia.directive('sortable', function($compile, explorationData) {
   return {
     restrict: 'C',
     link: function(scope, element, attrs) {
@@ -25,13 +26,16 @@ oppia.directive('sortable', function($compile) {
         stop: function(event, ui) {
           if ($(ui.item).hasClass('oppia-state-text-item')) {
             // This prevents a collision with the itemDroppable trashing.
-            for (var i = 0; i < scope.stateContent.length; ++i) {
-              if (scope.stateContent[i] === undefined) {
-                scope.stateContent.splice(i, 1);
+            // TODO(sll): Now that we don't have drag-and-drop trashing, is this
+            // still needed?
+            var content = explorationData.getStateProperty(scope.stateId, 'content');
+            for (var i = 0; i < content.length; ++i) {
+              if (content[i] === undefined) {
+                content.splice(i, 1);
                 --i;
               }
             }
-            scope.saveStateChange('stateContent');
+            explorationData.saveStateData(scope.stateId, {'content': content});
             scope.$apply();
           }
         }
@@ -43,28 +47,44 @@ oppia.directive('sortable', function($compile) {
 function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
   // Switch to the stateEditor tab when this controller is activated.
-  $('#editorViewTab a[href="#stateEditor"]').tab('show');
+  $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
 
-  // Initializes the GuiEditor.
-  var data = explorationData.getStateData($scope.stateId);
-  $scope.processStateData(data);
-  // If a (non-interactive) widget exists, show its compiled version and populate the widget
-  // view fields.
-  for (var i = 0; i < $scope.stateContent.length; ++i) {
-    if ($scope.stateContent[i].type == 'widget') {
-      var widgetFrameId = 'widgetPreview' + i;
-      if ($scope.stateContent[i].value) {
-        $http.get('/widgets/' + $scope.stateContent[i].value).
-            success(function(data) {
-              $scope.widgetCode = data.raw;
-              $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-            }).error(function(data) {
-              warningsData.addWarning(
-                  'Widget could not be loaded: ' + String(data.error));
-            });
+  $scope.init = function(data) {
+    $scope.content = data.content;
+    console.log('Content updated.');
+
+    // If a (non-interactive) widget exists, show its compiled version and
+    // populate the widget view fields.
+    for (var i = 0; i < $scope.content.length; ++i) {
+      if ($scope.content.type == 'widget') {
+        var widgetFrameId = 'widgetPreview' + i;
+        if ($scope.content.value) {
+          $http.get('/widgets/' + $scope.content.value).
+              success(function(data) {
+                $scope.widgetCode = data.raw;
+                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
+              }).error(function(data) {
+                warningsData.addWarning(
+                    'Widget could not be loaded: ' + String(data.error));
+              });
+        }
       }
     }
-  }
+  };
+
+  // Initializes the GuiEditor.
+  $scope.init(explorationData.getStateData($scope.stateId));
+  console.log('Initializing GUI editor');
+
+  $scope.$on('explorationData', function() {
+    // TODO(sll): Does this actually receive anything?
+    console.log('Init content');
+    $scope.init(explorationData.getStateData($scope.stateId));
+  });
+
+  $scope.saveStateContent = function() {
+    explorationData.saveStateData($scope.stateId, {'content': $scope.content});
+  };
 
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
@@ -101,79 +121,64 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       /*
       $http.get('https://gdata.youtube.com/feeds/api/videos/' + videoId[2], '').
           success(function(data) {
-            $scope.stateContent[index].value = videoId[2];
-            $scope.saveStateChange('stateContent');
+            $scope.content[index].value = videoId[2];
+            $scope.saveStateContent();
           }).error(function(data) {
             warningsData.addWarning('This is not a valid YouTube video id.');
           });
       */
-      $scope.stateContent[index].value = videoId[2];
-      $scope.saveStateChange('stateContent');
+      $scope.content[index].value = videoId[2];
+      $scope.saveStateContent();
     }
     activeInputData.clear();
   };
 
   $scope.deleteVideo = function(index) {
-    $scope.stateContent[index].value = '';
-    $scope.saveStateChange('stateContent');
+    $scope.content[index].value = '';
+    $scope.saveStateContent();
   };
 
   $scope.addContent = function(contentType) {
     if (contentType == 'text') {
-      activeInputData.name = 'stateContent.' + $scope.stateContent.length;
-      $scope.stateContent.push({type: 'text', value: ''});
+      activeInputData.name = 'content.' + $scope.content.length;
+      $scope.content.push({type: 'text', value: ''});
     } else if (contentType == 'image') {
-      $scope.stateContent.push({type: 'image', value: ''});
+      $scope.content.push({type: 'image', value: ''});
     } else if (contentType == 'video') {
-      $scope.stateContent.push({type: 'video', value: ''});
+      $scope.content.push({type: 'video', value: ''});
     } else if (contentType == 'widget') {
-      $scope.stateContent.push({type: 'widget', value: ''});
+      $scope.content.push({type: 'widget', value: ''});
     } else {
       warningsData.addWarning('Unknown content type ' + contentType + '.');
       return;
     }
-    $scope.saveStateChange('stateContent');
+    $scope.saveStateContent();
   };
 
   $scope.deleteContent = function(index) {
-    for (var i = 0; i < $scope.stateContent.length; ++i) {
-      if (i == index) {
-        // TODO(sll): Using just scope.stateContent.splice(i, 1) doesn't
-        // work, because the other objects in the array get randomly
-        // arranged. Find out why, or refactor the following into a
-        // different splice() method and use that throughout.
-        var tempstateContent = [];
-        for (var j = 0; j < $scope.stateContent.length; ++j) {
-          if (i != j) {
-            tempstateContent.push($scope.stateContent[j]);
-          }
-        }
-        $scope.$parent.stateContent = tempstateContent;
-        $scope.saveStateChange('stateContent');
-        return;
-      }
-    }
+    $scope.content.splice(index, 1);
+    $scope.saveStateContent();
   };
 
   $scope.saveStateContentImage = function(index) {
     activeInputData.clear();
     $scope.saveImage(function(data) {
-        $scope.stateContent[index].value = data.image_id;
-        $scope.saveStateChange('stateContent');
+        $scope.content[index].value = data.image_id;
+        $scope.saveStateContent();
     });
   };
 
   $scope.deleteImage = function(index) {
     // TODO(sll): Send a delete request to the backend datastore.
-    $scope.stateContent[index].value = '';
-    $scope.saveStateChange('stateContent');
+    $scope.content[index].value = '';
+    $scope.saveStateContent();
   };
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     var index = -1;
-    for (var i = 0; i < $scope.stateContent.length; ++i) {
-      if ($scope.stateContent[i].type == 'widget') {
+    for (var i = 0; i < $scope.content.length; ++i) {
+      if ($scope.content[i].type == 'widget') {
         index = i;
         break;
       }
@@ -191,7 +196,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
         {'raw': JSON.stringify(widgetCode)},
         true
     );
-    var widgetId = $scope.stateContent[index].value || '';
+    var widgetId = $scope.content[index].value || '';
     console.log(widgetId);
 
     $http.post(
@@ -202,20 +207,19 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       // Check that the data has been saved correctly.
       console.log(widgetData);
       $('#widgetTabs' + index + ' a:first').tab('show');
-      $scope.stateContent[index].value = widgetData.widgetId;
+      $scope.content[index].value = widgetData.widgetId;
       $scope.$apply();
       $scope.addContentToIframe('widgetPreview' + index, widgetCode);
       $scope.widgetCode = widgetCode;
-      $scope.saveStateChange('stateContent');
+      $scope.saveStateContent();
       // TODO(sll): Display multiple widget div's here.
       activeInputData.clear();
-      console.log($scope.stateContent);
     });
   };
 
   $scope.isWidgetInStateContent = function() {
-    for (var i = 0; i < $scope.stateContent.length; ++i) {
-      if ($scope.stateContent[i] && $scope.stateContent[i]['type'] == 'widget') {
+    for (var i = 0; i < $scope.content.length; ++i) {
+      if ($scope.content[i] && $scope.content[i]['type'] == 'widget') {
         return true;
       }
     }

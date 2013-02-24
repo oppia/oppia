@@ -81,13 +81,7 @@ class ExplorationPage(BaseHandler):
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
 
-        state = utils.create_new_state(exploration, state_name)
-
-        self.response.out.write(json.dumps({
-            'stateId': state.hash_id,
-            'stateName': state.name,
-            'stateContent': state.content,
-        }))
+        unused_state = utils.create_new_state(exploration, state_name)
 
     @require_editor
     def put(self, user, exploration):
@@ -194,7 +188,7 @@ class StateHandler(BaseHandler):
             self.response.out.write(json.dumps({
                 'explorationId': exploration.hash_id,
                 'state': {'name': state.name},
-                'stateContent': state.content,
+                'content': state.content,
             }))
             return
 
@@ -202,9 +196,11 @@ class StateHandler(BaseHandler):
         interactive_widget_json = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
-        state_content_json = self.request.get('state_content')
+        content_json = self.request.get('content')
 
-        logging.info(self.request.arguments())
+        for arg in self.request.arguments():
+            logging.info(arg)
+            logging.info(self.request.get(arg))
 
         if state_name_json:
             state_name = json.loads(state_name_json)
@@ -280,10 +276,10 @@ class StateHandler(BaseHandler):
                 logging.info(result)
                 rule['code'] = result
 
-        if state_content_json:
-            state_content = json.loads(state_content_json)
+        if content_json:
+            content = json.loads(content_json)
             state.content = [{'type': item['type'], 'value': item['value']}
-                             for item in state_content]
+                             for item in content]
 
         state.put()
         self.response.out.write(json.dumps(state.as_dict()))

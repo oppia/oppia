@@ -5,21 +5,21 @@
         <button ng-click="changeMode('text')">Use Plaintext Editor</button>
         <h4>Content displayed to the reader</h4>
         <div>
-          <ul ui-sortable ng-model="stateContent" class="sortable oppia-state-text-list">
-            <li ng-repeat="item in stateContent" class="oppia-state-text-item" ng-class="'item-' + $index">
+          <ul ui-sortable ng-model="content" class="sortable oppia-state-text-list">
+            <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
               <a ng-click="deleteContent($index)" class="pull-right">Delete</a>
               <ng-switch on="item.type">
-                <!-- TODO(sll): In the following, stateContent should store the
+                <!-- TODO(sll): In the following, 'content' should store the
                 raw HTML. When the user clicks to edit, the textarea should
                 convert <br> into newlines, and when the user saves, the
                 newlines should be converted into <br>'s. Tags like < and >
                 also need to be HTML-ified. Maybe use a contenteditable? -->
                 <div ng-switch-when="text">
-                  <ng-switch on="activeInputData.name == 'stateContent.' + $index">
+                  <ng-switch on="activeInputData.name == 'content.' + $index">
                     <div ng-switch-when="true">
                       <textarea rows="5" ng-model="item.value" unfocus-state-content="activeInputData.clear()"></textarea>
                     </div>
-                    <div ng-switch-default ng-click="initializeNewActiveInput('stateContent.' + $index)">
+                    <div ng-switch-default ng-click="initializeNewActiveInput('content.' + $index)">
                       <ng-switch on="item.value == ''">
                         <div ng-switch-when="true" class="oppia-placeholder">
                           You can enter text here.
