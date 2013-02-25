@@ -24,15 +24,20 @@ DEFAULT_NORMALIZER = normalizers.String
 
 
 def equals(val, x):
-    """The given value should be equal to {{x}}."""
+    """The given value should be equal to {{x}}, ignoring case."""
+    return val.lower() == x.lower()
+
+
+def case_sensitive_equals(val, x):
+    """The given value should be equal to {{x}}. This is case-sensitive."""
     return val == x
 
 
 def starts_with(val, x):
     """The given string should start with {{x}}."""
-    return val.startswith(x)
+    return val.lower().startswith(x.lower())
 
 
 def contains(val, x):
     """The given string should contain {{x}}."""
-    return val.find(x) != -1
+    return val.lower().find(x.lower()) != -1

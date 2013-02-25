@@ -20,11 +20,18 @@ __author__ = 'Sean Lip'
 import TextClassifier
 
 assert TextClassifier.equals('hello', 'hello')
+assert TextClassifier.equals('hello', 'Hello')
 assert not TextClassifier.equals('hello', 'goodbye')
 
+assert TextClassifier.case_sensitive_equals('hello', 'hello')
+assert not TextClassifier.case_sensitive_equals('hello', 'Hello')
+assert not TextClassifier.case_sensitive_equals('hello', 'goodbye')
+
 assert TextClassifier.starts_with('hello', 'he')
+assert TextClassifier.starts_with('hello', 'HE')
 assert not TextClassifier.starts_with('he', 'hello')
 
 assert TextClassifier.contains('hello', 'he')
+assert TextClassifier.contains('hello', 'HE')
 assert TextClassifier.contains('hello', 'll')
 assert not TextClassifier.contains('hello', 'ol')

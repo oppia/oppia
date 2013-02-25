@@ -42,6 +42,6 @@ assert not normalizers.Real({'a': 3})
 assert not normalizers.Real([3])
 assert not normalizers.Real((3,))
 
-assert normalizers.String('ABC') == 'abc'
-assert normalizers.String('ABC   DEF') == 'abc def'
+assert normalizers.String('ABc') == 'ABc'
+assert normalizers.String('ABC   DEF') == 'ABC DEF'
 assert normalizers.String(3) == '3'
