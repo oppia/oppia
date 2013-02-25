@@ -2,8 +2,14 @@
   <div class="row-fluid">
     <div class="span10">
       <div id="editorWindow" ng-show="stateId">
-        <button ng-click="changeMode('text')">Use Plaintext Editor</button>
-        <h4>Content displayed to the reader</h4>
+
+        <!-- TODO(yanamal): Uncomment the following once it is working.
+        <div>
+          {% include 'parameter_change.html' %}
+        </div>
+        -->
+
+        <h4>Non-Interactive Content</h4>
         <div>
           <ul ui-sortable ng-model="content" class="sortable oppia-state-text-list">
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
@@ -100,14 +106,11 @@
           <br>
           <br>
         </div>
-        
-        <div>
-          {% include 'parameter_change.html' %}
-        </div>
+
         <br>
       </div>
+      {% include 'editor/views/interactive_widget_preview.html' %}
     </div>
   </div>
 
-  {% include 'editor/views/interactive_widget_preview.html' %}
 </div>

@@ -1,18 +1,20 @@
 <div ng-controller="InteractiveWidgetPreview">
-  <h4>Interactive Widget Preview</h4>
-  <iframe id="interactiveWidgetPreview" frameborder="1" width="90%">
-  </iframe>
+  <span class="pull-right">
+    <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
+      Customize
+    </a> |
+    <a href="#" data-toggle="modal" data-target="#interactiveWidgetModal">
+      Choose another widget
+    </a>
+  </span>
 
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#customizeWidgetModal">
-    Customize this widget
-  </button>
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#interactiveWidgetModal">
-    Use a different interactive widget
-  </button>
+  <h4>Interactivity Preview</h4>
+  <iframe id="interactiveWidgetPreview" frameborder="1" width="100%">
+  </iframe>
 
   <hr>
 
-  <h4>Rules</h4>
+  <h4>Answer classification rules</h4>
   <div ng-repeat="(action, properties) in interactiveWidget.actions">
     <h5>On user <[action]>:</h5>
     <ul>
