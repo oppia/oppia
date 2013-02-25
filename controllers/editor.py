@@ -76,8 +76,8 @@ class ExplorationPage(BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'js': utils.get_js_files_with_base(
-                ['editorExploration', 'editorTree',
-                 'editorGraph', 'guiEditor', 'yamlEditor']),
+                ['editorExploration', 'editorTree', 'editorGraph',
+                 'guiEditor', 'yamlEditor', 'interactiveWidgetPreview']),
             'nav_mode': EDITOR_MODE,
         })
         self.response.out.write(feconf.JINJA_ENV.get_template(
