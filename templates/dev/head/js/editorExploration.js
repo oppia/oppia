@@ -155,7 +155,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 // Receive events from the iframed widget repository.
 oppia.run(function($rootScope) {
   window.addEventListener('message', function(event) {
-    console.log(event);
     $rootScope.$broadcast('message', event);
   });
 });
@@ -205,7 +204,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
    * @param {string} mode The state editor mode to switch to (currently, gui or text).
    */
   $scope.changeMode = function(mode) {
-    console.log('MODE ' + mode);
     if (mode == GUI_EDITOR_URL.substring(1)) {
       $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
     } else if (mode == YAML_EDITOR_URL.substring(1)) {
@@ -244,8 +242,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     var data = explorationData.data;
     $scope.stateId = explorationData.stateId;
     $scope.states = data.states;
-    console.log('Data for exploration page:');
-    console.log(data);
     $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
@@ -263,7 +259,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    console.log(explorationFullyLoaded);
     $scope.saveExplorationProperty('explorationCategory', 'category', newValue, oldValue);
   });
 
@@ -341,7 +336,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     // the effects of the old change. But, for now, each case is handled
     // specially.
     console.log('Current Active Input: ' + activeInputData.name);
-    console.log($scope.stateId);
     if (activeInputData.name == 'stateName') {
       $scope.saveStateName();
     }

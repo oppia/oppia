@@ -206,7 +206,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.$on('message', function(event, arg) {
     $scope.addContentToIframe('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    console.log($scope.interactiveWidget);
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
       $scope.interactiveParams = $scope.interactiveWidget.params;

@@ -288,7 +288,6 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
         success: function(data) {
           data = jQuery.parseJSON(data);
           if (data.image_id) {
-            console.log(data.image_id);
             $scope.$apply(successCallback(data));
           }
         },
@@ -309,7 +308,6 @@ oppia.directive('list', function () {
     scope: {items: '=', editorIsActive: '@active'},
     templateUrl: '/templates/list',
     controller: function ($scope, $http, $attrs) {
-      console.log($scope.items);
 
       $scope.openItemEditor = function() {
         $scope.editorIsActive = true;
@@ -368,7 +366,6 @@ oppia.directive('angularHtmlBind', function($compile) {
     scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
       if (newValue !== oldValue) {
         elm.html(newValue);
-        console.log(elm.contents());
         $compile(elm.contents())(scope);
       }
     });
