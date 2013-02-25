@@ -49,14 +49,17 @@
       <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
     </div>
     <div class="modal-body">
-      <h4>[This is work in progress. It doesn't work yet.]</h4>
       <div ng-repeat="(key, val) in interactiveWidget.params">
-        <!-- TODO(sll): Complete this. -->
-        <[key]>: <input type="text" ng-model="val">
+        <span ng-show="isArray(val)">
+          <[key]>: <list items="val" active="false"></list>
+        </span>
+        <span ng-hide="isArray(val)">
+          <[key]>: <input type="text" ng-model="val">
+        </span>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal">Save</button>
+      <button type="button" class="btn" data-dismiss="modal" ng-click="saveWidgetParams()">Save</button>
     </div>
   </div>
 

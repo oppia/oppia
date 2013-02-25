@@ -303,6 +303,43 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   };
 }
 
+oppia.directive('list', function () {
+  return {
+    restrict: 'E',
+    scope: {items: '=', editorIsActive: '@active'},
+    templateUrl: '/templates/list',
+    controller: function ($scope, $http, $attrs) {
+      console.log($scope.items);
+
+      $scope.openItemEditor = function() {
+        $scope.editorIsActive = true;
+      };
+
+      $scope.closeItemEditor = function() {
+        $scope.editorIsActive = false;
+      };
+
+      $scope.addItem = function(newItem) {
+        $scope.newItem = '';
+        $scope.items.push(newItem);
+      };
+
+      $scope.replaceItem = function(index, newItem) {
+        $scope.index = '';
+        $scope.replacementItem = '';
+        if (index < $scope.items.length && index >= 0) {
+          $scope.items[index] = newItem;
+        }
+      };
+
+      $scope.deleteItem = function(index) {
+        $scope.deleteIndex = '';
+        $scope.items.splice(index, 1);
+      };
+    }
+  };
+});
+
 oppia.directive('mustBeValidString', function($timeout) {
   return {
     require: 'ngModel',

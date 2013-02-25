@@ -32,11 +32,6 @@ from google.appengine.ext import ndb
 END_DEST = 'END'
 
 
-class InvalidCategoryError(Exception):
-    """Error class for when an invalid category is passed into a classifier."""
-    pass
-
-
 class InvalidInputException(Exception):
     """Error class for invalid input."""
     pass

@@ -21,6 +21,25 @@
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
   var data = explorationData.getStateData($scope.stateId);
 
+  // Tests whether an object is a JavaScript array.
+  $scope.isArray = function(obj) {
+    return toString.call(obj) === '[object Array]';
+  };
+
+  $scope.generateWidgetPreview = function(widgetId, widgetParams) {
+    var request = $.param({params: JSON.stringify(widgetParams)}, true);
+    $http.post(
+        '/interactive_widgets/' + widgetId,
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(widgetData) {
+        $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
+        $scope.interactiveWidget = widgetData.widget;
+        $scope.interactiveParams = widgetData.widget.params;
+      }
+    );
+  };
+
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
     // action and the value has several keys:
@@ -32,12 +51,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     // - 'paramChanges' (parameter changes associated with this rule)
     $scope.interactiveRulesets = data.widget.rules;
     $scope.interactiveParams = data.widget.params;
-    $http.get('/interactive_widgets/' + data.widget.id).success(
-      function(widgetData) {
-        $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
-        $scope.interactiveWidget = widgetData.widget;
-      }
-    );
+    $scope.generateWidgetPreview(data.widget.id, data.widget.params);
   };
 
   if (data) {
@@ -183,6 +197,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     F[0].src = F[0].src;
   });
 
+  $scope.saveWidgetParams = function() {
+    $scope.generateWidgetPreview($scope.interactiveWidget.id, $scope.interactiveParams);
+    $scope.saveInteractiveWidget();
+  };
+
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     $scope.addContentToIframe('interactiveWidgetPreview', arg.data.raw);
@@ -190,7 +209,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     console.log($scope.interactiveWidget);
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
-      $scope.interactiveParams = {};
+      $scope.interactiveParams = $scope.interactiveWidget.params;
       $scope.interactiveRulesets = {'submit': [{
           'rule': 'Default',
           'attrs': {},

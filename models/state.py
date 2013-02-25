@@ -30,6 +30,9 @@ class State(ndb.Model):
     content = ndb.JsonProperty(repeated=True)
     # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
+    # Parameter overrides for the interactive widget view, stored as key-value
+    # pairs.
+    interactive_params = ndb.JsonProperty(default={})
     # Rulesets for the interactive widget. Each ruleset is a key-value pair: the
     # key is the name of the reader's action (submit, click, etc.) and the value
     # is a list of rules, each represented as a dict with six elements:
@@ -42,9 +45,6 @@ class State(ndb.Model):
     # TODO(yanamal): Implement the parameter changes parts (the rest are done).
     # TODO(sll): Add validation.
     interactive_rulesets = ndb.JsonProperty(default={'submit': []})
-    # Parameter overrides for the interactive widget view, stored as key-value
-    # pairs.
-    interactive_params = ndb.JsonProperty(default={})
 
     def as_dict(self):
         """Gets a Python dict representation of the state."""

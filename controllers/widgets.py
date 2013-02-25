@@ -212,14 +212,13 @@ class InteractiveWidget(BaseHandler):
         widget_js = ''
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
-            widget_params = copy.deepcopy(widget['params'])
             for key in params:
-                widget_params[key] = params[key]
+                widget['params'][key] = params[key]
             try:
                 with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, html_file)) as f:
                     pass
                 widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                    html_file).render(widget_params)
+                    html_file).render(widget['params'])
 
                 if include_js:
                     with open(os.path.join(
@@ -252,4 +251,14 @@ class InteractiveWidget(BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         response = self.get_interactive_widget(widget_id)
+        self.response.out.write(json.dumps({'widget': response}))
+
+    def post(self, widget_id):
+        """Handles POST requests, for parameterized widgets."""
+        params = self.request.get('params')
+        if params:
+            params = json.loads(params)
+        else:
+            params = []
+        response = self.get_interactive_widget(widget_id, params=params)
         self.response.out.write(json.dumps({'widget': response}))
