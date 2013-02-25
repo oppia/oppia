@@ -23,6 +23,7 @@ import logging
 
 from controllers.base import BaseHandler, require_editor, require_user
 from controllers.widgets import InteractiveWidget
+from data.classifiers import normalizers
 import feconf
 from models.models import AugmentedUser
 from models.state import State
@@ -258,7 +259,7 @@ class StateHandler(BaseHandler):
                 rule = ruleset[rule_ind]
 
                 # Generate the code to be executed.
-                if 'attrs' not in rule or 'classifier' not in rule['attrs']:
+                if rule['rule'] == 'Default':
                     # This is the default rule.
                     assert rule_ind == len(ruleset) - 1
                     rule['code'] = 'True'
@@ -267,6 +268,8 @@ class StateHandler(BaseHandler):
                 classifier_func = rule['attrs']['classifier'].replace(' ', '')
                 first_bracket = classifier_func.find('(')
                 result = classifier_func[: first_bracket + 1]
+
+                mutable_rule = rule['rule']
 
                 # TODO(sll): The next line is wrong. It should account for
                 # commas within brackets.
@@ -278,13 +281,23 @@ class StateHandler(BaseHandler):
                     if index != 0:
                         result += ','
 
-                    # TODO(sll): This normalizer should follow the one specified
-                    # in the rule, instead.
-                    normalizer = Classifier.DEFAULT_NORMALIZER
+                    # Get the normalizer specified in the rule.
+                    mutable_rule = mutable_rule[mutable_rule.find('{{') + 2:]
+                    mutable_rule = mutable_rule[mutable_rule.find('|') + 1:]
+                    normalizer_string = mutable_rule[: mutable_rule.find('}}')]
+                    mutable_rule = mutable_rule[mutable_rule.find('}}') + 2:]
+
+                    normalizer = getattr(normalizers, normalizer_string)
+                    normalized_param = normalizer(rule['inputs'][param])
+                    if normalized_param is None:
+                        raise self.InvalidInputException(
+                            '%s has the wrong type. Please replace it with a '
+                            '%s.' % (rule['inputs'][param], normalizer_string))
+
                     if normalizer.__name__ == 'String':
-                        result += 'u\'' + unicode(normalizer(rule['inputs'][param])) + '\''
+                        result += 'u\'' + unicode(normalized_param) + '\''
                     else:
-                        result += str(normalizer(rule['inputs'][param]))
+                        result += str(normalized_param)
 
                 result += ')'
 

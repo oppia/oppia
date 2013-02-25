@@ -19,7 +19,8 @@
     <h5>On user <[action]>:</h5>
     <ul>
       <li ng-repeat="rule in interactiveRulesets[action]">
-        <[rule | parameterizeRule]>: (<[getStateName(rule.dest)]>, <[rule.feedback]>)
+        <[rule | parameterizeRule]>:
+        (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback]></span>)
         <span class="pull-right">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
