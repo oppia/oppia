@@ -27,7 +27,6 @@ var YAML_EDITOR_URL = '/text';
 // TODO(sll): Move all strings to the top of the file, particularly
 // warning messages and activeInputData.name.
 // TODO(sll): console.log is not supported in IE. Fix before launch.
-// TODO(sll): CSS3 selectors of the form [..] aren't supported in all browsers.
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
