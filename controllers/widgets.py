@@ -23,6 +23,7 @@ from controllers.base import BaseHandler, require_user
 import feconf
 from models.models import GenericWidget, Widget
 import utils
+from yaml_utils import YamlTransformer
 
 import json
 
@@ -205,7 +206,7 @@ class InteractiveWidget(BaseHandler):
                 feconf.SAMPLE_WIDGETS_DIR,
                 widget_id,
                 '%s.config.yaml' % widget_id)) as f:
-            widget = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+            widget = YamlTransformer.get_dict_from_yaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
         widget_js = ''
@@ -244,7 +245,7 @@ class InteractiveWidget(BaseHandler):
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,
                         '%sRules.yaml' % classifier)) as f:
-                    properties['rules'] = utils.get_dict_from_yaml(
+                    properties['rules'] = YamlTransformer.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget
 

@@ -21,6 +21,7 @@ import feconf
 from models.exploration import Exploration
 import os
 import utils
+from yaml_utils import YamlTransformer
 
 from google.appengine.api import users
 
@@ -36,7 +37,7 @@ class MainPage(BaseHandler):
             with open(os.path.join(
                     feconf.SAMPLE_EXPLORATIONS_DIR, 'hola.yaml')) as f:
                 yaml = f.read().decode('utf-8')
-            exploration = utils.create_exploration_from_yaml(
+            exploration = YamlTransformer.create_exploration_from_yaml(
                 yaml=yaml, user=None, title='Demo: ¡Hola!',
                 category='Languages', id='0')
             exploration.is_public = True

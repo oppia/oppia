@@ -53,7 +53,6 @@ class State(ndb.Model):
         state_dict['name'] = self.name
         return state_dict
 
-
     def internals_as_dict(self):
         """Gets a Python dict representation of the state, without its id and name."""
         return {

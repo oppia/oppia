@@ -32,7 +32,8 @@ function WidgetRepository($scope, $http, activeInputData) {
         $scope.$apply();
         $scope.addContentToIframe(
             'widget-' + category + '-' + i,
-            $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
+            $scope.createCustomizedCode(
+                $scope.widgets[category][i].params, null, rawCode));
       }
     }
   };

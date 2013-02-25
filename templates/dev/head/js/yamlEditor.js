@@ -12,22 +12,7 @@ function YamlEditor($scope, $http, $routeParams, explorationData, warningsData) 
    * Saves the YAML representation of a state.
    */
   $scope.saveState = function() {
-    $http.put(
-        '/create/' + $scope.explorationId + '/' + $scope.stateId + '/data/',
-        'yaml_file=' + encodeURIComponent($scope.yaml),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              $scope.$parent.states[$scope.stateId] = data.state;
-              $scope.$parent.content = data.content;
-
-              // TODO(sll): Try and do this refresh without requiring an
-              // update from the backend.
-              // TODO(sll): Update the exploration and graph view.
-              $scope.processStateData(explorationData.getStateData($scope.stateId));
-            }).error(function(data) {
-              warningsData.addWarning(data.error ||
-                  'Error: Could not add new state.');
-            });
+    explorationData.saveStateData($scope.stateId, {'yaml_file': $scope.yaml});
   };
 }
 

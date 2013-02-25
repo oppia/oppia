@@ -49,7 +49,9 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'interactive_widget',
     'interactive_params',
     'interactive_rulesets',
-    'state_name'];
+    'state_name',
+    'yaml_file'
+  ];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
@@ -125,7 +127,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   explorationData.saveStateData = function(stateId, propertyValueMap) {
     for (var property in propertyValueMap) {
       if (validStateProperties.indexOf(property) < 0) {
-        warningsData.addWarning('Invalid property name:' + property);
+        warningsData.addWarning('Invalid property name: ' + property);
         return;
       }
       propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
@@ -138,6 +140,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
+      warningsData.clear();
       console.log('Changes to this state were saved successfully.');
       explorationData.data['states'][stateId] = data;
       explorationData.broadcastState(stateId);

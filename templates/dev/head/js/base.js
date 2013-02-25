@@ -118,6 +118,13 @@ oppia.factory('warningsData', function($rootScope) {
     warningsData.warnings.splice(index, 1);
   };
 
+  /**
+   * Clears all warnings.
+   */
+  warningsData.clear = function() {
+    warningsData.warnings = [];
+  };
+
   return warningsData;
 });
 
@@ -164,6 +171,10 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
    */
   $scope.addContentToIframe = function(iframeId, content) {
     var iframe = document.getElementById(iframeId);
+    if (!iframe) {
+      // TODO(sll): Raise an error here.
+      return;
+    }
     if (iframe.contentDocument) {
       doc = iframe.contentDocument;
     } else {

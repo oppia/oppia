@@ -16,6 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import copy
 import importlib
 import json
 import logging
@@ -26,8 +27,23 @@ import feconf
 from models.models import AugmentedUser
 from models.state import State
 import utils
+from yaml_utils import YamlTransformer
 
 EDITOR_MODE = 'editor'
+
+
+def get_state_for_frontend(state):
+    """Returns a representation of the given state for the frontend."""
+
+    state_repr = state.as_dict()
+    # Modify the YAML representation to use names instead of ids.
+    modified_state_dict = copy.deepcopy(state.internals_as_dict())
+    for action in modified_state_dict['widget']['rules']:
+        for rule in modified_state_dict['widget']['rules'][action]:
+            if rule['dest'] != utils.END_DEST:
+                rule['dest'] = utils.get_entity(State, rule['dest']).name
+    state_repr['yaml'] = YamlTransformer.get_yaml_from_dict(modified_state_dict)
+    return state_repr
 
 
 class NewExploration(BaseHandler):
@@ -41,7 +57,7 @@ class NewExploration(BaseHandler):
         category = self.request.get('category')
         yaml = self.request.get('yaml')
         if yaml:
-            exploration = utils.create_exploration_from_yaml(
+            exploration = YamlTransformer.create_exploration_from_yaml(
                 yaml=yaml, user=user, title=title, category=category)
         else:
             exploration = utils.create_new_exploration(
@@ -81,7 +97,8 @@ class ExplorationPage(BaseHandler):
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
 
-        unused_state = utils.create_new_state(exploration, state_name)
+        state = utils.create_new_state(exploration, state_name)
+        self.response.out.write(json.dumps(state.as_dict()))
 
     @require_editor
     def put(self, user, exploration):
@@ -133,7 +150,7 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_list[state.hash_id] = state.as_dict()
+            state_list[state.hash_id] = get_state_for_frontend(state)
 
         self.values.update({
             'exploration_id': exploration.hash_id,
@@ -168,8 +185,10 @@ class ExplorationDownloadHandler(BaseHandler):
                 init_dict[state.name] = state.internals_as_dict()
             else:
                 exploration_dict[state.name] = state.internals_as_dict()
-        self.response.out.write(utils.get_yaml_from_dict(init_dict))
-        self.response.out.write(utils.get_yaml_from_dict(exploration_dict))
+        self.response.out.write(YamlTransformer.get_yaml_from_dict(init_dict))
+        if exploration_dict:
+            self.response.out.write(
+                YamlTransformer.get_yaml_from_dict(exploration_dict))
 
 
 class StateHandler(BaseHandler):
@@ -179,17 +198,13 @@ class StateHandler(BaseHandler):
     def put(self, user, exploration, state):
         """Saves updates to a state."""
 
-        yaml_file = self.request.get('yaml_file')
-        if yaml_file:
+        yaml_file_json = self.request.get('yaml_file')
+        if yaml_file_json:
             # The user has uploaded a YAML file. Process only this action.
-            # TODO(sll): This needs to have more stuff in it.
-            state = utils.modify_state_using_dict(
-                exploration, state, utils.get_dict_from_yaml(yaml_file))
-            self.response.out.write(json.dumps({
-                'explorationId': exploration.hash_id,
-                'state': {'name': state.name},
-                'content': state.content,
-            }))
+            yaml_file = json.loads(yaml_file_json)
+            state = YamlTransformer.modify_state_using_dict(
+                exploration, state, YamlTransformer.get_dict_from_yaml(yaml_file))
+            self.response.out.write(json.dumps(get_state_for_frontend(state)))
             return
 
         state_name_json = self.request.get('state_name')
@@ -282,7 +297,8 @@ class StateHandler(BaseHandler):
                              for item in content]
 
         state.put()
-        self.response.out.write(json.dumps(state.as_dict()))
+        logging.info(get_state_for_frontend(state))
+        self.response.out.write(json.dumps(get_state_for_frontend(state)))
 
     @require_editor
     def delete(self, user, exploration, state):

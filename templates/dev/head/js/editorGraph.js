@@ -43,9 +43,6 @@ function EditorGraph($scope, $filter, explorationData) {
     nodes[initStateId].y0 = VERT_OFFSET;
     nodes[initStateId].x0 = 50;
 
-    console.log(states);
-    console.log(nodes);
-
     while (queue.length > 0) {
       var currNode = queue[0];
       queue.shift();
