@@ -2,7 +2,7 @@ Answer is equal to {{x|String}}:
   classifier: equals(x)
 
 Answer is equal to {{x|String}}, taking case into account:
-  classifier: equals_with_case(x)
+  classifier: case_sensitive_equals(x)
 
 Answer starts with {{x|String}}:
   classifier: starts_with(x)
