@@ -25,7 +25,7 @@ class ShouldHaveFailedByNow(Exception):
     pass
 
 
-class TestBase(suite.BaseTestClass):
+class TestBase(suite.AppEngineTestBase):
     """Contains methods common to all tests."""
     def getApp(self):
         feconf.DEBUG = True

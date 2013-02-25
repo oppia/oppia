@@ -21,7 +21,7 @@ import unittest
 
 import webtest
 
-EXPECTED_TEST_COUNT = 17 
+EXPECTED_TEST_COUNT = 18
 
 
 def empty_environ():
@@ -33,8 +33,17 @@ def empty_environ():
     os.environ['USER_ID'] = ''
 
 
-class BaseTestClass(unittest.TestCase):
-    """Base class for setting up and tearing down test cases."""
+class TestBase(unittest.TestCase):
+    """Base class for all tests."""
+
+    def shortDescription(self):
+        """Additional information logged during unit test invocation."""
+        # Suppress default logging of docstrings.
+        return None
+
+
+class AppEngineTestBase(TestBase):
+    """Base class for tests requiring App Engine services."""
 
     def setUp(self):  # pylint: disable-msg=g-bad-name
         empty_environ()

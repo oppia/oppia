@@ -76,6 +76,6 @@ def Set(val):
 def String(x):
     """Collapses spaces and makes all characters of a string lowercase."""
     try:
-        return ' '.join(unicode(x.lower()).split())
+        return ' '.join(unicode(x).lower().split())
     except:
         return None
