@@ -37,7 +37,7 @@ class StatsHandler(BaseHandler):
             STATS_ENUMS.default_case_hit, exploration.hash_id)
 
         self.values.update({
-            'js': utils.get_js_files_with_base(['stats']),
+            'js': utils.get_js_controllers(['stats']),
             'num_visits': num_visits,
             'num_comp': num_completions,
             'answers': answers,

@@ -29,7 +29,7 @@ class GalleryPage(BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_files_with_base(['gallery']),
+            'js': utils.get_js_controllers(['gallery']),
             'nav_mode': 'gallery',
         })
         self.response.out.write(

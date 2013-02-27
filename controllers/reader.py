@@ -39,7 +39,7 @@ class ExplorationPage(BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_files_with_base(['readerExploration']),
+            'js': utils.get_js_controllers(['readerExploration']),
             'nav_mode': READER_MODE,
         })
 

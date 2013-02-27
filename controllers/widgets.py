@@ -36,7 +36,7 @@ class WidgetRepositoryPage(BaseHandler):
     def get(self):
         """Returns the widget repository page."""
         self.values.update({
-            'js': utils.get_js_files_with_base(['widgetRepository']),
+            'js': utils.get_js_controllers(['widgetRepository']),
         })
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True

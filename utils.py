@@ -165,7 +165,7 @@ def get_file_contents(root, filepath):
     Args:
         root: the path to prepend to the filepath.
         filepath: a path to a HTML, JS or CSS file. It should not include the
-                template/dev/head or template/prod/head prefix.
+            template/dev/head or template/prod/head prefix.
 
     Returns:
         the file contents.
@@ -174,8 +174,8 @@ def get_file_contents(root, filepath):
         return f.read().decode('utf-8')
 
 
-def get_js_files(filenames):
-    """Gets the concatenated contents of some JS files.
+def get_js_controllers(filenames):
+    """Gets the concatenated contents of some JS controllers.
 
     Args:
         filenames: an array with names of JS files (without the '.js' suffix).
@@ -183,21 +183,9 @@ def get_js_files(filenames):
     Returns:
         the concatenated contents of these JS files.
     """
-    return '\n'.join(
-            [get_file_contents(feconf.TEMPLATE_DIR, 'js/%s.js' % filename)
-             for filename in filenames])
-
-
-def get_js_files_with_base(filenames):
-    """Gets the concatenated contents of some JS files, including the base JS.
-
-    Args:
-        filenames: an array with names of JS files (without the '.js' suffix).
-
-    Returns:
-        the concatenated contents of these JS files, with base.js prepended.
-    """
-    return get_js_files(['base'] + filenames)
+    return '\n'.join([get_file_contents(
+        feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename)
+        for filename in filenames])
 
 
 def parse_content_into_html(content_array, block_number):

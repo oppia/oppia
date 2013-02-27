@@ -76,7 +76,7 @@ class ExplorationPage(BaseHandler):
     def get(self, user, exploration):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_files_with_base(
+            'js': utils.get_js_controllers(
                 ['editorExploration', 'editorTree', 'editorGraph',
                  'guiEditor', 'yamlEditor', 'interactiveWidgetPreview']),
             'nav_mode': EDITOR_MODE,

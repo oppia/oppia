@@ -46,7 +46,7 @@ class MainPage(BaseHandler):
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
         self.ensure_default_exploration_exists()
-        self.values['js'] = utils.get_js_files_with_base(['index'])
+        self.values['js'] = utils.get_js_controllers(['index'])
         self.values['login_url'] = users.create_login_url('/gallery')
         self.values['user'] = users.get_current_user()
         self.response.out.write(
@@ -57,7 +57,7 @@ class AboutPage(BaseHandler):
     """Page with information about Oppia."""
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.get_js_files_with_base([])
+        self.values['js'] = utils.get_js_controllers([])
         self.values['code_contributors'] = [
             'Jeremy Emerson',
             'Manas Tungare',
@@ -84,6 +84,6 @@ class TermsPage(BaseHandler):
     """Page with terms and conditions."""
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.get_js_files_with_base([])
+        self.values['js'] = utils.get_js_controllers([])
         self.response.out.write(
             feconf.JINJA_ENV.get_template('terms.html').render(self.values))
