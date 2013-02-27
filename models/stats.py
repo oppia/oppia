@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 from google.appengine.ext import ndb
 
+from models import Exploration
 import utils
 
 
@@ -29,33 +30,35 @@ class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def _record_event(cls, event_name, entity_id, extra_info=''):
+    def _record_event(cls, event_name, entity_key, extra_info=''):
         """Updates statistics based on recorded events."""
 
         if event_name == STATS_ENUMS.exploration_visited:
-            event_key = 'e.%s' % entity_id
+            event_key = 'e.%s' % entity_key
             cls._inc(event_key)
         if event_name == STATS_ENUMS.default_case_hit:
-            event_key = 'default.%s' % entity_id
+            event_key = 'default.%s' % entity_key
             cls._add(event_key, extra_info)
         if event_name == STATS_ENUMS.exploration_completed:
-            event_key = 'c.%s' % entity_id
+            event_key = 'c.%s' % entity_key
             cls._inc(event_key)
 
     @classmethod
-    def record_default_case_hit(cls, entity_id, extra_info=''):
+    def record_default_case_hit(cls, exploration_id, state_id, extra_info=''):
         """Records an event when an answer triggers the default rule."""
-        cls._record_event(STATS_ENUMS.default_case_hit, entity_id, extra_info)
+        cls._record_event(
+            STATS_ENUMS.default_case_hit, '%s.%s' % (exploration_id, state_id),
+            extra_info)
 
     @classmethod
-    def record_exploration_visited(cls, entity_id):
+    def record_exploration_visited(cls, exploration_id):
         """Records an event when an exploration is visited for the first time."""
-        cls._record_event(STATS_ENUMS.exploration_visited, entity_id)
+        cls._record_event(STATS_ENUMS.exploration_visited, exploration_id)
 
     @classmethod
-    def record_exploration_completed(cls, entity_id):
+    def record_exploration_completed(cls, exploration_id):
         """Records an event when an exploration is completed."""
-        cls._record_event(STATS_ENUMS.exploration_completed, entity_id)
+        cls._record_event(STATS_ENUMS.exploration_completed, exploration_id)
 
     @classmethod
     def _inc(cls, event_key):
@@ -96,26 +99,37 @@ class Statistics(object):
     """Retrieves statistics to display in the views."""
 
     @classmethod
-    def get_stats(cls, event_name, entity_id):
-        """Retrieves statistics for the given event name and entity id."""
+    def get_exploration_stats(cls, event_name, exploration_id):
+        """Retrieves statistics for the given event name and exploration id."""
 
         if event_name == STATS_ENUMS.exploration_visited:
-            event_key = 'e.%s' % entity_id
+            event_key = 'e.%s' % exploration_id
             counter = Counter.get_by_id(event_key)
             if not counter:
                 return 0
             return counter.value
 
         if event_name == STATS_ENUMS.exploration_completed:
-            event_key = 'c.%s' % entity_id
+            event_key = 'c.%s' % exploration_id
             counter = Counter.get_by_id(event_key)
             if not counter:
                 return 0
             return counter.value
 
         if event_name == STATS_ENUMS.default_case_hit:
-            event_key = 'default.%s' % entity_id
-            journal = Journal.get_by_id(event_key)
-            if not journal:
-                return []
-            return journal.values
+            result = []
+
+            exploration = utils.get_entity(Exploration, exploration_id)
+            for state_key in exploration.states:
+                state = state_key.get()
+                event_key = 'default.%s.%s' % (exploration_id, state.hash_id)
+
+                journal = Journal.get_by_id(event_key)
+
+                result.append({
+                    'id': state.hash_id,
+                    'name': state.name,
+                    'answers': sorted(journal.values) if journal else []
+                })
+
+            return result

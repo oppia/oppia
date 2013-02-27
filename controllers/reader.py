@@ -132,7 +132,8 @@ class ExplorationHandler(BaseHandler):
         logging.info(Classifier.__name__)
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
-                EventHandler.record_default_case_hit(exploration_id, answer)
+                EventHandler.record_default_case_hit(
+                    exploration_id, state_id, answer)
 
             assert rule['code']
 

@@ -3,11 +3,35 @@
 {% block content %}
   <div class="oppia-content">
 
-    <br>
+    <h3>Statistics for '{{exploration_title}}'</h3>
+
     Number of visits: {{num_visits}}
     <br>
     Number of completions: {{num_comp}}
     <br>
-    Answers: {{answers}}
+
+    <h4>Answers that triggered the default category</h4>
+
+    <table>
+      <tr>
+        <th class="oppia-stats-table">State name</th>
+        <th class="oppia-stats-table">Answers</th>
+      </tr>
+      {% for state in answers %}
+        <tr>
+          <td class="oppia-stats-table">
+            <a href="/create/{{exploration_id}}#/gui/{{state.id}}">
+              {{state.name}}
+            </a>
+          </td>
+          <td class="oppia-stats-table">
+            {% for answer in state.answers %}
+              {{answer}}<br>
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+
   </div>
 {% endblock %}

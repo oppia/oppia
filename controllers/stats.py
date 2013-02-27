@@ -27,16 +27,18 @@ class StatsHandler(BaseHandler):
     def get(self, unused_user, exploration):
         """Displays the statistics page for the given exploration."""
 
-        num_visits = Statistics.get_stats(
+        num_visits = Statistics.get_exploration_stats(
             STATS_ENUMS.exploration_visited, exploration.hash_id)
 
-        num_completions = Statistics.get_stats(
+        num_completions = Statistics.get_exploration_stats(
             STATS_ENUMS.exploration_completed, exploration.hash_id)
 
-        answers = Statistics.get_stats(
+        answers = Statistics.get_exploration_stats(
             STATS_ENUMS.default_case_hit, exploration.hash_id)
 
         self.values.update({
+            'exploration_title': exploration.title,
+            'exploration_id': exploration.hash_id,
             'js': utils.get_js_controllers(['stats']),
             'num_visits': num_visits,
             'num_comp': num_completions,

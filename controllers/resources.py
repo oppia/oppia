@@ -22,8 +22,6 @@ import feconf
 from models.models import Image
 import utils
 
-from google.appengine.api import memcache
-
 
 class LibHandler(BaseHandler):
     """Assembles and returns CSS and JS library code."""
@@ -41,37 +39,18 @@ class LibHandler(BaseHandler):
         utils.get_file_contents('', filepath)
         for filepath in feconf.FOOTER_JS_FILES])
 
-    def try_getting_from_memcache(self, key):
-        data = memcache.get(key)
-        if data is not None:
-            return data
-        else:
-            data = self.__getattribute__(key)
-            memcache.add(key, data, 3600)
-            return data
-
     def get(self, lib_type):
         """Handles GET requests for CSS and JS library code."""
 
-        expiry_time = (datetime.datetime.today() +
-            datetime.timedelta(minutes=60)).strftime(
-                '%a, %d %b %Y %H:%M:%S GMT')
-
-        self.response.headers['Cache-Control'] = 'public, max-age=3600'
-        self.response.headers['Expires'] = expiry_time
-
         if lib_type == 'css':
-            self.response.out.write(
-                self.try_getting_from_memcache('CSS_LIB_CODE'))
+            self.response.out.write(self.CSS_LIB_CODE)
             self.response.headers['Content-Type'] = 'text/css'
         elif lib_type == 'header_js' or lib_type == 'footer_js':
             self.response.headers['Content-Type'] = 'application/javascript'
             if lib_type == 'header_js':
-                self.response.out.write(
-                    self.try_getting_from_memcache('HEADER_JS_LIB_CODE'))
+                self.response.out.write(self.HEADER_JS_LIB_CODE)
             else:
-                self.response.out.write(
-                    self.try_getting_from_memcache('FOOTER_JS_LIB_CODE'))
+                self.response.out.write(self.FOOTER_JS_LIB_CODE)
         else:
             self.error(404)
 

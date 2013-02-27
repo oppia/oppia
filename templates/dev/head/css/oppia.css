@@ -342,8 +342,17 @@ div.oppia-footer {
   stroke-width: 1.5px;
 }
 
-/* Styles for interactive widgets */
+
+/* Styles for interactive widgets. */
 
 .oppia-rule {
   height: 30px;
+}
+
+
+/* Styles for the statistics page. */
+
+.oppia-stats-table {
+  border: 1px solid black;
+  padding: 10px;
 }
