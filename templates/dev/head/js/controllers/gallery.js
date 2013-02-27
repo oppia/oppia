@@ -42,6 +42,8 @@ function Gallery($scope, $http, warningsData, GalleryData) {
 
   $scope.openNewExplorationModal = function() {
     $scope.newExplorationIsBeingAdded = true;
+    $scope.includeYamlFile = false;
+    $scope.useSampleExploration = false;
     $('#newExplorationModal').modal();
   };
 
@@ -49,30 +51,54 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     $('#newExplorationModal').modal('hide');
   };
 
-  // TODO(sll): Change the YAML file input to a file upload, rather than
-  // a textarea.
   $scope.createNewExploration = function() {
-    console.log($scope.newExplorationYaml);
-    var request = $.param({
-        title: $scope.newExplorationTitle || '',
-        category: $scope.newExplorationCategory || '',
-        yaml: $scope.newExplorationYaml || ''
-    }, true);
+    if ($scope.file && $scope.includeYamlFile) {
+      // A yaml file was uploaded.
+      var form = new FormData();
+      form.append('yaml', $scope.file);
+      form.append('category', $scope.newExplorationCategory || '');
+      form.append('title', $scope.newExplorationTitle || '');
 
-    $http.post(
-        '/create_new',
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              $scope.newExplorationTitle = '';
-              $scope.newExplorationCategory = '';
-              $scope.newExplorationYaml = '';
-              window.location = '/create/' + data.explorationId;
-            }).error(function(data) {
-              warningsData.addWarning(data.error ? data.error :
-                    'Error: Could not add new exploration.');
-            });
+      $.ajax({
+          url: '/create_new',
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          success: function(data) {
+            $scope.newExplorationTitle = '';
+            $scope.newExplorationCategory = '';
+            $scope.newExplorationYaml = '';
+            window.location = '/create/' + JSON.parse(data).explorationId;
+          },
+          error: function(data) {
+            warningsData.addWarning(data.error || 'Error communicating with server.');
+          }
+      });
+      return;
+    } else {
+      var request = $.param({
+          title: $scope.newExplorationTitle || '',
+          category: $scope.newExplorationCategory || '',
+          use_sample: $scope.useSampleExploration
+      }, true);
+
+      $http.post(
+          '/create_new',
+          request,
+          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+              success(function(data) {
+                $scope.newExplorationTitle = '';
+                $scope.newExplorationCategory = '';
+                $scope.newExplorationYaml = '';
+                window.location = '/create/' + data.explorationId;
+              }).error(function(data) {
+                warningsData.addWarning(data.error ? data.error :
+                      'Error: Could not add new exploration.');
+              });
+    }
   };
+
 }
 
 /**

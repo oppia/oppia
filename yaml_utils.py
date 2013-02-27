@@ -46,6 +46,31 @@ class YamlTransformer(BaseHandler):
             raise cls.InvalidInputException(e)
 
     @classmethod
+    def get_exploration_as_yaml(cls, exploration):
+        """Returns a copy of the exploration as YAML."""
+        init_dict = {}
+        exploration_dict = {}
+        for state_key in exploration.states:
+            state = state_key.get()
+
+            state_internals = state.internals_as_dict()
+            # Change the dest id to a dest name.
+            for action in state_internals['widget']['rules']:
+                for rule in state_internals['widget']['rules'][action]:
+                    if rule['dest'] != utils.END_DEST:
+                        rule['dest'] = utils.get_entity(State, rule['dest']).name
+
+            if exploration.init_state.get().hash_id == state.hash_id:
+                init_dict[state.name] = state.internals_as_dict()
+            else:
+                exploration_dict[state.name] = state.internals_as_dict()
+
+        result = YamlTransformer.get_yaml_from_dict(init_dict)
+        if exploration_dict:
+            result += YamlTransformer.get_yaml_from_dict(exploration_dict)
+        return result
+
+    @classmethod
     def create_exploration_from_yaml(cls, yaml, user, title, category, id=None):
         """Creates an exploration from a YAML file."""
 

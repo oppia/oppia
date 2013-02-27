@@ -11,7 +11,7 @@ oppia.filter('truncate', function() {
     if (!input)
       return '';
     if (isNaN(length))
-      length = 50;
+      length = 70;
     if (suffix === undefined)
       suffix = '...';
     if (input.length <= length || input.length - suffix.length <= length)

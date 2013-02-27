@@ -165,6 +165,10 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.setActiveImage = function(image) {
     $scope.image = image;
   };
+
+  $scope.setActiveFile = function(file) {
+    $scope.file = file;
+  };
 }
 
 /**

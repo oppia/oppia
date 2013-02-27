@@ -25,6 +25,7 @@ from controllers.base import BaseHandler, require_editor, require_user
 from controllers.widgets import InteractiveWidget
 from data.classifiers import normalizers
 import feconf
+from models.exploration import Exploration
 from models.models import AugmentedUser
 from models.state import State
 import utils
@@ -56,7 +57,24 @@ class NewExploration(BaseHandler):
 
         title = self.request.get('title')
         category = self.request.get('category')
-        yaml = self.request.get('yaml')
+        use_sample_exploration = self.request.get('use_sample')
+
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        if use_sample_exploration:
+            # It is necessary to get the sample exploration as a YAML file, so
+            # that new states can be created.
+            exploration = utils.get_entity(Exploration, '0')
+            yaml = YamlTransformer.get_exploration_as_yaml(exploration)
+            if not title:
+                title = 'Clone of \'Hola\''
+        else:
+            yaml = self.request.get('yaml')
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+
         if yaml:
             exploration = YamlTransformer.create_exploration_from_yaml(
                 yaml=yaml, user=user, title=title, category=category)
@@ -178,18 +196,8 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.txt' % filename)
         # TODO(sll): Cache the YAML file.
-        init_dict = {}
-        exploration_dict = {}
-        for state_key in exploration.states:
-            state = state_key.get()
-            if exploration.init_state.get().hash_id == state.hash_id:
-                init_dict[state.name] = state.internals_as_dict()
-            else:
-                exploration_dict[state.name] = state.internals_as_dict()
-        self.response.out.write(YamlTransformer.get_yaml_from_dict(init_dict))
-        if exploration_dict:
-            self.response.out.write(
-                YamlTransformer.get_yaml_from_dict(exploration_dict))
+        self.response.out.write(
+            YamlTransformer.get_exploration_as_yaml(exploration))
 
 
 class StateHandler(BaseHandler):

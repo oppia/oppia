@@ -95,9 +95,20 @@
             <div>
               Category: <input type="text" ng-model="newExplorationCategory">
             </div>
-            <div>
-              Plaintext file (optional): <textarea ng-model="newExplorationYaml" rows="14"></textarea>
+            <br>
+
+            <div ng-hide="useSampleExploration">
+              (Optional) Upload YAML file with exploration data?
+              <input type="checkbox" ng-model="includeYamlFile">
+              <br><br>
+              <input ng-show="includeYamlFile" id="newFileInput" type="file" file-upload="true">
             </div>
+
+            <div ng-hide="includeYamlFile">
+              (Optional) Use a copy of the sample exploration (hola.yaml)?
+              <input type="checkbox" ng-model="useSampleExploration">
+            </div>
+
           </div>
 
           <div class="modal-footer">

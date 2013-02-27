@@ -46,6 +46,12 @@ class State(ndb.Model):
     # TODO(sll): Add validation.
     interactive_rulesets = ndb.JsonProperty(default={'submit': []})
 
+    @classmethod
+    def get(cls, state_id):
+        state = cls.query().filter(cls.hash_id == state_id).get()
+        # TODO(sll): Raise an exception if the state is not found.
+        return state
+
     def as_dict(self):
         """Gets a Python dict representation of the state."""
         state_dict = self.internals_as_dict()
@@ -54,8 +60,8 @@ class State(ndb.Model):
         return state_dict
 
     def internals_as_dict(self):
-        """Gets a Python dict representation of the state, without its id and name."""
-        return {
+        """Gets a Python dict of the internals of the state."""
+        state_dict = {
             'content': self.content,
             'widget': {
                 'id': self.interactive_widget,
@@ -63,3 +69,5 @@ class State(ndb.Model):
                 'rules': self.interactive_rulesets,
             }
         }
+
+        return state_dict

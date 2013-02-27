@@ -284,9 +284,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   $scope.saveExplorationImage = function() {
     activeInputData.clear();
     $scope.saveImage(function(data) {
-        $scope.explorationImageId = data.image_id;
-        $scope.saveExplorationProperty(
-            'explorationImageId', 'image_id', $scope.explorationImageId, null);
+      $scope.explorationImageId = data.image_id;
+      $scope.saveExplorationProperty(
+          'explorationImageId', 'image_id', $scope.explorationImageId, null);
     });
   };
 

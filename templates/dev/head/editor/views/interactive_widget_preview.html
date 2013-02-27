@@ -20,7 +20,7 @@
     <ul>
       <li ng-repeat="rule in interactiveRulesets[action]">
         <[rule | parameterizeRule]>:
-        (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback]></span>)
+        (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         <span class="pull-right">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
