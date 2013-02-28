@@ -21,7 +21,7 @@ notes_dictionary={
 $(window).load(function() {
   var staff = document.getElementsByTagName("line");
   note01 = document.getElementById("note01");
-    
+
   MIDI.loadPlugin({
     soundfontUrl: "./soundfont/",
     instrument: "acoustic_grand_piano",
@@ -30,7 +30,7 @@ $(window).load(function() {
           playRandomNote();  //The note for the user to match
     }
   });
-    
+
   note01.onclick = function(event) { //If the note is clicked
     var isSelected = changeColor(); //boolean if it is selected or deselected
     document.onkeydown = function(event){
@@ -66,11 +66,19 @@ function playUserNote(){
   playNote(note);
 }
 
-function checkIfCorrect(note){
+function checkIfCorrect(note) {
+  // Post an event message to the parent iframe.
+  pm({
+    target: window.parent,
+    type: 'submit',
+    data: note
+  });
+  // It might be possible to use something like this instead:
+  //     window.parent.postMessage({'submit': note}, '*');
   if (note != randomNote){
     increaseAttemptNumber();
   } else {
-    $('#isCorrect').text('You\'re right');  
+    $('#isCorrect').text('You\'re right');
   }
 }
 
@@ -100,8 +108,8 @@ function increaseAttemptNumber(){
 function changeColor() {
   //Changes the color and returns with true if red (note is selected)
   if (note01.getAttribute("fill") == "black"){
-    note01.setAttribute("fill","red");  
-    return true; 
+    note01.setAttribute("fill","red");
+    return true;
   } else {
     note01.setAttribute("fill","black");
     return false;
@@ -137,7 +145,7 @@ function moveNote(notePosition, moveVector) {
   var newPosition = parseInt(notePosition, 10);
   var moveAmount = parseInt(moveVector, 10);
   newPosition += moveAmount;
-    
+
   //Confusing because positions decrease down the page
   //If the newPosition > minNotePos it is further down the page than the staff
   if (newPosition <= minNotePos && newPosition >= maxNotePos) {

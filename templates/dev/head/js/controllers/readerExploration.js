@@ -37,11 +37,18 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     }
   };
 
-  $scope.submitAnswer = function() {
+  $scope.submitAnswer = function(answer) {
+    console.log(answer);
+    var requestMap = {
+      answer: JSON.stringify(answer),
+      block_number: $scope.blockNumber
+    };
+
+    var request = $.param(requestMap, true);
+
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        $('.answer').serialize() +
-            '&block_number=' + JSON.stringify($scope.blockNumber),
+        request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
@@ -67,6 +74,10 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
           $scope.widgets[0].index, $scope.widgets[0].code);
     }
   };
+
+  pm.bind('submit', function(data) {
+    $scope.submitAnswer(data);
+  });
 }
 
 /**

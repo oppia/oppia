@@ -77,11 +77,15 @@ function Gallery($scope, $http, warningsData, GalleryData) {
       });
       return;
     } else {
-      var request = $.param({
+      var requestMap = {
           title: $scope.newExplorationTitle || '',
-          category: $scope.newExplorationCategory || '',
-          use_sample: $scope.useSampleExploration
-      }, true);
+          category: $scope.newExplorationCategory || ''
+      };
+      if ($scope.useSampleExploration) {
+        requestMap.use_sample = true;
+      }
+
+      var request = $.param(requestMap, true);
 
       $http.post(
           '/create_new',

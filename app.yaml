@@ -1,4 +1,4 @@
-application: oppia-test-server
+application: oppiaserver
 version: 2
 runtime: python27
 api_version: 1
@@ -11,6 +11,10 @@ handlers:
 - url: /favicon.ico
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
+  secure: always
+- url: /third_party/postmessage/postmessage.js
+  static_files: third_party/postmessage/postmessage.js
+  upload: third_party/postmessage/postmessage.js
   secure: always
 - url: /images
   static_dir: static/images

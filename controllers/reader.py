@@ -114,7 +114,7 @@ class ExplorationHandler(BaseHandler):
         block_number = int(self.request.get('block_number'))
 
         # The reader's answer.
-        answer = self.request.get('answer')
+        answer = json.loads(self.request.get('answer'))
         dest_id = None
         feedback = None
 
@@ -128,8 +128,8 @@ class ExplorationHandler(BaseHandler):
                 interactive_widget_properties['classifier'],
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)
+            logging.info(Classifier.__name__)
 
-        logging.info(Classifier.__name__)
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
                 EventHandler.record_default_case_hit(
@@ -189,7 +189,7 @@ class ExplorationHandler(BaseHandler):
             # Append text for the new state only if the new and old states differ.
             if old_state.hash_id != state.hash_id:
                 state_html, state_widgets = utils.parse_content_into_html(
-                        state.content, block_number)
+                    state.content, block_number)
                 html_output += state_html
                 widget_output.append(state_widgets)
 

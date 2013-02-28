@@ -119,7 +119,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
     return stateData[property];
   };
-  
+
   // Saves data for a given state to the backend, and, on a success callback,
   // updates the data for that state in the frontend and broadcasts an
   // 'state updated' event.

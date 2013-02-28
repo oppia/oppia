@@ -1,6 +1,6 @@
 <div ng-controller="TextInput">
-  <form ng-submit="submitAnswer()">
-    <input type="textarea" class="answer" name="answer" ng-model="answer" required>
+  <form ng-submit="submitAnswer(answer)">
+    <input type="textarea" ng-model="answer" required>
     <button type="submit">Submit</button>
   </form>
 </div>

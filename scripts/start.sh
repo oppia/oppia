@@ -88,6 +88,12 @@ if [ ! -d "third_party/d3js" ]; then
   wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
 fi
 
+echo Checking whether postmessage.js is installed in third_party
+if [ ! -d "third_party/postmessage" ]; then
+  echo Installing postmessage.js
+  mkdir -p third_party/postmessage/
+  wget https://raw.github.com/daepark/postmessage/master/postmessage.js -O third_party/postmessage/postmessage.js
+fi
 
 # Set up a local dev instance
 echo Starting GAE development server in a new shell

@@ -1,24 +1,17 @@
 function SetInput($scope) {
-  $scope.submitAnswer = function() {
-    $scope.$parent.submitAnswer();
-  };
+  $scope.answer = [];
 
   $scope.addElement = function() {
-    $scope.$parent.answer.push($scope.newElement);
+    $scope.answer.push($scope.newElement);
     $scope.newElement = '';
   };
 
   $scope.deleteElement = function(index) {
-    $scope.$parent.answer.splice(index, 1);
+    $scope.answer.splice(index, 1);
   };
 
-  $scope.submitAnswer = function() {
+  $scope.submitAnswer = function(answer) {
     // Send a JSON version of $scope.answer to the backend.
-    $http.post(
-        '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        'answer=' + JSON.stringify($scope.$parent.answer) +
-            '&block_number=' + JSON.stringify($scope.blockNumber),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshPage);
+    $scope.$parent.submitAnswer(JSON.stringify($scope.answer));
   };
 }
