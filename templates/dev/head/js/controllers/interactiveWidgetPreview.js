@@ -41,8 +41,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   };
 
   $scope.initInteractiveWidget = function(data) {
-    // Stores rules in the form of key-value pairs. For each pair, the key is the corresponding
-    // action and the value has several keys:
+    // Stores rules in the form of key-value pairs. For each pair, the key is
+    // the corresponding action and the value has several keys:
     // - 'rule' (the raw rule string)
     // - 'inputs' (a list of parameters)
     // - 'attrs' (stuff needed to build the Python classifier code)
@@ -69,6 +69,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     }
     allStates.push(END_DEST);
     return allStates;
+  };
+
+  $scope.getExtendedChoiceArray = function(choices) {
+    var result = [];
+    for (var i = 0; i < choices.length; i++) {
+      result.push({id: i, val: choices[i]});
+    }
+    return result;
   };
 
   $scope.selectRule = function(rule, attrs) {
@@ -184,7 +192,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     // }
 
     if (!found) {
-      warningsData.addWarning('Invalid destination id.');
+      warningsData.addWarning('Invalid destination name: ' + destName);
       return destName + '(INVALID)';
     }
 
@@ -210,12 +218,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveWidget = arg.data.widget;
       $scope.interactiveParams = $scope.interactiveWidget.params;
       $scope.interactiveRulesets = {'submit': [{
-          'rule': 'Default',
-          'attrs': {},
-          'inputs': {},
-          'dest': $scope.stateId,
-          'feedback': '',
-          'paramChanges': []
+        'rule': 'Default',
+        'attrs': {},
+        'inputs': {},
+        'dest': $scope.stateId,
+        'feedback': '',
+        'paramChanges': []
       }]};
     }
     $scope.saveInteractiveWidget();

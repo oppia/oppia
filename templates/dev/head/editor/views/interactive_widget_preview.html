@@ -4,7 +4,7 @@
       Customize
     </a> |
     <a href="#" data-toggle="modal" data-target="#interactiveWidgetModal">
-      Choose another widget
+      Choose a different interaction
     </a>
   </span>
 
@@ -19,7 +19,7 @@
     <h5>On user <[action]>:</h5>
     <ul>
       <li ng-repeat="rule in interactiveRulesets[action]">
-        <[rule | parameterizeRule]>:
+        <[rule | parameterizeRule: interactiveWidget.params.choices]>:
         (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         <span class="pull-right">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
@@ -111,7 +111,8 @@
       </div>
 
       <div ng-show="addRuleActionRule">
-        <span angular-html-bind="addRuleActionRule | bracesToInput"></span>
+        <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveWidget.params.choices"></span>
+
         <hr>
         <div>
           Destination:

@@ -38,7 +38,7 @@ class EventHandler(object):
             cls._inc(event_key)
         if event_name == STATS_ENUMS.default_case_hit:
             event_key = 'default.%s' % entity_key
-            cls._add(event_key, extra_info)
+            cls._add(event_key, str(extra_info))
         if event_name == STATS_ENUMS.exploration_completed:
             event_key = 'c.%s' % entity_key
             cls._inc(event_key)
