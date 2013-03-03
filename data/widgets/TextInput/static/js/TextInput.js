@@ -11,8 +11,10 @@ function TextInput($scope) {
     if (!answer) {
       return;
     }
-    window.parent.postMessage(
-        {'submit': answer}, window.location.origin
-    );
+    if (parent.location.pathname.indexOf('/learn') === 0) {
+      window.parent.postMessage(
+          {'submit': answer}, window.location.origin
+      );
+    }
   };
 }

@@ -23,8 +23,10 @@ function SetInput($scope) {
 
   $scope.submitAnswer = function(answer) {
     // Send a JSON version of $scope.answer to the backend.
-    window.parent.postMessage(
-      {'submit': JSON.stringify(answer)}, window.location.origin
-    );
+    if (parent.location.pathname.indexOf('/learn') === 0) {
+      window.parent.postMessage(
+        {'submit': JSON.stringify(answer)}, window.location.origin
+      );
+    }
   };
 }

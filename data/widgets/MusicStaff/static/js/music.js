@@ -68,7 +68,9 @@ function playUserNote(){
 
 function checkIfCorrect(note) {
   // Post an event message to the parent iframe.
-  window.parent.postMessage({'submit': note}, window.location.origin);
+  if (parent.location.pathname.indexOf('/learn') === 0) {
+    window.parent.postMessage({'submit': note}, window.location.origin);
+  }
   if (note != randomNote){
     increaseAttemptNumber();
   } else {

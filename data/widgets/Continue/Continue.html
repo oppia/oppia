@@ -2,8 +2,10 @@
 
 <script>
   var submitAnswer = function() {
-    window.parent.postMessage(
-        {'submit': ''}, window.location.origin
-    );
+  	if (parent.location.pathname.indexOf('/learn') === 0) {
+      window.parent.postMessage(
+          {'submit': ''}, window.location.origin
+      );
+    }
   };
 </script>
