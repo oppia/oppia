@@ -1,4 +1,9 @@
-<div ng-controller="Continue">
-  <button type="button" ng-click="submitAnswer('')">Continue</button>
-</div>
+<button type="button" onclick="submitAnswer()">Continue</button>
 
+<script>
+  var submitAnswer = function() {
+    window.parent.postMessage(
+        {'submit': ''}, window.location.origin
+    );
+  };
+</script>

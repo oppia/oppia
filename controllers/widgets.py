@@ -209,34 +209,24 @@ class InteractiveWidget(BaseHandler):
             widget = YamlTransformer.get_dict_from_yaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
-        widget_js = ''
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            html_file = os.path.join(widget_id, '%s.html' % widget_id)
             for key in params:
                 widget['params'][key] = params[key]
-            try:
-                with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, html_file)) as f:
-                    pass
-                widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                    html_file).render(widget['params'])
 
-                if include_js:
-                    with open(os.path.join(
-                            feconf.SAMPLE_WIDGETS_DIR,
-                            widget_id,
-                            '%s.js' % widget_id)) as f:
-                        widget_js = ('<script>%s</script>' %
-                                     f.read().decode('utf-8'))
-            except IOError:
-                # Serve a link to the static directory in an iframe.
-                html_path = os.path.join(
-                    feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
-                    '%s.html' % widget_id)
-                widget_html = feconf.JINJA_ENV.get_template(
-                    'iframe.html').render({
-                        'src': os.path.join('/', html_path)})
+            html_file = os.path.join(widget_id, '%s.html' % widget_id)
 
-        widget['raw'] = '\n'.join([widget_html, widget_js])
+            widget_html = feconf.WIDGET_JINJA_ENV.get_template(
+                html_file).render(widget['params'])
+            """
+            # Serve a link to the static directory in an iframe.
+            html_path = os.path.join(
+                feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
+                '%s.html' % widget_id)
+            widget_html = feconf.JINJA_ENV.get_template(
+                'iframe.html').render({'src': os.path.join('/', html_path)})
+            """
+
+        widget['raw'] = widget_html
         for action, properties in widget['actions'].iteritems():
             classifier = properties['classifier']
             if classifier and classifier != 'None':

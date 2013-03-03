@@ -1,14 +1,25 @@
-<div ng-controller="MultipleChoiceInput">
-  <form ng-submit="submitAnswer(answer)">
-  	{% for choice in choices %}
-  	  <div>
-        <label class="radio">
-          <input type="radio" ng-model="answer"
-                 value="{{loop.index0}}" id="{{loop.index0}}">
-          {{choice}}
-        </label>
-      </div>
-    {% endfor %}
-    <button type="submit">Submit</button>
-  </form>
-</div>
+<html ng-app="mc">
+  <head>
+    <script src="/lib/header_js"></script>
+  </head>
+
+  <body>
+    <div ng-controller="MultipleChoiceInput">
+      <form ng-submit="submitAnswer(answer)">
+      	{% for choice in choices %}
+      	  <div>
+            <label class="radio">
+              <input type="radio" ng-model="answer"
+                     value="{{loop.index0}}" id="{{loop.index0}}">
+              {{choice}}
+            </label>
+          </div>
+        {% endfor %}
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <script src="/data/widgets/MultipleChoiceInput/static/js/MultipleChoiceInput.js">
+    </script>
+  </body>
+</html>

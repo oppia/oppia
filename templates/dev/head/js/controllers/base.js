@@ -30,6 +30,18 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.activeInputData = activeInputData;
 
   /**
+   * Checks if an object is empty.
+   */
+  $scope.isEmpty = function(obj) {
+    for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
    * Adds content to an iframe.
    * @param {string} iframeId The id of the iframe to add content to.
    * @param {string} content The code for the iframe.

@@ -1,8 +1,10 @@
 <div ng-controller="InteractiveWidgetPreview">
   <span class="pull-right">
-    <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
-      Customize
-    </a> |
+    <span ng-hide="isEmpty(interactiveWidget.params)">
+      <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
+        Customize
+      </a> |
+    </span>
     <a href="#" data-toggle="modal" data-target="#interactiveWidgetModal">
       Choose a different interaction
     </a>

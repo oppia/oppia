@@ -30,6 +30,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.widgets = data.widgets;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+
     $scope.$apply();
     if (data.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + data.widgets[0].blockIndex + '-' +
@@ -37,11 +39,12 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     }
   };
 
-  $scope.submitAnswer = function(answer) {
+  $scope.submitAnswer = function(answer, channel) {
     console.log(answer);
     var requestMap = {
       answer: JSON.stringify(answer),
-      block_number: $scope.blockNumber
+      block_number: $scope.blockNumber,
+      channel: channel
     };
 
     var request = $.param(requestMap, true);
@@ -68,6 +71,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+
     $scope.$apply();
     if ($scope.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
@@ -75,9 +80,14 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     }
   };
 
-  pm.bind('submit', function(data) {
-    $scope.submitAnswer(data);
-  });
+  window.addEventListener('message', receiveMessage, false);
+
+  function receiveMessage(evt) {
+    console.log('event received');
+    if (evt.origin == window.location.origin) {
+      $scope.submitAnswer(evt.data.submit, 'submit');
+    }
+  }
 }
 
 /**

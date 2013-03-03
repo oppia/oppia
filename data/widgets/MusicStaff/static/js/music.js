@@ -23,7 +23,7 @@ $(window).load(function() {
   note01 = document.getElementById("note01");
 
   MIDI.loadPlugin({
-    soundfontUrl: "./soundfont/",
+    soundfontUrl: "/data/widgets/MusicStaff/static/soundfont/",
     instrument: "acoustic_grand_piano",
     callback: function() {
       $('#playNote').removeAttr("disabled");  //enable the button
@@ -68,13 +68,7 @@ function playUserNote(){
 
 function checkIfCorrect(note) {
   // Post an event message to the parent iframe.
-  pm({
-    target: window.parent,
-    type: 'submit',
-    data: note
-  });
-  // It might be possible to use something like this instead:
-  //     window.parent.postMessage({'submit': note}, '*');
+  window.parent.postMessage({'submit': note}, window.location.origin);
   if (note != randomNote){
     increaseAttemptNumber();
   } else {
@@ -121,7 +115,7 @@ function whichLineIsNoteOn(){
   note01.setAttribute("display", "none");
   var noteXPos = document.getElementById("note01").getAttribute("cx");
   var noteYPos = note01.getAttribute("cy");
-  var notePitch = document.elementFromPoint(noteXPos,noteYPos).id;
+  var notePitch = null; //document.elementFromPoint(noteXPos,noteYPos).id;
   if (!notePitch) {
     // For some reason, white lines are not triggering.
     var pitches = {

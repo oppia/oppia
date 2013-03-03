@@ -9,21 +9,20 @@
         padding: 0px;
       }
     </style>
-    <script src="/third_party/postmessage/postmessage.js"></script>
-
     <!-- midi.js package -->
-    <script src="./js/jquery-1.7.2.min.js"></script>
-    <script src="./js/MIDI/AudioDetect.js" type="text/javascript"></script>
-    <script src="./js/MIDI/LoadPlugin.js" type="text/javascript"></script>
-    <script src="./js/MIDI/Plugin.js" type="text/javascript"></script>
-    <script src="./js/MIDI/Player.js" type="text/javascript"></script>
-    <script src="./js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
-    <script src="./js/Window/DOMLoader.script.js" type="text/javascript"></script>
+    <script src="/data/widgets/MusicStaff/static/js/jquery-1.7.2.min.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/MIDI/AudioDetect.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/MIDI/LoadPlugin.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/MIDI/Plugin.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/MIDI/Player.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/Window/DOMLoader.XMLHttp.js">
+    </script>
+    <script src="/data/widgets/MusicStaff/static/js/Window/DOMLoader.script.js">
+    </script>
     <!-- extras -->
-    <script src="./js/WebMIDIAPI.js" type="text/javascript"></script>
-    <script src="./js/Base64.js" type="text/javascript"></script>
-    <script src="./js/base64binary.js" type="text/javascript"></script>
-    <script type="text/javascript" src="./js/music.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/WebMIDIAPI.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/Base64.js"></script>
+    <script src="/data/widgets/MusicStaff/static/js/base64binary.js"></script>
   </head>
   <body>
 	<svg
@@ -131,7 +130,7 @@
          y="33.508091"
          x="78.376656"
 	     id="treble"
-	     xlink:href="treble_clef.png"
+	     xlink:href="/data/widgets/MusicStaff/static/treble_clef.png"
 	     height="214.07819"
 	     width="172.62373" />
 	</svg>
@@ -144,5 +143,7 @@
     <p>Match the note played at the beginning<ol><li>Click on the note and move it up and down using the arrow keys.</li><li>When you think you have it, press the <em>Play Note</em> button.</li></ol></p>
     </div>
     <!--<embed id="svgDoc" src="staff.svg" type="image/svg+xml" width="800" height="1000">-->
+
+    <script src="../data/widgets/MusicStaff/static/js/music.js"></script>
   </body>
 </html>

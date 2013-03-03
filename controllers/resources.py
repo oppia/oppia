@@ -27,16 +27,19 @@ class LibHandler(BaseHandler):
     """Assembles and returns CSS and JS library code."""
 
     def get_css_lib_code(self):
-        return '\n'.join([utils.get_file_contents('', filepath)
-            for filepath in feconf.ALL_CSS_LIBS])
+        return '\n'.join(
+            [utils.get_file_contents('', filepath)
+             for filepath in feconf.ALL_CSS_LIBS])
 
     def get_header_js_code(self):
-        return '\n'.join([utils.get_file_contents('', filepath)
-            for filepath in feconf.HEADER_JS_FILES])
+        return '\n'.join(
+            [utils.get_file_contents('', filepath)
+             for filepath in feconf.HEADER_JS_FILES])
 
     def get_footer_js_code(self):
-        return '\n'.join([utils.get_file_contents('', filepath)
-            for filepath in feconf.FOOTER_JS_FILES])
+        return '\n'.join(
+            [utils.get_file_contents('', filepath)
+             for filepath in feconf.FOOTER_JS_FILES])
 
     def get(self, lib_type):
         """Handles GET requests for CSS and JS library code."""
