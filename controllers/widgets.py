@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import copy
 import os
 
 from controllers.base import BaseHandler, require_user
@@ -211,20 +210,18 @@ class InteractiveWidget(BaseHandler):
         widget_html = 'This widget is not available.'
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
             for key in params:
-                widget['params'][key] = params[key]
+                # This is a bad hack for pushing things like ["A", "B"] to
+                # the frontend without the leading 'u', but it works.
+                # TODO(sll): Fix this more robustly.
+                if isinstance(params[key], list):
+                    widget['params'][key] = json.dumps(params[key])
+                else:
+                    widget['params'][key] = params[key]
 
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
 
             widget_html = feconf.WIDGET_JINJA_ENV.get_template(
                 html_file).render(widget['params'])
-            """
-            # Serve a link to the static directory in an iframe.
-            html_path = os.path.join(
-                feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
-                '%s.html' % widget_id)
-            widget_html = feconf.JINJA_ENV.get_template(
-                'iframe.html').render({'src': os.path.join('/', html_path)})
-            """
 
         widget['raw'] = widget_html
         for action, properties in widget['actions'].iteritems():

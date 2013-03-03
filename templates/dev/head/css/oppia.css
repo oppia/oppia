@@ -22,6 +22,10 @@ textarea.oppia-code {
   width: 80%;
 }
 
+.oppia-margin-left {
+  margin-left: 70px;
+}
+
 .oppia-content {
   margin: 0 auto;
   padding-left: 30px;

@@ -14,8 +14,9 @@ description: |
 # interaction.
 actions:
   submit:
-    classifier: ListClassifier
+    classifier: TextClassifier
 
 # Customization parameters and their default values.
-params: {}
-
+params:
+  noteToGuess: B4
+  notesToPlayAtStart: []

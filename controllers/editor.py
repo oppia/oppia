@@ -265,6 +265,7 @@ class StateHandler(BaseHandler):
             # changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
+                logging.info(rule)
 
                 # Generate the code to be executed.
                 if rule['rule'] == 'Default':

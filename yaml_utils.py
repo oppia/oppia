@@ -158,7 +158,7 @@ class YamlTransformer(BaseHandler):
         widget_id = description['widget']['id']
         try:
             with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id,
-                    '%s.config.yaml' % widget_id)):
+                      '%s.config.yaml' % widget_id)):
                 pass
         except IOError:
             return False, 'No widget with widget id %s exists.' % widget_id
@@ -229,6 +229,9 @@ class YamlTransformer(BaseHandler):
 
             if 'inputs' in rule:
                 rule_dict['inputs'] = rule['inputs']
+
+            if 'attrs' in rule:
+                rule_dict['attrs'] = rule['attrs']
 
             # TODO(yanamal): Add param_changes here.
 
