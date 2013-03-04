@@ -214,7 +214,7 @@ class InteractiveWidget(BaseHandler):
                 # the frontend without the leading 'u', but it works.
                 # TODO(sll): Fix this more robustly.
                 if isinstance(params[key], list):
-                    widget['params'][key] = json.dumps(params[key])
+                    widget['params'][key] = map(str, params[key])
                 else:
                     widget['params'][key] = params[key]
 

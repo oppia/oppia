@@ -98,15 +98,22 @@
             <br>
 
             <div ng-hide="useSampleExploration">
-              (Optional) Upload an existing exploration (YAML file)?
-              <input type="checkbox" ng-model="includeYamlFile">
+              <label>
+                (Optional) Upload an existing exploration (YAML file)?
+                <input type="checkbox" ng-model="includeYamlFile">
+              </label>
               <br><br>
-              <input ng-show="includeYamlFile" id="newFileInput" type="file" file-upload="true">
+              <div ng-show="includeYamlFile">
+                Upload file:
+                <input id="newFileInput" type="file" file-upload="true">
+              </div>
             </div>
 
             <div ng-hide="includeYamlFile">
-              (Optional) Use a copy of the sample exploration (hola.yaml)?
-              <input type="checkbox" ng-model="useSampleExploration">
+              <label>
+                (Optional) Use a copy of the sample exploration (hola.yaml)?
+                <input type="checkbox" ng-model="useSampleExploration">
+              </label>
             </div>
 
           </div>
