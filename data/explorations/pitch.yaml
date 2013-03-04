@@ -1,0 +1,47 @@
+Main window:
+  content:
+  - type: text
+    value: 'This exploration will help you develop your skills at recognizing music
+      note pitches.
+
+      <br><br>
+
+      When you''re ready, click the button to play a note. Listen to it, and guess
+      what it is by moving the note to the right place on the staff using the up and
+      down arrow keys. When you think you have it, click the ''check answer'' button.'
+  param_changes:
+    noteStart:
+    - C4
+    - D4
+    - E4
+    - F4
+    - G4
+    - A4
+    - B4
+    - C5
+    - D5
+    - E5
+    - F5
+  widget:
+    id: MusicStaff
+    params:
+      noteToGuess: '{{noteStart}}'
+      notesToPlayAtStart: []
+    rules:
+      submit:
+      - $$hashKey: 01T
+        attrs:
+          classifier: equals(x)
+        code: equals(u'{{noteStart}}')
+        dest: END
+        feedback: Yes, that's correct!
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer is equal to {{x|String}}
+      - $$hashKey: 00N
+        attrs: {}
+        code: 'True'
+        dest: Main window
+        feedback: That's not right. Why not try again?
+        inputs: {}
+        rule: Default
