@@ -36,14 +36,16 @@ $(window).load(function() {
     callback: function() {
       $('#playNote').removeAttr("disabled");  //enable the button
       var index = 0;
-      var interval = setInterval(function() {
-        console.log(initialNotes[index]);
-        playNote(initialNotes[index]);
-        index++;
-        if (index >= initialNotes.length) {
-          clearInterval(interval);
-        }
-      }, 1000);
+      if (initialNotes.length > 0) {
+        var interval = setInterval(function() {
+          console.log(initialNotes[index]);
+          playNote(initialNotes[index]);
+          index++;
+          if (index >= initialNotes.length) {
+            clearInterval(interval);
+          }
+        }, 1000);  
+      }    
     }
   });
 
@@ -77,9 +79,12 @@ function playCorrectNote() {
 
 function submitAnswer() {
   var note = whichLineIsNoteOn();
+
   // Post an event message to the parent iframe.
   if (parent.location.pathname.indexOf('/learn') === 0) {
-    window.parent.postMessage({'submit': note}, window.location.origin);
+    window.parent.postMessage(
+      {'submit': note},
+      window.location.protocol + '//' + window.location.host);
   }
 }
 

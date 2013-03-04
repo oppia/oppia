@@ -243,13 +243,14 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.addParamChange = function(paramName, paramVals) {
     // Verify that the active input was the parameter input, as expected
     // TODO(yanamal): Add the new change to the list
-    $scope.paramChanges.push({name: paramName, values: paramVals});
+    $scope.paramChanges[paramName] = paramVals;
     $scope.saveParamChanges();
     $scope.resetParamChangeInput();
   };
 
-  $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
-    $scope.paramChanges.splice(paramIndex, 1);
+  $scope.deleteParamChange = function (paramName) {
+    //TODO(yanamal): add category index when this is per-category
+    delete $scope.paramChanges[paramName];
     $scope.saveParamChanges();
   };
 

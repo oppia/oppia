@@ -24,7 +24,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.categories = data.categories;
     $scope.html = data.html;
     $scope.inputTemplate = data.interactive_widget_html;
-    // $scope.inputTemplate = data.input_template;   //OLD
+    $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
     $scope.widgets = data.widgets;
@@ -44,7 +44,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     var requestMap = {
       answer: JSON.stringify(answer),
       block_number: $scope.blockNumber,
-      channel: channel
+      channel: channel,
+      params: JSON.stringify($scope.params)
     };
 
     var request = $.param(requestMap, true);
@@ -67,6 +68,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.inputTemplate = data.interactive_widget_html;
     $scope.stateId = data.state_id;
 
+    $scope.params = data.params;
+
     $scope.html += data.html;
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
@@ -84,7 +87,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
 
   function receiveMessage(evt) {
     console.log('event received');
-    if (evt.origin == window.location.origin) {
+    if (evt.origin == window.location.protocol + '//' + window.location.host) {
       $scope.submitAnswer(evt.data.submit, 'submit');
     }
   }

@@ -74,6 +74,9 @@ class YamlTransformer(BaseHandler):
     def create_exploration_from_yaml(cls, yaml, user, title, category, id=None):
         """Creates an exploration from a YAML file."""
 
+        # TODO(sll): If the exploration creation throws an error, the
+        # newly-created exploration should be deleted.
+
         yaml = yaml.strip()
         # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
         init_state_name = yaml[:yaml.find(':\n')]
@@ -109,8 +112,9 @@ class YamlTransformer(BaseHandler):
         """Verifies a state representation without referencing other states.
 
         This enforces the following constraints:
-        - The only permitted fields are ['content', 'widget'].
+        - The only permitted fields are ['content', 'param_changes', 'widget'].
             - 'content' is optional and defaults to [].
+            - 'param_changes' is optional and defaults to {}.
             - 'widget' must be present.
         - Each item in the 'content' array must have the keys ['type', 'value'].
             - The type must be one of ['text', 'image', 'video', 'widget'].
@@ -129,11 +133,13 @@ class YamlTransformer(BaseHandler):
 
         # Check the main keys.
         for key in description:
-            if key not in ['content', 'widget']:
+            if key not in ['content', 'param_changes', 'widget']:
                 return False, 'Invalid key: %s' % key
 
         if 'content' not in description:
             description['content'] = []
+        if 'param_changes' not in description:
+            description['param_changes'] = {}
         if 'widget' not in description:
             return False, 'Missing key: \'widget\''
 
@@ -200,6 +206,7 @@ class YamlTransformer(BaseHandler):
             raise cls.InvalidInputException(error_log)
 
         state.content = state_dict['content']
+        state.param_changes = state_dict['param_changes']
         state.interactive_widget = state_dict['widget']['id']
         if 'params' in state_dict['widget']:
             state.interactive_params = state_dict['widget']['params']

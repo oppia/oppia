@@ -29,6 +29,8 @@ from models.state import State
 from models.stats import EventHandler
 import utils
 
+from jinja2 import Environment, meta
+
 READER_MODE = 'reader'
 DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 
@@ -53,6 +55,18 @@ class ExplorationPage(BaseHandler):
 
 class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
+
+    def get_params(self, state, existing_params={}):
+        """Updates existing parameters based on the changes in the given state."""
+        # Modify params using param_changes.
+        # TODO(sll): Define this behavior. Currently a new parameter is set
+        # only if it doesn't exist, but it might be the case that the parameter
+        # should be reset each time the state is entered.
+        for (key, values) in state.param_changes.iteritems():
+            if key not in existing_params:
+                # Pick a random parameter for this key.
+                existing_params[key] = random.choice(values)
+        return existing_params
 
     def normalize_classifier_return(self, *args):
         """Normalizes the return value of a classifier to a two-element tuple.
@@ -79,10 +93,11 @@ class ExplorationHandler(BaseHandler):
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         init_html, init_widgets = utils.parse_content_into_html(init_state.content, 0)
+        params = self.get_params(init_state)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
             params=init_state.interactive_params,
-            include_js=True
+            state_params_dict=params
         )['raw']
 
         self.values.update({
@@ -90,6 +105,7 @@ class ExplorationHandler(BaseHandler):
             'html': init_html,
             'interactive_widget_html': interactive_widget_html,
             'interactive_params': init_state.interactive_params,
+            'params': params,
             'state_id': init_state.hash_id,
             'title': exploration.title,
             'widgets': init_widgets,
@@ -112,6 +128,13 @@ class ExplorationHandler(BaseHandler):
         old_state = state
         # The 0-based index of the last content block already on the page.
         block_number = int(self.request.get('block_number'))
+        params = self.request.get('params')
+        if params:
+            params = json.loads(params)
+        else:
+            params = {}
+
+        params = self.get_params(state, params)
 
         # The reader's answer.
         answer = json.loads(self.request.get('answer'))
@@ -119,7 +142,7 @@ class ExplorationHandler(BaseHandler):
         feedback = None
 
         interactive_widget_properties = InteractiveWidget.get_interactive_widget(
-            state.interactive_widget)['actions']['submit']
+            state.interactive_widget, state_params_dict=params)['actions']['submit']
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
@@ -148,6 +171,24 @@ class ExplorationHandler(BaseHandler):
                 raise self.InvalidInputException('Invalid input')
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
+
+            # Pass the code through a Jinja templating process.
+            # Find the variables in 'code'.
+            can_parse_as_jinja = True
+            variables = meta.find_undeclared_variables(
+                Environment().parse(code))
+            for var in variables:
+                if var not in params:
+                    can_parse_as_jinja = False
+                    break
+
+            if can_parse_as_jinja:
+                # Parse as Jinja, using the reader's parameters.
+                code = Environment().from_string(code).render(params)
+            else:
+                logging.info('Cannot parse %s using %s' % (code, params))
+                continue
+
             return_value, return_data = (
                 self.normalize_classifier_return(eval(code)))
 
@@ -202,12 +243,13 @@ class ExplorationHandler(BaseHandler):
         values['block_number'] = block_number + 1
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
+        values['params'] = params
 
         if dest_id != utils.END_DEST:
             values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
                 state.interactive_widget,
                 params=state.interactive_params,
-                include_js=True)['raw']
+                state_params_dict=params)['raw']
 
         logging.info(values)
         self.response.out.write(json.dumps(values))

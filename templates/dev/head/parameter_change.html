@@ -1,11 +1,11 @@
 <div>
   <ol>
-    <li ng-repeat="change in paramChanges">
-      <a class="close" ng-click="deleteParamChange($index)"> 
+    <li ng-repeat="(name, values) in paramChanges">
+      <a class="close" ng-click="deleteParamChange(name)"> 
         &times;
       </a>
       <span class="oppia-editable-name">
-        Change <b><[change.name]></b> to <b><[change.values]></b>
+        Change <b><[name]></b> to <b><[values]></b>
       </span>
     </li>
   </ol>

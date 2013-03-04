@@ -201,8 +201,9 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_id, params=[], state_params_dict={}, include_js=False):
+    def get_interactive_widget(cls, widget_id, params=[], state_params_dict={}):
         """Gets interactive widget code from the file system."""
+
         widget = {}
         with open(os.path.join(
                 feconf.SAMPLE_WIDGETS_DIR,
@@ -266,13 +267,14 @@ class InteractiveWidget(BaseHandler):
         params = self.request.get('params')
         params = json.loads(params) if params else []
 
-        state_params = self.request.get('state_params')
-        state_params = json.loads(state_params) if state_params else []
         state_params_dict = {}
-        for state_param in state_params:
-            # Pick a random parameter for each key.
-            state_params_dict[state_param['name']] = (
-                random.choice(state_param['values']))
+        state_params_given = self.request.get('state_params')
+        if state_params_given:
+            state_params_given = json.loads(state_params_given)
+        if state_params_given:
+            for (key, values) in state_params_given.iteritems():
+                # Pick a random parameter for each key.
+                state_params_dict[key] = random.choice(values)
 
         response = self.get_interactive_widget(
             widget_id, params=params, state_params_dict=state_params_dict)

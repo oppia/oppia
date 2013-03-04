@@ -87,6 +87,8 @@ oppia.filter('parameterizeRule', function() {
       isMultipleChoice = true;
     }
 
+    var finalRule = rule;
+
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (true) {
       if (!rule.match(pattern)) {
@@ -97,8 +99,9 @@ oppia.filter('parameterizeRule', function() {
       if (isMultipleChoice) {
         replacementText = "'" + choices[inputs[varName]] + "'";
       }
-      rule = rule.replace(pattern, replacementText);
+      rule = rule.replace(pattern, ' ');
+      finalRule = finalRule.replace(pattern, replacementText);
     }
-    return rule;
+    return finalRule;
   };
 });

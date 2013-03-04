@@ -46,7 +46,7 @@ class State(ndb.Model):
     # TODO(sll): Add validation.
     interactive_rulesets = ndb.JsonProperty(default={'submit': []})
     # Parameter changes associated with this state.
-    param_changes = ndb.JsonProperty(default=[])
+    param_changes = ndb.JsonProperty(default={})
 
     @classmethod
     def get(cls, state_id):
