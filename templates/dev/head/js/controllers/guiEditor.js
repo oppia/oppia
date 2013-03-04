@@ -46,11 +46,11 @@ oppia.directive('sortable', function($compile, explorationData) {
 
 function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
-  // Switch to the stateEditor tab when this controller is activated.
-  $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
 
   $scope.init = function(data) {
     $scope.content = data.content;
+    $scope.paramChanges = data.param_changes;
+
     console.log('Content updated.');
 
     // If a (non-interactive) widget exists, show its compiled version and
@@ -70,16 +70,19 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
         }
       }
     }
+
+    // Switch to the stateEditor tab when this controller is activated.
+    $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
   };
 
   // Initializes the GuiEditor.
-  $scope.init(explorationData.getStateData($scope.stateId));
+  $scope.init(explorationData.getStateData($scope.$parent.stateId));
   console.log('Initializing GUI editor');
 
   $scope.$on('explorationData', function() {
     // TODO(sll): Does this actually receive anything?
     console.log('Init content');
-    $scope.init(explorationData.getStateData($scope.stateId));
+    $scope.init(explorationData.getStateData($scope.$parent.stateId));
   });
 
   $scope.saveStateContent = function() {
@@ -230,33 +233,28 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   //reset and/or initialize variables for parameter change input
   $scope.resetParamChangeInput = function() {
-    console.log($scope);
     activeInputData.clear();
     $scope.tmpParamName = '';
-    $scope.tmpNewValue = '';
-    $scope.tmpLiteral = ''; //new value literal, if parameter is to be changed to a literal value
+    $scope.tmpParamValues = [];
   };
 
   $scope.resetParamChangeInput();
 
-  $scope.addParamChange = function(paramName, paramVal, valLiteral) {
-    // Verify that the active input was the parameter input, as expected TODO(yanamal)
-    // Add the new change to the list
-    if(paramVal == 'newval') { //changing param to a new literal value
-      $scope.paramChanges.push({name: paramName, newVal: valLiteral});
-    }
-    else { //changing to a computed value - either value of another var, or student input
-      $scope.paramChanges.push({name: paramName, newVal: '{{'+paramVal+'}}'});
-    }
-    console.log($scope.paramChanges);
-    // Save the parameter property TODO(yanamal)
-    // Reset and hide the input field
+  $scope.addParamChange = function(paramName, paramVals) {
+    // Verify that the active input was the parameter input, as expected
+    // TODO(yanamal): Add the new change to the list
+    $scope.paramChanges.push({name: paramName, values: paramVals});
+    $scope.saveParamChanges();
     $scope.resetParamChangeInput();
   };
 
   $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
     $scope.paramChanges.splice(paramIndex, 1);
-    // TODO(yanamal): save to server-side
+    $scope.saveParamChanges();
+  };
+
+  $scope.saveParamChanges = function() {
+    explorationData.saveStateData($scope.stateId, {'param_changes': $scope.paramChanges});
   };
 }
 

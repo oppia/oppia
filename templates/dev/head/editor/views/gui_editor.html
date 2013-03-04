@@ -3,11 +3,10 @@
     <div class="span10">
       <div id="editorWindow" ng-show="stateId">
 
-        <!-- TODO(yanamal): Uncomment the following once it is working.
-        <div>
-          {% include 'parameter_change.html' %}
-        </div>
-        -->
+        <h4>Parameter Changes</h4>
+        {% include 'parameter_change.html' %}
+
+        <br>
 
         <h4>Non-Interactive Content</h4>
         <div>
@@ -67,6 +66,9 @@
                     </div>
                   </ng-switch>
                 </div>
+                <!--
+                TODO(sll): Reinstate this when it works better.
+
                 <div ng-switch-when="widget">
                   <ng-switch on="item.value == ''">
 
@@ -92,6 +94,7 @@
 
                   </ng-switch>
                 </div>
+                -->
               </ng-switch>
             </li>
           </ul>
@@ -100,7 +103,10 @@
             <button ng-click="addContent('text')">Add text</button>
             <button ng-click="addContent('image')">Add image</button>
             <button ng-click="addContent('video')">Add video</button>
+            <!-- TODO(sll): Reinstate this when it works better.
+
             <button ng-click="addContent('widget')" ng-hide="isWidgetInStateContent()">Add widget</button>
+            -->
           </center>
 
           <br>

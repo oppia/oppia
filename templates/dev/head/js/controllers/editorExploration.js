@@ -48,6 +48,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'interactive_widget',
     'interactive_params',
     'interactive_rulesets',
+    'param_changes',
     'state_name',
     'yaml_file'
   ];
@@ -55,7 +56,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
   var Exploration = $resource('/create/:explorationId/data');
- 
+
   // There should be one GET request made for Exploration when the editor page
   // is initially loaded. This results in a broadcast that will initialize the
   // relevant frontend controllers.
@@ -88,9 +89,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   };
 
   explorationData.broadcastState = function(stateId) {
-    if (stateId) {
-      explorationData.stateId = stateId;
+    if (!stateId) {
+      return;
     }
+    explorationData.stateId = stateId;
     console.log('Broadcasting data for state ' + explorationData.stateId);
     $rootScope.$broadcast('explorationData');
   };
@@ -98,7 +100,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   explorationData.getStateData = function(stateId) {
     console.log('Getting state data for state ' + stateId);
     explorationData.stateId = stateId;
-    if (stateId === undefined) {
+    if (!stateId) {
       return;
     }
     if (stateId in explorationData.data.states) {
@@ -246,12 +248,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.explorationCategory = data.category;
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
-    //$scope.parameters = data.parameters; //TODO(yanamal): get parameters from server side
-    $scope.parameters = [];
     explorationFullyLoaded = true;
-    if (!$scope.stateId) {
-      $scope.stateId = $scope.initStateId;
-    }
     if ($scope.stateId) {
       $scope.processStateData(explorationData.getStateData($scope.stateId));
     }
@@ -388,9 +385,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   $scope.processStateData = function(data) {
     $scope.stateId = explorationData.stateId;
     $scope.stateName = data.name;
-
-    //TODO(yanamal): actually take them from back end; change to be per-dest
-    $scope.paramChanges = [];
   };
 
   // Deletes the state with id stateId. This action cannot be undone.
@@ -418,56 +412,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     .success(function(data) {
       window.location = '/gallery/';
     });
-  };
-
-  // logic for parameter definition interface
-
-  // reset and/or initialize variables used for parameter input
-  $scope.resetParamInput = function() {
-    console.log($scope);
-    activeInputData.clear();
-    $scope.tmpVals = [];
-    $scope.tmpName = '';
-    $scope.newTmpElement = '';
-  };
-
-  $scope.resetParamInput();
-
-  // add a new element to the list of possible starting values for the parameter being edited
-  $scope.addNewTmpElement = function() {
-    console.log($scope.newTmpElement);
-    if ($scope.newTmpElement) {
-      $scope.tmpVals.push($scope.newTmpElement);
-      $scope.newTmpElement = '';
-    }
-  };
-
-  /**
-   * add a new parameter
-   * @param {String} paramName the name of the parameter being added
-   * @param {Array} paramVals list of initial values the parameter could take
-   */
-  $scope.addParameter = function(paramName, paramVals) {
-    // Verify that the active input was the parameter input, as expected
-    if (activeInputData.name != 'exploration.dummy.parameter') {
-      console.log('Error: unexpected activeInputData.name ' + activeInputData.name);
-    }
-    //TODO(yanamal): require name and at least one starting value?
-    // Add the new parameter to the list
-    $scope.parameters.push({name: paramName, values: paramVals});
-    console.log($scope.parameters);
-    // Save the parameter property TODO(yanamal)
-    // Reset and hide the input field
-    $scope.resetParamInput();
-  };
-
-  /**
-   * delete a  parameter
-   * @param {number} index the index of the parameter to be deleted
-   */
-  $scope.deleteParameter = function(index) {
-    $scope.parameters.splice(index, 1);
-    // TODO(yanamal): save to server-side
   };
 }
 

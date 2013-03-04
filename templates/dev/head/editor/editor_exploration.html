@@ -36,7 +36,7 @@
                 Exploration Editor
               </a>
             </li>
-            <li>
+            <li ng-show="stateId">
               <a data-toggle="tab" href="#stateEditor">
                 State Editor
               </a>
@@ -66,40 +66,47 @@
                 </div>
               </div>
             </div>
-            
-            <div class="container-fluid">
-              <div class="row-fluid">
-                <div class="span11">
-                  <div class="pull-right">
-                    <span ng-show="getMode() == 'gui'">
-                      Graphical Editor | 
-                    </span>
-                    <span ng-hide="getMode() == 'gui'">
-                      <a ng-click="changeMode('gui')">Graphical Editor</a> |
-                    </span>
 
-                    <span ng-show="getMode() == 'text'">
-                      Plaintext Editor
-                    </span>
-                    <span ng-hide="getMode() == 'text'">
-                      <a ng-click="changeMode('text')">Plaintext Editor</a>
-                    </span>
+            <div class="tab-pane" id="stateEditor" ng-cloak>
+
+              <div class="container-fluid">
+                <div class="row-fluid">
+                  <div class="span5">
+                    <form ng-submit="saveStateName()">
+                      <h3>
+                        <span class="oppia-editable-name"
+                              ng-hide="activeInputData.name == 'stateName'"
+                              ng-click="initializeNewActiveInput('stateName')">
+                          <[stateName]>
+                        </span>
+                        <span ng-show="activeInputData.name == 'stateName'">
+                          <input type="text" ng-model="stateName">
+                          <input type="submit" value="Save">
+                        </span>
+                      </h3>
+                    </form>
+                  </div>
+
+                  <div class="span5">
+                    <div class="pull-right">
+                      <span ng-show="getMode() == 'gui'">
+                        Graphical Editor | 
+                      </span>
+                      <span ng-hide="getMode() == 'gui'">
+                        <a ng-click="changeMode('gui')">Graphical Editor</a> |
+                      </span>
+  
+                      <span ng-show="getMode() == 'text'">
+                        Plaintext Editor
+                      </span>
+                      <span ng-hide="getMode() == 'text'">
+                        <a ng-click="changeMode('text')">Plaintext Editor</a>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="tab-pane" id="stateEditor" ng-cloak>
-              <form ng-submit="saveStateName()">
-                <h3>
-                  <span class="oppia-editable-name" ng-hide="activeInputData.name == 'stateName'"
-                        ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
-                  <span ng-show="activeInputData.name == 'stateName'">
-                    <input type="text" ng-model="stateName">
-                    <input type="submit" value="Save">
-                  </span>
-                </h3>
-              </form>
               <div ng-view ng-cloak></div>
             </div>
           </div>

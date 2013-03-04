@@ -217,6 +217,7 @@ class StateHandler(BaseHandler):
             return
 
         state_name_json = self.request.get('state_name')
+        param_changes_json = self.request.get('param_changes')
         interactive_widget_json = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
@@ -232,11 +233,14 @@ class StateHandler(BaseHandler):
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             if (state_name != state.name and utils.check_existence_of_name(
-                State, state_name, exploration)):
+                    State, state_name, exploration)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
             state.name = state_name
             state.put()
+
+        if param_changes_json:
+            state.param_changes = json.loads(param_changes_json)
 
         if interactive_widget_json:
             state.interactive_widget = json.loads(interactive_widget_json)
