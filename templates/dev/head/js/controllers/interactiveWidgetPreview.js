@@ -27,7 +27,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   };
 
   $scope.generateWidgetPreview = function(widgetId, widgetParams) {
-    var request = $.param({params: JSON.stringify(widgetParams)}, true);
+    var request = $.param({
+      params: JSON.stringify(widgetParams),
+      state_params: JSON.stringify($scope.paramChanges)
+    }, true);
     $http.post(
         '/interactive_widgets/' + widgetId,
         request,
@@ -35,7 +38,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     ).success(function(widgetData) {
         $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
         $scope.interactiveWidget = widgetData.widget;
-        $scope.interactiveParams = widgetData.widget.params;
+        $scope.interactiveParams = widgetParams;
       }
     );
   };
@@ -206,7 +209,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   });
 
   $scope.saveWidgetParams = function() {
-    $scope.generateWidgetPreview($scope.interactiveWidget.id, $scope.interactiveParams);
+    $scope.generateWidgetPreview(
+        $scope.interactiveWidget.id, $scope.interactiveParams);
     $scope.saveInteractiveWidget();
   };
 

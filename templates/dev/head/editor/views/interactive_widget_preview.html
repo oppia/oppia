@@ -54,12 +54,12 @@
       <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
     </div>
     <div class="modal-body">
-      <div ng-repeat="(key, val) in interactiveWidget.params">
+      <div ng-repeat="(key, val) in interactiveParams">
         <span ng-show="isArray(val)">
           <[key]>: <list items="val" active="false"></list>
         </span>
         <span ng-hide="isArray(val)">
-          <[key]>: <input type="text" ng-model="val">
+          <[key]>: <input type="text" ng-model="interactiveParams[key]">
         </span>
       </div>
     </div>

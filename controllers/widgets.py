@@ -16,7 +16,9 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import logging
 import os
+import random
 
 from controllers.base import BaseHandler, require_user
 import feconf
@@ -25,6 +27,7 @@ import utils
 from yaml_utils import YamlTransformer
 
 import json
+from jinja2 import Environment, meta
 
 from google.appengine.api import users
 
@@ -198,7 +201,7 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_id, params=[], include_js=False):
+    def get_interactive_widget(cls, widget_id, params=[], state_params_dict={}, include_js=False):
         """Gets interactive widget code from the file system."""
         widget = {}
         with open(os.path.join(
@@ -216,7 +219,25 @@ class InteractiveWidget(BaseHandler):
                 if isinstance(params[key], list):
                     widget['params'][key] = map(str, params[key])
                 else:
-                    widget['params'][key] = params[key]
+                    can_parse_as_jinja = True
+                    # Find the variables in params[key].
+                    variables = meta.find_undeclared_variables(
+                        Environment().parse(params[key]))
+                    for var in variables:
+                        if var not in state_params_dict:
+                            can_parse_as_jinja = False
+                            break
+
+                    if can_parse_as_jinja:
+                        # Parse as Jinja, using a state parameter if applicable.
+                        widget['params'][key] = Environment().from_string(
+                            params[key]).render(state_params_dict)
+                    else:
+                        # Default to the default parameter for the widget.
+                        logging.info(
+                            'Could not initialize %s with %s' %
+                            (params[key], state_params_dict))
+                        widget['params'][key] = params[key]
 
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
 
@@ -243,9 +264,16 @@ class InteractiveWidget(BaseHandler):
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
         params = self.request.get('params')
-        if params:
-            params = json.loads(params)
-        else:
-            params = []
-        response = self.get_interactive_widget(widget_id, params=params)
+        params = json.loads(params) if params else []
+
+        state_params = self.request.get('state_params')
+        state_params = json.loads(state_params) if state_params else []
+        state_params_dict = {}
+        for state_param in state_params:
+            # Pick a random parameter for each key.
+            state_params_dict[state_param['name']] = (
+                random.choice(state_param['values']))
+
+        response = self.get_interactive_widget(
+            widget_id, params=params, state_params_dict=state_params_dict)
         self.response.out.write(json.dumps({'widget': response}))
