@@ -18,7 +18,7 @@
         <h2>Available Explorations</h2>
 
         <div class="tabbable tabs-left" ui-if="categories">
-          <ul class="nav nav-tabs">
+          <ul class="nav nav-tabs" id="navTabs">
             <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
               <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
                 <[category]>

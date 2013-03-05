@@ -98,11 +98,11 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   };
 
   explorationData.getStateData = function(stateId) {
-    console.log('Getting state data for state ' + stateId);
-    explorationData.stateId = stateId;
     if (!stateId) {
       return;
     }
+    console.log('Getting state data for state ' + stateId);
+    explorationData.stateId = stateId;
     if (stateId in explorationData.data.states) {
       return explorationData.data.states[stateId];
     } else {
@@ -113,7 +113,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   explorationData.getStateProperty = function(stateId, property) {
     // NB: This does not broadcast an event.
     console.log(
-      'Getting state property ' + property + ' for state ' + stateId);
+        'Getting state property ' + property + ' for state ' + stateId);
     var stateData = explorationData.getStateData(stateId);
     if (!stateData.hasOwnProperty(property)) {
       warningsData.addWarning('Invalid property name: ' + property);
