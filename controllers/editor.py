@@ -203,6 +203,17 @@ class ExplorationDownloadHandler(BaseHandler):
 class StateHandler(BaseHandler):
     """Handles state transactions."""
 
+    # Recursively removes keys from a dict.
+    def recursively_remove_attr(self, d, attr_to_remove):
+        if isinstance(d, list):
+            for item in d:
+                self.recursively_remove_attr(item, attr_to_remove)
+        elif isinstance(d, dict):
+            if attr_to_remove in d:
+                del d[attr_to_remove]
+            for k, v in d.items():
+                self.recursively_remove_attr(d[k], attr_to_remove)
+
     @require_editor
     def put(self, user, exploration, state):
         """Saves updates to a state."""
@@ -250,8 +261,10 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets_json:
             state.interactive_rulesets = json.loads(interactive_rulesets_json)
-            logging.info(state.interactive_rulesets)
             ruleset = state.interactive_rulesets['submit']
+
+            self.recursively_remove_attr(
+                state.interactive_rulesets['submit'], u'$$hashKey')
 
             if len(ruleset) > 1:
                 interactive_widget_properties = InteractiveWidget.get_interactive_widget(
