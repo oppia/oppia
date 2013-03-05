@@ -80,8 +80,8 @@
 
 
     {% if user %}
-      <form name="createNewExplorationForm" ng-submit="createNewExploration()">
-        <div ui-modal class="fade" id="newExplorationModal" ng-model="createModalShown">
+      <form novalidate name="createNewExplorationForm" ng-submit="createNewExploration()" class="oppia-form">
+        <div class="modal hide fade" id="newExplorationModal" ng-model="createModalShown">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
               &times;
@@ -90,10 +90,10 @@
           </div>
           <div class="modal-body">
             <div>
-              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus>
+              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
             </div>
             <div>
-              Category: <input type="text" ng-model="newExplorationCategory">
+              Category: <input type="text" ng-model="newExplorationCategory" required>
             </div>
             <br>
 
@@ -119,14 +119,15 @@
           </div>
 
           <div class="modal-footer">
-            <input type="submit" class="btn" value="Save">
+            <input type="submit" class="btn" value="Save"
+                   ng-disabled="createNewExplorationForm.$invalid">
             <a class="btn" data-dismiss="modal" ng-click="closeNewExplorationModal()">Close</a>
           </div>
         </div>
       </form>
     {% endif %}
 
-    <div ui-modal class="fade" id="embedModal" ng-model="embedModalShown">
+    <div class="modal hide fade" id="embedModal" ng-model="embedModalShown">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
           &times;

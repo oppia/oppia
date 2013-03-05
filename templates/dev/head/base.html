@@ -51,13 +51,16 @@
         {% endif %}
 
         <div ng-cloak>
-          <div ng-repeat="warning in warningsData.warnings">
-            <p class="alert alert-block">
-              <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-              <strong>Warning!</strong>
-              <[warning]>
-            </p>
+          <div class="oppia-alert-blocks">
+            <div ng-repeat="warning in (warningsData.warnings | limitTo:5)">
+              <p class="alert alert-block">
+                <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+                <strong>Warning!</strong>
+                <[warning]>
+              </p>
+            </div>
           </div>
+        
           {% block content %}{% endblock %}
         </div>
       </div>

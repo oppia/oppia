@@ -18,6 +18,7 @@
 
 oppia.factory('warningsData', function($rootScope) {
   var warningsData = {warnings: []};
+  var MAX_WARNINGS = 5;
 
   /**
    * Adds a warning message to the butterbar.
@@ -25,7 +26,9 @@ oppia.factory('warningsData', function($rootScope) {
    */
   warningsData.addWarning = function(warning) {
     console.log('WARNING: ' + warning);
-    warningsData.warnings.push(warning);
+    if (warningsData.warnings.length < MAX_WARNINGS) {
+      warningsData.warnings.push(warning);
+    }
   };
 
   /**

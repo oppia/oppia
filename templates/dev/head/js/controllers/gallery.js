@@ -52,6 +52,16 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   };
 
   $scope.createNewExploration = function() {
+    if (!$scope.newExplorationTitle) {
+      warningsData.addWarning('Please specify an exploration title.');
+      return;
+    }
+
+    if (!$scope.newExplorationCategory) {
+      warningsData.addWarning('Please specify a category for this exploration.');
+      return;
+    }
+
     if ($scope.file && $scope.includeYamlFile) {
       // A yaml file was uploaded.
       var form = new FormData();
