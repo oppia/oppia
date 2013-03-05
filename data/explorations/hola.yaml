@@ -87,7 +87,7 @@ Colores:
         rule: Answer is equal to {{x|NonnegativeInt}}        
       - code: equals(2)
         dest: Adios
-        feedback: "\xA1S\xED! Las manzanas son rojas y verdes."
+        feedback: "\xA1S\xED! That's right -- apples are red and green.</em>"
         inputs:
           x: '2'
         rule: Answer is equal to {{x|NonnegativeInt}}       
@@ -144,7 +144,7 @@ Como meaning:
 Me llamo:
   content:
   - type: text
-    value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas?"
+    value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
 
   widget:
     id: TextInput
@@ -174,7 +174,7 @@ Me llamo:
 Me llamo meaning:
   content:
   - type: text
-    value: So what does "Me llamo" mean?
+    value: Can you say what "Me llamo" means?
 
   widget:
     id: TextInput
@@ -240,6 +240,7 @@ Supermercado:
         rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(2)
         dest: Colores
+        feedback: "Yes! You can buy apples in a supermarket."
         inputs:
           x: '2'
         rule: Answer is equal to {{x|NonnegativeInt}}
