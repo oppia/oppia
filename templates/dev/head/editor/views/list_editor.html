@@ -1,46 +1,19 @@
-<div ng-hide="editorIsActive">
-  <a class="pull-right" ng-click="openItemEditor()">Edit</a>
-
-  <span ng-show="items.length == 0" class="oppia-margin-left">
-    None
+<div>
+  <span ng-show="items.length == 0">
+    <em>None</em>
   </span>
 
   <ol start="0">
     <li ng-repeat="item in items">
-      <[item]>
+      <[item]> (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
+      <span ng-show="activeItem == $index">
+        <input type="text" ng-model="replacementItem"
+               placeholder="Replacement Item">
+        <button type="button" ng-click="replaceItem($index, replacementItem)">Replace</button>
+      </span>
     </li>
   </ol>
+  
+  <input type="text" ng-model="newItem" placeholder="Add New List Element">
+  <button type="button" ng-click="addItem(newItem)">Add List Element</button>
 </div>
-
-<div ng-show="editorIsActive">
-  <a class="pull-right" ng-click="closeItemEditor()">Save</a>
-
-  <span ng-show="items.length == 0" class="oppia-margin-left">
-    None
-  </span>
-
-  <ol start="0">
-    <li ng-repeat="item in items">
-      <input type="text" ng-model="item">
-    </li>
-  </ol>
-
-  <hr>
-
-  <form ng-submit="addItem(newItem)">
-    <input type="text" ng-model="newItem" placeholder="Add New Item">
-    <input type="submit" value="Add Item">
-  </form>
-
-  <form ng-submit="replaceItem(index, replacementItem)">
-    <input type="text" ng-model="index" placeholder="Index Number to Replace">
-    <input type="text" ng-model="replacementItem" placeholder="Replacement Item">
-    <input type="submit" value="Replace">
-  </form>
-
-  <form ng-submit="deleteItem(deleteIndex)">
-    <input type="text" ng-model="deleteIndex" placeholder="Index Number to Delete">
-    <input type="submit" value="Delete">
-  </form>
-</div>
-

@@ -1,29 +1,40 @@
-oppia.directive('list', function () {
+oppia.directive('list', function (warningsData) {
   return {
     restrict: 'E',
-    scope: {items: '=', editorIsActive: '@active'},
+    scope: {items: '='},
     templateUrl: '/templates/list',
     controller: function ($scope, $http, $attrs) {
 
-      $scope.openItemEditor = function() {
-        $scope.editorIsActive = true;
+      $scope.activeItem = null;
+
+      $scope.openItemEditor = function(index) {
+        $scope.activeItem = index;
       };
 
       $scope.closeItemEditor = function() {
-        $scope.editorIsActive = false;
+        $scope.activeItem = null;
       };
 
       $scope.addItem = function(newItem) {
+        if (!newItem) {
+          warningsData.addWarning('Please enter a non-empty item.');
+          return;
+        }
         $scope.newItem = '';
         $scope.items.push(newItem);
       };
 
       $scope.replaceItem = function(index, newItem) {
+        if (!newItem) {
+          warningsData.addWarning('Please enter a non-empty item.');
+          return;
+        }
         $scope.index = '';
         $scope.replacementItem = '';
         if (index < $scope.items.length && index >= 0) {
           $scope.items[index] = newItem;
         }
+        $scope.closeItemEditor();
       };
 
       $scope.deleteItem = function(index) {

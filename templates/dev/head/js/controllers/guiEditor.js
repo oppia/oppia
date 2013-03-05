@@ -241,6 +241,15 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.resetParamChangeInput();
 
   $scope.addParamChange = function(paramName, paramVals) {
+    if (!paramName) {
+      warningsData.addWarning('Please specify a parameter name.');
+      return;
+    }
+    if (paramVals.length === 0) {
+      warningsData.addWarning('Please specify at least one value for the parameter.');
+      return;
+    }
+
     // Verify that the active input was the parameter input, as expected
     // TODO(yanamal): Add the new change to the list
     $scope.paramChanges[paramName] = paramVals;
