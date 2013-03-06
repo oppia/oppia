@@ -11,7 +11,7 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
           $scope.loadPage(data);
         }).error(function(data) {
           warningsData.addWarning(
-              data.error || 'There was an error loading the story.');
+              data.error || 'There was an error loading the exploration.');
         });
   };
 
