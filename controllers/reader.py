@@ -29,8 +29,6 @@ from models.state import State
 from models.stats import EventHandler
 import utils
 
-from jinja2 import Environment, meta
-
 READER_MODE = 'reader'
 DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 
@@ -92,8 +90,9 @@ class ExplorationHandler(BaseHandler):
         exploration = utils.get_entity(Exploration, exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
-        init_html, init_widgets = utils.parse_content_into_html(init_state.content, 0)
         params = self.get_params(init_state)
+        init_html, init_widgets = utils.parse_content_into_html(
+            init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
             params=init_state.interactive_params,
@@ -167,26 +166,13 @@ class ExplorationHandler(BaseHandler):
 
             norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
             if norm_answer is None:
-                # Replace this with a more detailed warning.
-                raise self.InvalidInputException('Invalid input')
+                raise self.InvalidInputException(
+                    'Invalid input: could not normalize the answer.')
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
 
-            # Pass the code through a Jinja templating process.
-            # Find the variables in 'code'.
-            can_parse_as_jinja = True
-            variables = meta.find_undeclared_variables(
-                Environment().parse(code))
-            for var in variables:
-                if var not in params:
-                    can_parse_as_jinja = False
-                    break
-
-            if can_parse_as_jinja:
-                # Parse as Jinja, using the reader's parameters.
-                code = Environment().from_string(code).render(params)
-            else:
-                logging.info('Cannot parse %s using %s' % (code, params))
+            code = utils.parse_with_jinja(code, params)
+            if code is None:
                 continue
 
             return_value, return_data = (
@@ -214,7 +200,7 @@ class ExplorationHandler(BaseHandler):
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
@@ -224,13 +210,13 @@ class ExplorationHandler(BaseHandler):
             # Append Oppia's feedback, if any.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.
             if old_state.hash_id != state.hash_id:
                 state_html, state_widgets = utils.parse_content_into_html(
-                    state.content, block_number)
+                    state.content, block_number, params)
                 html_output += state_html
                 widget_output.append(state_widgets)
 

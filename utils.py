@@ -26,6 +26,8 @@ import feconf
 from models.models import AugmentedUser, Widget
 from models.exploration import Exploration
 from models.state import State
+
+from jinja2 import Environment, meta
 from google.appengine.ext import ndb
 
 
@@ -188,7 +190,7 @@ def get_js_controllers(filenames):
         for filename in filenames])
 
 
-def parse_content_into_html(content_array, block_number):
+def parse_content_into_html(content_array, block_number, params={}):
     """Takes a content array and transforms it into HTML.
 
     Args:
@@ -199,6 +201,7 @@ def parse_content_into_html(content_array, block_number):
                 - 'video'; then the value is a video ID
                 - 'widget'; then the value is a widget ID
         block_number: the number of content blocks preceding this one.
+        params: any parameters used for templatizing text strings.
 
     Returns:
         the HTML string representing the array.
@@ -230,8 +233,13 @@ def parse_content_into_html(content_array, block_number):
                 # Ignore empty widget content.
                 pass
         elif (content['type'] in ['text', 'image', 'video']):
+            if content['type'] == 'text':
+                value = parse_with_jinja(content['value'], params)
+            else:
+                value = content['value']
+
             html += feconf.JINJA_ENV.get_template('content.html').render({
-                'type': content['type'], 'value': content['value']})
+                'type': content['type'], 'value': value})
         else:
             raise InvalidInputException(
                 'Invalid content type %s', content['type'])
@@ -320,3 +328,31 @@ def delete_exploration(exploration):
         augmented_user.put()
 
     exploration.delete()
+
+
+def parse_with_jinja(string, params):
+    """Parses a string using Jinja templating.
+
+    Args:
+    - string: the string to be parsed.
+    - params: the parameters to parse the string with.
+
+    Returns:
+      the parsed string, or None if the string could not be parsed.
+    """
+    # Pass the code through a Jinja templating process.
+    # Find the variables in 'code'.
+    can_parse_as_jinja = True
+    variables = meta.find_undeclared_variables(
+        Environment().parse(string))
+    for var in variables:
+        if var not in params:
+            can_parse_as_jinja = False
+            break
+
+    if can_parse_as_jinja:
+        # Parse as Jinja, using the reader's parameters.
+        return Environment().from_string(string).render(params)
+    else:
+        logging.info('Cannot parse %s using %s' % (string, params))
+        return None

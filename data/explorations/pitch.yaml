@@ -29,8 +29,7 @@ Main window:
       notesToPlayAtStart: []
     rules:
       submit:
-      - $$hashKey: 01T
-        attrs:
+      - attrs:
           classifier: equals(x)
         code: equals(u'{{noteStart}}')
         dest: END
@@ -38,10 +37,9 @@ Main window:
         inputs:
           x: '{{noteStart}}'
         rule: Answer is equal to {{x|String}}
-      - $$hashKey: 00N
-        attrs: {}
+      - attrs: {}
         code: 'True'
         dest: Main window
-        feedback: That's not right. Why not try again?
+        feedback: That's not right. Why not try again? (The right answer is {{noteStart}}.)
         inputs: {}
         rule: Default
