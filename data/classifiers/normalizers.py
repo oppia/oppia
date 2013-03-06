@@ -32,6 +32,18 @@ def List(val):
     return val
 
 
+def MusicNote(val):
+    """The given value is a music note between C4 and F5."""
+    # TODO(sll): Make this a lot more general! E.g., enum.
+    try:
+        val = str(val)
+        assert val in [
+            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5']
+    except:
+        return None
+    return val
+
+
 def NonnegativeInt(val):
     """The given value should be a non-negative integer."""
     try:

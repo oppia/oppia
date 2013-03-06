@@ -36,7 +36,7 @@ Main window:
         feedback: Yes, that's correct!
         inputs:
           x: '{{noteStart}}'
-        rule: Answer is equal to {{x|String}}
+        rule: Answer is equal to {{x|MusicNote}}
       - attrs: {}
         code: 'True'
         dest: Main window

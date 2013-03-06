@@ -14,7 +14,7 @@ description: |
 # interaction.
 actions:
   submit:
-    classifier: TextClassifier
+    classifier: MusicNoteClassifier
 
 # Customization parameters and their default values.
 params:

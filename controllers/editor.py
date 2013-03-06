@@ -305,13 +305,18 @@ class StateHandler(BaseHandler):
                     mutable_rule = mutable_rule[mutable_rule.find('}}') + 2:]
 
                     normalizer = getattr(normalizers, normalizer_string)
-                    normalized_param = normalizer(rule['inputs'][param])
+                    # TODO(sll): Make the following check more robust.
+                    if '{{' not in rule['inputs'][param] or '}}' not in rule['inputs'][param]:
+                        normalized_param = normalizer(rule['inputs'][param])
+                    else:
+                        normalized_param = rule['inputs'][param]
+
                     if normalized_param is None:
                         raise self.InvalidInputException(
                             '%s has the wrong type. Please replace it with a '
                             '%s.' % (rule['inputs'][param], normalizer_string))
 
-                    if normalizer.__name__ == 'String':
+                    if normalizer.__name__ == 'String' or normalizer.__name__ == 'MusicNote':
                         result += 'u\'' + unicode(normalized_param) + '\''
                     else:
                         result += str(normalized_param)
