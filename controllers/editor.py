@@ -299,10 +299,9 @@ class StateHandler(BaseHandler):
                         result += ','
 
                     # Get the normalizer specified in the rule.
-                    mutable_rule = mutable_rule[mutable_rule.find('{{') + 2:]
-                    mutable_rule = mutable_rule[mutable_rule.find('|') + 1:]
-                    normalizer_string = mutable_rule[: mutable_rule.find('}}')]
-                    mutable_rule = mutable_rule[mutable_rule.find('}}') + 2:]
+                    param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
+                    param_spec = param_spec[param_spec.find('|') + 1:]
+                    normalizer_string = param_spec[: param_spec.find('}}')]
 
                     normalizer = getattr(normalizers, normalizer_string)
                     # TODO(sll): Make the following check more robust.

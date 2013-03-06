@@ -38,6 +38,15 @@ Main window:
           x: '{{noteStart}}'
         rule: Answer is equal to {{x|MusicNote}}
       - attrs:
+          classifier: is_within_tolerance(x, tol)
+        code: is_within_tolerance(u'{{noteStart}}',1)
+        dest: Main window
+        feedback: No, but you're very close!
+        inputs:
+          tol: '1'
+          x: '{{noteStart}}'
+        rule: Answer is within {{tol|NonnegativeInt}} of {{x|MusicNote}}
+      - attrs:
           classifier: is_less_than(x)
         code: is_less_than(u'{{noteStart}}')
         dest: Main window
