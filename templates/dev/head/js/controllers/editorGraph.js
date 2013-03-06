@@ -273,7 +273,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
               if (d.hashId == initStateId) {
                 return;
               }
-              scope.$parent.$parent.deleteState(d.hashId);
+              scope.$parent.$parent.openDeleteStateModal(d.hashId);
             });
 
         nodeEnter.append('svg:text')

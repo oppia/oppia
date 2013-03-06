@@ -125,7 +125,7 @@
     </div>
 
 
-    <div ui-modal class="fade" id="deleteExplorationModal" ng-model="deleteExplorationModalShown">
+    <div class="modal hide fade" id="deleteExplorationModal" ng-model="deleteExplorationModalShown">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
           &times;
@@ -143,6 +143,23 @@
       </div>
     </div>
 
+    <div class="modal hide fade" id="deleteStateModal" ng-model="deleteStateModalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="deleteStateModalLabel">Delete State</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          Really delete state <[getStateName(deleteStateId)]>? This action cannot be reversed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" ng-click="deleteState(deleteStateId)">Delete</button>
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
 
   </div>
 

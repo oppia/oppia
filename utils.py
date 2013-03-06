@@ -309,3 +309,14 @@ def create_new_state(exploration, state_name):
     exploration.states.append(state.key)
     exploration.put()
     return state
+
+
+def delete_exploration(exploration):
+    """Deletes an exploration."""
+    augmented_users = AugmentedUser.query().filter(
+        AugmentedUser.editable_explorations == exploration.key)
+    for augmented_user in augmented_users:
+        augmented_user.editable_explorations.remove(exploration.key)
+        augmented_user.put()
+
+    exploration.delete()

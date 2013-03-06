@@ -74,13 +74,9 @@ class YamlTransformer(BaseHandler):
     def create_exploration_from_yaml(cls, yaml, user, title, category, id=None):
         """Creates an exploration from a YAML file."""
 
-        # TODO(sll): If the exploration creation throws an error, the
-        # newly-created exploration should be deleted.
-
         yaml = yaml.strip()
         # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
         init_state_name = yaml[:yaml.find(':\n')]
-        logging.info(init_state_name)
         if not init_state_name:
             raise cls.InvalidInputException(
                 'Invalid YAML file: the initial state name cannot be identified')
@@ -88,22 +84,27 @@ class YamlTransformer(BaseHandler):
         exploration = utils.create_new_exploration(
             user, title=title, category=category, init_state_name=init_state_name,
             id=id)
-        yaml_description = cls.get_dict_from_yaml(yaml)
 
-        # Create all the states first.
-        for state_name, unused_state_description in yaml_description.iteritems():
-            if state_name == init_state_name:
-                continue
-            else:
-                if utils.check_existence_of_name(State, state_name, exploration):
-                    raise cls.InvalidInputException(
-                        'Invalid YAML file: contains duplicate state names %s' %
-                        state_name)
-                state = utils.create_new_state(exploration, state_name)
+        try:
+            yaml_description = cls.get_dict_from_yaml(yaml)
 
-        for state_name, state_description in yaml_description.iteritems():
-            state = utils.get_state_by_name(state_name, exploration)
-            cls.modify_state_using_dict(exploration, state, state_description)
+            # Create all the states first.
+            for state_name, unused_state_description in yaml_description.iteritems():
+                if state_name == init_state_name:
+                    continue
+                else:
+                    if utils.check_existence_of_name(State, state_name, exploration):
+                        raise cls.InvalidInputException(
+                            'Invalid YAML file: contains duplicate state names %s' %
+                            state_name)
+                    state = utils.create_new_state(exploration, state_name)
+
+            for state_name, state_description in yaml_description.iteritems():
+                state = utils.get_state_by_name(state_name, exploration)
+                cls.modify_state_using_dict(exploration, state, state_description)
+        except Exception as e:
+            utils.delete_exploration(exploration)
+            raise cls.InvalidInputException('Error parsing YAML file: %s' % e)
 
         return exploration
 

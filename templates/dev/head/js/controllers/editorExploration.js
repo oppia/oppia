@@ -55,9 +55,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
-  var Exploration = $resource('/create/:explorationId/data');
 
-  // There should be one GET request made for Exploration when the editor page
+  // There should be one GET request made for an exploration when the editor page
   // is initially loaded. This results in a broadcast that will initialize the
   // relevant frontend controllers.
   // Any further GET requests will be state-specific and will be obtained by
@@ -72,13 +71,16 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   explorationData.getData = function(stateId) {
     // Retrieve data from the server.
     console.log('Retrieving exploration data from the server');
-    explorationData.data = Exploration.get(
-      {explorationId: pathnameArray[2]}, function() {
+
+    $http.get(explorationUrl + '/data').success(
+      function(data) {
+        explorationData.data = data;
         explorationData.broadcastExploration();
-        if (stateId) {
+        explorationData.stateId = null;
+        if (stateId && stateId in explorationData.data.states) {
           explorationData.broadcastState(stateId);
         }
-      }, function(errorResponse) {
+      }).error(function(errorResponse) {
         warningsData.addWarning('Server error: ' + errorResponse.error);
       });
   };
@@ -103,7 +105,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
     console.log('Getting state data for state ' + stateId);
     explorationData.stateId = stateId;
-    if (stateId in explorationData.data.states) {
+    if ('states' in explorationData.data && stateId in explorationData.data.states) {
       return explorationData.data.states[stateId];
     } else {
       explorationData.getData(stateId);
@@ -111,10 +113,17 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   };
 
   explorationData.getStateProperty = function(stateId, property) {
+    if (!stateId) {
+      return;
+    }
     // NB: This does not broadcast an event.
     console.log(
         'Getting state property ' + property + ' for state ' + stateId);
     var stateData = explorationData.getStateData(stateId);
+    if (!stateData) {
+      warningsData.addWarning('Cannot get data for state ' + stateId);
+      return;
+    }
     if (!stateData.hasOwnProperty(property)) {
       warningsData.addWarning('Invalid property name: ' + property);
       return;
@@ -249,6 +258,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     explorationFullyLoaded = true;
+
     if ($scope.stateId) {
       $scope.processStateData(explorationData.getStateData($scope.stateId));
     }
@@ -387,9 +397,24 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.stateName = data.name;
   };
 
+  $scope.getStateName = function(stateId) {
+    if (!stateId) {
+      return '[none]';
+    }
+    return explorationData.getStateProperty(stateId, 'name');
+  };
+
+  $scope.openDeleteStateModal = function(stateId) {
+    $scope.deleteStateId = stateId;
+    $scope.$apply();
+    $('#deleteStateModal').modal('show');
+  };
+
+  $('#deleteStateModal').on('hidden', function() {
+    $scope.deleteStateId = '';
+  });
+
   // Deletes the state with id stateId. This action cannot be undone.
-  // TODO(sll): Add an 'Are you sure?' prompt. Later, allow undoing of the
-  // deletion.
   $scope.deleteState = function(stateId) {
     if (stateId == $scope.initStateId) {
       warningsData.addWarning('Deleting the initial state of a question is not ' +
@@ -397,11 +422,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       return;
     }
 
-    $http.delete(
-        $scope.explorationUrl + '/' + stateId + '/data', '',
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
-      explorationData.getData();
+    $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
+    .success(function(data) {
+      // TODO(sll): Try and handle this without reloading the page.
+      window.location = $scope.explorationUrl;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });

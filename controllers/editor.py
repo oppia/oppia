@@ -147,17 +147,7 @@ class ExplorationPage(BaseHandler):
     @require_editor
     def delete(self, user, exploration):
         """Deletes the given exploration."""
-
-        for state_key in exploration.states:
-            state_key.delete()
-
-        augmented_users = AugmentedUser.query().filter(
-            AugmentedUser.editable_explorations == exploration.key)
-        for augmented_user in augmented_users:
-            augmented_user.editable_explorations.remove(exploration.key)
-            augmented_user.put()
-
-        exploration.key.delete()
+        utils.delete_exploration(exploration)
 
 
 class ExplorationHandler(BaseHandler):
