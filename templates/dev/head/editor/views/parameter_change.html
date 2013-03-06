@@ -1,0 +1,38 @@
+<div>
+  <ol>
+    <li ng-repeat="(name, values) in paramChanges">
+      <a class="close" ng-click="deleteParamChange(name)"> 
+        &times;
+      </a>
+      <span class="oppia-editable-name">
+        Change <b><[name]></b> to <b><[values]></b>
+      </span>
+    </li>
+  </ol>
+
+  <button type="button" 
+          ng-hide="activeInputData.name == 'state.dummy.paramChange'"
+          ng-click="initializeNewActiveInput('state.dummy.paramChange')">
+    Add Parameter Change
+  </button>
+
+  <br>
+
+  <div ng-show="activeInputData.name == 'state.dummy.paramChange'">
+    <form novalidate class="oppia-form" name="newParameterForm" ng-submit="addParamChange(tmpParamName, tmpParamValues)">
+      Change
+      <input ng-model="tmpParamName" type="text" list="params"
+             placeholder="Parameter Name" required>
+      <datalist id="params">
+        <option ng-repeat="param in parameters" value="<[param.name]>"></option>
+      </datalist>
+      to one of these values:
+      <list items="tmpParamValues"></list>
+
+      <br>
+      <input type="submit" value="Save Changes"
+             ng-disabled="newParameterForm.$invalid">
+      <button type="button" ng-click="resetParamChangeInput()">Cancel</button>
+    </form>
+  </div>
+</div>

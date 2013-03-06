@@ -139,8 +139,9 @@ class ExplorationPage(BaseHandler):
             exploration.category = category
         if title:
             exploration.title = title
-        if 'image_id' in self.request.arguments():  # NB: image_id can be null
-            exploration.image_id = image_id
+        if 'image_id' in self.request.arguments():
+            exploration.image_id = None if image_id == 'null' else image_id
+
         exploration.put()
 
     @require_editor

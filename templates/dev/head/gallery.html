@@ -86,7 +86,11 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
               &times;
             </button>
-            <h3 id="customizeModalLabel">Add New Exploration</h3>
+            <h3 id="customizeModalLabel">
+              Add New Exploration <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
+              title="This form allows you to add new explorations.
+              Enter the title of your exploration, as well as the Gallery page category it should fall under (e.g. languages, music).">
+            </h3>
           </div>
           <div class="modal-body">
             <div>
@@ -111,7 +115,7 @@
 
             <div ng-hide="includeYamlFile">
               <label>
-                (Optional) Use a copy of the sample exploration (hola.yaml)?
+                (Optional) Use a copy of the sample exploration ('Hola!')?
                 <input type="checkbox" ng-model="useSampleExploration">
               </label>
             </div>

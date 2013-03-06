@@ -12,15 +12,28 @@
             <button ng-hide="isPublic" type="button" ng-click="makePublic()">
               Publish
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Click this button to publish your exploration in the gallery, so that others can read it.">
+
+            &nbsp;&nbsp;&nbsp;
 
             <button type="button" ng-click="downloadExploration()">
               Download A Copy
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Download a copy of this exploration in plaintext format.">
+
+            &nbsp;&nbsp;&nbsp;
 
             <button type="button" class="btn btn-danger" data-toggle="modal"
                     data-target="#deleteExplorationModal">
               Delete
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Delete this exploration. Warning: this action cannot be reversed!">
           </span>
 
           <h3>
@@ -54,13 +67,6 @@
                   </div>
 
                   <div class="span7">
-                    <form ng-submit="addState(newStateDesc, false)">
-                      <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add New State" required>
-                      <datalist id="states">
-                        <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
-                      </datalist>
-                      <div class="oppia-loading" ng-show="addStateLoading"></div>
-                    </form>
                     {% include 'editor/editor_viz.html' %}
                   </div>
                 </div>
@@ -98,6 +104,9 @@
   
                       <span ng-show="getMode() == 'text'">
                         Plaintext Editor
+                        <img class="oppia-help" src="/images/help.png"
+                             ui-jq="tooltip"
+                             title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
                       </span>
                       <span ng-hide="getMode() == 'text'">
                         <a ng-click="changeMode('text')">Plaintext Editor</a>

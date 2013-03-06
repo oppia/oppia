@@ -7,17 +7,20 @@
 </div>
 
 <div>
-  Image to show on the Gallery page:
-  <ng-switch on="!explorationImageId">
-    <div ng-switch-when="true" class="oppia-placeholder">
-      <form id="newImageForm">
-        <input type="file" id="newImage" name="newImage" image-upload="true">
-        <button type="button" ng-click="saveExplorationImage()">Save</button>
-      </form>
-    </div>
-    <div ng-switch-default>
-      <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>"></img>
-      <button ng-click="deleteExplorationImage()">Delete image</button>
-    </div>
-  </ng-switch>
+  Cover image (to show on the Gallery page):
+  <span ui-if="explorationImageId">
+    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
+    <button ng-click="deleteExplorationImage()">
+      Revert to default image
+    </button>
+  </span>
+  <span ui-if="!explorationImageId">
+    <img class="oppia-small-image" src="/images/draft.png">
+    <form id="newImageForm">
+      <input type="file" id="newImage" name="newImage" image-upload="true">
+      <button type="button" ng-click="saveExplorationImage()">
+        Save New Image
+      </button>
+    </form>
+  </span>
 </div>

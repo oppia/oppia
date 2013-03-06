@@ -59,6 +59,11 @@ textarea.oppia-code {
   padding-right: 20px;
 }
 
+.oppia-help {
+  height: 16px;
+  width: 16px;
+}
+
 .oppia-holder {
   min-height: 100%;
   position: relative;
