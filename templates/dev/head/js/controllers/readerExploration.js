@@ -17,6 +17,8 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
 
   $scope.initializePage();
 
+  $scope.answerIsBeingProcessed = false;
+
   $scope.loadPage = function(data) {
     console.log(data);
     $scope.answer = data.default_answer;
@@ -40,6 +42,10 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
   };
 
   $scope.submitAnswer = function(answer, channel) {
+    if ($scope.answerIsBeingProcessed) {
+      return;
+    }
+
     console.log(answer);
     var requestMap = {
       answer: JSON.stringify(answer),
@@ -50,18 +56,23 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
 
     var request = $.param(requestMap, true);
 
+    $scope.answerIsBeingProcessed = true;
+
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
         request,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
+      $scope.answerIsBeingProcessed = false;
       warningsData.addWarning(
         data.error || 'There was an error processing your input.');
     });
   };
 
   $scope.refreshPage = function(data) {
+    $scope.answerIsBeingProcessed = false;
+
     console.log(data);
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
