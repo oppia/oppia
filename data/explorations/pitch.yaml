@@ -37,6 +37,22 @@ Main window:
         inputs:
           x: '{{noteStart}}'
         rule: Answer is equal to {{x|MusicNote}}
+      - attrs:
+          classifier: is_less_than(x)
+        code: is_less_than(u'{{noteStart}}')
+        dest: Main window
+        feedback: I think the original note is higher.
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer has a lower pitch than {{x|MusicNote}}
+      - attrs:
+          classifier: is_greater_than(x)
+        code: is_greater_than(u'{{noteStart}}')
+        dest: Main window
+        feedback: I think the original pitch is lower.
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer has a greater pitch than {{x|MusicNote}}
       - attrs: {}
         code: 'True'
         dest: Main window

@@ -12,47 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Numeric classifier tests."""
+"""Music note classifier tests."""
 
 __author__ = 'Sean Lip'
 
 
-import NumericClassifier
+import MusicNoteClassifier
 
-assert NumericClassifier.equals(3, 3)
-assert NumericClassifier.equals(3.0, 3)
-assert not NumericClassifier.equals(4, 3)
+assert MusicNoteClassifier.equals('A4', 'A4')
+assert not MusicNoteClassifier.equals('A4', 'B4')
 
-assert NumericClassifier.is_less_than(3, 4)
-assert NumericClassifier.is_less_than(3.0, 4)
-assert NumericClassifier.is_less_than(3.0, 4.0)
-assert not NumericClassifier.is_less_than(3, 3)
-assert not NumericClassifier.is_less_than(3.0, 3.0)
-assert not NumericClassifier.is_less_than(4.0, 3.0)
-assert not NumericClassifier.is_less_than(4, 3)
+assert MusicNoteClassifier.is_less_than('A4', 'B4')
+assert not MusicNoteClassifier.is_less_than('B4', 'A4')
+assert not MusicNoteClassifier.is_less_than('F5', 'F5')
 
-assert NumericClassifier.is_greater_than(4, 3)
-assert NumericClassifier.is_greater_than(4, 3.0)
-assert NumericClassifier.is_greater_than(4.0, 3.0)
-assert not NumericClassifier.is_greater_than(3, 3)
-assert not NumericClassifier.is_greater_than(3.0, 3.0)
-assert not NumericClassifier.is_greater_than(3.0, 4.0)
-assert not NumericClassifier.is_greater_than(3, 4)
+assert MusicNoteClassifier.is_greater_than('B4', 'A4')
+assert not MusicNoteClassifier.is_greater_than('A4', 'B4')
+assert not MusicNoteClassifier.is_greater_than('F5', 'F5')
 
-assert NumericClassifier.is_less_than_or_equal_to(3, 4)
-assert NumericClassifier.is_less_than_or_equal_to(3, 3)
-assert not NumericClassifier.is_less_than_or_equal_to(4, 3)
+assert MusicNoteClassifier.is_less_than_or_equal_to('A4', 'B4')
+assert MusicNoteClassifier.is_less_than_or_equal_to('A4', 'A4')
+assert not MusicNoteClassifier.is_less_than_or_equal_to('B4', 'A4')
 
-assert NumericClassifier.is_greater_than_or_equal_to(4, 3)
-assert NumericClassifier.is_greater_than_or_equal_to(3, 3)
-assert not NumericClassifier.is_greater_than_or_equal_to(3, 4)
+assert MusicNoteClassifier.is_inclusively_between('A4', 'G4', 'B4')
+assert not MusicNoteClassifier.is_inclusively_between('A4', 'B4', 'F5')
 
-assert NumericClassifier.is_inclusively_between(2, 1, 3)
-assert NumericClassifier.is_inclusively_between(1, 1, 3)
-assert NumericClassifier.is_inclusively_between(3, 1, 3)
-assert NumericClassifier.is_inclusively_between(1.0, 1, 3)
-assert not NumericClassifier.is_inclusively_between(3.0, 1, 2.99)
-
-assert NumericClassifier.is_within_tolerance(3, 3, 0.5)
-assert NumericClassifier.is_within_tolerance(3.5, 3, 0.5)
-assert not NumericClassifier.is_within_tolerance(3.51, 3, 0.5)
+assert MusicNoteClassifier.is_within_tolerance('A4', 'D5', 3)
+assert not MusicNoteClassifier.is_within_tolerance('A4', 'D4', 3)
