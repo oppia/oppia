@@ -1,7 +1,10 @@
 var staff;
 var note01;
-var randomNote = GLOBALS.noteToGuess;
-var initialNotes = GLOBALS.notesToPlayAtStart;
+var noteToGuess = GLOBALS.noteToGuess;
+var notesToPlayAtStart = GLOBALS.notesToPlayAtStart;
+var previousAnswer = GLOBALS.previousAnswer;
+var playScaleStart = GLOBALS.playScaleStart;
+var playScaleEnd = GLOBALS.playScaleEnd;
 var numberOfNotes = 0;
 
 var pitches = {
@@ -30,22 +33,31 @@ $(window).load(function() {
   var staff = document.getElementsByTagName("line");
   note01 = document.getElementById("note01");
 
+  if (previousAnswer) {
+    for (var pitch in pitches) {
+      if (pitches[pitch] == previousAnswer) {
+        moveNote(note01.getAttribute("cy"), pitch - note01.getAttribute("cy"));
+        break;
+      }
+    }
+  }
+
   MIDI.loadPlugin({
     soundfontUrl: "/data/widgets/MusicStaff/static/soundfont/",
     instrument: "acoustic_grand_piano",
     callback: function() {
       $('#playNote').removeAttr("disabled");  //enable the button
+      $('#playCurrent').removeAttr("disabled");  //enable the button
       var index = 0;
-      if (initialNotes.length > 0) {
+      if (notesToPlayAtStart.length > 0) {
         var interval = setInterval(function() {
-          console.log(initialNotes[index]);
-          playNote(initialNotes[index]);
+          playNote(notesToPlayAtStart[index]);
           index++;
-          if (index >= initialNotes.length) {
+          if (index >= notesToPlayAtStart.length) {
             clearInterval(interval);
           }
-        }, 1000);  
-      }    
+        }, 1000);
+      }
     }
   });
 
@@ -74,7 +86,11 @@ $(window).load(function() {
 });
 
 function playCorrectNote() {
-  playNote(randomNote);
+  playNote(noteToGuess);
+}
+
+function playCurrentNote() {
+  playNote(whichLineIsNoteOn());
 }
 
 function submitAnswer() {

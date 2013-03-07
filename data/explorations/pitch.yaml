@@ -27,13 +27,16 @@ Main window:
     params:
       noteToGuess: '{{noteStart}}'
       notesToPlayAtStart: []
+      playScaleEnd: ''
+      playScaleStart: ''
+      previousAnswer: '{{answer}}'
     rules:
       submit:
       - attrs:
           classifier: equals(x)
         code: equals(u'{{noteStart}}')
         dest: END
-        feedback: Yes, that's correct!
+        feedback: Yay, that's correct!
         inputs:
           x: '{{noteStart}}'
         rule: Answer is equal to {{x|MusicNote}}
@@ -65,6 +68,6 @@ Main window:
       - attrs: {}
         code: 'True'
         dest: Main window
-        feedback: That's not right. Why not try again? (The right answer is {{noteStart}}.)
+        feedback: That's not right. Why not try again?
         inputs: {}
         rule: Default

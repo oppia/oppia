@@ -140,6 +140,10 @@ class ExplorationHandler(BaseHandler):
         dest_id = None
         feedback = None
 
+        # Add the reader's answer to the parameter list. This must happen before
+        # the interactive widget is constructed.
+        params['answer'] = answer
+
         interactive_widget_properties = InteractiveWidget.get_interactive_widget(
             state.interactive_widget, state_params_dict=params)['actions']['submit']
 
@@ -151,6 +155,11 @@ class ExplorationHandler(BaseHandler):
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
+
+        norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+        if norm_answer is None:
+            raise self.InvalidInputException(
+                'Invalid input: could not normalize the answer.')
 
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
@@ -164,10 +173,6 @@ class ExplorationHandler(BaseHandler):
                 feedback = rule['feedback']
                 break
 
-            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
-            if norm_answer is None:
-                raise self.InvalidInputException(
-                    'Invalid input: could not normalize the answer.')
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
 

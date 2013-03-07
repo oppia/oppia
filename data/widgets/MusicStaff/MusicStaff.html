@@ -10,10 +10,15 @@
       }
     </style>
 
+    <!-- Assume all parameters are strings or lists. Null values are represented
+    by the empty string. -->
     <script>
       var GLOBALS = {};
       GLOBALS.noteToGuess = '{{noteToGuess}}';
       GLOBALS.notesToPlayAtStart = {{notesToPlayAtStart}};
+      GLOBALS.previousAnswer = '{{previousAnswer}}';
+      GLOBALS.playScaleStart = '{{playScaleStart}}';
+      GLOBALS.playScaleEnd = '{{playScaleEnd}}';
     </script>
 
     <!-- midi.js package -->
@@ -91,6 +96,10 @@
       <button type="button" id="playNote" disabled="true" onClick="playCorrectNote();">
       	Play Desired Note
       </button>
+      <button type="button" id="playCurrent" disabled="true" onclick="playCurrentNote()">
+      	Play Current Note
+      </button>
+
       <button type="button" onclick="submitAnswer()">
       	Check Answer
       </button>

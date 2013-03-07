@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import base64
+import copy
 import hashlib
 import json
 import logging
@@ -330,29 +331,24 @@ def delete_exploration(exploration):
     exploration.delete()
 
 
-def parse_with_jinja(string, params):
+def parse_with_jinja(string, params, default=''):
     """Parses a string using Jinja templating.
 
     Args:
     - string: the string to be parsed.
     - params: the parameters to parse the string with.
+    - default: the default string to use for missing parameters.
 
     Returns:
       the parsed string, or None if the string could not be parsed.
     """
-    # Pass the code through a Jinja templating process.
-    # Find the variables in 'code'.
-    can_parse_as_jinja = True
     variables = meta.find_undeclared_variables(
         Environment().parse(string))
-    for var in variables:
-        if var not in params:
-            can_parse_as_jinja = False
-            break
 
-    if can_parse_as_jinja:
-        # Parse as Jinja, using the reader's parameters.
-        return Environment().from_string(string).render(params)
-    else:
-        logging.info('Cannot parse %s using %s' % (string, params))
-        return None
+    new_params = copy.deepcopy(params)
+    for var in variables:
+        if var not in new_params:
+            new_params[var] = default
+            logging.info('Cannot parse %s properly using %s' % (string, params))
+
+    return Environment().from_string(string).render(new_params)

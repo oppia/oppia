@@ -220,25 +220,8 @@ class InteractiveWidget(BaseHandler):
                 if isinstance(params[key], list):
                     widget['params'][key] = map(str, params[key])
                 else:
-                    can_parse_as_jinja = True
-                    # Find the variables in params[key].
-                    variables = meta.find_undeclared_variables(
-                        Environment().parse(params[key]))
-                    for var in variables:
-                        if var not in state_params_dict:
-                            can_parse_as_jinja = False
-                            break
-
-                    if can_parse_as_jinja:
-                        # Parse as Jinja, using a state parameter if applicable.
-                        widget['params'][key] = Environment().from_string(
-                            params[key]).render(state_params_dict)
-                    else:
-                        # Default to the default parameter for the widget.
-                        logging.info(
-                            'Could not initialize %s with %s' %
-                            (params[key], state_params_dict))
-                        widget['params'][key] = params[key]
+                    widget['params'][key] = utils.parse_with_jinja(
+                        params[key], state_params_dict, '')
 
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
 
