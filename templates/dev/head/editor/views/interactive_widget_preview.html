@@ -88,7 +88,7 @@
     </div>
   </div>
 
-  <div ui-modal class="fade" id="addRuleModal" ng-model="addRuleModalShown">
+  <div ui-modal class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;
@@ -124,6 +124,7 @@
           <textarea rows="10" cols="50" ng-model="addRuleActionFeedback"></textarea>
         </div>
         <!-- TODO(yanamal): Add a section for parameter changes here. -->
+        {% include 'parameter_change.html' %}
       </div>
     </div>
 

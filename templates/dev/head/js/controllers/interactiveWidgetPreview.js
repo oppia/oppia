@@ -85,6 +85,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
     $scope.addRuleActionFeedback = null;
+    $scope.addRuleActionParamChanges = null;
   };
 
   $scope.openAddRuleModal = function(action) {
@@ -104,8 +105,54 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionInputs = rule.inputs;
     $scope.addRuleActionDest = rule.dest;
     $scope.addRuleActionFeedback = rule.feedback;
+    $scope.addRuleActionParamChanges = rule.paramChanges;
   };
 
+  //logic for parameter change interface
+
+  //set up variables to add a new param change
+  $scope.startAddParamChange = function() {
+  }
+
+  //set up variables to edit an existing param change
+  $scope.startEditParamChange = function(pChangeIndex) {
+  }
+
+  //reset and/or initialize variables for parameter change input
+  $scope.resetParamChangeInput = function() {
+    activeInputData.clear();
+    $scope.tmpParamName = null;
+    $scope.tmpParamNewValue = null;
+    $scope.tmpParamLiteral = null; //new value literal, if parameter is to be changed to a literal value
+  };
+
+  $scope.addParamChange = function(paramName, paramVal, valLiteral) {
+    // Verify that the active input was the parameter input, as expected TODO(yanamal)
+
+    // format the data for the new change
+    var newChange = {};
+    if(paramVal == 'newval') { //changing param to a new literal value
+      newChange = {pname: paramName, newVal: valLiteral};
+    }
+    else { //changing to a computed value - either value of another var, or student input
+      newChange = {pname: paramName, newVal: '{{'+paramVal+'}}'};
+    }
+    // Add the new change to the list
+    var rule = $scope.interactiveRulesets[addRuleAction][addRuleActionIndex];
+    var paramChange = rule.paramChanges[paramChangeIndex];//TODO
+    // Reset and hide the input field
+    $scope.resetParamChangeInput();
+  };
+
+  $scope.deleteParamChange = function (paramIndex) { //TODO(yanamal): add category index when this is per-category
+    $scope.paramChanges.splice(paramIndex, 1);
+    // TODO(yanamal): save to server-side
+  };
+}
+
+
+  
+  
   $('#addRuleModal').on('hide', function() {
     if ($scope.addRuleActionRule) {
       var bad = false;

@@ -72,7 +72,7 @@
   </div>
 
 
-  <div ui-modal class="fade" id="editWidgetModal" ng-model="editWidgetModal">
+  <div ui-modal class="modal hide fade" id="editWidgetModal" ng-model="editWidgetModal">
     <div class="modal-header">
       <button ng-hide="newWidgetIsBeingAdded" type="button" class="close" data-dismiss="modal" aria-hidden="true"
               ng-click="saveEditedWidget(modalWidget)">
@@ -222,7 +222,7 @@
 
   {% endif %}
 
-  <div ui-modal class="fade" id="customizeModal" ng-model="modalShown">
+  <div ui-modal class="modal hide fade" id="customizeModal" ng-model="modalShown">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;

@@ -3,23 +3,21 @@
     <a class="close" ng-click="deleteParamChange($index)"> 
       &times;
     </a>
-    <span class="oppia-editable-name">Change Parameter: <[change.name]> to: <[change.newVal]></span><br>
+    <span class="oppia-editable-name">Change Parameter: <[change.pname]> to: <[change.newVal]></span><br>
   </div>
   <button type="button" ng-hide="activeInputData.name == 'state.dummy.paramChange'" ng-click="initializeNewActiveInput('state.dummy.paramChange')"> Add Parameter Change </button><br>
   <div ng-show="activeInputData.name == 'state.dummy.paramChange'">
     Change Parameter:
     <select id="tmpParamName">
-      <option value="foo">foo</option>
       <option ng-repeat="param in parameters" value="<[param.name]>"><[param.name]></option>
     </select>
     to: 
-    <select ng-model="tmpNewValue">
+    <select ng-model="tmpParamNewValue">
       <option value="input">Student's input</option>
       <option value="newval">New value</option>
-      <option value="foo">foo</option>
       <option ng-repeat="param in parameters" value="<[param.name]>"><[param.name]></option>
     </select>
-    <input type="text" ng-model="tmpLiteral" ng-show="tmpNewValue == 'newval'">
-    <br><button type="button" ng-click="addParamChange(tmpParamName, tmpNewValue, tmpLiteral)">Submit</button>
+    <input type="text" ng-model="tmpParamLiteral" ng-show="tmpParamNewValue == 'newval'">
+    <br><button type="button" ng-click="addParamChange(tmpParamName, tmpParamNewValue, tmpParamLiteral)">Submit</button>
   </div>
 </div>
