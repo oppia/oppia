@@ -45,7 +45,7 @@ class MainPage(BaseHandler):
     def ensure_default_explorations_exist(self):
         """Add the default explorations, if they don't already exist."""
         self.ensure_default_exploration_exists(
-            '0', 'hola.yaml', 'Demo: ¡Hola!', 'Languages')
+            '0', 'hola.yaml', '¡Hola!', 'Languages')
         self.ensure_default_exploration_exists(
             '1', 'pitch.yaml', 'Pitch Perfect', 'Music')
 
