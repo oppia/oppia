@@ -65,7 +65,7 @@ function EditorTree($scope, $filter, explorationData) {
 }
 
 
-oppia.directive('stateTreeViz', function () {
+oppia.directive('stateTreeViz', function (explorationData) {
   // constants
   var w = 960,
       h = 4000,
@@ -159,9 +159,10 @@ oppia.directive('stateTreeViz', function () {
               return 'hashId' in d ? 'grey': '';
             })
             .on("click", function (d) {
-              if (!('hashId' in d)) {
+              if (!('hashId' in d) || d.hashId == END_DEST) {
                 return;
               }
+              explorationData.getStateData(d.hashId);
               scope.$parent.$parent.stateId = d.hashId;
               $('#editorViewTab a[href="#stateEditor"]').tab('show');
             });

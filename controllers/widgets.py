@@ -16,8 +16,9 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import copy
+import logging
 import os
+import random
 
 from controllers.base import BaseHandler, require_user
 import feconf
@@ -26,6 +27,7 @@ import utils
 from yaml_utils import YamlTransformer
 
 import json
+from jinja2 import Environment, meta
 
 from google.appengine.api import users
 
@@ -199,8 +201,9 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_id, params=[], include_js=False):
+    def get_interactive_widget(cls, widget_id, params=[], state_params_dict={}):
         """Gets interactive widget code from the file system."""
+
         widget = {}
         with open(os.path.join(
                 feconf.SAMPLE_WIDGETS_DIR,
@@ -209,34 +212,25 @@ class InteractiveWidget(BaseHandler):
             widget = YamlTransformer.get_dict_from_yaml(f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
-        widget_js = ''
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            html_file = os.path.join(widget_id, '%s.html' % widget_id)
             for key in params:
-                widget['params'][key] = params[key]
-            try:
-                with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, html_file)) as f:
-                    pass
-                widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                    html_file).render(widget['params'])
+                # This is a bad hack for pushing things like ["A", "B"] to
+                # the frontend without the leading 'u', but it works.
+                # TODO(sll): Fix this more robustly.
+                if isinstance(params[key], list):
+                    widget['params'][key] = map(str, params[key])
+                elif not isinstance(params[key], str):
+                    widget['params'][key] = params[key]
+                else:
+                    widget['params'][key] = utils.parse_with_jinja(
+                        params[key], state_params_dict, '')
 
-                if include_js:
-                    with open(os.path.join(
-                            feconf.SAMPLE_WIDGETS_DIR,
-                            widget_id,
-                            '%s.js' % widget_id)) as f:
-                        widget_js = ('<script>%s</script>' %
-                                     f.read().decode('utf-8'))
-            except IOError:
-                # Serve a link to the static directory in an iframe.
-                html_path = os.path.join(
-                    feconf.SAMPLE_WIDGETS_DIR, widget_id, 'static',
-                    '%s.html' % widget_id)
-                widget_html = feconf.JINJA_ENV.get_template(
-                    'iframe.html').render({
-                        'src': os.path.join('/', html_path)})
+            html_file = os.path.join(widget_id, '%s.html' % widget_id)
 
-        widget['raw'] = '\n'.join([widget_html, widget_js])
+            widget_html = feconf.WIDGET_JINJA_ENV.get_template(
+                html_file).render(widget['params'])
+
+        widget['raw'] = widget_html
         for action, properties in widget['actions'].iteritems():
             classifier = properties['classifier']
             if classifier and classifier != 'None':
@@ -256,9 +250,17 @@ class InteractiveWidget(BaseHandler):
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
         params = self.request.get('params')
-        if params:
-            params = json.loads(params)
-        else:
-            params = []
-        response = self.get_interactive_widget(widget_id, params=params)
+        params = json.loads(params) if params else []
+
+        state_params_dict = {}
+        state_params_given = self.request.get('state_params')
+        if state_params_given:
+            state_params_given = json.loads(state_params_given)
+        if state_params_given:
+            for (key, values) in state_params_given.iteritems():
+                # Pick a random parameter for each key.
+                state_params_dict[key] = random.choice(values)
+
+        response = self.get_interactive_widget(
+            widget_id, params=params, state_params_dict=state_params_dict)
         self.response.out.write(json.dumps({'widget': response}))

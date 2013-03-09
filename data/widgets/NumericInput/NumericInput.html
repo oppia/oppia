@@ -1,6 +1,17 @@
-<div ng-controller="NumericInput">
-  <form ng-submit="submitAnswer(answer)">
-    <input type="number" ng-model="answer" required>
-    <button type="submit">Submit</button>
-  </form>
-</div>
+<html ng-app="numeric">
+  <head>
+    <script src="/lib/header_js"></script>
+  </head>
+
+  <body>
+    <div ng-controller="NumericInput">
+      <form ng-submit="submitAnswer(answer)">
+        <input type="number" ng-model="answer" required autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <script src="/data/widgets/NumericInput/static/js/NumericInput.js">
+    </script>
+  </body>
+</html>

@@ -1,3 +1,0 @@
-function Continue($scope) {
-
-}

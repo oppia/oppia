@@ -4,7 +4,6 @@
     <meta charset=utf-8>
     <title>Oppia</title>
     <link rel="stylesheet" type="text/css" href="/lib/css" media="screen">
-    <script src="/third_party/postmessage/postmessage.js"></script>
     <script src="/lib/header_js"></script>
   </head>
 
@@ -52,13 +51,16 @@
         {% endif %}
 
         <div ng-cloak>
-          <div ng-repeat="warning in warningsData.warnings">
-            <p class="alert alert-block">
-              <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-              <strong>Warning!</strong>
-              <[warning]>
-            </p>
+          <div class="oppia-alert-blocks">
+            <div ng-repeat="warning in (warningsData.warnings | limitTo:5)">
+              <p class="alert alert-block">
+                <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+                <strong>Warning!</strong>
+                <[warning]>
+              </p>
+            </div>
           </div>
+        
           {% block content %}{% endblock %}
         </div>
       </div>

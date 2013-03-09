@@ -19,4 +19,4 @@ Answer is between {{a|Real}} and {{b|Real}}, inclusive:
   - is_less_than_or_equal_to(a, b)
 
 Answer is within {{tol|Real}} of {{x|Real}}:
-  classifier: is_within_tolerance(tol, x)
+  classifier: is_within_tolerance(x, tol)

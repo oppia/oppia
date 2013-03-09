@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import base64
+import copy
 import hashlib
 import json
 import logging
@@ -26,6 +27,8 @@ import feconf
 from models.models import AugmentedUser, Widget
 from models.exploration import Exploration
 from models.state import State
+
+from jinja2 import Environment, meta
 from google.appengine.ext import ndb
 
 
@@ -104,7 +107,7 @@ def check_existence_of_name(entity, name, ancestor=None):
         raise EntityIdNotFoundError('No %s name supplied', entity_type)
     if ancestor:
         entity = entity.query(ancestor=ancestor.key).filter(
-                entity.name == name).get()
+            entity.name == name).get()
     else:
         if entity == State:
             raise KeyError('Queries for state entities must include ancestors.')
@@ -188,7 +191,7 @@ def get_js_controllers(filenames):
         for filename in filenames])
 
 
-def parse_content_into_html(content_array, block_number):
+def parse_content_into_html(content_array, block_number, params={}):
     """Takes a content array and transforms it into HTML.
 
     Args:
@@ -199,6 +202,7 @@ def parse_content_into_html(content_array, block_number):
                 - 'video'; then the value is a video ID
                 - 'widget'; then the value is a widget ID
         block_number: the number of content blocks preceding this one.
+        params: any parameters used for templatizing text strings.
 
     Returns:
         the HTML string representing the array.
@@ -230,8 +234,13 @@ def parse_content_into_html(content_array, block_number):
                 # Ignore empty widget content.
                 pass
         elif (content['type'] in ['text', 'image', 'video']):
+            if content['type'] == 'text':
+                value = parse_with_jinja(content['value'], params)
+            else:
+                value = content['value']
+
             html += feconf.JINJA_ENV.get_template('content.html').render({
-                'type': content['type'], 'value': content['value']})
+                'type': content['type'], 'value': value})
         else:
             raise InvalidInputException(
                 'Invalid content type %s', content['type'])
@@ -249,7 +258,7 @@ def get_augmented_user(user):
 
 
 def create_new_exploration(user, title='New Exploration', category='No category',
-        id=None, init_state_name='Activity 1'):
+                           id=None, init_state_name='Activity 1'):
     """Creates and returns a new exploration."""
     if id:
         exploration_hash_id = id
@@ -274,7 +283,7 @@ def create_new_exploration(user, title='New Exploration', category='No category'
         interactive_rulesets={'submit': [{
             'rule': 'Default',
             'inputs': {},
-            'code': '',
+            'code': 'True',
             'dest': state_hash_id,
             'feedback': '',
             'param_changes': [],
@@ -300,7 +309,7 @@ def create_new_state(exploration, state_name):
         interactive_rulesets={'submit': [{
             'rule': 'Default',
             'inputs': {},
-            'code': '',
+            'code': 'True',
             'dest': state_hash_id,
             'feedback': '',
             'param_changes': [],
@@ -309,3 +318,37 @@ def create_new_state(exploration, state_name):
     exploration.states.append(state.key)
     exploration.put()
     return state
+
+
+def delete_exploration(exploration):
+    """Deletes an exploration."""
+    augmented_users = AugmentedUser.query().filter(
+        AugmentedUser.editable_explorations == exploration.key)
+    for augmented_user in augmented_users:
+        augmented_user.editable_explorations.remove(exploration.key)
+        augmented_user.put()
+
+    exploration.delete()
+
+
+def parse_with_jinja(string, params, default=''):
+    """Parses a string using Jinja templating.
+
+    Args:
+    - string: the string to be parsed.
+    - params: the parameters to parse the string with.
+    - default: the default string to use for missing parameters.
+
+    Returns:
+      the parsed string, or None if the string could not be parsed.
+    """
+    variables = meta.find_undeclared_variables(
+        Environment().parse(string))
+
+    new_params = copy.deepcopy(params)
+    for var in variables:
+        if var not in new_params:
+            new_params[var] = default
+            logging.info('Cannot parse %s properly using %s' % (string, params))
+
+    return Environment().from_string(string).render(new_params)

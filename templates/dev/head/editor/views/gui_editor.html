@@ -3,13 +3,22 @@
     <div class="span10">
       <div id="editorWindow" ng-show="stateId">
 
-        <!-- TODO(yanamal): Uncomment the following once it is working.
-        <div>
-          {% include 'parameter_change.html' %}
-        </div>
-        -->
+        <h4>
+          Parameter Changes
+          <img class="oppia-help" src="/images/help.png"
+               ui-jq="tooltip"
+               title="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields.">
+        </h4>
+        {% include 'editor/views/parameter_change.html' %}
 
-        <h4>Non-Interactive Content</h4>
+        <br>
+
+        <h4>
+          Non-Interactive Content
+          <img class="oppia-help" src="/images/help.png"
+               ui-jq="tooltip"
+               title="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input.">
+        </h4>
         <div>
           <ul ui-sortable ng-model="content" class="sortable oppia-state-text-list">
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
@@ -67,6 +76,9 @@
                     </div>
                   </ng-switch>
                 </div>
+                <!--
+                TODO(sll): Reinstate this when it works better.
+
                 <div ng-switch-when="widget">
                   <ng-switch on="item.value == ''">
 
@@ -92,6 +104,7 @@
 
                   </ng-switch>
                 </div>
+                -->
               </ng-switch>
             </li>
           </ul>
@@ -100,7 +113,10 @@
             <button ng-click="addContent('text')">Add text</button>
             <button ng-click="addContent('image')">Add image</button>
             <button ng-click="addContent('video')">Add video</button>
+            <!-- TODO(sll): Reinstate this when it works better.
+
             <button ng-click="addContent('widget')" ng-hide="isWidgetInStateContent()">Add widget</button>
+            -->
           </center>
 
           <br>

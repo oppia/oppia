@@ -26,7 +26,8 @@ class Error404Handler(base.BaseHandler):
     """Handles 404 errors."""
 
     def get(self):
-        self.error(404)
+        """Redirects users to the main gallery if an invalid URL is entered."""
+        self.redirect('/gallery')
 
 
 # Regex for base64 hash_id encoding

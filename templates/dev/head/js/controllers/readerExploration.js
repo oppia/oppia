@@ -11,11 +11,13 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
           $scope.loadPage(data);
         }).error(function(data) {
           warningsData.addWarning(
-              data.error || 'There was an error loading the story.');
+              data.error || 'There was an error loading the exploration.');
         });
   };
 
   $scope.initializePage();
+
+  $scope.answerIsBeingProcessed = false;
 
   $scope.loadPage = function(data) {
     console.log(data);
@@ -24,12 +26,14 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     $scope.categories = data.categories;
     $scope.html = data.html;
     $scope.inputTemplate = data.interactive_widget_html;
-    // $scope.inputTemplate = data.input_template;   //OLD
+    $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
     $scope.widgets = data.widgets;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+
     $scope.$apply();
     if (data.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + data.widgets[0].blockIndex + '-' +
@@ -37,14 +41,22 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     }
   };
 
-  $scope.submitAnswer = function(answer) {
+  $scope.submitAnswer = function(answer, channel) {
+    if ($scope.answerIsBeingProcessed) {
+      return;
+    }
+
     console.log(answer);
     var requestMap = {
       answer: JSON.stringify(answer),
-      block_number: $scope.blockNumber
+      block_number: $scope.blockNumber,
+      channel: channel,
+      params: JSON.stringify($scope.params)
     };
 
     var request = $.param(requestMap, true);
+
+    $scope.answerIsBeingProcessed = true;
 
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
@@ -52,22 +64,29 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
+      $scope.answerIsBeingProcessed = false;
       warningsData.addWarning(
         data.error || 'There was an error processing your input.');
     });
   };
 
   $scope.refreshPage = function(data) {
+    $scope.answerIsBeingProcessed = false;
+
     console.log(data);
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.inputTemplate = data.interactive_widget_html;
     $scope.stateId = data.state_id;
 
+    $scope.params = data.params;
+
     $scope.html += data.html;
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+
     $scope.$apply();
     if ($scope.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
@@ -75,9 +94,14 @@ function ReaderExploration($scope, $http, $timeout, warningsData) {
     }
   };
 
-  pm.bind('submit', function(data) {
-    $scope.submitAnswer(data);
-  });
+  window.addEventListener('message', receiveMessage, false);
+
+  function receiveMessage(evt) {
+    console.log('event received');
+    if (evt.origin == window.location.protocol + '//' + window.location.host) {
+      $scope.submitAnswer(evt.data.submit, 'submit');
+    }
+  }
 }
 
 /**

@@ -45,6 +45,8 @@ class State(ndb.Model):
     # TODO(yanamal): Implement the parameter changes parts (the rest are done).
     # TODO(sll): Add validation.
     interactive_rulesets = ndb.JsonProperty(default={'submit': []})
+    # Parameter changes associated with this state.
+    param_changes = ndb.JsonProperty(default={})
 
     @classmethod
     def get(cls, state_id):
@@ -63,6 +65,7 @@ class State(ndb.Model):
         """Gets a Python dict of the internals of the state."""
         state_dict = {
             'content': self.content,
+            'param_changes': self.param_changes,
             'widget': {
                 'id': self.interactive_widget,
                 'params': self.interactive_params,

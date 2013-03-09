@@ -29,6 +29,11 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.$on('galleryData', function() {
     console.log(GalleryData.data.categories);
     $scope.categories = GalleryData.data.categories;
+    $scope.$apply();
+
+    if ($('#navTabs a[href="#My_Explorations"]')) {
+      $('#navTabs a[href="#My_Explorations"]').tab('show');
+    }
   });
 
   /**
@@ -49,9 +54,20 @@ function Gallery($scope, $http, warningsData, GalleryData) {
 
   $scope.closeNewExplorationModal = function() {
     $('#newExplorationModal').modal('hide');
+    warningsData.clear();
   };
 
   $scope.createNewExploration = function() {
+    if (!$scope.newExplorationTitle) {
+      warningsData.addWarning('Please specify an exploration title.');
+      return;
+    }
+
+    if (!$scope.newExplorationCategory) {
+      warningsData.addWarning('Please specify a category for this exploration.');
+      return;
+    }
+
     if ($scope.file && $scope.includeYamlFile) {
       // A yaml file was uploaded.
       var form = new FormData();
@@ -72,7 +88,10 @@ function Gallery($scope, $http, warningsData, GalleryData) {
             window.location = '/create/' + JSON.parse(data).explorationId;
           },
           error: function(data) {
-            warningsData.addWarning(data.error || 'Error communicating with server.');
+            warningsData.addWarning(
+                JSON.parse(data.responseText).error ||
+                'Error communicating with server.');
+            $scope.$apply();
           }
       });
       return;
@@ -98,7 +117,7 @@ function Gallery($scope, $http, warningsData, GalleryData) {
                 window.location = '/create/' + data.explorationId;
               }).error(function(data) {
                 warningsData.addWarning(data.error ? data.error :
-                      'Error: Could not add new exploration.');
+                    'Error: Could not add new exploration.');
               });
     }
   };

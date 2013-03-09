@@ -17,7 +17,7 @@ if (typeof (MIDI.Soundfont) === "undefined") MIDI.Soundfont = {};
 (function() { "use strict";
 
 // Turn on to get "onprogress" event. XHR will not work from file://
-var USE_XHR = false; 
+var USE_XHR = false;
 var USE_JAZZMIDI = false;
 
 MIDI.loadPlugin = function(conf) {

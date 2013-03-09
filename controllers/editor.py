@@ -139,24 +139,15 @@ class ExplorationPage(BaseHandler):
             exploration.category = category
         if title:
             exploration.title = title
-        if 'image_id' in self.request.arguments():  # NB: image_id can be null
-            exploration.image_id = image_id
+        if 'image_id' in self.request.arguments():
+            exploration.image_id = None if image_id == 'null' else image_id
+
         exploration.put()
 
     @require_editor
     def delete(self, user, exploration):
         """Deletes the given exploration."""
-
-        for state_key in exploration.states:
-            state_key.delete()
-
-        augmented_users = AugmentedUser.query().filter(
-            AugmentedUser.editable_explorations == exploration.key)
-        for augmented_user in augmented_users:
-            augmented_user.editable_explorations.remove(exploration.key)
-            augmented_user.put()
-
-        exploration.key.delete()
+        utils.delete_exploration(exploration)
 
 
 class ExplorationHandler(BaseHandler):
@@ -203,6 +194,17 @@ class ExplorationDownloadHandler(BaseHandler):
 class StateHandler(BaseHandler):
     """Handles state transactions."""
 
+    # Recursively removes keys from a dict.
+    def recursively_remove_attr(self, d, attr_to_remove):
+        if isinstance(d, list):
+            for item in d:
+                self.recursively_remove_attr(item, attr_to_remove)
+        elif isinstance(d, dict):
+            if attr_to_remove in d:
+                del d[attr_to_remove]
+            for k, v in d.items():
+                self.recursively_remove_attr(d[k], attr_to_remove)
+
     @require_editor
     def put(self, user, exploration, state):
         """Saves updates to a state."""
@@ -217,6 +219,7 @@ class StateHandler(BaseHandler):
             return
 
         state_name_json = self.request.get('state_name')
+        param_changes_json = self.request.get('param_changes')
         interactive_widget_json = self.request.get('interactive_widget')
         interactive_params_json = self.request.get('interactive_params')
         interactive_rulesets_json = self.request.get('interactive_rulesets')
@@ -232,11 +235,14 @@ class StateHandler(BaseHandler):
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             if (state_name != state.name and utils.check_existence_of_name(
-                State, state_name, exploration)):
+                    State, state_name, exploration)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
             state.name = state_name
             state.put()
+
+        if param_changes_json:
+            state.param_changes = json.loads(param_changes_json)
 
         if interactive_widget_json:
             state.interactive_widget = json.loads(interactive_widget_json)
@@ -246,8 +252,10 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets_json:
             state.interactive_rulesets = json.loads(interactive_rulesets_json)
-            logging.info(state.interactive_rulesets)
             ruleset = state.interactive_rulesets['submit']
+
+            self.recursively_remove_attr(
+                state.interactive_rulesets['submit'], u'$$hashKey')
 
             if len(ruleset) > 1:
                 interactive_widget_properties = InteractiveWidget.get_interactive_widget(
@@ -265,6 +273,7 @@ class StateHandler(BaseHandler):
             # changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
+                logging.info(rule)
 
                 # Generate the code to be executed.
                 if rule['rule'] == 'Default':
@@ -290,19 +299,23 @@ class StateHandler(BaseHandler):
                         result += ','
 
                     # Get the normalizer specified in the rule.
-                    mutable_rule = mutable_rule[mutable_rule.find('{{') + 2:]
-                    mutable_rule = mutable_rule[mutable_rule.find('|') + 1:]
-                    normalizer_string = mutable_rule[: mutable_rule.find('}}')]
-                    mutable_rule = mutable_rule[mutable_rule.find('}}') + 2:]
+                    param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
+                    param_spec = param_spec[param_spec.find('|') + 1:]
+                    normalizer_string = param_spec[: param_spec.find('}}')]
 
                     normalizer = getattr(normalizers, normalizer_string)
-                    normalized_param = normalizer(rule['inputs'][param])
+                    # TODO(sll): Make the following check more robust.
+                    if '{{' not in rule['inputs'][param] or '}}' not in rule['inputs'][param]:
+                        normalized_param = normalizer(rule['inputs'][param])
+                    else:
+                        normalized_param = rule['inputs'][param]
+
                     if normalized_param is None:
                         raise self.InvalidInputException(
                             '%s has the wrong type. Please replace it with a '
                             '%s.' % (rule['inputs'][param], normalizer_string))
 
-                    if normalizer.__name__ == 'String':
+                    if normalizer.__name__ == 'String' or normalizer.__name__ == 'MusicNote':
                         result += 'u\'' + unicode(normalized_param) + '\''
                     else:
                         result += str(normalized_param)

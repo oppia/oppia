@@ -18,7 +18,7 @@
         <h2>Available Explorations</h2>
 
         <div class="tabbable tabs-left" ui-if="categories">
-          <ul class="nav nav-tabs">
+          <ul class="nav nav-tabs" id="navTabs">
             <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
               <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
                 <[category]>
@@ -80,46 +80,58 @@
 
 
     {% if user %}
-      <form name="createNewExplorationForm" ng-submit="createNewExploration()">
-        <div ui-modal class="modal hide fade" id="newExplorationModal" ng-model="createModalShown">
+      <form novalidate name="createNewExplorationForm" ng-submit="createNewExploration()" class="oppia-form">
+        <div class="modal hide fade" id="newExplorationModal" ng-model="createModalShown">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
               &times;
             </button>
-            <h3 id="customizeModalLabel">Add New Exploration</h3>
+            <h3 id="customizeModalLabel">
+              Add New Exploration <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
+              title="This form allows you to add new explorations.
+              Enter the title of your exploration, as well as the Gallery page category it should fall under (e.g. languages, music).">
+            </h3>
           </div>
           <div class="modal-body">
             <div>
-              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus>
+              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
             </div>
             <div>
-              Category: <input type="text" ng-model="newExplorationCategory">
+              Category: <input type="text" ng-model="newExplorationCategory" required>
             </div>
             <br>
 
             <div ng-hide="useSampleExploration">
-              (Optional) Upload YAML file with exploration data?
-              <input type="checkbox" ng-model="includeYamlFile">
+              <label>
+                (Optional) Upload an existing exploration (YAML file)?
+                <input type="checkbox" ng-model="includeYamlFile">
+              </label>
               <br><br>
-              <input ng-show="includeYamlFile" id="newFileInput" type="file" file-upload="true">
+              <div ng-show="includeYamlFile">
+                Upload file:
+                <input id="newFileInput" type="file" file-upload="true">
+              </div>
             </div>
 
             <div ng-hide="includeYamlFile">
-              (Optional) Use a copy of the sample exploration (hola.yaml)?
-              <input type="checkbox" ng-model="useSampleExploration">
+              <label>
+                (Optional) Use a copy of the sample exploration ('Hola!')?
+                <input type="checkbox" ng-model="useSampleExploration">
+              </label>
             </div>
 
           </div>
 
           <div class="modal-footer">
-            <input type="submit" class="btn" value="Save">
+            <input type="submit" class="btn" value="Save"
+                   ng-disabled="createNewExplorationForm.$invalid">
             <a class="btn" data-dismiss="modal" ng-click="closeNewExplorationModal()">Close</a>
           </div>
         </div>
       </form>
     {% endif %}
 
-    <div ui-modal class="modal hide fade" id="embedModal" ng-model="embedModalShown">
+    <div class="modal hide fade" id="embedModal" ng-model="embedModalShown">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
           &times;

@@ -54,6 +54,18 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
 
+    def get_params(self, state, existing_params={}):
+        """Updates existing parameters based on the changes in the given state."""
+        # Modify params using param_changes.
+        # TODO(sll): Define this behavior. Currently a new parameter is set
+        # only if it doesn't exist, but it might be the case that the parameter
+        # should be reset each time the state is entered.
+        for (key, values) in state.param_changes.iteritems():
+            if key not in existing_params:
+                # Pick a random parameter for this key.
+                existing_params[key] = random.choice(values)
+        return existing_params
+
     def normalize_classifier_return(self, *args):
         """Normalizes the return value of a classifier to a two-element tuple.
 
@@ -78,11 +90,13 @@ class ExplorationHandler(BaseHandler):
         exploration = utils.get_entity(Exploration, exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
-        init_html, init_widgets = utils.parse_content_into_html(init_state.content, 0)
+        params = self.get_params(init_state)
+        init_html, init_widgets = utils.parse_content_into_html(
+            init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
             params=init_state.interactive_params,
-            include_js=True
+            state_params_dict=params
         )['raw']
 
         self.values.update({
@@ -90,6 +104,7 @@ class ExplorationHandler(BaseHandler):
             'html': init_html,
             'interactive_widget_html': interactive_widget_html,
             'interactive_params': init_state.interactive_params,
+            'params': params,
             'state_id': init_state.hash_id,
             'title': exploration.title,
             'widgets': init_widgets,
@@ -112,14 +127,25 @@ class ExplorationHandler(BaseHandler):
         old_state = state
         # The 0-based index of the last content block already on the page.
         block_number = int(self.request.get('block_number'))
+        params = self.request.get('params')
+        if params:
+            params = json.loads(params)
+        else:
+            params = {}
+
+        params = self.get_params(state, params)
 
         # The reader's answer.
         answer = json.loads(self.request.get('answer'))
         dest_id = None
         feedback = None
 
+        # Add the reader's answer to the parameter list. This must happen before
+        # the interactive widget is constructed.
+        params['answer'] = answer
+
         interactive_widget_properties = InteractiveWidget.get_interactive_widget(
-            state.interactive_widget)['actions']['submit']
+            state.interactive_widget, state_params_dict=params)['actions']['submit']
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
@@ -129,6 +155,11 @@ class ExplorationHandler(BaseHandler):
                 interactive_widget_properties['classifier']])
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
+
+        norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+        if norm_answer is None:
+            raise self.InvalidInputException(
+                'Invalid input: could not normalize the answer.')
 
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
@@ -142,12 +173,13 @@ class ExplorationHandler(BaseHandler):
                 feedback = rule['feedback']
                 break
 
-            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
-            if norm_answer is None:
-                # Replace this with a more detailed warning.
-                raise self.InvalidInputException('Invalid input')
             # Add the 'answer' variable, and prepend classifier.
             code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
+
+            code = utils.parse_with_jinja(code, params)
+            if code is None:
+                continue
+
             return_value, return_data = (
                 self.normalize_classifier_return(eval(code)))
 
@@ -173,7 +205,7 @@ class ExplorationHandler(BaseHandler):
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
@@ -183,13 +215,13 @@ class ExplorationHandler(BaseHandler):
             # Append Oppia's feedback, if any.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number)
+                    [{'type': 'text', 'value': feedback}], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.
             if old_state.hash_id != state.hash_id:
                 state_html, state_widgets = utils.parse_content_into_html(
-                    state.content, block_number)
+                    state.content, block_number, params)
                 html_output += state_html
                 widget_output.append(state_widgets)
 
@@ -202,12 +234,13 @@ class ExplorationHandler(BaseHandler):
         values['block_number'] = block_number + 1
         values['interactive_widget_html'] = (
             'Congratulations, you\'ve finished this exploration!')
+        values['params'] = params
 
         if dest_id != utils.END_DEST:
             values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
                 state.interactive_widget,
                 params=state.interactive_params,
-                include_js=True)['raw']
+                state_params_dict=params)['raw']
 
         logging.info(values)
         self.response.out.write(json.dumps(values))

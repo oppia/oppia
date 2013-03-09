@@ -46,11 +46,11 @@ oppia.directive('sortable', function($compile, explorationData) {
 
 function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
-  // Switch to the stateEditor tab when this controller is activated.
-  $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
 
   $scope.init = function(data) {
     $scope.content = data.content;
+    $scope.paramChanges = data.param_changes;
+
     console.log('Content updated.');
 
     // If a (non-interactive) widget exists, show its compiled version and
@@ -70,16 +70,19 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
         }
       }
     }
+
+    // Switch to the stateEditor tab when this controller is activated.
+    $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
   };
 
   // Initializes the GuiEditor.
-  $scope.init(explorationData.getStateData($scope.stateId));
+  $scope.init(explorationData.getStateData($scope.$parent.stateId));
   console.log('Initializing GUI editor');
 
   $scope.$on('explorationData', function() {
     // TODO(sll): Does this actually receive anything?
     console.log('Init content');
-    $scope.init(explorationData.getStateData($scope.stateId));
+    $scope.init(explorationData.getStateData($scope.$parent.stateId));
   });
 
   $scope.saveStateContent = function() {
@@ -225,6 +228,45 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     }
     return false;
   };
-  
+
+  //logic for parameter change interface
+
+  //reset and/or initialize variables for parameter change input
+  $scope.resetParamChangeInput = function() {
+    activeInputData.clear();
+    $scope.tmpParamName = '';
+    $scope.tmpParamValues = [];
+  };
+
+  $scope.resetParamChangeInput();
+
+  $scope.addParamChange = function(paramName, paramVals) {
+    if (!paramName) {
+      warningsData.addWarning('Please specify a parameter name.');
+      return;
+    }
+    if (paramVals.length === 0) {
+      warningsData.addWarning('Please specify at least one value for the parameter.');
+      return;
+    }
+
+    // Verify that the active input was the parameter input, as expected
+    // TODO(yanamal): Add the new change to the list
+    $scope.paramChanges[paramName] = paramVals;
+    $scope.saveParamChanges();
+    $scope.resetParamChangeInput();
+  };
+
+  $scope.deleteParamChange = function (paramName) {
+    //TODO(yanamal): add category index when this is per-category
+    delete $scope.paramChanges[paramName];
+    $scope.saveParamChanges();
+  };
+
+  $scope.saveParamChanges = function() {
+    explorationData.saveStateData($scope.stateId, {'param_changes': $scope.paramChanges});
+  };
+}
+
 GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
     'warningsData', 'activeInputData'];

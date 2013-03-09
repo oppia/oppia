@@ -1,25 +1,37 @@
 <div ng-controller="InteractiveWidgetPreview">
   <span class="pull-right">
-    <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
-      Customize
-    </a> |
+    <span ng-hide="isEmpty(interactiveWidget.params)">
+      <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
+        Customize
+      </a> |
+    </span>
     <a href="#" data-toggle="modal" data-target="#interactiveWidgetModal">
-      Choose another widget
+      Choose a different interaction
     </a>
   </span>
 
-  <h4>Interactivity Preview</h4>
-  <iframe id="interactiveWidgetPreview" frameborder="1" width="100%">
+  <h4>
+    Interactivity Preview
+    <img class="oppia-help" src="/images/help.png"
+         ui-jq="tooltip"
+         title="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below.">
+  </h4>
+  <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
   </iframe>
 
   <hr>
 
-  <h4>Answer classification rules</h4>
+  <h4>
+    Answer classification rules
+    <img class="oppia-help" src="/images/help.png"
+         ui-jq="tooltip"
+         title="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown.">
+  </h4>
   <div ng-repeat="(action, properties) in interactiveWidget.actions">
     <h5>On user <[action]>:</h5>
     <ul>
       <li ng-repeat="rule in interactiveRulesets[action]">
-        <[rule | parameterizeRule]>:
+        <[rule | parameterizeRule: interactiveWidget.params.choices]>:
         (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         <span class="pull-right">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
@@ -52,12 +64,12 @@
       <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
     </div>
     <div class="modal-body">
-      <div ng-repeat="(key, val) in interactiveWidget.params">
+      <div ng-repeat="(key, val) in interactiveParams">
         <span ng-show="isArray(val)">
-          <[key]>: <list items="val" active="false"></list>
+          <[key]>: <list items="val"></list>
         </span>
         <span ng-hide="isArray(val)">
-          <[key]>: <input type="text" ng-model="val">
+          <[key]>: <input type="text" ng-model="interactiveParams[key]">
         </span>
       </div>
     </div>
@@ -88,7 +100,7 @@
     </div>
   </div>
 
-  <div ui-modal class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
+  <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
         &times;
@@ -111,7 +123,8 @@
       </div>
 
       <div ng-show="addRuleActionRule">
-        <span angular-html-bind="addRuleActionRule | bracesToInput"></span>
+        <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveWidget.params.choices"></span>
+
         <hr>
         <div>
           Destination:

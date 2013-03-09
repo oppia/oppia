@@ -17,15 +17,34 @@ textarea.oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
+.oppia-alert-blocks {
+  position: fixed;
+  width: 80%;
+  z-index: 3000;
+}
+
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
+  border: 1px solid black;
+  font-size: 1.2em;
+  margin: 0 25% 0 25%;
+  opacity: 1;
   width: 80%;
+  z-index: 3000;
 }
 
 .oppia-content {
   margin: 0 auto;
   padding-left: 30px;
   width: 80%;
+}
+
+.oppia-form input.ng-invalid.ng-dirty {
+  border: 2px solid #FA787E;
+}
+
+.oppia-form input.ng-valid.ng-dirty {
+  border: 2px solid #78FA89;
 }
 
 .oppia-gallery-frame {
@@ -38,6 +57,11 @@ textarea.oppia-code {
 
 .oppia-form-search {
   padding-right: 20px;
+}
+
+.oppia-help {
+  height: 16px;
+  width: 16px;
 }
 
 .oppia-holder {

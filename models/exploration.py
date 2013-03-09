@@ -44,3 +44,9 @@ class Exploration(ndb.Model):
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
+
+    def delete(self):
+        """Deletes an exploration."""
+        for state_key in self.states:
+            state_key.delete()
+        self.key.delete()

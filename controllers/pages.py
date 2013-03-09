@@ -28,24 +28,30 @@ from google.appengine.api import users
 
 class MainPage(BaseHandler):
     """Oppia's main page."""
-
-    def ensure_default_exploration_exists(self):
-        """Add the default explorations, if they don't already exist."""
+    def ensure_default_exploration_exists(self, hash_id, filename, title, category):
+        """Create a default exploration from a file."""
         try:
-            exploration = utils.get_entity(Exploration, '0')
+            exploration = utils.get_entity(Exploration, hash_id)
         except:
             with open(os.path.join(
-                    feconf.SAMPLE_EXPLORATIONS_DIR, 'hola.yaml')) as f:
+                    feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
                 yaml = f.read().decode('utf-8')
             exploration = YamlTransformer.create_exploration_from_yaml(
-                yaml=yaml, user=None, title='Demo: ¡Hola!',
-                category='Languages', id='0')
+                yaml=yaml, user=None, title=title,
+                category=category, id=hash_id)
             exploration.is_public = True
             exploration.put()
 
+    def ensure_default_explorations_exist(self):
+        """Add the default explorations, if they don't already exist."""
+        self.ensure_default_exploration_exists(
+            '0', 'hola.yaml', 'Demo: ¡Hola!', 'Languages')
+        self.ensure_default_exploration_exists(
+            '1', 'pitch.yaml', 'Pitch Perfect', 'Music')
+
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.ensure_default_exploration_exists()
+        self.ensure_default_explorations_exist()
         self.values['js'] = utils.get_js_controllers(['index'])
         self.values['login_url'] = users.create_login_url('/gallery')
         self.values['user'] = users.get_current_user()

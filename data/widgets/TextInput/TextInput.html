@@ -1,6 +1,17 @@
-<div ng-controller="TextInput">
-  <form ng-submit="submitAnswer(answer)">
-    <input type="textarea" ng-model="answer" required>
-    <button type="submit">Submit</button>
-  </form>
-</div>
+<html ng-app="text">
+  <head>
+    <script src="/lib/header_js"></script>
+  </head>
+
+  <body>
+    <div ng-controller="TextInput">
+      <form ng-submit="submitAnswer(answer)">
+        <input type="textarea" ng-model="answer" required autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <script src="/data/widgets/TextInput/static/js/TextInput.js">
+    </script>
+  </body>
+</html>

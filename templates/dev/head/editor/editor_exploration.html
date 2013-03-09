@@ -12,15 +12,28 @@
             <button ng-hide="isPublic" type="button" ng-click="makePublic()">
               Publish
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Click this button to publish your exploration in the gallery, so that others can read it.">
+
+            &nbsp;&nbsp;&nbsp;
 
             <button type="button" ng-click="downloadExploration()">
               Download A Copy
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Download a copy of this exploration in plaintext format.">
+
+            &nbsp;&nbsp;&nbsp;
 
             <button type="button" class="btn btn-danger" data-toggle="modal"
                     data-target="#deleteExplorationModal">
               Delete
             </button>
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="Delete this exploration. Warning: this action cannot be reversed!">
           </span>
 
           <h3>
@@ -36,7 +49,7 @@
                 Exploration Editor
               </a>
             </li>
-            <li>
+            <li ng-show="stateId">
               <a data-toggle="tab" href="#stateEditor">
                 State Editor
               </a>
@@ -54,52 +67,55 @@
                   </div>
 
                   <div class="span7">
-                    <form ng-submit="addState(newStateDesc, false)">
-                      <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add New State" required>
-                      <datalist id="states">
-                        <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
-                      </datalist>
-                      <div class="oppia-loading" ng-show="addStateLoading"></div>
-                    </form>
                     {% include 'editor/editor_viz.html' %}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="container-fluid">
-              <div class="row-fluid">
-                <div class="span11">
-                  <div class="pull-right">
-                    <span ng-show="getMode() == 'gui'">
-                      Graphical Editor | 
-                    </span>
-                    <span ng-hide="getMode() == 'gui'">
-                      <a ng-click="changeMode('gui')">Graphical Editor</a> |
-                    </span>
-
-                    <span ng-show="getMode() == 'text'">
-                      Plaintext Editor
-                    </span>
-                    <span ng-hide="getMode() == 'text'">
-                      <a ng-click="changeMode('text')">Plaintext Editor</a>
-                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="tab-pane" id="stateEditor" ng-cloak>
-              <form ng-submit="saveStateName()">
-                <h3>
-                  <span class="oppia-editable-name" ng-hide="activeInputData.name == 'stateName'"
-                        ng-click="initializeNewActiveInput('stateName')"> <[stateName]> </span>
-                  <span ng-show="activeInputData.name == 'stateName'">
-                    <input type="text" ng-model="stateName">
-                    <input type="submit" value="Save">
-                  </span>
-                </h3>
-              </form>
+
+              <div class="container-fluid">
+                <div class="row-fluid">
+                  <div class="span5">
+                    <form ng-submit="saveStateName()">
+                      <h3>
+                        <span class="oppia-editable-name"
+                              ng-hide="activeInputData.name == 'stateName'"
+                              ng-click="initializeNewActiveInput('stateName')">
+                          <[stateName]>
+                        </span>
+                        <span ng-show="activeInputData.name == 'stateName'">
+                          <input type="text" ng-model="stateName">
+                          <input type="submit" value="Save">
+                        </span>
+                      </h3>
+                    </form>
+                  </div>
+
+                  <div class="span5">
+                    <div class="pull-right">
+                      <span ng-show="getMode() == 'gui'">
+                        Graphical Editor | 
+                      </span>
+                      <span ng-hide="getMode() == 'gui'">
+                        <a ng-click="changeMode('gui')">Graphical Editor</a> |
+                      </span>
+  
+                      <span ng-show="getMode() == 'text'">
+                        Plaintext Editor
+                        <img class="oppia-help" src="/images/help.png"
+                             ui-jq="tooltip"
+                             title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
+                      </span>
+                      <span ng-hide="getMode() == 'text'">
+                        <a ng-click="changeMode('text')">Plaintext Editor</a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div ng-view ng-cloak></div>
             </div>
           </div>
@@ -109,7 +125,7 @@
     </div>
 
 
-    <div ui-modal class="modal hide fade" id="deleteExplorationModal" ng-model="deleteExplorationModalShown">
+    <div class="modal hide fade" id="deleteExplorationModal" ng-model="deleteExplorationModalShown">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
           &times;
@@ -127,6 +143,23 @@
       </div>
     </div>
 
+    <div class="modal hide fade" id="deleteStateModal" ng-model="deleteStateModalShown">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+        <h3 id="deleteStateModalLabel">Delete State</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          Really delete state <[getStateName(deleteStateId)]>? This action cannot be reversed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" ng-click="deleteState(deleteStateId)">Delete</button>
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
 
   </div>
 

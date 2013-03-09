@@ -33,13 +33,20 @@ oppia.filter('bracesToText', function() {
 });
 
 // Filter that changes {{...}} tags into input fields.
+// Uses a multiple-choice selector if the input is multiple-choice.
 oppia.filter('bracesToInput', function() {
-  return function(input) {
+  return function(input, choices) {
     if (!input) {
       return '';
     }
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var index = 0;
+
+    var isMultipleChoice = false;
+    if (choices) {
+      isMultipleChoice = true;
+    }
+
     while (true) {
       if (!input.match(pattern)) {
         break;
@@ -47,11 +54,19 @@ oppia.filter('bracesToInput', function() {
       var varName = input.match(pattern)[1];
       var tail = '>';
       if (index === 0) {
-        tail = 'autofocus>';
+        tail = ' autofocus>';
       }
-      input = input.replace(
-          pattern,
-          '<input type="text" ng-model="addRuleActionInputs.' + varName + '"' + tail);
+
+      var replacementHtml = '<input type="text" ng-model="addRuleActionInputs.' +
+          varName + '"' + tail;
+      if (isMultipleChoice) {
+        replacementHtml =
+          '<select ng-model="addRuleActionInputs.' + varName +
+          '" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(interactiveWidget.params.choices)"' +
+          tail + '</select>';
+      }
+
+      input = input.replace(pattern, replacementHtml);
       index++;
     }
     return input;
@@ -60,20 +75,33 @@ oppia.filter('bracesToInput', function() {
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 oppia.filter('parameterizeRule', function() {
-  return function(input) {
+  return function(input, choices) {
     if (!input) {
       return '';
     }
     var rule = input.rule;
     var inputs = input.inputs;
+
+    var isMultipleChoice = false;
+    if (choices) {
+      isMultipleChoice = true;
+    }
+
+    var finalRule = rule;
+
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (true) {
       if (!rule.match(pattern)) {
         break;
       }
       var varName = rule.match(pattern)[1];
-      rule = rule.replace(pattern, inputs[varName]);
+      var replacementText = inputs[varName];
+      if (isMultipleChoice) {
+        replacementText = "'" + choices[inputs[varName]] + "'";
+      }
+      rule = rule.replace(pattern, ' ');
+      finalRule = finalRule.replace(pattern, replacementText);
     }
-    return rule;
+    return finalRule;
   };
 });

@@ -77,7 +77,6 @@ class YamlTransformer(BaseHandler):
         yaml = yaml.strip()
         # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
         init_state_name = yaml[:yaml.find(':\n')]
-        logging.info(init_state_name)
         if not init_state_name:
             raise cls.InvalidInputException(
                 'Invalid YAML file: the initial state name cannot be identified')
@@ -85,22 +84,27 @@ class YamlTransformer(BaseHandler):
         exploration = utils.create_new_exploration(
             user, title=title, category=category, init_state_name=init_state_name,
             id=id)
-        yaml_description = cls.get_dict_from_yaml(yaml)
 
-        # Create all the states first.
-        for state_name, unused_state_description in yaml_description.iteritems():
-            if state_name == init_state_name:
-                continue
-            else:
-                if utils.check_existence_of_name(State, state_name, exploration):
-                    raise cls.InvalidInputException(
-                        'Invalid YAML file: contains duplicate state names %s' %
-                        state_name)
-                state = utils.create_new_state(exploration, state_name)
+        try:
+            yaml_description = cls.get_dict_from_yaml(yaml)
 
-        for state_name, state_description in yaml_description.iteritems():
-            state = utils.get_state_by_name(state_name, exploration)
-            cls.modify_state_using_dict(exploration, state, state_description)
+            # Create all the states first.
+            for state_name, unused_state_description in yaml_description.iteritems():
+                if state_name == init_state_name:
+                    continue
+                else:
+                    if utils.check_existence_of_name(State, state_name, exploration):
+                        raise cls.InvalidInputException(
+                            'Invalid YAML file: contains duplicate state names %s' %
+                            state_name)
+                    state = utils.create_new_state(exploration, state_name)
+
+            for state_name, state_description in yaml_description.iteritems():
+                state = utils.get_state_by_name(state_name, exploration)
+                cls.modify_state_using_dict(exploration, state, state_description)
+        except Exception as e:
+            utils.delete_exploration(exploration)
+            raise cls.InvalidInputException('Error parsing YAML file: %s' % e)
 
         return exploration
 
@@ -109,8 +113,9 @@ class YamlTransformer(BaseHandler):
         """Verifies a state representation without referencing other states.
 
         This enforces the following constraints:
-        - The only permitted fields are ['content', 'widget'].
+        - The only permitted fields are ['content', 'param_changes', 'widget'].
             - 'content' is optional and defaults to [].
+            - 'param_changes' is optional and defaults to {}.
             - 'widget' must be present.
         - Each item in the 'content' array must have the keys ['type', 'value'].
             - The type must be one of ['text', 'image', 'video', 'widget'].
@@ -129,11 +134,13 @@ class YamlTransformer(BaseHandler):
 
         # Check the main keys.
         for key in description:
-            if key not in ['content', 'widget']:
+            if key not in ['content', 'param_changes', 'widget']:
                 return False, 'Invalid key: %s' % key
 
         if 'content' not in description:
             description['content'] = []
+        if 'param_changes' not in description:
+            description['param_changes'] = {}
         if 'widget' not in description:
             return False, 'Missing key: \'widget\''
 
@@ -158,7 +165,7 @@ class YamlTransformer(BaseHandler):
         widget_id = description['widget']['id']
         try:
             with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id,
-                    '%s.config.yaml' % widget_id)):
+                      '%s.config.yaml' % widget_id)):
                 pass
         except IOError:
             return False, 'No widget with widget id %s exists.' % widget_id
@@ -200,6 +207,7 @@ class YamlTransformer(BaseHandler):
             raise cls.InvalidInputException(error_log)
 
         state.content = state_dict['content']
+        state.param_changes = state_dict['param_changes']
         state.interactive_widget = state_dict['widget']['id']
         if 'params' in state_dict['widget']:
             state.interactive_params = state_dict['widget']['params']
@@ -229,6 +237,9 @@ class YamlTransformer(BaseHandler):
 
             if 'inputs' in rule:
                 rule_dict['inputs'] = rule['inputs']
+
+            if 'attrs' in rule:
+                rule_dict['attrs'] = rule['attrs']
 
             # TODO(yanamal): Add param_changes here.
 

@@ -1,0 +1,73 @@
+Main window:
+  content:
+  - type: text
+    value: 'This exploration will help you develop your skills at recognizing music
+      note pitches.
+
+      <br><br>
+
+      When you''re ready, click the button to play a note. Listen to it, and guess
+      what it is by moving the note to the right place on the staff using the up and
+      down arrow keys. When you think you have it, click the ''check answer'' button.'
+  param_changes:
+    noteStart:
+    - C4
+    - D4
+    - E4
+    - F4
+    - G4
+    - A4
+    - B4
+    - C5
+    - D5
+    - E5
+    - F5
+  widget:
+    id: MusicStaff
+    params:
+      noteToGuess: '{{noteStart}}'
+      notesToPlayAtStart: []
+      playScaleEnd: ''
+      playScaleStart: ''
+      previousAnswer: '{{answer}}'
+    rules:
+      submit:
+      - attrs:
+          classifier: equals(x)
+        code: equals(u'{{noteStart}}')
+        dest: END
+        feedback: Yay, that's correct!
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer is equal to {{x|MusicNote}}
+      - attrs:
+          classifier: is_within_tolerance(x, tol)
+        code: is_within_tolerance(u'{{noteStart}}',1)
+        dest: Main window
+        feedback: No, but you're very close!
+        inputs:
+          tol: '1'
+          x: '{{noteStart}}'
+        rule: Answer is within {{tol|NonnegativeInt}} of {{x|MusicNote}}
+      - attrs:
+          classifier: is_less_than(x)
+        code: is_less_than(u'{{noteStart}}')
+        dest: Main window
+        feedback: I think the original note is higher.
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer has a lower pitch than {{x|MusicNote}}
+      - attrs:
+          classifier: is_greater_than(x)
+        code: is_greater_than(u'{{noteStart}}')
+        dest: Main window
+        feedback: I think the original pitch is lower.
+        inputs:
+          x: '{{noteStart}}'
+        rule: Answer has a greater pitch than {{x|MusicNote}}
+      - attrs: {}
+        code: 'True'
+        dest: Main window
+        feedback: That's not right. Why not try again?
+        inputs: {}
+        rule: Default
