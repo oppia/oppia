@@ -159,7 +159,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.paramChanges.splice(paramIndex, 1);
     // TODO(yanamal): save to server-side
   };
-}
 
 
   

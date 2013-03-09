@@ -230,29 +230,52 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 
   //logic for parameter change interface
+  //TODO: discuss changing back to not be keyed by parameter name, in case
+  //someone wants to change the same parameter several times? e.g.
+  //x=y+z; x=x/2
+  //could also be useful if order of changes matters, e.g.
+  //temp=x; x=y; y=temp
+
+  //TODO: (in html) see if there's a clean way of having the editor pop-up in
+  //the list itself
+
+  //start editing/adding a parameter change
+  $scope.startAddParamChange = function() {
+    $scope.editingParamChange = 'New change';
+  }
+
+  $scope.startEditParamChange = function(pName) {
+    $scope.tmpParamName = pName;
+    $scope.editingParamChange = pName;
+    if (pName in $scope.paramChanges) {
+      $scope.tmpParamValues = $scope.paramChanges[pName];
+    }
+  }
 
   //reset and/or initialize variables for parameter change input
   $scope.resetParamChangeInput = function() {
-    activeInputData.clear();
+    //activeInputData.clear();
+    $scope.editingParamChange = null; //used to determine what to display in the html
+    //TODO: this can be consolidated with tmpParamName if we decide to keep keying by name
     $scope.tmpParamName = '';
     $scope.tmpParamValues = [];
   };
 
   $scope.resetParamChangeInput();
 
-  $scope.addParamChange = function(paramName, paramVals) {
-    if (!paramName) {
+  $scope.addParamChange = function() {
+    if (!$scope.tmpParamName) {
       warningsData.addWarning('Please specify a parameter name.');
       return;
     }
-    if (paramVals.length === 0) {
+    if ($scope.tmpParamValues.length === 0) {
       warningsData.addWarning('Please specify at least one value for the parameter.');
       return;
     }
 
     // Verify that the active input was the parameter input, as expected
     // TODO(yanamal): Add the new change to the list
-    $scope.paramChanges[paramName] = paramVals;
+    $scope.paramChanges[$scope.tmpParamName] = $scope.tmpParamValues;
     $scope.saveParamChanges();
     $scope.resetParamChangeInput();
   };
