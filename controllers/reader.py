@@ -163,8 +163,17 @@ class ExplorationHandler(BaseHandler):
 
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
+                # TODO(sll): This is a special case for multiple-choice input
+                # which should really be handled generically. However, it's
+                # not very interesting anyway because the reader's answer
+                # in this case is already known (it's just the last of the
+                # multiple-choice options given).
+                recorded_answer = answer
+                if state.interactive_widget == 'MultipleChoiceInput':
+                    recorded_answer = state.interactive_params['choices'][int(answer)]
+
                 EventHandler.record_default_case_hit(
-                    exploration_id, state_id, answer)
+                    exploration_id, state_id, recorded_answer)
 
             assert rule['code']
 
