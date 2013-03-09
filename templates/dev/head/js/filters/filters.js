@@ -57,7 +57,7 @@ oppia.filter('bracesToInput', function() {
         tail = ' autofocus>';
       }
 
-      var replacementHtml = '<input type="text" ng-model="addRuleActionInputs.' +
+      var replacementHtml = '<input type="text" required ng-model="addRuleActionInputs.' +
           varName + '"' + tail;
       if (isMultipleChoice) {
         replacementHtml =

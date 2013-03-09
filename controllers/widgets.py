@@ -219,7 +219,7 @@ class InteractiveWidget(BaseHandler):
                 # TODO(sll): Fix this more robustly.
                 if isinstance(params[key], list):
                     widget['params'][key] = map(str, params[key])
-                elif not isinstance(params[key], str):
+                elif not isinstance(params[key], basestring):
                     widget['params'][key] = params[key]
                 else:
                     widget['params'][key] = utils.parse_with_jinja(

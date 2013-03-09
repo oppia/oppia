@@ -68,7 +68,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
 
-  explorationData.getData = function(stateId) {
+  explorationData.getData = function() {
     // Retrieve data from the server.
     console.log('Retrieving exploration data from the server');
 
@@ -76,10 +76,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       function(data) {
         explorationData.data = data;
         explorationData.broadcastExploration();
-        explorationData.stateId = null;
-        if (stateId && stateId in explorationData.data.states) {
-          explorationData.broadcastState(stateId);
-        }
       }).error(function(errorResponse) {
         warningsData.addWarning('Server error: ' + errorResponse.error);
       });
@@ -108,7 +104,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     if ('states' in explorationData.data && stateId in explorationData.data.states) {
       return explorationData.data.states[stateId];
     } else {
-      explorationData.getData(stateId);
+      explorationData.getData();
+      return explorationData.data.states[stateId];
     }
   };
 
@@ -170,9 +167,11 @@ oppia.run(function($rootScope) {
 });
 
 
-function ExplorationTab($scope) {
+function ExplorationTab($scope, explorationData) {
   // Changes the tab to the Exploration Editor view.
   $('#editorViewTab a[href="#explorationEditor"]').tab('show');
+  $scope.stateId = '';
+  explorationData.stateId = '';
 }
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
@@ -353,7 +352,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   // Adds a new state to the list of states, and updates the backend.
-  $scope.addState = function(newStateName, changeIsInline, categoryId) {
+  $scope.addState = function(newStateName, successCallback) {
     if (!$scope.isValidEntityName(newStateName, true))
       return;
     if (newStateName.toUpperCase() == END_DEST) {
@@ -367,17 +366,17 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       }
     }
 
-    $scope.addStateLoading = true;
     $http.post(
         $scope.explorationUrl,
         'state_name=' + newStateName,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              $scope.addStateLoading = false;
               $scope.newStateDesc = '';
               explorationData.getData();
+              if (successCallback) {
+                successCallback(data);
+              }
             }).error(function(data) {
-              $scope.addStateLoading = false;
               warningsData.addWarning(
                   'Server error when adding state: ' + data.error);
             });
@@ -444,4 +443,4 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
  */
 EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'explorationData', 'warningsData', 'activeInputData'];
-ExplorationTab.$inject = ['$scope'];
+ExplorationTab.$inject = ['$scope', 'explorationData'];
