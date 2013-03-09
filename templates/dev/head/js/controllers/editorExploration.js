@@ -353,7 +353,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   // Adds a new state to the list of states, and updates the backend.
-  $scope.addState = function(newStateName, changeIsInline, categoryId) {
+  $scope.addState = function(newStateName, successCallback) {
     if (!$scope.isValidEntityName(newStateName, true))
       return;
     if (newStateName.toUpperCase() == END_DEST) {
@@ -367,17 +367,17 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       }
     }
 
-    $scope.addStateLoading = true;
     $http.post(
         $scope.explorationUrl,
         'state_name=' + newStateName,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              $scope.addStateLoading = false;
               $scope.newStateDesc = '';
               explorationData.getData();
+              if (successCallback) {
+                successCallback(data);
+              }
             }).error(function(data) {
-              $scope.addStateLoading = false;
               warningsData.addWarning(
                   'Server error when adding state: ' + data.error);
             });

@@ -74,6 +74,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return allStates;
   };
 
+  $scope.getDestName = function(stateId) {
+    return stateId === '?' ? 'Add New State...' : $scope.getStateName(stateId);
+  };
+
+  // Returns a list of all states, as well as an 'Add New State' option.
+  $scope.getAllDests = function() {
+    var result = $scope.getAllStates();
+    result.push('?');
+    return result;
+  };
+
   $scope.getExtendedChoiceArray = function(choices) {
     var result = [];
     for (var i = 0; i < choices.length; i++) {
@@ -87,6 +98,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionRule = rule;
     $scope.addRuleActionAttrs = attrs;
     $scope.addRuleActionDest = explorationData.stateId;
+    $scope.addRuleActionDestNew = '';
   };
 
   $scope.deselectAllRules = function() {
@@ -95,6 +107,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionAttrs = null;
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
+    $scope.addRuleActionDestNew = '';
     $scope.addRuleActionFeedback = null;
   };
 
@@ -114,41 +127,65 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionAttrs = rule.attrs;
     $scope.addRuleActionInputs = rule.inputs;
     $scope.addRuleActionDest = rule.dest;
+    $scope.addRuleActionDestNew = '';
     $scope.addRuleActionFeedback = rule.feedback;
   };
 
-  $('#addRuleModal').on('hide', function() {
-    if ($scope.addRuleActionRule) {
-      var bad = false;
-      // TODO(sll): Do error-checking here.
+  $scope.saveRuleset = function(action, ruleset) {
+    if (!$scope.interactiveRulesets.hasOwnProperty(action)) {
+      $scope.interactiveRulesets[action] = [];
+    }
 
-      if (!bad) {
-        var finalRuleset = {
-            rule: $scope.addRuleActionRule,
-            attrs: $scope.addRuleActionAttrs,
-            inputs: $scope.addRuleActionInputs,
-            dest: $scope.addRuleActionDest,
-            feedback: $scope.addRuleActionFeedback
-        };
+    var rules = $scope.interactiveRulesets[action];
+    if ($scope.addRuleActionIndex !== null) {
+      rules[$scope.addRuleActionIndex] = ruleset;
+    } else {
+      rules.splice(rules.length - 1, 0, ruleset);
+    }
 
-        if (!$scope.interactiveRulesets.hasOwnProperty($scope.addRuleAction)) {
-          $scope.interactiveRulesets[$scope.addRuleAction] = [];
-        }
+    $('#addRuleModal').modal('hide');
 
-        var rules = $scope.interactiveRulesets[$scope.addRuleAction];
+    $scope.saveInteractiveWidget();
+  };
 
-        if ($scope.addRuleActionIndex !== null) {
-          rules[$scope.addRuleActionIndex] = finalRuleset;
+  $scope.saveRulesetWithNewDest = function(action, ruleset, dest) {
+    ruleset['dest'] = dest.id;
+    $scope.saveRuleset(action, ruleset);
+  };
+
+  $scope.saveRule = function(rule, attrs, inputs, dest, newDest, feedback) {
+    if (rule) {
+      var ruleset = {
+        rule: rule,
+        attrs: attrs,
+        inputs: inputs,
+        dest: dest,
+        feedback: feedback
+      };
+
+      // TODO(sll): Do more error-checking here.
+      if (dest === '?') {
+        // The user has added a new state.
+        if (!newDest) {
+          warningsData.addWarning('Error: destination state is empty.')
+        } else if ($scope.convertDestToId(newDest, true)) {
+          // The new state already exists.
+          ruleset.dest = $scope.convertDestToId(newDest);
         } else {
-          rules.splice(rules.length - 1, 0, finalRuleset);
+          ruleset.dest = newDest;
+          $scope.addState(
+              $scope.addRuleActionDestNew,
+              $scope.saveRulesetWithNewDest.bind(null, $scope.addRuleAction, ruleset));
+          return;
         }
-        $scope.saveInteractiveWidget();
       }
+
+      $scope.saveRuleset($scope.addRuleAction, ruleset);
     }
 
     $scope.addRuleAction = null;
     $scope.deselectAllRules();
-  });
+  };
 
   $scope.swapRules = function(action, index1, index2) {
     $scope.tmpRule = $scope.interactiveRulesets[action][index1];
@@ -164,7 +201,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.saveInteractiveWidget();
   };
 
-  $scope.convertDestToId = function(destName) {
+  $scope.convertDestToId = function(destName, hideWarnings) {
     if (!destName) {
       warningsData.addWarning('Please choose a destination.');
       return;
@@ -187,16 +224,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       }
     }
 
-    // TODO(sll): Add the following code, which triggers when the dest id
-    // doesn't exist.
-    // if (!found) {
-    //   $scope.addState(destName, true, categoryId);
-    //   return;
-    // }
-
     if (!found) {
       warningsData.addWarning('Invalid destination name: ' + destName);
-      return destName + '(INVALID)';
+      return;
     }
 
     return destId;
