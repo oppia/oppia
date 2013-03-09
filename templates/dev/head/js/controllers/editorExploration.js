@@ -68,7 +68,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
 
-  explorationData.getData = function(stateId) {
+  explorationData.getData = function() {
     // Retrieve data from the server.
     console.log('Retrieving exploration data from the server');
 
@@ -76,10 +76,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       function(data) {
         explorationData.data = data;
         explorationData.broadcastExploration();
-        explorationData.stateId = null;
-        if (stateId && stateId in explorationData.data.states) {
-          explorationData.broadcastState(stateId);
-        }
       }).error(function(errorResponse) {
         warningsData.addWarning('Server error: ' + errorResponse.error);
       });
@@ -108,7 +104,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     if ('states' in explorationData.data && stateId in explorationData.data.states) {
       return explorationData.data.states[stateId];
     } else {
-      explorationData.getData(stateId);
+      explorationData.getData();
+      return explorationData.data.states[stateId];
     }
   };
 
