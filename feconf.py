@@ -51,6 +51,7 @@ FOOTER_JS_FILES = [
     'third_party/angularjs/angular-sanitize.min.js',
     'third_party/angular-ui/build/angular-ui.js',
     'third_party/d3js/d3.min.js',
+    'third_party/yui/yui-min.js',
     TEMPLATE_DIR + '/js/app.js',
     TEMPLATE_DIR + '/js/directives/directives.js',
     TEMPLATE_DIR + '/js/filters/filters.js',

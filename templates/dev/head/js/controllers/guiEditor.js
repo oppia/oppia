@@ -14,35 +14,6 @@ oppia.directive('unfocusStateContent', function(activeInputData, explorationData
   };
 });
 
-// Makes the corresponding elements sortable.
-// TODO(sll): This directive doesn't actually update the underlying array,
-// so ui-sortable still needs to be used. Try and fix this.
-oppia.directive('sortable', function($compile, explorationData) {
-  return {
-    restrict: 'C',
-    link: function(scope, element, attrs) {
-      $(element).sortable({
-        scroll: false,
-        stop: function(event, ui) {
-          if ($(ui.item).hasClass('oppia-state-text-item')) {
-            // This prevents a collision with the itemDroppable trashing.
-            // TODO(sll): Now that we don't have drag-and-drop trashing, is this
-            // still needed?
-            var content = explorationData.getStateProperty(scope.stateId, 'content');
-            for (var i = 0; i < content.length; ++i) {
-              if (content[i] === undefined) {
-                content.splice(i, 1);
-                --i;
-              }
-            }
-            explorationData.saveStateData(scope.stateId, {'content': content});
-            scope.$apply();
-          }
-        }
-      });
-    }
-  };
-});
 
 function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   $scope.$parent.stateId = $routeParams.stateId;
@@ -85,9 +56,60 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.init(explorationData.getStateData($scope.$parent.stateId));
   });
 
+  var editor = null;
+
+  $scope.initYui = function(divId, initContent) {
+    YUI().use('editor-base', 'gallery-itsatoolbar', function (Y) {
+
+      var config = {height: '10px'};
+
+      editor = new Y.EditorBase({
+        content: initContent || 'You can enter <strong>rich</strong> text here.'
+      });
+
+      editor.plug(Y.Plugin.ITSAToolbar);
+      editor.plug(Y.Plugin.EditorBidi);
+
+      editor.on('frame:ready', function() {
+        //Focus the Editor when the frame is ready..
+        this.focus();
+
+        // Adjust the iframe's height.
+        this.frame._iframe._node.height = 10;
+      });
+
+      //Rendering the Editor.
+      editor.render('#' + divId);
+    });
+  };
+
+  $scope.saveContent = function(index) {
+    if ($scope.content[index].type == 'text') {
+      $scope.content[index].value = editor.getContent();
+    }
+    activeInputData.name = '';
+  };
+
   $scope.saveStateContent = function() {
     explorationData.saveStateData($scope.stateId, {'content': $scope.content});
   };
+
+  // Destroy and initialize the correct rich text editors.
+  $scope.$watch('activeInputData.name', function(newValue, oldValue) {
+    editor = null;
+
+    if (oldValue && oldValue.indexOf('content.') === 0) {
+      // Remove all old YUI editors from the DOM.
+      $('.yuiEditor').empty();
+    }
+
+    if (newValue && newValue.indexOf('content.') === 0) {
+      var index = parseInt(newValue.substring(8));
+      if ($scope.content[index].type == 'text') {
+        $scope.initYui('yuiEditor' + index, $scope.content[index].value);
+      }
+    }
+  });
 
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
@@ -159,8 +181,29 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 
   $scope.deleteContent = function(index) {
+    activeInputData.clear();
     $scope.content.splice(index, 1);
     $scope.saveStateContent();
+  };
+
+  $scope.swapContent = function(index1, index2) {
+    activeInputData.clear();
+    if (index1 < 0 || index1 >= $scope.content.length) {
+      warningsData.addWarning('Content element ' + index1 + ' does not exist.');
+    }
+    if (index2 < 0 || index2 >= $scope.content.length) {
+      warningsData.addWarning('Content element ' + index2 + ' does not exist.');
+    }
+
+    var tmpContent = $scope.content[index1];
+    $scope.content[index1] = $scope.content[index2];
+    $scope.content[index2] = tmpContent;
+
+    $scope.saveStateContent();
+  };
+
+  $scope.editContent = function(index) {
+    activeInputData.name = 'content.' + index;
   };
 
   $scope.saveStateContentImage = function(index) {

@@ -88,6 +88,24 @@ if [ ! -d "third_party/d3js" ]; then
   wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
 fi
 
+echo Checking whether YUI is installed in third_party
+if [ ! -d "third_party/yui" ]; then
+  echo Installing yui
+  mkdir -p third_party/yui/
+  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/yui/yui-min.js
+fi
+
+
+# webtest is used for tests.
+echo Checking if webtest is installed in third_party
+if [ ! -d "third_party/webtest" ]; then
+  echo Installing webtest framework
+  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
+  unzip webtest-download.zip -d third_party
+  rm webtest-download.zip
+  mv third_party/WebTest-1.4.2 third_party/webtest
+fi
+
 # Set up a local dev instance
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \

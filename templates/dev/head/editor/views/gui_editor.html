@@ -9,6 +9,7 @@
                ui-jq="tooltip"
                title="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields.">
         </h4>
+
         {% include 'editor/views/parameter_change.html' %}
 
         <br>
@@ -20,29 +21,36 @@
                title="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input.">
         </h4>
         <div>
-          <ul ui-sortable ng-model="content" class="sortable oppia-state-text-list">
+          <ul ng-model="content" class="oppia-state-text-list">
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
-              <a ng-click="deleteContent($index)" class="pull-right">Delete</a>
+
+              <span class="pull-right">
+                <span ng-show="item.type == 'text'">
+                  <a ng-show="activeInputData.name == 'content.' + $index" ng-click="saveContent($index)">Save</a>
+                  <a ng-hide="activeInputData.name == 'content.' + $index" ng-click="editContent($index)">Edit</a>
+                  |
+                </span>
+                <span ng-show="$index != 0">
+                  <a ng-click="swapContent($index, $index - 1)"> ⇑ </a> |
+                </span>
+                <span ng-show="$index < content.length - 1">
+                  <a ng-click="swapContent($index, $index + 1)"> ⇓ </a> |
+                </span>
+                <a ng-click="deleteContent($index)">Delete</a>
+              </span>
+
               <ng-switch on="item.type">
-                <!-- TODO(sll): In the following, 'content' should store the
-                raw HTML. When the user clicks to edit, the textarea should
-                convert <br> into newlines, and when the user saves, the
-                newlines should be converted into <br>'s. Tags like < and >
-                also need to be HTML-ified. Maybe use a contenteditable? -->
+
                 <div ng-switch-when="text">
-                  <ng-switch on="activeInputData.name == 'content.' + $index">
-                    <div ng-switch-when="true">
-                      <textarea rows="5" ng-model="item.value" unfocus-state-content="activeInputData.clear()"></textarea>
-                    </div>
-                    <div ng-switch-default ng-click="initializeNewActiveInput('content.' + $index)">
-                      <ng-switch on="item.value == ''">
-                        <div ng-switch-when="true" class="oppia-placeholder">
-                          You can enter text here.
-                        </div>
-                      </ng-switch>
-                      <span ng-bind-html="item.value"></span>
-                    </div>
-                  </ng-switch>
+                  <!-- The display of this element is controlled manually, outside Angular JS. -->
+                  <div id="yuiEditor<[$index]>" class="yuiEditor"></div>
+
+                  <div ng-hide="activeInputData.name == 'content.' + $index">
+                    <span ng-show="item.value == ''" class="oppia-placeholder">
+                      You can enter text here.
+                    </span>
+                    <span ng-bind-html="item.value"></span>
+                  </div>
                 </div>
                 <div ng-switch-when="image">
                   <ng-switch on="item.value == ''">
@@ -63,10 +71,10 @@
                 <div ng-switch-when="video">
                   <ng-switch on="item.value == ''">
                     <div ng-switch-when="true" class="oppia-placeholder">
-                      <form ng-submit="hideVideoInputDialog(newVideoLink, $index)">
+                      <form novalidate name="addVideoContent" ng-submit="hideVideoInputDialog(newVideoLink, $index)">
                         Add a Youtube video link:
-                        <input type="text" ng-model="newVideoLink" id="newVideoLink">
-                        <input type="submit" value="Save">
+                        <input type="text" ng-model="newVideoLink" id="newVideoLink" required>
+                        <input type="submit" value="Save" ng-disabled="addVideoContent.$invalid">
                       </form>
                     </div>
                     <div ng-switch-default>
@@ -110,7 +118,7 @@
           </ul>
 
           <center class="oppia-add-content-box">
-            <button ng-click="addContent('text')">Add text</button>
+            <button ng-click="addContent('text')">Add rich text</button>
             <button ng-click="addContent('image')">Add image</button>
             <button ng-click="addContent('video')">Add video</button>
             <!-- TODO(sll): Reinstate this when it works better.

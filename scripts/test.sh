@@ -22,6 +22,16 @@ GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
 export PYTHONPATH=$PYTHONPATH
 
+# webtest is used for tests.
+echo Checking if webtest is installed in third_party
+if [ ! -d "third_party/webtest" ]; then
+  echo Installing webtest framework
+  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
+  unzip webtest-download.zip -d third_party
+  rm webtest-download.zip
+  mv third_party/WebTest-1.4.2 third_party/webtest
+fi
+
 # Note: you can safely delete all of the following code (up to the end of the
 # file) if it leads to errors on your system. It runs checks to see how well
 # the tests cover the code.

@@ -156,10 +156,10 @@ class ExplorationHandler(BaseHandler):
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
 
-        norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
-        if norm_answer is None:
-            raise self.InvalidInputException(
-                'Invalid input: could not normalize the answer.')
+            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+            if norm_answer is None:
+                raise self.InvalidInputException(
+                    'Invalid input: could not normalize the answer.')
 
         for ind, rule in enumerate(state.interactive_rulesets['submit']):
             if ind == len(state.interactive_rulesets['submit']) - 1:
