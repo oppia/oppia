@@ -167,9 +167,11 @@ oppia.run(function($rootScope) {
 });
 
 
-function ExplorationTab($scope) {
+function ExplorationTab($scope, explorationData) {
   // Changes the tab to the Exploration Editor view.
   $('#editorViewTab a[href="#explorationEditor"]').tab('show');
+  $scope.stateId = '';
+  explorationData.stateId = '';
 }
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
@@ -441,4 +443,4 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
  */
 EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', 'explorationData', 'warningsData', 'activeInputData'];
-ExplorationTab.$inject = ['$scope'];
+ExplorationTab.$inject = ['$scope', 'explorationData'];
