@@ -1,5 +1,7 @@
 # coding: utf-8
 #
+# Copyright 2012 Google Inc. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -52,7 +54,7 @@ class MainPage(BaseHandler):
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
         self.ensure_default_explorations_exist()
-        self.values['js'] = utils.get_js_controllers(['index'])
+        self.values['js'] = utils.get_js_controllers([])
         self.values['login_url'] = users.create_login_url('/gallery')
         self.values['user'] = users.get_current_user()
         self.response.out.write(

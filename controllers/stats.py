@@ -1,3 +1,5 @@
+# Copyright 2012 Google Inc. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -39,7 +41,7 @@ class StatsHandler(BaseHandler):
         self.values.update({
             'exploration_title': exploration.title,
             'exploration_id': exploration.hash_id,
-            'js': utils.get_js_controllers(['stats']),
+            'js': utils.get_js_controllers([]),
             'num_visits': num_visits,
             'num_comp': num_completions,
             'answers': answers,

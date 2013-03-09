@@ -9,7 +9,9 @@
     <br>
     Number of completions: {{num_comp}}
     <br>
-    Percent completing exercize: {{num_comp/num_visits * 100}}%
+    {% if num_visits > 0 %}
+      Percent completing exercise: {{num_comp/num_visits * 100}}%
+    {% endif %}
 
     <h4>Answers that triggered the default category</h4>
 

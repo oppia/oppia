@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Angular controllers for elements on an editor's exploration page.
+ * @fileoverview Controllers for an editor's main exploration page.
  *
  * @author sll@google.com (Sean Lip)
  */
