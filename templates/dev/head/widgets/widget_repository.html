@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block subtitle %}
+  Widget Repository
+{% endblock subtitle %}
+
 {% block content %}
 <div ng-controller="WidgetRepository">
   {% if not iframed %}
