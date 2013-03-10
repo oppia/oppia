@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +39,17 @@ IDEA_CONTRIBUTORS = [
     'Phil Wagner',
     'Philip Guo',
     'Reinaldo Aguiar',
+]
+
+# Demo explorations to load on startup. The id assigned to each exploration
+# is based on the index of the exploration in this list, so if you want to
+# add a new exploration and preserve the existing ids, add that exploration
+# to the end of the list.
+# Each item is represented as a tuple: (filename, title, category). Note
+# that the filename omits the .yaml suffix.
+DEMO_EXPLORATIONS = [
+    ('hola', '¡Hola!', 'Languages'),
+    ('pitch', 'Pitch Perfect', 'Music'),
 ]
 
 # Whether to unconditionally log info messages.

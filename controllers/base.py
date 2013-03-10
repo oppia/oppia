@@ -116,6 +116,12 @@ class BaseHandler(webapp2.RequestHandler):
                 {'code': '400 Bad Request', 'error': str(exception)}))
             return
 
+        if isinstance(exception, self.InternalErrorException):
+            self.error(500)
+            self.response.out.write(json.dumps(
+                {'code': '500 System Error', 'error': str(exception)}))
+            return
+
         webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
         logging.error('Exception was not handled: %s', exception)
 
@@ -127,3 +133,6 @@ class BaseHandler(webapp2.RequestHandler):
 
     class InvalidInputException(Exception):
         """Error class for invalid input on the user's side (error code 400)."""
+
+    class InternalErrorException(Exception):
+        """Error class for an internal server side error (error code 500)."""

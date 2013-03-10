@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,45 +19,29 @@ __author__ = 'sll@google.com (Sean Lip)'
 from controllers.base import BaseHandler
 import feconf
 from models.exploration import Exploration
-import os
 import utils
 from yaml_utils import YamlTransformer
 
-from google.appengine.api import users
-
 
 class MainPage(BaseHandler):
-    """Oppia's main page."""
-
-    def _ensure_default_exploration_exists(self, hash_id, filename, title, category):
-        """Create a default exploration from a file."""
-
-        try:
-            exploration = utils.get_entity(Exploration, hash_id)
-        except:
-            with open(os.path.join(
-                    feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
-                yaml = f.read().decode('utf-8')
-            exploration = YamlTransformer.create_exploration_from_yaml(
-                yaml=yaml, user=None, title=title,
-                category=category, id=hash_id)
-            exploration.is_public = True
-            exploration.put()
+    """Main splash page for Oppia."""
 
     def _ensure_default_explorations_exist(self):
-        """Add the default explorations, if they don't already exist."""
+        """Checks whether a demo exploration exists; if not, creates them."""
 
-        self._ensure_default_exploration_exists(
-            '0', 'hola.yaml', '¡Hola!', 'Languages')
-        self._ensure_default_exploration_exists(
-            '1', 'pitch.yaml', 'Pitch Perfect', 'Music')
+        if not feconf.DEMO_EXPLORATIONS:
+            raise self.InternalErrorException('No demo explorations defined.')
 
-    def get(self):  # pylint: disable-msg=C6409
+        # TODO(sll): Try and get the following code to run on warmup instead,
+        # so that we don't have to do the datastore check each time.
+        # Alternatively, implement caching so that the check is done cheaply.
+        if not Exploration.get('0'):
+            YamlTransformer.create_default_explorations()
+
+    def get(self):
         """Handles GET requests."""
 
         self._ensure_default_explorations_exist()
-        self.values['login_url'] = users.create_login_url('/gallery')
-        self.values['user'] = users.get_current_user()
         self.response.out.write(
             feconf.JINJA_ENV.get_template('index.html').render(self.values))
 
@@ -67,7 +49,7 @@ class MainPage(BaseHandler):
 class AboutPage(BaseHandler):
     """Page with information about Oppia."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         """Handles GET requests."""
 
         self.values.update({
@@ -83,7 +65,7 @@ class AboutPage(BaseHandler):
 class TermsPage(BaseHandler):
     """Page with terms and conditions."""
 
-    def get(self):  # pylint: disable-msg=C6409
+    def get(self):
         """Handles GET requests."""
 
         self.response.out.write(

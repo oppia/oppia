@@ -47,6 +47,11 @@ class Exploration(ndb.Model):
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
 
+    @classmethod
+    def get(cls, exploration_id):
+        """Gets an exploration by id. If it does not exist, returns None."""
+        return cls.query().filter(cls.hash_id == exploration_id).get()
+
     def delete(self):
         """Deletes an exploration."""
         for state_key in self.states:

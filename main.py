@@ -16,6 +16,8 @@
 
 __author__ = 'Sean Lip'
 
+import logging
+
 import feconf
 from controllers import base, editor, gallery, pages, reader, resources, stats, widgets
 
@@ -27,6 +29,8 @@ class Error404Handler(base.BaseHandler):
 
     def get(self):
         """Redirects users to the main gallery if an invalid URL is entered."""
+
+        logging.error('Invalid URL requested: %s' % self.request.uri)
         self.redirect('/gallery')
 
 

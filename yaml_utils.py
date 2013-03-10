@@ -248,3 +248,25 @@ class YamlTransformer(BaseHandler):
         state.interactive_rulesets = rulesets_dict
         state.put()
         return state
+
+    @classmethod
+    def create_default_explorations(cls):
+        """Initializes the demo explorations."""
+
+        for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
+            assert len(exploration) == 3
+
+            hash_id = str(index)
+            filename = '%s.yaml' % exploration[0]
+            title = exploration[1]
+            category = exploration[2]
+
+            with open(os.path.join(
+                    feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
+                yaml = f.read().decode('utf-8')
+
+            exploration = cls.create_exploration_from_yaml(
+                yaml=yaml, user=None, title=title, category=category,
+                id=hash_id)
+            exploration.is_public = True
+            exploration.put()

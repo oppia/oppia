@@ -19,7 +19,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 from controllers.base import BaseHandler, require_editor
 import feconf
 from models.stats import Statistics, STATS_ENUMS
-import utils
 
 
 class StatsHandler(BaseHandler):
@@ -41,7 +40,6 @@ class StatsHandler(BaseHandler):
         self.values.update({
             'exploration_title': exploration.title,
             'exploration_id': exploration.hash_id,
-            'js': utils.get_js_controllers([]),
             'num_visits': num_visits,
             'num_comp': num_completions,
             'answers': answers,
