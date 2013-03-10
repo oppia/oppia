@@ -45,19 +45,14 @@
           Oppia was (and is still being) built by a small group of engineers in their 20% time at Google,
           including:
           <ul>
-            {% for name in code_contributors %}
+            {% for name in code_contributors_list %}
               <li> {{name}} </li>
             {% endfor %}
           </ul>
         </p>
 
         <p>
-          We are also very grateful for feedback, ideas and suggestions from the following people:
-            {% for name in idea_contributors[:-1] %}
-              {{name}}{% if name != idea_contributors[-2] %}, {% endif %}
-            {% endfor %}
-            and {{ idea_contributors[-1] }}.
-          </ul>
+          We are also very grateful for feedback, ideas and suggestions from the following people: {{ idea_contributors_str }}.
         </p>
       </div>
     </div>

@@ -30,8 +30,10 @@ from google.appengine.api import users
 
 class MainPage(BaseHandler):
     """Oppia's main page."""
-    def ensure_default_exploration_exists(self, hash_id, filename, title, category):
+
+    def _ensure_default_exploration_exists(self, hash_id, filename, title, category):
         """Create a default exploration from a file."""
+
         try:
             exploration = utils.get_entity(Exploration, hash_id)
         except:
@@ -44,17 +46,18 @@ class MainPage(BaseHandler):
             exploration.is_public = True
             exploration.put()
 
-    def ensure_default_explorations_exist(self):
+    def _ensure_default_explorations_exist(self):
         """Add the default explorations, if they don't already exist."""
-        self.ensure_default_exploration_exists(
+
+        self._ensure_default_exploration_exists(
             '0', 'hola.yaml', '¡Hola!', 'Languages')
-        self.ensure_default_exploration_exists(
+        self._ensure_default_exploration_exists(
             '1', 'pitch.yaml', 'Pitch Perfect', 'Music')
 
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.ensure_default_explorations_exist()
-        self.values['js'] = utils.get_js_controllers([])
+
+        self._ensure_default_explorations_exist()
         self.values['login_url'] = users.create_login_url('/gallery')
         self.values['user'] = users.get_current_user()
         self.response.out.write(
@@ -63,35 +66,25 @@ class MainPage(BaseHandler):
 
 class AboutPage(BaseHandler):
     """Page with information about Oppia."""
+
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.get_js_controllers([])
-        self.values['code_contributors'] = [
-            'Jeremy Emerson',
-            'Manas Tungare',
-            'Sean Lip',
-            'Stephanie Federwisch',
-            'Wilson Hong',
-            'Yana Malysheva',
-        ]
-        self.values['idea_contributors'] = [
-            'Alex Kauffmann',
-            'Catherine Colman',
-            'Neil Fraser',
-            'Pavel Simakov',
-            'Peter Norvig',
-            'Phil Wagner',
-            'Philip Guo',
-            'Reinaldo Aguiar',
-        ]
+
+        self.values['code_contributors_list'] = feconf.CODE_CONTRIBUTORS
+        self.values['idea_contributors_str'] = (
+            '%s and %s' % (', '.join(feconf.IDEA_CONTRIBUTORS[:-1]),
+                           feconf.IDEA_CONTRIBUTORS[-1])
+        )
+
         self.response.out.write(
             feconf.JINJA_ENV.get_template('about.html').render(self.values))
 
 
 class TermsPage(BaseHandler):
     """Page with terms and conditions."""
+
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
-        self.values['js'] = utils.get_js_controllers([])
+
         self.response.out.write(
             feconf.JINJA_ENV.get_template('terms.html').render(self.values))

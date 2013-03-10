@@ -12,10 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Stores various configuration options for Oppia."""
+"""Stores various configuration options and constants for Oppia."""
 
 import os
 import jinja2
+
+# Code contributors, in alphabetical order.
+CODE_CONTRIBUTORS = [
+    'Jeremy Emerson',
+    'Manas Tungare',
+    'Sean Lip',
+    'Stephanie Federwisch',
+    'Wilson Hong',
+    'Yana Malysheva',
+]
+
+# Idea contributors, in alphabetical order.
+IDEA_CONTRIBUTORS = [
+    'Alex Kauffmann',
+    'Catherine Colman',
+    'Neil Fraser',
+    'Pavel Simakov',
+    'Peter Norvig',
+    'Phil Wagner',
+    'Philip Guo',
+    'Reinaldo Aguiar',
+]
 
 # Whether to unconditionally log info messages.
 DEBUG = False
