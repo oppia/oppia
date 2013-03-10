@@ -64,6 +64,7 @@ class GalleryHandler(BaseHandler):
                 'data': exploration.to_dict(
                     exclude=['states', 'init_state', 'owner']),
                 'can_edit': can_edit,
+                'can_fork': utils.is_demo_exploration(exploration.hash_id),
                 'is_owner': user == exploration.owner,
             })
 

@@ -153,7 +153,8 @@ def get_new_id(entity, entity_name):
     Returns:
         string - the id representing the entity
     """
-    new_id = base64.urlsafe_b64encode(hashlib.sha1(entity_name).digest())[:10]
+    new_id = base64.urlsafe_b64encode(
+        hashlib.sha1(entity_name.encode('utf-8')).digest())[:10]
     seed = 0
     while entity.query().filter(entity.hash_id == new_id).get():
         seed += 1
@@ -263,6 +264,7 @@ def create_new_exploration(user, title='New Exploration', category='No category'
     if id:
         exploration_hash_id = id
     else:
+        logging.info(title)
         exploration_hash_id = get_new_id(Exploration, title)
     state_hash_id = get_new_id(State, init_state_name)
 
@@ -364,3 +366,9 @@ def get_comma_sep_string_from_list(items):
         return items[0]
 
     return '%s and %s' % (', '.join(items[:-1]), items[-1])
+
+
+def is_demo_exploration(exploration_id):
+    """Checks if the exploration is one of the demos."""
+
+    return len(exploration_id) < 4

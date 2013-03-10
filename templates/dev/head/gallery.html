@@ -48,6 +48,9 @@
                         </a>
                         <div>
                           <h5><[exploration.data.title]></h5>
+                          <span ui-if="exploration.can_fork">
+                            <a ng-click="forkExploration(exploration.data.hash_id)">Fork</a> |
+                          </span>
                           <span ui-if="exploration.can_edit">
                             <a href="/create/<[exploration.data.hash_id]>">Edit</a> |
                             <a href="/stats/<[exploration.data.hash_id]>">Stats</a> |
@@ -105,25 +108,14 @@
             </div>
             <br>
 
-            <div ng-hide="useSampleExploration">
-              <label>
-                (Optional) Upload an existing exploration (YAML file)?
-                <input type="checkbox" ng-model="includeYamlFile">
-              </label>
-              <br><br>
-              <div ng-show="includeYamlFile">
-                Upload file:
-                <input id="newFileInput" type="file" file-upload="true">
-              </div>
+            <label>
+              (Optional) Upload an existing exploration (YAML file)?
+              <input type="checkbox" ng-model="includeYamlFile">
+            </label>
+            <div ng-show="includeYamlFile">
+              Upload file:
+              <input id="newFileInput" type="file" file-upload="true">
             </div>
-
-            <div ng-hide="includeYamlFile">
-              <label>
-                (Optional) Use a copy of the sample exploration ('Hola!')?
-                <input type="checkbox" ng-model="useSampleExploration">
-              </label>
-            </div>
-
           </div>
 
           <div class="modal-footer">

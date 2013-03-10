@@ -57,23 +57,13 @@ class NewExploration(BaseHandler):
 
         title = self.request.get('title')
         category = self.request.get('category')
-        use_sample_exploration = self.request.get('use_sample')
-
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
-        if use_sample_exploration:
-            # It is necessary to get the sample exploration as a YAML file, so
-            # that new states can be created.
-            exploration = utils.get_entity(Exploration, '0')
-            yaml = YamlTransformer.get_exploration_as_yaml(exploration)
-            if not title:
-                title = 'Clone of \'Hola\''
-        else:
-            yaml = self.request.get('yaml')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        yaml = self.request.get('yaml')
 
         if yaml:
             exploration = YamlTransformer.create_exploration_from_yaml(
@@ -81,6 +71,37 @@ class NewExploration(BaseHandler):
         else:
             exploration = utils.create_new_exploration(
                 user, title=title, category=category)
+
+        self.response.out.write(json.dumps({
+            'explorationId': exploration.hash_id,
+        }))
+
+
+class ForkExploration(BaseHandler):
+    """Forks an existing exploration."""
+
+    @require_user
+    def post(self, user):
+        """Handles POST requests."""
+
+        exploration_id = self.request.get('exploration_id')
+
+        if not utils.is_demo_exploration(exploration_id):
+            raise self.InvalidInputException('Exploration cannot be forked.')
+
+        forked_exploration = utils.get_entity(Exploration, exploration_id)
+        if not forked_exploration:
+            raise self.InvalidInputException(
+                'Exploration %s does not exist.' % exploration_id)
+
+        # Get the demo exploration as a YAML file, so that new states can be
+        # created.
+        yaml = YamlTransformer.get_exploration_as_yaml(forked_exploration)
+        title = 'Copy of %s' % forked_exploration.title
+        category = forked_exploration.category
+
+        exploration = YamlTransformer.create_exploration_from_yaml(
+            yaml=yaml, user=user, title=title, category=category)
 
         self.response.out.write(json.dumps({
             'explorationId': exploration.hash_id,

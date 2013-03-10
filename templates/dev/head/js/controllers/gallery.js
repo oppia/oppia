@@ -68,13 +68,29 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.openNewExplorationModal = function() {
     $scope.newExplorationIsBeingAdded = true;
     $scope.includeYamlFile = false;
-    $scope.useSampleExploration = false;
     $('#newExplorationModal').modal();
   };
 
   $scope.closeNewExplorationModal = function() {
     $('#newExplorationModal').modal('hide');
     warningsData.clear();
+  };
+
+  $scope.forkExploration = function(explorationId) {
+    var request = $.param({
+      exploration_id: explorationId
+    }, true);
+
+    $http.post(
+        '/fork',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              window.location = '/create/' + data.explorationId;
+            }).error(function(data) {
+              warningsData.addWarning(data.error ? data.error :
+                  'Error: Could not add new exploration.');
+            });
   };
 
   $scope.createNewExploration = function() {
@@ -120,9 +136,6 @@ function Gallery($scope, $http, warningsData, GalleryData) {
           title: $scope.newExplorationTitle || '',
           category: $scope.newExplorationCategory || ''
       };
-      if ($scope.useSampleExploration) {
-        requestMap.use_sample = true;
-      }
 
       var request = $.param(requestMap, true);
 

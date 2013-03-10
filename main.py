@@ -58,6 +58,7 @@ urls = [
     (r'/learn_random/?', reader.RandomExplorationPage),
 
     (r'/create_new/?', editor.NewExploration),
+    (r'/fork/?', editor.ForkExploration),
     (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
     (r'/create/(%s)/?' % r, editor.ExplorationPage),
     (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
