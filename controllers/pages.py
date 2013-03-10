@@ -70,11 +70,11 @@ class AboutPage(BaseHandler):
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
 
-        self.values['code_contributors_list'] = feconf.CODE_CONTRIBUTORS
-        self.values['idea_contributors_str'] = (
-            '%s and %s' % (', '.join(feconf.IDEA_CONTRIBUTORS[:-1]),
-                           feconf.IDEA_CONTRIBUTORS[-1])
-        )
+        self.values.update({
+            'code_contributors_list': feconf.CODE_CONTRIBUTORS,
+            'idea_contributors_str': utils.get_comma_sep_string_from_list(
+                feconf.IDEA_CONTRIBUTORS),
+        })
 
         self.response.out.write(
             feconf.JINJA_ENV.get_template('about.html').render(self.values))

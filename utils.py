@@ -352,3 +352,15 @@ def parse_with_jinja(string, params, default=''):
             logging.info('Cannot parse %s properly using %s' % (string, params))
 
     return Environment().from_string(string).render(new_params)
+
+
+def get_comma_sep_string_from_list(items):
+    """Turns a list of items into a comma-separated string."""
+
+    if not items:
+        return ''
+
+    if len(items) == 1:
+        return items[0]
+
+    return '%s and %s' % (', '.join(items[:-1]), items[-1])

@@ -51,9 +51,11 @@
           </ul>
         </p>
 
-        <p>
-          We are also very grateful for feedback, ideas and suggestions from the following people: {{ idea_contributors_str }}.
-        </p>
+        {% if idea_contributors_str %}
+          <p>
+            We are also very grateful for feedback, ideas and suggestions from the following people: {{ idea_contributors_str }}.
+          </p>
+        {% endif %}
       </div>
     </div>
 
