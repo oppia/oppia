@@ -159,7 +159,8 @@ def get_new_id(entity, entity_name):
     while entity.query().filter(entity.hash_id == new_id).get():
         seed += 1
         new_id = base64.urlsafe_b64encode(
-            hashlib.sha1('%s%s' % (entity_name, seed)).digest())[:10]
+            hashlib.sha1('%s%s' % (
+                entity_name.encode('utf-8'), seed)).digest())[:10]
     return new_id
 
 

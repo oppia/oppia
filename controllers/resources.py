@@ -90,7 +90,7 @@ class ImageHandler(BaseHandler):
         # TODO(sll): Check that the image is really an image.
         image = self.request.get('image')
         if image:
-            image_hash_id = utils.get_new_id(Image, image)
+            image_hash_id = utils.get_new_id(Image, '')
             image_entity = Image(hash_id=image_hash_id, image=image)
             image_entity.put()
             self.response.out.write(json.dumps(
