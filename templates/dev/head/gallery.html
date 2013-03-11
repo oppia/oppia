@@ -109,9 +109,18 @@
             <div>
               Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
             </div>
+
             <div>
-              Category: <input type="text" ng-model="newExplorationCategory" required>
+              Category:
+              <select ng-model="newExplorationCategory" required
+                      ng-options="getCategoryName(category) for category in getCategoryList()">
+              </select>
+
+              <input ng-model="customExplorationCategory"
+                     ng-show="newExplorationCategory == '?'" type="text"
+                     ng-required="newExplorationCategory == '?'">
             </div>
+
             <br>
 
             <label>

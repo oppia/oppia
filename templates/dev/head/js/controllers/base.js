@@ -21,7 +21,7 @@
 var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 var ALPHANUMERIC_REGEXP = {
-    'regexp': /^[ A-Za-z0-9\.\?\,\+\(\)\[\]\;\!\'\"\:_-]+$/,
+    'regexp': /^[ A-Za-z0-9\.\,\+\(\)\[\]\;\!\'\"\:_-]+$/,
     'warning': 'Invalid input. Please use a non-empty ' +
         'description consisting of alphanumeric characters, underscores, ' +
         'spaces and/or hyphens.'};

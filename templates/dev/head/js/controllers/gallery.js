@@ -89,7 +89,9 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   };
 
   $scope.openNewExplorationModal = function() {
-    $scope.newExplorationIsBeingAdded = true;
+    $scope.newExplorationTitle = '';
+    $scope.newExplorationCategory = '';
+    $scope.customExplorationCategory = '';
     $scope.includeYamlFile = false;
     $('#newExplorationModal').modal();
   };
@@ -99,21 +101,17 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     warningsData.clear();
   };
 
-  $scope.forkExploration = function(explorationId) {
-    var request = $.param({
-      exploration_id: explorationId
-    }, true);
+  $scope.getCategoryList = function() {
+    var categoryList = [];
+    for (var category in $scope.categories) {
+      categoryList.push(category);
+    }
+    categoryList.push('?');
+    return categoryList;
+  };
 
-    $http.post(
-        '/fork',
-        request,
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              window.location = '/create/' + data.explorationId;
-            }).error(function(data) {
-              warningsData.addWarning(data.error ? data.error :
-                  'Error: Could not add new exploration.');
-            });
+  $scope.getCategoryName = function(category) {
+    return category === '?' ? 'Add New Category...' : category;
   };
 
   $scope.createNewExploration = function() {
@@ -122,8 +120,18 @@ function Gallery($scope, $http, warningsData, GalleryData) {
       return;
     }
 
-    if (!$scope.newExplorationCategory) {
+    if (!$scope.newExplorationCategory ||
+        ($scope.newExplorationCategory === '?' && !$scope.customExplorationCategory)) {
       warningsData.addWarning('Please specify a category for this exploration.');
+      return;
+    }
+
+    var title = $scope.newExplorationTitle;
+    var category = $scope.newExplorationCategory === '?' ?
+                   $scope.customExplorationCategory :
+                   $scope.newExplorationCategory;
+
+    if (!$scope.isValidEntityName(category, true)) {
       return;
     }
 
@@ -131,8 +139,8 @@ function Gallery($scope, $http, warningsData, GalleryData) {
       // A yaml file was uploaded.
       var form = new FormData();
       form.append('yaml', $scope.file);
-      form.append('category', $scope.newExplorationCategory || '');
-      form.append('title', $scope.newExplorationTitle || '');
+      form.append('category', category || '');
+      form.append('title', title || '');
 
       $.ajax({
           url: '/create_new',
@@ -156,8 +164,8 @@ function Gallery($scope, $http, warningsData, GalleryData) {
       return;
     } else {
       var requestMap = {
-          title: $scope.newExplorationTitle || '',
-          category: $scope.newExplorationCategory || ''
+          title: title || '',
+          category: category || ''
       };
 
       var request = $.param(requestMap, true);
@@ -178,6 +186,23 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     }
   };
 
+
+  $scope.forkExploration = function(explorationId) {
+    var request = $.param({
+      exploration_id: explorationId
+    }, true);
+
+    $http.post(
+        '/fork',
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              window.location = '/create/' + data.explorationId;
+            }).error(function(data) {
+              warningsData.addWarning(data.error ? data.error :
+                  'Error: Could not add new exploration.');
+            });
+  };
 }
 
 /**
