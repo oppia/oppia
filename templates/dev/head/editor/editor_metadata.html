@@ -1,13 +1,44 @@
 <div>
-  Title: <input type="text" ng-model="explorationTitle" ng-model-onblur>
+  <h4>Title</h4>
+  <input type="text" ng-model="explorationTitle" ng-model-onblur>
 </div>
 
 <div>
-  Category: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+  <h4>Category</h4>
+  <input type="text" ng-model="explorationCategory" ng-model-onblur>
 </div>
 
 <div>
-  Cover image (to show on the Gallery page):
+  <h4>Collaborators</h4>
+  <ul>
+    <li><em><[explorationOwner]></em></li>
+    <li ng-repeat="editor in explorationEditors">
+      <[editor]>
+    </li>
+  </ul>
+
+  <div ng-show="currentUser == explorationOwner">
+    <button type="button" ng-click="openAddNewEditorForm()"
+            ng-hide="activeInputData.name == 'addNewEditor'">
+      Add Collaborator
+    </button>
+  
+    <form ng-show="activeInputData.name == 'addNewEditor'"
+          ng-submit="addNewEditor(newEditorEmail)">
+      <input type="text" ng-model="newEditorEmail"
+             placeholder="New editor's email address">
+      <input type="submit" value="Add Editor">
+    </form>
+  </div>
+</div>
+
+<div>
+  <h4>
+    Cover image
+    <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
+         title="This image is displayed on the Gallery page.">
+  </h4>
+
   <span ui-if="explorationImageId">
     <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
     <button ng-click="deleteExplorationImage()">

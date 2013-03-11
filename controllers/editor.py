@@ -26,10 +26,11 @@ from controllers.widgets import InteractiveWidget
 from data.classifiers import normalizers
 import feconf
 from models.exploration import Exploration
-from models.models import AugmentedUser
 from models.state import State
 import utils
 from yaml_utils import YamlTransformer
+
+from google.appengine.api import users
 
 EDITOR_MODE = 'editor'
 
@@ -145,7 +146,7 @@ class ExplorationPage(BaseHandler):
         """Updates properties of the given exploration."""
 
         for key in self.request.arguments():
-            if key not in ['is_public', 'category', 'title', 'image_id']:
+            if key not in ['is_public', 'category', 'title', 'image_id', 'editors']:
                 raise self.InvalidInputException(
                     '\'%s\' is not a valid editable property' % key)
 
@@ -153,6 +154,7 @@ class ExplorationPage(BaseHandler):
         category = self.request.get('category')
         title = self.request.get('title')
         image_id = self.request.get('image_id')
+        editors_json = self.request.get('editors')
 
         if is_public:
             exploration.is_public = True
@@ -162,6 +164,19 @@ class ExplorationPage(BaseHandler):
             exploration.title = title
         if 'image_id' in self.request.arguments():
             exploration.image_id = None if image_id == 'null' else image_id
+        if editors_json:
+            editors = json.loads(editors_json)
+            if user == exploration.owner:
+                exploration.editors = editors
+                for email in editors:
+                    editor = users.User(email=email)
+                    augmented_user = utils.get_augmented_user(editor)
+                    if exploration.key not in augmented_user.editable_explorations:
+                        augmented_user.editable_explorations.append(exploration.key)
+                        augmented_user.put()
+            else:
+                raise self.UnauthorizedUserException(
+                    'Only the exploration owner can add new collaborators.')
 
         exploration.put()
 
@@ -191,6 +206,7 @@ class ExplorationHandler(BaseHandler):
             'category': exploration.category,
             'title': exploration.title,
             'owner': str(exploration.owner),
+            'editors': exploration.editors,
             'states': state_list,
         })
         self.response.out.write(json.dumps(self.values))

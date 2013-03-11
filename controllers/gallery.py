@@ -53,8 +53,7 @@ class GalleryHandler(BaseHandler):
                 Exploration.is_public == True):
             category_name = exploration.category
 
-            can_edit = (augmented_user and
-                        exploration.key in augmented_user.editable_explorations)
+            can_edit = user and utils.check_can_edit(user, exploration)
 
             used_keys.append(exploration.key)
 
@@ -65,7 +64,7 @@ class GalleryHandler(BaseHandler):
                     exclude=['states', 'init_state', 'owner']),
                 'can_edit': can_edit,
                 'can_fork': utils.is_demo_exploration(exploration.hash_id),
-                'is_owner': user == exploration.owner,
+                'is_owner': user and user == exploration.owner,
             })
 
         if augmented_user:
@@ -77,6 +76,7 @@ class GalleryHandler(BaseHandler):
                         'data': exploration.to_dict(
                             exclude=['states', 'init_state', 'owner']),
                         'can_edit': True,
+                        'is_editor': True,
                         'is_owner': user == exploration.owner,
                     }
 

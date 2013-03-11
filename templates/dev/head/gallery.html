@@ -19,11 +19,13 @@
           </form>
         -->
 
-        <div class="pull-right">
-          <button ng-click="toggleExplorationView()">
-            <[getToggleText()]>
-          </button>
-        </div>
+        {% if user %}
+          <div class="pull-right">
+            <button ng-click="toggleExplorationView()">
+              <[getToggleText()]>
+            </button>
+          </div>
+        {% endif %}
 
         <h2><[getHeadingText()]></h2>
 

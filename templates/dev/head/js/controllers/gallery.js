@@ -76,7 +76,7 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   };
 
   $scope.filterExplorations = function(exploration) {
-    return !$scope.showMyExplorations || exploration.is_owner;
+    return !$scope.showMyExplorations || exploration.is_owner || exploration.can_edit;
   };
 
   /**

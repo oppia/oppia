@@ -23,7 +23,7 @@ import unittest
 
 import webtest
 
-EXPECTED_TEST_COUNT = 18
+EXPECTED_TEST_COUNT = 17
 
 
 def empty_environ():

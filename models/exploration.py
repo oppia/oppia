@@ -46,6 +46,8 @@ class Exploration(ndb.Model):
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
+    # List of email addresses of users who can edit this exploration.
+    editors = ndb.StringProperty(repeated=True)
 
     @classmethod
     def get(cls, exploration_id):

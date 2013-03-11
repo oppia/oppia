@@ -253,14 +253,6 @@ class UtilsUnitTests(suite.TestBase):
             utils.get_state_by_name(None, None)
         with self.assertRaises(KeyError):
             utils.get_state_by_name('The_fake_entity', None)
-        self.assertEqual(fake_state, utils.get_state_by_name('The_fake_entity',
-                exploration))
+        self.assertEqual(fake_state, utils.get_state_by_name(
+            'The_fake_entity', exploration))
         utils.State.query = backup_query
-
-    def test_check_authorship_method(self):
-        """Test get_check_authorship Method."""
-        exploration = FakeEntity('The_fake_exploration', 1, user='The_fake_user')
-        fake_user = FakeAugmentedUser(exploration)
-        utils.get_augmented_user = fake_user.get_augmented_user
-        self.assertTrue(utils.check_authorship('The_fake_user', exploration))
-        self.assertFalse(utils.check_authorship('The_non_user', exploration))

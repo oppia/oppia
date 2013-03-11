@@ -254,8 +254,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
+    $scope.explorationOwner = data.owner;
+    $scope.explorationEditors = data.editors;
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
+    $scope.currentUser = data.user;
     explorationFullyLoaded = true;
 
     if ($scope.stateId) {
@@ -264,12 +267,40 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    $scope.saveExplorationProperty('explorationCategory', 'category', newValue, oldValue);
+    $scope.saveExplorationProperty(
+        'explorationCategory', 'category', newValue, oldValue);
   });
 
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
-    $scope.saveExplorationProperty('explorationTitle', 'title', newValue, oldValue);
+    $scope.saveExplorationProperty(
+        'explorationTitle', 'title', newValue, oldValue);
   });
+
+  $scope.openAddNewEditorForm = function() {
+    activeInputData.name = 'addNewEditor';
+  };
+
+  $scope.addNewEditor = function(newEditorEmail) {
+    activeInputData.clear();
+    $scope.explorationEditors.push(newEditorEmail);
+
+    var requestParameters = {};
+    requestParameters['editors'] = JSON.stringify($scope.explorationEditors);
+
+    var request = $.param(requestParameters, true);
+    $http.put(
+        $scope.explorationUrl,
+        request,
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              console.log('PUT request succeeded');
+            }).
+            error(function(data) {
+              warningsData.addWarning(
+                  'Error adding collaborator: ' + data.error);
+              $scope.explorationEditors.pop();
+            });
+  };
 
   /**
    * Downloads the YAML representation of an exploration.

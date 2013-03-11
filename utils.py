@@ -138,9 +138,10 @@ def get_state_by_name(name, exploration):
     return state
 
 
-def check_authorship(user, exploration):
+def check_can_edit(user, exploration):
     """Checks whether the current user has rights to edit this exploration."""
-    return exploration.key in get_augmented_user(user).editable_explorations
+    return (user.email() in exploration.editors or
+            exploration.key in get_augmented_user(user).editable_explorations)
 
 
 def get_new_id(entity, entity_name):

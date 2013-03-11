@@ -63,7 +63,7 @@ def require_editor(handler):
             return
 
         exploration = utils.get_entity(Exploration, exploration_id)
-        if not utils.check_authorship(user, exploration):
+        if not utils.check_can_edit(user, exploration):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
                 user)

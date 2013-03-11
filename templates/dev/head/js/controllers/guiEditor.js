@@ -89,8 +89,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   $scope.saveContent = function(index) {
     if ($scope.content[index].type == 'text') {
-      console.log(editors);
-      console.log(editors[index].getContent());
       $scope.content[index].value = editors[index].getContent();
       $scope.saveStateContent();
     }
