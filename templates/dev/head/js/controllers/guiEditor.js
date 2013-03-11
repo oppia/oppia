@@ -59,21 +59,22 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.init(explorationData.getStateData($scope.$parent.stateId));
   });
 
-  var editor = null;
+  var editors = {};
 
-  $scope.initYui = function(divId, initContent) {
+  $scope.initYui = function(index, initContent) {
+    var divId = 'yuiEditor' + index;
+
     YUI().use('editor-base', 'gallery-itsatoolbar', function (Y) {
-
       var config = {height: '10px'};
 
-      editor = new Y.EditorBase({
+      editors[index] = new Y.EditorBase({
         content: initContent || 'You can enter <strong>rich</strong> text here.'
       });
 
-      editor.plug(Y.Plugin.ITSAToolbar);
-      editor.plug(Y.Plugin.EditorBidi);
+      editors[index].plug(Y.Plugin.ITSAToolbar);
+      editors[index].plug(Y.Plugin.EditorBidi);
 
-      editor.on('frame:ready', function() {
+      editors[index].on('frame:ready', function() {
         //Focus the Editor when the frame is ready..
         this.focus();
 
@@ -82,13 +83,16 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       });
 
       //Rendering the Editor.
-      editor.render('#' + divId);
+      editors[index].render('#' + divId);
     });
   };
 
   $scope.saveContent = function(index) {
     if ($scope.content[index].type == 'text') {
-      $scope.content[index].value = editor.getContent();
+      console.log(editors);
+      console.log(editors[index].getContent());
+      $scope.content[index].value = editors[index].getContent();
+      $scope.saveStateContent();
     }
     activeInputData.name = '';
   };
@@ -99,7 +103,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   // Destroy and initialize the correct rich text editors.
   $scope.$watch('activeInputData.name', function(newValue, oldValue) {
-    editor = null;
+    editors = {};
 
     if (oldValue && oldValue.indexOf('content.') === 0) {
       // Remove all old YUI editors from the DOM.
@@ -107,9 +111,9 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     }
 
     if (newValue && newValue.indexOf('content.') === 0) {
-      var index = parseInt(newValue.substring(8));
+      var index = parseInt(newValue.substring(8), 10);
       if ($scope.content[index].type == 'text') {
-        $scope.initYui('yuiEditor' + index, $scope.content[index].value);
+        $scope.initYui(index, $scope.content[index].value);
       }
     }
   });
