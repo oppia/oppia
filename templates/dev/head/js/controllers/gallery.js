@@ -45,6 +45,7 @@ oppia.factory('GalleryData', function($rootScope, $http, warningsData) {
 function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
+  $scope.showMyExplorations = false;
 
   $scope.$on('galleryData', function() {
     console.log(GalleryData.data.categories);
@@ -57,13 +58,35 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   });
 
   /**
+   * Toggles the user's preference for whether to show just explorations he/she
+   * can edit, or all explorations.
+   */
+  $scope.toggleExplorationView = function() {
+    $scope.showMyExplorations = !$scope.showMyExplorations;
+  };
+
+  $scope.getToggleText = function() {
+    return 'Show ' + ($scope.showMyExplorations ? 'all' : 'editable') +
+        ' explorations';
+  };
+
+  $scope.getHeadingText = function() {
+    return $scope.showMyExplorations ? 'Explorations I can edit' :
+        'All Explorations';
+  };
+
+  $scope.filterExplorations = function(exploration) {
+    return !$scope.showMyExplorations || exploration.is_owner;
+  };
+
+  /**
    * Displays a model explaining how to embed the exploration.
    * @param {string} id The id of the exploration to be embedded.
    */
-   $scope.showModal = function(id) {
-     $scope.currentId = id;
-     $('#embedModal').modal();
-   };
+  $scope.showModal = function(id) {
+    $scope.currentId = id;
+    $('#embedModal').modal();
+  };
 
   $scope.openNewExplorationModal = function() {
     $scope.newExplorationIsBeingAdded = true;

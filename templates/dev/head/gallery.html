@@ -19,7 +19,13 @@
           </form>
         -->
 
-        <h2>Available Explorations</h2>
+        <div class="pull-right">
+          <button ng-click="toggleExplorationView()">
+            <[getToggleText()]>
+          </button>
+        </div>
+
+        <h2><[getHeadingText()]></h2>
 
         <div class="tabbable tabs-left" ui-if="categories">
           <ul class="nav nav-tabs" id="navTabs">
@@ -35,7 +41,7 @@
                 <div class="row-fluid">
 
                   <ul class="thumbnails">
-                    <li ng-repeat="exploration in explorations" class="span3">
+                    <li ng-repeat="exploration in explorations | filter: filterExplorations" class="span3">
                       <div class="thumbnail">
                         <a href="/learn/<[exploration.data.hash_id]>">
                           <span ui-if="exploration.data.image_id">
