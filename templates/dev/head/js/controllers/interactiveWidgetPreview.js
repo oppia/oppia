@@ -115,7 +115,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.openAddRuleModal = function(action) {
     $scope.addRuleModalTitle = 'Add Rule';
     $scope.addRuleAction = action;
-    $scope.addRuleActionIndex = null;
+    $scope.deselectAllRules();
   };
 
   $scope.openEditRuleModal = function(action, index) {
@@ -226,7 +226,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       }
     }
 
-    if (!found) {
+    if (!found && !hideWarnings) {
       warningsData.addWarning('Invalid destination name: ' + destName);
       return;
     }

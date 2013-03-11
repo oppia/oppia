@@ -133,7 +133,8 @@
           <hr>
           <div>
             Destination:
-            <select ng-model="addRuleActionDest" required
+            <select ng-model="addRuleActionDest"
+                    ng-required="addRuleActionDest != '?'"
                     ng-options="getDestName(id) for id in getAllDests()">
             </select>
   
