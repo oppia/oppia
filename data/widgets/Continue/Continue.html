@@ -4,7 +4,7 @@
   var submitAnswer = function() {
   	if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
-          {'submit': ''},
+          JSON.stringify({'submit': ''}),
           window.location.protocol + '//' + window.location.host
       );
     }

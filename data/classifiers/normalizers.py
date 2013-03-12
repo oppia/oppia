@@ -20,14 +20,11 @@ __author__ = 'Sean Lip'
 
 
 import numbers
-import json
 
 
 def List(val):
     """The given value should be a list."""
     try:
-        if isinstance(val, str):
-            val = json.loads(val)
         assert isinstance(val, list)
     except:
         return None
@@ -78,13 +75,11 @@ def Real(val):
 def Set(val):
     """The given value should be a list with unique elements."""
     try:
-        if isinstance(val, str):
-            val = json.loads(val)
         assert isinstance(val, list)
         assert len(set(val)) == len(val)
     except:
         return None
-    return val
+    return set(val)
 
 
 def String(x):

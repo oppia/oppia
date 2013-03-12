@@ -25,7 +25,7 @@ function SetInput($scope) {
     // Send a JSON version of $scope.answer to the backend.
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
-          {'submit': JSON.stringify(answer)},
+          JSON.stringify({'submit': answer}),
           window.location.protocol + '//' + window.location.host
       );
     }

@@ -13,7 +13,7 @@ function TextInput($scope) {
     }
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
-          {'submit': answer},
+          JSON.stringify({'submit': answer}),
           window.location.protocol + '//' + window.location.host
       );
     }

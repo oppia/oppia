@@ -66,15 +66,14 @@
       return;
     }
 
-    console.log(answer);
     var requestMap = {
-      answer: JSON.stringify(answer),
+      answer: answer,
       block_number: $scope.blockNumber,
       channel: channel,
-      params: JSON.stringify($scope.params)
+      params: $scope.params
     };
 
-    var request = $.param(requestMap, true);
+    var request = $.param({payload: JSON.stringify(requestMap)}, true);
 
     $scope.answerIsBeingProcessed = true;
 
@@ -119,7 +118,7 @@
   function receiveMessage(evt) {
     console.log('event received');
     if (evt.origin == window.location.protocol + '//' + window.location.host) {
-      $scope.submitAnswer(evt.data.submit, 'submit');
+      $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }
   }
 }

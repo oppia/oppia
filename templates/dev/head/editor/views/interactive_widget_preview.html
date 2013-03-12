@@ -100,9 +100,6 @@
     </div>
   </div>
 
-  <form novalidate name="addRuleForm" class="oppia-form"
-        ng-submit="saveRule(addRuleActionRule, addRuleActionAttrs, addRuleActionInputs,
-                            addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
     <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
       <div class="modal-header">
         <span ng-show="addRuleActionIndex">
@@ -151,7 +148,11 @@
   
       <div class="modal-footer">
         <span ng-show="addRuleActionRule">
-          <input type="submit" class="btn" value="Save" ng-disabled="addRuleForm.$invalid">
+          <button type="button"
+                  ng-click="saveRule(addRuleActionRule, addRuleActionAttrs,
+                            addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
+            Save
+          </button>
         </span>
 
         <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
@@ -170,7 +171,6 @@
         </span>
       </div>
     </div>
-  </form>
 
 </div>
 

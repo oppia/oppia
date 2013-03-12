@@ -125,20 +125,20 @@ class ExplorationHandler(BaseHandler):
         exploration = utils.get_entity(Exploration, exploration_id)
         state = utils.get_entity(State, state_id)
         old_state = state
+
+        payload = json.loads(self.request.get('payload'))
+
+        logging.info(payload)
+
         # The 0-based index of the last content block already on the page.
-        block_number = int(self.request.get('block_number'))
-        params = self.request.get('params')
-        if params:
-            params = json.loads(params)
-        else:
-            params = {}
-
-        params = self.get_params(state, params)
-
+        block_number = payload.get('block_number')
+        params = self.get_params(state, payload.get('params'))
         # The reader's answer.
-        answer = json.loads(self.request.get('answer'))
+        answer = payload.get('answer')
         dest_id = None
         feedback = None
+
+        logging.info(answer)
 
         # Add the reader's answer to the parameter list. This must happen before
         # the interactive widget is constructed.
@@ -208,7 +208,10 @@ class ExplorationHandler(BaseHandler):
 
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
-            'reader_response.html').render({'response': answer})
+            'reader_response.html').render(
+                {'response': utils.encode_strings_as_ascii(answer)})
+
+        logging.info(answer)
 
         if dest_id == utils.END_DEST:
             # This leads to a FINISHED state.

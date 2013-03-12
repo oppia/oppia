@@ -40,6 +40,11 @@ def is_superset_pf(val, x):
     return val > x
 
 
+def has_elements_in(val, x):
+    """The given value should have elements in common with {{x}}."""
+    return bool(val.intersection(x))
+
+
 def has_elements_not_in(val, x):
     """The given value should have elements not in {{x}}."""
     return bool(val - x)

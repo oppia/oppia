@@ -99,7 +99,7 @@ function submitAnswer() {
   // Post an event message to the parent iframe.
   if (parent.location.pathname.indexOf('/learn') === 0) {
     window.parent.postMessage(
-      {'submit': note},
+      JSON.stringify({'submit': note}),
       window.location.protocol + '//' + window.location.host);
   }
 }

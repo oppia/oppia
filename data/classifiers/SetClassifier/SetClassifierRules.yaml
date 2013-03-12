@@ -7,6 +7,9 @@ Answer is a proper subset of {{x|Set}}:
 Answer is a proper superset of {{x|Set}}:
   classifier: is_superset_of(x)
 
+Answer has elements in common with {{x|Set}}:
+  classifier: has_elements_in(x)
+
 Answer has some elements not in {{x|Set}}:
   classifier: has_elements_not_in(x)
 

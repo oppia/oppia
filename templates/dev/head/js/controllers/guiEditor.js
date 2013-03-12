@@ -104,6 +104,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     editors = {};
 
     if (oldValue && oldValue.indexOf('content.') === 0) {
+      $scope.saveContent(oldValue.substring(8));
       // Remove all old YUI editors from the DOM.
       $('.yuiEditor').empty();
     }
