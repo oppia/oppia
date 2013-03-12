@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import logging
 import os
 import random
 
@@ -27,7 +26,6 @@ import utils
 from yaml_utils import YamlTransformer
 
 import json
-from jinja2 import Environment, meta
 
 from google.appengine.api import users
 
@@ -122,6 +120,9 @@ class WidgetRepositoryHandler(BaseHandler):
             if category not in response:
                 response[category] = []
             response[category].append(widget)
+
+        for category in response:
+            response[category].sort()
         return response
 
     def get_non_interactive_widgets(self):

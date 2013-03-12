@@ -23,7 +23,7 @@
 
             {% if iframed %}
 
-              <div class="accordion-group" ng-repeat="widget in widgetList | orderBy: 'name'">
+              <div class="accordion-group" ng-repeat="widget in widgetList">
                 <div style="margin: 10px">
                   <span class="pull-right">
                     <a ng-click="previewWidget(category, $index)">
