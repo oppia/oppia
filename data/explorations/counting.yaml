@@ -1,0 +1,152 @@
+Question:
+  content:
+  - type: text
+    value: How many ways are there to arrange three balls in a row?
+  param_changes: {}
+  widget:
+    id: NumericInput
+    params:
+      placeholder: 0
+    rules:
+      submit:
+      - attrs:
+          classifier: equals(x)
+        code: equals(6.0)
+        dest: Prompt for explanation
+        feedback: ''
+        inputs:
+          x: '6'
+        rule: Answer is equal to {{x|Number}}
+      - attrs: {}
+        code: 'True'
+        dest: List the ways
+        feedback: ''
+        inputs: {}
+        rule: Default
+List the ways:
+  content:
+  - type: text
+    value: All right! So you think there are {{answer}} ways to arrange the balls.
+      Could you list them?<div><br></div><div>Let's say one ball is red, one ball
+      is blue, and one ball is yellow. So you could represent one of the arrangements
+      as:</div><div><ul><li>RBY</li></ul><div>This means that the red ball is on the
+      left, the blue ball is in the middle, and the yellow ball is on the right. What
+      are the other ways?</div></div>
+  param_changes: {}
+  widget:
+    id: SetInput
+    params: {}
+    rules:
+      submit:
+      - attrs:
+          classifier: has_elements_in(x)
+        code: has_elements_in(set([u'RBY']))
+        dest: List the ways
+        feedback: We've already counted RBY, so let's not do it again.
+        inputs:
+          x:
+          - RBY
+        rule: Answer has elements in common with {{x|Set}}
+      - attrs:
+          classifier: equals(x)
+        code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
+        dest: Prompt for explanation with all ways listed
+        feedback: null
+        inputs:
+          x:
+          - RYB
+          - BRY
+          - BYR
+          - YRB
+          - YBR
+        rule: Answer is equal to {{x|Set}}
+      - attrs:
+          classifier: has_elements_in(x)
+        code: has_elements_in(set([u'rby', u'bry', u'ryb', u'ybr', u'byr', u'yrb']))
+        dest: List the ways
+        feedback: Sorry about this, but please could you enter your answer using uppercase
+          letters (as in the example)?
+        inputs:
+          x:
+          - rby
+          - ryb
+          - bry
+          - byr
+          - yrb
+          - ybr
+        rule: Answer has elements in common with {{x|Set}}
+      - attrs:
+          classifier: is_disjoint_from(x)
+        code: is_disjoint_from(set([u'YBR', u'YRB']))
+        dest: List the ways
+        feedback: How about arrangements in which the yellow ball is on the left?
+        inputs:
+          x:
+          - YBR
+          - YRB
+        rule: Answer has no elements in common with {{x|Set}}
+      - attrs:
+          classifier: is_disjoint_from(x)
+        code: is_disjoint_from(set([u'BYR', u'BRY']))
+        dest: List the ways
+        feedback: How about arrangements for which the blue ball is on the left?
+        inputs:
+          x:
+          - BRY
+          - BYR
+        rule: Answer has no elements in common with {{x|Set}}
+      - attrs:
+          classifier: is_subset_of(x)
+        code: is_subset_of(set([u'BYR', u'YBR', u'RYB', u'YRB', u'BRY']))
+        dest: List the ways
+        feedback: I think you've missed some...
+        inputs:
+          x:
+          - RYB
+          - YBR
+          - YRB
+          - BRY
+          - BYR
+        rule: Answer is a proper subset of {{x|Set}}
+      - attrs: {}
+        code: 'True'
+        dest: List the ways
+        feedback: Sorry, I don't think that's right. Try again?
+        inputs: {}
+        rule: Default
+Prompt for explanation:
+  content:
+  - type: text
+    value: OK, why do you think it is 6?
+  param_changes: {}
+  widget:
+    id: TextInput
+    params:
+      placeholder: Type your answer here.
+    rules:
+      submit:
+      - attrs: {}
+        code: 'True'
+        dest: END
+        feedback: ''
+        inputs: {}
+        rule: Default
+Prompt for explanation with all ways listed:
+  content:
+  - type: text
+    value: Do you think you've got all of them?<div><br></div><div>If so, how do you
+      know?</div>
+  param_changes: {}
+  widget:
+    id: TextInput
+    params:
+      placeholder: Type your answer here.
+    rules:
+      submit:
+      - attrs: {}
+        code: 'True'
+        dest: END
+        feedback: 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and
+          YBR. Great!'
+        inputs: {}
+        rule: Default
