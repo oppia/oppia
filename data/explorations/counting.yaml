@@ -39,6 +39,20 @@ List the ways:
     rules:
       submit:
       - attrs:
+          classifier: equals(x)
+        code: equals(set([]))
+        dest: List the ways
+        feedback: 'What? No more ways? There''s at least one, surely -- for example,
+          RYB.
+
+
+          Or maybe you clicked the ''Submit'' button before you clicked the ''Add
+          element'' button. You''ll need to build up the set first, and then, once
+          you''re happy with your answer, click Submit.'
+        inputs:
+          x: []
+        rule: Answer is equal to {{x|Set}}
+      - attrs:
           classifier: has_elements_in(x)
         code: has_elements_in(set([u'RBY']))
         dest: List the ways
@@ -47,6 +61,19 @@ List the ways:
           x:
           - RBY
         rule: Answer has elements in common with {{x|Set}}
+      - attrs:
+          classifier: has_elements_not_in(x)
+        code: has_elements_not_in(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
+        dest: List the ways
+        feedback: It looks like at least one of your list elements is invalid...
+        inputs:
+          x:
+          - RYB
+          - BRY
+          - BYR
+          - YRB
+          - YBR
+        rule: Answer has some elements not in {{x|Set}}
       - attrs:
           classifier: equals(x)
         code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))

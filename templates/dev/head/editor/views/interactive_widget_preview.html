@@ -29,26 +29,40 @@
   </h4>
   <div ng-repeat="(action, properties) in interactiveWidget.actions">
     <h5>On user <[action]>:</h5>
-    <ul>
-      <li ng-repeat="rule in interactiveRulesets[action]">
-        <[rule | parameterizeRule: interactiveWidget.params.choices]>:
-        (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
-        <span class="pull-right">
+    <table>
+      <tr ng-repeat="rule in interactiveRulesets[action]">
+        <td>
+          <[rule | parameterizeRule: interactiveWidget.params.choices]>:
+          (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
+        </td>
+        <td style="width: 100px">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
           </a>
+
           <span ng-show="$index != 0 && $index != interactiveRulesets[action].length - 1">
             | <a ng-click="swapRules(action, $index, $index - 1)"> ⇑ </a>
           </span>
+          <span ng-hide="$index != 0 && $index != interactiveRulesets[action].length - 1">
+            | <span class="oppia-grayed"> ⇑ </span>
+          </span>
+
           <span ng-show="$index < interactiveRulesets[action].length - 2">
             | <a ng-click="swapRules(action, $index, $index + 1)"> ⇓ </a>
           </span>
-          <span ng-show="$index != interactiveRulesets[action].length - 1">
-            | <a ng-click="deleteRule(action, $index)"> Delete </a>
+          <span ng-hide="$index < interactiveRulesets[action].length - 2">
+            | <span class="oppia-grayed"> ⇓ </span>
           </span>
-        </span>
-      </li>
-    </ul>
+
+          <span ng-show="$index != interactiveRulesets[action].length - 1">
+            | <a ng-click="deleteRule(action, $index)"> &times; </a>
+          </span>
+          <span ng-hide="$index != interactiveRulesets[action].length - 1">
+            | <span class="oppia-grayed"> &times; </span>
+          </span>
+        </td>
+      </tr>
+    </table>
     <button ng-show="properties.rules"
             type="button" class="btn btn-primary" data-toggle="modal"
             data-target="#addRuleModal" ng-click="openAddRuleModal(action)">

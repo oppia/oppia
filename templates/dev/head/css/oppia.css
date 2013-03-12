@@ -75,6 +75,11 @@ textarea.oppia-code {
   padding-right: 20px;
 }
 
+.oppia-grayed {
+  color: gray;
+  opacity: 0.5;
+}
+
 .oppia-help {
   height: 16px;
   width: 16px;
