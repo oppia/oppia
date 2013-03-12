@@ -183,7 +183,7 @@ class ExplorationHandler(BaseHandler):
                 break
 
             # Add the 'answer' variable, and prepend classifier.
-            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,')
+            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,', 1)
 
             code = utils.parse_with_jinja(code, params)
             if code is None:
