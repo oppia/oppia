@@ -99,6 +99,28 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionAttrs = attrs;
     $scope.addRuleActionDest = explorationData.stateId;
     $scope.addRuleActionDestNew = '';
+
+    // Finds the parameters and sets them in addRuleActionInputs.
+    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var copyOfRule = rule;
+    while (true) {
+      if (!copyOfRule.match(pattern)) {
+        break;
+      }
+      var varName = copyOfRule.match(pattern)[1];
+      var varType = null;
+      if (copyOfRule.match(pattern)[2]) {
+        varType = copyOfRule.match(pattern)[2].substring(1);
+      }
+
+      if (varType == 'Set') {
+        $scope.addRuleActionInputs[varName] = [];
+      } else {
+        $scope.addRuleActionInputs[varName] = '';
+      }
+
+      copyOfRule = rule.replace(pattern, ' ');
+    }
   };
 
   $scope.deselectAllRules = function() {

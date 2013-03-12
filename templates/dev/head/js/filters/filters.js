@@ -72,6 +72,11 @@ oppia.filter('bracesToInput', function() {
         break;
       }
       var varName = input.match(pattern)[1];
+      var varType = null;
+      if (input.match(pattern)[2]) {
+        varType = input.match(pattern)[2].substring(1);
+      }
+
       var tail = '>';
       if (index === 0) {
         tail = ' autofocus>';
@@ -84,6 +89,9 @@ oppia.filter('bracesToInput', function() {
           '<select ng-model="addRuleActionInputs.' + varName +
           '" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(interactiveWidget.params.choices)"' +
           tail + '</select>';
+      } else if (varType == 'Set') {
+        replacementHtml =
+          '<list items="addRuleActionInputs.' + varName + '">';
       }
 
       input = input.replace(pattern, replacementHtml);
