@@ -26,7 +26,7 @@ from controllers.widgets import InteractiveWidget
 import feconf
 from models.exploration import Exploration
 from models.state import State
-from models.stats import EventHandler
+from models.statistics import EventHandler
 import utils
 
 READER_MODE = 'reader'

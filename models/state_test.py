@@ -14,12 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Multiple-choice classifier tests."""
+__author__ = 'Jeremy Emerson'
 
-__author__ = 'Sean Lip'
+from state import State
+import test_utils
 
 
-import MultipleChoiceClassifier
+class StateModelUnitTests(test_utils.AppEngineTestBase):
+    """Test the state model."""
 
-assert MultipleChoiceClassifier.equals(3, 3)
-assert not MultipleChoiceClassifier.equals(2, 3)
+    def testStateClass(self):
+        """Test State Class."""
+        o = State()
+        o.hash_id = 'The hash id'
+        o.name = 'The name'
+        o.content = ['The content']
+        self.assertEqual(o.hash_id, 'The hash id')
+        self.assertEqual(o.name, 'The name')
+        self.assertEqual(o.content, ['The content'])

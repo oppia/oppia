@@ -17,7 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from controllers.base import BaseHandler, require_editor
-from models.stats import Statistics, STATS_ENUMS
+from models.statistics import Statistics, STATS_ENUMS
 
 
 class StatsHandler(BaseHandler):

@@ -14,11 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Set classifier tests."""
+__author__ = 'Jeremy Emerson'
 
-__author__ = 'Sean Lip'
+from parameter import Parameter
+import test_utils
 
 
-import SetClassifier
+class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
+    """Test the exploration model."""
 
-# TODO(sll): Add tests.
+    def test_Parameter_Class(self):
+        """Test Parameter Class."""
+        o = Parameter()
+        o.name = 'The name'
+        o.starting_values = ['The values']
+        self.assertEqual(o.name, 'The name')
+        self.assertEqual(o.starting_values, ['The values'])

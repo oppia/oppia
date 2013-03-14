@@ -12,31 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functional tests for Oppia."""
-
 __author__ = 'Sean Lip'
 
-import actions
-from actions import assert_equals
+import test_utils
 
 
-class TestPermissions(actions.TestBase):
-    """Test access to various pages."""
+class EditorTest(test_utils.AppEngineTestBase):
 
-    def test_index_page(self):
-        """Test access to the index page."""
-        response = self.testapp.get('/')
-        assert_equals(response.status_int, 200)
-
-    def test_simple_pages(self):
-        """Test access to the about and terms pages."""
-        response = self.testapp.get('/terms/')
-        assert_equals(response.status_int, 200)
-
-        response = self.testapp.get('/about/')
-        assert_equals(response.status_int, 200)
-
-    def test_editor_page(self):
+    def testEditorPage(self):
         """Test access to editor pages for the sample exploration."""
         response = self.testapp.get('/create/0/')
-        assert_equals(response.status_int, 302)
+        self.assertEqual(response.status_int, 302)
