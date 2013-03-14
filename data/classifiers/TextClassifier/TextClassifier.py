@@ -43,3 +43,17 @@ def starts_with(val, x):
 def contains(val, x):
     """The given string should contain {{x}}."""
     return val.lower().find(x.lower()) != -1
+
+
+def fuzzy_equals(val, x):
+    """The edit distance between the given string and {{x}} is 1."""
+    oneago = None
+    thisrow = range(1, len(x) + 1) + [0]
+    for i in range(len(val)):
+        twoago, oneago, thisrow = oneago, thisrow, [0] * len(x) + [i + 1]
+        for j in range(len(x)):
+            delcost = oneago[j] + 1
+            addcost = thisrow[j - 1] + 1
+            subcost = oneago[j - 1] + (val[i] != x[j])
+            thisrow[j] = min(delcost, addcost, subcost)
+    return thisrow[len(x) - 1] <= 1

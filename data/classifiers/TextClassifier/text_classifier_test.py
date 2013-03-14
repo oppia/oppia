@@ -42,3 +42,11 @@ class TextClassifierTest(test_utils.TestBase):
         assert TextClassifier.contains('hello', 'HE')
         assert TextClassifier.contains('hello', 'll')
         assert not TextClassifier.contains('hello', 'ol')
+
+        assert TextClassifier.fuzzy_equals('hello', 'hello')
+        assert TextClassifier.fuzzy_equals('hell', 'hello')
+        assert TextClassifier.fuzzy_equals('hello', 'hell')
+        assert TextClassifier.fuzzy_equals('hello', 'hellp')
+        assert TextClassifier.fuzzy_equals('hellp', 'hello')
+        assert not TextClassifier.fuzzy_equals('hellp', 'HEllp')
+        assert not TextClassifier.fuzzy_equals('help', 'pleh')

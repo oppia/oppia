@@ -9,3 +9,6 @@ Answer starts with {{x|String}}:
 
 Answer contains {{x|String}}:
   classifier: contains(x)
+
+Answer is equal to {{x|String}}, but misspelled by one character:
+  classifier: fuzzy_equals(x)

@@ -377,20 +377,25 @@ def is_demo_exploration(exploration_id):
 
 
 def encode_strings_as_ascii(obj):
-        """Recursively tries to encode strings in an object as ASCII strings."""
-        if isinstance(obj, int) or isinstance(obj, set):
+    """Recursively tries to encode strings in an object as ASCII strings."""
+    if isinstance(obj, int) or isinstance(obj, set):
+        return obj
+    elif isinstance(obj, str) or isinstance(obj, unicode):
+        try:
+            return str(obj)
+        except Exception:
             return obj
-        elif isinstance(obj, str) or isinstance(obj, unicode):
-            try:
-                return str(obj)
-            except Exception:
-                return obj
-        elif isinstance(obj, list):
-            return [encode_strings_as_ascii(item) for item in obj]
-        elif isinstance(obj, dict):
-            new_dict = {}
-            for item in obj:
-                new_dict[encode_strings_as_ascii(item)] = (
-                    encode_strings_as_ascii(obj[item]))
-        else:
-            return obj
+    elif isinstance(obj, list):
+        return [encode_strings_as_ascii(item) for item in obj]
+    elif isinstance(obj, dict):
+        new_dict = {}
+        for item in obj:
+            new_dict[encode_strings_as_ascii(item)] = (
+                encode_strings_as_ascii(obj[item]))
+    else:
+        return obj
+
+
+def to_string(string):
+    """Removes unicode characters from a string."""
+    return string.encode('ascii', 'ignore')
