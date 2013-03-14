@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 from controllers.base import BaseHandler
-import feconf
 from models.exploration import Exploration
 import utils
 
@@ -34,8 +33,7 @@ class GalleryPage(BaseHandler):
             'js': utils.get_js_controllers(['gallery']),
             'nav_mode': 'gallery',
         })
-        self.response.out.write(
-            feconf.JINJA_ENV.get_template('gallery.html').render(self.values))
+        self.render_template('gallery.html')
 
 
 class GalleryHandler(BaseHandler):
@@ -87,4 +85,4 @@ class GalleryHandler(BaseHandler):
         self.values.update({
             'categories': categories,
         })
-        self.response.out.write(json.dumps(self.values))
+        self.response.write(json.dumps(self.values))

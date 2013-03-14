@@ -65,7 +65,10 @@ DEV = (os.environ.get('SERVER_SOFTWARE')
        and not PRODUCTION_MODE)
 
 # The directory containing the HTML/JS/CSS templates.
-TEMPLATE_DIR = 'templates/dev/head' if DEV else 'templates/prod/head'
+TEMPLATE_DIR = os.path.join(
+    os.path.dirname(__file__),
+    'templates/dev/head' if DEV else 'templates/prod/head'
+)
 
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'third_party'
@@ -76,8 +79,7 @@ SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_WIDGETS_DIR = 'data/widgets'
 
 # The jinja environment used for loading frontend templates.
-JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
-    os.path.join(os.path.dirname(__file__), TEMPLATE_DIR)))
+JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
 
 # The jinja environment used for loading widget previews.
 WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(

@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from controllers.base import BaseHandler, require_editor
-import feconf
 from models.stats import Statistics, STATS_ENUMS
 
 
@@ -45,5 +44,4 @@ class StatsHandler(BaseHandler):
             'answers': answers,
         })
 
-        self.response.out.write(feconf.JINJA_ENV.get_template(
-            'stats.html').render(self.values))
+        self.render_template('stats.html')

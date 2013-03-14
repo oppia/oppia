@@ -44,8 +44,7 @@ class WidgetRepositoryPage(BaseHandler):
             self.values['interactive'] = True
         if users.is_current_user_admin():
             self.values['admin'] = True
-        self.response.out.write(feconf.JINJA_ENV.get_template(
-            'widgets/widget_repository.html').render(self.values))
+        self.render_template('widgets/widget_repository.html')
 
     def post(self):
         """Creates a new generic widget."""
@@ -82,7 +81,7 @@ class WidgetRepositoryPage(BaseHandler):
             hash_id=widget_hash_id, raw=raw, name=name, params=params,
             category=category, description=description)
         widget.put()
-        self.response.out.write(json.dumps({'widget': widget_data}))
+        self.response.write(json.dumps({'widget': widget_data}))
 
     def put(self):
         """Updates a generic widget."""
@@ -105,7 +104,7 @@ class WidgetRepositoryPage(BaseHandler):
         widget.params = widget_data['params']
         widget.category = widget_data['category']
         widget.put()
-        self.response.out.write(json.dumps({'widget': widget_data}))
+        self.response.write(json.dumps({'widget': widget_data}))
 
 
 class WidgetRepositoryHandler(BaseHandler):
@@ -147,7 +146,7 @@ class WidgetRepositoryHandler(BaseHandler):
         else:
             response = self.get_non_interactive_widgets()
 
-        self.response.out.write(json.dumps({'widgets': response}))
+        self.response.write(json.dumps({'widgets': response}))
 
 
 class WidgetInstance(BaseHandler):
@@ -165,11 +164,11 @@ class WidgetInstance(BaseHandler):
         """
         widget = utils.get_entity(Widget, widget_id)
         if widget:
-            self.response.out.write(json.dumps({
+            self.response.write(json.dumps({
                 'raw': widget.raw,
             }))
         else:
-            self.response.out.write(json.dumps({'error': 'No such widget'}))
+            self.response.write(json.dumps({'error': 'No such widget'}))
 
     @require_user
     def post(self, widget_id=None):
@@ -195,7 +194,7 @@ class WidgetInstance(BaseHandler):
                 widget.raw = raw
             widget.put()
         response = {'widgetId': widget.hash_id, 'raw': widget.raw}
-        self.response.out.write(json.dumps(response))
+        self.response.write(json.dumps(response))
 
 
 class InteractiveWidget(BaseHandler):
@@ -246,7 +245,7 @@ class InteractiveWidget(BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         response = self.get_interactive_widget(widget_id)
-        self.response.out.write(json.dumps({'widget': response}))
+        self.response.write(json.dumps({'widget': response}))
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
@@ -264,4 +263,4 @@ class InteractiveWidget(BaseHandler):
 
         response = self.get_interactive_widget(
             widget_id, params=params, state_params_dict=state_params_dict)
-        self.response.out.write(json.dumps({'widget': response}))
+        self.response.write(json.dumps({'widget': response}))

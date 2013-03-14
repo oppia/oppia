@@ -42,8 +42,7 @@ class MainPage(BaseHandler):
         """Handles GET requests."""
 
         self._ensure_default_explorations_exist()
-        self.response.out.write(
-            feconf.JINJA_ENV.get_template('index.html').render(self.values))
+        self.render_template('index.html')
 
 
 class AboutPage(BaseHandler):
@@ -57,9 +56,7 @@ class AboutPage(BaseHandler):
             'idea_contributors_str': utils.get_comma_sep_string_from_list(
                 feconf.IDEA_CONTRIBUTORS),
         })
-
-        self.response.out.write(
-            feconf.JINJA_ENV.get_template('about.html').render(self.values))
+        self.render_template('about.html')
 
 
 class TermsPage(BaseHandler):
@@ -67,6 +64,4 @@ class TermsPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
-        self.response.out.write(
-            feconf.JINJA_ENV.get_template('terms.html').render(self.values))
+        self.render_template('terms.html')

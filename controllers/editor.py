@@ -73,7 +73,7 @@ class NewExploration(BaseHandler):
             exploration = utils.create_new_exploration(
                 user, title=title, category=category)
 
-        self.response.out.write(json.dumps({
+        self.response.write(json.dumps({
             'explorationId': exploration.hash_id,
         }))
 
@@ -104,7 +104,7 @@ class ForkExploration(BaseHandler):
         exploration = YamlTransformer.create_exploration_from_yaml(
             yaml=yaml, user=user, title=title, category=category)
 
-        self.response.out.write(json.dumps({
+        self.response.write(json.dumps({
             'explorationId': exploration.hash_id,
         }))
 
@@ -121,8 +121,7 @@ class ExplorationPage(BaseHandler):
                  'guiEditor', 'yamlEditor', 'interactiveWidgetPreview']),
             'nav_mode': EDITOR_MODE,
         })
-        self.response.out.write(feconf.JINJA_ENV.get_template(
-            'editor/editor_exploration.html').render(self.values))
+        self.render_template('editor/editor_exploration.html')
 
     @require_editor
     def post(self, user, exploration):
@@ -139,7 +138,7 @@ class ExplorationPage(BaseHandler):
                 (exploration.title, state_name))
 
         state = utils.create_new_state(exploration, state_name)
-        self.response.out.write(json.dumps(state.as_dict()))
+        self.response.write(json.dumps(state.as_dict()))
 
     @require_editor
     def put(self, user, exploration):
@@ -209,7 +208,7 @@ class ExplorationHandler(BaseHandler):
             'editors': exploration.editors,
             'states': state_list,
         })
-        self.response.out.write(json.dumps(self.values))
+        self.response.write(json.dumps(self.values))
 
 
 class ExplorationDownloadHandler(BaseHandler):
@@ -224,7 +223,7 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.txt' % filename)
         # TODO(sll): Cache the YAML file.
-        self.response.out.write(
+        self.response.write(
             YamlTransformer.get_exploration_as_yaml(exploration))
 
 
@@ -252,7 +251,7 @@ class StateHandler(BaseHandler):
             yaml_file = json.loads(yaml_file_json)
             state = YamlTransformer.modify_state_using_dict(
                 exploration, state, YamlTransformer.get_dict_from_yaml(yaml_file))
-            self.response.out.write(json.dumps(get_state_for_frontend(state)))
+            self.response.write(json.dumps(get_state_for_frontend(state)))
             return
 
         state_name_json = self.request.get('state_name')
@@ -369,7 +368,7 @@ class StateHandler(BaseHandler):
 
         state.put()
         logging.info(get_state_for_frontend(state))
-        self.response.out.write(json.dumps(get_state_for_frontend(state)))
+        self.response.write(json.dumps(get_state_for_frontend(state)))
 
     @require_editor
     def delete(self, user, exploration, state):

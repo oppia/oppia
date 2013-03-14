@@ -28,9 +28,9 @@ handlers:
 
 libraries:
 - name: jinja2
-  version: latest
+  version: '2.6'
 - name: webapp2
-  version: latest
+  version: '2.5.2'
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppia-test-server.settings'

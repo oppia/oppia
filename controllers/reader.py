@@ -47,8 +47,7 @@ class ExplorationPage(BaseHandler):
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
 
-        self.response.out.write(feconf.JINJA_ENV.get_template(
-            'reader/reader_exploration.html').render(self.values))
+        self.render_template('reader/reader_exploration.html')
 
 
 class ExplorationHandler(BaseHandler):
@@ -114,7 +113,7 @@ class ExplorationHandler(BaseHandler):
         if init_state.interactive_widget == 'MultipleChoiceInput':
             # self.values['categories'] = init_state.classifier_categories
             pass
-        self.response.out.write(json.dumps(self.values))
+        self.response.write(json.dumps(self.values))
 
         EventHandler.record_exploration_visited(exploration_id)
 
@@ -255,7 +254,7 @@ class ExplorationHandler(BaseHandler):
                 state_params_dict=params)['raw']
 
         logging.info(values)
-        self.response.out.write(json.dumps(values))
+        self.response.write(json.dumps(values))
 
 
 class RandomExplorationPage(BaseHandler):

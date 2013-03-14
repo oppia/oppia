@@ -20,7 +20,6 @@ import json
 import logging
 import sys
 import traceback
-import webapp2
 
 import feconf
 from models.exploration import Exploration
@@ -28,6 +27,9 @@ from models.state import State
 import utils
 
 from google.appengine.api import users
+
+import jinja2
+import webapp2
 
 
 def require_user(handler):
@@ -78,6 +80,12 @@ def require_editor(handler):
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
+
+    @webapp2.cached_property
+    def jinja2_env(self):
+        return jinja2.Environment(
+            loader=jinja2.FileSystemLoader(feconf.TEMPLATE_DIR))
+
     def __init__(self, request, response):
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -95,6 +103,12 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values['login_url'] = users.create_login_url(self.request.uri)
 
+    def render_template(self, filename, values=None):
+        if values is None:
+            values = self.values
+        self.response.write(self.jinja2_env.get_template(
+            filename).render(**values))
+
     def handle_exception(self, exception, debug_mode):
         """Overwrites the default exception handler."""
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
@@ -106,19 +120,19 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self.response.out.write(json.dumps(
+            self.response.write(json.dumps(
                 {'code': '401 Unauthorized', 'error': str(exception)}))
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self.response.out.write(json.dumps(
+            self.response.write(json.dumps(
                 {'code': '400 Bad Request', 'error': str(exception)}))
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self.response.out.write(json.dumps(
+            self.response.write(json.dumps(
                 {'code': '500 System Error', 'error': str(exception)}))
             return
 
