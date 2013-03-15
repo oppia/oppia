@@ -16,8 +16,9 @@
 
 __author__ = 'Jeremy Emerson'
 
-from state import Content, State
 import test_utils
+
+from state import Content, State
 
 
 class StateModelUnitTests(test_utils.AppEngineTestBase):

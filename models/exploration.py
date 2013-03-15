@@ -18,10 +18,10 @@
 
 __author__ = 'Sean Lip'
 
-from google.appengine.ext import ndb
-
-from state import State
 from parameter import Parameter
+from state import State
+
+from google.appengine.ext import ndb
 
 
 # TODO(sll): Add an anyone-can-edit mode.

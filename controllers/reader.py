@@ -25,7 +25,8 @@ from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
 import feconf
 from models.exploration import Exploration
-from models.state import Content, State
+from models.state import Content
+from models.state import State
 from models.statistics import EventHandler
 import utils
 
@@ -36,14 +37,14 @@ DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
         self.values.update({
             'js': utils.get_js_controllers(['readerExploration']),
             'nav_mode': READER_MODE,
         })
 
-        # The following is needed for embedding Oppia explorations in other pages.
+        # The following allows embedding of Oppia explorations in other pages.
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
 
@@ -53,8 +54,10 @@ class ExplorationPage(BaseHandler):
 class ExplorationHandler(BaseHandler):
     """Provides the data for a single exploration."""
 
-    def get_params(self, state, existing_params={}):
-        """Updates existing parameters based on the changes in the given state."""
+    def get_params(self, state, existing_params=None):
+        """Updates existing parameters based on changes in the given state."""
+        if existing_params is None:
+            existing_params = {}
         # Modify params using param_changes.
         # TODO(sll): Define this behavior. Currently a new parameter is set
         # only if it doesn't exist, but it might be the case that the parameter
@@ -68,10 +71,19 @@ class ExplorationHandler(BaseHandler):
     def normalize_classifier_return(self, *args):
         """Normalizes the return value of a classifier to a two-element tuple.
 
+        Args:
+          *args: the value returned by a rule classifier. This is either:
+              - a single boolean saying whether the rule was satisfied
+              - a boolean as above, together with a dict of additional data.
+
         Returns:
           A two-element tuple: a boolean stating whether the category matched,
               and a dict with additional data.
+
+        Raises:
+          Exception: if a rule classifier returns invalid values.
         """
+        # TODO(sll): All rules should return a 2-tuple instead.
         if len(args) > 2:
             raise Exception('Invalid classifier return values: %s' % args)
 
@@ -109,10 +121,8 @@ class ExplorationHandler(BaseHandler):
             'widgets': init_widgets,
         })
         if init_state.interactive_widget in DEFAULT_ANSWERS:
-            self.values['default_answer'] = DEFAULT_ANSWERS[init_state.interactive_widget]
-        if init_state.interactive_widget == 'MultipleChoiceInput':
-            # self.values['categories'] = init_state.classifier_categories
-            pass
+            self.values['default_answer'] = (
+                DEFAULT_ANSWERS[init_state.interactive_widget])
         self.response.write(json.dumps(self.values))
 
         EventHandler.record_exploration_visited(exploration_id)
@@ -143,8 +153,10 @@ class ExplorationHandler(BaseHandler):
         # the interactive widget is constructed.
         params['answer'] = answer
 
-        interactive_widget_properties = InteractiveWidget.get_interactive_widget(
-            state.interactive_widget, state_params_dict=params)['actions']['submit']
+        interactive_widget_properties = (
+            InteractiveWidget.get_interactive_widget(
+                state.interactive_widget,
+                state_params_dict=params)['actions']['submit'])
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
@@ -169,7 +181,8 @@ class ExplorationHandler(BaseHandler):
                 # multiple-choice options given).
                 recorded_answer = answer
                 if state.interactive_widget == 'MultipleChoiceInput':
-                    recorded_answer = state.interactive_params['choices'][int(answer)]
+                    recorded_answer = (
+                        state.interactive_params['choices'][int(answer)])
 
                 EventHandler.record_default_case_hit(
                     exploration_id, state_id, recorded_answer)
@@ -188,7 +201,7 @@ class ExplorationHandler(BaseHandler):
             if code is None:
                 continue
 
-            return_value, return_data = (
+            return_value, unused_return_data = (
                 self.normalize_classifier_return(eval(code)))
 
             if return_value:
@@ -200,8 +213,8 @@ class ExplorationHandler(BaseHandler):
 
         html_output, widget_output = '', []
         # TODO(sll): The following is a special-case for multiple choice input,
-        # in which the choice text must be displayed instead of the choice number.
-        # We might need to find a way to do this more generically.
+        # in which the choice text must be displayed instead of the choice
+        # number. We might need to find a way to do this more generically.
         if state.interactive_widget == 'MultipleChoiceInput':
             answer = state.interactive_params['choices'][int(answer)]
 
@@ -216,7 +229,9 @@ class ExplorationHandler(BaseHandler):
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [Content(type='text', value=feedback)], block_number, params)
+                    [Content(type='text', value=feedback)],
+                    block_number,
+                    params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
@@ -226,10 +241,13 @@ class ExplorationHandler(BaseHandler):
             # Append Oppia's feedback, if any.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [Content(type='text', value=feedback)], block_number, params)
+                    [Content(type='text', value=feedback)],
+                    block_number,
+                    params)
                 html_output += action_html
                 widget_output.append(action_widgets)
-            # Append text for the new state only if the new and old states differ.
+            # Append text for the new state only if the new and old states
+            # differ.
             if old_state.id != state.id:
                 state_html, state_widgets = utils.parse_content_into_html(
                     state.content, block_number, params)
@@ -248,10 +266,12 @@ class ExplorationHandler(BaseHandler):
         values['params'] = params
 
         if dest_id != utils.END_DEST:
-            values['interactive_widget_html'] = InteractiveWidget.get_interactive_widget(
-                state.interactive_widget,
-                params=state.interactive_params,
-                state_params_dict=params)['raw']
+            values['interactive_widget_html'] = (
+                InteractiveWidget.get_interactive_widget(
+                    state.interactive_widget,
+                    params=state.interactive_params,
+                    state_params_dict=params)['raw']
+            )
 
         logging.info(values)
         self.response.write(json.dumps(values))

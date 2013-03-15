@@ -55,7 +55,8 @@ class GalleryHandler(BaseHandler):
 
             used_keys.append(exploration.key)
 
-            data = exploration.to_dict(exclude=['states', 'init_state', 'owner'])
+            data = exploration.to_dict(
+                exclude=['states', 'init_state', 'owner'])
             data.update({'id': exploration.id})
 
             if not categories.get(category_name):

@@ -16,16 +16,17 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import json
 import os
 import random
 
-from controllers.base import BaseHandler, require_user
+from controllers.base import BaseHandler
+from controllers.base import require_user
 import feconf
-from models.models import GenericWidget, Widget
+from models.models import GenericWidget
+from models.models import Widget
 import utils
 from yaml_utils import YamlTransformer
-
-import json
 
 from google.appengine.api import users
 
@@ -200,15 +201,21 @@ class InteractiveWidget(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
-    def get_interactive_widget(cls, widget_id, params=[], state_params_dict={}):
+    def get_interactive_widget(
+        cls, widget_id, params=None, state_params_dict=None):
         """Gets interactive widget code from the file system."""
+        if params is None:
+            params = []
+        if state_params_dict is None:
+            state_params_dict = {}
 
         widget = {}
         with open(os.path.join(
-                feconf.SAMPLE_WIDGETS_DIR,
-                widget_id,
-                '%s.config.yaml' % widget_id)) as f:
-            widget = YamlTransformer.get_dict_from_yaml(f.read().decode('utf-8'))
+            feconf.SAMPLE_WIDGETS_DIR,
+            widget_id,
+            '%s.config.yaml' % widget_id)) as f:
+            widget = YamlTransformer.get_dict_from_yaml(
+                f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
         if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
@@ -230,13 +237,13 @@ class InteractiveWidget(BaseHandler):
                 html_file).render(widget['params'])
 
         widget['raw'] = widget_html
-        for action, properties in widget['actions'].iteritems():
+        for unused_action, properties in widget['actions'].iteritems():
             classifier = properties['classifier']
             if classifier and classifier != 'None':
                 with open(os.path.join(
-                        feconf.SAMPLE_CLASSIFIERS_DIR,
-                        classifier,
-                        '%sRules.yaml' % classifier)) as f:
+                    feconf.SAMPLE_CLASSIFIERS_DIR,
+                    classifier,
+                    '%sRules.yaml' % classifier)) as f:
                     properties['rules'] = YamlTransformer.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget

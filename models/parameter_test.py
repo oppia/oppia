@@ -16,14 +16,15 @@
 
 __author__ = 'Jeremy Emerson'
 
-from parameter import Parameter
 import test_utils
+
+from parameter import Parameter
 
 
 class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
 
-    def test_Parameter_Class(self):
+    def testParameterClass(self):
         """Test Parameter Class."""
         o = Parameter()
         o.name = 'The name'

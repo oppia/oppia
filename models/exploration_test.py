@@ -16,9 +16,10 @@
 
 __author__ = 'Jeremy Emerson'
 
+import test_utils
+
 from exploration import Exploration
 from state import State
-import test_utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb

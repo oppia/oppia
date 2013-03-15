@@ -22,14 +22,13 @@ import sys
 import traceback
 
 import feconf
+import jinja2
 from models.exploration import Exploration
 from models.state import State
 import utils
+import webapp2
 
 from google.appengine.api import users
-
-import jinja2
-import webapp2
 
 
 def require_user(handler):
@@ -49,6 +48,12 @@ def require_editor(handler):
     """Decorator that checks if the user can edit the given entity."""
     def test_editor(self, exploration_id, state_id=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
+
+        Args:
+            self: the handler instance
+            exploration_id: the exploration id
+            state_id: the state id, if it exists
+            **kwargs: any other arguments passed to the handler
 
         Returns:
             The user and exploration instance, if the user is authorized to edit

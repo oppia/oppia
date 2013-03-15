@@ -71,7 +71,7 @@ class YamlTransformer(BaseHandler):
         return result
 
     @classmethod
-    def create_exploration_from_yaml(cls, yaml, user, title, category, id=None):
+    def create_exploration_from_yaml(cls, yaml, user, title, category, exploration_id=None):
         """Creates an exploration from a YAML file."""
 
         yaml = yaml.strip()
@@ -83,7 +83,7 @@ class YamlTransformer(BaseHandler):
 
         exploration = utils.create_new_exploration(
             user, title=title, category=category, init_state_name=init_state_name,
-            id=id)
+            exploration_id=exploration_id)
 
         try:
             yaml_description = cls.get_dict_from_yaml(yaml)
@@ -258,6 +258,6 @@ class YamlTransformer(BaseHandler):
 
             exploration = cls.create_exploration_from_yaml(
                 yaml=yaml, user=None, title=title, category=category,
-                id=str(index))
+                exploration_id=str(index))
             exploration.is_public = True
             exploration.put()

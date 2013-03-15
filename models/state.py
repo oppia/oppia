@@ -28,7 +28,7 @@ class Content(ndb.Model):
 
 
 class State(ndb.Model):
-    """A state. (An exploration is composed of many states.)"""
+    """A state whichh forms part of an exploration."""
     # NB: This element's parent should be an Exploration.
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')

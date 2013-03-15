@@ -18,10 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from google.appengine.ext import ndb
+import utils
 
 from models import Exploration
-import utils
+
+from google.appengine.ext import ndb
 
 
 STATS_ENUMS = utils.create_enum(
@@ -54,7 +55,7 @@ class EventHandler(object):
 
     @classmethod
     def record_exploration_visited(cls, exploration_id):
-        """Records an event when an exploration is visited for the first time."""
+        """Records an event when an exploration is first loaded."""
         cls._record_event(STATS_ENUMS.exploration_visited, exploration_id)
 
     @classmethod

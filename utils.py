@@ -23,12 +23,15 @@ import json
 import logging
 import os
 
+from jinja2 import Environment
+from jinja2 import meta
+
 import feconf
-from models.models import AugmentedUser, Widget
 from models.exploration import Exploration
+from models.models import AugmentedUser
+from models.models import Widget
 from models.state import State
 
-from jinja2 import Environment, meta
 from google.appengine.ext import ndb
 
 
@@ -189,12 +192,14 @@ def get_js_controllers(filenames):
     Returns:
         the concatenated contents of these JS files.
     """
-    return '\n'.join([get_file_contents(
-        feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename)
-        for filename in filenames])
+    return '\n'.join([
+        get_file_contents(
+            feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename
+        ) for filename in filenames
+    ])
 
 
-def parse_content_into_html(content_array, block_number, params={}):
+def parse_content_into_html(content_array, block_number, params=None):
     """Takes a Content array and transforms it into HTML.
 
     Args:
@@ -215,6 +220,9 @@ def parse_content_into_html(content_array, block_number, params={}):
         InvalidInputException: if content has no 'type' attribute, or an invalid
             'type' attribute.
     """
+    if params is None:
+        params = {}
+
     html = ''
     widget_array = []
     widget_counter = 0
@@ -248,7 +256,7 @@ def parse_content_into_html(content_array, block_number, params={}):
 
 
 def get_augmented_user(user):
-    """Gets the corresponding AugmentedUser, creating a new one if it doesn't exist."""
+    """Gets (or creates) the corresponding AugmentedUser."""
     augmented_user = AugmentedUser.query().filter(
         AugmentedUser.user == user).get()
     if not augmented_user:
@@ -257,12 +265,11 @@ def get_augmented_user(user):
     return augmented_user
 
 
-def create_new_exploration(user, title='New Exploration', category='No category',
-                           id=None, init_state_name='Activity 1'):
+def create_new_exploration(
+    user, title='New Exploration', category='No category', exploration_id=None,
+    init_state_name='Activity 1'):
     """Creates and returns a new exploration."""
-    if id:
-        exploration_id = id
-    else:
+    if exploration_id is None:
         exploration_id = get_new_id(Exploration, title)
     state_id = get_new_id(State, init_state_name)
 
@@ -328,7 +335,7 @@ def parse_with_jinja(string, params, default=''):
     for var in variables:
         if var not in new_params:
             new_params[var] = default
-            logging.info('Cannot parse %s properly using %s' % (string, params))
+            logging.info('Cannot parse %s properly using %s', string, params)
 
     return Environment().from_string(string).render(new_params)
 
@@ -356,10 +363,7 @@ def encode_strings_as_ascii(obj):
     if isinstance(obj, int) or isinstance(obj, set):
         return obj
     elif isinstance(obj, str) or isinstance(obj, unicode):
-        try:
-            return str(obj)
-        except Exception:
-            return obj
+        return str(obj)
     elif isinstance(obj, list):
         return [encode_strings_as_ascii(item) for item in obj]
     elif isinstance(obj, dict):

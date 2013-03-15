@@ -16,9 +16,13 @@
 
 __author__ = 'Jeremy Emerson'
 
-from exploration import Exploration
-from models import Image, Widget, GenericWidget, AugmentedUser
 import test_utils
+
+from exploration import Exploration
+from models import AugmentedUser
+from models import GenericWidget
+from models import Image
+from models import Widget
 
 from google.appengine.api import users
 from google.appengine.ext import ndb

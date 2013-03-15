@@ -18,8 +18,6 @@ import os
 import re
 import shutil
 
-import css_minifier
-
 HEAD_DIR = 'templates/dev/head/'
 OUT_DIR = 'templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -27,35 +25,40 @@ CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
     --compilation_level WHITESPACE_ONLY """
 
 
-def EnsureDirectoryExists(f):
+def ensure_directory_exists(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
 
 
-def GetTarget(filename):
+def get_target(filename):
     return filename.replace(HEAD_DIR, OUT_DIR)
 
 
-def ProcessHtml(filename, target):
+def process_html(filename, target):
     f = open(filename, 'r')
     content = f.read()
     content = REMOVE_WS(' ', content)
-    EnsureDirectoryExists(target)
+    ensure_directory_exists(target)
     d = open(target, 'w+')
     d.write(content)
 
 
-def ProcessCSS(filename, target):
+def minify_css(css):
+    """Collapse whitespace in CSS file."""
+    # TODO(sll): replace with a third-party minifier, such as yuicompressor.
+    return re.sub(r'\s+', ' ', css)
+
+
+def process_css(filename, target):
     f = open(filename, 'r')
-    EnsureDirectoryExists(target)
+    ensure_directory_exists(target)
     d = open(target, 'w+')
-    css_minifier.MinifyCSS(f.read(), d)
-    return
+    d.write(minify_css(f.read()))
 
 
-def ProcessJS(filename, target):
-    EnsureDirectoryExists(target)
+def process_js(filename, target):
+    ensure_directory_exists(target)
     # TODO(sll): Reinstate the following once it can handle 'delete'.
     # cmd = CLOSURE_COMPILER + filename + ' --js_output_file ' + target
     # call(cmd, shell=True)
@@ -67,7 +70,7 @@ def ProcessJS(filename, target):
 
 
 # Script starts here.
-EnsureDirectoryExists(OUT_DIR)
+ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
 for root, dirs, files in os.walk(os.getcwd()):
     if '.git' in root:
@@ -83,10 +86,10 @@ for root, dirs, files in os.walk(os.getcwd()):
         # Do not process files in third_party.
         if any(key in full_filename for key in ['third_party', '.git']):
             continue
-        target_filename = GetTarget(full_filename)
+        target_filename = get_target(full_filename)
         if fn.endswith('.html'):
-            ProcessHtml(full_filename, target_filename)
+            process_html(full_filename, target_filename)
         if fn.endswith('.css'):
-            ProcessCSS(full_filename, target_filename)
+            process_css(full_filename, target_filename)
         if fn.endswith('.js'):
-            ProcessJS(full_filename, target_filename)
+            process_js(full_filename, target_filename)

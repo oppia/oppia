@@ -21,12 +21,15 @@ import importlib
 import json
 import logging
 
-from controllers.base import BaseHandler, require_editor, require_user
+from controllers.base import BaseHandler
+from controllers.base import require_editor
+from controllers.base import require_user
 from controllers.widgets import InteractiveWidget
 from data.classifiers import normalizers
 import feconf
 from models.exploration import Exploration
-from models.state import Content, State
+from models.state import Content
+from models.state import State
 import utils
 from yaml_utils import YamlTransformer
 
@@ -113,7 +116,7 @@ class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
     @require_editor
-    def get(self, user, exploration):
+    def get(self, unused_user, unused_exploration):
         """Handles GET requests."""
         self.values.update({
             'js': utils.get_js_controllers(
@@ -124,7 +127,7 @@ class ExplorationPage(BaseHandler):
         self.render_template('editor/editor_exploration.html')
 
     @require_editor
-    def post(self, user, exploration):
+    def post(self, unused_user, exploration):
         """Adds a new state to the given exploration."""
 
         state_name = self.request.get('state_name')
@@ -145,7 +148,8 @@ class ExplorationPage(BaseHandler):
         """Updates properties of the given exploration."""
 
         for key in self.request.arguments():
-            if key not in ['is_public', 'category', 'title', 'image_id', 'editors']:
+            if key not in ['is_public', 'category', 'title', 'image_id',
+                           'editors']:
                 raise self.InvalidInputException(
                     '\'%s\' is not a valid editable property' % key)
 
@@ -170,8 +174,10 @@ class ExplorationPage(BaseHandler):
                 for email in editors:
                     editor = users.User(email=email)
                     augmented_user = utils.get_augmented_user(editor)
-                    if exploration.key not in augmented_user.editable_explorations:
-                        augmented_user.editable_explorations.append(exploration.key)
+                    if (exploration.key not in
+                        augmented_user.editable_explorations):
+                        augmented_user.editable_explorations.append(
+                            exploration.key)
                         augmented_user.put()
             else:
                 raise self.UnauthorizedUserException(
@@ -180,7 +186,7 @@ class ExplorationPage(BaseHandler):
         exploration.put()
 
     @require_editor
-    def delete(self, user, exploration):
+    def delete(self, unused_user, exploration):
         """Deletes the given exploration."""
         utils.delete_exploration(exploration)
 
@@ -189,7 +195,7 @@ class ExplorationHandler(BaseHandler):
     """Page with editor data for a single exploration."""
 
     @require_editor
-    def get(self, user, exploration):
+    def get(self, unused_user, exploration):
         """Gets the question name and state list for a question page."""
 
         state_list = {}
@@ -215,7 +221,7 @@ class ExplorationDownloadHandler(BaseHandler):
     """Downloads an exploration as a YAML file."""
 
     @require_editor
-    def get(self, user, exploration):
+    def get(self, unused_user, exploration):
         """Handles GET requests."""
         filename = 'oppia-%s' % utils.to_string(exploration.title)
 
@@ -238,11 +244,11 @@ class StateHandler(BaseHandler):
         elif isinstance(d, dict):
             if attr_to_remove in d:
                 del d[attr_to_remove]
-            for k, v in d.items():
-                self.recursively_remove_attr(d[k], attr_to_remove)
+            for key, unused_value in d.items():
+                self.recursively_remove_attr(d[key], attr_to_remove)
 
     @require_editor
-    def put(self, user, exploration, state):
+    def put(self, unused_user, exploration, state):
         """Saves updates to a state."""
 
         yaml_file_json = self.request.get('yaml_file')
@@ -250,8 +256,10 @@ class StateHandler(BaseHandler):
             # The user has uploaded a YAML file. Process only this action.
             yaml_file = json.loads(yaml_file_json)
             state = YamlTransformer.modify_state_using_dict(
-                exploration, state, YamlTransformer.get_dict_from_yaml(yaml_file))
-            self.response.write(json.dumps(get_state_for_frontend(state, exploration)))
+                exploration, state,
+                YamlTransformer.get_dict_from_yaml(yaml_file))
+            self.response.write(json.dumps(
+                get_state_for_frontend(state, exploration)))
             return
 
         state_name_json = self.request.get('state_name')
@@ -294,19 +302,21 @@ class StateHandler(BaseHandler):
                 state.interactive_rulesets['submit'], u'$$hashKey')
 
             if len(ruleset) > 1:
-                interactive_widget_properties = InteractiveWidget.get_interactive_widget(
-                    state.interactive_widget)['actions']['submit']
-                # Import the relevant classifier module to be used in eval() below.
+                interactive_widget_properties = (
+                    InteractiveWidget.get_interactive_widget(
+                        state.interactive_widget)['actions']['submit'])
+                # Import the relevant classifier module to use in eval() below.
                 classifier_module = '.'.join([
                     feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
                     interactive_widget_properties['classifier'],
                     interactive_widget_properties['classifier']])
                 Classifier = importlib.import_module(classifier_module)
             else:
-                assert 'attrs' not in ruleset[0] or 'classifier' not in ruleset[0]['attrs']
+                assert ('attrs' not in ruleset[0] or
+                        'classifier' not in ruleset[0]['attrs'])
 
-            # TODO(yanamal): Do additional calculations here to get the parameter
-            # changes, if necessary.
+            # TODO(yanamal): Do additional calculations here to get the
+            # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
                 logging.info(rule)
@@ -335,13 +345,15 @@ class StateHandler(BaseHandler):
                         result += ','
 
                     # Get the normalizer specified in the rule.
-                    param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
+                    param_spec = mutable_rule[
+                        mutable_rule.find('{{' + param) + 2:]
                     param_spec = param_spec[param_spec.find('|') + 1:]
                     normalizer_string = param_spec[: param_spec.find('}}')]
 
                     normalizer = getattr(normalizers, normalizer_string)
                     # TODO(sll): Make the following check more robust.
-                    if '{{' not in rule['inputs'][param] or '}}' not in rule['inputs'][param]:
+                    if ('{{' not in rule['inputs'][param] or
+                        '}}' not in rule['inputs'][param]):
                         normalized_param = normalizer(rule['inputs'][param])
                     else:
                         normalized_param = rule['inputs'][param]
@@ -351,7 +363,8 @@ class StateHandler(BaseHandler):
                             '%s has the wrong type. Please replace it with a '
                             '%s.' % (rule['inputs'][param], normalizer_string))
 
-                    if normalizer.__name__ == 'String' or normalizer.__name__ == 'MusicNote':
+                    if (normalizer.__name__ == 'String' or
+                        normalizer.__name__ == 'MusicNote'):
                         result += 'u\'' + unicode(normalized_param) + '\''
                     else:
                         result += str(normalized_param)
@@ -367,17 +380,17 @@ class StateHandler(BaseHandler):
                              for item in content]
 
         state.put()
-        self.response.write(json.dumps(get_state_for_frontend(state, exploration)))
+        self.response.write(json.dumps(
+            get_state_for_frontend(state, exploration)))
 
     @require_editor
-    def delete(self, user, exploration, state):
+    def delete(self, unused_user, exploration, state):
         """Deletes the state with id state_id."""
 
         # Do not allow deletion of initial states.
         if exploration.init_state == state.key:
             raise self.InvalidInputException(
                 'Cannot delete initial state of an exploration.')
-            return
 
         # Find all dests in this exploration which equal the state to be
         # deleted, and change them to loop back to their containing state.

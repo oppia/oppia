@@ -96,4 +96,3 @@ class ImageHandler(BaseHandler):
                 {'image_id': image_entity.id}))
         else:
             raise self.InvalidInputException('No image supplied')
-            return

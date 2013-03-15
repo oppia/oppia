@@ -18,9 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-from google.appengine.ext import ndb
-
 from exploration import Exploration
+
+from google.appengine.ext import ndb
 
 
 class Image(ndb.Model):
