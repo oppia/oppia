@@ -23,7 +23,7 @@ import yaml
 
 from controllers.base import BaseHandler
 import feconf
-from models.state import State
+from models.state import Content, State
 import utils
 
 
@@ -112,7 +112,8 @@ class YamlTransformer(BaseHandler):
     def verify_state(cls, description):
         """Verifies a state representation without referencing other states.
 
-        This enforces the following constraints:
+        The following constraints are enforced either here or in the state
+        model:
         - The only permitted fields are ['content', 'param_changes', 'widget'].
             - 'content' is optional and defaults to [].
             - 'param_changes' is optional and defaults to {}.
@@ -137,22 +138,8 @@ class YamlTransformer(BaseHandler):
             if key not in ['content', 'param_changes', 'widget']:
                 return False, 'Invalid key: %s' % key
 
-        if 'content' not in description:
-            description['content'] = []
-        if 'param_changes' not in description:
-            description['param_changes'] = {}
         if 'widget' not in description:
             return False, 'Missing key: \'widget\''
-
-        # Validate 'content'.
-        for item in description['content']:
-            if len(item) != 2:
-                return False, 'Invalid content item: %s' % item
-            for key in item:
-                if key not in ['type', 'value']:
-                    return False, 'Invalid key in content array: %s' % key
-            if item['type'] not in ['text', 'image', 'video', 'widget']:
-                return False, 'Invalid item type in content array: %s' % item['type']
 
         # Validate 'widget'.
         for key in description['widget']:
@@ -206,8 +193,13 @@ class YamlTransformer(BaseHandler):
         if not is_valid:
             raise cls.InvalidInputException(error_log)
 
-        state.content = state_dict['content']
-        state.param_changes = state_dict['param_changes']
+        if 'content' in state_dict:
+            state.content = [
+                Content(type=content['type'], value=content['value'])
+                for content in state_dict['content']
+            ]
+        if 'param_changes' in state_dict:
+            state.param_changes = state_dict['param_changes']
         state.interactive_widget = state_dict['widget']['id']
         if 'params' in state_dict['widget']:
             state.interactive_params = state_dict['widget']['params']

@@ -31,11 +31,11 @@
     <h5>On user <[action]>:</h5>
     <table>
       <tr ng-repeat="rule in interactiveRulesets[action]">
-        <td>
+        <td style="width: 80%">
           <[rule | parameterizeRule: interactiveWidget.params.choices]>:
           (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         </td>
-        <td style="width: 100px">
+        <td style="width: 20%">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
           </a>

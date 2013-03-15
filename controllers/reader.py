@@ -25,7 +25,7 @@ from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
 import feconf
 from models.exploration import Exploration
-from models.state import State
+from models.state import Content, State
 from models.statistics import EventHandler
 import utils
 
@@ -216,7 +216,7 @@ class ExplorationHandler(BaseHandler):
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number, params)
+                    [Content(type='text', value=feedback)], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
@@ -226,7 +226,7 @@ class ExplorationHandler(BaseHandler):
             # Append Oppia's feedback, if any.
             if feedback:
                 action_html, action_widgets = utils.parse_content_into_html(
-                    [{'type': 'text', 'value': feedback}], block_number, params)
+                    [Content(type='text', value=feedback)], block_number, params)
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.

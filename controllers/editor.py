@@ -26,7 +26,7 @@ from controllers.widgets import InteractiveWidget
 from data.classifiers import normalizers
 import feconf
 from models.exploration import Exploration
-from models.state import State
+from models.state import Content, State
 import utils
 from yaml_utils import YamlTransformer
 
@@ -363,7 +363,7 @@ class StateHandler(BaseHandler):
 
         if content_json:
             content = json.loads(content_json)
-            state.content = [{'type': item['type'], 'value': item['value']}
+            state.content = [Content(type=item['type'], value=item['value'])
                              for item in content]
 
         state.put()

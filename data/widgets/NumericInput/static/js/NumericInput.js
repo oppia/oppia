@@ -8,9 +8,6 @@ numeric.config(function($interpolateProvider) {
 
 function NumericInput($scope) {
   $scope.submitAnswer = function(answer) {
-    if (!answer) {
-      return;
-    }
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
           JSON.stringify({'submit': answer}),

@@ -16,7 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
-from state import State
+from state import Content, State
 import test_utils
 
 
@@ -29,7 +29,9 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         # exploration.
         o = State(id='The hash id')
         o.name = 'The name'
-        o.content = ['The content']
+        o.content = [Content(type='text', value='The content')]
         self.assertEqual(o.key.id(), 'The hash id')
         self.assertEqual(o.name, 'The name')
-        self.assertEqual(o.content, ['The content'])
+        self.assertEqual(len(o.content), 1)
+        self.assertEqual(o.content[0].type, 'text')
+        self.assertEqual(o.content[0].value, 'The content')

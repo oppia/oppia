@@ -21,13 +21,19 @@ __author__ = 'Sean Lip'
 from google.appengine.ext import ndb
 
 
+class Content(ndb.Model):
+    """Non-interactive content in a state."""
+    type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
+    value = ndb.StringProperty(default='')
+
+
 class State(ndb.Model):
     """A state. (An exploration is composed of many states.)"""
     # NB: This element's parent should be an Exploration.
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')
     # The content displayed to the reader in this state.
-    content = ndb.JsonProperty(repeated=True)
+    content = ndb.StructuredProperty(Content, repeated=True)
     # The id of the interactive widget class for this state.
     interactive_widget = ndb.StringProperty(default='Continue')
     # Parameter overrides for the interactive widget view, stored as key-value
@@ -86,7 +92,8 @@ class State(ndb.Model):
     def internals_as_dict(self):
         """Gets a Python dict of the internals of the state."""
         state_dict = {
-            'content': self.content,
+            'content': [{'type': item.type, 'value': item.value} for
+                        item in self.content],
             'param_changes': self.param_changes,
             'widget': {
                 'id': self.interactive_widget,

@@ -195,11 +195,12 @@ def get_js_controllers(filenames):
 
 
 def parse_content_into_html(content_array, block_number, params={}):
-    """Takes a content array and transforms it into HTML.
+    """Takes a Content array and transforms it into HTML.
 
     Args:
-        content_array: an array, each of whose members is a dict with two keys:
-            type and value. The 'type' is one of the following:
+        content_array: an array, each of whose members is of type Content. This
+            object has two keys: type and value. The 'type' is one of the
+            following:
                 - 'text'; then the value is a text string
                 - 'image'; then the value is an image ID
                 - 'video'; then the value is a video ID
@@ -218,16 +219,12 @@ def parse_content_into_html(content_array, block_number, params={}):
     widget_array = []
     widget_counter = 0
     for content in content_array:
-        if 'type' not in content:
-            raise InvalidInputException(
-                'Content type for content_array %s does not exist',
-                content_array)
-        if content['type'] == 'widget':
+        if content.type == 'widget':
             try:
-                widget = get_entity(Widget, content['value'])
+                widget = get_entity(Widget, content.value)
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template('content.html').render({
-                    'type': content['type'], 'blockIndex': block_number,
+                    'type': content.type, 'blockIndex': block_number,
                     'index': widget_counter})
                 widget_array.append({
                     'blockIndex': block_number,
@@ -236,17 +233,17 @@ def parse_content_into_html(content_array, block_number, params={}):
             except EntityIdNotFoundError:
                 # Ignore empty widget content.
                 pass
-        elif (content['type'] in ['text', 'image', 'video']):
-            if content['type'] == 'text':
-                value = parse_with_jinja(content['value'], params)
+        elif (content.type in ['text', 'image', 'video']):
+            if content.type == 'text':
+                value = parse_with_jinja(content.value, params)
             else:
-                value = content['value']
+                value = content.value
 
             html += feconf.JINJA_ENV.get_template('content.html').render({
-                'type': content['type'], 'value': value})
+                'type': content.type, 'value': value})
         else:
             raise InvalidInputException(
-                'Invalid content type %s', content['type'])
+                'Invalid content type %s', content.type)
     return html, widget_array
 
 
