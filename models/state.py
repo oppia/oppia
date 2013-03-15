@@ -74,7 +74,6 @@ class State(ndb.Model):
     @classmethod
     def get(cls, state_id, exploration):
         """Gets a state by id. If it does not exist, returns None."""
-        # TODO(sll): Query by parent, too?
         return cls.get_by_id(state_id, parent=exploration.key)
 
     def as_dict(self):
