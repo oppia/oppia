@@ -352,7 +352,8 @@ class StateHandler(BaseHandler):
 
                     normalizer = getattr(normalizers, normalizer_string)
                     # TODO(sll): Make the following check more robust.
-                    if ('{{' not in rule['inputs'][param] or
+                    if (not isinstance(rule['inputs'][param], basestring) or
+                        '{{' not in rule['inputs'][param] or
                         '}}' not in rule['inputs'][param]):
                         normalized_param = normalizer(rule['inputs'][param])
                     else:
