@@ -137,8 +137,6 @@ class ExplorationHandler(BaseHandler):
 
         payload = json.loads(self.request.get('payload'))
 
-        logging.info(payload)
-
         # The 0-based index of the last content block already on the page.
         block_number = payload.get('block_number')
         params = self.get_params(state, payload.get('params'))

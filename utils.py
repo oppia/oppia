@@ -66,30 +66,6 @@ def log(message):
             logging.info(str(message))
 
 
-# TODO(sll): Consider refactoring this to include ancestors.
-def get_entity(entity, entity_id):
-    """Gets the entity corresponding to a given id.
-
-    Args:
-        entity: the name of the entity's class.
-        entity_id: string representing the entity id.
-
-    Returns:
-        the entity corresponding to the input id
-
-    Raises:
-        EntityIdNotFoundError: If the entity_id is None, or cannot be found.
-    """
-    entity_type = entity.__name__.lower()
-    if not entity_id:
-        raise EntityIdNotFoundError('No %s id supplied' % entity_type)
-    instance = entity.get_by_id(entity_id)
-    if not instance:
-        raise EntityIdNotFoundError(
-            '%s id %s not found' % (entity_type, entity_id))
-    return instance
-
-
 def check_existence_of_name(entity, name, ancestor=None):
     """Checks whether an entity with the given name and ancestor already exists.
 
@@ -231,7 +207,7 @@ def parse_content_into_html(content_array, block_number, params=None):
     for content in content_array:
         if content.type == 'widget':
             try:
-                widget = get_entity(Widget, content.value)
+                widget = Widget.get(content.value)
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template('content.html').render({
                     'type': content.type, 'blockIndex': block_number,
