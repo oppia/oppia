@@ -283,6 +283,20 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   //TODO: (in html) see if there's a clean way of having the editor pop-up in
   //the list itself
+  //TODO: where does the list of existing parameters come from? 
+  //we should take it from the exploration. does it just automatically get there? what about updating it?
+  //parameters arent even part of the exloration data model? browsing admin on the runnin server I dont see them
+
+  //controllers for ui boxes: parameter to be changed, and change options/list
+  $scope.paramSelector = {
+    createSearchChoice:function(term, data) { 
+      if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
+        {
+          return term;
+        }
+    },
+    data: [] 
+  };
 
   //start editing/adding a parameter change
   $scope.startAddParamChange = function() {
