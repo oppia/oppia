@@ -20,45 +20,11 @@ import test_utils
 import utils
 
 
-class FakeEntity(object):
-
-    def __init__(self, name, entity_id, ancestor=None, user=None):
-        self.__name__ = name
-        self.name = name
-        self.id = entity_id
-        self.key = entity_id
-        if ancestor:
-            self.ancestor = ancestor
-        if user:
-            self.user = user
-        self.param = True
-
-    def get_by_id(self, query_id):
-        if query_id == self.id:
-            return self
-
-    def query(self, ancestor=None):
-        if not ancestor:
-            return self
-        if self.ancestor.key == ancestor:
-            return self
-        return None
-
-    def filter(self, param):
-        self.param = param
-        return self
-
-    def get(self):
-        if self.param:
-            return self
-        return None
-
-
 class UtilsTests(test_utils.AppEngineTestBase):
-    """Test the exploration model."""
+    """Test the core utility methods."""
 
     def test_create_enum_method(self):
-        """Test create_enum Method."""
+        """Test create_enum method."""
         o = utils.create_enum('first', 'second', 'third')
         self.assertEqual(o.first, 'first')
         self.assertEqual(o.second, 'second')
@@ -66,3 +32,9 @@ class UtilsTests(test_utils.AppEngineTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
+    def test_get_js_controllers(self):
+        """Test get_js_controllers method."""
+        js_file = utils.get_js_controllers(['base', 'yamlEditor'])
+        self.assertIn('Base', js_file)
+        self.assertIn('function YamlEditor(', js_file)
+        self.assertNotIn('function EditorExploration(', js_file)

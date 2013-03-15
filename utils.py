@@ -42,11 +42,6 @@ class EntityIdNotFoundError(Exception):
     pass
 
 
-def create_enum(*sequential, **names):
-    enums = dict(zip(sequential, sequential), **names)
-    return type('Enum', (), enums)
-
-
 def log(message):
     """Logs info messages in development/debug mode.
 
@@ -60,24 +55,31 @@ def log(message):
             logging.info(str(message))
 
 
+def create_enum(*sequential, **names):
+    enums = dict(zip(sequential, sequential), **names)
+    return type('Enum', (), enums)
+
+
 def get_new_id(entity, entity_name):
     """Gets a new id for an entity, based on its name.
 
     Args:
-        entity: the name of the entity's class.
+        entity: the entity's class.
         entity_name: string representing the name of the entity
 
     Returns:
-        string - the id representing the entity
+        string - the 12-character id representing the entity
     """
-    new_id = base64.urlsafe_b64encode(
-        hashlib.sha1(entity_name.encode('utf-8')).digest())[:10]
     seed = 0
+    new_id = base64.urlsafe_b64encode(
+        hashlib.sha1(entity_name.encode('utf-8')).digest())[:12]
+
     while entity.get_by_id(new_id):
         seed += 1
         new_id = base64.urlsafe_b64encode(
             hashlib.sha1('%s%s' % (
-                entity_name.encode('utf-8'), seed)).digest())[:10]
+                entity_name.encode('utf-8'), seed)).digest())[:12]
+
     return new_id
 
 
