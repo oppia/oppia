@@ -56,4 +56,4 @@ def fuzzy_equals(val, x):
             addcost = thisrow[j - 1] + 1
             subcost = oneago[j - 1] + (val[i] != x[j])
             thisrow[j] = min(delcost, addcost, subcost)
-    return thisrow[len(x) - 1] <= 1
+    return thisrow[len(x) - 1] == 1

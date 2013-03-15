@@ -10,14 +10,6 @@ Hola:
     rules:
       submit:
       - attrs:
-          classifier: fuzzy_equals(x)
-        code: fuzzy_equals(u'hola')
-        dest: Hola
-        feedback: Check your spelling!
-        inputs:
-          x: hola
-        rule: Answer is equal to {{x|String}}, but misspelled by one character
-      - attrs:
           classifier: equals(x)
         code: equals(u'hola!')
         dest: Me llamo
@@ -28,12 +20,20 @@ Hola:
         rule: Answer contains {{x|String}}
       - attrs:
           classifier: contains(x)
-        code: contains(u'hola!')
+        code: contains(u'hola')
         dest: Me llamo
         feedback: ''
         inputs:
           x: hola!
         rule: Answer contains {{x|String}}
+      - attrs:
+          classifier: fuzzy_equals(x)
+        code: fuzzy_equals(u'hola')
+        dest: Hola
+        feedback: Check your spelling!
+        inputs:
+          x: hola
+        rule: Answer is equal to {{x|String}}, but misspelled by one character
       - attrs: {}
         code: 'True'
         dest: Hola
