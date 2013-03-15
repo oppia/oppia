@@ -78,27 +78,39 @@ class UtilsTests(test_utils.AppEngineTestBase):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 
-    def test_encode_strings_as_ascii(self):
-        """Test encode_strings_as_ascii method."""
+    def test_try_removing_unicode_prefixes(self):
+        """Test try_removing_unicode_prefixes method."""
         # Integers.
-        o = utils.encode_strings_as_ascii(2)
+        o = utils.try_removing_unicode_prefixes(2)
         self.assertEqual(o, 2)
         self.assertNotEqual(o, '2')
 
         # Floats.
-        o = utils.encode_strings_as_ascii(2.0)
+        o = utils.try_removing_unicode_prefixes(2.0)
         self.assertEqual(o, 2.0)
         self.assertNotEqual(o, '2')
         self.assertNotEqual(o, '2.0')
 
         # Strings.
-        o = utils.encode_strings_as_ascii('a')
+        o = utils.try_removing_unicode_prefixes('a')
         self.assertEqual(o, 'a')
         self.assertIsInstance(o, str)
 
         # Unicode strings.
-        o = utils.encode_strings_as_ascii(u'a')
+        o = utils.try_removing_unicode_prefixes(u'a')
         self.assertEqual(o, 'a')
         self.assertIsInstance(o, str)
 
+        # Fancy unicode strings.
+        o = utils.try_removing_unicode_prefixes(u'¡Hola!')
+        self.assertEqual(o, u'¡Hola!')
+        self.assertIsInstance(o, unicode)
+
+        # Lists.
+        o = utils.try_removing_unicode_prefixes([u'a', u'¡Hola!'])
+        self.assertEqual(o, ['a', u'¡Hola!'])
+        
+
         # TODO(sll): Add more tests here.
+
+

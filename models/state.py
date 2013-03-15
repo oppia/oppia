@@ -30,11 +30,11 @@ from google.appengine.ext import ndb
 class Content(ndb.Model):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
-    value = ndb.StringProperty(default='')
+    value = ndb.TextProperty(default='')
 
 
 class State(ndb.Model):
-    """A state whichh forms part of an exploration."""
+    """A state which forms part of an exploration."""
     # NB: This element's parent should be an Exploration.
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')
