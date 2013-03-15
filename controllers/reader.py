@@ -260,7 +260,7 @@ class ExplorationHandler(BaseHandler):
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
         values['interactive_widget_html'] = (
-            'Congratulations, you\'ve finished this exploration!')
+            'Congratulations, you\'ve finished this exploration! Would you like to <a href ng-click="initializePage()" target="_top">play again?</a>')
         values['params'] = params
 
         if dest_id != utils.END_DEST:
