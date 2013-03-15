@@ -22,6 +22,7 @@ import hashlib
 import json
 import logging
 import os
+import yaml
 
 from jinja2 import Environment
 from jinja2 import meta
@@ -29,9 +30,6 @@ from jinja2 import meta
 import feconf
 
 from google.appengine.ext import ndb
-
-
-END_DEST = 'END'
 
 
 class InvalidInputException(Exception):
@@ -172,3 +170,18 @@ def encode_strings_as_ascii(obj):
 def to_string(string):
     """Removes unicode characters from a string."""
     return string.encode('ascii', 'ignore')
+
+
+def get_yaml_from_dict(dictionary):
+    """Gets the YAML representation of a dict."""
+    return yaml.safe_dump(dictionary, default_flow_style=False)
+
+
+def get_dict_from_yaml(yaml_file):
+    """Gets the dict representation of a YAML file."""
+    try:
+        yaml_dict = yaml.safe_load(yaml_file)
+        assert isinstance(yaml_dict, dict)
+        return yaml_dict
+    except yaml.YAMLError as e:
+        raise utils.InvalidInputException(e)

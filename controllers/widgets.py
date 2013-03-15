@@ -27,7 +27,6 @@ import feconf
 from models.models import GenericWidget
 from models.models import Widget
 import utils
-from yaml_utils import YamlTransformer
 
 from google.appengine.api import users
 
@@ -217,7 +216,7 @@ class InteractiveWidget(BaseHandler):
             feconf.SAMPLE_WIDGETS_DIR,
             widget_id,
             '%s.config.yaml' % widget_id)) as f:
-            widget = YamlTransformer.get_dict_from_yaml(
+            widget = utils.get_dict_from_yaml(
                 f.read().decode('utf-8'))
 
         widget_html = 'This widget is not available.'
@@ -247,7 +246,7 @@ class InteractiveWidget(BaseHandler):
                     feconf.SAMPLE_CLASSIFIERS_DIR,
                     classifier,
                     '%sRules.yaml' % classifier)) as f:
-                    properties['rules'] = YamlTransformer.get_dict_from_yaml(
+                    properties['rules'] = utils.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget
 

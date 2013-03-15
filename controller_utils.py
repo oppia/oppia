@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import os
+
 import feconf
 from models.exploration import Exploration
 from models.augmented_user import AugmentedUser
@@ -169,3 +171,65 @@ def check_can_edit(user, exploration):
     """Checks whether the current user has rights to edit this exploration."""
     return (user.email() in exploration.editors or
             exploration.key in AugmentedUser.get(user).editable_explorations)
+
+
+def create_exploration_from_yaml(
+    yaml_file, user, title, category, exploration_id=None):
+    """Creates an exploration from a YAML file."""
+
+    yaml_file = yaml_file.strip()
+    # TODO(sll): Make this more flexible by allowing spaces between ':'
+    # and '\n'.
+    init_state_name = yaml_file[:yaml_file.find(':\n')]
+    if not init_state_name:
+        raise utils.InvalidInputException(
+            'Invalid YAML file: the initial state name cannot '
+            'be identified')
+
+    exploration = create_new_exploration(
+        user, title=title, category=category,
+        init_state_name=init_state_name, exploration_id=exploration_id)
+
+    try:
+        yaml_description = utils.get_dict_from_yaml(yaml_file)
+
+        # Create all the states first.
+        for state_name, unused_state_desc in yaml_description.iteritems():
+            if state_name == init_state_name:
+                continue
+            else:
+                if check_existence_of_name(State, state_name, exploration):
+                    raise utils.InvalidInputException(
+                        'Invalid YAML file: contains duplicate state '
+                        'names %s' % state_name)
+                state = create_new_state(exploration, state_name)
+
+        for state_name, state_description in yaml_description.iteritems():
+            state = State.get_by_name(state_name, exploration)
+            State.modify_using_dict(exploration, state, state_description)
+    except Exception as e:
+        delete_exploration(exploration)
+        raise
+
+    return exploration
+
+
+def create_default_explorations():
+    """Initializes the demo explorations."""
+
+    for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
+        assert len(exploration) == 3
+
+        filename = '%s.yaml' % exploration[0]
+        title = exploration[1]
+        category = exploration[2]
+
+        with open(
+            os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
+            yaml_file = f.read().decode('utf-8')
+
+        exploration = create_exploration_from_yaml(
+            yaml_file=yaml_file, user=None, title=title, category=category,
+            exploration_id=str(index))
+        exploration.is_public = True
+        exploration.put()

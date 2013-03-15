@@ -17,10 +17,10 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from controllers.base import BaseHandler
+import controller_utils
 import feconf
 from models.exploration import Exploration
 import utils
-from yaml_utils import YamlTransformer
 
 
 class MainPage(BaseHandler):
@@ -30,7 +30,7 @@ class MainPage(BaseHandler):
         """Checks whether a demo exploration exists; if not, creates them."""
 
         if not Exploration.get('0'):
-            YamlTransformer.create_default_explorations()
+            controller_utils.create_default_explorations()
 
     def get(self):
         """Handles GET requests."""

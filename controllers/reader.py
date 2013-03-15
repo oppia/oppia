@@ -234,7 +234,7 @@ class ExplorationHandler(BaseHandler):
             'reader_response.html').render(
                 {'response': utils.encode_strings_as_ascii(answer)})
 
-        if dest_id == utils.END_DEST:
+        if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = controller_utils.parse_content_into_html(
@@ -274,7 +274,7 @@ class ExplorationHandler(BaseHandler):
             'Congratulations, you\'ve finished this exploration! Would you like to <a href ng-click="initializePage()" target="_top">play again?</a>')
         values['params'] = params
 
-        if dest_id != utils.END_DEST:
+        if dest_id != feconf.END_DEST:
             values['interactive_widget_html'] = (
                 InteractiveWidget.get_interactive_widget(
                     state.interactive_widget,

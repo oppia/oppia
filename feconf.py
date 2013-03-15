@@ -119,3 +119,5 @@ ALL_CSS_LIBS = [
     os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
     os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap-responsive.css'),
 ]
+
+END_DEST = 'END'
