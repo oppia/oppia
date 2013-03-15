@@ -16,8 +16,10 @@
 
 __author__ = 'Jeremy Emerson'
 
+import controller_utils
 import test_utils
 import utils
+from models.state import State
 
 
 class FakeEntity(object):
@@ -57,12 +59,19 @@ class FakeEntity(object):
 class UtilsTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
 
-    def test_create_enum_method(self):
-        """Test create_enum Method."""
-        o = utils.create_enum('first', 'second', 'third')
-        self.assertEqual(o.first, 'first')
-        self.assertEqual(o.second, 'second')
-        self.assertEqual(o.third, 'third')
+    def test_check_existence_of_name_method(self):
+        """Test check_existence_of_name Method."""
+        ancestor = FakeEntity('The_ancestor', 2)
+        entity = FakeEntity('The_fake_entity', 1, ancestor)
         with self.assertRaises(AttributeError):
-            o.fourth
-
+            controller_utils.check_existence_of_name(None, None)
+        with self.assertRaises(utils.EntityIdNotFoundError):
+            controller_utils.check_existence_of_name(entity, None)
+        self.assertTrue(controller_utils.check_existence_of_name(
+            entity, 'The_fake_entity'))
+        self.assertFalse(controller_utils.check_existence_of_name(
+            entity, 'The_not_found_entity'))
+        self.assertTrue(controller_utils.check_existence_of_name(
+            entity, 'The_fake_entity', ancestor))
+        with self.assertRaises(KeyError):
+            controller_utils.check_existence_of_name(State, 'The_fake_entity', None)

@@ -21,6 +21,7 @@ import logging
 import sys
 import traceback
 
+import controller_utils
 import feconf
 import jinja2
 from models.exploration import Exploration
@@ -70,7 +71,7 @@ def require_editor(handler):
             return
 
         exploration = Exploration.get(exploration_id)
-        if not utils.check_can_edit(user, exploration):
+        if not controller_utils.check_can_edit(user, exploration):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
                 user)

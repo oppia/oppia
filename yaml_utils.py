@@ -22,6 +22,7 @@ import os
 import yaml
 
 from controllers.base import BaseHandler
+import controller_utils
 import feconf
 from models.state import Content
 from models.state import State
@@ -85,7 +86,7 @@ class YamlTransformer(BaseHandler):
                 'Invalid YAML file: the initial state name cannot '
                 'be identified')
 
-        exploration = utils.create_new_exploration(
+        exploration = controller_utils.create_new_exploration(
             user, title=title, category=category,
             init_state_name=init_state_name, exploration_id=exploration_id)
 
@@ -97,19 +98,19 @@ class YamlTransformer(BaseHandler):
                 if state_name == init_state_name:
                     continue
                 else:
-                    if utils.check_existence_of_name(
+                    if controller_utils.check_existence_of_name(
                             State, state_name, exploration):
                         raise cls.InvalidInputException(
                             'Invalid YAML file: contains duplicate state '
                             'names %s' % state_name)
-                    state = utils.create_new_state(exploration, state_name)
+                    state = controller_utils.create_new_state(exploration, state_name)
 
             for state_name, state_description in yaml_description.iteritems():
-                state = utils.get_state_by_name(state_name, exploration)
+                state = State.get_by_name(state_name, exploration)
                 cls.modify_state_using_dict(
                     exploration, state, state_description)
         except Exception as e:
-            utils.delete_exploration(exploration)
+            controller_utils.delete_exploration(exploration)
             raise cls.InvalidInputException('Error parsing YAML file: %s' % e)
 
         return exploration
@@ -241,7 +242,7 @@ class YamlTransformer(BaseHandler):
             if rule['dest'] == utils.END_DEST:
                 rule_dict['dest'] = utils.END_DEST
             else:
-                dest_state = utils.get_state_by_name(rule['dest'], exploration)
+                dest_state = State.get_by_name(rule['dest'], exploration)
                 if dest_state:
                     rule_dict['dest'] = dest_state.id
                 else:

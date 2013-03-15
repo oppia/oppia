@@ -23,6 +23,7 @@ import random
 
 from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
+import controller_utils
 import feconf
 from models.exploration import Exploration
 from models.state import Content
@@ -101,7 +102,7 @@ class ExplorationHandler(BaseHandler):
         exploration = Exploration.get(exploration_id)
         init_state = exploration.init_state.get()
         params = self.get_params(init_state)
-        init_html, init_widgets = utils.parse_content_into_html(
+        init_html, init_widgets = controller_utils.parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
@@ -236,7 +237,7 @@ class ExplorationHandler(BaseHandler):
         if dest_id == utils.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                action_html, action_widgets = utils.parse_content_into_html(
+                action_html, action_widgets = controller_utils.parse_content_into_html(
                     [Content(type='text', value=feedback)],
                     block_number,
                     params)
@@ -248,7 +249,7 @@ class ExplorationHandler(BaseHandler):
 
             # Append Oppia's feedback, if any.
             if feedback:
-                action_html, action_widgets = utils.parse_content_into_html(
+                action_html, action_widgets = controller_utils.parse_content_into_html(
                     [Content(type='text', value=feedback)],
                     block_number,
                     params)
@@ -257,7 +258,7 @@ class ExplorationHandler(BaseHandler):
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
-                state_html, state_widgets = utils.parse_content_into_html(
+                state_html, state_widgets = controller_utils.parse_content_into_html(
                     state.content, block_number, params)
                 html_output += state_html
                 widget_output.append(state_widgets)

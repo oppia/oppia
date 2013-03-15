@@ -60,14 +60,3 @@ class GenericWidget(ndb.Model):
     def id(self):
         return self.key.id()
 
-
-class AugmentedUser(ndb.Model):
-    """Stores information about a particular user."""
-    # The corresponding user.
-    user = ndb.UserProperty(required=True)
-    # The list of explorations that this user has editing rights for.
-    editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
-
-    @property
-    def id(self):
-        return self.key.id()

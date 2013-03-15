@@ -25,8 +25,10 @@ from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
 from controllers.widgets import InteractiveWidget
+import controller_utils
 from data.classifiers import normalizers
 import feconf
+from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 from models.state import Content
 from models.state import State
@@ -73,7 +75,7 @@ class NewExploration(BaseHandler):
             exploration = YamlTransformer.create_exploration_from_yaml(
                 yaml_file=yaml, user=user, title=title, category=category)
         else:
-            exploration = utils.create_new_exploration(
+            exploration = controller_utils.create_new_exploration(
                 user, title=title, category=category)
 
         self.response.write(json.dumps({
@@ -92,13 +94,13 @@ class ForkExploration(BaseHandler):
 
         exploration_id = payload.get('exploration_id')
 
-        if not utils.is_demo_exploration(exploration_id):
-            raise self.InvalidInputException('Exploration cannot be forked.')
-
         forked_exploration = Exploration.get(exploration_id)
         if not forked_exploration:
             raise self.InvalidInputException(
                 'Exploration %s does not exist.' % exploration_id)
+
+        if not forked_exploration.is_demo():
+            raise self.InvalidInputException('Exploration cannot be forked.')
 
         # Get the demo exploration as a YAML file, so that new states can be
         # created.
@@ -139,12 +141,12 @@ class ExplorationPage(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         # Check that the state_name has not been taken.
-        if utils.check_existence_of_name(State, state_name, exploration):
+        if controller_utils.check_existence_of_name(State, state_name, exploration):
             raise self.InvalidInputException(
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
 
-        state = utils.create_new_state(exploration, state_name)
+        state = controller_utils.create_new_state(exploration, state_name)
         self.response.write(json.dumps(state.as_dict()))
 
     @require_editor
@@ -172,7 +174,7 @@ class ExplorationPage(BaseHandler):
                 exploration.editors = editors
                 for email in editors:
                     editor = users.User(email=email)
-                    augmented_user = utils.get_augmented_user(editor)
+                    augmented_user = AugmentedUser.get(editor)
                     if (exploration.key not in
                         augmented_user.editable_explorations):
                         augmented_user.editable_explorations.append(
@@ -187,7 +189,7 @@ class ExplorationPage(BaseHandler):
     @require_editor
     def delete(self, unused_user, exploration):
         """Deletes the given exploration."""
-        utils.delete_exploration(exploration)
+        controller_utils.delete_exploration(exploration)
 
 
 class ExplorationHandler(BaseHandler):
@@ -273,7 +275,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            if (state_name != state.name and utils.check_existence_of_name(
+            if (state_name != state.name and controller_utils.check_existence_of_name(
                     State, state_name, exploration)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)

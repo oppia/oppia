@@ -61,3 +61,7 @@ class Exploration(ndb.Model):
         for state_key in self.states:
             state_key.delete()
         self.key.delete()
+
+    def is_demo(self):
+        """Checks if the exploration is one of the demos."""
+        return len(self.id) < 4

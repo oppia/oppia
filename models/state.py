@@ -107,3 +107,11 @@ class State(ndb.Model):
         }
 
         return state_dict
+
+    @classmethod
+    def get_by_name(cls, name, exploration):
+        """Gets a state by name. If it does not exist, returns None."""
+        assert name
+        assert exploration
+        return cls.query(ancestor=exploration.key).filter(
+            cls.name == name).get()

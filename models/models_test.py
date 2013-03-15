@@ -19,12 +19,10 @@ __author__ = 'Jeremy Emerson'
 import test_utils
 
 from exploration import Exploration
-from models import AugmentedUser
 from models import GenericWidget
 from models import Image
 from models import Widget
 
-from google.appengine.api import users
 from google.appengine.ext import ndb
 
 
@@ -60,11 +58,3 @@ class ModelsUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(o.raw, 'Some code here')
         self.assertEqual(o.prams, 'Some JsonProperties here')
 
-    def testAugmentedUserClass(self):
-        """Test AugmentedUser Class."""
-        u = users.get_current_user()
-        o = AugmentedUser()
-        o.user = u
-        o.states = [ndb.Key(Exploration, 5)]
-        self.assertEqual(o.user, u)
-        self.assertEqual(o.states, [ndb.Key(Exploration, 5)])

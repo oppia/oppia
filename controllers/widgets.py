@@ -20,6 +20,7 @@ import json
 import os
 import random
 
+import controller_utils
 from controllers.base import BaseHandler
 from controllers.base import require_user
 import feconf
@@ -68,7 +69,7 @@ class WidgetRepositoryPage(BaseHandler):
         raw = widget_data['raw']
         name = widget_data['name']
         category = widget_data['category']
-        if utils.check_existence_of_name(GenericWidget, name):
+        if controller_utils.check_existence_of_name(GenericWidget, name):
             raise self.InvalidInputException(
                 'A widget with name %s already exists' % name)
 
