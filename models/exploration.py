@@ -27,8 +27,6 @@ from parameter import Parameter
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(ndb.Model):
     """An exploration (which is made up of several states)."""
-    # A hash_id to show in the browser.
-    hash_id = ndb.StringProperty(required=True)
     # The original creator of this exploration.
     owner = ndb.UserProperty()
     # The category this exploration belongs to.
@@ -49,10 +47,14 @@ class Exploration(ndb.Model):
     # List of email addresses of users who can edit this exploration.
     editors = ndb.StringProperty(repeated=True)
 
+    @property
+    def id(self):
+        return self.key.id()
+
     @classmethod
     def get(cls, exploration_id):
         """Gets an exploration by id. If it does not exist, returns None."""
-        return cls.query().filter(cls.hash_id == exploration_id).get()
+        return cls.get_by_id(exploration_id)
 
     def delete(self):
         """Deletes an exploration."""

@@ -30,8 +30,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     def testExplorationClass(self):
         """Test Exploration Class."""
         u = users.get_current_user()
-        o = Exploration()
-        o.hash_id = 'The hash id'
+        o = Exploration(id='The hash id')
         o.owner = u
         o.category = 'The category'
         o.title = 'The title'
@@ -39,7 +38,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         o.states = [ndb.Key(State, 4)]
         o.is_public = False
         o.image_id = 'The image id'
-        self.assertEqual(o.hash_id, 'The hash id')
+        self.assertEqual(o.id, 'The hash id')
         self.assertEqual(o.owner, u)
         self.assertEqual(o.category, 'The category')
         self.assertEqual(o.title, 'The title')

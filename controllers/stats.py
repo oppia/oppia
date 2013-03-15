@@ -28,17 +28,17 @@ class StatsHandler(BaseHandler):
         """Displays the statistics page for the given exploration."""
 
         num_visits = Statistics.get_exploration_stats(
-            STATS_ENUMS.exploration_visited, exploration.hash_id)
+            STATS_ENUMS.exploration_visited, exploration.id)
 
         num_completions = Statistics.get_exploration_stats(
-            STATS_ENUMS.exploration_completed, exploration.hash_id)
+            STATS_ENUMS.exploration_completed, exploration.id)
 
         answers = Statistics.get_exploration_stats(
-            STATS_ENUMS.default_case_hit, exploration.hash_id)
+            STATS_ENUMS.default_case_hit, exploration.id)
 
         self.values.update({
             'exploration_title': exploration.title,
-            'exploration_id': exploration.hash_id,
+            'exploration_id': exploration.id,
             'num_visits': num_visits,
             'num_comp': num_completions,
             'answers': answers,

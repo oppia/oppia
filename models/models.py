@@ -25,24 +25,26 @@ from exploration import Exploration
 
 class Image(ndb.Model):
     """An image."""
-    # The id of the image.
-    hash_id = ndb.StringProperty(required=True)
     # The image itself.
     image = ndb.BlobProperty()
+
+    @property
+    def id(self):
+        return self.key.id()
 
 
 class Widget(ndb.Model):
     """A specific HTML/JS/CSS widget."""
-    # The id of the widget.
-    hash_id = ndb.StringProperty(required=True)
     # The raw widget code.
     raw = ndb.TextProperty()
+
+    @property
+    def id(self):
+        return self.key.id()
 
 
 class GenericWidget(ndb.Model):
     """A generic, reusable widget that is part of the widget repo."""
-    # The id of the generic widget.
-    hash_id = ndb.StringProperty(required=True)
     # The name of the generic widget.
     name = ndb.StringProperty(required=True)
     # The category to which this widget belongs.
@@ -54,6 +56,10 @@ class GenericWidget(ndb.Model):
     # Parameter names, definitions, types and default arguments for this widget.
     params = ndb.JsonProperty(repeated=True)
 
+    @property
+    def id(self):
+        return self.key.id()
+
 
 class AugmentedUser(ndb.Model):
     """Stores information about a particular user."""
@@ -61,3 +67,7 @@ class AugmentedUser(ndb.Model):
     user = ndb.UserProperty(required=True)
     # The list of explorations that this user has editing rights for.
     editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
+
+    @property
+    def id(self):
+        return self.key.id()

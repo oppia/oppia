@@ -121,15 +121,15 @@ class Statistics(object):
         if event_name == STATS_ENUMS.default_case_hit:
             result = []
 
-            exploration = utils.get_entity(Exploration, exploration_id)
+            exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
-                event_key = 'default.%s.%s' % (exploration_id, state.hash_id)
+                event_key = 'default.%s.%s' % (exploration_id, state.id)
 
                 journal = Journal.get_by_id(event_key)
 
                 result.append({
-                    'id': state.hash_id,
+                    'id': state.id,
                     'name': state.name,
                     'answers': sorted(journal.values) if journal else []
                 })

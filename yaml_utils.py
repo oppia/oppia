@@ -58,9 +58,9 @@ class YamlTransformer(BaseHandler):
             for action in state_internals['widget']['rules']:
                 for rule in state_internals['widget']['rules'][action]:
                     if rule['dest'] != utils.END_DEST:
-                        rule['dest'] = utils.get_entity(State, rule['dest']).name
+                        rule['dest'] = State.get(rule['dest'], exploration).name
 
-            if exploration.init_state.get().hash_id == state.hash_id:
+            if exploration.init_state.get().id == state.id:
                 init_dict[state.name] = state.internals_as_dict()
             else:
                 exploration_dict[state.name] = state.internals_as_dict()
@@ -227,7 +227,7 @@ class YamlTransformer(BaseHandler):
             else:
                 dest_state = utils.get_state_by_name(rule['dest'], exploration)
                 if dest_state:
-                    rule_dict['dest'] = dest_state.hash_id
+                    rule_dict['dest'] = dest_state.id
                 else:
                     raise cls.InvalidInputException(
                         'Invalid dest: %s' % rule['dest'])
@@ -256,7 +256,6 @@ class YamlTransformer(BaseHandler):
         for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
             assert len(exploration) == 3
 
-            hash_id = str(index)
             filename = '%s.yaml' % exploration[0]
             title = exploration[1]
             category = exploration[2]
@@ -267,6 +266,6 @@ class YamlTransformer(BaseHandler):
 
             exploration = cls.create_exploration_from_yaml(
                 yaml=yaml, user=None, title=title, category=category,
-                id=hash_id)
+                id=str(index))
             exploration.is_public = True
             exploration.put()

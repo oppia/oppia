@@ -55,13 +55,15 @@ class GalleryHandler(BaseHandler):
 
             used_keys.append(exploration.key)
 
+            data = exploration.to_dict(exclude=['states', 'init_state', 'owner'])
+            data.update({'id': exploration.id})
+
             if not categories.get(category_name):
                 categories[category_name] = []
             categories[category_name].append({
-                'data': exploration.to_dict(
-                    exclude=['states', 'init_state', 'owner']),
+                'data': data,
                 'can_edit': can_edit,
-                'can_fork': user and utils.is_demo_exploration(exploration.hash_id),
+                'can_fork': user and utils.is_demo_exploration(exploration.id),
                 'is_owner': user and user == exploration.owner,
             })
 
@@ -70,9 +72,12 @@ class GalleryHandler(BaseHandler):
                 if exploration_key not in used_keys:
                     # Add this exploration to the relevant category.
                     exploration = exploration_key.get()
+
+                    data = exploration.to_dict(
+                        exclude=['states', 'init_state', 'owner'])
+                    data.update({'id': exploration.id})
                     exploration_data = {
-                        'data': exploration.to_dict(
-                            exclude=['states', 'init_state', 'owner']),
+                        'data': data,
                         'can_edit': True,
                         'can_fork': False,
                         'is_owner': user == exploration.owner,

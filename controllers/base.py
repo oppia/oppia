@@ -64,7 +64,7 @@ def require_editor(handler):
             self.redirect(users.create_login_url(self.request.uri))
             return
 
-        exploration = utils.get_entity(Exploration, exploration_id)
+        exploration = Exploration.get(exploration_id)
         if not utils.check_can_edit(user, exploration):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
@@ -72,7 +72,7 @@ def require_editor(handler):
 
         if not state_id:
             return handler(self, user, exploration, **kwargs)
-        state = utils.get_entity(State, state_id)
+        state = State.get(state_id, exploration)
         return handler(self, user, exploration, state, **kwargs)
 
     return test_editor

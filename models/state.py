@@ -24,8 +24,6 @@ from google.appengine.ext import ndb
 class State(ndb.Model):
     """A state. (An exploration is composed of many states.)"""
     # NB: This element's parent should be an Exploration.
-    # A hash_id to show in the browser.
-    hash_id = ndb.StringProperty(required=True)
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')
     # The content displayed to the reader in this state.
@@ -50,16 +48,39 @@ class State(ndb.Model):
     # Parameter changes associated with this state.
     param_changes = ndb.JsonProperty(default={})
 
+    @property
+    def id(self):
+        return self.key.id()
+
     @classmethod
-    def get(cls, state_id):
-        state = cls.query().filter(cls.hash_id == state_id).get()
-        # TODO(sll): Raise an exception if the state is not found.
-        return state
+    def create(cls, state_id, exploration, name):
+        """Creates a new state."""
+        new_state = cls(
+            id=state_id,
+            parent=exploration.key,
+            name=name,
+            interactive_rulesets={'submit': [{
+                'rule': 'Default',
+                'inputs': {},
+                'code': 'True',
+                'dest': state_id,
+                'feedback': '',
+                'param_changes': [],
+            }]}
+        )
+        new_state.put()
+        return new_state
+
+    @classmethod
+    def get(cls, state_id, exploration):
+        """Gets a state by id. If it does not exist, returns None."""
+        # TODO(sll): Query by parent, too?
+        return cls.get_by_id(state_id, parent=exploration.key)
 
     def as_dict(self):
         """Gets a Python dict representation of the state."""
         state_dict = self.internals_as_dict()
-        state_dict['id'] = self.hash_id
+        state_dict['id'] = self.id
         state_dict['name'] = self.name
         return state_dict
 

@@ -74,11 +74,11 @@ class WidgetRepositoryPage(BaseHandler):
         description = widget_data['description']
         params = widget_data['params']
 
-        widget_hash_id = utils.get_new_id(GenericWidget, name)
-        widget_data['id'] = widget_hash_id
+        widget_id = utils.get_new_id(GenericWidget, name)
+        widget_data['id'] = widget_id
 
         widget = GenericWidget(
-            hash_id=widget_hash_id, raw=raw, name=name, params=params,
+            id=widget_id, raw=raw, name=name, params=params,
             category=category, description=description)
         widget.put()
         self.response.write(json.dumps({'widget': widget_data}))
@@ -94,7 +94,7 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.InvalidInputException('No widget supplied')
         widget_data = json.loads(widget_data)
 
-        widget = utils.get_entity(GenericWidget, widget_data['id'])
+        widget = GenericWidget.get_by_id(widget_data['id'])
         if not widget:
             raise self.InvalidInputException(
                 'No generic widget found with id %s' % widget_data['id'])
@@ -132,10 +132,9 @@ class WidgetRepositoryHandler(BaseHandler):
             if widget.category not in response:
                 response[widget.category] = []
             response[widget.category].append({
-                'hash_id': widget.hash_id, 'name': widget.name,
+                'name': widget.name, 'id': widget.id,
                 'raw': widget.raw, 'params': widget.params,
                 'description': widget.description, 'category': widget.category,
-                'id': widget.hash_id
             })
         return response
 
@@ -162,7 +161,7 @@ class WidgetInstance(BaseHandler):
             utils.EntityIdNotFoundError, if an id is not supplied or no widget
             with this id exists.
         """
-        widget = utils.get_entity(Widget, widget_id)
+        widget = Widget.get_by_id(widget_id)
         if widget:
             self.response.write(json.dumps({
                 'raw': widget.raw,
@@ -182,18 +181,18 @@ class WidgetInstance(BaseHandler):
 
         # TODO(sll): Rewrite the following.
         if not widget_id:
-            widget_hash_id = utils.get_new_id(Widget, 'temp_hash_id')
-            widget = Widget(hash_id=widget_hash_id, raw=raw)
+            widget_id = utils.get_new_id(Widget, 'temp_id')
+            widget = Widget(id=widget_id, raw=raw)
             widget.put()
         else:
-            widget = utils.get_entity(Widget, widget_id)
+            widget = Widget.get_by_id(widget_id)
             if not widget:
                 raise self.InvalidInputException(
                     'No widget found with id %s' % widget_id)
             if 'raw' in self.request.arguments():
                 widget.raw = raw
             widget.put()
-        response = {'widgetId': widget.hash_id, 'raw': widget.raw}
+        response = {'widgetId': widget.id, 'raw': widget.raw}
         self.response.write(json.dumps(response))
 
 

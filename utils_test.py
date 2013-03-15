@@ -23,16 +23,20 @@ from models.state import State
 
 class FakeEntity(object):
 
-    def __init__(self, name, hash_id, ancestor=None, user=None):
+    def __init__(self, name, entity_id, ancestor=None, user=None):
         self.__name__ = name
         self.name = name
-        self.hash_id = hash_id
-        self.key = hash_id
+        self.id = entity_id
+        self.key = entity_id
         if ancestor:
             self.ancestor = ancestor
         if user:
             self.user = user
         self.param = True
+
+    def get_by_id(self, query_id):
+        if query_id == self.id:
+            return self
 
     def query(self, ancestor=None):
         if not ancestor:
@@ -62,18 +66,6 @@ class UtilsTests(test_utils.AppEngineTestBase):
         self.assertEqual(o.third, 'third')
         with self.assertRaises(AttributeError):
             o.fourth
-
-    def test_get_entity_method(self):
-        """Test get_entity Method."""
-        entity = FakeEntity("The_fake_entity", 1)
-        with self.assertRaises(AttributeError):
-            utils.get_entity(None, None)
-        with self.assertRaises(utils.EntityIdNotFoundError):
-            utils.get_entity(entity, None)
-        o = utils.get_entity(entity, 1)
-        self.assertEqual(o.hash_id, 1)
-        with self.assertRaises(utils.EntityIdNotFoundError):
-            utils.get_entity(entity, 2)
 
     def test_check_existence_of_name_method(self):
         """Test check_existence_of_name Method."""

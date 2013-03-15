@@ -25,10 +25,11 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
 
     def testStateClass(self):
         """Test State Class."""
-        o = State()
-        o.hash_id = 'The hash id'
+        # TODO(sll): Need to test that this model's parent must be an
+        # exploration.
+        o = State(id='The hash id')
         o.name = 'The name'
         o.content = ['The content']
-        self.assertEqual(o.hash_id, 'The hash id')
+        self.assertEqual(o.key.id(), 'The hash id')
         self.assertEqual(o.name, 'The name')
         self.assertEqual(o.content, ['The content'])

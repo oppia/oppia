@@ -76,7 +76,7 @@ class ImageHandler(BaseHandler):
         Args:
             image_id: string representing the image id.
         """
-        image = utils.get_entity(Image, image_id)
+        image = Image.get_by_id(image_id)
         if image:
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = 'image/png'
@@ -89,11 +89,11 @@ class ImageHandler(BaseHandler):
         # TODO(sll): Check that the image is really an image.
         image = self.request.get('image')
         if image:
-            image_hash_id = utils.get_new_id(Image, '')
-            image_entity = Image(hash_id=image_hash_id, image=image)
+            image_id = utils.get_new_id(Image, '')
+            image_entity = Image(id=image_id, image=image)
             image_entity.put()
             self.response.write(json.dumps(
-                {'image_id': image_entity.hash_id}))
+                {'image_id': image_entity.id}))
         else:
             raise self.InvalidInputException('No image supplied')
             return

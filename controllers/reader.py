@@ -86,7 +86,7 @@ class ExplorationHandler(BaseHandler):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
-        exploration = utils.get_entity(Exploration, exploration_id)
+        exploration = Exploration.get(exploration_id)
         logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         params = self.get_params(init_state)
@@ -104,7 +104,7 @@ class ExplorationHandler(BaseHandler):
             'interactive_widget_html': interactive_widget_html,
             'interactive_params': init_state.interactive_params,
             'params': params,
-            'state_id': init_state.hash_id,
+            'state_id': init_state.id,
             'title': exploration.title,
             'widgets': init_widgets,
         })
@@ -121,8 +121,8 @@ class ExplorationHandler(BaseHandler):
         """Handles feedback interactions with readers."""
         values = {'error': []}
 
-        exploration = utils.get_entity(Exploration, exploration_id)
-        state = utils.get_entity(State, state_id)
+        exploration = Exploration.get(exploration_id)
+        state = State.get(state_id, exploration)
         old_state = state
 
         payload = json.loads(self.request.get('payload'))
@@ -221,7 +221,7 @@ class ExplorationHandler(BaseHandler):
                 widget_output.append(action_widgets)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = utils.get_entity(State, dest_id)
+            state = State.get(dest_id, exploration)
 
             # Append Oppia's feedback, if any.
             if feedback:
@@ -230,7 +230,7 @@ class ExplorationHandler(BaseHandler):
                 html_output += action_html
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states differ.
-            if old_state.hash_id != state.hash_id:
+            if old_state.id != state.id:
                 state_html, state_widgets = utils.parse_content_into_html(
                     state.content, block_number, params)
                 html_output += state_html
@@ -238,8 +238,8 @@ class ExplorationHandler(BaseHandler):
 
         if state.interactive_widget in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.interactive_widget]
-        values['exploration_id'] = exploration.hash_id
-        values['state_id'] = state.hash_id
+        values['exploration_id'] = exploration.id
+        values['state_id'] = state.id
         values['html'] = html_output
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
@@ -267,4 +267,4 @@ class RandomExplorationPage(BaseHandler):
 
         selected_exploration = random.choice(explorations)
 
-        self.redirect('/learn/%s' % selected_exploration.hash_id)
+        self.redirect('/learn/%s' % selected_exploration.id)

@@ -29,30 +29,27 @@ class ModelsUnitTests(test_utils.AppEngineTestBase):
 
     def testImageClass(self):
         """Test Image Class."""
-        o = Image()
-        o.hash_id = 'The hash id'
+        o = Image(id='The hash id')
         o.image = 'The image'
-        self.assertEquals(o.hash_id, 'The hash id')
+        self.assertEquals(o.id, 'The hash id')
         self.assertEquals(o.image, 'The image')
 
     def testWidgetClass(self):
         """Test Widget Class."""
-        o = Widget()
-        o.hash_id = 'The hash id'
+        o = Widget(id='The hash id')
         o.raw = 'Some code here'
-        self.assertEqual(o.hash_id, 'The hash id')
+        self.assertEqual(o.id, 'The hash id')
         self.assertEqual(o.raw, 'Some code here')
 
     def testGenericWidgetClass(self):
         """Test GenericWidget Class."""
-        o = GenericWidget()
-        o.hash_id = 'The hash id'
+        o = GenericWidget(id='The hash id')
         o.name = 'The name'
         o.category = 'The category'
         o.description = 'The description'
         o.raw = 'Some code here'
         o.prams = 'Some JsonProperties here'
-        self.assertEqual(o.hash_id, 'The hash id')
+        self.assertEqual(o.id, 'The hash id')
         self.assertEqual(o.name, 'The name')
         self.assertEqual(o.category, 'The category')
         self.assertEqual(o.description, 'The description')

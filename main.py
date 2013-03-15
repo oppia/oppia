@@ -34,7 +34,7 @@ class Error404Handler(base.BaseHandler):
         self.redirect('/gallery')
 
 
-# Regex for base64 hash_id encoding
+# Regex for base64 id encoding
 r = '[A-Za-z0-9=_-]+'
 
 # Register the URL with the responsible classes

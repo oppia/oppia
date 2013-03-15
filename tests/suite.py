@@ -20,13 +20,13 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 23
+EXPECTED_TEST_COUNT = 22
 
 
 def main():
-    """Starts in-process server and runs all test cases in this module."""
+    """Runs the tests."""
 
-    # Check if the next dir is valid.
+    # TODO(sll): Check if the next dir is valid.
     sdk_path = os.path.join(
         os.getcwd(), '..', 'oppia_runtime', 'google_appengine')
     sys.path.insert(0, sdk_path)

@@ -35,7 +35,7 @@ from google.appengine.api import users
 EDITOR_MODE = 'editor'
 
 
-def get_state_for_frontend(state):
+def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
     state_repr = state.as_dict()
@@ -44,7 +44,7 @@ def get_state_for_frontend(state):
     for action in modified_state_dict['widget']['rules']:
         for rule in modified_state_dict['widget']['rules'][action]:
             if rule['dest'] != utils.END_DEST:
-                rule['dest'] = utils.get_entity(State, rule['dest']).name
+                rule['dest'] = State.get(rule['dest'], exploration).name
     state_repr['yaml'] = YamlTransformer.get_yaml_from_dict(modified_state_dict)
     return state_repr
 
@@ -74,7 +74,7 @@ class NewExploration(BaseHandler):
                 user, title=title, category=category)
 
         self.response.write(json.dumps({
-            'explorationId': exploration.hash_id,
+            'explorationId': exploration.id,
         }))
 
 
@@ -90,7 +90,7 @@ class ForkExploration(BaseHandler):
         if not utils.is_demo_exploration(exploration_id):
             raise self.InvalidInputException('Exploration cannot be forked.')
 
-        forked_exploration = utils.get_entity(Exploration, exploration_id)
+        forked_exploration = Exploration.get(exploration_id)
         if not forked_exploration:
             raise self.InvalidInputException(
                 'Exploration %s does not exist.' % exploration_id)
@@ -105,7 +105,7 @@ class ForkExploration(BaseHandler):
             yaml=yaml, user=user, title=title, category=category)
 
         self.response.write(json.dumps({
-            'explorationId': exploration.hash_id,
+            'explorationId': exploration.id,
         }))
 
 
@@ -195,11 +195,11 @@ class ExplorationHandler(BaseHandler):
         state_list = {}
         for state_key in exploration.states:
             state = state_key.get()
-            state_list[state.hash_id] = get_state_for_frontend(state)
+            state_list[state.id] = get_state_for_frontend(state, exploration)
 
         self.values.update({
-            'exploration_id': exploration.hash_id,
-            'init_state_id': exploration.init_state.get().hash_id,
+            'exploration_id': exploration.id,
+            'init_state_id': exploration.init_state.get().id,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
             'category': exploration.category,
@@ -251,7 +251,7 @@ class StateHandler(BaseHandler):
             yaml_file = json.loads(yaml_file_json)
             state = YamlTransformer.modify_state_using_dict(
                 exploration, state, YamlTransformer.get_dict_from_yaml(yaml_file))
-            self.response.write(json.dumps(get_state_for_frontend(state)))
+            self.response.write(json.dumps(get_state_for_frontend(state, exploration)))
             return
 
         state_name_json = self.request.get('state_name')
@@ -367,8 +367,7 @@ class StateHandler(BaseHandler):
                              for item in content]
 
         state.put()
-        logging.info(get_state_for_frontend(state))
-        self.response.write(json.dumps(get_state_for_frontend(state)))
+        self.response.write(json.dumps(get_state_for_frontend(state, exploration)))
 
     @require_editor
     def delete(self, user, exploration, state):

@@ -80,11 +80,11 @@ def get_entity(entity, entity_id):
     entity_type = entity.__name__.lower()
     if not entity_id:
         raise EntityIdNotFoundError('No %s id supplied' % entity_type)
-    entity = entity.query().filter(entity.hash_id == entity_id).get()
-    if not entity:
+    instance = entity.get_by_id(entity_id)
+    if not instance:
         raise EntityIdNotFoundError(
             '%s id %s not found' % (entity_type, entity_id))
-    return entity
+    return instance
 
 
 def check_existence_of_name(entity, name, ancestor=None):
@@ -157,7 +157,7 @@ def get_new_id(entity, entity_name):
     new_id = base64.urlsafe_b64encode(
         hashlib.sha1(entity_name.encode('utf-8')).digest())[:10]
     seed = 0
-    while entity.query().filter(entity.hash_id == new_id).get():
+    while entity.get_by_id(new_id):
         seed += 1
         new_id = base64.urlsafe_b64encode(
             hashlib.sha1('%s%s' % (
@@ -264,35 +264,22 @@ def create_new_exploration(user, title='New Exploration', category='No category'
                            id=None, init_state_name='Activity 1'):
     """Creates and returns a new exploration."""
     if id:
-        exploration_hash_id = id
+        exploration_id = id
     else:
-        logging.info(title)
-        exploration_hash_id = get_new_id(Exploration, title)
-    state_hash_id = get_new_id(State, init_state_name)
+        exploration_id = get_new_id(Exploration, title)
+    state_id = get_new_id(State, init_state_name)
 
     # Create a fake state key temporarily for initialization of the question.
     # TODO(sll): Do this in a transaction so it doesn't break other things.
-    fake_state_key = ndb.Key(State, state_hash_id)
+    fake_state_key = ndb.Key(State, state_id)
 
     exploration = Exploration(
-        hash_id=exploration_hash_id, init_state=fake_state_key,
+        id=exploration_id, init_state=fake_state_key,
         owner=user, category=category)
     if title:
         exploration.title = title
     exploration.put()
-    new_init_state = State(
-        hash_id=state_hash_id,
-        parent=exploration.key,
-        name=init_state_name,
-        interactive_rulesets={'submit': [{
-            'rule': 'Default',
-            'inputs': {},
-            'code': 'True',
-            'dest': state_hash_id,
-            'feedback': '',
-            'param_changes': [],
-        }]})
-    new_init_state.put()
+    new_init_state = State.create(state_id, exploration, init_state_name)
 
     # Replace the fake key with its real counterpart.
     exploration.init_state = new_init_state.key
@@ -307,18 +294,9 @@ def create_new_exploration(user, title='New Exploration', category='No category'
 
 def create_new_state(exploration, state_name):
     """Creates and returns a new state."""
-    state_hash_id = get_new_id(State, state_name)
-    state = State(
-        name=state_name, hash_id=state_hash_id, parent=exploration.key,
-        interactive_rulesets={'submit': [{
-            'rule': 'Default',
-            'inputs': {},
-            'code': 'True',
-            'dest': state_hash_id,
-            'feedback': '',
-            'param_changes': [],
-        }]})
-    state.put()
+    state_id = get_new_id(State, state_name)
+    state = State.create(state_id, exploration, state_name)
+
     exploration.states.append(state.key)
     exploration.put()
     return state

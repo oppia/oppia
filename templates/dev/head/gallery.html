@@ -45,7 +45,7 @@
                   <ul class="thumbnails">
                     <li ng-repeat="exploration in explorations | filter: filterExplorations" class="span3">
                       <div class="thumbnail">
-                        <a href="/learn/<[exploration.data.hash_id]>">
+                        <a href="/learn/<[exploration.data.id]>">
                           <span ui-if="exploration.data.image_id">
                             <img ng-src="/imagehandler/<[exploration.data.image_id]>"
                                  class="oppia-large-image">
@@ -57,13 +57,13 @@
                         <div>
                           <h5><[exploration.data.title]></h5>
                           <span ui-if="exploration.can_fork">
-                            <a ng-click="forkExploration(exploration.data.hash_id)">Fork</a> |
+                            <a ng-click="forkExploration(exploration.data.id)">Fork</a> |
                           </span>
                           <span ui-if="exploration.can_edit">
-                            <a href="/create/<[exploration.data.hash_id]>">Edit</a> |
-                            <a href="/stats/<[exploration.data.hash_id]>">Stats</a> |
+                            <a href="/create/<[exploration.data.id]>">Edit</a> |
+                            <a href="/stats/<[exploration.data.id]>">Stats</a> |
                           </span>
-                          <a ng-click="showModal(exploration.data.hash_id)">Embed</a>
+                          <a ng-click="showModal(exploration.data.id)">Embed</a>
                         </div>
                       </div>
                     </li>
