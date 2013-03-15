@@ -32,6 +32,15 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.activeInputData = activeInputData;
 
   /**
+   * Creates a request object that can be sent to the server.
+   * @param {object} requestObj The object to be sent to the server. It will
+        be JSON-stringified and stored under 'payload'.
+   */
+  $scope.createRequest = function(requestObj) {
+    return $.param({payload: JSON.stringify(requestObj)}, true);
+  };
+
+  /**
    * Checks if an object is empty.
    */
   $scope.isEmpty = function(obj) {

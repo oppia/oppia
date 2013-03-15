@@ -188,13 +188,9 @@ function Gallery($scope, $http, warningsData, GalleryData) {
 
 
   $scope.forkExploration = function(explorationId) {
-    var request = $.param({
-      exploration_id: explorationId
-    }, true);
-
     $http.post(
         '/fork',
-        request,
+        $scope.createRequest({exploration_id: explorationId}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               window.location = '/create/' + data.explorationId;

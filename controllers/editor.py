@@ -88,7 +88,9 @@ class ForkExploration(BaseHandler):
     def post(self, user):
         """Handles POST requests."""
 
-        exploration_id = self.request.get('exploration_id')
+        payload = json.loads(self.request.get('payload'))
+
+        exploration_id = payload.get('exploration_id')
 
         if not utils.is_demo_exploration(exploration_id):
             raise self.InvalidInputException('Exploration cannot be forked.')
@@ -130,7 +132,9 @@ class ExplorationPage(BaseHandler):
     def post(self, unused_user, exploration):
         """Adds a new state to the given exploration."""
 
-        state_name = self.request.get('state_name')
+        payload = json.loads(self.request.get('payload'))
+
+        state_name = payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
@@ -147,17 +151,13 @@ class ExplorationPage(BaseHandler):
     def put(self, user, exploration):
         """Updates properties of the given exploration."""
 
-        for key in self.request.arguments():
-            if key not in ['is_public', 'category', 'title', 'image_id',
-                           'editors']:
-                raise self.InvalidInputException(
-                    '\'%s\' is not a valid editable property' % key)
+        payload = json.loads(self.request.get('payload'))
 
-        is_public = self.request.get('is_public')
-        category = self.request.get('category')
-        title = self.request.get('title')
-        image_id = self.request.get('image_id')
-        editors_json = self.request.get('editors')
+        is_public = payload.get('is_public')
+        category = payload.get('category')
+        title = payload.get('title')
+        image_id = payload.get('image_id')
+        editors = payload.get('editors')
 
         if is_public:
             exploration.is_public = True
@@ -167,8 +167,7 @@ class ExplorationPage(BaseHandler):
             exploration.title = title
         if 'image_id' in self.request.arguments():
             exploration.image_id = None if image_id == 'null' else image_id
-        if editors_json:
-            editors = json.loads(editors_json)
+        if editors:
             if user == exploration.owner:
                 exploration.editors = editors
                 for email in editors:
@@ -251,10 +250,11 @@ class StateHandler(BaseHandler):
     def put(self, unused_user, exploration, state):
         """Saves updates to a state."""
 
-        yaml_file_json = self.request.get('yaml_file')
-        if yaml_file_json:
+        payload = json.loads(self.request.get('payload'))
+
+        yaml_file = payload.get('yaml_file')
+        if yaml_file:
             # The user has uploaded a YAML file. Process only this action.
-            yaml_file = json.loads(yaml_file_json)
             state = YamlTransformer.modify_state_using_dict(
                 exploration, state,
                 YamlTransformer.get_dict_from_yaml(yaml_file))
@@ -262,19 +262,14 @@ class StateHandler(BaseHandler):
                 get_state_for_frontend(state, exploration)))
             return
 
-        state_name_json = self.request.get('state_name')
-        param_changes_json = self.request.get('param_changes')
-        interactive_widget_json = self.request.get('interactive_widget')
-        interactive_params_json = self.request.get('interactive_params')
-        interactive_rulesets_json = self.request.get('interactive_rulesets')
-        content_json = self.request.get('content')
+        state_name = payload.get('state_name')
+        param_changes = payload.get('param_changes')
+        interactive_widget = payload.get('interactive_widget')
+        interactive_params = payload.get('interactive_params')
+        interactive_rulesets = payload.get('interactive_rulesets')
+        content = payload.get('content')
 
-        for arg in self.request.arguments():
-            logging.info(arg)
-            logging.info(self.request.get(arg))
-
-        if state_name_json:
-            state_name = json.loads(state_name_json)
+        if state_name:
             # Replace the state name with this one, after checking validity.
             if state_name == utils.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
@@ -285,17 +280,17 @@ class StateHandler(BaseHandler):
             state.name = state_name
             state.put()
 
-        if param_changes_json:
-            state.param_changes = json.loads(param_changes_json)
+        if param_changes:
+            state.param_changes = param_changes
 
-        if interactive_widget_json:
-            state.interactive_widget = json.loads(interactive_widget_json)
+        if interactive_widget:
+            state.interactive_widget = interactive_widget
 
-        if interactive_params_json:
-            state.interactive_params = json.loads(interactive_params_json)
+        if interactive_params:
+            state.interactive_params = interactive_params
 
-        if interactive_rulesets_json:
-            state.interactive_rulesets = json.loads(interactive_rulesets_json)
+        if interactive_rulesets:
+            state.interactive_rulesets = interactive_rulesets
             ruleset = state.interactive_rulesets['submit']
 
             self.recursively_remove_attr(
@@ -375,8 +370,7 @@ class StateHandler(BaseHandler):
                 logging.info(result)
                 rule['code'] = result
 
-        if content_json:
-            content = json.loads(content_json)
+        if content:
             state.content = [Content(type=item['type'], value=item['value'])
                              for item in content]
 

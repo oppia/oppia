@@ -244,16 +244,12 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   });
 
   $scope.saveWidget = function(widgetCode, index) {
-    var request = $.param(
-        {'raw': JSON.stringify(widgetCode)},
-        true
-    );
     var widgetId = $scope.content[index].value || '';
     console.log(widgetId);
 
     $http.post(
       '/widgets/' + widgetId,
-      request,
+      $scope.createRequest({'raw': widgetCode}),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
       // Check that the data has been saved correctly.

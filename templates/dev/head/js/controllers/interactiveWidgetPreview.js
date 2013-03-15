@@ -27,13 +27,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   };
 
   $scope.generateWidgetPreview = function(widgetId, widgetParams) {
-    var request = $.param({
-      params: JSON.stringify(widgetParams),
-      state_params: JSON.stringify($scope.paramChanges)
-    }, true);
     $http.post(
         '/interactive_widgets/' + widgetId,
-        request,
+        $scope.createRequest({params: widgetParams, state_params: $scope.paramChanges}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
         $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);

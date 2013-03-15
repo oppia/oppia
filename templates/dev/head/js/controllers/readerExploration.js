@@ -73,13 +73,11 @@
       params: $scope.params
     };
 
-    var request = $.param({payload: JSON.stringify(requestMap)}, true);
-
     $scope.answerIsBeingProcessed = true;
 
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        request,
+        $scope.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {

@@ -53,11 +53,11 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.UnauthorizedUserException(
                 'Insufficient privileges to create a new generic widget.')
 
-        widget_data = self.request.get('widget')
+        payload = json.loads(self.request.get('payload'))
+
+        widget_data = payload.get('widget')
         if not widget_data:
             raise self.InvalidInputException('No widget supplied')
-        widget_data = json.loads(widget_data)
-
         if 'raw' not in widget_data:
             raise self.InvalidInputException('No widget code supplied')
         if 'name' not in widget_data:
@@ -90,15 +90,17 @@ class WidgetRepositoryPage(BaseHandler):
             raise self.UnauthorizedUserException(
                 'Insufficient privileges to edit a generic widget.')
 
-        widget_data = self.request.get('widget')
+        payload = json.loads(self.request.get('payload'))
+
+        widget_data = payload.get('widget')
         if not widget_data:
             raise self.InvalidInputException('No widget supplied')
-        widget_data = json.loads(widget_data)
 
         widget = GenericWidget.get_by_id(widget_data['id'])
         if not widget:
             raise self.InvalidInputException(
                 'No generic widget found with id %s' % widget_data['id'])
+
         widget.raw = widget_data['raw']
         widget.name = widget_data['name']
         widget.description = widget_data['description']
@@ -173,12 +175,12 @@ class WidgetInstance(BaseHandler):
     @require_user
     def post(self, widget_id=None):
         """Saves or edits a widget uploaded by a content creator."""
-        raw = self.request.get('raw')
-        if not raw:
-            raise self.InvalidInputException('No widget code supplied')
+        payload = json.loads(self.request.get('payload'))        
 
         # TODO(sll): Make sure this JS is clean!
-        raw = json.loads(raw)
+        raw = payload.get('raw')
+        if not raw:
+            raise self.InvalidInputException('No widget code supplied')
 
         # TODO(sll): Rewrite the following.
         if not widget_id:
@@ -190,7 +192,7 @@ class WidgetInstance(BaseHandler):
             if not widget:
                 raise self.InvalidInputException(
                     'No widget found with id %s' % widget_id)
-            if 'raw' in self.request.arguments():
+            if raw:
                 widget.raw = raw
             widget.put()
         response = {'widgetId': widget.id, 'raw': widget.raw}
@@ -255,13 +257,12 @@ class InteractiveWidget(BaseHandler):
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
-        params = self.request.get('params')
-        params = json.loads(params) if params else []
+        payload = json.loads(self.request.get('payload'))        
+
+        params = payload.get('params', [])
 
         state_params_dict = {}
-        state_params_given = self.request.get('state_params')
-        if state_params_given:
-            state_params_given = json.loads(state_params_given)
+        state_params_given = payload.get('state_params')
         if state_params_given:
             for (key, values) in state_params_given.iteritems():
                 # Pick a random parameter for each key.

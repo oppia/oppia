@@ -133,14 +133,9 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   $scope.saveEditedWidget = function(widget) {
     if (widget) {
-      var request = $.param(
-        {'widget': JSON.stringify(widget)},
-        true
-      );
-
       $http.put(
         '/widgetrepository/',
-        request,
+        $scope.createRequest({'widget': widget}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       ).success(function(widgetData) {
         var category = widgetData.widget.category;
@@ -167,14 +162,9 @@ function WidgetRepository($scope, $http, activeInputData) {
   };
 
   $scope.saveNewWidget = function(widget) {
-    var request = $.param(
-      {'widget': JSON.stringify(widget)},
-      true
-    );
-
     $http.post(
       '/widgetrepository/',
-      request,
+      $scope.createRequest({'widget': widget}),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
       $('#editWidgetModal').modal('hide');

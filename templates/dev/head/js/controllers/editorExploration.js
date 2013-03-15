@@ -40,7 +40,7 @@ oppia.config(['$routeProvider', function($routeProvider) {
 
 oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData) {
   // Put exploration variables here.
-  var explorationData ={};
+  var explorationData = {};
 
   // Valid state properties
   var validStateProperties = [
@@ -137,14 +137,11 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         warningsData.addWarning('Invalid property name: ' + property);
         return;
       }
-      propertyValueMap[property] = JSON.stringify(propertyValueMap[property]);
     }
-
-    var request = $.param(propertyValueMap, true);
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
-        request,
+        $.param({payload: JSON.stringify(propertyValueMap)}, true),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       warningsData.clear();
@@ -284,13 +281,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     activeInputData.clear();
     $scope.explorationEditors.push(newEditorEmail);
 
-    var requestParameters = {};
-    requestParameters['editors'] = JSON.stringify($scope.explorationEditors);
-
     var request = $.param(requestParameters, true);
     $http.put(
         $scope.explorationUrl,
-        request,
+        $scope.createRequest({editors: $scope.explorationEditors}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               console.log('PUT request succeeded');
@@ -348,10 +342,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     activeInputData.clear();
 
-    var request = $.param(requestParameters, true);
     $http.put(
         $scope.explorationUrl,
-        request,
+        $scope.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               if (frontendName == 'isPublic' || frontendName == 'explorationImageId') {
@@ -399,7 +392,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http.post(
         $scope.explorationUrl,
-        'state_name=' + newStateName,
+        $scope.createRequest({state_name: newStateName}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';

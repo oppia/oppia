@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function YamlEditor($scope, $http, $routeParams, explorationData, warningsData) {
+ function YamlEditor($scope, $routeParams, explorationData, warningsData) {
   $scope.$parent.stateId = $routeParams.stateId;
 
   // Initializes the YAML textarea using data from the backend.
@@ -37,4 +37,4 @@
   };
 }
 
-YamlEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData', 'warningsData'];
+YamlEditor.$inject = ['$scope', '$routeParams', 'explorationData', 'warningsData'];
