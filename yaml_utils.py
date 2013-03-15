@@ -23,7 +23,8 @@ import yaml
 
 from controllers.base import BaseHandler
 import feconf
-from models.state import Content, State
+from models.state import Content
+from models.state import State
 import utils
 
 
@@ -71,37 +72,42 @@ class YamlTransformer(BaseHandler):
         return result
 
     @classmethod
-    def create_exploration_from_yaml(cls, yaml, user, title, category, exploration_id=None):
+    def create_exploration_from_yaml(
+        cls, yaml_file, user, title, category, exploration_id=None):
         """Creates an exploration from a YAML file."""
 
-        yaml = yaml.strip()
-        # TODO(sll): Make this more flexible by allowing spaces between ':' and '\n'.
-        init_state_name = yaml[:yaml.find(':\n')]
+        yaml_file = yaml_file.strip()
+        # TODO(sll): Make this more flexible by allowing spaces between ':'
+        # and '\n'.
+        init_state_name = yaml_file[:yaml_file.find(':\n')]
         if not init_state_name:
             raise cls.InvalidInputException(
-                'Invalid YAML file: the initial state name cannot be identified')
+                'Invalid YAML file: the initial state name cannot '
+                'be identified')
 
         exploration = utils.create_new_exploration(
-            user, title=title, category=category, init_state_name=init_state_name,
-            exploration_id=exploration_id)
+            user, title=title, category=category,
+            init_state_name=init_state_name, exploration_id=exploration_id)
 
         try:
-            yaml_description = cls.get_dict_from_yaml(yaml)
+            yaml_description = cls.get_dict_from_yaml(yaml_file)
 
             # Create all the states first.
-            for state_name, unused_state_description in yaml_description.iteritems():
+            for state_name, unused_state_desc in yaml_description.iteritems():
                 if state_name == init_state_name:
                     continue
                 else:
-                    if utils.check_existence_of_name(State, state_name, exploration):
+                    if utils.check_existence_of_name(
+                            State, state_name, exploration):
                         raise cls.InvalidInputException(
-                            'Invalid YAML file: contains duplicate state names %s' %
-                            state_name)
+                            'Invalid YAML file: contains duplicate state '
+                            'names %s' % state_name)
                     state = utils.create_new_state(exploration, state_name)
 
             for state_name, state_description in yaml_description.iteritems():
                 state = utils.get_state_by_name(state_name, exploration)
-                cls.modify_state_using_dict(exploration, state, state_description)
+                cls.modify_state_using_dict(
+                    exploration, state, state_description)
         except Exception as e:
             utils.delete_exploration(exploration)
             raise cls.InvalidInputException('Error parsing YAML file: %s' % e)
@@ -118,7 +124,8 @@ class YamlTransformer(BaseHandler):
             - 'content' is optional and defaults to [].
             - 'param_changes' is optional and defaults to {}.
             - 'widget' must be present.
-        - Each item in the 'content' array must have the keys ['type', 'value'].
+        - Each item in the 'content' array must have the keys
+           ['type', 'value'].
             - The type must be one of ['text', 'image', 'video', 'widget'].
         - Permitted subfields of 'widget' are ['id', 'params', 'rules'].
             - The field 'id' is mandatory, and must correspond to an actual
@@ -130,6 +137,14 @@ class YamlTransformer(BaseHandler):
                 IMPLEMENTED YET]
             - For the last value in each ruleset, the 'code' field should equal
                 'True'.
+
+        Args:
+            description: A dict representation of a state.
+
+        Returns:
+            A 2-tuple. The first element is a boolean stating whether the state
+            is valid. The second element is a string providing an error message
+            if applicable.
         """
         logging.info(description)
 
@@ -152,7 +167,7 @@ class YamlTransformer(BaseHandler):
         widget_id = description['widget']['id']
         try:
             with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id,
-                      '%s.config.yaml' % widget_id)):
+                                   '%s.config.yaml' % widget_id)):
                 pass
         except IOError:
             return False, 'No widget with widget id %s exists.' % widget_id
@@ -163,21 +178,25 @@ class YamlTransformer(BaseHandler):
             for ruleset_name in rulesets:
                 rules = rulesets[ruleset_name]
                 if not rules:
-                    return False, 'No rules supplied for ruleset %s' % ruleset_name
+                    return (False,
+                            'No rules supplied for ruleset %s' % ruleset_name)
 
                 for ind, rule in enumerate(rules):
                     if 'code' not in rule:
-                        return False, 'Rule %s is missing a \'code\' field.' % ind
+                        return (False,
+                                'Rule %s is missing a \'code\' field.' % ind)
                     if 'dest' not in rule:
-                        return False, 'Rule %s is missing a destination.' % ind
+                        return (False,
+                                'Rule %s is missing a destination.' % ind)
 
                     if ind == len(rules) - 1:
                         rule['code'] = str(rule['code'])
                         if rule['code'] != 'True':
-                            return False, 'The \'code\' field of the last rule should be \'True\''
+                            return (False, 'The \'code\' field of the last '
+                                    'rule should be \'True\'')
                     else:
-                        # TODO(sll): Check that the rule corresponds to a valid one
-                        # from the relevant classifier.
+                        # TODO(sll): Check that the rule corresponds to a
+                        # valid one from the relevant classifier.
                         pass
 
         return True, ''
@@ -185,6 +204,11 @@ class YamlTransformer(BaseHandler):
     @classmethod
     def modify_state_using_dict(cls, exploration, state, state_dict):
         """Modifies the properties of a state using values from a dictionary.
+
+        Args:
+            exploration: the exploration containing this state.
+            state: the state.
+            state_dict: the dict used to modify the state.
 
         Returns:
             The modified state.
@@ -252,12 +276,12 @@ class YamlTransformer(BaseHandler):
             title = exploration[1]
             category = exploration[2]
 
-            with open(os.path.join(
-                    feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
-                yaml = f.read().decode('utf-8')
+            with open(
+                os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
+                yaml_file = f.read().decode('utf-8')
 
             exploration = cls.create_exploration_from_yaml(
-                yaml=yaml, user=None, title=title, category=category,
+                yaml_file=yaml_file, user=None, title=title, category=category,
                 exploration_id=str(index))
             exploration.is_public = True
             exploration.put()

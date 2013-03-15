@@ -71,7 +71,7 @@ class NewExploration(BaseHandler):
 
         if yaml:
             exploration = YamlTransformer.create_exploration_from_yaml(
-                yaml=yaml, user=user, title=title, category=category)
+                yaml_file=yaml, user=user, title=title, category=category)
         else:
             exploration = utils.create_new_exploration(
                 user, title=title, category=category)
@@ -105,7 +105,7 @@ class ForkExploration(BaseHandler):
         category = forked_exploration.category
 
         exploration = YamlTransformer.create_exploration_from_yaml(
-            yaml=yaml, user=user, title=title, category=category)
+            yaml_file=yaml, user=user, title=title, category=category)
 
         self.response.write(json.dumps({
             'explorationId': exploration.id,
