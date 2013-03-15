@@ -99,7 +99,6 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         exploration = Exploration.get(exploration_id)
-        logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         params = self.get_params(init_state)
         init_html, init_widgets = utils.parse_content_into_html(
@@ -127,34 +126,13 @@ class ExplorationHandler(BaseHandler):
 
         EventHandler.record_exploration_visited(exploration_id)
 
-    def post(self, exploration_id, state_id):
-        """Handles feedback interactions with readers."""
-        values = {'error': []}
+    def transition(self, state, answer, params, interactive_widget_properties):
+        """Handle feedback interactions with readers."""
+        # TODO(sll): Move this to the models.state class.
 
-        exploration = Exploration.get(exploration_id)
-        state = State.get(state_id, exploration)
-        old_state = state
-
-        payload = json.loads(self.request.get('payload'))
-
-        # The 0-based index of the last content block already on the page.
-        block_number = payload.get('block_number')
-        params = self.get_params(state, payload.get('params'))
-        # The reader's answer.
-        answer = payload.get('answer')
         dest_id = None
         feedback = None
-
-        logging.info(answer)
-
-        # Add the reader's answer to the parameter list. This must happen before
-        # the interactive widget is constructed.
-        params['answer'] = answer
-
-        interactive_widget_properties = (
-            InteractiveWidget.get_interactive_widget(
-                state.interactive_widget,
-                state_params_dict=params)['actions']['submit'])
+        default_recorded_answer = None
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
@@ -182,8 +160,7 @@ class ExplorationHandler(BaseHandler):
                     recorded_answer = (
                         state.interactive_params['choices'][int(answer)])
 
-                EventHandler.record_default_case_hit(
-                    exploration_id, state_id, recorded_answer)
+                default_recorded_answer = recorded_answer
 
             assert rule['code']
 
@@ -207,6 +184,41 @@ class ExplorationHandler(BaseHandler):
                 feedback = rule['feedback']
                 break
 
+        return dest_id, feedback, default_recorded_answer
+
+
+    def post(self, exploration_id, state_id):
+        """Handles feedback interactions with readers."""
+        values = {'error': []}
+
+        exploration = Exploration.get(exploration_id)
+        state = State.get(state_id, exploration)
+        old_state = state
+
+        payload = json.loads(self.request.get('payload'))
+
+        # The 0-based index of the last content block already on the page.
+        block_number = payload.get('block_number')
+        params = self.get_params(state, payload.get('params'))
+        # The reader's answer.
+        answer = payload.get('answer')
+
+        # Add the reader's answer to the parameter list. This must happen before
+        # the interactive widget is constructed.
+        params['answer'] = answer
+
+        interactive_widget_properties = (
+            InteractiveWidget.get_interactive_widget(
+                state.interactive_widget,
+                state_params_dict=params)['actions']['submit'])
+
+        dest_id, feedback, default_recorded_answer = self.transition(
+            state, answer, params, interactive_widget_properties)
+
+        if default_recorded_answer:
+            EventHandler.record_default_case_hit(
+                exploration_id, state_id, default_recorded_answer)
+
         assert dest_id
 
         html_output, widget_output = '', []
@@ -220,8 +232,6 @@ class ExplorationHandler(BaseHandler):
         html_output = feconf.JINJA_ENV.get_template(
             'reader_response.html').render(
                 {'response': utils.encode_strings_as_ascii(answer)})
-
-        logging.info(answer)
 
         if dest_id == utils.END_DEST:
             # This leads to a FINISHED state.
@@ -271,7 +281,6 @@ class ExplorationHandler(BaseHandler):
                     state_params_dict=params)['raw']
             )
 
-        logging.info(values)
         self.response.write(json.dumps(values))
 
 

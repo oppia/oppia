@@ -18,6 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
+import importlib
+import logging
+
 from google.appengine.ext import ndb
 
 

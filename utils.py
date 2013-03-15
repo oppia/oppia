@@ -341,7 +341,10 @@ def encode_strings_as_ascii(obj):
     if isinstance(obj, int) or isinstance(obj, set):
         return obj
     elif isinstance(obj, str) or isinstance(obj, unicode):
-        return str(obj)
+        try:
+            return str(obj)
+        except Exception:
+            return obj
     elif isinstance(obj, list):
         return [encode_strings_as_ascii(item) for item in obj]
     elif isinstance(obj, dict):
