@@ -130,15 +130,17 @@ def get_state_by_name(name, exploration):
 
     Returns:
         the state, if it exists; None otherwise.
+
+    Raises:
+        EntityIdNotFoundError: if the state name is not provided.
+        KeyError: if no exploration is given.
     """
     if not name:
         raise EntityIdNotFoundError('No state name supplied')
-    if exploration:
-        state = State.query(ancestor=exploration.key).filter(
-            State.name == name).get()
-    else:
-        raise KeyError('Queries for state entities must include ancestors.')
-    return state
+    if not exploration:
+        raise KeyError('Queries for state entities must include explorations.')
+    return State.query(ancestor=exploration.key).filter(
+        State.name == name).get()
 
 
 def check_can_edit(user, exploration):
@@ -321,9 +323,9 @@ def parse_with_jinja(string, params, default=''):
     """Parses a string using Jinja templating.
 
     Args:
-    - string: the string to be parsed.
-    - params: the parameters to parse the string with.
-    - default: the default string to use for missing parameters.
+      string: the string to be parsed.
+      params: the parameters to parse the string with.
+      default: the default string to use for missing parameters.
 
     Returns:
       the parsed string, or None if the string could not be parsed.
