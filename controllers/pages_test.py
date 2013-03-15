@@ -19,19 +19,23 @@ import test_utils
 
 class PagesTest(test_utils.AppEngineTestBase):
 
-    def testTermsPage(self):
-        response = self.testapp.get('/terms')
+    def testMainPage(self):
+        """Test the main splash page."""
+        response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
-        self.assertIn('an open source project', response)
+        self.assertIn('With Oppia, you can', response)
+        self.assertIn('View more explorations', response)
 
     def testAboutPage(self):
+        """Test the About page."""
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
         self.assertIn('Reinaldo', response)
 
-    def testMainPage(self):
-        """Test access to the main splash page."""
-        response = self.testapp.get('/')
+    def testTermsPage(self):
+        """Test the Terms page."""
+        response = self.testapp.get('/terms')
         self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+        self.assertIn('an open source project', response)
