@@ -24,7 +24,7 @@ import logging
 from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
-from controllers.widgets import InteractiveWidget
+from controllers.widgets import InteractiveWidgetHandler
 import controller_utils
 from data.classifiers import normalizers
 import feconf
@@ -175,7 +175,7 @@ class ExplorationPage(BaseHandler):
                     editor = users.User(email=email)
                     augmented_user = AugmentedUser.get(editor)
                     if (exploration.key not in
-                        augmented_user.editable_explorations):
+                            augmented_user.editable_explorations):
                         augmented_user.editable_explorations.append(
                             exploration.key)
                         augmented_user.put()
@@ -300,7 +300,7 @@ class StateHandler(BaseHandler):
 
             if len(ruleset) > 1:
                 interactive_widget_properties = (
-                    InteractiveWidget.get_interactive_widget(
+                    InteractiveWidgetHandler.get_interactive_widget(
                         state.interactive_widget)['actions']['submit'])
                 # Import the relevant classifier module to use in eval() below.
                 classifier_module = '.'.join([
@@ -350,8 +350,8 @@ class StateHandler(BaseHandler):
                     normalizer = getattr(normalizers, normalizer_string)
                     # TODO(sll): Make the following check more robust.
                     if (not isinstance(rule['inputs'][param], basestring) or
-                        '{{' not in rule['inputs'][param] or
-                        '}}' not in rule['inputs'][param]):
+                            '{{' not in rule['inputs'][param] or
+                            '}}' not in rule['inputs'][param]):
                         normalized_param = normalizer(rule['inputs'][param])
                     else:
                         normalized_param = rule['inputs'][param]
@@ -362,7 +362,7 @@ class StateHandler(BaseHandler):
                             '%s.' % (rule['inputs'][param], normalizer_string))
 
                     if (normalizer.__name__ == 'String' or
-                        normalizer.__name__ == 'MusicNote'):
+                            normalizer.__name__ == 'MusicNote'):
                         result += 'u\'' + unicode(normalized_param) + '\''
                     else:
                         result += str(normalized_param)

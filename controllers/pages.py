@@ -19,23 +19,15 @@ __author__ = 'sll@google.com (Sean Lip)'
 from controllers.base import BaseHandler
 import controller_utils
 import feconf
-from models.exploration import Exploration
 import utils
 
 
 class MainPage(BaseHandler):
     """Main splash page for Oppia."""
 
-    def _ensure_default_explorations_exist(self):
-        """Checks whether a demo exploration exists; if not, creates them."""
-
-        if not Exploration.get('0'):
-            controller_utils.create_default_explorations()
-
     def get(self):
         """Handles GET requests."""
-
-        self._ensure_default_explorations_exist()
+        controller_utils.ensure_default_data_is_loaded()
         self.render_template('index.html')
 
 
@@ -44,7 +36,6 @@ class AboutPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
         self.values.update({
             'code_contributors_list': feconf.CODE_CONTRIBUTORS,
             'idea_contributors_str': utils.get_comma_sep_string_from_list(
@@ -58,5 +49,4 @@ class TermsPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
         self.render_template('terms.html')

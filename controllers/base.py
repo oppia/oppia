@@ -26,7 +26,6 @@ import feconf
 import jinja2
 from models.exploration import Exploration
 from models.state import State
-import utils
 import webapp2
 
 from google.appengine.api import users

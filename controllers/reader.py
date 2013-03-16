@@ -22,7 +22,7 @@ import logging
 import random
 
 from controllers.base import BaseHandler
-from controllers.widgets import InteractiveWidget
+from controllers.widgets import InteractiveWidgetHandler
 import controller_utils
 import feconf
 from models.exploration import Exploration
@@ -104,7 +104,7 @@ class ExplorationHandler(BaseHandler):
         params = self.get_params(init_state)
         init_html, init_widgets = controller_utils.parse_content_into_html(
             init_state.content, 0, params)
-        interactive_widget_html = InteractiveWidget.get_interactive_widget(
+        interactive_widget_html = InteractiveWidgetHandler.get_interactive_widget(
             init_state.interactive_widget,
             params=init_state.interactive_params,
             state_params_dict=params
@@ -187,7 +187,6 @@ class ExplorationHandler(BaseHandler):
 
         return dest_id, feedback, default_recorded_answer
 
-
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
         values = {'error': []}
@@ -209,7 +208,7 @@ class ExplorationHandler(BaseHandler):
         params['answer'] = answer
 
         interactive_widget_properties = (
-            InteractiveWidget.get_interactive_widget(
+            InteractiveWidgetHandler.get_interactive_widget(
                 state.interactive_widget,
                 state_params_dict=params)['actions']['submit'])
 
@@ -275,7 +274,7 @@ class ExplorationHandler(BaseHandler):
 
         if dest_id != feconf.END_DEST:
             values['interactive_widget_html'] = (
-                InteractiveWidget.get_interactive_widget(
+                InteractiveWidgetHandler.get_interactive_widget(
                     state.interactive_widget,
                     params=state.interactive_params,
                     state_params_dict=params)['raw']

@@ -20,12 +20,9 @@ import json
 import os
 import random
 
-import controller_utils
 from controllers.base import BaseHandler
-from controllers.base import require_user
 import feconf
-from models.widget import GenericWidget
-from models.widget import Widget
+from models.widget import InteractiveWidget
 import utils
 
 from google.appengine.api import users
@@ -47,68 +44,6 @@ class WidgetRepositoryPage(BaseHandler):
             self.values['admin'] = True
         self.render_template('widgets/widget_repository.html')
 
-    def post(self):
-        """Creates a new generic widget."""
-        if not users.is_current_user_admin():
-            raise self.UnauthorizedUserException(
-                'Insufficient privileges to create a new generic widget.')
-
-        payload = json.loads(self.request.get('payload'))
-
-        widget_data = payload.get('widget')
-        if not widget_data:
-            raise self.InvalidInputException('No widget supplied')
-        if 'raw' not in widget_data:
-            raise self.InvalidInputException('No widget code supplied')
-        if 'name' not in widget_data:
-            raise self.InvalidInputException('No widget name supplied')
-        if 'category' not in widget_data:
-            raise self.InvalidInputException('No widget category supplied')
-
-        raw = widget_data['raw']
-        name = widget_data['name']
-        category = widget_data['category']
-        if controller_utils.check_existence_of_name(GenericWidget, name):
-            raise self.InvalidInputException(
-                'A widget with name %s already exists' % name)
-
-        description = widget_data['description']
-        params = widget_data['params']
-
-        widget_id = utils.get_new_id(GenericWidget, name)
-        widget_data['id'] = widget_id
-
-        widget = GenericWidget(
-            id=widget_id, raw=raw, name=name, params=params,
-            category=category, description=description)
-        widget.put()
-        self.response.write(json.dumps({'widget': widget_data}))
-
-    def put(self):
-        """Updates a generic widget."""
-        if not users.is_current_user_admin():
-            raise self.UnauthorizedUserException(
-                'Insufficient privileges to edit a generic widget.')
-
-        payload = json.loads(self.request.get('payload'))
-
-        widget_data = payload.get('widget')
-        if not widget_data:
-            raise self.InvalidInputException('No widget supplied')
-
-        widget = GenericWidget.get_by_id(widget_data['id'])
-        if not widget:
-            raise self.InvalidInputException(
-                'No generic widget found with id %s' % widget_data['id'])
-
-        widget.raw = widget_data['raw']
-        widget.name = widget_data['name']
-        widget.description = widget_data['description']
-        widget.params = widget_data['params']
-        widget.category = widget_data['category']
-        widget.put()
-        self.response.write(json.dumps({'widget': widget_data}))
-
 
 class WidgetRepositoryHandler(BaseHandler):
     """Provides data to populate the widget repository page."""
@@ -116,29 +51,16 @@ class WidgetRepositoryHandler(BaseHandler):
     def get_interactive_widgets(self):
         """Load interactive widgets from the file system."""
         response = {}
-        for widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            widget = InteractiveWidget.get_interactive_widget(widget_id)
-            category = widget['category']
+
+        for widget in InteractiveWidget.query():
+            category = widget.category
             if category not in response:
                 response[category] = []
-            response[category].append(widget)
+            response[category].append(InteractiveWidget.get_with_params(
+                widget.id, {}))
 
         for category in response:
             response[category].sort()
-        return response
-
-    def get_non_interactive_widgets(self):
-        """Load non-interactive widgets."""
-        generic_widgets = GenericWidget.query()
-        response = {}
-        for widget in generic_widgets:
-            if widget.category not in response:
-                response[widget.category] = []
-            response[widget.category].append({
-                'name': widget.name, 'id': widget.id,
-                'raw': widget.raw, 'params': widget.params,
-                'description': widget.description, 'category': widget.category,
-            })
         return response
 
     def get(self):  # pylint: disable-msg=C6409
@@ -151,101 +73,41 @@ class WidgetRepositoryHandler(BaseHandler):
         self.response.write(json.dumps({'widgets': response}))
 
 
-class WidgetInstance(BaseHandler):
-    """Handles individual (non-generic) widget uploads, edits and retrievals."""
-
-    def get(self, widget_id):
-        """Handles GET requests.
-
-        Args:
-            widget_id: string representing the widget id.
-
-        Raises:
-            utils.EntityIdNotFoundError, if an id is not supplied or no widget
-            with this id exists.
-        """
-        widget = Widget.get_by_id(widget_id)
-        if widget:
-            self.response.write(json.dumps({
-                'raw': widget.raw,
-            }))
-        else:
-            self.response.write(json.dumps({'error': 'No such widget'}))
-
-    @require_user
-    def post(self, widget_id=None):
-        """Saves or edits a widget uploaded by a content creator."""
-        payload = json.loads(self.request.get('payload'))        
-
-        # TODO(sll): Make sure this JS is clean!
-        raw = payload.get('raw')
-        if not raw:
-            raise self.InvalidInputException('No widget code supplied')
-
-        # TODO(sll): Rewrite the following.
-        if not widget_id:
-            widget_id = utils.get_new_id(Widget, 'temp_id')
-            widget = Widget(id=widget_id, raw=raw)
-            widget.put()
-        else:
-            widget = Widget.get_by_id(widget_id)
-            if not widget:
-                raise self.InvalidInputException(
-                    'No widget found with id %s' % widget_id)
-            if raw:
-                widget.raw = raw
-            widget.put()
-        response = {'widgetId': widget.id, 'raw': widget.raw}
-        self.response.write(json.dumps(response))
-
-
-class InteractiveWidget(BaseHandler):
+class InteractiveWidgetHandler(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     @classmethod
     def get_interactive_widget(
-        cls, widget_id, params=None, state_params_dict=None):
+            cls, widget_id, params=None, state_params_dict=None):
         """Gets interactive widget code from the file system."""
         if params is None:
-            params = []
+            params = {}
         if state_params_dict is None:
             state_params_dict = {}
 
-        widget = {}
-        with open(os.path.join(
-            feconf.SAMPLE_WIDGETS_DIR,
-            widget_id,
-            '%s.config.yaml' % widget_id)) as f:
-            widget = utils.get_dict_from_yaml(
-                f.read().decode('utf-8'))
+        parameters = {}
 
-        widget_html = 'This widget is not available.'
-        if widget_id in os.listdir(feconf.SAMPLE_WIDGETS_DIR):
-            for key in params:
-                # This is a bad hack for pushing things like ["A", "B"] to
-                # the frontend without the leading 'u', but it works.
-                # TODO(sll): Fix this more robustly.
-                if isinstance(params[key], list):
-                    widget['params'][key] = map(str, params[key])
-                elif not isinstance(params[key], basestring):
-                    widget['params'][key] = params[key]
-                else:
-                    widget['params'][key] = utils.parse_with_jinja(
-                        params[key], state_params_dict, '')
+        for key in params:
+            # This is a bad hack for pushing things like ["A", "B"] to
+            # the frontend without the leading 'u', but it works.
+            # TODO(sll): Fix this more robustly.
+            if isinstance(params[key], list):
+                parameters[key] = map(str, params[key])
+            elif not isinstance(params[key], basestring):
+                parameters[key] = params[key]
+            else:
+                parameters[key] = utils.parse_with_jinja(
+                    params[key], state_params_dict, '')
 
-            html_file = os.path.join(widget_id, '%s.html' % widget_id)
+        widget = InteractiveWidget.get_with_params(widget_id, parameters)
 
-            widget_html = feconf.WIDGET_JINJA_ENV.get_template(
-                html_file).render(widget['params'])
-
-        widget['raw'] = widget_html
         for unused_action, properties in widget['actions'].iteritems():
             classifier = properties['classifier']
             if classifier and classifier != 'None':
                 with open(os.path.join(
-                    feconf.SAMPLE_CLASSIFIERS_DIR,
-                    classifier,
-                    '%sRules.yaml' % classifier)) as f:
+                        feconf.SAMPLE_CLASSIFIERS_DIR,
+                        classifier,
+                        '%sRules.yaml' % classifier)) as f:
                     properties['rules'] = utils.get_dict_from_yaml(
                         f.read().decode('utf-8'))
         return widget
@@ -257,9 +119,14 @@ class InteractiveWidget(BaseHandler):
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
-        payload = json.loads(self.request.get('payload'))        
+        payload = json.loads(self.request.get('payload'))
 
-        params = payload.get('params', [])
+        params = payload.get('params', {})
+        if isinstance(params, list):
+            new_params = {}
+            for item in params:
+                new_params[item['name']] = item['default_value']
+            params = new_params
 
         state_params_dict = {}
         state_params_given = payload.get('state_params')

@@ -21,7 +21,8 @@ import os
 import feconf
 from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
-from models.widget import Widget
+from models.widget import InteractiveWidget
+from models.widget import NonInteractiveWidget
 from models.state import State
 import utils
 
@@ -58,7 +59,8 @@ def parse_content_into_html(content_array, block_number, params=None):
     for content in content_array:
         if content.type == 'widget':
             try:
-                widget = Widget.get(content.value)
+                widget = NonInteractiveWidget.get_with_params(
+                    content.value, params)
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template('content.html').render({
                     'type': content.type, 'blockIndex': block_number,
@@ -174,7 +176,7 @@ def check_can_edit(user, exploration):
 
 
 def create_exploration_from_yaml(
-    yaml_file, user, title, category, exploration_id=None):
+        yaml_file, user, title, category, exploration_id=None):
     """Creates an exploration from a YAML file."""
 
     yaml_file = yaml_file.strip()
@@ -207,14 +209,14 @@ def create_exploration_from_yaml(
         for state_name, state_description in yaml_description.iteritems():
             state = State.get_by_name(state_name, exploration)
             State.modify_using_dict(exploration, state, state_description)
-    except Exception as e:
+    except Exception:
         delete_exploration(exploration)
         raise
 
     return exploration
 
 
-def create_default_explorations():
+def load_default_explorations():
     """Initializes the demo explorations."""
 
     for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
@@ -225,7 +227,7 @@ def create_default_explorations():
         category = exploration[2]
 
         with open(
-            os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
+                os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
             yaml_file = f.read().decode('utf-8')
 
         exploration = create_exploration_from_yaml(
@@ -233,3 +235,16 @@ def create_default_explorations():
             exploration_id=str(index))
         exploration.is_public = True
         exploration.put()
+
+
+def ensure_default_data_is_loaded():
+    """Ensures that the default explorations and widgets exist."""
+    # TODO(sll): This is fragile. Should we do it only if we fail to get
+    # the exploration?
+
+    if not InteractiveWidget.get('Continue'):
+        InteractiveWidget.load_default_widgets()
+        NonInteractiveWidget.load_default_widgets()
+
+    if not Exploration.get('0'):
+        load_default_explorations()

@@ -28,6 +28,9 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
     console.log('Content updated.');
 
+    /*
+    // NB: /widgets/ does not exist anymore!
+    //
     // If a (non-interactive) widget exists, show its compiled version and
     // populate the widget view fields.
     for (var i = 0; i < $scope.content.length; ++i) {
@@ -45,6 +48,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
         }
       }
     }
+    */
 
     // Switch to the stateEditor tab when this controller is activated.
     $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
@@ -248,6 +252,8 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     var widgetId = $scope.content[index].value || '';
     console.log(widgetId);
 
+    // NB: /widgets/ does not exist anymore!
+    /*
     $http.post(
       '/widgets/' + widgetId,
       $scope.createRequest({'raw': widgetCode}),
@@ -264,6 +270,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       // TODO(sll): Display multiple widget div's here.
       activeInputData.clear();
     });
+    */
   };
 
   $scope.isWidgetInStateContent = function() {
@@ -289,7 +296,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   //parameters arent even part of the exloration data model? browsing admin on the runnin server I dont see them
   //controllers for ui boxes: parameter to be changed, and change options/list
   $scope.paramSelector = {
-    createSearchChoice:function(term, data) { 
+    createSearchChoice:function(term, data) {
       if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
         {
           return {id:term, text:term};
@@ -298,7 +305,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     data:$scope.parameters//TODO: fix it so we don't have to assume that parameters are in such form; or make them conform externally somewhere
     //data: [{id:1,text:"foo"}, {id:2,text:"bar"}] 
   };
-  
+
   //TODO: make this actually work.
   /*
   $scope.tmpParamName.on("change", function(e){
@@ -308,7 +315,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   //start editing/adding a parameter change
   $scope.startAddParamChange = function() {
     $scope.editingParamChange = 'New change';
-  }
+  };
 
   $scope.startEditParamChange = function(pName) {
     $scope.tmpParamName = pName;
@@ -316,7 +323,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     if (pName in $scope.paramChanges) {
       $scope.tmpParamValues = $scope.paramChanges[pName];
     }
-  }
+  };
 
   //reset and/or initialize variables for parameter change input
   $scope.resetParamChangeInput = function() {

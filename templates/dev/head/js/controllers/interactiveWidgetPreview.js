@@ -187,7 +187,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       if (dest === '?') {
         // The user has added a new state.
         if (!newDest) {
-          warningsData.addWarning('Error: destination state is empty.')
+          warningsData.addWarning('Error: destination state is empty.');
         } else if ($scope.convertDestToId(newDest, true)) {
           // The new state already exists.
           ruleset.dest = $scope.convertDestToId(newDest);

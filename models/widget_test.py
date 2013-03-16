@@ -16,7 +16,6 @@
 
 __author__ = 'Jeremy Emerson'
 
-from widget import GenericWidget
 from widget import Widget
 import test_utils
 
@@ -26,8 +25,9 @@ from google.appengine.ext.db import BadValueError
 class WidgetUnitTests(test_utils.AppEngineTestBase):
     """Test widget models."""
 
+    """
     def test_widget_class(self):
-        """Test the Widget class."""
+        Test the Widget class.
         # A Widget must have the 'raw' property set.
         widget = Widget(id='The hash id')
         with self.assertRaises(BadValueError):
@@ -40,18 +40,5 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         # Retrieve the widget.
         retrieved_widget = Widget.get_by_id('The hash id')
         self.assertEqual(retrieved_widget.raw, 'Some code here')
-
-    def test_generic_widget_class(self):
-        """Test the GenericWidget class."""
-        o = GenericWidget(id='The hash id')
-        o.name = 'The name'
-        o.category = 'The category'
-        o.description = 'The description'
-        o.raw = 'Some code here'
-        o.params = ['Some JsonProperties here']
-        self.assertEqual(o.id, 'The hash id')
-        self.assertEqual(o.name, 'The name')
-        self.assertEqual(o.category, 'The category')
-        self.assertEqual(o.description, 'The description')
-        self.assertEqual(o.raw, 'Some code here')
-        self.assertEqual(o.params, ['Some JsonProperties here'])
+    """
+    pass

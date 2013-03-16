@@ -72,11 +72,9 @@ urls = [
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
     (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
 
-    (r'/widgets/?', widgets.WidgetInstance),
-    (r'/widgets/(%s)/?' % r, widgets.WidgetInstance),
     (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
     (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
-    (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidget),
+    (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidgetHandler),
 
     (r'/stats/(%s)/?' % r, stats.StatsHandler),
 

@@ -168,4 +168,4 @@ def get_dict_from_yaml(yaml_file):
         assert isinstance(yaml_dict, dict)
         return yaml_dict
     except yaml.YAMLError as e:
-        raise utils.InvalidInputException(e)
+        raise InvalidInputException(e)
