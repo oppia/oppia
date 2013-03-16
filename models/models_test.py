@@ -29,27 +29,37 @@ class ModelsUnitTests(test_utils.AppEngineTestBase):
 
     def test_image_class(self):
         """Test the Image class."""
+        # An Image must have the 'raw' property set.
         image = Image(id='The hash id')
         with self.assertRaises(BadValueError):
             image.put()
+
+        # The 'raw' property must be a valid image.
         with self.assertRaises(AssertionError):
             image.raw = 'The image'
+
+        # Set the 'raw' property to be a valid image, then do a put().
         with open('tests/data/img.png') as f:
             image_file = f.read()
         image.raw = image_file
         image.put()
 
+        # Retrieve the image.
         retrieved_image = Image.get_by_id('The hash id')
         self.assertEqual(retrieved_image.raw, image_file)
 
     def test_widget_class(self):
         """Test the Widget class."""
+        # A Widget must have the 'raw' property set.
         widget = Widget(id='The hash id')
         with self.assertRaises(BadValueError):
             widget.put()
+
+        # Set the 'raw' property to be a valid string, then do a put().
         widget.raw = 'Some code here'
         widget.put()
 
+        # Retrieve the widget.
         retrieved_widget = Widget.get_by_id('The hash id')
         self.assertEqual(retrieved_widget.raw, 'Some code here')
 
