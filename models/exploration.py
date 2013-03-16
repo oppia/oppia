@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+from base_model import BaseModel
 import feconf
 from parameter import Parameter
 from state import State
@@ -27,7 +28,7 @@ from google.appengine.ext import ndb
 
 
 # TODO(sll): Add an anyone-can-edit mode.
-class Exploration(ndb.Model):
+class Exploration(BaseModel):
     """An exploration (which is made up of several states)."""
     # The original creator of this exploration.
     owner = ndb.UserProperty()
@@ -48,10 +49,6 @@ class Exploration(ndb.Model):
     image_id = ndb.StringProperty()
     # List of email addresses of users who can edit this exploration.
     editors = ndb.StringProperty(repeated=True)
-
-    @property
-    def id(self):
-        return self.key.id()
 
     @classmethod
     def get(cls, exploration_id):

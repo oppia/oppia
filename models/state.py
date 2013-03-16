@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import os
 
+from base_model import BaseModel
 import feconf
 import importlib
 import logging
@@ -33,7 +34,7 @@ class Content(ndb.Model):
     value = ndb.TextProperty(default='')
 
 
-class State(ndb.Model):
+class State(BaseModel):
     """A state which forms part of an exploration."""
     # NB: This element's parent should be an Exploration.
     # Human-readable name for the state.
@@ -59,10 +60,6 @@ class State(ndb.Model):
     interactive_rulesets = ndb.JsonProperty(default={'submit': []})
     # Parameter changes associated with this state.
     param_changes = ndb.JsonProperty(default={})
-
-    @property
-    def id(self):
-        return self.key.id()
 
     @classmethod
     def create(cls, state_id, exploration, name):

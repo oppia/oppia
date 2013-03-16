@@ -18,32 +18,25 @@
 
 __author__ = 'Sean Lip'
 
+from base_model import BaseModel
 from exploration import Exploration
 
 from google.appengine.ext import ndb
 
 
-class Image(ndb.Model):
+class Image(BaseModel):
     """An image."""
     # The image itself.
-    image = ndb.BlobProperty()
-
-    @property
-    def id(self):
-        return self.key.id()
+    image = ndb.BlobProperty(required=True)
 
 
-class Widget(ndb.Model):
+class Widget(BaseModel):
     """A specific HTML/JS/CSS widget."""
     # The raw widget code.
     raw = ndb.TextProperty()
 
-    @property
-    def id(self):
-        return self.key.id()
 
-
-class GenericWidget(ndb.Model):
+class GenericWidget(BaseModel):
     """A generic, reusable widget that is part of the widget repo."""
     # The name of the generic widget.
     name = ndb.StringProperty(required=True)
@@ -55,8 +48,3 @@ class GenericWidget(ndb.Model):
     raw = ndb.TextProperty()
     # Parameter names, definitions, types and default arguments for this widget.
     params = ndb.JsonProperty(repeated=True)
-
-    @property
-    def id(self):
-        return self.key.id()
-

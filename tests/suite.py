@@ -35,7 +35,8 @@ def main():
     dev_appserver.fix_sys_path()
 
     root_dir = os.path.realpath(os.path.join(os.getcwd()))
-    suite = unittest.loader.TestLoader().discover(root_dir, pattern='*_test.py', top_level_dir=root_dir)
+    suite = unittest.loader.TestLoader().discover(
+        root_dir, pattern='*_test.py', top_level_dir=root_dir)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
 
     if result.errors or result.failures:

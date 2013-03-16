@@ -24,37 +24,42 @@ from models import Image
 from models import Widget
 
 from google.appengine.ext import ndb
+from google.appengine.ext.db import BadValueError
 
 
 class ModelsUnitTests(test_utils.AppEngineTestBase):
     """Test models."""
 
-    def testImageClass(self):
-        """Test Image Class."""
-        o = Image(id='The hash id')
-        o.image = 'The image'
-        self.assertEquals(o.id, 'The hash id')
-        self.assertEquals(o.image, 'The image')
+    def test_image_class(self):
+        """Test the Image class."""
+        image_entity = Image(id='The hash id')
+        with self.assertRaises(BadValueError):
+            image_entity.put()
+        image_entity.image = 'The image'
+        image_entity.put()
 
-    def testWidgetClass(self):
-        """Test Widget Class."""
+        retrieved_entity = Image.get_by_id('The hash id')
+        self.assertEquals(retrieved_entity.image, 'The image')
+
+    def test_widget_class(self):
+        """Test the Widget class."""
+
         o = Widget(id='The hash id')
         o.raw = 'Some code here'
         self.assertEqual(o.id, 'The hash id')
         self.assertEqual(o.raw, 'Some code here')
 
-    def testGenericWidgetClass(self):
-        """Test GenericWidget Class."""
+    def test_generic_widget_class(self):
+        """Test the GenericWidget class."""
         o = GenericWidget(id='The hash id')
         o.name = 'The name'
         o.category = 'The category'
         o.description = 'The description'
         o.raw = 'Some code here'
-        o.prams = 'Some JsonProperties here'
+        o.params = ['Some JsonProperties here']
         self.assertEqual(o.id, 'The hash id')
         self.assertEqual(o.name, 'The name')
         self.assertEqual(o.category, 'The category')
         self.assertEqual(o.description, 'The description')
         self.assertEqual(o.raw, 'Some code here')
-        self.assertEqual(o.prams, 'Some JsonProperties here')
-
+        self.assertEqual(o.params, ['Some JsonProperties here'])

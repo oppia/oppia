@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Model for an Oppia exploration parameter."""
+"""Base model class."""
 
 __author__ = 'Sean Lip'
-
-from base_model import BaseModel
 
 from google.appengine.ext import ndb
 
 
-class Parameter(BaseModel):
-    """A parameter definition for an exploration."""
-    # The name of the parameter
-    name = ndb.StringProperty(required=True)
-    # The possible starting values to choose from
-    starting_values = ndb.StringProperty(repeated=True)
+class BaseModel(ndb.Model):
+    """A model stub which has an explicit id property."""
+    @property
+    def id(self):
+        return self.key.id()
+
