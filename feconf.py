@@ -114,6 +114,7 @@ FOOTER_JS_FILES = [
 ALL_CSS_LIBS = [
     os.path.join(THIRD_PARTY_DIR, 'angular-ui/build/angular-ui.css'),
     os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap.css'),
+    os.path.join(THIRD_PARTY_DIR, 'select2/select2.css'),
     os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
     os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap-responsive.css'),
 ]
