@@ -51,7 +51,11 @@ DEMO_EXPLORATIONS = [
     ('hola', '¡Hola!', 'Languages'),
     ('pitch', 'Pitch Perfect', 'Music'),
     ('counting', 'Three Balls', 'Mathematics'),
+    ('bootVerbs', 'Boot Verbs', 'Languages'),
 ]
+
+# Ensure that there is at least one demo exploration.
+assert DEMO_EXPLORATIONS
 
 # Whether to unconditionally log info messages.
 DEBUG = False
@@ -80,6 +84,10 @@ SAMPLE_WIDGETS_DIR = 'data/widgets'
 
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
+JINJA_ENV.filters.update({
+    'is_list': lambda x: isinstance(x, list),
+    'is_dict': lambda x: isinstance(x, dict),
+})
 
 # The jinja environment used for loading widget previews.
 WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
@@ -118,3 +126,5 @@ ALL_CSS_LIBS = [
     os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
     os.path.join(THIRD_PARTY_DIR, 'bootstrap/css/bootstrap-responsive.css'),
 ]
+
+END_DEST = 'END'

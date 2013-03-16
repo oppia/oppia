@@ -18,48 +18,13 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 import utils
-from models.state import State
-
-
-class FakeEntity(object):
-
-    def __init__(self, name, entity_id, ancestor=None, user=None):
-        self.__name__ = name
-        self.name = name
-        self.id = entity_id
-        self.key = entity_id
-        if ancestor:
-            self.ancestor = ancestor
-        if user:
-            self.user = user
-        self.param = True
-
-    def get_by_id(self, query_id):
-        if query_id == self.id:
-            return self
-
-    def query(self, ancestor=None):
-        if not ancestor:
-            return self
-        if self.ancestor.key == ancestor:
-            return self
-        return None
-
-    def filter(self, param):
-        self.param = param
-        return self
-
-    def get(self):
-        if self.param:
-            return self
-        return None
 
 
 class UtilsTests(test_utils.AppEngineTestBase):
-    """Test the exploration model."""
+    """Test the core utility methods."""
 
     def test_create_enum_method(self):
-        """Test create_enum Method."""
+        """Test create_enum method."""
         o = utils.create_enum('first', 'second', 'third')
         self.assertEqual(o.first, 'first')
         self.assertEqual(o.second, 'second')
@@ -67,33 +32,48 @@ class UtilsTests(test_utils.AppEngineTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
-    def test_check_existence_of_name_method(self):
-        """Test check_existence_of_name Method."""
-        ancestor = FakeEntity('The_ancestor', 2)
-        entity = FakeEntity('The_fake_entity', 1, ancestor)
-        with self.assertRaises(AttributeError):
-            utils.check_existence_of_name(None, None)
-        with self.assertRaises(utils.EntityIdNotFoundError):
-            utils.check_existence_of_name(entity, None)
-        self.assertTrue(utils.check_existence_of_name(
-            entity, 'The_fake_entity'))
-        self.assertFalse(utils.check_existence_of_name(
-            entity, 'The_not_found_entity'))
-        self.assertTrue(utils.check_existence_of_name(
-            entity, 'The_fake_entity', ancestor))
-        with self.assertRaises(KeyError):
-            utils.check_existence_of_name(State, 'The_fake_entity', None)
+    def test_get_js_controllers(self):
+        """Test get_js_controllers method."""
+        js_file = utils.get_js_controllers(['base', 'yamlEditor'])
+        self.assertIn('Base', js_file)
+        self.assertIn('function YamlEditor(', js_file)
+        self.assertNotIn('function EditorExploration(', js_file)
 
-    def test_get_state_by_name_method(self):
-        """Test get_state_by_name_method Method."""
-        exploration = FakeEntity('The_fake_exploration', 1)
-        fake_state = FakeEntity('The_fake_state', 2, exploration)
-        backup_query = utils.State.query
-        utils.State.query = fake_state.query
-        with self.assertRaises(utils.EntityIdNotFoundError):
-            utils.get_state_by_name(None, None)
-        with self.assertRaises(KeyError):
-            utils.get_state_by_name('The_fake_entity', None)
-        self.assertEqual(fake_state, utils.get_state_by_name(
-            'The_fake_entity', exploration))
-        utils.State.query = backup_query
+        # Try the case where no controllers are needed.
+        js_file = utils.get_js_controllers([])
+        self.assertEqual(js_file, '')
+
+    def test_parse_with_jinja(self):
+        """Test parse_with_jinja method."""
+        parsed_str = utils.parse_with_jinja('{{test}}', {'test': 'hi'})
+        self.assertEqual(parsed_str, 'hi')
+
+        # Some parameters are missing.
+        parsed_str = utils.parse_with_jinja(
+            '{{test}} and {{test2}}', {'test2': 'hi'})
+        self.assertEqual(parsed_str, ' and hi')
+
+        # All parameters are missing.
+        parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {})
+        self.assertEqual(parsed_str, ' and ')
+
+        # Default parameters are used.
+        parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {}, 'def')
+        self.assertEqual(parsed_str, 'def and def')
+
+        # The string has no parameters.
+        parsed_str = utils.parse_with_jinja('no params', {'param': 'hi'})
+        self.assertEqual(parsed_str, 'no params')
+
+        # Integer parameters are used.
+        parsed_str = utils.parse_with_jinja('int {{i}}', {'i': 2})
+        self.assertEqual(parsed_str, 'int 2')
+
+    def test_get_comma_sep_string_from_list(self):
+        """Test get_comma_sep_string_from_list method."""
+        alist = ['a', 'b', 'c', 'd']
+        results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
+
+        for i in range(len(alist) + 1):
+            comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
+            self.assertEqual(comma_sep_string, results[i])

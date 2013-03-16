@@ -17,7 +17,9 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
+import controller_utils
 from controllers.base import BaseHandler
+from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 import utils
 
@@ -42,7 +44,7 @@ class GalleryHandler(BaseHandler):
     def get(self):
         """Handles GET requests."""
         user = users.get_current_user()
-        augmented_user = utils.get_augmented_user(user) if user else None
+        augmented_user = AugmentedUser.get(user) if user else None
 
         used_keys = []
 
@@ -51,7 +53,7 @@ class GalleryHandler(BaseHandler):
                 Exploration.is_public == True):
             category_name = exploration.category
 
-            can_edit = user and utils.check_can_edit(user, exploration)
+            can_edit = user and controller_utils.check_can_edit(user, exploration)
 
             used_keys.append(exploration.key)
 
@@ -64,7 +66,7 @@ class GalleryHandler(BaseHandler):
             categories[category_name].append({
                 'data': data,
                 'can_edit': can_edit,
-                'can_fork': user and utils.is_demo_exploration(exploration.id),
+                'can_fork': user and exploration.is_demo(),
                 'is_owner': user and user == exploration.owner,
             })
 

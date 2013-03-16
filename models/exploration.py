@@ -18,8 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
 from parameter import Parameter
 from state import State
+import utils
 
 from google.appengine.ext import ndb
 
@@ -61,3 +63,31 @@ class Exploration(ndb.Model):
         for state_key in self.states:
             state_key.delete()
         self.key.delete()
+
+    def is_demo(self):
+        """Checks if the exploration is one of the demos."""
+        return len(self.id) < 4
+
+    def as_yaml(self):
+        """Returns a copy of the exploration as YAML."""
+        init_dict = {}
+        exploration_dict = {}
+        for state_key in self.states:
+            state = state_key.get()
+
+            state_internals = state.internals_as_dict()
+            # Change the dest id to a dest name.
+            for action in state_internals['widget']['rules']:
+                for rule in state_internals['widget']['rules'][action]:
+                    if rule['dest'] != feconf.END_DEST:
+                        rule['dest'] = State.get(rule['dest'], self).name
+
+            if self.init_state.get().id == state.id:
+                init_dict[state.name] = state.internals_as_dict()
+            else:
+                exploration_dict[state.name] = state.internals_as_dict()
+
+        result = utils.get_yaml_from_dict(init_dict)
+        if exploration_dict:
+            result += utils.get_yaml_from_dict(exploration_dict)
+        return result

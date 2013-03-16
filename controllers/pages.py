@@ -17,10 +17,10 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from controllers.base import BaseHandler
+import controller_utils
 import feconf
 from models.exploration import Exploration
 import utils
-from yaml_utils import YamlTransformer
 
 
 class MainPage(BaseHandler):
@@ -29,14 +29,8 @@ class MainPage(BaseHandler):
     def _ensure_default_explorations_exist(self):
         """Checks whether a demo exploration exists; if not, creates them."""
 
-        if not feconf.DEMO_EXPLORATIONS:
-            raise self.InternalErrorException('No demo explorations defined.')
-
-        # TODO(sll): Try and get the following code to run on warmup instead,
-        # so that we don't have to do the datastore check each time.
-        # Alternatively, implement caching so that the check is done cheaply.
         if not Exploration.get('0'):
-            YamlTransformer.create_default_explorations()
+            controller_utils.create_default_explorations()
 
     def get(self):
         """Handles GET requests."""
@@ -64,4 +58,5 @@ class TermsPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
         self.render_template('terms.html')

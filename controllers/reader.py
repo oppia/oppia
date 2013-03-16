@@ -23,6 +23,7 @@ import random
 
 from controllers.base import BaseHandler
 from controllers.widgets import InteractiveWidget
+import controller_utils
 import feconf
 from models.exploration import Exploration
 from models.state import Content
@@ -99,10 +100,9 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         exploration = Exploration.get(exploration_id)
-        logging.info(exploration.init_state)
         init_state = exploration.init_state.get()
         params = self.get_params(init_state)
-        init_html, init_widgets = utils.parse_content_into_html(
+        init_html, init_widgets = controller_utils.parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_interactive_widget(
             init_state.interactive_widget,
@@ -127,34 +127,13 @@ class ExplorationHandler(BaseHandler):
 
         EventHandler.record_exploration_visited(exploration_id)
 
-    def post(self, exploration_id, state_id):
-        """Handles feedback interactions with readers."""
-        values = {'error': []}
+    def transition(self, state, answer, params, interactive_widget_properties):
+        """Handle feedback interactions with readers."""
+        # TODO(sll): Move this to the models.state class.
 
-        exploration = Exploration.get(exploration_id)
-        state = State.get(state_id, exploration)
-        old_state = state
-
-        payload = json.loads(self.request.get('payload'))
-
-        # The 0-based index of the last content block already on the page.
-        block_number = payload.get('block_number')
-        params = self.get_params(state, payload.get('params'))
-        # The reader's answer.
-        answer = payload.get('answer')
         dest_id = None
         feedback = None
-
-        logging.info(answer)
-
-        # Add the reader's answer to the parameter list. This must happen before
-        # the interactive widget is constructed.
-        params['answer'] = answer
-
-        interactive_widget_properties = (
-            InteractiveWidget.get_interactive_widget(
-                state.interactive_widget,
-                state_params_dict=params)['actions']['submit'])
+        default_recorded_answer = None
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module to be used in eval() below.
@@ -182,8 +161,7 @@ class ExplorationHandler(BaseHandler):
                     recorded_answer = (
                         state.interactive_params['choices'][int(answer)])
 
-                EventHandler.record_default_case_hit(
-                    exploration_id, state_id, recorded_answer)
+                default_recorded_answer = recorded_answer
 
             assert rule['code']
 
@@ -207,6 +185,41 @@ class ExplorationHandler(BaseHandler):
                 feedback = rule['feedback']
                 break
 
+        return dest_id, feedback, default_recorded_answer
+
+
+    def post(self, exploration_id, state_id):
+        """Handles feedback interactions with readers."""
+        values = {'error': []}
+
+        exploration = Exploration.get(exploration_id)
+        state = State.get(state_id, exploration)
+        old_state = state
+
+        payload = json.loads(self.request.get('payload'))
+
+        # The 0-based index of the last content block already on the page.
+        block_number = payload.get('block_number')
+        params = self.get_params(state, payload.get('params'))
+        # The reader's answer.
+        answer = payload.get('answer')
+
+        # Add the reader's answer to the parameter list. This must happen before
+        # the interactive widget is constructed.
+        params['answer'] = answer
+
+        interactive_widget_properties = (
+            InteractiveWidget.get_interactive_widget(
+                state.interactive_widget,
+                state_params_dict=params)['actions']['submit'])
+
+        dest_id, feedback, default_recorded_answer = self.transition(
+            state, answer, params, interactive_widget_properties)
+
+        if default_recorded_answer:
+            EventHandler.record_default_case_hit(
+                exploration_id, state_id, default_recorded_answer)
+
         assert dest_id
 
         html_output, widget_output = '', []
@@ -218,15 +231,12 @@ class ExplorationHandler(BaseHandler):
 
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
-            'reader_response.html').render(
-                {'response': utils.encode_strings_as_ascii(answer)})
+            'reader_response.html').render({'response': answer})
 
-        logging.info(answer)
-
-        if dest_id == utils.END_DEST:
+        if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                action_html, action_widgets = utils.parse_content_into_html(
+                action_html, action_widgets = controller_utils.parse_content_into_html(
                     [Content(type='text', value=feedback)],
                     block_number,
                     params)
@@ -238,7 +248,7 @@ class ExplorationHandler(BaseHandler):
 
             # Append Oppia's feedback, if any.
             if feedback:
-                action_html, action_widgets = utils.parse_content_into_html(
+                action_html, action_widgets = controller_utils.parse_content_into_html(
                     [Content(type='text', value=feedback)],
                     block_number,
                     params)
@@ -247,7 +257,7 @@ class ExplorationHandler(BaseHandler):
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
-                state_html, state_widgets = utils.parse_content_into_html(
+                state_html, state_widgets = controller_utils.parse_content_into_html(
                     state.content, block_number, params)
                 html_output += state_html
                 widget_output.append(state_widgets)
@@ -260,10 +270,10 @@ class ExplorationHandler(BaseHandler):
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
         values['interactive_widget_html'] = (
-            'Congratulations, you\'ve finished this exploration!')
+            'Congratulations, you\'ve finished this exploration! Would you like to <a href ng-click="initializePage()" target="_top">play again?</a>')
         values['params'] = params
 
-        if dest_id != utils.END_DEST:
+        if dest_id != feconf.END_DEST:
             values['interactive_widget_html'] = (
                 InteractiveWidget.get_interactive_widget(
                     state.interactive_widget,
@@ -271,7 +281,6 @@ class ExplorationHandler(BaseHandler):
                     state_params_dict=params)['raw']
             )
 
-        logging.info(values)
         self.response.write(json.dumps(values))
 
 
