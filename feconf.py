@@ -51,6 +51,7 @@ DEMO_EXPLORATIONS = [
     ('hola', '¡Hola!', 'Languages'),
     ('pitch', 'Pitch Perfect', 'Music'),
     ('counting', 'Three Balls', 'Mathematics'),
+    ('bootVerbs', 'Boot Verbs', 'Languages'),
 ]
 
 # Ensure that there is at least one demo exploration.
