@@ -69,6 +69,15 @@ if [ ! -d "third_party/bootstrap" ]; then
   rm bootstrap-download.zip
 fi
 
+echo Checking whether select2 is installed in third_party
+if [ ! -d "third_party/select2" ]; then
+  echo Installing select2
+  mkdir -p third_party/
+  wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
+  unzip select2-download.zip -d third_party/
+  rm select2-download.zip
+fi
+
 echo Checking whether the Closure Compiler is installed in third_party
 if [ ! -d "third_party/closure-compiler" ]; then
   echo Installing Closure Compiler
