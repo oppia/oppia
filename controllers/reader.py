@@ -231,8 +231,7 @@ class ExplorationHandler(BaseHandler):
 
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
-            'reader_response.html').render(
-                {'response': utils.try_removing_unicode_prefixes(answer)})
+            'reader_response.html').render({'response': answer})
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
