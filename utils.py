@@ -22,6 +22,7 @@ import hashlib
 import json
 import logging
 import os
+import unicodedata
 import yaml
 
 from jinja2 import Environment
@@ -149,9 +150,10 @@ def get_comma_sep_string_from_list(items):
     return '%s and %s' % (', '.join(items[:-1]), items[-1])
 
 
-def to_string(string):
-    """Removes unicode characters from a string."""
-    return string.encode('ascii', 'ignore')
+def to_ascii(string):
+    """Change unicode characters in a string to ascii if possible."""
+    return unicodedata.normalize(
+        'NFKD', unicode(string)).encode('ascii', 'ignore')
 
 
 def get_yaml_from_dict(dictionary):
