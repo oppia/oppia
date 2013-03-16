@@ -76,6 +76,7 @@ if [ ! -d "third_party/select2" ]; then
   wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
   unzip select2-download.zip -d third_party/
   rm select2-download.zip
+  mv third_party/select2-master third_party/select2
 fi
 
 echo Checking whether the Closure Compiler is installed in third_party
