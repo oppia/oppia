@@ -149,26 +149,6 @@ def get_comma_sep_string_from_list(items):
     return '%s and %s' % (', '.join(items[:-1]), items[-1])
 
 
-def try_removing_unicode_prefixes(obj):
-    """Recursively tries to encode strings in an object as ASCII strings."""
-    if isinstance(obj, int) or isinstance(obj, set):
-        return obj
-    elif isinstance(obj, str) or isinstance(obj, unicode):
-        try:
-            return str(obj)
-        except Exception:
-            return obj
-    elif isinstance(obj, list):
-        return [try_removing_unicode_prefixes(item) for item in obj]
-    elif isinstance(obj, dict):
-        new_dict = {}
-        for item in obj:
-            new_dict[try_removing_unicode_prefixes(item)] = (
-                try_removing_unicode_prefixes(obj[item]))
-    else:
-        return obj
-
-
 def to_string(string):
     """Removes unicode characters from a string."""
     return string.encode('ascii', 'ignore')

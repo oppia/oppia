@@ -84,6 +84,10 @@ SAMPLE_WIDGETS_DIR = 'data/widgets'
 
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
+JINJA_ENV.filters.update({
+    'is_list': lambda x: isinstance(x, list),
+    'is_dict': lambda x: isinstance(x, dict),
+})
 
 # The jinja environment used for loading widget previews.
 WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(

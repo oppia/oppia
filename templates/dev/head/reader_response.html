@@ -1,3 +1,21 @@
 <div class="oppia-reader-response">
-  {{response}}
+  {% if response | is_list %}
+    <!-- This allows unicode items in lists to be displayed properly. -->
+    {% if (response | length) == 0 %}
+      None
+    {% else %}
+      <ul>
+      	{% for item in response %}
+      	  <li>
+      	    {{item}}
+      	  </li>
+      	{% endfor %}
+      </ul>
+    {% endif %}
+
+  {% else %}
+
+    {{response}}
+
+  {% endif %}
 </div>
