@@ -131,3 +131,5 @@ END_DEST = 'END'
 
 # Default file name for newly-created files for download.
 DEFAULT_FILE_NAME = 'New file'
+
+ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']

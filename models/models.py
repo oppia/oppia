@@ -18,22 +18,34 @@
 
 __author__ = 'Sean Lip'
 
+import imghdr
+
+import feconf
 from base_model import BaseModel
-from exploration import Exploration
 
 from google.appengine.ext import ndb
 
 
+class ImageProperty(ndb.BlobProperty):
+    """An image property that validates that the image is valid."""
+    def _validate(self, value):
+        is_valid = imghdr.what(None, h=value) in feconf.ACCEPTED_IMAGE_FORMATS
+        allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
+        error_message = ('Image file not recognized: it should be in one of '
+                         'the following formats: %s.' % allowed_formats)
+        assert is_valid, error_message
+
+
 class Image(BaseModel):
     """An image."""
-    # The image itself.
-    image = ndb.BlobProperty(required=True)
+    # The raw image blob.
+    raw = ImageProperty(required=True)
 
 
 class Widget(BaseModel):
     """A specific HTML/JS/CSS widget."""
     # The raw widget code.
-    raw = ndb.TextProperty()
+    raw = ndb.TextProperty(required=True)
 
 
 class GenericWidget(BaseModel):
@@ -45,6 +57,6 @@ class GenericWidget(BaseModel):
     # The description of the generic widget.
     description = ndb.TextProperty()
     # The raw code for the generic widget.
-    raw = ndb.TextProperty()
+    raw = ndb.TextProperty(required=True)
     # Parameter names, definitions, types and default arguments for this widget.
     params = ndb.JsonProperty(repeated=True)

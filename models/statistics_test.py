@@ -25,7 +25,7 @@ from statistics import Journal
 class StatisticsUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
 
-    def testCounterClass(self):
+    def test_counter_class(self):
         """Test Counter Class."""
         o = Counter()
         o.name = 'The name'
@@ -33,7 +33,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(o.name, 'The name')
         self.assertEqual(o.value, 2)
 
-    def testJournalClass(self):
+    def test_journal_class(self):
         """Test Journal Class."""
         o = Journal()
         o.name = 'The name'

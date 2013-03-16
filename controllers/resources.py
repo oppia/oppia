@@ -80,17 +80,16 @@ class ImageHandler(BaseHandler):
         if image:
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = 'image/png'
-            self.response.write(image.image)
+            self.response.write(image.raw)
         else:
             self.response.write('No image')
 
     def post(self):
         """Saves an image uploaded by a content creator."""
-        # TODO(sll): Check that the image is really an image.
-        image = self.request.get('image')
-        if image:
+        raw = self.request.get('image')
+        if raw:
             image_id = utils.get_new_id(Image, '')
-            image_entity = Image(id=image_id, image=image)
+            image_entity = Image(id=image_id, raw=raw)
             image_entity.put()
             self.response.write(json.dumps(
                 {'image_id': image_entity.id}))

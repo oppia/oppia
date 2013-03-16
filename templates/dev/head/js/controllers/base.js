@@ -162,6 +162,8 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
       return;
     }
 
+    warningsData.clear();
+
     // The content creator has uploaded an image.
     var form = new FormData();
     form.append('image', image);
@@ -180,7 +182,11 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
           }
         },
         error: function(data) {
-          warningsData.addWarning(data.error || 'Error communicating with server.');
+          warningsData.addWarning(
+            JSON.parse(data.responseText).error ||
+            'Error communicating with server.'
+          );
+          $scope.$apply();
         }
     });
   };

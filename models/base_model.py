@@ -24,4 +24,3 @@ class BaseModel(ndb.Model):
     @property
     def id(self):
         return self.key.id()
-

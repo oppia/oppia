@@ -142,8 +142,9 @@ class BaseHandler(webapp2.RequestHandler):
                 {'code': '500 System Error', 'error': str(exception)}))
             return
 
-        webapp2.RequestHandler.handle_exception(self, exception, debug_mode)
-        logging.error('Exception was not handled: %s', exception)
+        self.error(500)
+        self.response.write(json.dumps(
+            {'code': '500', 'error': str(exception)}))
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""

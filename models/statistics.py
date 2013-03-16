@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 import utils
 
-from models import Exploration
+from exploration import Exploration
 
 from google.appengine.ext import ndb
 

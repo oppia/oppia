@@ -16,14 +16,11 @@
 
 __author__ = 'Jeremy Emerson'
 
-import test_utils
-
-from exploration import Exploration
 from models import GenericWidget
 from models import Image
 from models import Widget
+import test_utils
 
-from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
 
 
@@ -32,22 +29,29 @@ class ModelsUnitTests(test_utils.AppEngineTestBase):
 
     def test_image_class(self):
         """Test the Image class."""
-        image_entity = Image(id='The hash id')
+        image = Image(id='The hash id')
         with self.assertRaises(BadValueError):
-            image_entity.put()
-        image_entity.image = 'The image'
-        image_entity.put()
+            image.put()
+        with self.assertRaises(AssertionError):
+            image.raw = 'The image'
+        with open('tests/data/img.png') as f:
+            image_file = f.read()
+        image.raw = image_file
+        image.put()
 
-        retrieved_entity = Image.get_by_id('The hash id')
-        self.assertEquals(retrieved_entity.image, 'The image')
+        retrieved_image = Image.get_by_id('The hash id')
+        self.assertEqual(retrieved_image.raw, image_file)
 
     def test_widget_class(self):
         """Test the Widget class."""
+        widget = Widget(id='The hash id')
+        with self.assertRaises(BadValueError):
+            widget.put()
+        widget.raw = 'Some code here'
+        widget.put()
 
-        o = Widget(id='The hash id')
-        o.raw = 'Some code here'
-        self.assertEqual(o.id, 'The hash id')
-        self.assertEqual(o.raw, 'Some code here')
+        retrieved_widget = Widget.get_by_id('The hash id')
+        self.assertEqual(retrieved_widget.raw, 'Some code here')
 
     def test_generic_widget_class(self):
         """Test the GenericWidget class."""
