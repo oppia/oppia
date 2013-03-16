@@ -20,7 +20,7 @@ import json
 
 from controllers.base import BaseHandler
 import feconf
-from models.models import Image
+from models.image import Image
 import utils
 
 

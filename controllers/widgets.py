@@ -24,8 +24,8 @@ import controller_utils
 from controllers.base import BaseHandler
 from controllers.base import require_user
 import feconf
-from models.models import GenericWidget
-from models.models import Widget
+from models.widget import GenericWidget
+from models.widget import Widget
 import utils
 
 from google.appengine.api import users

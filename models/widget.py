@@ -14,32 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for Oppia."""
+"""Models for Oppia widgets."""
 
 __author__ = 'Sean Lip'
 
-import imghdr
-
-import feconf
 from base_model import BaseModel
 
 from google.appengine.ext import ndb
-
-
-class ImageProperty(ndb.BlobProperty):
-    """An image property that validates that the image is valid."""
-    def _validate(self, value):
-        is_valid = imghdr.what(None, h=value) in feconf.ACCEPTED_IMAGE_FORMATS
-        allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
-        error_message = ('Image file not recognized: it should be in one of '
-                         'the following formats: %s.' % allowed_formats)
-        assert is_valid, error_message
-
-
-class Image(BaseModel):
-    """An image."""
-    # The raw image blob.
-    raw = ImageProperty(required=True)
 
 
 class Widget(BaseModel):

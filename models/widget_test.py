@@ -16,37 +16,15 @@
 
 __author__ = 'Jeremy Emerson'
 
-from models import GenericWidget
-from models import Image
-from models import Widget
+from widget import GenericWidget
+from widget import Widget
 import test_utils
 
 from google.appengine.ext.db import BadValueError
 
 
-class ModelsUnitTests(test_utils.AppEngineTestBase):
-    """Test models."""
-
-    def test_image_class(self):
-        """Test the Image class."""
-        # An Image must have the 'raw' property set.
-        image = Image(id='The hash id')
-        with self.assertRaises(BadValueError):
-            image.put()
-
-        # The 'raw' property must be a valid image.
-        with self.assertRaises(AssertionError):
-            image.raw = 'The image'
-
-        # Set the 'raw' property to be a valid image, then do a put().
-        with open('tests/data/img.png') as f:
-            image_file = f.read()
-        image.raw = image_file
-        image.put()
-
-        # Retrieve the image.
-        retrieved_image = Image.get_by_id('The hash id')
-        self.assertEqual(retrieved_image.raw, image_file)
+class WidgetUnitTests(test_utils.AppEngineTestBase):
+    """Test widget models."""
 
     def test_widget_class(self):
         """Test the Widget class."""

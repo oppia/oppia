@@ -19,9 +19,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 import os
 
 import feconf
-from models.exploration import Exploration
 from models.augmented_user import AugmentedUser
-from models.models import Widget
+from models.exploration import Exploration
+from models.widget import Widget
 from models.state import State
 import utils
 
