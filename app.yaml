@@ -12,16 +12,24 @@ handlers:
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
   secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /images
   static_dir: static/images
   secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /data/widgets/(.*)/static/(.*)
   static_files: data/widgets/\1/static/\2
   upload: data/widgets/(.*)/static/(.*)
   secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /.*
   script: main.app
   secure: always
