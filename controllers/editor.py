@@ -223,7 +223,9 @@ class ExplorationDownloadHandler(BaseHandler):
     @require_editor
     def get(self, unused_user, exploration):
         """Handles GET requests."""
-        filename = 'oppia-%s' % utils.to_string(exploration.title)
+        filename = 'oppia-%s' % utils.to_ascii(exploration.title)
+        if not filename:
+            filename = feconf.DEFAULT_FILE_NAME
 
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (

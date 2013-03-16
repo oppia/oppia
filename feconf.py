@@ -51,7 +51,7 @@ DEMO_EXPLORATIONS = [
     ('hola', '¡Hola!', 'Languages'),
     ('pitch', 'Pitch Perfect', 'Music'),
     ('counting', 'Three Balls', 'Mathematics'),
-    ('bootVerbs', 'Boot Verbs', 'Languages'),
+    ('boot_verbs', 'Boot Verbs', 'Languages'),
 ]
 
 # Ensure that there is at least one demo exploration.
@@ -128,3 +128,6 @@ ALL_CSS_LIBS = [
 ]
 
 END_DEST = 'END'
+
+# Default file name for newly-created files for download.
+DEFAULT_FILE_NAME = 'New file'

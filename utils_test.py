@@ -77,3 +77,28 @@ class UtilsTests(test_utils.AppEngineTestBase):
         for i in range(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
+
+    def test_to_ascii(self):
+        """Test to_ascii method."""
+        parsed_str = utils.to_ascii('abc')
+        self.assertEqual(parsed_str, 'abc')
+
+        parsed_str = utils.to_ascii(u'¡Hola!')
+        self.assertEqual(parsed_str, 'Hola!')
+
+        parsed_str = utils.to_ascii(
+            u'Klüft skräms inför på fédéral électoral große')
+        self.assertEqual(
+            parsed_str, 'Kluft skrams infor pa federal electoral groe')
+
+        parsed_str = utils.to_ascii('')
+        self.assertEqual(parsed_str, '')
+
+    def test_yaml_dict_conversion(self):
+        """Test get_yaml_from_dict and get_dict_from_yaml methods."""
+        test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
+
+        for adict in test_dicts:
+            yaml_str = utils.get_yaml_from_dict(adict)
+            yaml_dict = utils.get_dict_from_yaml(yaml_str)
+            self.assertEqual(adict, yaml_dict)
