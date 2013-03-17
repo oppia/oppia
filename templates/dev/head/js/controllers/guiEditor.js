@@ -176,8 +176,8 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   $scope.addContent = function(contentType) {
     if (contentType == 'text') {
-      activeInputData.name = 'content.' + $scope.content.length;
       $scope.content.push({type: 'text', value: ''});
+      activeInputData.name = 'content.' + $scope.content.length;
     } else if (contentType == 'image') {
       $scope.content.push({type: 'image', value: ''});
     } else if (contentType == 'video') {
@@ -291,7 +291,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   //TODO: (in html) see if there's a clean way of having the editor pop-up in
   //the list itself
-  
+
   //controllers for ui boxes: parameter to be changed, and change options/list
   $scope.paramSelector = {
     createSearchChoice:function(term, data) {
