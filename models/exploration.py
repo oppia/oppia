@@ -20,12 +20,17 @@ __author__ = 'Sean Lip'
 
 from base_model import BaseModel
 import feconf
-from parameter import Parameter
 from state import State
 import utils
 
 from google.appengine.ext import ndb
 
+class Parameter(ndb.Model):
+    """A parameter definition for an exploration."""
+    # The name of the parameter
+    name = ndb.StringProperty(required=True)
+    # The data type of the parameter - for now only string or list
+    type = ndb.StringProperty(required=True) 
 
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(BaseModel):
@@ -42,7 +47,7 @@ class Exploration(BaseModel):
     # The list of states this exploration consists of.
     states = ndb.KeyProperty(kind=State, repeated=True)
     # The list of parameters associated with this exploration
-    parameters = ndb.KeyProperty(kind=Parameter, repeated=True)
+    parameters = ndb.StructuredProperty(Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.

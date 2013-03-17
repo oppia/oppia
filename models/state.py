@@ -171,8 +171,6 @@ class State(BaseModel):
             if 'attrs' in rule:
                 rule_dict['attrs'] = rule['attrs']
 
-            # TODO(yanamal): Add param_changes here.
-
             rulesets_dict['submit'].append(rule_dict)
 
         state.interactive_rulesets = rulesets_dict
