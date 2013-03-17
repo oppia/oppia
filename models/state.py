@@ -25,6 +25,7 @@ import os
 from base_model import BaseModel
 import feconf
 import utils
+from widget import Widget
 
 from google.appengine.ext import ndb
 
@@ -140,18 +141,26 @@ class State(BaseModel):
         if 'param_changes' in state_dict:
             state.param_changes = state_dict['param_changes']
         state.interactive_widget = state_dict['widget']['id']
-        if 'params' in state_dict['widget']:
-            state.interactive_params = state_dict['widget']['params']
+
+        widget_params = Widget.get(state.interactive_widget).params
+        parameters = {}
+        for param in widget_params:
+            if param.name in state_dict['widget']['params']:
+                parameters[param.name] = state_dict['widget']['params'][param.name]
+                del state_dict['widget']['params'][param.name]
+            else:
+                parameters[param.name] = param.default_value
+
+        if state_dict['widget']['params']:
+            raise Exception('Extra parameters not used: %s' %
+                            state_dict['widget']['params'])
+
+        state.interactive_params = parameters
 
         rulesets_dict = {'submit': []}
 
         for rule in state_dict['widget']['rules']['submit']:
-            rule_dict = {'code': rule['code']}
-
-            if 'feedback' in rule:
-                rule_dict['feedback'] = rule['feedback']
-            else:
-                rule_dict['feedback'] = None
+            rule_dict = {'code': rule['code'], 'feedback': rule.get('feedback')}
 
             if rule['dest'] == feconf.END_DEST:
                 rule_dict['dest'] = feconf.END_DEST
@@ -161,7 +170,7 @@ class State(BaseModel):
                     rule_dict['dest'] = dest_state.id
                 else:
                     raise cls.InvalidInputException(
-                        'Invalid dest: %s' % rule['dest'])
+                        'Invalid destination: %s' % rule['dest'])
 
             if 'rule' in rule:
                 rule_dict['rule'] = rule['rule']
