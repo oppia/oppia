@@ -55,6 +55,8 @@
     $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
 
     $scope.$apply();
+    $scope.updateMath();
+
     if (data.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + data.widgets[0].blockIndex + '-' +
           data.widgets[0].index, data.widgets[0].code);
@@ -105,6 +107,8 @@
     $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
 
     $scope.$apply();
+    $scope.updateMath();
+
     if ($scope.widgets.length > 0) {
       $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
           $scope.widgets[0].index, $scope.widgets[0].code);

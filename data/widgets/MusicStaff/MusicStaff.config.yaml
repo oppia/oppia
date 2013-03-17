@@ -1,4 +1,4 @@
-# The system name for this widget.
+# The system name for this widget. This should match this file's name.
 id: MusicStaff
 
 # The human-readable name of the widget.
@@ -11,15 +11,22 @@ description: |
   using the up and down arrow keys.
 
 # Actions that the reader can perform on this widget which trigger a feedback
-# interaction.
-actions:
-  submit:
-    classifier: MusicNoteClassifier
+# interaction, and the associated classifiers.
+handlers:
+- name: submit
+  classifier: MusicNoteClassifier
 
-# Customization parameters and their default values.
+# Customization parameters and their descriptions, types and default values.
 params:
-  noteToGuess: B4
-  notesToPlayAtStart: []
-  previousAnswer: ''
-  playScaleStart: ''
-  playScaleEnd: ''
+  - name: noteToGuess
+    description: The note that the reader should guess.
+    param_type: str
+    default_value: B4
+  - name: notesToPlayAtStart
+    description: A sequence of notes to play when the widget is loaded.
+    param_type: list
+    default_value: []
+  - name: previousAnswer
+    description: The reader's previous answer.
+    param_type: str
+    default_value: ''

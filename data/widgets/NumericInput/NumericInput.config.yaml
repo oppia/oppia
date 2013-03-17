@@ -1,4 +1,4 @@
-# The system name for this widget.
+# The system name for this widget. This should match this file's name.
 id: NumericInput
 
 # The human-readable name of the widget.
@@ -11,11 +11,14 @@ description: |
   floating point numbers.
 
 # Actions that the reader can perform on this widget which trigger a feedback
-# interaction.
-actions:
-  submit:
-    classifier: NumericClassifier
+# interaction, and the associated classifiers.
+handlers:
+- name: submit
+  classifier: NumericClassifier
 
-# Customization parameters and their default values.
+# Customization parameters and their descriptions, types and default values.
 params:
-  placeholder: 0
+  - name: placeholder
+    description: The placeholder for the numeric input field.
+    param_type: str
+    default_value: None

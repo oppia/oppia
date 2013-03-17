@@ -27,13 +27,13 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 
 
-class Parameter(ndb.Model):
+class WidgetParameter(ndb.Model):
     """A class for parameters."""
     name = ndb.StringProperty(required=True)
     description = ndb.TextProperty()
     param_type = ndb.StringProperty(required=True)
-    # TODO(sll): Validate that this default value is of the correct type.
-    default_value = ndb.JsonProperty(required=True)
+    # TODO(sll): Validate that this default value is of the correct type, or None.
+    default_value = ndb.JsonProperty()
 
 
 class AnswerHandler(ndb.Model):
@@ -63,7 +63,7 @@ class Widget(polymodel.PolyModel):
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used.
-    params = ndb.StructuredProperty(Parameter, repeated=True)
+    params = ndb.StructuredProperty(WidgetParameter, repeated=True)
 
     @classmethod
     def get(cls, widget_id):
@@ -80,9 +80,7 @@ class Widget(polymodel.PolyModel):
         if widget is None:
             raise Exception('Widget %s does not exist.' % widget_id)
 
-        # Get the raw code by parameterizing widget with params. For now, just
-        # use default values.
-        # TODO(sll): Actually use params.
+        # Get the raw code by parameterizing widget with params.
         parameters = {}
         for param in widget.params:
             if param.name in params:
@@ -90,18 +88,21 @@ class Widget(polymodel.PolyModel):
                 parameters[param.name] = params[param.name]
             else:
                 parameters[param.name] = param.default_value
+        # TODO(sll): Do we have to be careful here about how 'None' params are handled?
         raw = utils.parse_with_jinja(widget.template, parameters)
 
         result = widget.to_dict()
+        result['id'] = widget_id
+        result['raw'] = raw
+        # TODO(sll): Restructure this so that it is
+        # {key: {value: ..., param_type: ..., default_value: ...}}
+        result['params'] = parameters
         if 'handlers' in result:
             actions = {}
             for item in result['handlers']:
                 actions[item['name']] = {'classifier': item['classifier']}
             result['actions'] = actions
             del result['handlers']
-        result['params'] = parameters
-        result['id'] = widget_id
-        result['raw'] = raw
         return result
 
 
@@ -136,21 +137,27 @@ class InteractiveWidget(Widget):
                 widget_config = utils.get_dict_from_yaml(
                     f.read().decode('utf-8'))
 
+            assert widget_id == widget_config['id']
+
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
-            template = utils.get_file_contents(feconf.SAMPLE_WIDGETS_DIR, html_file)
+            template = utils.get_file_contents(
+                feconf.SAMPLE_WIDGETS_DIR, html_file)
 
             params = []
-            for key, value in widget_config['params'].iteritems():
-                params.append(Parameter(
-                    name=key, default_value=value,
-                    param_type=type(value).__name__
+            for param in widget_config['params']:
+                params.append(WidgetParameter(
+                    name=param.get('name'),
+                    description=param.get('description'),
+                    param_type=param.get('param_type'),
+                    default_value=param.get('default_value'),
                 ))
 
-            actions = []
-            for key, value in widget_config['actions'].iteritems():
-                actions.append(AnswerHandler(
-                    name=key, classifier=value['classifier']
-                ))
+            handlers = []
+            for handler in widget_config['handlers']:
+                handlers.append(AnswerHandler(
+                    name=handler.get('name'),
+                    classifier=handler.get('classifier')),
+                )
 
             widget = cls(
                 id=widget_config['id'],
@@ -159,7 +166,7 @@ class InteractiveWidget(Widget):
                 description=widget_config['description'],
                 template=template,
                 params=params,
-                handlers=actions
+                handlers=handlers,
             )
 
             widget.put()

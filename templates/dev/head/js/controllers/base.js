@@ -31,6 +31,11 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
+  $scope.updateMath = function() {
+    console.log('Updating math expressions.');
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  };
+
   /**
    * Creates a request object that can be sent to the server.
    * @param {object} requestObj The object to be sent to the server. It will
@@ -71,6 +76,9 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     doc.open();
     doc.writeln(content);
     doc.close();
+
+    $scope.$apply();
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
   };
 
   /**
