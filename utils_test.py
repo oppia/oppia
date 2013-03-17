@@ -49,6 +49,7 @@ class UtilsTests(test_utils.AppEngineTestBase):
             ('a', "'a'"),
             (2, '2'),
             (5.5, '5.5'),
+            ("'", "'\\''"),
             (u'¡Hola!', u"'¡Hola!'"),
             (['a', '¡Hola!', 2], u"['a', '¡Hola!', 2]"),
             ({'a': 4, '¡Hola!': 2}, u"{'a': 4, '¡Hola!': 2}"),
