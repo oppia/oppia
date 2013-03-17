@@ -1,21 +1,27 @@
 <html ng-app="mc">
   <head>
     <script src="/lib/header_js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.choices = {{choices}};
+    </script>
+
   </head>
 
   <body>
     <div ng-controller="MultipleChoiceInput">
       <form ng-submit="submitAnswer(answer)">
-      	{% for choice in choices %}
-      	  <div>
-            <label class="radio">
-              <input type="radio" ng-model="answer"
-                     value="{{loop.index0}}" id="{{loop.index0}}">
-              {{choice}}
-            </label>
-          </div>
-        {% endfor %}
-        <button type="submit">Submit</button>
+        <div ng-repeat="choice in choices">
+          <label>
+            <input type="radio" ng-model="$parent.answer"
+                   name="choiceGroup" id="<[$index]>"
+                   value="<[$index]>">
+            <[choice]>
+          </label>
+        </div>
+        
+        <input type="submit" value="Submit">
       </form>
     </div>
 

@@ -24,7 +24,6 @@ import logging
 from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
-from controllers.widgets import InteractiveWidgetHandler
 import controller_utils
 from data.classifiers import normalizers
 import feconf
@@ -32,6 +31,7 @@ from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 from models.state import Content
 from models.state import State
+from models.widget import InteractiveWidget
 import utils
 
 from google.appengine.api import users
@@ -300,7 +300,7 @@ class StateHandler(BaseHandler):
 
             if len(ruleset) > 1:
                 interactive_widget_properties = (
-                    InteractiveWidgetHandler.get_interactive_widget(
+                    InteractiveWidget.get_with_params(
                         state.interactive_widget)['actions']['submit'])
                 # Import the relevant classifier module to use in eval() below.
                 classifier_module = '.'.join([

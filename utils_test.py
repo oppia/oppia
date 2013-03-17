@@ -43,6 +43,25 @@ class UtilsTests(test_utils.AppEngineTestBase):
         js_file = utils.get_js_controllers([])
         self.assertEqual(js_file, '')
 
+    def test_convert_to_js_string(self):
+        """Test convert_to_js_string method."""
+        expected_values = [
+            ('a', "'a'"),
+            (2, '2'),
+            (5.5, '5.5'),
+            (u'¡Hola!', u"'¡Hola!'"),
+            (['a', '¡Hola!', 2], u"['a', '¡Hola!', 2]"),
+            ({'a': 4, '¡Hola!': 2}, u"{'a': 4, '¡Hola!': 2}"),
+            (set(['a']), u"['a']"),
+            ('', u"''"),
+            (None, 'null'),
+            (['a', {'b': 'c', 'd': ['e', None]}],
+                u"['a', {'b': 'c', 'd': ['e', null]}]")
+        ]
+
+        for tup in expected_values:
+            self.assertEqual(utils.convert_to_js_string(tup[0]), tup[1])
+
     def test_parse_with_jinja(self):
         """Test parse_with_jinja method."""
         parsed_str = utils.parse_with_jinja('{{test}}', {'test': 'hi'})
@@ -102,3 +121,5 @@ class UtilsTests(test_utils.AppEngineTestBase):
             yaml_str = utils.get_yaml_from_dict(adict)
             yaml_dict = utils.get_dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
+
+        # TODO(sll): Add a test here for the failure case.

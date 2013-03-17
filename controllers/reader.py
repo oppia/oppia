@@ -22,13 +22,13 @@ import logging
 import random
 
 from controllers.base import BaseHandler
-from controllers.widgets import InteractiveWidgetHandler
 import controller_utils
 import feconf
 from models.exploration import Exploration
 from models.state import Content
 from models.state import State
 from models.statistics import EventHandler
+from models.widget import InteractiveWidget
 import utils
 
 READER_MODE = 'reader'
@@ -104,10 +104,10 @@ class ExplorationHandler(BaseHandler):
         params = self.get_params(init_state)
         init_html, init_widgets = controller_utils.parse_content_into_html(
             init_state.content, 0, params)
-        interactive_widget_html = InteractiveWidgetHandler.get_interactive_widget(
+        interactive_widget_html = InteractiveWidget.get_with_params(
             init_state.interactive_widget,
-            params=init_state.interactive_params,
-            state_params_dict=params
+            params=utils.parse_dict_with_params(
+                init_state.interactive_params, params)
         )['raw']
 
         self.values.update({
@@ -208,9 +208,8 @@ class ExplorationHandler(BaseHandler):
         params['answer'] = answer
 
         interactive_widget_properties = (
-            InteractiveWidgetHandler.get_interactive_widget(
-                state.interactive_widget,
-                state_params_dict=params)['actions']['submit'])
+            InteractiveWidget.get_with_params(
+                state.interactive_widget)['actions']['submit'])
 
         dest_id, feedback, default_recorded_answer = self.transition(
             state, answer, params, interactive_widget_properties)
@@ -274,10 +273,11 @@ class ExplorationHandler(BaseHandler):
 
         if dest_id != feconf.END_DEST:
             values['interactive_widget_html'] = (
-                InteractiveWidgetHandler.get_interactive_widget(
+                InteractiveWidget.get_with_params(
                     state.interactive_widget,
-                    params=state.interactive_params,
-                    state_params_dict=params)['raw']
+                    params=utils.parse_dict_with_params(
+                        state.interactive_params, params)
+                )['raw']
             )
 
         self.response.write(json.dumps(values))

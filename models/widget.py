@@ -87,8 +87,9 @@ class Widget(polymodel.PolyModel):
                 # TODO(sll): Do type-checking.
                 parameters[param.name] = params[param.name]
             else:
-                parameters[param.name] = param.default_value
-        # TODO(sll): Do we have to be careful here about how 'None' params are handled?
+                parameters[param.name] = utils.convert_to_js_string(
+                    param.default_value)
+
         raw = utils.parse_with_jinja(widget.template, parameters)
 
         result = widget.to_dict()
@@ -103,6 +104,17 @@ class Widget(polymodel.PolyModel):
                 actions[item['name']] = {'classifier': item['classifier']}
             result['actions'] = actions
             del result['handlers']
+
+        for unused_action, properties in result['actions'].iteritems():
+            classifier = properties['classifier']
+            if classifier and classifier != 'None':
+                with open(os.path.join(
+                        feconf.SAMPLE_CLASSIFIERS_DIR,
+                        classifier,
+                        '%sRules.yaml' % classifier)) as f:
+                    properties['rules'] = utils.get_dict_from_yaml(
+                        f.read().decode('utf-8'))
+
         return result
 
 

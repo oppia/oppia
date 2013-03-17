@@ -17,12 +17,11 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import os
 import random
 
 from controllers.base import BaseHandler
-import feconf
 from models.widget import InteractiveWidget
+from models.widget import NonInteractiveWidget
 import utils
 
 from google.appengine.api import users
@@ -48,16 +47,17 @@ class WidgetRepositoryPage(BaseHandler):
 class WidgetRepositoryHandler(BaseHandler):
     """Provides data to populate the widget repository page."""
 
-    def get_interactive_widgets(self):
-        """Load interactive widgets from the file system."""
+    def get_widgets(self, widget_class):
+        """Load widgets from the datastore."""
         response = {}
 
-        for widget in InteractiveWidget.query():
+        for widget in widget_class.query():
             category = widget.category
             if category not in response:
                 response[category] = []
-            response[category].append(InteractiveWidget.get_with_params(
-                widget.id, {}))
+            response[category].append(
+                widget_class.get_with_params(widget.id, {})
+            )
 
         for category in response:
             response[category].sort()
@@ -66,9 +66,9 @@ class WidgetRepositoryHandler(BaseHandler):
     def get(self):  # pylint: disable-msg=C6409
         """Handles GET requests."""
         if self.request.get('interactive') == 'true':
-            response = self.get_interactive_widgets()
+            response = self.get_widgets(InteractiveWidget)
         else:
-            response = self.get_non_interactive_widgets()
+            response = self.get_widgets(NonInteractiveWidget)
 
         self.response.write(json.dumps({'widgets': response}))
 
@@ -76,45 +76,9 @@ class WidgetRepositoryHandler(BaseHandler):
 class InteractiveWidgetHandler(BaseHandler):
     """Handles requests relating to interactive widgets."""
 
-    @classmethod
-    def get_interactive_widget(
-            cls, widget_id, params=None, state_params_dict=None):
-        """Gets interactive widget code from the file system."""
-        if params is None:
-            params = {}
-        if state_params_dict is None:
-            state_params_dict = {}
-
-        parameters = {}
-
-        for key in params:
-            # This is a bad hack for pushing things like ["A", "B"] to
-            # the frontend without the leading 'u', but it works.
-            # TODO(sll): Fix this more robustly.
-            if isinstance(params[key], list):
-                parameters[key] = map(str, params[key])
-            elif not isinstance(params[key], basestring):
-                parameters[key] = params[key]
-            else:
-                parameters[key] = utils.parse_with_jinja(
-                    params[key], state_params_dict, '')
-
-        widget = InteractiveWidget.get_with_params(widget_id, parameters)
-
-        for unused_action, properties in widget['actions'].iteritems():
-            classifier = properties['classifier']
-            if classifier and classifier != 'None':
-                with open(os.path.join(
-                        feconf.SAMPLE_CLASSIFIERS_DIR,
-                        classifier,
-                        '%sRules.yaml' % classifier)) as f:
-                    properties['rules'] = utils.get_dict_from_yaml(
-                        f.read().decode('utf-8'))
-        return widget
-
     def get(self, widget_id):
         """Handles GET requests."""
-        response = self.get_interactive_widget(widget_id)
+        response = InteractiveWidget.get_with_params(widget_id)
         self.response.write(json.dumps({'widget': response}))
 
     def post(self, widget_id):
@@ -135,6 +99,9 @@ class InteractiveWidgetHandler(BaseHandler):
                 # Pick a random parameter for each key.
                 state_params_dict[key] = random.choice(values)
 
-        response = self.get_interactive_widget(
-            widget_id, params=params, state_params_dict=state_params_dict)
+        response = InteractiveWidget.get_with_params(
+            widget_id, params=utils.parse_dict_with_params(
+                params, state_params_dict)
+        )
+
         self.response.write(json.dumps({'widget': response}))

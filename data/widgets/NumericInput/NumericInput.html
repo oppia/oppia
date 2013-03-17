@@ -1,12 +1,18 @@
 <html ng-app="numeric">
   <head>
     <script src="/lib/header_js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.placeholder = {{placeholder}};
+    </script>
   </head>
 
   <body>
     <div ng-controller="NumericInput">
       <form ng-submit="submitAnswer(answer)">
-        <input type="number" ng-model="answer" required autofocus>
+        <input type="number" ng-model="answer" placeholder="<[placeholder]>"
+               required autofocus>
         <button type="submit">Submit</button>
       </form>
     </div>

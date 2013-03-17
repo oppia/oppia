@@ -115,6 +115,47 @@ def get_js_controllers(filenames):
     ])
 
 
+def convert_to_js_string(value):
+    """Converts a value to a unicode string without extra 'u' characters."""
+
+    def recursively_convert_to_unicode(value, built_string):
+        if value is None:
+            return '%s%s' % (built_string, 'null')
+        if (isinstance(value, int) or isinstance(value, float)):
+            return '%s%s' % (built_string, value)
+        elif isinstance(value, unicode):
+            return "%s'%s'" % (built_string, value.replace("'", "\\'"))
+        elif isinstance(value, str):
+            return u"%s'%s'" % (
+                built_string, value.decode('utf-8').replace("'", "\\'"))
+        elif isinstance(value, list) or isinstance(value, set):
+            string = u'['
+            for index, item in enumerate(value):
+                string = recursively_convert_to_unicode(item, string)
+                if index != len(value) - 1:
+                    string += ', '
+            string += ']'
+            return '%s%s' % (built_string, string)
+        elif isinstance(value, dict):
+            string = u'{'
+            index = 0
+            for key, val in value.iteritems():
+                string = recursively_convert_to_unicode(key, string)
+                string += ': '
+                string = recursively_convert_to_unicode(val, string)
+                if index != len(value) - 1:
+                    string += ', '
+                index += 1
+            string += '}'
+            return '%s%s' % (built_string, string)
+        else:
+            logging.info(
+                'Could not convert %s of type %s' % (value, type(value)))
+            return '%s%s' % (built_string, value)
+
+    return recursively_convert_to_unicode(value, u'')
+
+
 def parse_with_jinja(string, params, default=''):
     """Parses a string using Jinja templating.
 
@@ -136,6 +177,26 @@ def parse_with_jinja(string, params, default=''):
             logging.info('Cannot parse %s properly using %s', string, params)
 
     return Environment().from_string(string).render(new_params)
+
+
+def parse_dict_with_params(d, params, default=''):
+    """Converts the values of a dict to strings, then parses them using params.
+
+    Args:
+      d: the dict whose values are to be parsed.
+      params: the parameters to parse the dict with.
+      default: the default string to use for missing parameters.
+
+    Returns:
+      the parsed dict. This is a copy of the old dict.
+    """
+    parameters = {}
+
+    for key in d:
+        parameters[key] = parse_with_jinja(
+            convert_to_js_string(d[key]), params, default)
+
+    return parameters
 
 
 def get_comma_sep_string_from_list(items):

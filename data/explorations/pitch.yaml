@@ -27,8 +27,6 @@ Main window:
     params:
       noteToGuess: '{{noteStart}}'
       notesToPlayAtStart: []
-      playScaleEnd: ''
-      playScaleStart: ''
       previousAnswer: '{{answer}}'
     rules:
       submit:

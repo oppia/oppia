@@ -62,6 +62,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     // TODO(sll): Does this actually receive anything?
     console.log('Init content');
     $scope.init(explorationData.getStateData($scope.$parent.stateId));
+    $scope.updateMath();
   });
 
   var editors = {};
@@ -98,8 +99,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       $scope.saveStateContent();
     }
     activeInputData.name = '';
-
-    setTimeout($scope.updateMath, 1000);
   };
 
   $scope.saveStateContent = function() {
