@@ -72,24 +72,23 @@ def process_js(filename, target):
 # Script starts here.
 ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
-for root, dirs, files in os.walk(os.getcwd()):
-    if '.git' in root:
+
+for root in os.listdir(os.getcwd()):
+    if '.git' in root or 'third_party' in root or 'data' in root:
         continue
-    for directory in dirs:
-        print 'Processing', os.path.join(root, directory)
-    if 'oppia/third_party' in root or 'oppia/data' in root:
-        continue
-    for fn in files:
-        full_filename = os.path.join(root) + '/' + fn
-        if full_filename.find(OUT_DIR) > 0:
-            continue
-        # Do not process files in third_party.
-        if any(key in full_filename for key in ['third_party', '.git']):
-            continue
-        target_filename = get_target(full_filename)
-        if fn.endswith('.html'):
-            process_html(full_filename, target_filename)
-        if fn.endswith('.css'):
-            process_css(full_filename, target_filename)
-        if fn.endswith('.js'):
-            process_js(full_filename, target_filename)
+
+    print 'Processing', os.path.join(os.getcwd(), root)
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
+        for directory in dirs:
+            print 'Processing', os.path.join(root, directory)
+        for fn in files:
+            full_filename = os.path.join(root) + '/' + fn
+            if full_filename.find(OUT_DIR) > 0:
+                continue
+            target_filename = get_target(full_filename)
+            if fn.endswith('.html'):
+                process_html(full_filename, target_filename)
+            if fn.endswith('.css'):
+                process_css(full_filename, target_filename)
+            if fn.endswith('.js'):
+                process_js(full_filename, target_filename)

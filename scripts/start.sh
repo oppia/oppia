@@ -125,6 +125,15 @@ if [ ! -d "third_party/yui" ]; then
   wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/yui/yui-min.js
 fi
 
+echo Checking whether sympy is installed in third_party
+if [ ! -d "third_party/sympy-0.7.2" ]; then
+  echo Installing sympy
+  mkdir -p third_party/sympy-0.7.2/
+  wget https://sympy.googlecode.com/files/sympy-0.7.2.tar.gz -O third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
+  tar -C third_party/sympy-0.7.2 -zxvf third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
+  rm third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
+fi
+
 
 # webtest is used for tests.
 echo Checking if webtest is installed in third_party
