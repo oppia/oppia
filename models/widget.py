@@ -37,7 +37,7 @@ class WidgetParameter(ndb.Model):
 
 
 class AnswerHandler(ndb.Model):
-    """An event stream."""
+    """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     # TODO(sll): Change the following to become a reference.
     classifier = ndb.StringProperty()
