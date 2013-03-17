@@ -256,7 +256,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
-    $scope.parameters = data.parameters;//TODO(yanamal): make sure this works when explorations actually have parameters
+    $scope.parameters = data.parameters || [];//TODO(yanamal): make sure this works when explorations actually have parameters
     explorationFullyLoaded = true;
 
     if ($scope.stateId) {
@@ -273,6 +273,26 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.saveExplorationProperty(
         'explorationTitle', 'title', newValue, oldValue);
   });
+
+  $scope.addParameter = function(name, type) {
+    console.log("adding parameter to exploration");
+    $scope.parameters.push({name:name, type:type});
+    //TODO: fix; right now updates server-side fine but trying to load exploration subsequently breaks.
+    /*
+    $http.put(
+        $scope.explorationUrl,
+        $scope.createRequest({parameters: $scope.parameters}),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              console.log('PUT request succeeded');
+            }).
+            error(function(data) {
+              warningsData.addWarning(
+                  'Error adding parameter: ' + data.error);
+              $scope.parameters.pop();
+            });
+            */
+  };
 
   $scope.openAddNewEditorForm = function() {
     activeInputData.name = 'addNewEditor';

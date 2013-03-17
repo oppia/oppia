@@ -24,7 +24,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.init = function(data) {
     $scope.content = data.content;
     $scope.paramChanges = data.param_changes || [];
-    $scope.parameters = []; //TODO(yanamal): actually use parameter list from exploration
 
     console.log('Content updated.');
 
@@ -292,29 +291,35 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   //TODO: (in html) see if there's a clean way of having the editor pop-up in
   //the list itself
   //TODO: we should take the list of parameters from the exploration. 
-  //and also update exploration list when new nes are added
+  //and also update exploration list when new ones are added
   //parameters arent even part of the exloration data model? browsing admin on the runnin server I dont see them
+  
   //controllers for ui boxes: parameter to be changed, and change options/list
   $scope.paramSelector = {
     createSearchChoice:function(term, data) {
       if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
         {
-          return {id:term, text:term};
+          return {id:'new', text:term};
         }
     },
-    data:$scope.parameters//TODO: fix it so we don't have to assume that parameters are in such form; or make them conform externally somewhere
-    //data: [{id:1,text:"foo"}, {id:2,text:"bar"}] 
+    data:[]
   };
 
-  //TODO: make this actually work.
-  /*
-  $scope.tmpParamName.on("change", function(e){
-          $scope.parameters.push(e.added);//TODO: add type; make sure it propagates to exploration
-  });
-  */
+  // initialize dropdown options for both selectors in the parameter change interface
+  // (parameter to change and new value(s) to change to)
+  // the select2 library expects the options to have 'id' and 'text' fields.
+  $scope.initSelectorOptions = function() {
+    var data = [];
+    $scope.parameters.forEach(function(param){
+      data.push({id:param.name, text:param.name});
+    });
+    angular.extend($scope.paramSelector.data, data);
+  }
+
   //start editing/adding a parameter change
   $scope.startAddParamChange = function() {
     $scope.editingParamChange = 'New change';
+    $scope.initSelectorOptions(); 
   };
 
   $scope.startEditParamChange = function(pName) {
@@ -323,6 +328,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     if (pName in $scope.paramChanges) {
       $scope.tmpParamValues = $scope.paramChanges[pName];
     }
+    $scope.initSelectorOptions(); 
   };
 
   //reset and/or initialize variables for parameter change input
@@ -345,8 +351,12 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       return;
     }
 
-    // Verify that the active input was the parameter input, as expected
-    // TODO(yanamal): Add the new change to the list
+    //TODO: if it was a new parameter, add it to the exploration's parameter list
+    if($scope.tmpParamName.id === 'new') {
+      $scope.addParameter($scope.tmpParamName.text, 'string');//TODO:ask for type(modal?)
+      $scope.tmpParamName.id = $scope.tmpParamName.text;
+    }
+
     $scope.paramChanges[$scope.tmpParamName.id] = $scope.tmpParamValues;
     $scope.saveParamChanges();
     $scope.resetParamChangeInput();

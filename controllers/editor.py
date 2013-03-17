@@ -30,6 +30,7 @@ from data.classifiers import normalizers
 import feconf
 from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
+from models.exploration import Parameter
 from models.state import Content
 from models.state import State
 import utils
@@ -184,7 +185,8 @@ class ExplorationPage(BaseHandler):
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
         if parameters:
-            exploration.parameters = parameters # TODO(yanamal): make sure this works properly; any transformations?
+            exploration.parameters = [Parameter(name=item['name'],type=item['type'])
+                             for item in parameters]
 
         exploration.put()
 
