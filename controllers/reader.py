@@ -267,11 +267,10 @@ class ExplorationHandler(BaseHandler):
         values['html'] = html_output
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
-        values['interactive_widget_html'] = (
-            'Congratulations, you\'ve finished this exploration! Would you like to <a href ng-click="initializePage()" target="_top">play again?</a>')
         values['params'] = params
 
         if dest_id != feconf.END_DEST:
+            values['finished'] = False
             values['interactive_widget_html'] = (
                 InteractiveWidget.get_with_params(
                     state.interactive_widget,
@@ -279,6 +278,9 @@ class ExplorationHandler(BaseHandler):
                         state.interactive_params, params)
                 )['raw']
             )
+        else:
+            values['finished'] = True
+            values['interactive_widget_html'] = ''
 
         self.response.write(json.dumps(values))
 

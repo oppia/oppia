@@ -44,6 +44,7 @@
     $scope.answer = data.default_answer;
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
+    $scope.finished = data.finished;
     $scope.html = data.html;
     $scope.inputTemplate = data.interactive_widget_html;
     $scope.params = data.params;
@@ -97,6 +98,7 @@
     $scope.categories = data.categories;
     $scope.inputTemplate = data.interactive_widget_html;
     $scope.stateId = data.state_id;
+    $scope.finished = data.finished;
 
     $scope.params = data.params;
 
