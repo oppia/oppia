@@ -27,5 +27,5 @@ class Parameter(BaseModel):
     """A parameter definition for an exploration."""
     # The name of the parameter
     name = ndb.StringProperty(required=True)
-    # The possible starting values to choose from
-    starting_values = ndb.StringProperty(repeated=True)
+    # The data type of the parameter - for now only string or list
+    type = ndb.StringProperty(required=False) # TODO: make required and make sure it doesn't break anything. for now assume string by default.

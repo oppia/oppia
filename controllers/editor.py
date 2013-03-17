@@ -159,6 +159,7 @@ class ExplorationPage(BaseHandler):
         title = payload.get('title')
         image_id = payload.get('image_id')
         editors = payload.get('editors')
+        parameters = payload.get('parameters')
 
         if is_public:
             exploration.is_public = True
@@ -182,6 +183,8 @@ class ExplorationPage(BaseHandler):
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
+        if parameters:
+            exploration.parameters = parameters # TODO(yanamal): make sure this works properly; any transformations?
 
         exploration.put()
 
@@ -213,6 +216,7 @@ class ExplorationHandler(BaseHandler):
             'owner': str(exploration.owner),
             'editors': exploration.editors,
             'states': state_list,
+            'parameters': exploration.parameters,
         })
         self.response.write(json.dumps(self.values))
 
