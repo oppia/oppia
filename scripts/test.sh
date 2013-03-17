@@ -36,19 +36,19 @@ echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
-GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
+GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.4/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 
 # webtest is used for tests.
 echo Checking if webtest is installed in third_party
-if [ ! -d "third_party/webtest" ]; then
+if [ ! -d "third_party/webtest-1.4.2" ]; then
   echo Installing webtest framework
   wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
   unzip webtest-download.zip -d third_party
   rm webtest-download.zip
-  mv third_party/WebTest-1.4.2 third_party/webtest
+  mv third_party/WebTest-1.4.2 third_party/webtest-1.4.2
 fi
 
 # Note: you can safely delete all of the following code (up to the end of the

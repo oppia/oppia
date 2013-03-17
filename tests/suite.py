@@ -28,7 +28,8 @@ def main():
 
     # TODO(sll): Check if the next dir is valid.
     sdk_path = os.path.join(
-        os.getcwd(), '..', 'oppia_runtime', 'google_appengine')
+        os.getcwd(), '..', 'oppia_runtime', 'google_appengine_1.7.4',
+        'google_appengine')
     sys.path.insert(0, sdk_path)
 
     import dev_appserver

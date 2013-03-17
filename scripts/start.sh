@@ -36,9 +36,9 @@ echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
-GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine
+GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.4/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
@@ -46,18 +46,17 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
   wget http://googleappengine.googlecode.com/files/google_appengine_1.7.4.zip -O gae-download.zip
-  unzip gae-download.zip -d $RUNTIME_HOME/
+  unzip gae-download.zip -d $RUNTIME_HOME/google_appengine_1.7.4/
   rm gae-download.zip
 fi
 
 echo Checking whether angular-ui is installed in third_party
-if [ ! -d "third_party/angular-ui" ]; then
+if [ ! -d "third_party/angular-ui-0.4.0" ]; then
   echo Installing Angular UI
   mkdir -p third_party/
   wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
   unzip angular-ui-download.zip -d third_party/
   rm angular-ui-download.zip
-  mv third_party/angular-ui-0.4.0 third_party/angular-ui
 fi
 
 echo Checking whether bootstrap is installed in third_party
@@ -89,40 +88,40 @@ if [ ! -d "third_party/closure-compiler" ]; then
 fi
 
 echo Checking whether jquery is installed in third_party
-if [ ! -d "third_party/jquery" ]; then
+if [ ! -d "third_party/jquery-1.7.1" ]; then
   echo Installing JQuery
-  mkdir -p third_party/jquery/
-  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/jquery/jquery.min.js
+  mkdir -p third_party/jquery-1.7.1/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/jquery-1.7.1/jquery.min.js
 fi
 
 echo Checking whether jqueryui is installed in third_party
-if [ ! -d "third_party/jqueryui" ]; then
+if [ ! -d "third_party/jqueryui-1.8.17" ]; then
   echo Installing JQueryUI
-  mkdir -p third_party/jqueryui/
-  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/jqueryui/jquery-ui.min.js
+  mkdir -p third_party/jqueryui-1.8.17/
+  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/jqueryui-1.8.17/jquery-ui.min.js
 fi
 
 echo Checking whether angularjs is installed in third_party
-if [ ! -d "third_party/angularjs" ]; then
+if [ ! -d "third_party/angularjs-1.0.3" ]; then
   echo Installing AngularJS and angular-sanitize
-  mkdir -p third_party/angularjs/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/angularjs/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs/angular-sanitize.min.js
+  mkdir -p third_party/angularjs-1.0.3/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs-1.0.3/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/angularjs-1.0.3/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs-1.0.3/angular-sanitize.min.js
 fi
 
 echo Checking whether d3.js is installed in third_party
-if [ ! -d "third_party/d3js" ]; then
+if [ ! -d "third_party/d3js-3" ]; then
   echo Installing d3.js
-  mkdir -p third_party/d3js/
-  wget http://d3js.org/d3.v3.min.js -O third_party/d3js/d3.min.js
+  mkdir -p third_party/d3js-3/
+  wget http://d3js.org/d3.v3.min.js -O third_party/d3js-3/d3.min.js
 fi
 
 echo Checking whether YUI is installed in third_party
-if [ ! -d "third_party/yui" ]; then
+if [ ! -d "third_party/yui-3.8.1" ]; then
   echo Installing yui
-  mkdir -p third_party/yui/
-  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/yui/yui-min.js
+  mkdir -p third_party/yui-3.8.1/
+  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/yui-3.8.1/yui-min.js
 fi
 
 echo Checking whether sympy is installed in third_party
@@ -137,12 +136,12 @@ fi
 
 # webtest is used for tests.
 echo Checking if webtest is installed in third_party
-if [ ! -d "third_party/webtest" ]; then
+if [ ! -d "third_party/webtest-1.4.2" ]; then
   echo Installing webtest framework
   wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
   unzip webtest-download.zip -d third_party
   rm webtest-download.zip
-  mv third_party/WebTest-1.4.2 third_party/webtest
+  mv third_party/WebTest-1.4.2 third_party/webtest-1.4.2
 fi
 
 # Set up a local dev instance
