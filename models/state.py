@@ -315,7 +315,7 @@ class State(BaseModel):
                 continue
 
             return_value, unused_return_data = (
-                self.normalize_classifier_return(eval(code)))
+                utils.normalize_classifier_return(eval(code)))
 
             if return_value:
                 dest_id = rule['dest']

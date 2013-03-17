@@ -29,6 +29,7 @@
         .success(function(data) {
           $scope.explorationTitle = data.title;
           $scope.loadPage(data);
+          window.scrollTo(0, 0);
         }).error(function(data) {
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');

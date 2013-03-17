@@ -69,32 +69,6 @@ class ExplorationHandler(BaseHandler):
                 existing_params[key] = random.choice(values)
         return existing_params
 
-    def normalize_classifier_return(self, *args):
-        """Normalizes the return value of a classifier to a two-element tuple.
-
-        Args:
-          *args: the value returned by a rule classifier. This is either:
-              - a single boolean saying whether the rule was satisfied
-              - a boolean as above, together with a dict of additional data.
-
-        Returns:
-          A two-element tuple: a boolean stating whether the category matched,
-              and a dict with additional data.
-
-        Raises:
-          Exception: if a rule classifier returns invalid values.
-        """
-        # TODO(sll): All rules should return a 2-tuple instead.
-        if len(args) > 2:
-            raise Exception('Invalid classifier return values: %s' % args)
-
-        assert isinstance(args[0], bool)
-        if len(args) == 1:
-            return (args[0], {})
-        else:
-            assert isinstance(args[1], dict)
-            return (args[0], args[1])
-
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
@@ -151,8 +125,8 @@ class ExplorationHandler(BaseHandler):
             InteractiveWidget.get_with_params(
                 state.interactive_widget)['actions']['submit'])
 
-        dest_id, feedback, default_recorded_answer = self.transition(
-            state, answer, params, interactive_widget_properties)
+        dest_id, feedback, default_recorded_answer = state.transition(
+            answer, params, interactive_widget_properties)
 
         if default_recorded_answer:
             EventHandler.record_default_case_hit(

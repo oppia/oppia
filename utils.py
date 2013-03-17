@@ -228,3 +228,29 @@ def get_dict_from_yaml(yaml_file):
         return yaml_dict
     except yaml.YAMLError as e:
         raise InvalidInputException(e)
+
+
+def normalize_classifier_return(*args):
+    """Normalizes a 1-or-2-tuple return to a 2-tuple.
+
+    Args:
+      *args: the value to normalize. This is either:
+          - a single boolean saying whether a classifier rule was satisfied
+          - a boolean as above, together with a dict of additional data.
+
+    Returns:
+      A two-element tuple, consisting of a boolean and a dict.
+
+    Raises:
+      Exception: if a rule classifier returns invalid values.
+    """
+    # TODO(sll): All rules should return a 2-tuple instead.
+    if len(args) not in [1, 2]:
+        raise Exception('Invalid classifier return values: %s' % str(args))
+
+    assert isinstance(args[0], bool)
+    if len(args) == 1:
+        return (args[0], {})
+    else:
+        assert isinstance(args[1], dict)
+        return (args[0], args[1])
