@@ -20,7 +20,8 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=600'
 - url: /css
-  static_dir: static/css
+  # NB: not minified. TODO(sll): fix.
+  static_dir: templates/dev/head/css
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'

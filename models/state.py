@@ -18,12 +18,13 @@
 
 __author__ = 'Sean Lip'
 
+import importlib
+import logging
 import os
 
 from base_model import BaseModel
 import feconf
-import importlib
-import logging
+import utils
 
 from google.appengine.ext import ndb
 
@@ -263,3 +264,62 @@ class State(BaseModel):
                         pass
 
         return True, ''
+
+    def transition(self, answer, params, interactive_widget_properties):
+        """Handle feedback interactions with readers."""
+
+        dest_id = None
+        feedback = None
+        default_recorded_answer = None
+
+        if interactive_widget_properties['classifier'] != 'None':
+            # Import the relevant classifier module to be used in eval() below.
+            classifier_module = '.'.join([
+                feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
+                interactive_widget_properties['classifier'],
+                interactive_widget_properties['classifier']])
+            Classifier = importlib.import_module(classifier_module)
+            logging.info(Classifier.__name__)
+
+            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+            if norm_answer is None:
+                raise self.InvalidInputException(
+                    'Invalid input: could not normalize the answer.')
+
+        for ind, rule in enumerate(self.interactive_rulesets['submit']):
+            if ind == len(self.interactive_rulesets['submit']) - 1:
+                # TODO(sll): This is a special case for multiple-choice input
+                # which should really be handled generically. However, it's
+                # not very interesting anyway because the reader's answer
+                # in this case is already known (it's just the last of the
+                # multiple-choice options given).
+                recorded_answer = answer
+                if self.interactive_widget == 'MultipleChoiceInput':
+                    recorded_answer = (
+                        self.interactive_params['choices'][int(answer)])
+
+                default_recorded_answer = recorded_answer
+
+            assert rule['code']
+
+            if rule['code'] == 'True':
+                dest_id = rule['dest']
+                feedback = rule['feedback']
+                break
+
+            # Add the 'answer' variable, and prepend classifier.
+            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,', 1)
+
+            code = utils.parse_with_jinja(code, params)
+            if code is None:
+                continue
+
+            return_value, unused_return_data = (
+                self.normalize_classifier_return(eval(code)))
+
+            if return_value:
+                dest_id = rule['dest']
+                feedback = rule['feedback']
+                break
+
+        return dest_id, feedback, default_recorded_answer
