@@ -93,22 +93,9 @@ JINJA_ENV.filters.update({
 WIDGET_JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(
     os.path.join(os.path.dirname(__file__), SAMPLE_WIDGETS_DIR)))
 
-# List of filepaths to JS libraries to include in the HTML <header>.
-HEADER_JS_FILES = [
-    'third_party/jquery-1.7.1/jquery.min.js',
-    'third_party/jqueryui-1.8.17/jquery-ui.min.js',
-    'third_party/bootstrap/js/bootstrap.js',
-    'third_party/angularjs-1.0.3/angular.min.js',
-]
-
 # List of filepaths to JS libraries to include at the bottom of the HTML
 # response, in order.
 FOOTER_JS_FILES = [
-    'third_party/angularjs-1.0.3/angular-resource.min.js',
-    'third_party/angularjs-1.0.3/angular-sanitize.min.js',
-    'third_party/angular-ui-0.4.0/build/angular-ui.js',
-    'third_party/d3js-3/d3.min.js',
-    'third_party/yui-3.8.1/yui-min.js',
     os.path.join(TEMPLATE_DIR, 'js/app.js'),
     os.path.join(TEMPLATE_DIR, 'js/directives/directives.js'),
     os.path.join(TEMPLATE_DIR, 'js/filters/filters.js'),
@@ -117,13 +104,6 @@ FOOTER_JS_FILES = [
     os.path.join(TEMPLATE_DIR, 'js/controllers/base.js'),
 ]
 
-# List of filepaths to CSS libraries to include in responses.
-ALL_CSS_LIBS = [
-    'third_party/angular-ui-0.4.0/build/angular-ui.css',
-    'third_party/bootstrap/css/bootstrap.css',
-    os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
-    'third_party/bootstrap/css/bootstrap-responsive.css',
-]
 
 END_DEST = 'END'
 

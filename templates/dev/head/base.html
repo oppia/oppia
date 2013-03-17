@@ -3,10 +3,9 @@
   <head>
     <meta charset=utf-8>
     <title>Oppia - {% block subtitle %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="/resources/css" media="screen">
-    <link rel="stylesheet" type="text/css" href="/third_party/select2/select2.css" media="screen">
 
-    <script src="/resources/header_js"></script>
+    {% include 'header_css_libs.html' %}
+    {% include 'header_js_libs.html' %}
 
     <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
     <script type="text/x-mathjax-config">
@@ -93,8 +92,8 @@
       {% endif %}
     </div>
 
+    {% include 'footer_js_libs.html' %}
     <script src="/resources/footer_js"></script>
-    <script src="/third_party/select2/select2.js"></script>
     <script type="text/javascript">{{js}}</script>
   </body>
 </html>

@@ -19,13 +19,18 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
+- url: /css
+  static_dir: static/css
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
-- url: /third_party/select2
-  static_dir: third_party/select2
+- url: /third_party/static
+  static_dir: third_party/static
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'

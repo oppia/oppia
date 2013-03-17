@@ -25,17 +25,7 @@ import utils
 
 
 class LibHandler(BaseHandler):
-    """Assembles and returns CSS and JS library code."""
-
-    def get_css_lib_code(self):
-        return '\n'.join(
-            [utils.get_file_contents('', filepath)
-             for filepath in feconf.ALL_CSS_LIBS])
-
-    def get_header_js_code(self):
-        return '\n'.join(
-            [utils.get_file_contents('', filepath)
-             for filepath in feconf.HEADER_JS_FILES])
+    """Assembles and returns library code."""
 
     def get_footer_js_code(self):
         return '\n'.join(
@@ -45,15 +35,9 @@ class LibHandler(BaseHandler):
     def get(self, lib_type):
         """Handles GET requests for CSS and JS library code."""
 
-        if lib_type == 'css':
-            self.response.write(self.get_css_lib_code())
-            self.response.headers['Content-Type'] = 'text/css'
-        elif lib_type == 'header_js' or lib_type == 'footer_js':
+        if lib_type == 'footer_js':
             self.response.headers['Content-Type'] = 'application/javascript'
-            if lib_type == 'header_js':
-                self.response.write(self.get_header_js_code())
-            else:
-                self.response.write(self.get_footer_js_code())
+            self.response.write(self.get_footer_js_code())
         else:
             self.error(404)
 

@@ -50,34 +50,6 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   rm gae-download.zip
 fi
 
-echo Checking whether angular-ui is installed in third_party
-if [ ! -d "third_party/angular-ui-0.4.0" ]; then
-  echo Installing Angular UI
-  mkdir -p third_party/
-  wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
-  unzip angular-ui-download.zip -d third_party/
-  rm angular-ui-download.zip
-fi
-
-echo Checking whether bootstrap is installed in third_party
-if [ ! -d "third_party/bootstrap" ]; then
-  echo Installing Bootstrap
-  mkdir -p third_party/
-  wget http://twitter.github.com/bootstrap/assets/bootstrap.zip -O bootstrap-download.zip
-  unzip bootstrap-download.zip -d third_party/
-  rm bootstrap-download.zip
-fi
-
-echo Checking whether select2 is installed in third_party
-if [ ! -d "third_party/select2" ]; then
-  echo Installing select2
-  mkdir -p third_party/
-  wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
-  unzip select2-download.zip -d third_party/
-  rm select2-download.zip
-  mv third_party/select2-master third_party/select2
-fi
-
 echo Checking whether the Closure Compiler is installed in third_party
 if [ ! -d "third_party/closure-compiler" ]; then
   echo Installing Closure Compiler
@@ -87,43 +59,6 @@ if [ ! -d "third_party/closure-compiler" ]; then
   rm closure-compiler-download.zip
 fi
 
-echo Checking whether jquery is installed in third_party
-if [ ! -d "third_party/jquery-1.7.1" ]; then
-  echo Installing JQuery
-  mkdir -p third_party/jquery-1.7.1/
-  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/jquery-1.7.1/jquery.min.js
-fi
-
-echo Checking whether jqueryui is installed in third_party
-if [ ! -d "third_party/jqueryui-1.8.17" ]; then
-  echo Installing JQueryUI
-  mkdir -p third_party/jqueryui-1.8.17/
-  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/jqueryui-1.8.17/jquery-ui.min.js
-fi
-
-echo Checking whether angularjs is installed in third_party
-if [ ! -d "third_party/angularjs-1.0.3" ]; then
-  echo Installing AngularJS and angular-sanitize
-  mkdir -p third_party/angularjs-1.0.3/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/angularjs-1.0.3/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/angularjs-1.0.3/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/angularjs-1.0.3/angular-sanitize.min.js
-fi
-
-echo Checking whether d3.js is installed in third_party
-if [ ! -d "third_party/d3js-3" ]; then
-  echo Installing d3.js
-  mkdir -p third_party/d3js-3/
-  wget http://d3js.org/d3.v3.min.js -O third_party/d3js-3/d3.min.js
-fi
-
-echo Checking whether YUI is installed in third_party
-if [ ! -d "third_party/yui-3.8.1" ]; then
-  echo Installing yui
-  mkdir -p third_party/yui-3.8.1/
-  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/yui-3.8.1/yui-min.js
-fi
-
 echo Checking whether sympy is installed in third_party
 if [ ! -d "third_party/sympy-0.7.2" ]; then
   echo Installing sympy
@@ -131,6 +66,72 @@ if [ ! -d "third_party/sympy-0.7.2" ]; then
   wget https://sympy.googlecode.com/files/sympy-0.7.2.tar.gz -O third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
   tar -C third_party/sympy-0.7.2 -zxvf third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
   rm third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
+fi
+
+# Static resources.
+echo Checking whether angular-ui is installed in third_party
+if [ ! -d "third_party/static/angular-ui-0.4.0" ]; then
+  echo Installing Angular UI
+  mkdir -p third_party/static/
+  wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
+  unzip angular-ui-download.zip -d third_party/static/
+  rm angular-ui-download.zip
+fi
+
+echo Checking whether bootstrap is installed in third_party
+if [ ! -d "third_party/static/bootstrap" ]; then
+  echo Installing Bootstrap
+  mkdir -p third_party/static/
+  wget http://twitter.github.com/bootstrap/assets/bootstrap.zip -O bootstrap-download.zip
+  unzip bootstrap-download.zip -d third_party/static/
+  rm bootstrap-download.zip
+fi
+
+echo Checking whether select2 is installed in third_party
+if [ ! -d "third_party/static/select2" ]; then
+  echo Installing select2
+  mkdir -p third_party/static/
+  wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
+  unzip select2-download.zip -d third_party/static/
+  rm select2-download.zip
+  mv third_party/static/select2-master third_party/static/select2
+fi
+
+echo Checking whether jquery is installed in third_party
+if [ ! -d "third_party/static/jquery-1.7.1" ]; then
+  echo Installing JQuery
+  mkdir -p third_party/static/jquery-1.7.1/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/static/jquery-1.7.1/jquery.min.js
+fi
+
+echo Checking whether jqueryui is installed in third_party
+if [ ! -d "third_party/static/jqueryui-1.8.17" ]; then
+  echo Installing JQueryUI
+  mkdir -p third_party/static/jqueryui-1.8.17/
+  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/static/jqueryui-1.8.17/jquery-ui.min.js
+fi
+
+echo Checking whether angularjs is installed in third_party
+if [ ! -d "third_party/static/angularjs-1.0.3" ]; then
+  echo Installing AngularJS and angular-sanitize
+  mkdir -p third_party/static/angularjs-1.0.3/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/static/angularjs-1.0.3/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/static/angularjs-1.0.3/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/static/angularjs-1.0.3/angular-sanitize.min.js
+fi
+
+echo Checking whether d3.js is installed in third_party
+if [ ! -d "third_party/static/d3js-3" ]; then
+  echo Installing d3.js
+  mkdir -p third_party/static/d3js-3/
+  wget http://d3js.org/d3.v3.min.js -O third_party/static/d3js-3/d3.min.js
+fi
+
+echo Checking whether YUI is installed in third_party
+if [ ! -d "third_party/static/yui-3.8.1" ]; then
+  echo Installing yui
+  mkdir -p third_party/static/yui-3.8.1/
+  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/static/yui-3.8.1/yui-min.js
 fi
 
 
