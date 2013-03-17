@@ -25,12 +25,14 @@ import utils
 
 from google.appengine.ext import ndb
 
+
 class Parameter(ndb.Model):
     """A parameter definition for an exploration."""
     # The name of the parameter
     name = ndb.StringProperty(required=True)
     # The data type of the parameter - for now only string or list
-    type = ndb.StringProperty(required=True) 
+    param_type = ndb.StringProperty(required=True)
+
 
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(BaseModel):

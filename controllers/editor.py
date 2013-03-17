@@ -185,8 +185,10 @@ class ExplorationPage(BaseHandler):
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
         if parameters:
-            exploration.parameters = [Parameter(name=item['name'],type=item['type'])
-                             for item in parameters]
+            exploration.parameters = [
+                Parameter(name=item['name'], param_type=item['type'])
+                for item in parameters
+            ]
 
         exploration.put()
 
