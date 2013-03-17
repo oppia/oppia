@@ -107,7 +107,6 @@ FOOTER_JS_FILES = [
     'third_party/angularjs-1.0.3/angular-resource.min.js',
     'third_party/angularjs-1.0.3/angular-sanitize.min.js',
     'third_party/angular-ui-0.4.0/build/angular-ui.js',
-    'third_party/select2/select2.js',
     'third_party/d3js-3/d3.min.js',
     'third_party/yui-3.8.1/yui-min.js',
     os.path.join(TEMPLATE_DIR, 'js/app.js'),
@@ -122,7 +121,6 @@ FOOTER_JS_FILES = [
 ALL_CSS_LIBS = [
     'third_party/angular-ui-0.4.0/build/angular-ui.css',
     'third_party/bootstrap/css/bootstrap.css',
-    'third_party/select2/select2.css',
     os.path.join(TEMPLATE_DIR, 'css/oppia.css'),
     'third_party/bootstrap/css/bootstrap-responsive.css',
 ]

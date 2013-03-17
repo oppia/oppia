@@ -57,7 +57,7 @@ urls = [
     (r'/about/?', pages.AboutPage),
     (r'/terms/?', pages.TermsPage),
 
-    (r'/lib/(%s)/?' % r, resources.LibHandler),
+    (r'/resources/(%s)/?' % r, resources.LibHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),
     (r'/imagehandler/?', resources.ImageHandler),
     (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
