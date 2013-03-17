@@ -23,10 +23,11 @@
   <div ng-show="editingParamChange != null">
     <form novalidate class="oppia-form" name="newParameterForm" ng-submit="addParamChange()">
       Change
-      <input ng-model="tmpParamName" type="hidden" ui-select2="paramSelector"
-             placeholder="Parameter Name" required>
+      <input ng-model="tmpParamName" ui-select2="paramSelector"
+             placeholder="Parameter Name" style="width:300px" required>
       to one of these values:
-      <list items="tmpParamValues"></list>
+      <input ng-model="tmpParamValues" ui-select2="valueSelector" multiple
+             placeholder="New Value(s)" style="width:300px" required>
 
       <br>
       <input type="submit" value="Save Changes"

@@ -291,9 +291,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   //TODO: (in html) see if there's a clean way of having the editor pop-up in
   //the list itself
-  //TODO: we should take the list of parameters from the exploration. 
-  //and also update exploration list when new ones are added
-  //parameters arent even part of the exloration data model? browsing admin on the runnin server I dont see them
   
   //controllers for ui boxes: parameter to be changed, and change options/list
   $scope.paramSelector = {
@@ -303,18 +300,41 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
           return {id:'new', text:term};
         }
     },
-    data:[]
+    data:[],
+    formatNoMatches:function(term) {
+      return "(choose a parameter name)"
+    }
   };
+  $scope.valueSelector = {
+    createSearchChoice:function(term, data) {
+      if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
+        {
+          return {id:term, text:'"'+term+'"'};
+        }
+    },
+    data:[],
+    tokenSeparators:[","],
+    formatNoMatches:function(term) {
+      return "(list new values)"
+    }
+  };
+
 
   // initialize dropdown options for both selectors in the parameter change interface
   // (parameter to change and new value(s) to change to)
   // the select2 library expects the options to have 'id' and 'text' fields.
   $scope.initSelectorOptions = function() {
-    var data = [];
+    var namedata = [];
     $scope.parameters.forEach(function(param){
-      data.push({id:param.name, text:param.name});
+      namedata.push({id:param.name, text:param.name});
     });
-    angular.extend($scope.paramSelector.data, data);
+    angular.extend($scope.paramSelector.data, namedata);
+
+    var changedata = [{id:'{{input}}', text:'Input'}]; //TODO the student input option only applies to parameter changes that are associated with actions
+    $scope.parameters.forEach(function(param){
+      changedata.push({id:'{{'+param.name+'}}', text:param.name});
+    });
+    angular.extend($scope.valueSelector.data, changedata);
   }
 
   //start editing/adding a parameter change
@@ -327,7 +347,11 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.tmpParamName = pName;
     $scope.editingParamChange = pName;
     if (pName in $scope.paramChanges) {
-      $scope.tmpParamValues = $scope.paramChanges[pName];
+      //$scope.tmpParamValues = $scope.paramChanges[pName];
+      //TODO: correctly fill the param values field. 
+      //need to either change the structure of paramChanges to fit with the select2 structure (probably the best way) 
+      //or manually re-construct the display text every time from the value string
+      //e.g. {{pname}} -> pname, literalvalue -> "literalvalue"
     }
     $scope.initSelectorOptions(); 
   };
@@ -352,19 +376,29 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       return;
     }
 
-    //TODO: if it was a new parameter, add it to the exploration's parameter list
+    // tmpParamName as output by the selector is usually of the format {id:param_name, text:param_name}
+    // except when the user is creating a new parameter, then it is {id:'new', text:param_name}
+    var name = $scope.tmpParamName.text;
+    // tmpParamValuies comes back with the string that needs to be stored as the id;
+    // for changing to other parameter values or student input, this is {{pname}} or {{input}}
+    // otherwise the value option is interpreted as a string literal
+    var vals = [];
+    $scope.tmpParamValues.forEach(function(val){
+      vals.push(val.id);
+    });
+    // if it was a new parameter, add it to the exploration's parameter list
     if($scope.tmpParamName.id === 'new') {
-      $scope.addParameter($scope.tmpParamName.text, 'string');//TODO:ask for type(modal?)
-      $scope.tmpParamName.id = $scope.tmpParamName.text;
+      $scope.addParameter(name, 'string');//TODO:ask for type(modal?)
     }
-
-    $scope.paramChanges[$scope.tmpParamName.id] = $scope.tmpParamValues;
+    console.log($scope.tmpParamValues);
+    $scope.paramChanges[name] = vals;
     $scope.saveParamChanges();
     $scope.resetParamChangeInput();
   };
 
   $scope.deleteParamChange = function (paramName) {
     //TODO(yanamal): add category index when this is per-category
+    //TODO: why does this break when deleting the only parameter change?
     delete $scope.paramChanges[paramName];
     $scope.saveParamChanges();
   };
