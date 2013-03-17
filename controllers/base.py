@@ -70,6 +70,9 @@ def require_editor(handler):
             return
 
         exploration = Exploration.get(exploration_id)
+        if not exploration:
+            raise self.InvalidInputException('Exploration not found.')
+
         if not controller_utils.check_can_edit(user, exploration):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
