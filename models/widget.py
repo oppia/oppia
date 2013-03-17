@@ -32,8 +32,8 @@ class WidgetParameter(ndb.Model):
     name = ndb.StringProperty(required=True)
     description = ndb.TextProperty()
     param_type = ndb.StringProperty(required=True)
-    # TODO(sll): Validate that this default value is of the correct type.
-    default_value = ndb.JsonProperty(required=True)
+    # TODO(sll): Validate that this default value is of the correct type, or None.
+    default_value = ndb.JsonProperty()
 
 
 class AnswerHandler(ndb.Model):
@@ -88,6 +88,7 @@ class Widget(polymodel.PolyModel):
                 parameters[param.name] = params[param.name]
             else:
                 parameters[param.name] = param.default_value
+        # TODO(sll): Do we have to be careful here about how 'None' params are handled?
         raw = utils.parse_with_jinja(widget.template, parameters)
 
         result = widget.to_dict()
@@ -136,21 +137,27 @@ class InteractiveWidget(Widget):
                 widget_config = utils.get_dict_from_yaml(
                     f.read().decode('utf-8'))
 
+            assert widget_id == widget_config['id']
+
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
-            template = utils.get_file_contents(feconf.SAMPLE_WIDGETS_DIR, html_file)
+            template = utils.get_file_contents(
+                feconf.SAMPLE_WIDGETS_DIR, html_file)
 
             params = []
-            for key, value in widget_config['params'].iteritems():
+            for param in widget_config['params']:
                 params.append(WidgetParameter(
-                    name=key, default_value=value,
-                    param_type=type(value).__name__
+                    name=param.get('name'),
+                    description=param.get('description'),
+                    param_type=param.get('param_type'),
+                    default_value=param.get('default_value'),
                 ))
 
-            actions = []
-            for key, value in widget_config['actions'].iteritems():
-                actions.append(AnswerHandler(
-                    name=key, classifier=value['classifier']
-                ))
+            handlers = []
+            for handler in widget_config['handlers']:
+                handlers.append(AnswerHandler(
+                    name=handler.get('name'),
+                    classifier=handler.get('classifier')),
+                )
 
             widget = cls(
                 id=widget_config['id'],
@@ -159,7 +166,7 @@ class InteractiveWidget(Widget):
                 description=widget_config['description'],
                 template=template,
                 params=params,
-                handlers=actions
+                handlers=handlers,
             )
 
             widget.put()

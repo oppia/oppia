@@ -1,4 +1,4 @@
-# The system name for this widget.
+# The system name for this widget. This should match this file's name.
 id: TextInput
 
 # The human-readable name of the widget.
@@ -10,11 +10,14 @@ description: |
   A text input widget that can accept and classify strings.
 
 # Actions that the reader can perform on this widget which trigger a feedback
-# interaction.
-actions:
-  submit:
-    classifier: TextClassifier
+# interaction, and the associated classifiers.
+handlers:
+- name: submit
+  classifier: TextClassifier
 
-# Customization parameters and their default values.
+# Customization parameters and their descriptions, types and default values.
 params:
-  placeholder: 'Type your answer here.'
+  - name: placeholder
+    description: The placeholder for the text input field.
+    param_type: str
+    default_value: Type your answer here.

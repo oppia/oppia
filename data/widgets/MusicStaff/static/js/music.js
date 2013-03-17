@@ -3,8 +3,6 @@ var note01;
 var noteToGuess = GLOBALS.noteToGuess;
 var notesToPlayAtStart = GLOBALS.notesToPlayAtStart;
 var previousAnswer = GLOBALS.previousAnswer;
-var playScaleStart = GLOBALS.playScaleStart;
-var playScaleEnd = GLOBALS.playScaleEnd;
 var numberOfNotes = 0;
 
 var pitches = {
