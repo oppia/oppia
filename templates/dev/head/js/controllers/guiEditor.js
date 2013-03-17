@@ -93,11 +93,13 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 
   $scope.saveContent = function(index) {
-    if ($scope.content[index].type == 'text') {
+    if ($scope.content[index].type == 'text' && editors.hasOwnProperty(index)) {
       $scope.content[index].value = editors[index].getContent();
       $scope.saveStateContent();
     }
     activeInputData.name = '';
+
+    setTimeout($scope.updateMath, 1000);
   };
 
   $scope.saveStateContent = function() {
