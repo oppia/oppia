@@ -89,6 +89,27 @@ class UtilsTests(test_utils.AppEngineTestBase):
         parsed_str = utils.parse_with_jinja('int {{i}}', {'i': 2})
         self.assertEqual(parsed_str, 'int 2')
 
+    def test_parse_dict_with_params(self):
+        """Test parse_dict_with_params method."""
+        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {}, '')
+        self.assertEqual(parsed_dict, {'a': u"'b'"})
+
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {}, 'def')
+        self.assertEqual(parsed_dict, {'a': u"'def'"})
+
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3}, '')
+        self.assertEqual(parsed_dict, {'a': u"'3'"})
+
+        parsed_dict = utils.parse_dict_with_params(
+            {'a': '{{b}}'}, {'b': 'c'}, '')
+        self.assertEqual(parsed_dict, {'a': u"'c'"})
+
+        # Test that the original dictionary is unchanged.
+        orig_dict = {'a': '{{b}}'}
+        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'}, '')
+        self.assertEqual(orig_dict, {'a': '{{b}}'})
+        self.assertEqual(parsed_dict, {'a': u"'c'"})
+
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""
         alist = ['a', 'b', 'c', 'd']
@@ -123,4 +144,5 @@ class UtilsTests(test_utils.AppEngineTestBase):
             yaml_dict = utils.get_dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        # TODO(sll): Add a test here for the failure case.
+        with self.assertRaises(utils.InvalidInputException):
+            yaml_str = utils.get_dict_from_yaml('{')

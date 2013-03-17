@@ -30,8 +30,6 @@ from jinja2 import meta
 
 import feconf
 
-from google.appengine.ext import ndb
-
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
