@@ -28,6 +28,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         """Test Parameter Class."""
         o = Parameter()
         o.name = 'The name'
-        o.starting_values = ['The values']
+        o.default_values = ['The values']
         self.assertEqual(o.name, 'The name')
-        self.assertEqual(o.starting_values, ['The values'])
+        self.assertEqual(o.default_values, ['The values'])

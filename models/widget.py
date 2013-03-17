@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 
 
-class Parameter(ndb.Model):
+class WidgetParameter(ndb.Model):
     """A class for parameters."""
     name = ndb.StringProperty(required=True)
     description = ndb.TextProperty()
@@ -63,7 +63,7 @@ class Widget(polymodel.PolyModel):
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used.
-    params = ndb.StructuredProperty(Parameter, repeated=True)
+    params = ndb.StructuredProperty(WidgetParameter, repeated=True)
 
     @classmethod
     def get(cls, widget_id):
@@ -80,9 +80,7 @@ class Widget(polymodel.PolyModel):
         if widget is None:
             raise Exception('Widget %s does not exist.' % widget_id)
 
-        # Get the raw code by parameterizing widget with params. For now, just
-        # use default values.
-        # TODO(sll): Actually use params.
+        # Get the raw code by parameterizing widget with params.
         parameters = {}
         for param in widget.params:
             if param.name in params:
@@ -93,15 +91,17 @@ class Widget(polymodel.PolyModel):
         raw = utils.parse_with_jinja(widget.template, parameters)
 
         result = widget.to_dict()
+        result['id'] = widget_id
+        result['raw'] = raw
+        # TODO(sll): Restructure this so that it is
+        # {key: {value: ..., param_type: ..., default_value: ...}}
+        result['params'] = parameters
         if 'handlers' in result:
             actions = {}
             for item in result['handlers']:
                 actions[item['name']] = {'classifier': item['classifier']}
             result['actions'] = actions
             del result['handlers']
-        result['params'] = parameters
-        result['id'] = widget_id
-        result['raw'] = raw
         return result
 
 
@@ -141,7 +141,7 @@ class InteractiveWidget(Widget):
 
             params = []
             for key, value in widget_config['params'].iteritems():
-                params.append(Parameter(
+                params.append(WidgetParameter(
                     name=key, default_value=value,
                     param_type=type(value).__name__
                 ))
