@@ -81,15 +81,15 @@ class Exploration(BaseModel):
 
             state_internals = state.internals_as_dict()
             # Change the dest id to a dest name.
-            for action in state_internals['widget']['rules']:
-                for rule in state_internals['widget']['rules'][action]:
+            for handler in state_internals['widget']['handlers']:
+                for rule in handler['rules']:
                     if rule['dest'] != feconf.END_DEST:
                         rule['dest'] = State.get(rule['dest'], self).name
 
             if self.init_state.get().id == state.id:
-                init_dict[state.name] = state.internals_as_dict()
+                init_dict[state.name] = state_internals
             else:
-                exploration_dict[state.name] = state.internals_as_dict()
+                exploration_dict[state.name] = state_internals
 
         result = utils.get_yaml_from_dict(init_dict)
         if exploration_dict:

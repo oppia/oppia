@@ -5,10 +5,11 @@ Hola:
       \ just type or select \"I don't know\"\n<br><br>\n\xA1Hola!"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'hola!')
@@ -47,10 +48,11 @@ Adios:
       \xA1Adi\xF3s!"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: contains(x)
         code: contains('adios')
@@ -79,7 +81,7 @@ Colores:
     value: "\xBFDe qu\xE9 colores son las manzanas?"
   param_changes: {}
   widget:
-    id: MultipleChoiceInput
+    widget_id: MultipleChoiceInput
     params:
       choices:
       - negro y azul
@@ -87,8 +89,9 @@ Colores:
       - rojo y verde
       - amarillo y gris
       - I don't know
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(0)
@@ -138,10 +141,11 @@ Como meaning:
       \ is a question.\n<br>What would \"\xBFC\xF3mo te llamas?\" mean?"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals('what is your name?')
@@ -176,10 +180,11 @@ Me llamo:
     value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: starts_with(x)
         code: starts_with('me llamo es')
@@ -216,10 +221,11 @@ Me llamo meaning:
     value: Can you say what "Me llamo" means?
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals('my name is')
@@ -259,15 +265,16 @@ Supermercado:
       ?"
   param_changes: {}
   widget:
-    id: MultipleChoiceInput
+    widget_id: MultipleChoiceInput
     params:
       choices:
       - Ventanas
       - Coches
       - Manzanas
       - I don't know
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(0)

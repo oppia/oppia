@@ -5,11 +5,12 @@ Sentence:
       \ conjugation goes in the blank? \nOr type 'I don't know'"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'juego')
@@ -39,11 +40,12 @@ So...:
     value: So now put that stem together with the ending, and what is the answer?
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'juego')
@@ -71,11 +73,12 @@ boot verb:
       \ a verb ending in -gar, it uses the u > ue stem, so what does the stem become?"
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'jueg')
@@ -96,11 +99,12 @@ subject:
     value: So what is the subject of the sentence?
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'yo')
@@ -122,11 +126,12 @@ verb endings:
     value: So what is the correct verb ending for yo?
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'-o')

@@ -30,7 +30,9 @@ import feconf
 from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 from models.exploration import Parameter
+from models.state import AnswerHandlerInstance
 from models.state import Content
+from models.state import Rule
 from models.state import State
 from models.widget import InteractiveWidget
 import utils
@@ -46,10 +48,21 @@ def get_state_for_frontend(state, exploration):
     state_repr = state.as_dict()
     # Modify the YAML representation to use names instead of ids.
     modified_state_dict = copy.deepcopy(state.internals_as_dict())
-    for action in modified_state_dict['widget']['rules']:
-        for rule in modified_state_dict['widget']['rules'][action]:
+    for handler in modified_state_dict['widget']['handlers']:
+        for rule in handler['rules']:
             if rule['dest'] != feconf.END_DEST:
                 rule['dest'] = State.get(rule['dest'], exploration).name
+
+    # TODO(sll): The following is for backwards-compatibility and should be
+    # deleted later.
+    rules = {}
+    for handler in state_repr['widget']['handlers']:
+        rules[handler['name']] = handler['rules']
+        for item in rules[handler['name']]:
+            item['attrs'] = {'classifier': item['name']}
+    state_repr['widget']['rules'] = rules
+    state_repr['widget']['id'] = state_repr['widget']['widget_id']
+
     state_repr['yaml'] = utils.get_yaml_from_dict(modified_state_dict)
     return state_repr
 
@@ -294,22 +307,22 @@ class StateHandler(BaseHandler):
             state.param_changes = param_changes
 
         if interactive_widget:
-            state.interactive_widget = interactive_widget
+            state.widget.widget_id = interactive_widget
 
         if interactive_params:
-            state.interactive_params = interactive_params
+            state.widget.params = interactive_params
 
         if interactive_rulesets:
-            state.interactive_rulesets = interactive_rulesets
-            ruleset = state.interactive_rulesets['submit']
+            ruleset = interactive_rulesets['submit']
+            self.recursively_remove_attr(ruleset, u'$$hashKey')
 
-            self.recursively_remove_attr(
-                state.interactive_rulesets['submit'], u'$$hashKey')
+            state.widget.handlers = [AnswerHandlerInstance(
+                name='submit', rules=[])]
 
             if len(ruleset) > 1:
                 interactive_widget_properties = (
                     InteractiveWidget.get_with_params(
-                        state.interactive_widget)['actions']['submit'])
+                        state.widget.widget_id)['actions']['submit'])
                 # Import the relevant classifier module to use in eval() below.
                 classifier_module = '.'.join([
                     feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
@@ -320,17 +333,31 @@ class StateHandler(BaseHandler):
                 assert ('attrs' not in ruleset[0] or
                         'classifier' not in ruleset[0]['attrs'])
 
+            # This is part of the state. The rules should be put into it.
+            state_ruleset = state.widget.handlers[0].rules
+
             # TODO(yanamal): Do additional calculations here to get the
             # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
                 logging.info(rule)
 
+                state_rule = Rule()
+                if 'attrs' in rule and 'classifier' in rule['attrs']:
+                    state_rule.name = rule['attrs']['classifier']
+                state_rule.rule = rule.get('rule')
+                state_rule.code = rule.get('code')
+                state_rule.inputs = rule.get('inputs')
+                state_rule.dest = rule.get('dest')
+                state_rule.feedback = rule.get('feedback')
+
                 # Generate the code to be executed.
                 if rule['rule'] == 'Default':
                     # This is the default rule.
                     assert rule_ind == len(ruleset) - 1
-                    rule['code'] = 'True'
+                    state_rule.code = 'True'
+                    state_rule.name = 'Default'
+                    state_ruleset.append(state_rule)
                     continue
 
                 classifier_func = rule['attrs']['classifier'].replace(' ', '')
@@ -378,7 +405,8 @@ class StateHandler(BaseHandler):
                 result += ')'
 
                 logging.info(result)
-                rule['code'] = result
+                state_rule.code = result
+                state_ruleset.append(state_rule)
 
         if content:
             state.content = [Content(type=item['type'], value=item['value'])
@@ -402,11 +430,10 @@ class StateHandler(BaseHandler):
         for state_key in exploration.states:
             origin_state = state_key.get()
             changed = False
-            for key in origin_state.interactive_rulesets:
-                rules = origin_state.interactive_rulesets[key]
-                for rule in rules:
-                    if rule['dest'] == state.key:
-                        rule['dest'] = origin_state.key
+            for handler in origin_state.widget.handlers:
+                for rule in handler.rules:
+                    if rule.dest == state.id:
+                        rule.dest = origin_state.id
                         changed = True
             if changed:
                 origin_state.put()

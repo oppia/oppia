@@ -4,11 +4,12 @@ Question:
     value: How many ways are there to arrange three balls in a row?
   param_changes: {}
   widget:
-    id: NumericInput
+    widget_id: NumericInput
     params:
       placeholder: 0
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(6.0)
@@ -34,10 +35,11 @@ List the ways:
       are the other ways?</div></div>
   param_changes: {}
   widget:
-    id: SetInput
+    widget_id: SetInput
     params: {}
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(set([]))
@@ -147,11 +149,12 @@ Prompt for explanation:
     value: OK, why do you think it is 6?
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs: {}
         code: 'True'
         dest: END
@@ -165,11 +168,12 @@ Prompt for explanation with all ways listed:
       know?</div>
   param_changes: {}
   widget:
-    id: TextInput
+    widget_id: TextInput
     params:
       placeholder: Type your answer here.
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs: {}
         code: 'True'
         dest: END

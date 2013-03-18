@@ -177,7 +177,8 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.addContent = function(contentType) {
     if (contentType == 'text') {
       $scope.content.push({type: 'text', value: ''});
-      activeInputData.name = 'content.' + $scope.content.length;
+      $scope.$apply();
+      activeInputData.name = 'content.' + ($scope.content.length - 1);
     } else if (contentType == 'image') {
       $scope.content.push({type: 'image', value: ''});
     } else if (contentType == 'video') {

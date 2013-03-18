@@ -32,7 +32,7 @@
     <table>
       <tr ng-repeat="rule in interactiveRulesets[action]">
         <td style="width: 80%">
-          <[rule | parameterizeRule: interactiveWidget.params.choices]>:
+          <[rule | parameterizeRule: interactiveParams.choices]>:
           (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         </td>
         <td style="width: 20%">
@@ -139,8 +139,8 @@
         </div>
   
         <div ng-show="addRuleActionRule">
-          <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveWidget.params.choices"></span>
-  
+          <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveParams.choices"></span>
+
           <hr>
           <div>
             Destination:

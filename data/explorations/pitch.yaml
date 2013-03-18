@@ -23,13 +23,14 @@ Main window:
     - E5
     - F5
   widget:
-    id: MusicStaff
+    widget_id: MusicStaff
     params:
       noteToGuess: '{{noteStart}}'
       notesToPlayAtStart: []
       previousAnswer: '{{answer}}'
-    rules:
-      submit:
+    handlers:
+    - name: submit
+      rules:
       - attrs:
           classifier: equals(x)
         code: equals(u'{{noteStart}}')

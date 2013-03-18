@@ -87,7 +87,7 @@ oppia.filter('bracesToInput', function() {
       if (isMultipleChoice) {
         replacementHtml =
           '<select ng-model="addRuleActionInputs.' + varName +
-          '" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(interactiveWidget.params.choices)"' +
+          '" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(interactiveParams.choices)"' +
           tail + '</select>';
       } else if (varType == 'Set') {
         replacementHtml =

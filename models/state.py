@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import importlib
 import logging
 import os
@@ -36,49 +37,76 @@ class Content(ndb.Model):
     value = ndb.TextProperty(default='')
 
 
+class Rule(ndb.Model):
+    """A rule for an answer classifier."""
+    # The name of the rule.
+    name = ndb.StringProperty(required=True)
+    # Parameters for the classification rule.
+    inputs = ndb.JsonProperty(default={})
+    # The id of the destination state.
+    dest = ndb.StringProperty()
+    # Feedback to give the reader if this rule is triggered.
+    feedback = ndb.TextProperty(default='')
+    # Parameter changes to make if this rule is triggered.
+    param_changes = ndb.JsonProperty(default={})
+    # Code (temporary). TODO(sll): Remove this.
+    code = ndb.TextProperty(default='True')
+    # Rule (temporary). TODO(sll): Remove this.
+    rule = ndb.TextProperty(default='Default')
+
+
+class AnswerHandlerInstance(ndb.Model):
+    """An answer event stream (submit, click, drag, etc.)."""
+    name = ndb.StringProperty(default='submit')
+    rules = ndb.LocalStructuredProperty(Rule, repeated=True)
+
+
+class WidgetInstance(ndb.Model):
+    """An instance of a widget."""
+    # The id of the interactive widget class for this state.
+    widget_id = ndb.StringProperty(default='Continue')
+    # Parameter overrides for the interactive widget view, stored as key-value
+    # pairs.
+    params = ndb.JsonProperty(default={})
+    # Answer handlers and rulesets.
+    handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
+
+
 class State(BaseModel):
     """A state which forms part of an exploration."""
     # NB: This element's parent should be an Exploration.
+
+    def get_default_rule(self):
+        return Rule(name='Default', dest=self.id)
+
+    def get_default_handler(self):
+        return AnswerHandlerInstance(rules=[self.get_default_rule()])
+
+    def get_default_widget(self):
+        return WidgetInstance(handlers=[self.get_default_handler()])
+
+    def _pre_put_hook(self):
+        """Ensures that the widget and at least one handler for it exists."""
+        if not self.widget:
+            self.widget = self.get_default_widget()
+        elif not self.widget.handlers:
+            self.widget.handlers = [self.get_default_handler()]
+        # TODO(sll): Do other validation.
+
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
-    # The id of the interactive widget class for this state.
-    interactive_widget = ndb.StringProperty(default='Continue')
-    # Parameter overrides for the interactive widget view, stored as key-value
-    # pairs.
-    interactive_params = ndb.JsonProperty(default={})
-    # Rulesets for the interactive widget. Each ruleset is a key-value pair: the
-    # key is the name of the reader's action (submit, click, etc.) and the value
-    # is a list of rules, each represented as a dict with six elements:
-    # - rule: the raw classification rule
-    # - inputs: parameters for that classification rule
-    # - code: Python code to check whether the answer satisfies the category
-    # - dest: the destination state id
-    # - feedback: feedback text
-    # - param_changes: parameter changes
-    # TODO(yanamal): Implement the parameter changes parts (the rest are done).
-    # TODO(sll): Add validation.
-    interactive_rulesets = ndb.JsonProperty(default={'submit': []})
     # Parameter changes associated with this state.
     param_changes = ndb.JsonProperty(default={})
+    # The interactive widget associated with this state.
+    widget = ndb.StructuredProperty(WidgetInstance, required=True)
 
     @classmethod
     def create(cls, state_id, exploration, name):
         """Creates a new state."""
-        new_state = cls(
-            id=state_id,
-            parent=exploration.key,
-            name=name,
-            interactive_rulesets={'submit': [{
-                'rule': 'Default',
-                'inputs': {},
-                'code': 'True',
-                'dest': state_id,
-                'feedback': '',
-                'param_changes': [],
-            }]}
-        )
+        new_state = cls(id=state_id, parent=exploration.key, name=name)
+        new_state.widget = new_state.get_default_widget()
         new_state.put()
         return new_state
 
@@ -96,17 +124,7 @@ class State(BaseModel):
 
     def internals_as_dict(self):
         """Gets a Python dict of the internals of the state."""
-        state_dict = {
-            'content': [{'type': item.type, 'value': item.value} for
-                        item in self.content],
-            'param_changes': self.param_changes,
-            'widget': {
-                'id': self.interactive_widget,
-                'params': self.interactive_params,
-                'rules': self.interactive_rulesets,
-            }
-        }
-
+        state_dict = copy.deepcopy(self.to_dict(exclude=['name']))
         return state_dict
 
     @classmethod
@@ -131,7 +149,7 @@ class State(BaseModel):
         """
         is_valid, error_log = cls.verify(state_dict)
         if not is_valid:
-            raise cls.InvalidInputException(error_log)
+            raise Exception(error_log)
 
         if 'content' in state_dict:
             state.content = [
@@ -140,9 +158,10 @@ class State(BaseModel):
             ]
         if 'param_changes' in state_dict:
             state.param_changes = state_dict['param_changes']
-        state.interactive_widget = state_dict['widget']['id']
 
-        widget_params = Widget.get(state.interactive_widget).params
+        state.widget = WidgetInstance(widget_id=state_dict['widget']['widget_id'])
+
+        widget_params = Widget.get(state_dict['widget']['widget_id']).params
         parameters = {}
         for param in widget_params:
             if param.name in state_dict['widget']['params']:
@@ -155,35 +174,45 @@ class State(BaseModel):
             raise Exception('Extra parameters not used: %s' %
                             state_dict['widget']['params'])
 
-        state.interactive_params = parameters
+        state.widget.params = parameters
 
-        rulesets_dict = {'submit': []}
+        for handler in state_dict['widget']['handlers']:
 
-        for rule in state_dict['widget']['rules']['submit']:
-            rule_dict = {'code': rule['code'], 'feedback': rule.get('feedback')}
+            state_handler = AnswerHandlerInstance(name=handler['name'])
 
-            if rule['dest'] == feconf.END_DEST:
-                rule_dict['dest'] = feconf.END_DEST
-            else:
-                dest_state = State.get_by_name(rule['dest'], exploration)
-                if dest_state:
-                    rule_dict['dest'] = dest_state.id
+            for rule in handler['rules']:
+                rule_instance = Rule()
+                rule_instance.feedback = rule.get('feedback')
+
+                if rule['dest'] == feconf.END_DEST:
+                    rule_instance.dest = feconf.END_DEST
                 else:
-                    raise cls.InvalidInputException(
-                        'Invalid destination: %s' % rule['dest'])
+                    dest_state = State.get_by_name(rule['dest'], exploration)
+                    if dest_state:
+                        rule_instance.dest = dest_state.id
+                    else:
+                        raise Exception(
+                            'Invalid destination: %s' % rule['dest'])
 
-            if 'rule' in rule:
-                rule_dict['rule'] = rule['rule']
+                if 'inputs' in rule:
+                    rule_instance.inputs = rule['inputs']
 
-            if 'inputs' in rule:
-                rule_dict['inputs'] = rule['inputs']
+                if 'attrs' in rule and 'classifier' in rule['attrs']:
+                    rule_instance.name = rule['attrs']['classifier']
+                else:
+                    rule_instance.name = 'equals(x)'
 
-            if 'attrs' in rule:
-                rule_dict['attrs'] = rule['attrs']
+                # TODO(sll): Remove this.
+                if 'code' in rule:
+                    rule_instance.code = rule['code']
+                    if rule['code'] == 'True':
+                        rule_instance.name = 'Default'
+                if 'rule' in rule:
+                    rule_instance.rule = rule['rule']
 
-            rulesets_dict['submit'].append(rule_dict)
+                state_handler.rules.append(rule_instance)
 
-        state.interactive_rulesets = rulesets_dict
+        state.widget.handlers = [state_handler]
         state.put()
         return state
 
@@ -200,10 +229,10 @@ class State(BaseModel):
         - Each item in the 'content' array must have the keys
            ['type', 'value'].
             - The type must be one of ['text', 'image', 'video', 'widget'].
-        - Permitted subfields of 'widget' are ['id', 'params', 'rules'].
-            - The field 'id' is mandatory, and must correspond to an actual
+        - Permitted subfields of 'widget' are ['widget_id', 'params', 'handlers'].
+            - The field 'widget_id' is mandatory, and must correspond to an actual
                 widget in the feconf.SAMPLE_WIDGETS_DIR directory.
-        - Each ruleset in ['widget']['rules'] must have a non-empty array value,
+        - Each ruleset in ['widget']['handlers'] must have a non-empty array value,
             and each value should contain at least the fields ['code', 'dest'].
             - For all values except the last one, the 'code' field should
                 correspond to a valid rule for the widget's classifier. [NOT
@@ -231,13 +260,13 @@ class State(BaseModel):
 
         # Validate 'widget'.
         for key in description['widget']:
-            if key not in ['id', 'params', 'rules']:
+            if key not in ['widget_id', 'params', 'handlers']:
                 return False, 'Invalid key in widget: %s' % key
-        if 'id' not in description['widget']:
+        if 'widget_id' not in description['widget']:
             return False, 'No widget id supplied'
 
         # Check that the widget_id refers to an actual widget.
-        widget_id = description['widget']['id']
+        widget_id = description['widget']['widget_id']
         try:
             with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id,
                                    '%s.config.yaml' % widget_id)):
@@ -246,15 +275,10 @@ class State(BaseModel):
             return False, 'No widget with widget id %s exists.' % widget_id
 
         # Check each of the rulesets.
-        if 'rules' in description['widget']:
-            rulesets = description['widget']['rules']
-            for ruleset_name in rulesets:
-                rules = rulesets[ruleset_name]
-                if not rules:
-                    return (False,
-                            'No rules supplied for ruleset %s' % ruleset_name)
-
-                for ind, rule in enumerate(rules):
+        if 'handlers' in description['widget']:
+            handlers = description['widget']['handlers']
+            for handler in handlers:
+                for ind, rule in enumerate(handler['rules']):
                     if 'code' not in rule:
                         return (False,
                                 'Rule %s is missing a \'code\' field.' % ind)
@@ -262,7 +286,7 @@ class State(BaseModel):
                         return (False,
                                 'Rule %s is missing a destination.' % ind)
 
-                    if ind == len(rules) - 1:
+                    if ind == len(handler['rules']) - 1:
                         rule['code'] = str(rule['code'])
                         if rule['code'] != 'True':
                             return (False, 'The \'code\' field of the last '
@@ -292,32 +316,36 @@ class State(BaseModel):
 
             norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
             if norm_answer is None:
-                raise self.InvalidInputException(
+                raise Exception(
                     'Invalid input: could not normalize the answer.')
 
-        for ind, rule in enumerate(self.interactive_rulesets['submit']):
-            if ind == len(self.interactive_rulesets['submit']) - 1:
+        answer_handler = None
+        for handler in self.widget.handlers:
+            if handler.name == 'submit':
+                answer_handler = handler
+
+        for ind, rule in enumerate(answer_handler.rules):
+            if ind == len(answer_handler.rules) - 1:
                 # TODO(sll): This is a special case for multiple-choice input
                 # which should really be handled generically. However, it's
                 # not very interesting anyway because the reader's answer
                 # in this case is already known (it's just the last of the
                 # multiple-choice options given).
                 recorded_answer = answer
-                if self.interactive_widget == 'MultipleChoiceInput':
+                if self.widget.widget_id == 'MultipleChoiceInput':
                     recorded_answer = (
-                        self.interactive_params['choices'][int(answer)])
+                        self.widget.params['choices'][int(answer)])
 
                 default_recorded_answer = recorded_answer
 
-            assert rule['code']
-
-            if rule['code'] == 'True':
-                dest_id = rule['dest']
-                feedback = rule['feedback']
+            if rule.name == 'Default':
+                dest_id = rule.dest
+                feedback = rule.feedback
                 break
 
             # Add the 'answer' variable, and prepend classifier.
-            code = 'Classifier.' + rule['code'].replace('(', '(norm_answer,', 1)
+            # TODO(sll): Actually derive rule.code.
+            code = 'Classifier.' + rule.code.replace('(', '(norm_answer,', 1)
 
             code = utils.parse_with_jinja(code, params)
             if code is None:
@@ -327,8 +355,8 @@ class State(BaseModel):
                 utils.normalize_classifier_return(eval(code)))
 
             if return_value:
-                dest_id = rule['dest']
-                feedback = rule['feedback']
+                dest_id = rule.dest
+                feedback = rule.feedback
                 break
 
         return dest_id, feedback, default_recorded_answer

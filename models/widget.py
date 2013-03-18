@@ -92,12 +92,20 @@ class Widget(polymodel.PolyModel):
 
         raw = utils.parse_with_jinja(widget.template, parameters)
 
+        # The following are NOT stringified.
+        actual_params = {}
+        for param in widget.params:
+            if param.name in params:
+                actual_params[param.name] = params[param.name]
+            else:
+                actual_params[param.name] = param.default_value
+
         result = widget.to_dict()
         result['id'] = widget_id
         result['raw'] = raw
         # TODO(sll): Restructure this so that it is
         # {key: {value: ..., param_type: ..., default_value: ...}}
-        result['params'] = parameters
+        result['params'] = actual_params
         if 'handlers' in result:
             actions = {}
             for item in result['handlers']:

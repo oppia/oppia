@@ -79,24 +79,24 @@ class ExplorationHandler(BaseHandler):
         init_html, init_widgets = controller_utils.parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_with_params(
-            init_state.interactive_widget,
+            init_state.widget.widget_id,
             params=utils.parse_dict_with_params(
-                init_state.interactive_params, params)
+                init_state.widget.params, params)
         )['raw']
 
         self.values.update({
             'block_number': 0,
             'html': init_html,
             'interactive_widget_html': interactive_widget_html,
-            'interactive_params': init_state.interactive_params,
+            'interactive_params': init_state.widget.params,
             'params': params,
             'state_id': init_state.id,
             'title': exploration.title,
             'widgets': init_widgets,
         })
-        if init_state.interactive_widget in DEFAULT_ANSWERS:
+        if init_state.widget.widget_id in DEFAULT_ANSWERS:
             self.values['default_answer'] = (
-                DEFAULT_ANSWERS[init_state.interactive_widget])
+                DEFAULT_ANSWERS[init_state.widget.widget_id])
         self.response.write(json.dumps(self.values))
 
         EventHandler.record_exploration_visited(exploration_id)
@@ -123,7 +123,7 @@ class ExplorationHandler(BaseHandler):
 
         interactive_widget_properties = (
             InteractiveWidget.get_with_params(
-                state.interactive_widget)['actions']['submit'])
+                state.widget.widget_id)['actions']['submit'])
 
         dest_id, feedback, default_recorded_answer = state.transition(
             answer, params, interactive_widget_properties)
@@ -138,8 +138,8 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): The following is a special-case for multiple choice input,
         # in which the choice text must be displayed instead of the choice
         # number. We might need to find a way to do this more generically.
-        if state.interactive_widget == 'MultipleChoiceInput':
-            answer = state.interactive_params['choices'][int(answer)]
+        if state.widget.widget_id == 'MultipleChoiceInput':
+            answer = state.widget.params['choices'][int(answer)]
 
         # Append reader's answer.
         html_output = feconf.JINJA_ENV.get_template(
@@ -174,8 +174,8 @@ class ExplorationHandler(BaseHandler):
                 html_output += state_html
                 widget_output.append(state_widgets)
 
-        if state.interactive_widget in DEFAULT_ANSWERS:
-            values['default_answer'] = DEFAULT_ANSWERS[state.interactive_widget]
+        if state.widget.widget_id in DEFAULT_ANSWERS:
+            values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
         values['exploration_id'] = exploration.id
         values['state_id'] = state.id
         values['html'] = html_output
@@ -187,9 +187,9 @@ class ExplorationHandler(BaseHandler):
             values['finished'] = False
             values['interactive_widget_html'] = (
                 InteractiveWidget.get_with_params(
-                    state.interactive_widget,
+                    state.widget.widget_id,
                     params=utils.parse_dict_with_params(
-                        state.interactive_params, params)
+                        state.widget.params, params)
                 )['raw']
             )
         else:
