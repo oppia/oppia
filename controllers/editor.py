@@ -329,9 +329,6 @@ class StateHandler(BaseHandler):
                     interactive_widget_properties['classifier'],
                     interactive_widget_properties['classifier']])
                 Classifier = importlib.import_module(classifier_module)
-            else:
-                assert ('attrs' not in ruleset[0] or
-                        'classifier' not in ruleset[0]['attrs'])
 
             # This is part of the state. The rules should be put into it.
             state_ruleset = state.widget.handlers[0].rules

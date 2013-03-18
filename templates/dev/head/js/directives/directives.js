@@ -65,6 +65,37 @@ oppia.directive('list', function (warningsData) {
   };
 });
 
+// An editable string directive.
+oppia.directive('string', function (warningsData) {
+  return {
+    restrict: 'E',
+    scope: {item: '='},
+    templateUrl: '/templates/string',
+    controller: function ($scope, $http, $attrs) {
+
+      $scope.active = false;
+
+      $scope.openItemEditor = function() {
+        $scope.active = true;
+      };
+
+      $scope.closeItemEditor = function() {
+        $scope.active = false;
+      };
+
+      $scope.replaceItem = function(newItem) {
+        if (!newItem) {
+          warningsData.addWarning('Please enter a non-empty item.');
+          return;
+        }
+        $scope.replacementItem = '';
+        $scope.item = newItem;
+        $scope.closeItemEditor();
+      };
+    }
+  };
+});
+
 oppia.directive('mustBeValidString', function($timeout) {
   return {
     require: 'ngModel',

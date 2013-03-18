@@ -303,7 +303,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     },
     data:[],
     formatNoMatches:function(term) {
-      return "(choose a parameter name)"
+      return "(choose a parameter name)";
     }
   };
   $scope.valueSelector = {
@@ -316,7 +316,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     data:[],
     tokenSeparators:[","],
     formatNoMatches:function(term) {
-      return "(list new values)"
+      return "(list new values)";
     }
   };
 
@@ -336,12 +336,12 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       changedata.push({id:'{{'+param.name+'}}', text:param.name});
     });
     angular.extend($scope.valueSelector.data, changedata);
-  }
+  };
 
   //start editing/adding a parameter change
   $scope.startAddParamChange = function() {
     $scope.editingParamChange = 'New change';
-    $scope.initSelectorOptions(); 
+    $scope.initSelectorOptions();
   };
 
   $scope.startEditParamChange = function(pName) {
@@ -354,7 +354,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       //or manually re-construct the display text every time from the value string
       //e.g. {{pname}} -> pname, literalvalue -> "literalvalue"
     }
-    $scope.initSelectorOptions(); 
+    $scope.initSelectorOptions();
   };
 
   //reset and/or initialize variables for parameter change input

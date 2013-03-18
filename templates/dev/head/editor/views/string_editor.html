@@ -1,0 +1,8 @@
+<div>
+  <[item]> (<a ng-click="openItemEditor()">Edit</a>)
+  <span ng-show="active">
+    <input type="text" ng-model="replacementItem"
+           placeholder="Replacement Item">
+    <button type="button" ng-click="replaceItem(replacementItem)">Replace</button>
+  </span>
+</div>
