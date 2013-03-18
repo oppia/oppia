@@ -246,7 +246,8 @@ def normalize_classifier_return(*args):
     """
     # TODO(sll): All rules should return a 2-tuple instead.
     if len(args) not in [1, 2]:
-        raise Exception('Invalid classifier return values: %s' % str(args))
+        raise InvalidInputException(
+            'Invalid classifier return values: %s' % str(args))
 
     assert isinstance(args[0], bool)
     if len(args) == 1:
@@ -254,3 +255,15 @@ def normalize_classifier_return(*args):
     else:
         assert isinstance(args[1], dict)
         return (args[0], args[1])
+
+
+def recursively_remove_key(d, key_to_remove):
+    """Recursively removes keys gfrom a dict."""
+    if isinstance(d, list):
+        for item in d:
+            recursively_remove_key(item, key_to_remove)
+    elif isinstance(d, dict):
+        if key_to_remove in d:
+            del d[key_to_remove]
+        for key, unused_value in d.items():
+            recursively_remove_key(d[key], key_to_remove)

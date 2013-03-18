@@ -146,3 +146,42 @@ class UtilsTests(test_utils.AppEngineTestBase):
 
         with self.assertRaises(utils.InvalidInputException):
             yaml_str = utils.get_dict_from_yaml('{')
+
+    def test_normalize_classifier_return(self):
+        """Test normalize_classifier_return method."""
+        with self.assertRaises(utils.InvalidInputException):
+            utils.normalize_classifier_return()
+        with self.assertRaises(utils.InvalidInputException):
+            utils.normalize_classifier_return(1, 2, 3)
+        with self.assertRaises(AssertionError):
+            utils.normalize_classifier_return(1)
+        with self.assertRaises(AssertionError):
+            utils.normalize_classifier_return(1, {'a': 'b'})
+        with self.assertRaises(AssertionError):
+            utils.normalize_classifier_return(True, 2)
+
+        self.assertEqual(
+            utils.normalize_classifier_return(True), (True, {}))
+        self.assertEqual(
+            utils.normalize_classifier_return(False), (False, {}))
+        self.assertEqual(
+            utils.normalize_classifier_return(
+                False, {'a': 'b'}), (False, {'a': 'b'}))
+
+    def test_recursively_remove_key(self):
+        """Test recursively_remove_key method."""
+        d = {'a': 'b'}
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {})
+
+        d = {}
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {})
+
+        d = {'a': 'b', 'c': 'd'}
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {'c': 'd'})
+
+        d = {'a': 'b', 'c': {'a': 'b'}}
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {'c': {}})

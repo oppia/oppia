@@ -258,17 +258,6 @@ class ExplorationDownloadHandler(BaseHandler):
 class StateHandler(BaseHandler):
     """Handles state transactions."""
 
-    # Recursively removes keys from a dict.
-    def recursively_remove_attr(self, d, attr_to_remove):
-        if isinstance(d, list):
-            for item in d:
-                self.recursively_remove_attr(item, attr_to_remove)
-        elif isinstance(d, dict):
-            if attr_to_remove in d:
-                del d[attr_to_remove]
-            for key, unused_value in d.items():
-                self.recursively_remove_attr(d[key], attr_to_remove)
-
     @require_editor
     def put(self, unused_user, exploration, state):
         """Saves updates to a state."""
@@ -314,7 +303,7 @@ class StateHandler(BaseHandler):
 
         if interactive_rulesets:
             ruleset = interactive_rulesets['submit']
-            self.recursively_remove_attr(ruleset, u'$$hashKey')
+            utils.recursively_remove_key(ruleset, u'$$hashKey')
 
             state.widget.handlers = [AnswerHandlerInstance(
                 name='submit', rules=[])]
