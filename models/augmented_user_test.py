@@ -22,17 +22,38 @@ from augmented_user import AugmentedUser
 from exploration import Exploration
 
 from google.appengine.api import users
+from google.appengine.ext.db import BadValueError
 from google.appengine.ext import ndb
 
 
-class UserUnitTests(test_utils.AppEngineTestBase):
+class AugmentedUserUnitTests(test_utils.AppEngineTestBase):
     """Test AugmentedUser class."""
 
     def testAugmentedUserClass(self):
         """Test AugmentedUser Class."""
-        u = users.get_current_user()
-        o = AugmentedUser()
-        o.user = u
-        o.states = [ndb.Key(Exploration, 5)]
-        self.assertEqual(o.user, u)
-        self.assertEqual(o.states, [ndb.Key(Exploration, 5)])
+        # The user field of an AugmentedUser instance must be set.
+        au = AugmentedUser()
+        with self.assertRaises(BadValueError):
+            au.put()
+
+        # Create and save an actual AugmentedUser instance.
+        user = users.User(email='first@test.com')
+        au.user = user
+        au.editable_explorations = [ndb.Key(Exploration, 5)]
+        au.put()
+
+        retrieved_au = AugmentedUser.get(user)
+        self.assertEqual(retrieved_au.user, user)
+        self.assertEqual(
+            retrieved_au.editable_explorations, [ndb.Key(Exploration, 5)])
+
+        # There should be just one AugmentedUser in the datastore.
+        self.assertEqual(AugmentedUser.query().count(), 1)
+
+        # Querying for a non-existent user returns a new AugmentedUser entity.
+        new_user = users.User(email='new@example.com')
+        new_au = AugmentedUser.get(new_user)
+        self.assertEqual(new_au.user, new_user)
+
+        # There should now be two AugmentedUsers in the datastore.
+        self.assertEqual(AugmentedUser.query().count(), 2)

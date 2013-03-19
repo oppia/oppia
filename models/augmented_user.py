@@ -30,10 +30,6 @@ class AugmentedUser(ndb.Model):
     # The list of explorations that this user has editing rights for.
     editable_explorations = ndb.KeyProperty(kind=Exploration, repeated=True)
 
-    @property
-    def id(self):
-        return self.key.id()
-
     @classmethod
     def get(cls, user):
         """Gets (or creates) the corresponding AugmentedUser."""
@@ -43,4 +39,3 @@ class AugmentedUser(ndb.Model):
             augmented_user = cls(user=user)
             augmented_user.put()
         return augmented_user
-
