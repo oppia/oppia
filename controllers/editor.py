@@ -159,7 +159,7 @@ class ExplorationPage(BaseHandler):
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
 
-        state = controller_utils.create_new_state(exploration, state_name)
+        state = exploration.add_state(state_name)
         self.response.write(json.dumps(state.as_dict()))
 
     @require_editor

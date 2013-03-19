@@ -87,44 +87,15 @@ def parse_content_into_html(content_array, block_number, params=None):
 
 
 def create_new_exploration(
-    user, title='New Exploration', category='No category', exploration_id=None,
-    init_state_name='Activity 1'):
+        user, title, category, exploration_id=None, init_state_name='Activity 1'):
     """Creates and returns a new exploration."""
-    if exploration_id is None:
-        exploration_id = utils.get_new_id(Exploration, title)
-    state_id = utils.get_new_id(State, init_state_name)
-
-    # Create a fake state key temporarily for initialization of the question.
-    # TODO(sll): Do this in a transaction so it doesn't break other things.
-    fake_state_key = ndb.Key(State, state_id)
-
-    exploration = Exploration(
-        id=exploration_id, init_state=fake_state_key,
-        owner=user, category=category)
-    if title:
-        exploration.title = title
-    exploration.put()
-    new_init_state = State.create(state_id, exploration, init_state_name)
-
-    # Replace the fake key with its real counterpart.
-    exploration.init_state = new_init_state.key
-    exploration.states = [new_init_state.key]
-    exploration.put()
+    exploration = Exploration.create(
+        user, title, category, exploration_id, init_state_name)
     if user:
         augmented_user = AugmentedUser.get(user)
         augmented_user.editable_explorations.append(exploration.key)
         augmented_user.put()
     return exploration
-
-
-def create_new_state(exploration, state_name):
-    """Creates and returns a new state."""
-    state_id = utils.get_new_id(State, state_name)
-    state = State.create(state_id, exploration, state_name)
-
-    exploration.states.append(state.key)
-    exploration.put()
-    return state
 
 
 def delete_exploration(exploration):
@@ -189,8 +160,8 @@ def create_exploration_from_yaml(
             'be identified')
 
     exploration = create_new_exploration(
-        user, title=title, category=category,
-        init_state_name=init_state_name, exploration_id=exploration_id)
+        user, title, category, exploration_id=exploration_id,
+        init_state_name=init_state_name)
 
     try:
         yaml_description = utils.get_dict_from_yaml(yaml_file)
@@ -204,7 +175,7 @@ def create_exploration_from_yaml(
                     raise utils.InvalidInputException(
                         'Invalid YAML file: contains duplicate state '
                         'names %s' % state_name)
-                state = create_new_state(exploration, state_name)
+                state = exploration.add_state(state_name)
 
         for state_name, state_description in yaml_description.iteritems():
             state = State.get_by_name(state_name, exploration)

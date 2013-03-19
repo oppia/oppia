@@ -58,6 +58,30 @@ class Exploration(BaseModel):
     editors = ndb.StringProperty(repeated=True)
 
     @classmethod
+    def create(cls, user, title, category, exploration_id,
+               init_state_name='Activity 1'):
+        """Creates and returns a new exploration."""
+        if exploration_id is None:
+            exploration_id = utils.get_new_id(Exploration, title)
+        state_id = utils.get_new_id(State, init_state_name)
+
+        # Temporarily create a fake initial state key.
+        # TODO(sll): Do this in a transaction so it doesn't break other things.
+        fake_state_key = ndb.Key(State, state_id)
+
+        exploration = Exploration(
+            id=exploration_id, owner=user, title=title,
+            init_state=fake_state_key, category=category)
+        exploration.put()
+        new_init_state = State.create(state_id, exploration, init_state_name)
+
+        # Replace the fake key with its real counterpart.
+        exploration.init_state = new_init_state.key
+        exploration.states = [new_init_state.key]
+        exploration.put()
+        return exploration
+
+    @classmethod
     def get(cls, exploration_id):
         """Gets an exploration by id. If it does not exist, returns None."""
         return cls.get_by_id(exploration_id)
@@ -95,3 +119,12 @@ class Exploration(BaseModel):
         if exploration_dict:
             result += utils.get_yaml_from_dict(exploration_dict)
         return result
+
+    def add_state(self, state_name):
+        """Adds a new state to the exploration, and returns the state."""
+        state_id = utils.get_new_id(State, state_name)
+        state = State.create(state_id, self, state_name)
+
+        self.states.append(state.key)
+        self.put()
+        return state
