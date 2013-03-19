@@ -25,6 +25,8 @@ from google.appengine.ext import ndb
 
 class AugmentedUser(ndb.Model):
     """Stores information about a particular user."""
+    # TODO(sll): Should this class be keyed by user.email()?
+
     # The corresponding user.
     user = ndb.UserProperty(required=True)
     # The list of explorations that this user has editing rights for.
