@@ -223,6 +223,10 @@ class ExplorationHandler(BaseHandler):
             state = state_key.get()
             state_list[state.id] = get_state_for_frontend(state, exploration)
 
+        parameters = []
+        for param in exploration.parameters:
+            parameters.append({'name': param.name, 'type': param.param_type})
+
         self.values.update({
             'exploration_id': exploration.id,
             'init_state_id': exploration.init_state.get().id,
@@ -233,7 +237,7 @@ class ExplorationHandler(BaseHandler):
             'owner': str(exploration.owner),
             'editors': exploration.editors,
             'states': state_list,
-            'parameters': exploration.parameters,
+            'parameters': parameters,
         })
         self.response.write(json.dumps(self.values))
 

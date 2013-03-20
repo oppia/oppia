@@ -277,8 +277,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   $scope.addParameter = function(name, type) {
     console.log("adding parameter to exploration");
     $scope.parameters.push({name:name, type:type});
-    //TODO: fix; right now updates server-side fine but trying to load exploration subsequently breaks.
-    /*
     $http.put(
         $scope.explorationUrl,
         $scope.createRequest({parameters: $scope.parameters}),
@@ -291,7 +289,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
                   'Error adding parameter: ' + data.error);
               $scope.parameters.pop();
             });
-            */
   };
 
   $scope.openAddNewEditorForm = function() {

@@ -30,8 +30,8 @@ class Parameter(ndb.Model):
     """A parameter definition for an exploration."""
     # The name of the parameter
     name = ndb.StringProperty(required=True)
-    # The data type of the parameter - for now only string or list
-    param_type = ndb.StringProperty(required=True)
+    # The data type of the parameter - for now only str or list
+    param_type = ndb.StringProperty(default='str')
 
 
 # TODO(sll): Add an anyone-can-edit mode.
