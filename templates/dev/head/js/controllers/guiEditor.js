@@ -69,7 +69,18 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.initYui = function(index, initContent) {
     var divId = 'yuiEditor' + index;
 
-    YUI().use('editor-base', 'gallery-itsatoolbar', function (Y) {
+    YUI({
+        base: '/third_party/static/yui3-3.8.1/build/',
+        combine: false,
+        groups: {
+          gallery: {
+            base: '/third_party/static/yui3-gallery-20121107/build/',
+            patterns: {
+              'gallery-': {}
+            }
+          }
+        }
+    }).use('editor-base', 'gallery-itsatoolbar', function (Y) {
       var config = {height: '10px'};
 
       editors[index] = new Y.EditorBase({

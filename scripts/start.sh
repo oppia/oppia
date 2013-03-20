@@ -128,10 +128,22 @@ if [ ! -d "third_party/static/d3js-3" ]; then
 fi
 
 echo Checking whether YUI is installed in third_party
-if [ ! -d "third_party/static/yui-3.8.1" ]; then
+if [ ! -d "third_party/static/yui3-3.8.1/build" ]; then
   echo Installing yui
-  mkdir -p third_party/static/yui-3.8.1/
-  wget http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js -O third_party/static/yui-3.8.1/yui-min.js
+  mkdir -p third_party/static/
+  wget https://github.com/yui/yui3/archive/v3.8.1.zip -O yui-3.8.1.zip
+  unzip yui-3.8.1.zip -d third_party/static
+  rm yui-3.8.1.zip
+fi
+
+echo Checking whether YUI Gallery is installed in third_party
+if [ ! -d "third_party/static/yui3-gallery-20121107" ]; then
+  echo Installing yui3 gallery
+  mkdir -p third_party/static/
+  wget https://github.com/yui/yui3-gallery/archive/gallery-2012.11.07-21-32.zip -O yui3-gallery-20121107.zip
+  unzip yui3-gallery-20121107.zip -d third_party/static
+  rm yui3-gallery-20121107.zip
+  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32 third_party/static/yui3-gallery-20121107
 fi
 
 

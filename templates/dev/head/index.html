@@ -58,10 +58,9 @@
           </p>
           <center class="oppia-btn-container">
             {% if user %}
-              <!-- TODO(sll): Add a flag here to display only explorations that the user can edit. -->
               <a class="btn btn-large btn-success" href="/gallery">Edit / Create an exploration</a>
             {% else %}
-              <a class="btn btn-large btn-success" href="{{login_url}}">Edit / Create an exploration</a>
+              <a class="btn btn-large btn-success" href="{{gallery_login_url}}">Edit / Create an exploration</a>
             {% endif %}
           </center>
           <center>

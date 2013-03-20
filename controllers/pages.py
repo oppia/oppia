@@ -21,6 +21,8 @@ import controller_utils
 import feconf
 import utils
 
+from google.appengine.api import users
+
 
 class MainPage(BaseHandler):
     """Main splash page for Oppia."""
@@ -28,6 +30,9 @@ class MainPage(BaseHandler):
     def get(self):
         """Handles GET requests."""
         controller_utils.ensure_default_data_is_loaded()
+        self.values.update({
+            'gallery_login_url': users.create_login_url('/gallery'),
+        })
         self.render_template('index.html')
 
 
