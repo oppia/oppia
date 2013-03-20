@@ -345,9 +345,24 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 
   $scope.startEditParamChange = function(pName) {
-    $scope.tmpParamName = pName;
+    $scope.tmpParamName = {id:pName, text: pName};
     $scope.editingParamChange = pName;
     if (pName in $scope.paramChanges) {
+      $scope.tmpParamValues = [];
+      ($scope.paramChanges[pName]).forEach(function(change){
+        if(typeof change === "string") { // I think other stuff, like hashes, ends up in this object
+          var txt = "";
+          if(change.lastIndexOf("{{", 0) === 0) { // if change starts with "{{" - it is a variable
+            txt = change.substring(2, change.length-2);
+          }
+          else { // it's a literal; display in quotes
+            txt = '"'+change+'"';
+          }
+          $scope.tmpParamValues.push({id:change, text:txt});
+        }
+      });
+      console.log($scope.paramChanges[pName]);
+      console.log($scope.tmpParamValues);
       //$scope.tmpParamValues = $scope.paramChanges[pName];
       //TODO: correctly fill the param values field. 
       //need to either change the structure of paramChanges to fit with the select2 structure (probably the best way) 
