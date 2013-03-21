@@ -1,16 +1,16 @@
-Answer is equal to {{x|MusicNote}}:
-  classifier: equals(x)
+equals(x):
+  name: Answer is equal to {{x|MusicNote}}
 
-Answer has a lower pitch than {{x|MusicNote}}:
-  classifier: is_less_than(x)
+is_less_than(x):
+  name: Answer has a lower pitch than {{x|MusicNote}}
 
-Answer has a greater pitch than {{x|MusicNote}}:
-  classifier: is_greater_than(x)
+is_greater_than(x):
+  name: Answer has a greater pitch than {{x|MusicNote}}
 
-Answer has a pitch between {{a|MusicNote}} and {{b|MusicNote}}, inclusive:
-  classifier: is_inclusively_between(a, b)
+is_inclusively_between(a, b):
+  name: Answer has a pitch between {{a|MusicNote}} and {{b|MusicNote}}, inclusive
   checks:
   - is_less_than_or_equal_to(a, b)
 
-Answer is within {{tol|NonnegativeInt}} of {{x|MusicNote}}:
-  classifier: is_within_tolerance(x, tol)
+is_within_tolerance(x, tol):
+  name: Answer is within {{tol|NonnegativeInt}} of {{x|MusicNote}}

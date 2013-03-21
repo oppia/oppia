@@ -1,20 +1,20 @@
-Answer is equal to {{x|Set}}:
-  classifier: equals(x)
+equals(x):
+  name: Answer is equal to {{x|Set}}
 
-Answer is a proper subset of {{x|Set}}:
-  classifier: is_subset_of(x)
+is_subset_of(x):
+  name: Answer is a proper subset of {{x|Set}}
 
-Answer is a proper superset of {{x|Set}}:
-  classifier: is_superset_of(x)
+is_superset_of(x):
+  name: Answer is a proper superset of {{x|Set}}
 
-Answer has elements in common with {{x|Set}}:
-  classifier: has_elements_in(x)
+has_elements_in(x):
+  name: Answer has elements in common with {{x|Set}}
 
-Answer has some elements not in {{x|Set}}:
-  classifier: has_elements_not_in(x)
+has_elements_not_in(x):
+  name: Answer has some elements not in {{x|Set}}
 
-Answer omits some elements in {{x|Set}}:
-  classifier: omits_elements_in(x)
+omits_elements_in(x):
+  name: Answer omits some elements in {{x|Set}}
 
-Answer has no elements in common with {{x|Set}}:
-  classifier: is_disjoint_from(x)
+is_disjoint_from(x):
+  name: Answer has no elements in common with {{x|Set}}

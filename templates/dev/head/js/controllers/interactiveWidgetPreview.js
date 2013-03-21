@@ -115,7 +115,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         $scope.addRuleActionInputs[varName] = '';
       }
 
-      copyOfRule = rule.replace(pattern, ' ');
+      copyOfRule = copyOfRule.replace(pattern, ' ');
     }
   };
 

@@ -41,7 +41,7 @@ class Rule(ndb.Model):
     """A rule for an answer classifier."""
     # The name of the rule.
     name = ndb.StringProperty(required=True)
-    # Parameters for the classification rule.
+    # Parameters for the classification rule. TODO(sll): Make these the actual params.
     inputs = ndb.JsonProperty(default={})
     # The id of the destination state.
     dest = ndb.StringProperty()

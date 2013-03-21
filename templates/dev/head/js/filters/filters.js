@@ -67,10 +67,15 @@ oppia.filter('bracesToInput', function() {
       isMultipleChoice = true;
     }
 
+    var finalInput = input;
+
+    var iter = 0;
     while (true) {
-      if (!input.match(pattern)) {
+      if (!input.match(pattern) || iter == 100) {
         break;
       }
+      iter++;
+
       var varName = input.match(pattern)[1];
       var varType = null;
       if (input.match(pattern)[2]) {
@@ -94,10 +99,11 @@ oppia.filter('bracesToInput', function() {
           '<list items="addRuleActionInputs.' + varName + '">';
       }
 
-      input = input.replace(pattern, replacementHtml);
+      finalInput = finalInput.replace(pattern, replacementHtml);
+      input = input.replace(pattern, ' ');
       index++;
     }
-    return input;
+    return finalInput;
   };
 });
 
@@ -118,10 +124,13 @@ oppia.filter('parameterizeRule', function() {
     var finalRule = rule;
 
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    var iter = 0;
     while (true) {
-      if (!rule.match(pattern)) {
+      if (!rule.match(pattern) || iter == 100) {
         break;
       }
+      iter++;
+
       var varName = rule.match(pattern)[1];
       var replacementText = inputs[varName];
       if (isMultipleChoice) {

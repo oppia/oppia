@@ -1,14 +1,14 @@
-Answer is equal to {{x|String}}:
-  classifier: equals(x)
+equals(x):
+  name: Answer is equal to {{x|String}}
 
-Answer is equal to {{x|String}}, taking case into account:
-  classifier: case_sensitive_equals(x)
+case_sensitive_equals(x):
+  name: Answer is equal to {{x|String}}, taking case into account
 
-Answer starts with {{x|String}}:
-  classifier: starts_with(x)
+starts_with(x):
+  name: Answer starts with {{x|String}}
 
-Answer contains {{x|String}}:
-  classifier: contains(x)
+contains(x):
+  name: Answer contains {{x|String}}
 
-Answer is equal to {{x|String}}, but misspelled by one character:
-  classifier: fuzzy_equals(x)
+fuzzy_equals(x):
+  name: Answer is equal to {{x|String}}, but misspelled by one character

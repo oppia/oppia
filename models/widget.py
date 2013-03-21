@@ -120,8 +120,14 @@ class Widget(polymodel.PolyModel):
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,
                         '%sRules.yaml' % classifier)) as f:
-                    properties['rules'] = utils.get_dict_from_yaml(
-                        f.read().decode('utf-8'))
+                    rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+                    rule_dict = {}
+                    for rule in rules:
+                        rule_dict[rules[rule]['name']] = {'classifier': rule}
+                        if 'checks' in rules[rule]:
+                            rule_dict[rules[rule]['name']]['checks'] = (
+                                rules[rule]['checks'])
+                    properties['rules'] = rule_dict
 
         return result
 

@@ -356,8 +356,6 @@ class StateHandler(BaseHandler):
 
                 mutable_rule = rule['rule']
 
-                # TODO(sll): The next line is wrong. It should account for
-                # commas within brackets.
                 params = classifier_func[first_bracket + 1: -1].split(',')
                 for index, param in enumerate(params):
                     if param not in rule['inputs']:
