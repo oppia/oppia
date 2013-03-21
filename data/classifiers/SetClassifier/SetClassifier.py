@@ -27,34 +27,34 @@ DEFAULT_NORMALIZER = normalizers.Set
 
 def equals(val, x):
     """The given value should be equal to {{x}}."""
-    return val == x
+    return set(val) == set(x)
 
 
 def is_subset_of(val, x):
     """The given value should be a proper subset of {{x}}."""
-    return val < x
+    return set(val) < set(x)
 
 
-def is_superset_pf(val, x):
+def is_superset_of(val, x):
     """The given value should be a proper superset of {{x}}."""
-    return val > x
+    return set(val) > set(x)
 
 
 def has_elements_in(val, x):
     """The given value should have elements in common with {{x}}."""
-    return bool(val.intersection(x))
+    return bool(set(val).intersection(set(x)))
 
 
 def has_elements_not_in(val, x):
     """The given value should have elements not in {{x}}."""
-    return bool(val - x)
+    return bool(set(val) - set(x))
 
 
 def omits_elements_in(val, x):
     """The given value should omit some elements in {{x}}."""
-    return bool(x - val)
+    return bool(set(x) - set(val))
 
 
 def is_disjoint_from(val, x):
     """The given value should have no elements in common with {{x}}."""
-    return not bool(val.intersection(x))
+    return not bool(set(val).intersection(set(x)))

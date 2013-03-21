@@ -219,3 +219,4 @@ def ensure_default_data_is_loaded():
 
     if not Exploration.get('0'):
         load_default_explorations()
+

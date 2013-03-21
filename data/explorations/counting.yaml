@@ -10,14 +10,12 @@ Question:
     handlers:
     - name: submit
       rules:
-      - code: equals(6.0)
-        dest: Prompt for explanation
+      - dest: Prompt for explanation
         feedback: ''
         inputs:
           x: '6'
         name: equals(x)
-      - code: 'True'
-        dest: List the ways
+      - dest: List the ways
         feedback: ''
         inputs: {}
         name: Default
@@ -37,8 +35,7 @@ List the ways:
     handlers:
     - name: submit
       rules:
-      - code: equals(set([]))
-        dest: List the ways
+      - dest: List the ways
         feedback: 'What? No more ways? There''s at least one, surely -- for example,
           RYB.
 
@@ -49,15 +46,13 @@ List the ways:
         inputs:
           x: []
         name: equals(x)
-      - code: has_elements_in(set([u'RBY']))
-        dest: List the ways
+      - dest: List the ways
         feedback: We've already counted RBY, so let's not do it again.
         inputs:
           x:
           - RBY
         name: has_elements_in(x)
-      - code: has_elements_not_in(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
-        dest: List the ways
+      - dest: List the ways
         feedback: It looks like at least one of your list elements is invalid...
         inputs:
           x:
@@ -67,8 +62,7 @@ List the ways:
           - YRB
           - YBR
         name: has_elements_not_in(x)
-      - code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
-        dest: Prompt for explanation with all ways listed
+      - dest: Prompt for explanation with all ways listed
         feedback: null
         inputs:
           x:
@@ -78,8 +72,7 @@ List the ways:
           - YRB
           - YBR
         name: equals(x)
-      - code: has_elements_in(set([u'rby', u'bry', u'ryb', u'ybr', u'byr', u'yrb']))
-        dest: List the ways
+      - dest: List the ways
         feedback: Sorry about this, but please could you enter your answer using uppercase
           letters (as in the example)?
         inputs:
@@ -91,24 +84,21 @@ List the ways:
           - yrb
           - ybr
         name: has_elements_in(x)
-      - code: is_disjoint_from(set([u'YBR', u'YRB']))
-        dest: List the ways
+      - dest: List the ways
         feedback: How about arrangements in which the yellow ball is on the left?
         inputs:
           x:
           - YBR
           - YRB
         name: is_disjoint_from(x)
-      - code: is_disjoint_from(set([u'BYR', u'BRY']))
-        dest: List the ways
+      - dest: List the ways
         feedback: How about arrangements for which the blue ball is on the left?
         inputs:
           x:
           - BRY
           - BYR
         name: is_disjoint_from(x)
-      - code: is_subset_of(set([u'BYR', u'YBR', u'RYB', u'YRB', u'BRY']))
-        dest: List the ways
+      - dest: List the ways
         feedback: I think you've missed some...
         inputs:
           x:
@@ -118,8 +108,7 @@ List the ways:
           - BRY
           - BYR
         name: is_subset_of(x)
-      - code: 'True'
-        dest: List the ways
+      - dest: List the ways
         feedback: Sorry, I don't think that's right. Try again?
         inputs: {}
         name: Default
@@ -135,8 +124,7 @@ Prompt for explanation:
     handlers:
     - name: submit
       rules:
-      - code: 'True'
-        dest: END
+      - dest: END
         feedback: ''
         inputs: {}
         name: Default
@@ -153,8 +141,7 @@ Prompt for explanation with all ways listed:
     handlers:
     - name: submit
       rules:
-      - code: 'True'
-        dest: END
+      - dest: END
         feedback: 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and
           YBR. Great!'
         inputs: {}

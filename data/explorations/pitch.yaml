@@ -31,33 +31,28 @@ Main window:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'{{noteStart}}')
-        dest: END
+      - dest: END
         feedback: Yay, that's correct!
         inputs:
           x: '{{noteStart}}'
         name: equals(x)
-      - code: is_within_tolerance(u'{{noteStart}}',1)
-        dest: Main window
+      - dest: Main window
         feedback: No, but you're very close!
         inputs:
           tol: '1'
           x: '{{noteStart}}'
         name: is_within_tolerance(x, tol)
-      - code: is_less_than(u'{{noteStart}}')
-        dest: Main window
+      - dest: Main window
         feedback: I think the original note is higher.
         inputs:
           x: '{{noteStart}}'
         name: is_less_than(x)
-      - code: is_greater_than(u'{{noteStart}}')
-        dest: Main window
+      - dest: Main window
         feedback: I think the original pitch is lower.
         inputs:
           x: '{{noteStart}}'
         name: is_greater_than(x)
-      - code: 'True'
-        dest: Main window
+      - dest: Main window
         feedback: That's not right. Why not try again?
         inputs: {}
         name: Default

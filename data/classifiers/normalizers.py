@@ -79,7 +79,7 @@ def Set(val):
         assert len(set(val)) == len(val)
     except:
         return None
-    return set(val)
+    return list(val)
 
 
 def String(x):

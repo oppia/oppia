@@ -17,9 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import copy
-import importlib
 import json
-import logging
 import os
 
 from controllers.base import BaseHandler
@@ -43,21 +41,6 @@ from google.appengine.api import users
 EDITOR_MODE = 'editor'
 
 
-def get_readable_name(widget_id, handler_name, rule_name):
-    """Get the human-readable name for a rule."""
-    handlers = InteractiveWidget.get(widget_id).handlers
-    for handler in handlers:
-        if handler.name == handler_name:
-            classifier = handler.classifier
-            with open(os.path.join(
-                    feconf.SAMPLE_CLASSIFIERS_DIR,
-                    classifier,
-                    '%sRules.yaml' % classifier)) as f:
-                rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
-                return rules[rule_name]['name']
-    raise Exception('No rule name found for %s' % rule_name)
-
-
 def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
@@ -79,9 +62,10 @@ def get_state_for_frontend(state, exploration):
             if item['name'] == 'Default':
                 item['rule'] = 'Default'
             else:
-                item['rule'] = get_readable_name(
-                    state.widget.widget_id, handler['name'], item['name']
-                )
+                item['rule'] = InteractiveWidget.get(
+                    state.widget.widget_id).get_readable_name(
+                        handler['name'], item['name']
+                    )
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
@@ -334,17 +318,6 @@ class StateHandler(BaseHandler):
             state.widget.handlers = [AnswerHandlerInstance(
                 name='submit', rules=[])]
 
-            if len(ruleset) > 1:
-                interactive_widget_properties = (
-                    InteractiveWidget.get_with_params(
-                        state.widget.widget_id)['actions']['submit'])
-                # Import the relevant classifier module to use in eval() below.
-                classifier_module = '.'.join([
-                    feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
-                    interactive_widget_properties['classifier'],
-                    interactive_widget_properties['classifier']])
-                Classifier = importlib.import_module(classifier_module)
-
             # This is part of the state. The rules should be put into it.
             state_ruleset = state.widget.handlers[0].rules
 
@@ -352,12 +325,10 @@ class StateHandler(BaseHandler):
             # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
-                logging.info(rule)
 
                 state_rule = Rule()
                 if 'attrs' in rule and 'classifier' in rule['attrs']:
                     state_rule.name = rule['attrs']['classifier']
-                state_rule.code = rule.get('code')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')
                 state_rule.feedback = rule.get('feedback')
@@ -366,14 +337,13 @@ class StateHandler(BaseHandler):
                 if rule['rule'] == 'Default':
                     # This is the default rule.
                     assert rule_ind == len(ruleset) - 1
-                    state_rule.code = 'True'
                     state_rule.name = 'Default'
                     state_ruleset.append(state_rule)
                     continue
 
-                classifier_func = rule['attrs']['classifier'].replace(' ', '')
+                # Normalize the params here, then store them.
+                classifier_func = state_rule.name.replace(' ', '')
                 first_bracket = classifier_func.find('(')
-                result = classifier_func[: first_bracket + 1]
 
                 mutable_rule = rule['rule']
 
@@ -382,8 +352,6 @@ class StateHandler(BaseHandler):
                     if param not in rule['inputs']:
                         raise self.InvalidInputException(
                             'Parameter %s could not be replaced.' % param)
-                    if index != 0:
-                        result += ','
 
                     # Get the normalizer specified in the rule.
                     param_spec = mutable_rule[
@@ -405,16 +373,8 @@ class StateHandler(BaseHandler):
                             '%s has the wrong type. Please replace it with a '
                             '%s.' % (rule['inputs'][param], normalizer_string))
 
-                    if (normalizer.__name__ == 'String' or
-                            normalizer.__name__ == 'MusicNote'):
-                        result += 'u\'' + unicode(normalized_param) + '\''
-                    else:
-                        result += str(normalized_param)
+                    state_rule.inputs[param] = normalized_param
 
-                result += ')'
-
-                logging.info(result)
-                state_rule.code = result
                 state_ruleset.append(state_rule)
 
         if content:

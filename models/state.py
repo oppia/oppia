@@ -24,8 +24,10 @@ import logging
 import os
 
 from base_model import BaseModel
+from data.classifiers import normalizers
 import feconf
 import utils
+from widget import InteractiveWidget
 from widget import Widget
 
 from google.appengine.ext import ndb
@@ -49,8 +51,6 @@ class Rule(ndb.Model):
     feedback = ndb.TextProperty(default='')
     # Parameter changes to make if this rule is triggered.
     param_changes = ndb.JsonProperty(default={})
-    # Code (temporary). TODO(sll): Remove this.
-    code = ndb.TextProperty(default='True')
 
 
 class AnswerHandlerInstance(ndb.Model):
@@ -197,10 +197,6 @@ class State(BaseModel):
 
                 rule_instance.name = rule['name']
 
-                # TODO(sll): Remove this.
-                if 'code' in rule:
-                    rule_instance.code = rule['code']
-
                 state_handler.rules.append(rule_instance)
 
         state.widget.handlers = [state_handler]
@@ -331,12 +327,15 @@ class State(BaseModel):
                 break
 
             # Add the 'answer' variable, and prepend classifier.
-            # TODO(sll): Actually derive rule.code.
-            code = 'Classifier.' + rule.code.replace('(', '(norm_answer,', 1)
+            code = 'Classifier.' + self.get_code(
+                self.widget.widget_id, handler.name, rule).replace(
+                    '(', '(norm_answer,', 1)
 
             code = utils.parse_with_jinja(code, params)
             if code is None:
                 continue
+
+            logging.info(code)
 
             return_value, unused_return_data = (
                 utils.normalize_classifier_return(eval(code)))
@@ -347,3 +346,34 @@ class State(BaseModel):
                 break
 
         return dest_id, feedback, default_recorded_answer
+
+    def get_code(self, widget_id, handler_name, rule):
+        classifier_func = rule.name.replace(' ', '')
+        first_bracket = classifier_func.find('(')
+        result = classifier_func[: first_bracket + 1]
+
+        mutable_rule = InteractiveWidget.get(widget_id).get_readable_name(
+            handler_name, rule.name)
+
+        params = classifier_func[first_bracket + 1: -1].split(',')
+        for index, param in enumerate(params):
+            if index != 0:
+                result += ','
+
+            # Get the normalizer specified in the rule.
+            param_spec = mutable_rule[
+                mutable_rule.find('{{' + param) + 2:]
+            param_spec = param_spec[param_spec.find('|') + 1:]
+            normalizer_string = param_spec[: param_spec.find('}}')]
+
+            normalizer = getattr(normalizers, normalizer_string)
+
+            if (normalizer.__name__ == 'String' or
+                    normalizer.__name__ == 'MusicNote'):
+                result += 'u\'' + unicode(rule.inputs[param]) + '\''
+            else:
+                result += str(rule.inputs[param])
+
+        result += ')'
+
+        return result

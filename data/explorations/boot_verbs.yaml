@@ -11,23 +11,20 @@ Sentence:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'juego')
-        dest: END
+      - dest: END
         feedback: That is correct! Great job!
         inputs:
           x: juego
         name: equals(x)
         rule: Answer is equal to {{x|String}}
-      - code: equals(u'jugo')
-        dest: boot verb
+      - dest: boot verb
         feedback: No, remember jugo means 'juice'. It sounds about right, but it isn't
           quite because jugar is a boot verb.
         inputs:
           x: jugo
         name: equals(x)
         rule: Answer is equal to {{x|String}}
-      - code: 'True'
-        dest: subject
+      - dest: subject
         feedback: ''
         inputs: {}
         name: Default
@@ -44,15 +41,13 @@ So...:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'juego')
-        dest: END
+      - dest: END
         feedback: null
         inputs:
           x: juego
         name: equals(x)
         rule: Answer is equal to {{x|String}}
-      - code: 'True'
-        dest: So...
+      - dest: So...
         feedback: Try that again. Put jueg- together with -o and you get...?
         inputs: {}
         name: Default
@@ -76,15 +71,13 @@ boot verb:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'jueg')
-        dest: So...
+      - dest: So...
         feedback: null
         inputs:
           x: jueg
         name: equals(x)
         rule: Answer is equal to {{x|String}}
-      - code: 'True'
-        dest: boot verb
+      - dest: boot verb
         feedback: Not quite. Just change the u to a ue and you get jueg-
         inputs: {}
         name: Default
@@ -101,15 +94,13 @@ subject:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'yo')
-        dest: verb endings
+      - dest: verb endings
         feedback: null
         inputs:
           x: yo
         name: equals(x)
         rule: Answer is equal to {{x|String}}
-      - code: 'True'
-        dest: subject
+      - dest: subject
         feedback: ''
         inputs: {}
         name: Default
@@ -127,22 +118,19 @@ verb endings:
     handlers:
     - name: submit
       rules:
-      - code: equals(u'-o')
-        dest: boot verb
+      - dest: boot verb
         feedback: But if you just drop the -ar and at -o, you get jugo which means
           juice, so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: -o
         name: equals(x)
-      - code: equals(u'o')
-        dest: boot verb
+      - dest: boot verb
         feedback: But if you just drop the -ar and at -o, you get jugo which means
           juice, so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: o
         name: equals(x)
-      - code: 'True'
-        dest: verb endings
+      - dest: verb endings
         feedback: ''
         inputs: {}
         name: Default

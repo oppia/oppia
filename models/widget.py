@@ -196,3 +196,16 @@ class InteractiveWidget(Widget):
             )
 
             widget.put()
+
+    def get_readable_name(self, handler_name, rule_name):
+        """Get the human-readable name for a rule."""
+        for handler in self.handlers:
+            if handler.name == handler_name:
+                classifier = handler.classifier
+                with open(os.path.join(
+                        feconf.SAMPLE_CLASSIFIERS_DIR,
+                        classifier,
+                        '%sRules.yaml' % classifier)) as f:
+                    rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+                    return rules[rule_name]['name']
+        raise Exception('No rule name found for %s' % rule_name)
