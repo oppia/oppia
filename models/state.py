@@ -51,8 +51,6 @@ class Rule(ndb.Model):
     param_changes = ndb.JsonProperty(default={})
     # Code (temporary). TODO(sll): Remove this.
     code = ndb.TextProperty(default='True')
-    # Rule (temporary). TODO(sll): Remove this.
-    rule = ndb.TextProperty(default='Default')
 
 
 class AnswerHandlerInstance(ndb.Model):
@@ -202,8 +200,6 @@ class State(BaseModel):
                 # TODO(sll): Remove this.
                 if 'code' in rule:
                     rule_instance.code = rule['code']
-                if 'rule' in rule:
-                    rule_instance.rule = rule['rule']
 
                 state_handler.rules.append(rule_instance)
 

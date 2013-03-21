@@ -20,6 +20,7 @@ import copy
 import importlib
 import json
 import logging
+import os
 
 from controllers.base import BaseHandler
 from controllers.base import require_editor
@@ -42,6 +43,21 @@ from google.appengine.api import users
 EDITOR_MODE = 'editor'
 
 
+def get_readable_name(widget_id, handler_name, rule_name):
+    """Get the human-readable name for a rule."""
+    handlers = InteractiveWidget.get(widget_id).handlers
+    for handler in handlers:
+        if handler.name == handler_name:
+            classifier = handler.classifier
+            with open(os.path.join(
+                    feconf.SAMPLE_CLASSIFIERS_DIR,
+                    classifier,
+                    '%sRules.yaml' % classifier)) as f:
+                rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+                return rules[rule_name]['name']
+    raise Exception('No rule name found for %s' % rule_name)
+
+
 def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
@@ -60,6 +76,12 @@ def get_state_for_frontend(state, exploration):
         rules[handler['name']] = handler['rules']
         for item in rules[handler['name']]:
             item['attrs'] = {'classifier': item['name']}
+            if item['name'] == 'Default':
+                item['rule'] = 'Default'
+            else:
+                item['rule'] = get_readable_name(
+                    state.widget.widget_id, handler['name'], item['name']
+                )
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
@@ -335,7 +357,6 @@ class StateHandler(BaseHandler):
                 state_rule = Rule()
                 if 'attrs' in rule and 'classifier' in rule['attrs']:
                     state_rule.name = rule['attrs']['classifier']
-                state_rule.rule = rule.get('rule')
                 state_rule.code = rule.get('code')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')

@@ -16,13 +16,11 @@ Question:
         inputs:
           x: '6'
         name: equals(x)
-        rule: Answer is equal to {{x|Number}}
       - code: 'True'
         dest: List the ways
         feedback: ''
         inputs: {}
         name: Default
-        rule: Default
 List the ways:
   content:
   - type: text
@@ -51,7 +49,6 @@ List the ways:
         inputs:
           x: []
         name: equals(x)
-        rule: Answer is equal to {{x|Set}}
       - code: has_elements_in(set([u'RBY']))
         dest: List the ways
         feedback: We've already counted RBY, so let's not do it again.
@@ -59,7 +56,6 @@ List the ways:
           x:
           - RBY
         name: has_elements_in(x)
-        rule: Answer has elements in common with {{x|Set}}
       - code: has_elements_not_in(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
         dest: List the ways
         feedback: It looks like at least one of your list elements is invalid...
@@ -71,7 +67,6 @@ List the ways:
           - YRB
           - YBR
         name: has_elements_not_in(x)
-        rule: Answer has some elements not in {{x|Set}}
       - code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
         dest: Prompt for explanation with all ways listed
         feedback: null
@@ -83,7 +78,6 @@ List the ways:
           - YRB
           - YBR
         name: equals(x)
-        rule: Answer is equal to {{x|Set}}
       - code: has_elements_in(set([u'rby', u'bry', u'ryb', u'ybr', u'byr', u'yrb']))
         dest: List the ways
         feedback: Sorry about this, but please could you enter your answer using uppercase
@@ -97,7 +91,6 @@ List the ways:
           - yrb
           - ybr
         name: has_elements_in(x)
-        rule: Answer has elements in common with {{x|Set}}
       - code: is_disjoint_from(set([u'YBR', u'YRB']))
         dest: List the ways
         feedback: How about arrangements in which the yellow ball is on the left?
@@ -106,7 +99,6 @@ List the ways:
           - YBR
           - YRB
         name: is_disjoint_from(x)
-        rule: Answer has no elements in common with {{x|Set}}
       - code: is_disjoint_from(set([u'BYR', u'BRY']))
         dest: List the ways
         feedback: How about arrangements for which the blue ball is on the left?
@@ -115,7 +107,6 @@ List the ways:
           - BRY
           - BYR
         name: is_disjoint_from(x)
-        rule: Answer has no elements in common with {{x|Set}}
       - code: is_subset_of(set([u'BYR', u'YBR', u'RYB', u'YRB', u'BRY']))
         dest: List the ways
         feedback: I think you've missed some...
@@ -127,13 +118,11 @@ List the ways:
           - BRY
           - BYR
         name: is_subset_of(x)
-        rule: Answer is a proper subset of {{x|Set}}
       - code: 'True'
         dest: List the ways
         feedback: Sorry, I don't think that's right. Try again?
         inputs: {}
         name: Default
-        rule: Default
 Prompt for explanation:
   content:
   - type: text
@@ -151,7 +140,6 @@ Prompt for explanation:
         feedback: ''
         inputs: {}
         name: Default
-        rule: Default
 Prompt for explanation with all ways listed:
   content:
   - type: text
@@ -171,4 +159,3 @@ Prompt for explanation with all ways listed:
           YBR. Great!'
         inputs: {}
         name: Default
-        rule: Default

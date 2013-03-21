@@ -17,27 +17,23 @@ Hola:
         inputs:
           x: hola!
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: contains(u'hola')
         dest: Me llamo
         feedback: ''
         inputs:
           x: hola!
         name: contains(x)
-        rule: Answer contains {{x|String}}
       - code: fuzzy_equals(u'hola')
         dest: Hola
         feedback: Check your spelling!
         inputs:
           x: hola
         name: fuzzy_equals(x)
-        rule: Answer is equal to {{x|String}}, but misspelled by one character
       - code: 'True'
         dest: Hola
         feedback: Hola means Hello. <br><br> Say Hello back (in Spanish).
         inputs: {}
         name: Default
-        rule: Default
 Adios:
   content:
   - type: text
@@ -56,20 +52,17 @@ Adios:
         inputs:
           x: adios
         name: contains(x)
-        rule: Answer contains {{x|String}}
       - code: contains(u"adi\xF3s")
         dest: END
         feedback: ''
         inputs:
           x: adi\xF3s
         name: contains(x)
-        rule: Answer contains {{x|String}}
       - code: 'True'
         dest: Adios
         feedback: Say goodbye
         inputs: {}
         name: Default
-        rule: Default
 Colores:
   content:
   - type: text
@@ -93,28 +86,24 @@ Colores:
         inputs:
           x: '0'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(1)
         dest: Colores
         feedback: Orange and white...not quite
         inputs:
           x: '1'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(2)
         dest: Adios
         feedback: "\xA1S\xED! That's right -- apples are red and green.</em>"
         inputs:
           x: '2'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(3)
         dest: Colores
         feedback: Yellow and gray? Apples?
         inputs:
           x: '3'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: 'True'
         dest: Colores
         feedback: 'Colores is easy to translate.
@@ -124,7 +113,6 @@ Colores:
           So this is asking, what colors are apples?'
         inputs: {}
         name: Default
-        rule: Default
 Como meaning:
   content:
   - type: text
@@ -145,7 +133,6 @@ Como meaning:
         inputs:
           x: what is your name?
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: equals('what do you call yourself?')
         dest: Me llamo
         feedback: 'Great!
@@ -154,7 +141,6 @@ Como meaning:
         inputs:
           x: what do you call yourself?
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: 'True'
         dest: Me llamo
         feedback: 'So this means "What is your name?"
@@ -162,7 +148,6 @@ Como meaning:
           <br>So, let''s try this again...Introduce yourself.'
         inputs: {}
         name: Default
-        rule: Default
 Me llamo:
   content:
   - type: text
@@ -180,27 +165,23 @@ Me llamo:
         inputs:
           x: me llamo es
         name: starts_with(x)
-        rule: Answer starts with {{x|String}}
       - code: starts_with('me llamo')
         dest: Supermercado
         feedback: null
         inputs:
           x: me llamo
         name: starts_with(x)
-        rule: Answer starts with {{x|String}}
       - code: starts_with('mi nombre es')
         dest: Supermercado
         feedback: null
         inputs:
           x: mi nombre es
         name: starts_with(x)
-        rule: Answer starts with {{x|String}}
       - code: 'True'
         dest: Me llamo meaning
         feedback: null
         inputs: {}
         name: Default
-        rule: Default
 Me llamo meaning:
   content:
   - type: text
@@ -218,21 +199,18 @@ Me llamo meaning:
         inputs:
           x: my name is
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: equals('i am called')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i am called
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: equals('i call myself')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i call myself
         name: equals(x)
-        rule: Answer contains {{x|String}}
       - code: 'True'
         dest: Como meaning
         feedback: 'Me llamo means "My name is"
@@ -240,7 +218,6 @@ Me llamo meaning:
           <br>So "Me llamo Oppia" means "My name is Oppia".'
         inputs: {}
         name: Default
-        rule: Default
 Supermercado:
   content:
   - type: text
@@ -266,7 +243,6 @@ Supermercado:
         inputs:
           x: '0'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(1)
         dest: Supermercado
         feedback: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\n\
@@ -275,14 +251,12 @@ Supermercado:
         inputs:
           x: '1'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: equals(2)
         dest: Colores
         feedback: Yes! You can buy apples in a supermarket.
         inputs:
           x: '2'
         name: equals(x)
-        rule: Answer is equal to {{x|NonnegativeInt}}
       - code: 'True'
         dest: Supermercado
         feedback: 'Supermercado is supermarket.
@@ -292,4 +266,3 @@ Supermercado:
           What can you buy at a supermarket?'
         inputs: {}
         name: Default
-        rule: Default
