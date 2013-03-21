@@ -10,36 +10,33 @@ Hola:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(u'hola!')
+      - code: equals(u'hola!')
         dest: Me llamo
         feedback: 'Don''t forget: Spanish uses inverted exclamation points at the
           beginning of sentences as well as the ending exclamation point.'
         inputs:
           x: hola!
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: contains(x)
-        code: contains(u'hola')
+      - code: contains(u'hola')
         dest: Me llamo
         feedback: ''
         inputs:
           x: hola!
+        name: contains(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: fuzzy_equals(x)
-        code: fuzzy_equals(u'hola')
+      - code: fuzzy_equals(u'hola')
         dest: Hola
         feedback: Check your spelling!
         inputs:
           x: hola
+        name: fuzzy_equals(x)
         rule: Answer is equal to {{x|String}}, but misspelled by one character
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Hola
         feedback: Hola means Hello. <br><br> Say Hello back (in Spanish).
         inputs: {}
+        name: Default
         rule: Default
 Adios:
   content:
@@ -53,27 +50,25 @@ Adios:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: contains(x)
-        code: contains('adios')
+      - code: contains('adios')
         dest: Adios
         feedback: Don't forget your accent marks next time!
         inputs:
           x: adios
+        name: contains(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: contains(x)
-        code: contains(u"adi\xF3s")
+      - code: contains(u"adi\xF3s")
         dest: END
         feedback: ''
         inputs:
           x: adi\xF3s
+        name: contains(x)
         rule: Answer contains {{x|String}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Adios
         feedback: Say goodbye
         inputs: {}
+        name: Default
         rule: Default
 Colores:
   content:
@@ -92,40 +87,35 @@ Colores:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(0)
+      - code: equals(0)
         dest: Colores
         feedback: Apples aren't black unless they are rotten...and they aren't blue
         inputs:
           x: '0'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(1)
+      - code: equals(1)
         dest: Colores
         feedback: Orange and white...not quite
         inputs:
           x: '1'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(2)
+      - code: equals(2)
         dest: Adios
         feedback: "\xA1S\xED! That's right -- apples are red and green.</em>"
         inputs:
           x: '2'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(3)
+      - code: equals(3)
         dest: Colores
         feedback: Yellow and gray? Apples?
         inputs:
           x: '3'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Colores
         feedback: 'Colores is easy to translate.
 
@@ -133,6 +123,7 @@ Colores:
 
           So this is asking, what colors are apples?'
         inputs: {}
+        name: Default
         rule: Default
 Como meaning:
   content:
@@ -146,33 +137,31 @@ Como meaning:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals('what is your name?')
+      - code: equals('what is your name?')
         dest: Me llamo
         feedback: 'Yes!
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs:
           x: what is your name?
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: equals(x)
-        code: equals('what do you call yourself?')
+      - code: equals('what do you call yourself?')
         dest: Me llamo
         feedback: 'Great!
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs:
           x: what do you call yourself?
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Me llamo
         feedback: 'So this means "What is your name?"
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs: {}
+        name: Default
         rule: Default
 Me llamo:
   content:
@@ -185,35 +174,32 @@ Me llamo:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: starts_with(x)
-        code: starts_with('me llamo es')
+      - code: starts_with('me llamo es')
         dest: Me llamo
         feedback: You've got one too many verbs.
         inputs:
           x: me llamo es
+        name: starts_with(x)
         rule: Answer starts with {{x|String}}
-      - attrs:
-          classifier: starts_with(x)
-        code: starts_with('me llamo')
+      - code: starts_with('me llamo')
         dest: Supermercado
         feedback: null
         inputs:
           x: me llamo
+        name: starts_with(x)
         rule: Answer starts with {{x|String}}
-      - attrs:
-          classifier: starts_with(x)
-        code: starts_with('mi nombre es')
+      - code: starts_with('mi nombre es')
         dest: Supermercado
         feedback: null
         inputs:
           x: mi nombre es
+        name: starts_with(x)
         rule: Answer starts with {{x|String}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Me llamo meaning
         feedback: null
         inputs: {}
+        name: Default
         rule: Default
 Me llamo meaning:
   content:
@@ -226,37 +212,34 @@ Me llamo meaning:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals('my name is')
+      - code: equals('my name is')
         dest: Como meaning
         feedback: That's right!
         inputs:
           x: my name is
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: equals(x)
-        code: equals('i am called')
+      - code: equals('i am called')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i am called
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs:
-          classifier: equals(x)
-        code: equals('i call myself')
+      - code: equals('i call myself')
         dest: Como meaning
         feedback: Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i call myself
+        name: equals(x)
         rule: Answer contains {{x|String}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Como meaning
         feedback: 'Me llamo means "My name is"
 
           <br>So "Me llamo Oppia" means "My name is Oppia".'
         inputs: {}
+        name: Default
         rule: Default
 Supermercado:
   content:
@@ -275,36 +258,32 @@ Supermercado:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(0)
+      - code: equals(0)
         dest: Supermercado
         feedback: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
           <br>\nYou can't buy windows in a supermarket. If you need more help, select\
           \ \"I don't know\""
         inputs:
           x: '0'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(1)
+      - code: equals(1)
         dest: Supermercado
         feedback: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\n\
           You can't buy cars in a supermarket. If you need more help, select \"I don't\
           \ know\""
         inputs:
           x: '1'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(2)
+      - code: equals(2)
         dest: Colores
         feedback: Yes! You can buy apples in a supermarket.
         inputs:
           x: '2'
+        name: equals(x)
         rule: Answer is equal to {{x|NonnegativeInt}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Supermercado
         feedback: 'Supermercado is supermarket.
 
@@ -312,4 +291,5 @@ Supermercado:
 
           What can you buy at a supermarket?'
         inputs: {}
+        name: Default
         rule: Default

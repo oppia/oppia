@@ -197,16 +197,11 @@ class State(BaseModel):
                 if 'inputs' in rule:
                     rule_instance.inputs = rule['inputs']
 
-                if 'attrs' in rule and 'classifier' in rule['attrs']:
-                    rule_instance.name = rule['attrs']['classifier']
-                else:
-                    rule_instance.name = 'equals(x)'
+                rule_instance.name = rule['name']
 
                 # TODO(sll): Remove this.
                 if 'code' in rule:
                     rule_instance.code = rule['code']
-                    if rule['code'] == 'True':
-                        rule_instance.name = 'Default'
                 if 'rule' in rule:
                     rule_instance.rule = rule['rule']
 
@@ -233,12 +228,9 @@ class State(BaseModel):
             - The field 'widget_id' is mandatory, and must correspond to an actual
                 widget in the feconf.SAMPLE_WIDGETS_DIR directory.
         - Each ruleset in ['widget']['handlers'] must have a non-empty array value,
-            and each value should contain at least the fields ['code', 'dest'].
-            - For all values except the last one, the 'code' field should
-                correspond to a valid rule for the widget's classifier. [NOT
-                IMPLEMENTED YET]
-            - For the last value in each ruleset, the 'code' field should equal
-                'True'.
+            and each value should contain at least the fields ['name', 'dest'].
+            - For the last value in each ruleset, the 'name' field should equal
+                'Default'.
 
         Args:
             description: A dict representation of a state.
@@ -279,18 +271,17 @@ class State(BaseModel):
             handlers = description['widget']['handlers']
             for handler in handlers:
                 for ind, rule in enumerate(handler['rules']):
-                    if 'code' not in rule:
+                    if 'name' not in rule:
                         return (False,
-                                'Rule %s is missing a \'code\' field.' % ind)
+                                'Rule %s is missing a \'name\' field.' % ind)
                     if 'dest' not in rule:
                         return (False,
                                 'Rule %s is missing a destination.' % ind)
 
                     if ind == len(handler['rules']) - 1:
-                        rule['code'] = str(rule['code'])
-                        if rule['code'] != 'True':
-                            return (False, 'The \'code\' field of the last '
-                                    'rule should be \'True\'')
+                        if rule['name'] != 'Default':
+                            return (False, 'The \'name\' field of the last '
+                                    'rule should be \'Default\'')
                     else:
                         # TODO(sll): Check that the rule corresponds to a
                         # valid one from the relevant classifier.

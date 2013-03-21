@@ -31,42 +31,38 @@ Main window:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(u'{{noteStart}}')
+      - code: equals(u'{{noteStart}}')
         dest: END
         feedback: Yay, that's correct!
         inputs:
           x: '{{noteStart}}'
+        name: equals(x)
         rule: Answer is equal to {{x|MusicNote}}
-      - attrs:
-          classifier: is_within_tolerance(x, tol)
-        code: is_within_tolerance(u'{{noteStart}}',1)
+      - code: is_within_tolerance(u'{{noteStart}}',1)
         dest: Main window
         feedback: No, but you're very close!
         inputs:
           tol: '1'
           x: '{{noteStart}}'
+        name: is_within_tolerance(x, tol)
         rule: Answer is within {{tol|NonnegativeInt}} of {{x|MusicNote}}
-      - attrs:
-          classifier: is_less_than(x)
-        code: is_less_than(u'{{noteStart}}')
+      - code: is_less_than(u'{{noteStart}}')
         dest: Main window
         feedback: I think the original note is higher.
         inputs:
           x: '{{noteStart}}'
+        name: is_less_than(x)
         rule: Answer has a lower pitch than {{x|MusicNote}}
-      - attrs:
-          classifier: is_greater_than(x)
-        code: is_greater_than(u'{{noteStart}}')
+      - code: is_greater_than(u'{{noteStart}}')
         dest: Main window
         feedback: I think the original pitch is lower.
         inputs:
           x: '{{noteStart}}'
+        name: is_greater_than(x)
         rule: Answer has a greater pitch than {{x|MusicNote}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: Main window
         feedback: That's not right. Why not try again?
         inputs: {}
+        name: Default
         rule: Default

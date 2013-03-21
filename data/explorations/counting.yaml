@@ -10,19 +10,18 @@ Question:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(6.0)
+      - code: equals(6.0)
         dest: Prompt for explanation
         feedback: ''
         inputs:
           x: '6'
+        name: equals(x)
         rule: Answer is equal to {{x|Number}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: List the ways
         feedback: ''
         inputs: {}
+        name: Default
         rule: Default
 List the ways:
   content:
@@ -40,9 +39,7 @@ List the ways:
     handlers:
     - name: submit
       rules:
-      - attrs:
-          classifier: equals(x)
-        code: equals(set([]))
+      - code: equals(set([]))
         dest: List the ways
         feedback: 'What? No more ways? There''s at least one, surely -- for example,
           RYB.
@@ -53,19 +50,17 @@ List the ways:
           you''re happy with your answer, click Submit.'
         inputs:
           x: []
+        name: equals(x)
         rule: Answer is equal to {{x|Set}}
-      - attrs:
-          classifier: has_elements_in(x)
-        code: has_elements_in(set([u'RBY']))
+      - code: has_elements_in(set([u'RBY']))
         dest: List the ways
         feedback: We've already counted RBY, so let's not do it again.
         inputs:
           x:
           - RBY
+        name: has_elements_in(x)
         rule: Answer has elements in common with {{x|Set}}
-      - attrs:
-          classifier: has_elements_not_in(x)
-        code: has_elements_not_in(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
+      - code: has_elements_not_in(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
         dest: List the ways
         feedback: It looks like at least one of your list elements is invalid...
         inputs:
@@ -75,10 +70,9 @@ List the ways:
           - BYR
           - YRB
           - YBR
+        name: has_elements_not_in(x)
         rule: Answer has some elements not in {{x|Set}}
-      - attrs:
-          classifier: equals(x)
-        code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
+      - code: equals(set([u'BYR', u'YRB', u'RYB', u'YBR', u'BRY']))
         dest: Prompt for explanation with all ways listed
         feedback: null
         inputs:
@@ -88,10 +82,9 @@ List the ways:
           - BYR
           - YRB
           - YBR
+        name: equals(x)
         rule: Answer is equal to {{x|Set}}
-      - attrs:
-          classifier: has_elements_in(x)
-        code: has_elements_in(set([u'rby', u'bry', u'ryb', u'ybr', u'byr', u'yrb']))
+      - code: has_elements_in(set([u'rby', u'bry', u'ryb', u'ybr', u'byr', u'yrb']))
         dest: List the ways
         feedback: Sorry about this, but please could you enter your answer using uppercase
           letters (as in the example)?
@@ -103,30 +96,27 @@ List the ways:
           - byr
           - yrb
           - ybr
+        name: has_elements_in(x)
         rule: Answer has elements in common with {{x|Set}}
-      - attrs:
-          classifier: is_disjoint_from(x)
-        code: is_disjoint_from(set([u'YBR', u'YRB']))
+      - code: is_disjoint_from(set([u'YBR', u'YRB']))
         dest: List the ways
         feedback: How about arrangements in which the yellow ball is on the left?
         inputs:
           x:
           - YBR
           - YRB
+        name: is_disjoint_from(x)
         rule: Answer has no elements in common with {{x|Set}}
-      - attrs:
-          classifier: is_disjoint_from(x)
-        code: is_disjoint_from(set([u'BYR', u'BRY']))
+      - code: is_disjoint_from(set([u'BYR', u'BRY']))
         dest: List the ways
         feedback: How about arrangements for which the blue ball is on the left?
         inputs:
           x:
           - BRY
           - BYR
+        name: is_disjoint_from(x)
         rule: Answer has no elements in common with {{x|Set}}
-      - attrs:
-          classifier: is_subset_of(x)
-        code: is_subset_of(set([u'BYR', u'YBR', u'RYB', u'YRB', u'BRY']))
+      - code: is_subset_of(set([u'BYR', u'YBR', u'RYB', u'YRB', u'BRY']))
         dest: List the ways
         feedback: I think you've missed some...
         inputs:
@@ -136,12 +126,13 @@ List the ways:
           - YRB
           - BRY
           - BYR
+        name: is_subset_of(x)
         rule: Answer is a proper subset of {{x|Set}}
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: List the ways
         feedback: Sorry, I don't think that's right. Try again?
         inputs: {}
+        name: Default
         rule: Default
 Prompt for explanation:
   content:
@@ -155,11 +146,11 @@ Prompt for explanation:
     handlers:
     - name: submit
       rules:
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: END
         feedback: ''
         inputs: {}
+        name: Default
         rule: Default
 Prompt for explanation with all ways listed:
   content:
@@ -174,10 +165,10 @@ Prompt for explanation with all ways listed:
     handlers:
     - name: submit
       rules:
-      - attrs: {}
-        code: 'True'
+      - code: 'True'
         dest: END
         feedback: 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and
           YBR. Great!'
         inputs: {}
+        name: Default
         rule: Default

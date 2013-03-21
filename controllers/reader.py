@@ -16,9 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import importlib
 import json
-import logging
 import random
 
 from controllers.base import BaseHandler
