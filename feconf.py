@@ -48,10 +48,11 @@ IDEA_CONTRIBUTORS = [
 # Each item is represented as a tuple: (filename, title, category). Note
 # that the filename omits the .yaml suffix.
 DEMO_EXPLORATIONS = [
-    ('hola', '¡Hola!', 'Languages'),
+    ('welcome', 'Welcome to Oppia!', 'Other'),
     ('pitch', 'Pitch Perfect', 'Music'),
     ('counting', 'Three Balls', 'Mathematics'),
     ('boot_verbs', 'Boot Verbs', 'Languages'),
+    ('hola', '¡Hola!', 'Languages'),
 ]
 
 # Ensure that there is at least one demo exploration.
