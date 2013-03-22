@@ -24,7 +24,6 @@ class PagesTest(test_utils.AppEngineTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         self.assertIn('Launch a random exploration', response)
-        self.assertIn('View/create explorations', response)
 
     def testAboutPage(self):
         """Test the About page."""
