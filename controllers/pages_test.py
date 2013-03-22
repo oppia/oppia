@@ -24,7 +24,7 @@ class PagesTest(test_utils.AppEngineTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         self.assertIn('When you interact with Oppia', response)
-        self.assertIn('View more explorations', response)
+        self.assertIn('Edit / Create an exploration', response)
 
     def testAboutPage(self):
         """Test the About page."""
