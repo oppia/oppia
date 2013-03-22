@@ -237,12 +237,12 @@ fi
 # Set up a local dev instance
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
---address=0.0.0.0 --port=8080 --clear_datastore ."
+--address=0.0.0.0 --port=8181 --clear_datastore ."
 
 sleep 5
 
 echo Opening browser window pointing to an end user interface
-/opt/google/chrome/chrome http://localhost:8080/ &
+/opt/google/chrome/chrome http://localhost:8181/ &
 
 
 # Do a build.

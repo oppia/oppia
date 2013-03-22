@@ -84,7 +84,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       var config = {height: '10px'};
 
       editors[index] = new Y.EditorBase({
-        content: initContent || 'You can enter <strong>rich</strong> text here.'
+        content: initContent || 'Click \'Edit\' to enter text here.'
       });
 
       editors[index].plug(Y.Plugin.ITSAToolbar);
@@ -188,8 +188,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.addContent = function(contentType) {
     if (contentType == 'text') {
       $scope.content.push({type: 'text', value: ''});
-      $scope.$apply();
-      activeInputData.name = 'content.' + ($scope.content.length - 1);
     } else if (contentType == 'image') {
       $scope.content.push({type: 'image', value: ''});
     } else if (contentType == 'video') {
