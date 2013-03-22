@@ -13,14 +13,14 @@ Welcome!:
       - dest: What country
         feedback: Yes!
         inputs:
-          x: 1
+          x: 0
         name: equals(x)
         param_changes: {}
       - dest: Welcome!
         feedback: Actually I don't know of any such characters, so I must confess
           to making that one up. Sorry. Try another one?
         inputs:
-          x: 3
+          x: 2
         name: equals(x)
         param_changes: {}
       - dest: Welcome!
@@ -30,7 +30,6 @@ Welcome!:
         param_changes: {}
     params:
       choices:
-      - It's the name of an ice cream.
       - It's translated from a different language.
       - It's a nonsense word that someone made up.
       - It's the name of a popular cartoon character.
