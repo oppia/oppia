@@ -4,6 +4,9 @@ runtime: python27
 api_version: 1
 threadsafe: false
 
+env_variables:
+  OPPIA_VERSION: '1.0'
+
 builtins:
 - remote_api: on
 
