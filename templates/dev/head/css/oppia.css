@@ -96,7 +96,7 @@ div.oppia-footer {
   border-top: 1px solid lightgrey;
   bottom: 0;
   height: 20px;
-  position: absolute;
+  position: fixed;
   width: 100%;
 }
 

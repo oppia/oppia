@@ -1,8 +1,8 @@
 Welcome!:
   content:
   - type: text
-    value: 'Oppia is a tool that helps you create interactive learning explorations.
-      These allow students to learn by doing.<div><span style="font-size: 13px; line-height:
+    value: 'Oppia is a tool that helps you create interactive learning explorations that can
+      be continually improved over time. These allow students to learn by doing.<div><span style="font-size: 13px; line-height:
       1.22;"><br></span></div><div><span style="font-size: 13px; line-height: 1.22;">For
       example, do you know where the name ''Oppia'' comes from?</span><br></div>'
   param_changes: {}
@@ -63,10 +63,13 @@ Music widget:
   - type: text
     value: 'You might want to build something more complicated than that, though.
       The good news is that you can integrate your own interactive questions into
-      Oppia!<div><br></div><div>For example, have a go at this widget that Phil Wagner
-      built. Your goal is to listen to the pitch played, then match it by moving the
-      note on the musical staff. Use the <span style="font-weight: bold;">up</span>&nbsp;and
-      <span style="font-weight: bold;">down</span>&nbsp;arrow keys to do this.</div>'
+      Oppia!<div><br></div><div>For example, have a go at this activity that Phil Wagner
+      built:</div><hr><h4>Goal: Listen to the pitch played, then match it by moving the
+      note on the musical staff.</h4>Instructions:<ol><li>Click the black
+      circle representing the note. It should turn red.</li><li>Move the note up and
+      down using the <span style="font-weight: bold;">up</span>&nbsp;and
+      <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li>
+      </ol>'
   param_changes: {}
   widget:
     handlers:

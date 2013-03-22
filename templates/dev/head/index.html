@@ -8,50 +8,26 @@
   <div class="oppia-content">
 
     <br>
-    <iframe src="/learn/0?iframed=true" width="100%" height="400px"
+    <iframe src="/learn/0?iframed=true" width="100%" height="1000px"
             frameborder="0"></iframe>
 
     <br>
     <hr>
 
     <div class="row-fluid">
-      <div class="span6 oppia-wide-panel">
-        <div class="oppia-wide-panel-content">
-          <div class="oppia-wide-panel-title">
-            LEARN
-          </div>
-          <p>
-            When you interact with Oppia, the system determines the best response to give,
-            based on your answer. This enables you to get immediate, personalized feedback,
-            and help you learn faster and more enjoyably.
-          </p>
-          <center class="oppia-btn-container">
-            <a class="btn btn-large btn-success" href="/learn_random">Launch a random exploration</a>
-          </center>
-        </div>
+      <div class="span6">
+        <center class="oppia-btn-container">
+          {% if user %}
+            <a class="btn btn-large btn-success" href="/gallery">Browse the explorations gallery</a>
+          {% else %}
+            <a class="btn btn-large btn-success" href="{{gallery_login_url}}">Browse the explorations gallery</a>
+          {% endif %}
+        </center>
       </div>
-      <div class="span6 oppia-wide-panel">
-        <div class="oppia-wide-panel-content">
-          <div class="oppia-wide-panel-title">
-            CREATE
-          </div>
-
-          <img src="images/editor-image.png">
-          <p>
-            You can create your own explorations with our nifty editor interface, and edit
-            other explorations to make them better.
-          </p>
-          <center class="oppia-btn-container">
-            {% if user %}
-              <a class="btn btn-large btn-success" href="/gallery">Edit / Create an exploration</a>
-            {% else %}
-              <a class="btn btn-large btn-success" href="{{gallery_login_url}}">Edit / Create an exploration</a>
-            {% endif %}
-          </center>
-          <center>
-            <p>(you'll need to log in)</p>
-          </center>
-        </div>
+      <div class="span6">
+        <center class="oppia-btn-container">
+          <a class="btn btn-large btn-success" href="/learn_random">Launch a random exploration</a>
+        </center>
       </div>
     </div>
 
