@@ -159,13 +159,13 @@ Things you can do:
       out the gallery, which you can get to by clicking the ''Gallery'' tab on the
       top.<div><br></div><div>If you want to add custom question types, or run your
       own instance of Oppia, have a look at our code site:</div><div><br></div><div>&nbsp;
-      &nbsp; &nbsp;<a href="https://code.google.com/p/oppia/">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You
+      &nbsp; &nbsp;<a href="https://code.google.com/p/oppia/" target="_blank">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You
       can also create new explorations, like this one, by clicking on the "Create
       a new exploration" button in the gallery.</div><div><span style="font-size:
       13px; line-height: 1.22;"><br></span></div><div><span style="font-size: 13px;
       line-height: 1.22;">We hope you enjoy using Oppia. If you have feedback, let
       us know! You can find our discussion forum at&nbsp;</span><a href="https://groups.google.com/forum/?fromgroups#!forum/oppia"
-      style="font-size: 13px; line-height: 1.22;">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>'
+      style="font-size: 13px; line-height: 1.22;" target="_blank">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>'
   param_changes: {}
   widget:
     handlers:
