@@ -43,8 +43,21 @@
                   {% endif %}
                 </ul>
                 <ul class="nav pull-right">
+                  {% if nav_mode != 'feedback' %}
+                    <li>
+                      <a href="" ng-click="openFeedbackPage()">
+                        Give Feedback
+                      </a>
+                    </li>
+                  {% else %}
+                    <li class="active">
+                      <a href="">Give Feedback</a>
+                    </li>
+                  {% endif %}
+
                   {% if user %}
                     <li>
+                      &nbsp;
                       <span class="navbar-text">
                         {{user}}
                         {% if is_admin %}

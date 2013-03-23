@@ -26,25 +26,29 @@ from google.appengine.ext import ndb
 
 
 STATS_ENUMS = utils.create_enum(
-    'exploration_visited', 'default_case_hit', 'exploration_completed')
+    'exploration_visited', 'default_case_hit', 'exploration_completed',
+    'feedback_submitted')
 
 
 class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def _record_event(cls, event_name, entity_key, extra_info=''):
+    def _record_event(cls, event_name, key, extra_info=''):
         """Updates statistics based on recorded events."""
 
         if event_name == STATS_ENUMS.exploration_visited:
-            event_key = 'e.%s' % entity_key
+            event_key = 'e.%s' % key
             cls._inc(event_key)
         if event_name == STATS_ENUMS.default_case_hit:
-            event_key = 'default.%s' % entity_key
+            event_key = 'default.%s' % key
             cls._add(event_key, unicode(extra_info))
         if event_name == STATS_ENUMS.exploration_completed:
-            event_key = 'c.%s' % entity_key
+            event_key = 'c.%s' % key
             cls._inc(event_key)
+        if event_name == STATS_ENUMS.feedback_submitted:
+            event_key = 'f.%s' % key
+            cls._add(event_key, unicode(extra_info))
 
     @classmethod
     def record_default_case_hit(cls, exploration_id, state_id, extra_info=''):
@@ -62,6 +66,13 @@ class EventHandler(object):
     def record_exploration_completed(cls, exploration_id):
         """Records an event when an exploration is completed."""
         cls._record_event(STATS_ENUMS.exploration_completed, exploration_id)
+
+    @classmethod
+    def record_feedback_submitted(cls, url, feedback):
+        """Records an event where feedback was submitted via the web UI."""
+        cls._record_event(
+            STATS_ENUMS.feedback_submitted, url, extra_info=feedback
+        )
 
     @classmethod
     def _inc(cls, event_key):
@@ -88,6 +99,10 @@ class Counter(ndb.Model):
     name = ndb.StringProperty()
     # The value of the property.
     value = ndb.IntegerProperty(default=0)
+    # When this counter was first created.
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    # When this counter was last incremented.
+    last_updated = ndb.DateTimeProperty(auto_now=True)
 
 
 class Journal(ndb.Model):
@@ -96,6 +111,10 @@ class Journal(ndb.Model):
     name = ndb.StringProperty()
     # The list of values
     values = ndb.StringProperty(repeated=True)
+    # When this counter was first created.
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    # When this counter was last updated.
+    last_updated = ndb.DateTimeProperty(auto_now=True)
 
 
 class Statistics(object):

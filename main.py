@@ -24,6 +24,7 @@ import webapp2
 
 from controllers import base
 from controllers import editor
+from controllers import feedback
 from controllers import gallery
 from controllers import pages
 from controllers import reader
@@ -56,6 +57,8 @@ urls = [
     (r'/?', pages.MainPage),
     (r'/about/?', pages.AboutPage),
     (r'/terms/?', pages.TermsPage),
+
+    (r'/feedback/?', feedback.FeedbackPage),
 
     (r'/resources/(%s)/?' % r, resources.LibHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),

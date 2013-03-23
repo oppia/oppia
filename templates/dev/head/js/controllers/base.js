@@ -31,9 +31,23 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
+  // Gets URL parameter values.
+  $scope.getUrlParams = function() {
+    var params = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+      params[key] = value;
+    });
+    return params;
+  };
+
   $scope.updateMath = function() {
     console.log('Updating math expressions.');
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  };
+
+  // Opens the feedback page in a new window.
+  $scope.openFeedbackPage = function() {
+    window.open('/feedback/?url=' + encodeURIComponent(window.location.pathname));
   };
 
   /**
