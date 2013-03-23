@@ -1,10 +1,11 @@
 Welcome!:
   content:
   - type: text
-    value: 'Oppia is a tool that helps you create interactive learning explorations that can
-      be continually improved over time. These allow students to learn by doing.<div><span style="font-size: 13px; line-height:
-      1.22;"><br></span></div><div><span style="font-size: 13px; line-height: 1.22;">For
-      example, do you know where the name ''Oppia'' comes from?</span><br></div>'
+    value: 'Oppia is a tool that helps you create interactive learning explorations
+      that can be continually improved over time. These allow students to learn by
+      doing.<div><span style="font-size: 13px; line-height: 1.22;"><br></span></div><div><span
+      style="font-size: 13px; line-height: 1.22;">For example, do you know where the
+      name ''Oppia'' comes from?</span><br></div>'
   param_changes: {}
   widget:
     handlers:
@@ -24,7 +25,8 @@ Welcome!:
         name: equals(x)
         param_changes: {}
       - dest: What country
-        feedback: Hm, it certainly looks like it! But it's actually a word from a different language.
+        feedback: Hm, it certainly looks like it! But it's actually a word from a
+          different language.
         inputs: {}
         name: Default
         param_changes: {}
@@ -63,13 +65,12 @@ Music widget:
   - type: text
     value: 'You might want to build something more complicated than that, though.
       The good news is that you can integrate your own interactive questions into
-      Oppia!<div><br></div><div>For example, have a go at this activity that Phil Wagner
-      built:</div><hr><h4>Goal: Listen to the pitch played, then match it by moving the
-      note on the musical staff.</h4>Instructions:<ol><li>Click the black
+      Oppia!<div><br></div><div>For example, have a go at this custom activity that uses an interaction built by Phil
+      Wagner:</div><hr><h4>Goal: Listen to the pitch played, then match it by
+      moving the note on the musical staff.</h4>Instructions:<ol><li>Click the black
       circle representing the note. It should turn red.</li><li>Move the note up and
-      down using the <span style="font-weight: bold;">up</span>&nbsp;and
-      <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li>
-      </ol>'
+      down using the <span style="font-weight: bold;">up</span>&nbsp;and <span style="font-weight:
+      bold;">down</span>&nbsp;arrow keys.</li> </ol>'
   param_changes: {}
   widget:
     handlers:
@@ -184,12 +185,69 @@ Things you can do:
 What country:
   content:
   - type: text
-    value: In fact, the word Oppia means 'learn'. Can you guess which language it comes from?
+    value: In fact, the word Oppia means 'learn'. Can you guess which language it
+      comes from?
   param_changes: {}
   widget:
     handlers:
     - name: submit
       rules:
+      - dest: What country
+        feedback: That's a pretty good guess. Several Greek words end with 'ia', such
+          as 'thexia' and 'paralia'. But Oppia is not a Greek word, though it's from
+          a country that's not too far away. Try again?
+        inputs:
+          x: greek
+        name: equals(x)
+        param_changes: {}
+      - dest: What country
+        feedback: 'There is indeed an ancient Roman law named Lex Oppia, which was
+          instituted by Gaius Oppius, a friend of Julius Caesar. But this isn''t where
+          our word comes from, and Oppius isn''t the language (or person) that we''re
+          looking for.
+
+
+          <br><br>
+
+
+          (Please feel free to search on the Web for the answer, by the way; this
+          is admittedly a factual question which not many people will know the answer
+          to.)'
+        inputs:
+          x: roman
+        name: contains(x)
+        param_changes: {}
+      - dest: What country
+        feedback: 'There is indeed an ancient Roman law named Lex Oppia, which was
+          instituted by Gaius Oppius, a friend of Julius Caesar. But this isn''t where
+          our word comes from, and Oppius isn''t the language (or person) that we''re
+          looking for.
+
+
+          <br><br>
+
+
+          (Please feel free to search on the Web for the answer, by the way; this
+          is admittedly a factual question which not many people will know the answer
+          to.)'
+        inputs:
+          x: latin
+        name: contains(x)
+        param_changes: {}
+      - dest: What country
+        feedback: That's not it, alas. But you're very close! Oppia is indeed a Nordic
+          word, but it's not from Sweden.
+        inputs:
+          x: Swedish
+        name: equals(x)
+        param_changes: {}
+      - dest: What country
+        feedback: 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into
+          a search engine, such as Google.'
+        inputs:
+          x: translate oppia
+        name: contains(x)
+        param_changes: {}
       - dest: What country
         feedback: Not quite; that's actually the opposite of 'start'. Check your spelling!
         inputs:
@@ -223,9 +281,9 @@ What country:
         name: fuzzy_equals(x)
         param_changes: {}
       - dest: What country
-        feedback: 'Actually, that''s not where we thought we got it from. But you can find out lots
-          of things on the Web. Why not try doing a search for [translate oppia] on your
-          favorite search engine?'
+        feedback: Actually, that's not where we thought we got it from. But you can
+          find out lots of things on the Web. Why not try doing a search for [translate
+          oppia] on your favorite search engine?
         inputs: {}
         name: Default
         param_changes: {}
