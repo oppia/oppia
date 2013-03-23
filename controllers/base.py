@@ -108,6 +108,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['logout_url'] = (
                 users.create_logout_url(self.request.uri))
             self.values['user'] = str(user)
+            self.values['is_admin'] = users.is_current_user_admin()
         else:
             self.values['login_url'] = users.create_login_url(self.request.uri)
 

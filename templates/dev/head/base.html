@@ -45,7 +45,12 @@
                 <ul class="nav pull-right">
                   {% if user %}
                     <li>
-                      <span class="navbar-text">{{user}}</span>
+                      <span class="navbar-text">
+                        {{user}}
+                        {% if is_admin %}
+                          (Admin)
+                        {% endif %}
+                      </span>
                     </li>
                     <li>
                       <a href="{{logout_url}}">Logout</a>
