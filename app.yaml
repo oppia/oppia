@@ -9,6 +9,7 @@ env_variables:
   OPPIA_VERSION: '1.0'
 
 builtins:
+- appstats: on
 - remote_api: on
 
 handlers:
