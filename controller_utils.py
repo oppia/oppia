@@ -26,7 +26,7 @@ from models.widget import NonInteractiveWidget
 from models.state import State
 import utils
 
-from google.appengine.ext import ndb
+from google.appengine.api import users
 
 
 def parse_content_into_html(content_array, block_number, params=None):
@@ -142,7 +142,8 @@ def check_existence_of_name(entity, name, ancestor=None):
 
 def check_can_edit(user, exploration):
     """Checks whether the current user has rights to edit this exploration."""
-    return (user.email() in exploration.editors or
+    return (users.is_current_user_admin() or
+            user.email() in exploration.editors or
             exploration.key in AugmentedUser.get(user).editable_explorations)
 
 

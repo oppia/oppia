@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import copy
 import json
-import os
 
 from controllers.base import BaseHandler
 from controllers.base import require_editor
