@@ -163,16 +163,9 @@ function Gallery($scope, $http, warningsData, GalleryData) {
       });
       return;
     } else {
-      var requestMap = {
-          title: title || '',
-          category: category || ''
-      };
-
-      var request = $.param(requestMap, true);
-
       $http.post(
           '/create_new',
-          request,
+          $scope.createRequest({title: title || '', category: category || ''}),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
               success(function(data) {
                 $scope.newExplorationTitle = '';

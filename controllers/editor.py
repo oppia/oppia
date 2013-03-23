@@ -79,8 +79,10 @@ class NewExploration(BaseHandler):
     def post(self, user):
         """Handles POST requests."""
 
-        title = self.request.get('title')
-        category = self.request.get('category')
+        payload = json.loads(self.request.get('payload'))
+
+        title = payload.get('title')
+        category = payload.get('category')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
