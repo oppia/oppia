@@ -15,7 +15,7 @@
     <div ng-controller="NumericInput">
       <form ng-submit="submitAnswer(answer)">
         <input type="number" ng-model="answer" placeholder="<[placeholder]>"
-               required autofocus>
+               required autofocus oninvalid="setCustomValidity('Please enter a number.')">
         <button type="submit">Submit</button>
       </form>
     </div>
