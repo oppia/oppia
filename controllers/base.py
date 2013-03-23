@@ -115,8 +115,19 @@ class BaseHandler(webapp2.RequestHandler):
     def render_template(self, filename, values=None):
         if values is None:
             values = self.values
+
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
+
+    def _render_exception(self, error_code, values):
+        assert error_code in [400, 401, 500]
+        values['code'] = error_code
+
+        # This checks if the response should be JSON or HTML.
+        if self.request.get('payload'):
+            self.response.write(json.dumps(values))
+        else:
+            self.render_template('error.html', values)
 
     def handle_exception(self, exception, debug_mode):
         """Overwrites the default exception handler."""
@@ -129,25 +140,21 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self.response.write(json.dumps(
-                {'code': '401 Unauthorized', 'error': str(exception)}))
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self.response.write(json.dumps(
-                {'code': '400 Bad Request', 'error': str(exception)}))
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self.response.write(json.dumps(
-                {'code': '500 System Error', 'error': str(exception)}))
+            self._render_exception(500, {'error': str(exception)})
             return
 
         self.error(500)
-        self.response.write(json.dumps(
-            {'code': '500', 'error': str(exception)}))
+        self._render_exception(500, {'error': str(exception)})
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""

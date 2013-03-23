@@ -141,7 +141,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
-        $.param({payload: JSON.stringify(propertyValueMap)}, true),
+        $scope.createRequest(propertyValueMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       warningsData.clear();
@@ -240,6 +240,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
+  $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
 
   // Initializes the exploration page using data from the backend.
   explorationData.getData();
@@ -278,7 +279,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     console.log("adding parameter to exploration");
     $scope.parameters.push({name:name, type:type});
     $http.put(
-        $scope.explorationUrl,
+        $scope.explorationDataUrl,
         $scope.createRequest({parameters: $scope.parameters}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
@@ -299,9 +300,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     activeInputData.clear();
     $scope.explorationEditors.push(newEditorEmail);
 
-    var request = $.param(requestParameters, true);
     $http.put(
-        $scope.explorationUrl,
+        $scope.explorationDataUrl,
         $scope.createRequest({editors: $scope.explorationEditors}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
@@ -361,7 +361,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     activeInputData.clear();
 
     $http.put(
-        $scope.explorationUrl,
+        $scope.explorationDataUrl,
         $scope.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
@@ -409,7 +409,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
 
     $http.post(
-        $scope.explorationUrl,
+        $scope.explorationDataUrl,
         $scope.createRequest({state_name: newStateName}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
@@ -473,7 +473,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.deleteExploration = function() {
-    $http['delete']($scope.explorationUrl)
+    $http['delete']($scope.explorationDataUrl)
     .success(function(data) {
       window.location = '/gallery/';
     });

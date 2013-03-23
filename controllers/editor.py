@@ -148,6 +148,37 @@ class ExplorationPage(BaseHandler):
         })
         self.render_template('editor/editor_exploration.html')
 
+
+class ExplorationHandler(BaseHandler):
+    """Page with editor data for a single exploration."""
+
+    @require_editor
+    def get(self, unused_user, exploration):
+        """Gets the question name and state list for a question page."""
+
+        state_list = {}
+        for state_key in exploration.states:
+            state = state_key.get()
+            state_list[state.id] = get_state_for_frontend(state, exploration)
+
+        parameters = []
+        for param in exploration.parameters:
+            parameters.append({'name': param.name, 'type': param.param_type})
+
+        self.values.update({
+            'exploration_id': exploration.id,
+            'init_state_id': exploration.init_state.get().id,
+            'is_public': exploration.is_public,
+            'image_id': exploration.image_id,
+            'category': exploration.category,
+            'title': exploration.title,
+            'owner': str(exploration.owner),
+            'editors': exploration.editors,
+            'states': state_list,
+            'parameters': parameters,
+        })
+        self.response.write(json.dumps(self.values))
+
     @require_editor
     def post(self, unused_user, exploration):
         """Adds a new state to the given exploration."""
@@ -214,37 +245,6 @@ class ExplorationPage(BaseHandler):
     def delete(self, unused_user, exploration):
         """Deletes the given exploration."""
         controller_utils.delete_exploration(exploration)
-
-
-class ExplorationHandler(BaseHandler):
-    """Page with editor data for a single exploration."""
-
-    @require_editor
-    def get(self, unused_user, exploration):
-        """Gets the question name and state list for a question page."""
-
-        state_list = {}
-        for state_key in exploration.states:
-            state = state_key.get()
-            state_list[state.id] = get_state_for_frontend(state, exploration)
-
-        parameters = []
-        for param in exploration.parameters:
-            parameters.append({'name': param.name, 'type': param.param_type})
-
-        self.values.update({
-            'exploration_id': exploration.id,
-            'init_state_id': exploration.init_state.get().id,
-            'is_public': exploration.is_public,
-            'image_id': exploration.image_id,
-            'category': exploration.category,
-            'title': exploration.title,
-            'owner': str(exploration.owner),
-            'editors': exploration.editors,
-            'states': state_list,
-            'parameters': parameters,
-        })
-        self.response.write(json.dumps(self.values))
 
 
 class ExplorationDownloadHandler(BaseHandler):
