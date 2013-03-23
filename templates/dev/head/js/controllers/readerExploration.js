@@ -46,8 +46,9 @@
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
-    $scope.html = data.html;
     $scope.inputTemplate = data.interactive_widget_html;
+    $scope.oppiaHtml = data.oppia_html;
+    $scope.html = '';
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
@@ -103,7 +104,10 @@
 
     $scope.params = data.params;
 
-    $scope.html += data.html;
+    $scope.html += $scope.oppiaHtml;
+    $scope.html += data.reader_html;
+    $scope.oppiaHtml = data.oppia_html;
+
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.

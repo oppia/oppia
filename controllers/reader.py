@@ -89,9 +89,9 @@ class ExplorationHandler(BaseHandler):
 
         self.values.update({
             'block_number': 0,
-            'html': init_html,
             'interactive_widget_html': interactive_widget_html,
             'interactive_params': init_state.widget.params,
+            'oppia_html': init_html,
             'params': params,
             'state_id': init_state.id,
             'title': exploration.title,
@@ -145,7 +145,7 @@ class ExplorationHandler(BaseHandler):
             answer = state.widget.params['choices'][int(answer)]
 
         # Append reader's answer.
-        html_output = feconf.JINJA_ENV.get_template(
+        values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader_response.html').render({'response': answer})
 
         if dest_id == feconf.END_DEST:
@@ -181,7 +181,7 @@ class ExplorationHandler(BaseHandler):
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
         values['exploration_id'] = exploration.id
         values['state_id'] = state.id
-        values['html'] = html_output
+        values['oppia_html'] = html_output
         values['widgets'] = widget_output
         values['block_number'] = block_number + 1
         values['params'] = params

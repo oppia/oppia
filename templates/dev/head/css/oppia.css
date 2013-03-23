@@ -189,6 +189,10 @@ div.oppia-footer {
   font-style: italic;
 }
 
+.oppia-response {
+  background: paleGoldenRod;
+}
+
 .oppia-editable-name {
   color: #8f8661;
 }
