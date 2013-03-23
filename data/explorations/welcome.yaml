@@ -18,13 +18,13 @@ Welcome!:
         param_changes: {}
       - dest: Welcome!
         feedback: Actually I don't know of any such characters, so I must confess
-          to making that one up. Sorry. Try another one?
+          to making that one up. Try another one?
         inputs:
           x: 2
         name: equals(x)
         param_changes: {}
-      - dest: Welcome!
-        feedback: Nope, that's not it. Try again.
+      - dest: What country
+        feedback: Hm, it certainly looks like it! But it's actually a word from a different language.
         inputs: {}
         name: Default
         param_changes: {}
@@ -184,8 +184,7 @@ Things you can do:
 What country:
   content:
   - type: text
-    value: It is true that Oppia is a word from a different language -- in fact, it
-      means 'learn'. Which language is it?
+    value: In fact, the word Oppia means 'learn'. Can you guess which language it comes from?
   param_changes: {}
   widget:
     handlers:
@@ -224,8 +223,9 @@ What country:
         name: fuzzy_equals(x)
         param_changes: {}
       - dest: What country
-        feedback: That's not it. Try doing a search for 'oppia' on your favorite search
-          engine. Or maybe 'translate oppia'.
+        feedback: 'Actually, that''s not where we thought we got it from. But you can find out lots
+          of things on the Web. Why not try doing a search for [translate oppia] on your
+          favorite search engine?'
         inputs: {}
         name: Default
         param_changes: {}
