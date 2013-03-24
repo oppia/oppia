@@ -24,9 +24,9 @@
       <div class="oppia-main-body">
         {% if not iframed %}
           <!-- nav bar -->
-          <div class="navbar navbar-static-top oppia-navbar">
+          <div class="navbar navbar-static-top">
             <div class="navbar-inner">
-              <div class="container">
+              <div class="container oppia-content">
                 <a class="brand" href="/">Oppia</a>
                 <ul class="nav">
                   <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
@@ -99,14 +99,16 @@
 
       {% if not iframed %}
         <div class="navbar oppia-footer">
-          <ul class="nav">
-            <li>
-             <a href="/about">About Oppia</a>
-            </li>
-            <li>
-              <a href="/terms">Terms</a>
-            </li>
-          </ul>
+          <div class="oppia-content">
+            <ul class="nav">
+              <li>
+               <a href="/about">About Oppia</a>
+              </li>
+              <li>
+                <a href="/terms">Terms</a>
+              </li>
+            </ul>
+          </div>
         </div>
       {% endif %}
     </div>

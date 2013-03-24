@@ -31,7 +31,7 @@ html {
 }
 
 body {
-  height: 100%;
+  max-height: 97%;
   margin: 0 auto;
 }
 
@@ -149,10 +149,11 @@ textarea.oppia-code {
   padding-bottom: 20px;  /* Height of footer */
 }
 
-div.oppia-footer {
-  border-top: 1px solid lightgrey;
+.oppia-footer {
+  border-top: 1px solid #DDD;
   bottom: 0;
-  height: 20px;
+  max-height: 20px;
+  margin: auto;
   position: absolute;
   width: 100%;
 }

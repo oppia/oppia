@@ -214,6 +214,8 @@ class RandomExplorationPage(BaseHandler):
         explorations = Exploration.query().filter(
             Exploration.is_public == True).fetch(100)
 
-        selected_exploration = random.choice(explorations)
+        # Don't use the default exploration; users will have seen that already
+        # on the main page.
+        selected_exploration = random.choice(explorations[1:])
 
         self.redirect('/learn/%s' % selected_exploration.id)
