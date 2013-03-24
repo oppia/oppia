@@ -168,13 +168,16 @@ class ExplorationHandler(BaseHandler):
                     block_number,
                     params)
                 html_output += action_html
-                html_output += '<br>'
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
                 state_html, state_widgets = controller_utils.parse_content_into_html(
                     state.content, block_number, params)
+                # Separate text for the new state and feedback for the old state
+                # by an additional line.
+                if state_html and feedback:
+                    html_output += '<br>'
                 html_output += state_html
                 widget_output.append(state_widgets)
 
