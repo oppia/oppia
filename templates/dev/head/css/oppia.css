@@ -92,6 +92,8 @@ textarea.oppia-code {
 
 .oppia-btn {
   background-image: -webkit-linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
+  background-image: -moz-linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
+  background-image: linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
   color: #444;
   border-radius: 3px;
   font: bold 14px/20px Arial, sans-serif;
