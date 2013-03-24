@@ -74,11 +74,14 @@ textarea.oppia-code {
   z-index: 3000;
 }
 
+.oppia-reader-response-container {
+  margin: 20px 0;
+}
+
 .oppia-reader-response {
   border-radius: 6px;
-  margin: 20px 20px;
-  padding: 0 20px;
   font-style: italic;
+  margin: 0 20px;
 }
 
 .oppia-response {

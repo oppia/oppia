@@ -23,6 +23,10 @@
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
 
+  $scope.urlParams = $scope.getUrlParams();
+  $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
+      $scope.urlParams['iframed']);
+
   // Initializes the story page using data from the server.
   $scope.initializePage = function() {
     $http.get($scope.explorationDataUrl)
@@ -120,12 +124,17 @@
       $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
           $scope.widgets[0].index, $scope.widgets[0].code);
     }
+
+    var currentScrollTop = $('body').scrollTop();
+    // TODO(sll): This should actually scroll to the location of #oppiaHtml.
+    $('html,body').animate({scrollTop: Math.max(
+        $(document).height() - 1000, currentScrollTop + 50)});
   };
 
   window.addEventListener('message', receiveMessage, false);
 
   function receiveMessage(evt) {
-    console.log('event received');
+    console.log('Event received.');
     if (evt.origin == window.location.protocol + '//' + window.location.host) {
       $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }

@@ -12,9 +12,10 @@
         <br><br>
 
         <div angular-html-bind="html"></div>
-        <div angular-html-bind="oppiaHtml" class="oppia-response"></div>
+        <div angular-html-bind="oppiaHtml" class="oppia-response" ng-show="oppiaHtml">
+        </div>
         <br>
-        <div ng-show="finished">
+        <div ng-show="finished" class="oppia-response">
           Congratulations, you've finished this exploration!
           Would you like to <a ng-click="initializePage()">play again?</a>
         </div>

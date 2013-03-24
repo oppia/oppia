@@ -17,8 +17,8 @@ Welcome!:
         name: equals(x)
         param_changes: {}
       - dest: Welcome!
-        feedback: Actually I don't know of any such characters, so I must confess
-          to making that one up. Try another one?
+        feedback: Actually, I don't know of any such characters, so I must confess
+          to making that choice up. Have another go?
         inputs:
           x: 2
         name: equals(x)
@@ -107,8 +107,7 @@ Music widget:
 Numeric input:
   content:
   - type: text
-    value: '<div><span style="font-size: 13px; line-height: 1.22;">Let $x = 11$. What
-      is the value of $x^2$?</span><br></div><div><div><div><div><br></div></div></div></div>'
+    value: '<div>Let $x = 11$. What is the value of $x^2$?<br></div>'
   param_changes: {}
   widget:
     handlers:
@@ -280,7 +279,7 @@ What country:
         name: fuzzy_equals(x)
         param_changes: {}
       - dest: What country
-        feedback: Actually, that's not where we thought we got it from. But you can
+        feedback: Actually, that's not where we got it from. But you can
           find out lots of things on the Web. Why not try doing a search for [translate
           oppia] on your favorite search engine?
         inputs: {}
