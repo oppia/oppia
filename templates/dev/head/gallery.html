@@ -21,7 +21,7 @@
 
         {% if user %}
           <div class="pull-right">
-            <button ng-click="toggleExplorationView()">
+            <button class="btn" ng-click="toggleExplorationView()">
               <[getToggleText()]>
             </button>
           </div>
@@ -80,7 +80,7 @@
 
         {% if user %}
           <p>
-            <a class="btn btn-large btn-success" ng-click="openNewExplorationModal()">
+            <a class="btn btn-large" ng-click="openNewExplorationModal()">
               Create New Exploration
             </a>
           </p>

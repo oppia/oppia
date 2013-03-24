@@ -66,8 +66,8 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   };
 
   $scope.getToggleText = function() {
-    return 'Show ' + ($scope.showMyExplorations ? 'all' : 'editable') +
-        ' explorations';
+    return $scope.showMyExplorations ?
+        '◂ Show all explorations' : 'Show editable explorations ▸';
   };
 
   $scope.getHeadingText = function() {

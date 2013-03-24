@@ -168,6 +168,7 @@ class ExplorationHandler(BaseHandler):
                     block_number,
                     params)
                 html_output += action_html
+                html_output += '<br>'
                 widget_output.append(action_widgets)
             # Append text for the new state only if the new and old states
             # differ.

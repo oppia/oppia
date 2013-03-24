@@ -3,9 +3,8 @@ Welcome!:
   - type: text
     value: 'Oppia is a tool that helps you create interactive learning explorations
       that can be continually improved over time. These allow students to learn by
-      doing.<div><span style="font-size: 13px; line-height: 1.22;"><br></span></div><div><span
-      style="font-size: 13px; line-height: 1.22;">For example, do you know where the
-      name ''Oppia'' comes from?</span><br></div>'
+      doing.<div><br></div><div>For example, do you know where the
+      name ''Oppia'' comes from?<br></div>'
   param_changes: {}
   widget:
     handlers:

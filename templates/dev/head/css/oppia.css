@@ -31,10 +31,46 @@ textarea.oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
+.oppia-content {
+  margin: 0 auto;
+  width: 98%;
+  max-width: 700px;
+}
+
 .oppia-alert-blocks {
   position: fixed;
   width: 80%;
   z-index: 3000;
+}
+
+.oppia-reader-response {
+  border-radius: 6px;
+  margin: 20px 20px;
+  padding: 0 20px;
+  font-style: italic;
+}
+
+.oppia-response {
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
+.oppia-btn {
+  color: #444;
+  border-radius: 3px;
+  font: bold 14px/20px Arial, sans-serif;
+  padding: 4px 10px;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+}
+
+.oppia-btn:hover {
+  background: rgb(255, 177, 84);
+}
+
+.oppia-exploration {
+  padding: 5px;
+  width: 98%;
 }
 
 /* Adds to existing Bootstrap CSS rule. */
@@ -45,12 +81,6 @@ textarea.oppia-code {
   opacity: 1;
   width: 80%;
   z-index: 3000;
-}
-
-.oppia-content {
-  margin: 0 auto;
-  padding-left: 30px;
-  width: 80%;
 }
 
 .oppia-form input.ng-invalid.ng-dirty {
@@ -98,13 +128,6 @@ div.oppia-footer {
   height: 20px;
   position: absolute;
   width: 100%;
-}
-
-.oppia-exploration {
-  border: 1px solid black;
-  margin: 10px auto;
-  padding: 10px;
-  width: 98%;
 }
 
 .oppia-exploration-header {
@@ -180,17 +203,6 @@ div.oppia-footer {
   position: fixed;
   text-align: center;
   top: 100px;
-}
-
-.oppia-reader-response {
-  border-radius: 8px;
-  margin: 20px 20px;
-  padding: 0 20px;
-  font-style: italic;
-}
-
-.oppia-response {
-  background: paleGoldenRod;
 }
 
 .oppia-editable-name {
