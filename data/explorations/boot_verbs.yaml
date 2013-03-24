@@ -5,53 +5,56 @@ Sentence:
       \ conjugation goes in the blank? \nOr type 'I don't know'"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: END
-        feedback: That is correct! Great job!
+        feedback:
+        - That is correct! Great job!
         inputs:
           x: juego
         name: equals(x)
-        rule: Answer is equal to {{x|String}}
+        param_changes: {}
       - dest: boot verb
-        feedback: No, remember jugo means 'juice'. It sounds about right, but it isn't
-          quite because jugar is a boot verb.
+        feedback:
+        - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
+          because jugar is a boot verb.
         inputs:
           x: jugo
         name: equals(x)
-        rule: Answer is equal to {{x|String}}
+        param_changes: {}
       - dest: subject
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
-        rule: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 So...:
   content:
   - type: text
     value: So now put that stem together with the ending, and what is the answer?
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: END
-        feedback: null
+        feedback: []
         inputs:
           x: juego
         name: equals(x)
-        rule: Answer is equal to {{x|String}}
+        param_changes: {}
       - dest: So...
-        feedback: Try that again. Put jueg- together with -o and you get...?
+        feedback:
+        - Try that again. Put jueg- together with -o and you get...?
         inputs: {}
         name: Default
-        rule: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 boot verb:
   content:
   - type: text
@@ -65,73 +68,77 @@ boot verb:
       \ a verb ending in -gar, it uses the u > ue stem, so what does the stem become?"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: So...
-        feedback: null
+        feedback: []
         inputs:
           x: jueg
         name: equals(x)
-        rule: Answer is equal to {{x|String}}
+        param_changes: {}
       - dest: boot verb
-        feedback: Not quite. Just change the u to a ue and you get jueg-
+        feedback:
+        - Not quite. Just change the u to a ue and you get jueg-
         inputs: {}
         name: Default
-        rule: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 subject:
   content:
   - type: text
     value: So what is the subject of the sentence?
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: verb endings
-        feedback: null
+        feedback: []
         inputs:
           x: yo
         name: equals(x)
-        rule: Answer is equal to {{x|String}}
+        param_changes: {}
       - dest: subject
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
-        paramChanges: []
-        rule: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 verb endings:
   content:
   - type: text
     value: So what is the correct verb ending for yo?
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: boot verb
-        feedback: But if you just drop the -ar and at -o, you get jugo which means
-          juice, so that's not quite right. That's because jugar is a boot verb!
+        feedback:
+        - But if you just drop the -ar and at -o, you get jugo which means juice,
+          so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: -o
         name: equals(x)
+        param_changes: {}
       - dest: boot verb
-        feedback: But if you just drop the -ar and at -o, you get jugo which means
-          juice, so that's not quite right. That's because jugar is a boot verb!
+        feedback:
+        - But if you just drop the -ar and at -o, you get jugo which means juice,
+          so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: o
         name: equals(x)
+        param_changes: {}
       - dest: verb endings
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
-        paramChanges: []
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput

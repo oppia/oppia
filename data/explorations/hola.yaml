@@ -5,31 +5,39 @@ Hola:
       \ just type or select \"I don't know\"\n<br><br>\n\xA1Hola!"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: Me llamo
-        feedback: 'Don''t forget: Spanish uses inverted exclamation points at the
-          beginning of sentences as well as the ending exclamation point.'
+        feedback:
+        - 'Don''t forget: Spanish uses inverted exclamation points at the beginning
+          of sentences as well as the ending exclamation point.'
         inputs:
           x: hola!
         name: equals(x)
+        param_changes: {}
       - dest: Me llamo
-        feedback: ''
+        feedback: []
         inputs:
           x: hola
         name: contains(x)
+        param_changes: {}
       - dest: Hola
-        feedback: Check your spelling!
+        feedback:
+        - Check your spelling!
         inputs:
           x: hola
         name: fuzzy_equals(x)
+        param_changes: {}
       - dest: Hola
-        feedback: Hola means Hello. <br><br> Say Hello back (in Spanish).
+        feedback:
+        - Hola means Hello. <br><br> Say Hello back (in Spanish).
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Adios:
   content:
   - type: text
@@ -37,32 +45,78 @@ Adios:
       \xA1Adi\xF3s!"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: Adios
-        feedback: Don't forget your accent marks next time!
+        feedback:
+        - Don't forget your accent marks next time!
         inputs:
           x: adios
         name: contains(x)
+        param_changes: {}
       - dest: END
-        feedback: ''
+        feedback: []
         inputs:
           x: adi\xF3s
         name: contains(x)
+        param_changes: {}
       - dest: Adios
-        feedback: Say goodbye
+        feedback:
+        - Say goodbye
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Colores:
   content:
   - type: text
     value: "\xBFDe qu\xE9 colores son las manzanas?"
   param_changes: {}
   widget:
-    widget_id: MultipleChoiceInput
+    handlers:
+    - name: submit
+      rules:
+      - dest: Colores
+        feedback:
+        - Apples aren't black unless they are rotten...and they aren't blue
+        inputs:
+          x: '0'
+        name: equals(x)
+        param_changes: {}
+      - dest: Colores
+        feedback:
+        - Orange and white...not quite
+        inputs:
+          x: '1'
+        name: equals(x)
+        param_changes: {}
+      - dest: Adios
+        feedback:
+        - "\xA1S\xED! That's right -- apples are red and green.</em>"
+        inputs:
+          x: '2'
+        name: equals(x)
+        param_changes: {}
+      - dest: Colores
+        feedback:
+        - Yellow and gray? Apples?
+        inputs:
+          x: '3'
+        name: equals(x)
+        param_changes: {}
+      - dest: Colores
+        feedback:
+        - 'Colores is easy to translate.
+
+          <br>manzanas is apples.<br>
+
+          So this is asking, what colors are apples?'
+        inputs: {}
+        name: Default
+        param_changes: {}
     params:
       choices:
       - negro y azul
@@ -70,37 +124,7 @@ Colores:
       - rojo y verde
       - amarillo y gris
       - I don't know
-    handlers:
-    - name: submit
-      rules:
-      - dest: Colores
-        feedback: Apples aren't black unless they are rotten...and they aren't blue
-        inputs:
-          x: '0'
-        name: equals(x)
-      - dest: Colores
-        feedback: Orange and white...not quite
-        inputs:
-          x: '1'
-        name: equals(x)
-      - dest: Adios
-        feedback: "\xA1S\xED! That's right -- apples are red and green.</em>"
-        inputs:
-          x: '2'
-        name: equals(x)
-      - dest: Colores
-        feedback: Yellow and gray? Apples?
-        inputs:
-          x: '3'
-        name: equals(x)
-      - dest: Colores
-        feedback: 'Colores is easy to translate.
-
-          <br>manzanas is apples.<br>
-
-          So this is asking, what colors are apples?'
-        inputs: {}
-        name: Default
+    widget_id: MultipleChoiceInput
 Como meaning:
   content:
   - type: text
@@ -108,93 +132,115 @@ Como meaning:
       \ is a question.\n<br>What would \"\xBFC\xF3mo te llamas?\" mean?"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: Me llamo
-        feedback: 'Yes!
+        feedback:
+        - 'Yes!
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs:
           x: what is your name?
         name: equals(x)
+        param_changes: {}
       - dest: Me llamo
-        feedback: 'Great!
+        feedback:
+        - 'Great!
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs:
           x: what do you call yourself?
         name: equals(x)
+        param_changes: {}
       - dest: Me llamo
-        feedback: 'So this means "What is your name?"
+        feedback:
+        - 'So this means "What is your name?"
 
           <br>So, let''s try this again...Introduce yourself.'
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Me llamo:
   content:
   - type: text
     value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: Me llamo
-        feedback: You've got one too many verbs.
+        feedback:
+        - You've got one too many verbs.
         inputs:
           x: me llamo es
         name: starts_with(x)
+        param_changes: {}
       - dest: Supermercado
-        feedback: null
+        feedback: []
         inputs:
           x: me llamo
         name: starts_with(x)
+        param_changes: {}
       - dest: Supermercado
-        feedback: null
+        feedback: []
         inputs:
           x: mi nombre es
         name: starts_with(x)
+        param_changes: {}
       - dest: Me llamo meaning
-        feedback: null
+        feedback: []
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Me llamo meaning:
   content:
   - type: text
     value: Can you say what "Me llamo" means?
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: Como meaning
-        feedback: That's right!
+        feedback:
+        - That's right!
         inputs:
           x: my name is
         name: equals(x)
+        param_changes: {}
       - dest: Como meaning
-        feedback: Literally, yes, but it can also be translated as "My name is."
+        feedback:
+        - Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i am called
         name: equals(x)
+        param_changes: {}
       - dest: Como meaning
-        feedback: Literally, yes, but it can also be translated as "My name is."
+        feedback:
+        - Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i call myself
         name: equals(x)
+        param_changes: {}
       - dest: Como meaning
-        feedback: 'Me llamo means "My name is"
+        feedback:
+        - 'Me llamo means "My name is"
 
           <br>So "Me llamo Oppia" means "My name is Oppia".'
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Supermercado:
   content:
   - type: text
@@ -202,40 +248,47 @@ Supermercado:
       ?"
   param_changes: {}
   widget:
-    widget_id: MultipleChoiceInput
-    params:
-      choices:
-      - Ventanas
-      - Coches
-      - Manzanas
-      - I don't know
     handlers:
     - name: submit
       rules:
       - dest: Supermercado
-        feedback: "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
-          <br>\nYou can't buy windows in a supermarket. If you need more help, select\
-          \ \"I don't know\""
+        feedback:
+        - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
+          \ can't buy windows in a supermarket. If you need more help, select \"I\
+          \ don't know\""
         inputs:
           x: '0'
         name: equals(x)
+        param_changes: {}
       - dest: Supermercado
-        feedback: "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\n\
-          You can't buy cars in a supermarket. If you need more help, select \"I don't\
-          \ know\""
+        feedback:
+        - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou can't\
+          \ buy cars in a supermarket. If you need more help, select \"I don't know\""
         inputs:
           x: '1'
         name: equals(x)
+        param_changes: {}
       - dest: Colores
-        feedback: Yes! You can buy apples in a supermarket.
+        feedback:
+        - Yes! You can buy apples in a supermarket.
         inputs:
           x: '2'
         name: equals(x)
+        param_changes: {}
       - dest: Supermercado
-        feedback: 'Supermercado is supermarket.
+        feedback:
+        - 'Supermercado is supermarket.
 
           <br><br>
 
           What can you buy at a supermarket?'
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      choices:
+      - Ventanas
+      - Coches
+      - Manzanas
+      - I don't know
+    widget_id: MultipleChoiceInput

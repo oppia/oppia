@@ -1,31 +1,34 @@
 Welcome!:
   content:
   - type: text
-    value: 'Oppia is a tool that helps you create interactive learning explorations
+    value: Oppia is a tool that helps you create interactive learning explorations
       that can be continually improved over time. These allow students to learn by
-      doing.<div><br></div><div>For example, do you know where the
-      name ''Oppia'' comes from?<br></div>'
+      doing.<div><br></div><div>For example, do you know where the name 'Oppia' comes
+      from?<br></div>
   param_changes: {}
   widget:
     handlers:
     - name: submit
       rules:
       - dest: What country
-        feedback: Yes!
+        feedback:
+        - Yes!
         inputs:
           x: 0
         name: equals(x)
         param_changes: {}
       - dest: Welcome!
-        feedback: Actually, I don't know of any such characters, so I must confess
-          to making that choice up. Have another go?
+        feedback:
+        - Actually, I don't know of any such characters, so I must confess to making
+          that choice up. Have another go?
         inputs:
           x: 2
         name: equals(x)
         param_changes: {}
       - dest: What country
-        feedback: Hm, it certainly looks like it! But it's actually a word from a
-          different language.
+        feedback:
+        - Hm, it certainly looks like it! But it's actually a word from a different
+          language.
         inputs: {}
         name: Default
         param_changes: {}
@@ -45,14 +48,16 @@ Estimate 100:
     - name: submit
       rules:
       - dest: Numeric input
-        feedback: Yes! So 11 times 11 must be bigger. Let's try again.
+        feedback:
+        - Yes! So 11 times 11 must be bigger. Let's try again.
         inputs:
           x: 100.0
         name: equals(x)
         param_changes: {}
       - dest: Estimate 100
-        feedback: No; try again. Remember, multiplication by ten can be done by just
-          adding a zero at the end.
+        feedback:
+        - No; try again. Remember, multiplication by ten can be done by just adding
+          a zero at the end.
         inputs: {}
         name: Default
         param_changes: {}
@@ -64,38 +69,41 @@ Music widget:
   - type: text
     value: 'You might want to build something more complicated than that, though.
       The good news is that you can integrate your own interactive questions into
-      Oppia!<div><br></div><div>For example, have a go at this custom activity that uses an interaction built by Phil
-      Wagner:</div><hr><h4>Goal: Listen to the pitch played, then match it by
-      moving the note on the musical staff.</h4>Instructions:<ol><li>Click the black
-      circle representing the note. It should turn red.</li><li>Move the note up and
-      down using the <span style="font-weight: bold;">up</span>&nbsp;and <span style="font-weight:
-      bold;">down</span>&nbsp;arrow keys.</li> </ol>'
+      Oppia!<div><br></div><div>For example, have a go at this custom activity that
+      uses an interaction built by Phil Wagner:</div><hr><h4>Goal: Listen to the pitch
+      played, then match it by moving the note on the musical staff.</h4>Instructions:<ol><li>Click
+      the black circle representing the note. It should turn red.</li><li>Move the
+      note up and down using the <span style="font-weight: bold;">up</span>&nbsp;and
+      <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li> </ol>'
   param_changes: {}
   widget:
     handlers:
     - name: submit
       rules:
       - dest: Things you can do
-        feedback: That's right!
+        feedback:
+        - That's right!
         inputs:
           x: B4
         name: equals(x)
         param_changes: {}
       - dest: Music widget
-        feedback: I think the original note is lower.
+        feedback:
+        - I think the original note is lower.
         inputs:
           x: B4
         name: is_greater_than(x)
         param_changes: {}
       - dest: Music widget
-        feedback: Actually, the original note sounds higher. Try comparing both pitches
-          and listening carefully to the difference.
+        feedback:
+        - Actually, the original note sounds higher. Try comparing both pitches and
+          listening carefully to the difference.
         inputs:
           x: B4
         name: is_less_than(x)
         param_changes: {}
       - dest: Music widget
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
         param_changes: {}
@@ -107,47 +115,53 @@ Music widget:
 Numeric input:
   content:
   - type: text
-    value: '<div>Let $x = 11$. What is the value of $x^2$?<br></div>'
+    value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
   param_changes: {}
   widget:
     handlers:
     - name: submit
       rules:
       - dest: Music widget
-        feedback: 'Yes, that''s correct: 11 times 11 is 121.'
+        feedback:
+        - 'Yes, that''s correct: 11 times 11 is 121.'
         inputs:
           x: 121.0
         name: equals(x)
         param_changes: {}
       - dest: Estimate 100
-        feedback: Nope. Let's make a quick estimate.
+        feedback:
+        - Nope. Let's make a quick estimate.
         inputs:
           x: 121.0
         name: is_less_than(x)
         param_changes: {}
       - dest: Numeric input
-        feedback: You are actually very close. Think about the last digit of the answer;
-          what must it be? Then you should be able to get it in one or two more goes.
+        feedback:
+        - You are actually very close. Think about the last digit of the answer; what
+          must it be? Then you should be able to get it in one or two more goes.
         inputs:
           tol: 9.0
           x: 121.0
         name: is_within_tolerance(x, tol)
         param_changes: {}
       - dest: Numeric input
-        feedback: That's too high! Try guessing lower.
+        feedback:
+        - That's too high! Try guessing lower.
         inputs:
           x: 121.0
         name: is_greater_than(x)
         param_changes: {}
       - dest: Numeric input
-        feedback: That's not large enough. Try guessing higher?
+        feedback:
+        - That's not large enough. Try guessing higher?
         inputs:
           x: 121.0
         name: is_less_than(x)
         param_changes: {}
       - dest: Numeric input
-        feedback: If you got here, something's gone a bit wrong with this exploration.
-          Sorry about that. If you're wondering, the answer is 96721.
+        feedback:
+        - If you got here, something's gone a bit wrong with this exploration. Sorry
+          about that. If you're wondering, the answer is 96721.
         inputs: {}
         name: Default
         param_changes: {}
@@ -174,7 +188,7 @@ Things you can do:
     - name: submit
       rules:
       - dest: END
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
         param_changes: {}
@@ -191,18 +205,20 @@ What country:
     - name: submit
       rules:
       - dest: What country
-        feedback: That's a pretty good guess. Several Greek words end with 'ia', such
-          as 'thexia' and 'paralia'. But Oppia is not a Greek word, though it's from
-          a country that's not too far away. Try again?
+        feedback:
+        - That's a pretty good guess. Several Greek words end with 'ia', such as 'thexia'
+          and 'paralia'. But Oppia is not a Greek word, though it's from a country
+          that's not too far away. Try again?
         inputs:
           x: greek
         name: equals(x)
         param_changes: {}
       - dest: What country
-        feedback: 'There is indeed an ancient Roman law named Lex Oppia, which was
-          instituted by Gaius Oppius, a friend of Julius Caesar. But this isn''t where
-          our word comes from, and Oppius isn''t the language (or person) that we''re
-          looking for.
+        feedback:
+        - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
+          by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
+          comes from, and Oppius isn''t the language (or person) that we''re looking
+          for.
 
 
           <br><br>
@@ -216,10 +232,11 @@ What country:
         name: contains(x)
         param_changes: {}
       - dest: What country
-        feedback: 'There is indeed an ancient Roman law named Lex Oppia, which was
-          instituted by Gaius Oppius, a friend of Julius Caesar. But this isn''t where
-          our word comes from, and Oppius isn''t the language (or person) that we''re
-          looking for.
+        feedback:
+        - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
+          by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
+          comes from, and Oppius isn''t the language (or person) that we''re looking
+          for.
 
 
           <br><br>
@@ -233,27 +250,31 @@ What country:
         name: contains(x)
         param_changes: {}
       - dest: What country
-        feedback: That's not it, alas. But you're very close! Oppia is indeed a Nordic
-          word, but it's not from Sweden.
+        feedback:
+        - That's not it, alas. But you're very close! Oppia is indeed a Nordic word,
+          but it's not from Sweden.
         inputs:
           x: Swedish
         name: equals(x)
         param_changes: {}
       - dest: What country
-        feedback: 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into
-          a search engine, such as Google.'
+        feedback:
+        - 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into a search
+          engine, such as Google.'
         inputs:
           x: translate oppia
         name: contains(x)
         param_changes: {}
       - dest: What country
-        feedback: Not quite; that's actually the opposite of 'start'. Check your spelling!
+        feedback:
+        - Not quite; that's actually the opposite of 'start'. Check your spelling!
         inputs:
           x: finish
         name: equals(x)
         param_changes: {}
       - dest: Numeric input
-        feedback: 'Yes! Oppia is the Finnish word for learn.<br><br>
+        feedback:
+        - 'Yes! Oppia is the Finnish word for learn.<br><br>
 
 
           As you can see, you''re not limited to multiple-choice questions here. For
@@ -265,23 +286,25 @@ What country:
         name: case_sensitive_equals(x)
         param_changes: {}
       - dest: What country
-        feedback: (In general, the name of a language is a proper noun, so it should
-          start with a capital letter. Please could you fix that?)
+        feedback:
+        - (In general, the name of a language is a proper noun, so it should start
+          with a capital letter. Please could you fix that?)
         inputs:
           x: finnish
         name: equals(x)
         param_changes: {}
       - dest: What country
-        feedback: I think your spelling isn't quite right; you might want to check
-          it.
+        feedback:
+        - I think your spelling isn't quite right; you might want to check it.
         inputs:
           x: finnish
         name: fuzzy_equals(x)
         param_changes: {}
       - dest: What country
-        feedback: Actually, that's not where we got it from. But you can
-          find out lots of things on the Web. Why not try doing a search for [translate
-          oppia] on your favorite search engine?
+        feedback:
+        - Actually, that's not where we got it from. But you can find out lots of
+          things on the Web. Why not try doing a search for [translate oppia] on your
+          favorite search engine?
         inputs: {}
         name: Default
         param_changes: {}

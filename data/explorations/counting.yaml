@@ -4,21 +4,23 @@ Question:
     value: How many ways are there to arrange three balls in a row?
   param_changes: {}
   widget:
-    widget_id: NumericInput
-    params:
-      placeholder: 0
     handlers:
     - name: submit
       rules:
       - dest: Prompt for explanation
-        feedback: ''
+        feedback: []
         inputs:
           x: '6'
         name: equals(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: 0
+    widget_id: NumericInput
 List the ways:
   content:
   - type: text
@@ -30,14 +32,12 @@ List the ways:
       are the other ways?</div></div>
   param_changes: {}
   widget:
-    widget_id: SetInput
-    params: {}
     handlers:
     - name: submit
       rules:
       - dest: List the ways
-        feedback: 'What? No more ways? There''s at least one, surely -- for example,
-          RYB.
+        feedback:
+        - 'What? No more ways? There''s at least one, surely -- for example, RYB.
 
 
           Or maybe you clicked the ''Submit'' button before you clicked the ''Add
@@ -46,14 +46,18 @@ List the ways:
         inputs:
           x: []
         name: equals(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: We've already counted RBY, so let's not do it again.
+        feedback:
+        - We've already counted RBY, so let's not do it again.
         inputs:
           x:
           - RBY
         name: has_elements_in(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: It looks like at least one of your list elements is invalid...
+        feedback:
+        - It looks like at least one of your list elements is invalid...
         inputs:
           x:
           - RYB
@@ -62,8 +66,9 @@ List the ways:
           - YRB
           - YBR
         name: has_elements_not_in(x)
+        param_changes: {}
       - dest: Prompt for explanation with all ways listed
-        feedback: null
+        feedback: []
         inputs:
           x:
           - RYB
@@ -72,8 +77,10 @@ List the ways:
           - YRB
           - YBR
         name: equals(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: Sorry about this, but please could you enter your answer using uppercase
+        feedback:
+        - Sorry about this, but please could you enter your answer using uppercase
           letters (as in the example)?
         inputs:
           x:
@@ -84,22 +91,28 @@ List the ways:
           - yrb
           - ybr
         name: has_elements_in(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: How about arrangements in which the yellow ball is on the left?
+        feedback:
+        - How about arrangements in which the yellow ball is on the left?
         inputs:
           x:
           - YBR
           - YRB
         name: is_disjoint_from(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: How about arrangements for which the blue ball is on the left?
+        feedback:
+        - How about arrangements for which the blue ball is on the left?
         inputs:
           x:
           - BRY
           - BYR
         name: is_disjoint_from(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: I think you've missed some...
+        feedback:
+        - I think you've missed some...
         inputs:
           x:
           - RYB
@@ -108,26 +121,32 @@ List the ways:
           - BRY
           - BYR
         name: is_subset_of(x)
+        param_changes: {}
       - dest: List the ways
-        feedback: Sorry, I don't think that's right. Try again?
+        feedback:
+        - Sorry, I don't think that's right. Try again?
         inputs: {}
         name: Default
+        param_changes: {}
+    params: {}
+    widget_id: SetInput
 Prompt for explanation:
   content:
   - type: text
     value: OK, why do you think it is 6?
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: END
-        feedback: ''
+        feedback: []
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput
 Prompt for explanation with all ways listed:
   content:
   - type: text
@@ -135,14 +154,15 @@ Prompt for explanation with all ways listed:
       know?</div>
   param_changes: {}
   widget:
-    widget_id: TextInput
-    params:
-      placeholder: Type your answer here.
     handlers:
     - name: submit
       rules:
       - dest: END
-        feedback: 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and
-          YBR. Great!'
+        feedback:
+        - 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and YBR. Great!'
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      placeholder: Type your answer here.
+    widget_id: TextInput

@@ -23,36 +23,46 @@ Main window:
     - E5
     - F5
   widget:
-    widget_id: MusicStaff
-    params:
-      noteToGuess: '{{noteStart}}'
-      notesToPlayAtStart: []
-      previousAnswer: '{{answer}}'
     handlers:
     - name: submit
       rules:
       - dest: END
-        feedback: Yay, that's correct!
+        feedback:
+        - Yay, that's correct!
         inputs:
           x: '{{noteStart}}'
         name: equals(x)
+        param_changes: {}
       - dest: Main window
-        feedback: No, but you're very close!
+        feedback:
+        - No, but you're very close!
         inputs:
           tol: '1'
           x: '{{noteStart}}'
         name: is_within_tolerance(x, tol)
+        param_changes: {}
       - dest: Main window
-        feedback: I think the original note is higher.
+        feedback:
+        - I think the original note is higher.
         inputs:
           x: '{{noteStart}}'
         name: is_less_than(x)
+        param_changes: {}
       - dest: Main window
-        feedback: I think the original pitch is lower.
+        feedback:
+        - I think the original pitch is lower.
         inputs:
           x: '{{noteStart}}'
         name: is_greater_than(x)
+        param_changes: {}
       - dest: Main window
-        feedback: That's not right. Why not try again?
+        feedback:
+        - That's not right. Why not try again?
         inputs: {}
         name: Default
+        param_changes: {}
+    params:
+      noteToGuess: '{{noteStart}}'
+      notesToPlayAtStart: []
+      previousAnswer: '{{answer}}'
+    widget_id: MusicStaff
