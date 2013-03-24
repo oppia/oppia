@@ -1,4 +1,4 @@
-<div ng-controller="InteractiveWidgetPreview">
+<div ng-controller="InteractiveWidgetPreview" class="oppia-iframe-container">
   <span class="pull-right">
     <span ng-hide="isEmpty(interactiveWidget.params)">
       <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
@@ -114,77 +114,77 @@
     </div>
   </div>
 
-    <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
-      <div class="modal-header">
-        <span ng-show="addRuleActionIndex">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-            &times;
+  <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
+    <div class="modal-header">
+      <span ng-show="addRuleActionIndex">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          &times;
+        </button>
+      </span>
+      <h3><[addRuleModalTitle]></h3>
+    </div>
+
+    <div class="modal-body">
+      <h4><[addRuleAction.type]></h4>
+
+      <div ng-hide="addRuleActionRule">
+        <div ng-repeat="(rule, attrs) in interactiveWidget.actions[addRuleAction].rules"
+             class="oppia-rule">
+          <span ng-bind-html="rule | bracesToText"></span>
+          <button type="button" class="pull-right"
+                  ng-click="selectRule(rule, attrs)">
+            Select
           </button>
-        </span>
-        <h3><[addRuleModalTitle]></h3>
-      </div>
-  
-      <div class="modal-body">
-        <h4><[addRuleAction.type]></h4>
-
-        <div ng-hide="addRuleActionRule">
-          <div ng-repeat="(rule, attrs) in interactiveWidget.actions[addRuleAction].rules"
-               class="oppia-rule">
-            <span ng-bind-html="rule | bracesToText"></span>
-            <button type="button" class="pull-right"
-                    ng-click="selectRule(rule, attrs)">
-              Select
-            </button>
-          </div>
-        </div>
-  
-        <div ng-show="addRuleActionRule">
-          <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveParams.choices"></span>
-
-          <hr>
-          <div>
-            Destination:
-            <select ng-model="addRuleActionDest"
-                    ng-required="addRuleActionDest != '?'"
-                    ng-options="getDestName(id) for id in getAllDests()">
-            </select>
-  
-            <input ng-model="addRuleActionDestNew"
-                   ng-show="addRuleActionDest == '?'" type="text" ng-required="addRuleActionDest == '?'">
-          </div>
-          <div>
-            <p>In response to the reader's answer, display the text:</p>
-            <textarea rows="10" cols="50" ng-model="addRuleActionFeedback"></textarea>
-          </div>
-          <!-- TODO(yanamal): Add a section for parameter changes here. -->
         </div>
       </div>
-  
-      <div class="modal-footer">
-        <span ng-show="addRuleActionRule">
-          <button type="button"
-                  ng-click="saveRule(addRuleActionRule, addRuleActionAttrs,
-                            addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
-            Save
-          </button>
-        </span>
 
-        <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
-        returns to the 'previous' screen only when a new rule is being added. Otherwise, the modal
-        should just be dismissed. -->
-        <span ng-show="addRuleActionRule && addRuleActionIndex == null">
-          <button type="button" class="btn" ng-click="deselectAllRules()">
-            Cancel
-          </button>
-        </span>
+      <div ng-show="addRuleActionRule">
+        <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveParams.choices"></span>
+
+        <hr>
+        <div>
+          Destination:
+          <select ng-model="addRuleActionDest"
+                  ng-required="addRuleActionDest != '?'"
+                  ng-options="getDestName(id) for id in getAllDests()">
+          </select>
   
-        <span ng-show="!addRuleActionRule && addRuleActionIndex == null">
-          <button type="button" class="btn" data-dismiss="modal">
-            Cancel
-          </button>
-        </span>
+          <input ng-model="addRuleActionDestNew"
+                 ng-show="addRuleActionDest == '?'" type="text" ng-required="addRuleActionDest == '?'">
+        </div>
+        <div>
+          <p>In response to the reader's answer, display the text:</p>
+          <textarea rows="10" cols="50" ng-model="addRuleActionFeedback"></textarea>
+        </div>
+        <!-- TODO(yanamal): Add a section for parameter changes here. -->
       </div>
     </div>
+  
+    <div class="modal-footer">
+      <span ng-show="addRuleActionRule">
+        <button type="button"
+                ng-click="saveRule(addRuleActionRule, addRuleActionAttrs,
+                          addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
+          Save
+        </button>
+      </span>
+
+      <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
+      returns to the 'previous' screen only when a new rule is being added. Otherwise, the modal
+      should just be dismissed. -->
+      <span ng-show="addRuleActionRule && addRuleActionIndex == null">
+        <button type="button" class="btn" ng-click="deselectAllRules()">
+          Cancel
+        </button>
+      </span>
+  
+      <span ng-show="!addRuleActionRule && addRuleActionIndex == null">
+        <button type="button" class="btn" data-dismiss="modal">
+          Cancel
+        </button>
+      </span>
+    </div>
+  </div>
 
 </div>
 

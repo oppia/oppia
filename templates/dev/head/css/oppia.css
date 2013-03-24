@@ -14,6 +14,18 @@
   limitations under the License.
 */
 
+@-ms-viewport {
+  width: device-width; zoom: 1; user-zoom: zoom;
+}
+
+@-o-viewport {
+  width: device-width; zoom: 1; user-zoom: zoom;
+}
+
+@viewport {
+  width: device-width; zoom: 1; user-zoom: zoom;
+}
+
 html {
   height: 100%;
 }
@@ -21,6 +33,15 @@ html {
 body {
   height: 100%;
   margin: 0 auto;
+}
+
+/*
+  The following rule ensures that, as the viewport gets
+  smaller, any media will scale down according to its
+  container's width.
+*/
+img, video, canvas {
+  max-width: 100%
 }
 
 textarea {
@@ -33,8 +54,18 @@ textarea.oppia-code {
 
 .oppia-content {
   margin: 0 auto;
-  width: 98%;
   max-width: 700px;
+  -webkit-overflow-scrolling: touch;
+  width: 98%;
+}
+
+.oppia-exploration {
+  padding: 5px;
+  width: 98%;
+}
+
+.oppia-iframe-container {
+  -webkit-overflow-scrolling: touch;
 }
 
 .oppia-alert-blocks {
@@ -68,10 +99,6 @@ textarea.oppia-code {
   background: rgb(255, 177, 84);
 }
 
-.oppia-exploration {
-  padding: 5px;
-  width: 98%;
-}
 
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
