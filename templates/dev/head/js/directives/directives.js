@@ -21,7 +21,7 @@
 oppia.directive('list', function (warningsData) {
   return {
     restrict: 'E',
-    scope: {items: '='},
+    scope: {items: '=', largeInput: '@'},
     templateUrl: '/templates/list',
     controller: function ($scope, $http, $attrs) {
 

@@ -216,6 +216,8 @@ class RandomExplorationPage(BaseHandler):
 
         # Don't use the default exploration; users will have seen that already
         # on the main page.
+        # TODO(sll): Is the first exploration in the list always the default
+        # one?
         selected_exploration = random.choice(explorations[1:])
 
         self.redirect('/learn/%s' % selected_exploration.id)

@@ -7,13 +7,18 @@
     <li ng-repeat="item in items">
       <[item]> (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
       <span ng-show="activeItem == $index">
-        <input type="text" ng-model="replacementItem"
-               placeholder="Replacement Item">
+        <input ng-hide="largeInput" type="text" ng-model="replacementItem" placeholder="Replacement Item">
+        <textarea ng-show="largeInput" ng-model="replacementItem" placeholder="Replacement Item">
+        </textarea>
+        <span ng-show="inputSize == 'small'">
+          <input type="text" ng-model="replacementItem" placeholder="Replacement Item">
+        </span>
         <button type="button" ng-click="replaceItem($index, replacementItem)">Replace</button>
       </span>
     </li>
   </ol>
-  
-  <input type="text" ng-model="newItem" placeholder="Add New List Element">
+
+  <input ng-hide="largeInput" type="text" ng-model="newItem" placeholder="Add New List Item">
+  <textarea ng-show="largeInput" ng-model="newItem" placeholder="Add New List Item"></textarea>
   <button type="button" ng-click="addItem(newItem)">Add List Element</button>
 </div>

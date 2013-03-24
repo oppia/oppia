@@ -153,8 +153,8 @@
                  ng-show="addRuleActionDest == '?'" type="text" ng-required="addRuleActionDest == '?'">
         </div>
         <div>
-          <p>In response to the reader's answer, display the text:</p>
-          <textarea rows="10" cols="50" ng-model="addRuleActionFeedback"></textarea>
+          <p>Feedback for the reader (chosen at random from the following):</p>
+          <list large-input="true" items="addRuleActionFeedback">
         </div>
         <!-- TODO(yanamal): Add a section for parameter changes here. -->
       </div>

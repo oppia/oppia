@@ -126,7 +126,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
     $scope.addRuleActionDestNew = '';
-    $scope.addRuleActionFeedback = null;
+    $scope.addRuleActionFeedback = [];
     $scope.addRuleActionParamChanges = null;
   };
 
@@ -276,7 +276,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         'attrs': {},
         'inputs': {},
         'dest': $scope.stateId,
-        'feedback': '',
+        'feedback': [],
         'paramChanges': []
       }]};
     }

@@ -141,7 +141,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
-        $scope.createRequest(propertyValueMap),
+        $.param({payload: JSON.stringify(propertyValueMap)}, true),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       warningsData.clear();

@@ -22,6 +22,7 @@ import copy
 import importlib
 import logging
 import os
+import random
 
 from base_model import BaseModel
 from data.classifiers import normalizers
@@ -48,7 +49,7 @@ class Rule(ndb.Model):
     # The id of the destination state.
     dest = ndb.StringProperty()
     # Feedback to give the reader if this rule is triggered.
-    feedback = ndb.TextProperty(default='')
+    feedback = ndb.TextProperty(repeated=True)
     # Parameter changes to make if this rule is triggered.
     param_changes = ndb.JsonProperty(default={})
 
@@ -180,7 +181,7 @@ class State(BaseModel):
 
             for rule in handler['rules']:
                 rule_instance = Rule()
-                rule_instance.feedback = rule.get('feedback')
+                rule_instance.feedback = rule.get('feedback', [])
 
                 if rule['dest'] == feconf.END_DEST:
                     rule_instance.dest = feconf.END_DEST
@@ -279,6 +280,14 @@ class State(BaseModel):
                         # valid one from the relevant classifier.
                         pass
 
+                    if 'feedback' in rule:
+                        if not rule['feedback']:
+                            rule['feedback'] = []
+                        elif isinstance(rule['feedback'], basestring):
+                            rule['feedback'] = [rule['feedback']]
+                    else:
+                        rule['feedback'] = []
+
         return True, ''
 
     def transition(self, answer, params, interactive_widget_properties):
@@ -323,7 +332,7 @@ class State(BaseModel):
 
             if rule.name == 'Default':
                 dest_id = rule.dest
-                feedback = rule.feedback
+                feedback = random.choice(rule.feedback) if rule.feedback else ''
                 break
 
             # Add the 'answer' variable, and prepend classifier.
@@ -342,7 +351,7 @@ class State(BaseModel):
 
             if return_value:
                 dest_id = rule.dest
-                feedback = rule.feedback
+                feedback = random.choice(rule.feedback) if rule.feedback else ''
                 break
 
         return dest_id, feedback, default_recorded_answer
