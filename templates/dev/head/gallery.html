@@ -10,15 +10,6 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
 
-        <!--
-          <form class="oppia-form-search pull-right">
-            <div class="add-on">
-              <input type="text" placeholder="Search" class="input-medium search-query">
-              <i class="icon-search"></i>
-            </div>
-          </form>
-        -->
-
         {% if user %}
           <div class="pull-right">
             <button class="btn" ng-click="toggleExplorationView()">
@@ -27,7 +18,7 @@
           </div>
         {% endif %}
 
-        <h2><[getHeadingText()]></h2>
+        <h3 class="oppia-page-title"><[getHeadingText()]></h3>
 
         <div class="tabbable tabs-left" ui-if="categories">
           <ul class="nav nav-tabs" id="navTabs">
