@@ -24,98 +24,94 @@
   </head>
 
   <body ng-controller="Base">
-    <div>
-      <div class="oppia-main-body">
-        {% if not iframed %}
-          <!-- nav bar -->
-          <div class="navbar navbar-static-top">
-            <div class="navbar-inner">
-              <div class="container oppia-content">
-                <a class="brand" href="/">Oppia</a>
-                <ul class="nav">
-                  <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
-                    <a href="/gallery">Gallery</a>
-                  </li>
-                  {% if nav_mode == 'reader' %}
-                    <li class="active">
-                      <a href="">Learn</a>
-                    </li>
-                  {% endif %}
-                  {% if nav_mode == 'editor' %}
-                    <li class="active">
-                      <a href="">Create</a>
-                    </li>
-                  {% endif %}
-                </ul>
-                <ul class="nav pull-right">
-                  {% if nav_mode != 'feedback' %}
-                    <li>
-                      <a href="" ng-click="openFeedbackPage()">
-                        Give Feedback
-                      </a>
-                    </li>
-                  {% else %}
-                    <li class="active">
-                      <a href="">Give Feedback</a>
-                    </li>
-                  {% endif %}
-
-                  {% if user %}
-                    <li>
-                      &nbsp;
-                      <span class="navbar-text">
-                        {{user}}
-                        {% if is_admin %}
-                          (Admin)
-                        {% endif %}
-                      </span>
-                    </li>
-                    <li>
-                      <a href="{{logout_url}}">Logout</a>
-                    </li>
-                  {% else %}
-                    <li>
-                      <a href="{{login_url}}">Login</a>
-                    </li>
-                  {% endif %}
-                </ul>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-
-        <div ng-cloak>
-          <div class="oppia-alert-blocks">
-            <div ng-repeat="warning in (warningsData.warnings | limitTo:5)">
-              <p class="alert alert-block">
-                <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-                <strong>Warning!</strong>
-                <[warning]>
-              </p>
-            </div>
-          </div>
-        
-          {% block content %}{% endblock %}
-        </div>
-      </div>
-
-      <br><br>
-
+    <div class="oppia-main-body">
       {% if not iframed %}
-        <div class="navbar oppia-footer">
-          <div class="oppia-content">
-            <ul class="nav">
-              <li>
-               <a href="/about">About Oppia</a>
-              </li>
-              <li>
-                <a href="/terms">Terms</a>
-              </li>
-            </ul>
+        <!-- nav bar -->
+        <div class="navbar navbar-static-top">
+          <div class="navbar-inner">
+            <div class="container oppia-content">
+              <a class="brand" href="/">Oppia</a>
+              <ul class="nav">
+                <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
+                  <a href="/gallery">Gallery</a>
+                </li>
+                {% if nav_mode == 'reader' %}
+                  <li class="active">
+                    <a href="">Learn</a>
+                  </li>
+                {% endif %}
+                {% if nav_mode == 'editor' %}
+                  <li class="active">
+                    <a href="">Create</a>
+                  </li>
+                {% endif %}
+              </ul>
+              <ul class="nav pull-right">
+                {% if nav_mode != 'feedback' %}
+                  <li>
+                    <a href="" ng-click="openFeedbackPage()">
+                      Give Feedback
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="active">
+                    <a href="">Give Feedback</a>
+                  </li>
+                {% endif %}
+                {% if user %}
+                  <li>
+                    &nbsp;
+                    <span class="navbar-text">
+                      {{user}}
+                      {% if is_admin %}
+                        (Admin)
+                      {% endif %}
+                    </span>
+                  </li>
+                  <li>
+                    <a href="{{logout_url}}">Logout</a>
+                  </li>
+                {% else %}
+                  <li>
+                    <a href="{{login_url}}">Login</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
         </div>
       {% endif %}
+
+      <div ng-cloak>
+        <div class="oppia-alert-blocks">
+          <div ng-repeat="warning in (warningsData.warnings | limitTo:5)">
+            <p class="alert alert-block">
+              <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+              <strong>Warning!</strong>
+              <[warning]>
+            </p>
+          </div>
+        </div>
+        {% block content %}{% endblock %}
+      </div>
     </div>
+
+    <br><br>
+
+    {% if not iframed %}
+      <div class="navbar oppia-footer">
+        <div class="oppia-content">
+          <ul class="nav">
+            <li>
+             <a href="/about">About Oppia</a>
+            </li>
+            <li>
+              <a href="/terms">Terms</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
 
     {% include 'footer_js_libs.html' %}
     <script src="/resources/footer_js"></script>
