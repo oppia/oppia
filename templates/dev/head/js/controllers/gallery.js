@@ -52,6 +52,10 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     $scope.categories = GalleryData.data.categories;
   });
 
+  $scope.isDemoServer = function() {
+    return location.host == 'oppiaserver.appspot.com';
+  };
+
   /**
    * Toggles the user's preference for whether to show just explorations he/she
    * can edit, or all explorations.
