@@ -63,7 +63,7 @@ class ImageHandler(BaseHandler):
         image = Image.get_by_id(image_id)
         if image:
             # TODO(sll): Support other image types.
-            self.response.headers['Content-Type'] = 'image/png'
+            self.response.headers['Content-Type'] = str('image/%s' % image.format)
             self.response.write(image.raw)
         else:
             self.response.write('No image')
@@ -72,10 +72,7 @@ class ImageHandler(BaseHandler):
         """Saves an image uploaded by a content creator."""
         raw = self.request.get('image')
         if raw:
-            image_id = utils.get_new_id(Image, '')
-            image_entity = Image(id=image_id, raw=raw)
-            image_entity.put()
-            self.response.write(json.dumps(
-                {'image_id': image_entity.id}))
+            image_id = Image.create(raw)
+            self.response.write(json.dumps({'image_id': image_id}))
         else:
             raise self.InvalidInputException('No image supplied')

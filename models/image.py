@@ -20,8 +20,9 @@ __author__ = 'Sean Lip'
 
 import imghdr
 
-import feconf
 from base_model import BaseModel
+import feconf
+import utils
 
 from google.appengine.ext import ndb
 
@@ -42,3 +43,15 @@ class Image(BaseModel):
     """An image."""
     # The raw image blob.
     raw = ImageProperty(required=True)
+    # The image file format. TODO(sll): auto-assign on put().
+    format = ndb.StringProperty(
+        choices=feconf.ACCEPTED_IMAGE_FORMATS, default='png')
+
+    @classmethod
+    def create(cls, raw):
+        """Creates a new Image object and returns its id."""
+        image_id = utils.get_new_id(cls, '')
+        format = imghdr.what(None, h=raw)
+        image_entity = cls(id=image_id, raw=raw, format=format)
+        image_entity.put()
+        return image_entity.id

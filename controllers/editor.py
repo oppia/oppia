@@ -219,7 +219,7 @@ class ExplorationHandler(BaseHandler):
             exploration.category = category
         if title:
             exploration.title = title
-        if 'image_id' in self.request.arguments():
+        if 'image_id' in payload:
             exploration.image_id = None if image_id == 'null' else image_id
         if editors:
             if user == exploration.owner:

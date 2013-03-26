@@ -45,13 +45,14 @@ IDEA_CONTRIBUTORS = [
 # is based on the index of the exploration in this list, so if you want to
 # add a new exploration and preserve the existing ids, add that exploration
 # to the end of the list.
-# Each item is represented as a tuple: (filename, title, category). Note
-# that the filename omits the .yaml suffix.
+# Each item is represented as a tuple: (filename, title, category, image_name).
+# The fourth element is optional. Note that the filename omits the .yaml suffix.
+# The images are in /data/images.
 DEMO_EXPLORATIONS = [
     ('welcome', 'Welcome to Oppia!', 'Other'),
-    ('pitch', 'Pitch Perfect', 'Music'),
-    ('counting', 'Three Balls', 'Mathematics'),
-    ('boot_verbs', 'Boot Verbs', 'Languages'),
+    ('pitch', 'Pitch Perfect', 'Music', 'pitch.png'),
+    ('counting', 'Three Balls', 'Mathematics', 'counting.png'),
+    ('boot_verbs', 'Boot Verbs', 'Languages', 'boot_verbs.png'),
     ('hola', '¡Hola!', 'Languages'),
 ]
 
@@ -81,6 +82,7 @@ THIRD_PARTY_DIR = 'third_party'
 # The directories containing sample classifiers, explorations and widgets.
 SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
+SAMPLE_IMAGES_DIR = 'data/images'
 SAMPLE_WIDGETS_DIR = 'data/widgets'
 
 # The jinja environment used for loading frontend templates.

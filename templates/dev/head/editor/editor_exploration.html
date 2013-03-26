@@ -22,22 +22,25 @@
 
             &nbsp;&nbsp;&nbsp;
 
-            <button type="button" ng-click="downloadExploration()">
-              Download A Copy
-            </button>
-            <img class="oppia-help" src="/images/help.png"
-                 ui-jq="tooltip"
-                 title="Download a copy of this exploration in plaintext format.">
+            <a class="btn" ng-click="downloadExploration()"
+               title="Download exploration as text.">
+              <i class="icon-download-alt"></i>
+            </a>
+
+            &nbsp;&nbsp;&nbsp;
+                           
+            <a class="btn" href="/stats/<[explorationId]>"
+               title="View exploration stats">
+              <i class="icon-signal"></i>
+            </a>
 
             &nbsp;&nbsp;&nbsp;
 
             <button type="button" class="btn btn-danger" data-toggle="modal"
-                    data-target="#deleteExplorationModal">
-              Delete
+                    data-target="#deleteExplorationModal"
+                    title="Delete this exploration">
+              <i class="icon-trash" title="Delete Exploration"></i>
             </button>
-            <img class="oppia-help" src="/images/help.png"
-                 ui-jq="tooltip"
-                 title="Delete this exploration. Warning: this action cannot be reversed!">
           </span>
 
           <h3>

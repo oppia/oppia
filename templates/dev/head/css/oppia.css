@@ -38,7 +38,6 @@ html {
 
 body {
   min-height: 95%;
-  max-height: 97%;
   margin: 0 auto;
 }
 
@@ -57,6 +56,22 @@ textarea {
 
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
+}
+
+.oppia-gallery-box {
+  border: 1px solid #CCC;
+  border-radius: 3px;
+  display: block;
+  float: left;
+  margin: 5px;
+  min-width: 160px;
+  padding: 2px 0;
+  width: 30%;
+}
+
+.oppia-gallery-title {
+  color: #888;
+  padding: 2px;
 }
 
 .oppia-page-title {
@@ -105,9 +120,9 @@ textarea {
 }
 
 .oppia-btn {
-  background-image: -webkit-linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
-  background-image: -moz-linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
-  background-image: linear-gradient(top, rgb(255, 204, 139), rgb(230, 167, 93));
+  background-image: -webkit-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
+  background-image: -moz-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
+  background-image: linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   color: #444;
   border-radius: 3px;
   font: bold 14px/20px Arial, sans-serif;
@@ -120,6 +135,9 @@ textarea {
   background: rgb(255, 177, 84);
 }
 
+.oppia-small-font {
+  font-size: 1.0em;
+}
 
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
@@ -144,6 +162,10 @@ textarea {
   margin: 10px;
   padding: 10px;
   width: 100%;
+}
+
+.oppia-gallery-block {
+  display: block;
 }
 
 .oppia-form-search {
@@ -281,7 +303,7 @@ textarea {
   height: 50px;
 }
 .oppia-large-image {
-  height: 100px;
+  width: 80px;
 }
 
 .oppia-thumbnail {

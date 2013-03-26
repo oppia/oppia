@@ -50,11 +50,6 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   $scope.$on('galleryData', function() {
     console.log(GalleryData.data.categories);
     $scope.categories = GalleryData.data.categories;
-    $scope.$apply();
-
-    if ($('#navTabs a[href="#My_Explorations"]')) {
-      $('#navTabs a[href="#My_Explorations"]').tab('show');
-    }
   });
 
   /**

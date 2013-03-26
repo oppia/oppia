@@ -59,7 +59,7 @@ class Exploration(BaseModel):
 
     @classmethod
     def create(cls, user, title, category, exploration_id,
-               init_state_name='Activity 1'):
+               init_state_name='Activity 1', image_id=None):
         """Creates and returns a new exploration."""
         if exploration_id is None:
             exploration_id = utils.get_new_id(Exploration, title)
@@ -71,7 +71,7 @@ class Exploration(BaseModel):
 
         exploration = Exploration(
             id=exploration_id, owner=user, title=title,
-            init_state=fake_state_key, category=category)
+            init_state=fake_state_key, category=category, image_id=image_id)
         exploration.put()
         new_init_state = State.create(state_id, exploration, init_state_name)
 

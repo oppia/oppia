@@ -21,6 +21,7 @@ import os
 import feconf
 from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
+from models.image import Image
 from models.widget import InteractiveWidget
 from models.widget import NonInteractiveWidget
 from models.state import State
@@ -87,10 +88,11 @@ def parse_content_into_html(content_array, block_number, params=None):
 
 
 def create_new_exploration(
-        user, title, category, exploration_id=None, init_state_name='Activity 1'):
+        user, title, category, exploration_id=None, init_state_name='Activity 1',
+        image_id=None):
     """Creates and returns a new exploration."""
     exploration = Exploration.create(
-        user, title, category, exploration_id, init_state_name)
+        user, title, category, exploration_id, init_state_name, image_id)
     if user:
         augmented_user = AugmentedUser.get(user)
         augmented_user.editable_explorations.append(exploration.key)
@@ -148,7 +150,7 @@ def check_can_edit(user, exploration):
 
 
 def create_exploration_from_yaml(
-        yaml_file, user, title, category, exploration_id=None):
+        yaml_file, user, title, category, exploration_id=None, image_id=None):
     """Creates an exploration from a YAML file."""
 
     yaml_file = yaml_file.strip()
@@ -162,7 +164,7 @@ def create_exploration_from_yaml(
 
     exploration = create_new_exploration(
         user, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name)
+        init_state_name=init_state_name, image_id=image_id)
 
     try:
         yaml_description = utils.get_dict_from_yaml(yaml_file)
@@ -192,19 +194,26 @@ def load_default_explorations():
     """Initializes the demo explorations."""
 
     for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
-        assert len(exploration) == 3
+        assert len(exploration) == 3 or len(exploration) == 4
 
         filename = '%s.yaml' % exploration[0]
         title = exploration[1]
         category = exploration[2]
+        image_filename = exploration[3] if len(exploration) == 4 else None
 
         with open(
                 os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)) as f:
             yaml_file = f.read().decode('utf-8')
 
+        image_id = None
+        if image_filename:
+            with open(os.path.join(feconf.SAMPLE_IMAGES_DIR, image_filename)) as f:
+                raw_image = f.read()
+            image_id = Image.create(raw_image)
+
         exploration = create_exploration_from_yaml(
             yaml_file=yaml_file, user=None, title=title, category=category,
-            exploration_id=str(index))
+            exploration_id=str(index), image_id=image_id)
         exploration.is_public = True
         exploration.put()
 
@@ -220,4 +229,3 @@ def ensure_default_data_is_loaded():
 
     if not Exploration.get('0'):
         load_default_explorations()
-

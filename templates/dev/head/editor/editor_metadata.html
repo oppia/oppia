@@ -43,12 +43,14 @@
 
   <span ui-if="explorationImageId">
     <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
-    <button ng-click="deleteExplorationImage()">
-      Revert to default image
+
+    <button type="button" class="btn" ng-click="deleteExplorationImage()"
+            title="Delete this image">
+      <i class="icon-trash"></i>
     </button>
   </span>
   <span ui-if="!explorationImageId">
-    <img class="oppia-small-image" src="/images/draft.png">
+    <em>No image supplied.</em>
     <form id="newImageForm">
       <input type="file" id="newImage" name="newImage" image-upload="true">
       <button type="button" ng-click="saveExplorationImage()">
