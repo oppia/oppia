@@ -37,8 +37,14 @@ html {
 }
 
 body {
-  min-height: 95%;
+  height: 100%;
   margin: 0 auto;
+  padding: 0;
+}
+
+#wrapper {
+  min-height: 100%;
+  position: relative;
 }
 
 /*
@@ -186,6 +192,7 @@ textarea {
   height: 100%;
   margin: 0 auto -4em;
   min-height: 100%;  
+  padding-bottom: 3em;
 }
 
 .oppia-footer {
