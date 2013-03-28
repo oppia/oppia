@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+import cgi
 import json
 
 from controllers.base import BaseHandler
@@ -151,7 +152,7 @@ class ExplorationHandler(BaseHandler):
             # This leads to a FINISHED state.
             if feedback:
                 action_html, action_widgets = controller_utils.parse_content_into_html(
-                    [Content(type='text', value=feedback)],
+                    [Content(type='text', value=cgi.escape(feedback))],
                     block_number,
                     params)
                 html_output += action_html
@@ -163,7 +164,7 @@ class ExplorationHandler(BaseHandler):
             # Append Oppia's feedback, if any.
             if feedback:
                 action_html, action_widgets = controller_utils.parse_content_into_html(
-                    [Content(type='text', value=feedback)],
+                    [Content(type='text', value=cgi.escape(feedback))],
                     block_number,
                     params)
                 html_output += action_html
