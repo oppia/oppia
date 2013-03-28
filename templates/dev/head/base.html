@@ -116,6 +116,6 @@
 
     {% include 'footer_js_libs.html' %}
     <script src="/resources/footer_js"></script>
-    <script type="text/javascript" async>{{js}}</script>
+    <script type="text/javascript" async>{{js | safe}}</script>
   </body>
 </html>

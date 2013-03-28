@@ -92,6 +92,7 @@ class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def jinja2_env(self):
         return jinja2.Environment(
+            autoescape=True,
             loader=jinja2.FileSystemLoader(feconf.TEMPLATE_DIR))
 
     def __init__(self, request, response):

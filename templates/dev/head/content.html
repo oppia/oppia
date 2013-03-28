@@ -1,5 +1,5 @@
 {% if type == 'text' %}
-  <div>{{value}}</div>
+  <div>{{value | safe}}</div>
 {% elif type == 'image' %}
   <div>
     <img ng-src="/imagehandler/{{value}}">
