@@ -113,6 +113,15 @@ def get_js_controllers(filenames):
     ])
 
 
+def js_escape(string):
+    """Escapes a string so it can be safely inserted into JavaScript code."""
+    if not string:
+        return string
+    return string.replace('\\', '\\\\').replace('"', '\\"').replace(
+        "'", "\\'").replace('\n', '\\n').replace('\r', '\\r').replace(
+            '\b', '\\b')
+
+
 def convert_to_js_string(value):
     """Converts a value to a unicode string without extra 'u' characters."""
 
@@ -122,10 +131,10 @@ def convert_to_js_string(value):
         if (isinstance(value, int) or isinstance(value, float)):
             return '%s%s' % (built_string, value)
         elif isinstance(value, unicode):
-            return "%s'%s'" % (built_string, value.replace("'", "\\'"))
+            return "%s'%s'" % (built_string, js_escape(value))
         elif isinstance(value, str):
             return u"%s'%s'" % (
-                built_string, value.decode('utf-8').replace("'", "\\'"))
+                built_string, js_escape(value.decode('utf-8')))
         elif isinstance(value, list) or isinstance(value, set):
             string = u'['
             for index, item in enumerate(value):
