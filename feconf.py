@@ -62,13 +62,9 @@ assert DEMO_EXPLORATIONS
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# Whether we are running in production mode.
-PRODUCTION_MODE = False
-
 # Whether we should serve the development or production experience.
 DEV = (os.environ.get('SERVER_SOFTWARE')
-       and os.environ['SERVER_SOFTWARE'].startswith('Development')
-       and not PRODUCTION_MODE)
+       and os.environ['SERVER_SOFTWARE'].startswith('Development'))
 
 # The directory containing the HTML/JS/CSS templates.
 TEMPLATE_DIR = os.path.join(
@@ -114,3 +110,6 @@ END_DEST = 'END'
 DEFAULT_FILE_NAME = 'New file'
 
 ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
+
+# Set this to True to allow file uploads via YAML in the gallery and editor pages.
+ALLOW_YAML_FILE_UPLOAD = False

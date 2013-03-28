@@ -91,7 +91,7 @@ class NewExploration(BaseHandler):
 
         yaml = self.request.get('yaml')
 
-        if yaml:
+        if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
             exploration = controller_utils.create_exploration_from_yaml(
                 yaml_file=yaml, user=user, title=title, category=category)
         else:
@@ -276,7 +276,7 @@ class StateHandler(BaseHandler):
         payload = json.loads(self.request.get('payload'))
 
         yaml_file = payload.get('yaml_file')
-        if yaml_file:
+        if yaml_file and feconf.ALLOW_YAML_FILE_UPLOAD:
             # The user has uploaded a YAML file. Process only this action.
             state = State.modify_using_dict(
                 exploration, state,

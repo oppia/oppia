@@ -132,14 +132,16 @@
 
             <br>
 
-            <label>
-              (Optional) Upload an existing exploration (YAML file)?
-              <input type="checkbox" ng-model="includeYamlFile">
-            </label>
-            <div ng-show="includeYamlFile">
-              Upload file:
-              <input id="newFileInput" type="file" file-upload="true">
-            </div>
+            {% if allow_yaml_file_upload %}
+              <label>
+                (Optional) Upload an existing exploration (YAML file)?
+                <input type="checkbox" ng-model="includeYamlFile">
+              </label>
+              <div ng-show="includeYamlFile">
+                Upload file:
+                <input id="newFileInput" type="file" file-upload="true">
+              </div>
+            {% endif %}
           </div>
 
           <div class="modal-footer">

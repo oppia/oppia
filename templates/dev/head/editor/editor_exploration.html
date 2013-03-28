@@ -101,24 +101,27 @@
                   </div>
 
                   <div class="span5">
-                    <div class="pull-right">
-                      <span ng-show="getMode() == 'gui'">
-                        Graphical Editor | 
-                      </span>
-                      <span ng-hide="getMode() == 'gui'">
-                        <a ng-click="changeMode('gui')">Graphical Editor</a> |
-                      </span>
-  
-                      <span ng-show="getMode() == 'text'">
-                        Plaintext Editor
-                        <img class="oppia-help" src="/images/help.png"
-                             ui-jq="tooltip"
-                             title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
-                      </span>
-                      <span ng-hide="getMode() == 'text'">
-                        <a ng-click="changeMode('text')">Plaintext Editor</a>
-                      </span>
-                    </div>
+
+                    {% if allow_yaml_file_upload %}  
+                      <div class="pull-right">
+                        <span ng-show="getMode() == 'gui'">
+                          Graphical Editor | 
+                        </span>
+                        <span ng-hide="getMode() == 'gui'">
+                          <a ng-click="changeMode('gui')">Graphical Editor</a> |
+                        </span>
+
+                        <span ng-show="getMode() == 'text'">
+                          Plaintext Editor
+                          <img class="oppia-help" src="/images/help.png"
+                               ui-jq="tooltip"
+                               title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
+                        </span>
+                        <span ng-hide="getMode() == 'text'">
+                          <a ng-click="changeMode('text')">Plaintext Editor</a>
+                        </span>
+                      </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>

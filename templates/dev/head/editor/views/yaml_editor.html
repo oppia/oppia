@@ -1,14 +1,21 @@
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span11">
-      <br>
-      Enter a description of this state below.
-      <button type="button" ng-click="saveState(yaml)">
-        Save
-      </button>
-
-      <br><br>
-      <textarea rows="40" ng-model="yaml" class="oppia-code"></textarea>
+      {% if allow_yaml_file_upload %}
+        <br>
+        Enter a description of this state below.
+        <button type="button" ng-click="saveState(yaml)">
+          Save
+        </button>
+  
+        <br><br>
+        <textarea rows="40" ng-model="yaml" class="oppia-code"></textarea>
+      {% else %}
+        <p>
+          The YAML state editor is disabled for this application.
+        </p>
+      {% endif %}      
     </div>
   </div>
 </div>

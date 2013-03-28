@@ -22,7 +22,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.$parent.stateId = $routeParams.stateId;
 
   $scope.init = function(data) {
-    $scope.content = data.content;
+    $scope.content = data.content || [];
     $scope.paramChanges = data.param_changes || [];
 
     console.log('Content updated.');

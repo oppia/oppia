@@ -101,6 +101,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {
             'debug': feconf.DEBUG,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
         }
 
         user = users.get_current_user()
