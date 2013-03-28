@@ -117,6 +117,10 @@ class BaseHandler(webapp2.RequestHandler):
         if values is None:
             values = self.values
 
+        self.response.cache_control.no_cache = True
+        self.response.cache_control.must_revalidate = True
+        self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
+        self.response.pragma = 'no-cache'
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
 

@@ -18,7 +18,8 @@ handlers:
   upload: static/images/favicon.ico
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=600'
+    Cache-Control: 'public, max-age=2592000'
+    Vary: Accept-Encoding
 - url: /images
   static_dir: static/images
   secure: always
@@ -34,13 +35,13 @@ handlers:
   static_dir: third_party/bootstrap/img
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=3153600'
+    Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=3153600'
+    Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /data/widgets/(.*)/static/(.*)
   static_files: data/widgets/\1/static/\2
