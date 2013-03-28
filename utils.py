@@ -22,6 +22,7 @@ import hashlib
 import json
 import logging
 import os
+import random
 import unicodedata
 import yaml
 
@@ -276,3 +277,19 @@ def recursively_remove_key(d, key_to_remove):
             del d[key_to_remove]
         for key, unused_value in d.items():
             recursively_remove_key(d[key], key_to_remove)
+
+
+def get_random_int(upper_bound):
+    """Returns a random integer in [0, upper_bound)."""
+    assert upper_bound >= 0 and isinstance(upper_bound, int)
+
+    generator = random.SystemRandom()
+    return generator.randrange(0, upper_bound)
+
+
+def get_random_choice(alist):
+    """Gets a random element from a list."""
+    assert isinstance(alist, list) and len(alist) > 0
+
+    index = get_random_int(len(alist))
+    return alist[index]

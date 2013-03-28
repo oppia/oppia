@@ -22,7 +22,6 @@ import copy
 import importlib
 import logging
 import os
-import random
 
 from base_model import BaseModel
 from data.classifiers import normalizers
@@ -332,7 +331,8 @@ class State(BaseModel):
 
             if rule.name == 'Default':
                 dest_id = rule.dest
-                feedback = random.choice(rule.feedback) if rule.feedback else ''
+                feedback = (utils.get_random_choice(rule.feedback)
+                            if rule.feedback else '')
                 break
 
             # Add the 'answer' variable, and prepend classifier.
@@ -351,7 +351,8 @@ class State(BaseModel):
 
             if return_value:
                 dest_id = rule.dest
-                feedback = random.choice(rule.feedback) if rule.feedback else ''
+                feedback = (utils.get_random_choice(rule.feedback)
+                            if rule.feedback else '')
                 break
 
         return dest_id, feedback, default_recorded_answer

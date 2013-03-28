@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import random
 
 from controllers.base import BaseHandler
 from models.widget import InteractiveWidget
@@ -97,7 +96,7 @@ class InteractiveWidgetHandler(BaseHandler):
         if state_params_given:
             for (key, values) in state_params_given.iteritems():
                 # Pick a random parameter for each key.
-                state_params_dict[key] = random.choice(values)
+                state_params_dict[key] = utils.get_random_choice(values)
 
         response = InteractiveWidget.get_with_params(
             widget_id, params=utils.parse_dict_with_params(

@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 import json
-import random
 
 from controllers.base import BaseHandler
 import controller_utils
@@ -69,7 +68,7 @@ class ExplorationHandler(BaseHandler):
         for (key, values) in state.param_changes.iteritems():
             if key not in existing_params:
                 # Pick a random parameter for this key.
-                existing_params[key] = random.choice(values)
+                existing_params[key] = utils.get_random_choice(values)
         return existing_params
 
     def get(self, exploration_id):
@@ -218,6 +217,6 @@ class RandomExplorationPage(BaseHandler):
         # on the main page.
         # TODO(sll): Is the first exploration in the list always the default
         # one?
-        selected_exploration = random.choice(explorations[1:])
+        selected_exploration = utils.get_random_choice(explorations[1:])
 
         self.redirect('/learn/%s' % selected_exploration.id)
