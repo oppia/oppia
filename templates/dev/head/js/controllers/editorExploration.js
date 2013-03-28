@@ -252,7 +252,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
-    $scope.explorationOwner = data.owner;
     $scope.explorationEditors = data.editors;
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;

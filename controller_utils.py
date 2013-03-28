@@ -19,7 +19,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 import os
 
 import feconf
-from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 from models.image import Image
 from models.widget import InteractiveWidget
@@ -93,21 +92,11 @@ def create_new_exploration(
     """Creates and returns a new exploration."""
     exploration = Exploration.create(
         user, title, category, exploration_id, init_state_name, image_id)
-    if user:
-        augmented_user = AugmentedUser.get(user)
-        augmented_user.editable_explorations.append(exploration.key)
-        augmented_user.put()
     return exploration
 
 
 def delete_exploration(exploration):
     """Deletes an exploration."""
-    augmented_users = AugmentedUser.query().filter(
-        AugmentedUser.editable_explorations == exploration.key)
-    for augmented_user in augmented_users:
-        augmented_user.editable_explorations.remove(exploration.key)
-        augmented_user.put()
-
     exploration.delete()
 
 
@@ -144,9 +133,7 @@ def check_existence_of_name(entity, name, ancestor=None):
 
 def check_can_edit(user, exploration):
     """Checks whether the current user has rights to edit this exploration."""
-    return (users.is_current_user_admin() or
-            user.email() in exploration.editors or
-            exploration.key in AugmentedUser.get(user).editable_explorations)
+    return users.is_current_user_admin() or user in exploration.editors
 
 
 def create_exploration_from_yaml(

@@ -8,16 +8,20 @@
   <input type="text" ng-model="explorationCategory" ng-model-onblur>
 </div>
 
-<div>
+<div ng-show="explorationEditors">
   <h4>Collaborators</h4>
   <ul>
-    <li><em><[explorationOwner]></em></li>
     <li ng-repeat="editor in explorationEditors">
-      <[editor]>
+      <span ng-show="$index == 0">
+        <em><[editor]></em>
+      </span>
+      <span ng-hide="$index == 0">
+        <[editor]>
+      </span>
     </li>
   </ul>
 
-  <div ng-show="currentUser == explorationOwner">
+  <div ng-show="currentUser == explorationEditors[0]">
     <button type="button" ng-click="openAddNewEditorForm()"
             ng-hide="activeInputData.name == 'addNewEditor'">
       Add Collaborator

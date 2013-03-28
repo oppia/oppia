@@ -25,7 +25,6 @@ from controllers.base import require_user
 import controller_utils
 from data.classifiers import normalizers
 import feconf
-from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 from models.exploration import Parameter
 from models.state import AnswerHandlerInstance
@@ -174,8 +173,7 @@ class ExplorationHandler(BaseHandler):
             'image_id': exploration.image_id,
             'category': exploration.category,
             'title': exploration.title,
-            'owner': str(exploration.owner),
-            'editors': exploration.editors,
+            'editors': [editor.email() for editor in exploration.editors],
             'states': state_list,
             'parameters': parameters,
         })
@@ -222,16 +220,11 @@ class ExplorationHandler(BaseHandler):
         if 'image_id' in payload:
             exploration.image_id = None if image_id == 'null' else image_id
         if editors:
-            if user == exploration.owner:
-                exploration.editors = editors
+            if exploration.editors and user == exploration.editors[0]:
+                exploration.editors = []
                 for email in editors:
                     editor = users.User(email=email)
-                    augmented_user = AugmentedUser.get(editor)
-                    if (exploration.key not in
-                            augmented_user.editable_explorations):
-                        augmented_user.editable_explorations.append(
-                            exploration.key)
-                        augmented_user.put()
+                    exploration.editors.append(editor)
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')

@@ -37,8 +37,6 @@ class Parameter(ndb.Model):
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(BaseModel):
     """An exploration (which is made up of several states)."""
-    # The original creator of this exploration.
-    owner = ndb.UserProperty()
     # The category this exploration belongs to.
     # TODO(sll): Should this be a 'repeated' property?
     category = ndb.StringProperty(required=True)
@@ -55,7 +53,8 @@ class Exploration(BaseModel):
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
     # List of email addresses of users who can edit this exploration.
-    editors = ndb.StringProperty(repeated=True)
+    # The first element is the original creator of the exploration.
+    editors = ndb.UserProperty(repeated=True)
 
     @classmethod
     def create(cls, user, title, category, exploration_id,
@@ -69,9 +68,15 @@ class Exploration(BaseModel):
         # TODO(sll): Do this in a transaction so it doesn't break other things.
         fake_state_key = ndb.Key(State, state_id)
 
+        default_editors = []
+        # Note that an exploration may not have a default owner, e.g. if it is
+        # a default exploration.
+        if user:
+            default_editors.append(user)
+
         exploration = Exploration(
-            id=exploration_id, owner=user, title=title,
-            init_state=fake_state_key, category=category, image_id=image_id)
+            id=exploration_id, title=title, init_state=fake_state_key,
+            category=category, image_id=image_id, editors=default_editors)
         exploration.put()
         new_init_state = State.create(state_id, exploration, init_state_name)
 

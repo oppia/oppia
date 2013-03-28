@@ -19,11 +19,11 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 import controller_utils
 from controllers.base import BaseHandler
-from models.augmented_user import AugmentedUser
 from models.exploration import Exploration
 import utils
 
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 
 class GalleryPage(BaseHandler):
@@ -44,13 +44,15 @@ class GalleryHandler(BaseHandler):
     def get(self):
         """Handles GET requests."""
         user = users.get_current_user()
-        augmented_user = AugmentedUser.get(user) if user else None
 
         used_keys = []
 
         categories = {}
-        for exploration in Exploration.query().filter(
-                Exploration.is_public == True):
+        explorations = Exploration.query().filter(ndb.OR(
+            Exploration.is_public == True, Exploration.editors == user,
+        ))
+
+        for exploration in explorations:
             category_name = exploration.category
 
             can_edit = user and controller_utils.check_can_edit(user, exploration)
@@ -58,8 +60,9 @@ class GalleryHandler(BaseHandler):
             used_keys.append(exploration.key)
 
             data = exploration.to_dict(
-                exclude=['states', 'init_state', 'owner'])
+                exclude=['states', 'init_state'])
             data.update({'id': exploration.id})
+            data['editors'] = [editor.email() for editor in exploration.editors]
 
             if not categories.get(category_name):
                 categories[category_name] = []
@@ -67,28 +70,9 @@ class GalleryHandler(BaseHandler):
                 'data': data,
                 'can_edit': can_edit,
                 'can_fork': user and exploration.is_demo(),
-                'is_owner': user and user == exploration.owner,
+                'is_owner': (user and exploration.editors and
+                             user == exploration.editors[0]),
             })
-
-        if augmented_user:
-            for exploration_key in augmented_user.editable_explorations:
-                if exploration_key not in used_keys:
-                    # Add this exploration to the relevant category.
-                    exploration = exploration_key.get()
-
-                    data = exploration.to_dict(
-                        exclude=['states', 'init_state', 'owner'])
-                    data.update({'id': exploration.id})
-                    exploration_data = {
-                        'data': data,
-                        'can_edit': True,
-                        'can_fork': False,
-                        'is_owner': user == exploration.owner,
-                    }
-
-                    if not categories.get(exploration.category):
-                        categories[exploration.category] = []
-                    categories[exploration.category].append(exploration_data)
 
         self.values.update({
             'categories': categories,
