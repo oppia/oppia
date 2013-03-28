@@ -173,7 +173,7 @@ class ExplorationHandler(BaseHandler):
             'image_id': exploration.image_id,
             'category': exploration.category,
             'title': exploration.title,
-            'editors': [editor.email() for editor in exploration.editors],
+            'editors': [editor.nickname() for editor in exploration.editors],
             'states': state_list,
             'parameters': parameters,
         })

@@ -62,7 +62,8 @@ class GalleryHandler(BaseHandler):
             data = exploration.to_dict(
                 exclude=['states', 'init_state'])
             data.update({'id': exploration.id})
-            data['editors'] = [editor.email() for editor in exploration.editors]
+            data['editors'] = [editor.nickname() for
+                               editor in exploration.editors]
 
             if not categories.get(category_name):
                 categories[category_name] = []
