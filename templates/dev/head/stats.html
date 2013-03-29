@@ -9,15 +9,34 @@
 
     <h3>Statistics for '{{exploration_title}}'</h3>
 
-    Number of visits: {{num_visits}}
-    <br>
-    Number of completions: {{num_comp}}
-    <br>
+    <h4>Completions</h4>
     {% if num_visits > 0 %}
-      Percent completing exercise: {{num_comp/num_visits * 100}}%
+      <div style="position: relative;">
+      <table width=200 style="border: 1px solid black;">
+        <tr height = 30>
+          <td style="background-color:green;" width={{num_comp/num_visits * 200}}>
+          </td>
+          <td style="background-color:firebrick;" width={{200 -(num_comp/num_visits * 200)}}></td>
+        </tr>
+      </table>
+      <br>
+      <table height=20>
+        <tr>
+          <td width=20 style="background-color: green;"></td>
+          <td>&nbsp; Number of completions: {{num_comp}}</td>
+        </tr>
+        <tr>
+          <td width=20 style="background-color: firebrick;"></td>
+          <td>&nbsp; Number of non-completions: {{num_visits - num_comp}}</td>
+        </tr>
+      </table>
+
+      <div style="color: white; position: absolute; top: 5px; left: 5px; font-weight: bold;">
+             {{(num_comp/num_visits * 100)| round(1)}}%
+      </div>
     {% endif %}
 
-    <h4>State specific stats</h4>
+    <h4>State-specific stats</h4>
 
     <table>
       <tr>
