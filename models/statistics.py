@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 
 STATS_ENUMS = utils.create_enum(
     'exploration_visited', 'default_case_hit', 'exploration_completed',
-    'feedback_submitted')
+    'feedback_submitted', 'state_hit')
 
 
 class EventHandler(object):
@@ -49,6 +49,9 @@ class EventHandler(object):
         if event_name == STATS_ENUMS.feedback_submitted:
             event_key = 'f.%s' % key
             cls._add(event_key, unicode(extra_info))
+        if event_name == STATS_ENUMS.state_hit:
+            event_key = 's.%s' % key
+            cls._inc(event_key)
 
     @classmethod
     def record_default_case_hit(cls, exploration_id, state_id, extra_info=''):
@@ -73,6 +76,11 @@ class EventHandler(object):
         cls._record_event(
             STATS_ENUMS.feedback_submitted, url, extra_info=feedback
         )
+
+    @classmethod
+    def record_state_hit(cls, exploration_id, state_id):
+        """Record an event when a state is loaded."""
+        cls._record_event(STATS_ENUMS.state_hit, '%s.%s' % (exploration_id, state_id))
 
     @classmethod
     def _inc(cls, event_key):
@@ -139,7 +147,7 @@ class Statistics(object):
             return counter.value
 
         if event_name == STATS_ENUMS.default_case_hit:
-            result = []
+            result = {} 
 
             exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
@@ -148,10 +156,29 @@ class Statistics(object):
 
                 journal = Journal.get_by_id(event_key)
 
-                result.append({
-                    'id': state.id,
+                result[state.id] = {
                     'name': state.name,
-                    'answers': sorted(journal.values) if journal else []
-                })
+                    'answers': sorted(journal.values) if journal else [],
+                }
 
+            return result
+
+        if event_name == STATS_ENUMS.state_hit:
+            result = {}
+
+            exploration = Exploration.get(exploration_id)
+            for state_key in exploration.states:
+                state = state_key.get()
+                event_key = 's.%s.%s' % (exploration_id, state.id)
+
+                counter = Counter.get_by_id(event_key)
+                if not counter:
+                    count = 0
+                else:
+                    count = counter.value
+
+                result[state.id] = {
+                    'name': state.name,
+                    'count': count,
+                }
             return result

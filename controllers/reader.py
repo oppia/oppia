@@ -103,6 +103,7 @@ class ExplorationHandler(BaseHandler):
         self.response.write(json.dumps(self.values))
 
         EventHandler.record_exploration_visited(exploration_id)
+        EventHandler.record_state_hit(exploration_id, init_state.id)
 
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
@@ -160,6 +161,7 @@ class ExplorationHandler(BaseHandler):
             EventHandler.record_exploration_completed(exploration_id)
         else:
             state = State.get(dest_id, exploration)
+            EventHandler.record_state_hit(exploration_id, state_id)
 
             # Append Oppia's feedback, if any.
             if feedback:

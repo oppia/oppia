@@ -17,19 +17,23 @@
       Percent completing exercise: {{num_comp/num_visits * 100}}%
     {% endif %}
 
-    <h4>Answers that triggered the default category</h4>
+    <h4>State specific stats</h4>
 
     <table>
       <tr>
         <th class="oppia-stats-table">State name</th>
-        <th class="oppia-stats-table">Answers</th>
+        <th class="oppia-stats-table">Times hit</th>
+        <th class="oppia-stats-table">Answers in the default category</th>
       </tr>
-      {% for state in answers %}
+      {% for state in state_stats %}
         <tr>
           <td class="oppia-stats-table">
             <a href="/create/{{exploration_id}}#/gui/{{state.id}}">
               {{state.name}}
             </a>
+          </td>
+          <td class="oppia-stats-table">
+            {{state.count}}
           </td>
           <td class="oppia-stats-table">
             {% for answer in state.answers %}
