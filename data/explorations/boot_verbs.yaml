@@ -77,7 +77,7 @@ boot verb:
           x: jueg
         name: equals(x)
         param_changes: {}
-      - dest: boot verb
+      - dest: So...
         feedback:
         - Not quite. Just change the u to a ue and you get jueg-
         inputs: {}
@@ -102,7 +102,9 @@ subject:
         name: equals(x)
         param_changes: {}
       - dest: subject
-        feedback: []
+        feedback:
+        - The subject of the sentence is the noun in the sentence that is doing the
+          action. It is usually near the beginning of the sentence.
         inputs: {}
         name: Default
         param_changes: {}
