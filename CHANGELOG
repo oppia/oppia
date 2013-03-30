@@ -1,0 +1,12 @@
+Summary of changes:
+
+v1.0.1 (29 Mar 2013)
+--------------------
+* Add hits-per-state data to the statistics page.
+* Add responsive CSS support for viewing Oppia in mobile devices.
+* Add a 'Give Feedback' handler. The feedback is stored in the datastore.
+* Improve the display of the main page, the gallery page and the editor pages by tweaking the CSS.
+* After an interaction with the reader on the exploration page, scroll down to show the new content.
+* Update sample explorations
+* Security fixes
+
