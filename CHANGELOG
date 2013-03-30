@@ -1,4 +1,7 @@
-Summary of changes:
+This file contains a summary of changes to the Oppia code base. For a full changelog, please see 
+
+    https://code.google.com/p/oppia/source/list
+
 
 v1.0.1 (29 Mar 2013)
 --------------------
@@ -7,6 +10,11 @@ v1.0.1 (29 Mar 2013)
 * Add a 'Give Feedback' handler. The feedback is stored in the datastore.
 * Improve the display of the main page, the gallery page and the editor pages by tweaking the CSS.
 * After an interaction with the reader on the exploration page, scroll down to show the new content.
+* Remove the AugmentedUser class, replacing it instead with datastore queries.
 * Update sample explorations
 * Security fixes
+
+v1.0 (22 Mar 2013)
+------------------
+* Initial release
 
