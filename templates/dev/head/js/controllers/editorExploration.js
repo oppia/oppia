@@ -186,7 +186,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     explorationData.saveStateData(
         $scope.stateId, {'state_name': $scope.stateName});
-    activeInputData.name = 'explorationMetadata';
   };
 
 
@@ -330,7 +329,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.saveExplorationImage = function() {
-    activeInputData.name = 'explorationMetadata';
     $scope.saveImage(function(data) {
       $scope.explorationImageId = data.image_id;
       $scope.saveExplorationProperty(
@@ -356,8 +354,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
     var requestParameters = {};
     requestParameters[backendName] = newValue;
-
-    activeInputData.name = 'explorationMetadata';
 
     $http.put(
         $scope.explorationDataUrl,

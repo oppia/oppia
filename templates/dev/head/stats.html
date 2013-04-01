@@ -56,7 +56,9 @@
           </td>
           <td class="oppia-stats-table">
             {% for answer in state.answers %}
-              {{answer}}<br>
+              {{answer[0]}}
+              (<em>{{answer[1]}} time{% if answer[1] > 1 %}s{% endif %}</em>)
+              <br>
             {% endfor %}
           </td>
         </tr>

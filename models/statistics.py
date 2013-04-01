@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import collections
 import utils
 
 from exploration import Exploration
@@ -147,7 +148,7 @@ class Statistics(object):
             return counter.value
 
         if event_name == STATS_ENUMS.default_case_hit:
-            result = {} 
+            result = {}
 
             exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
@@ -156,9 +157,15 @@ class Statistics(object):
 
                 journal = Journal.get_by_id(event_key)
 
+                if journal:
+                    top_ten = collections.Counter(
+                        journal.values).most_common(10)
+                else:
+                    top_ten = []
+
                 result[state.id] = {
                     'name': state.name,
-                    'answers': sorted(journal.values) if journal else [],
+                    'answers': top_ten,
                 }
 
             return result

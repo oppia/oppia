@@ -35,20 +35,20 @@ class StatsHandler(BaseHandler):
         num_completions = Statistics.get_exploration_stats(
             STATS_ENUMS.exploration_completed, exploration.id)
 
-        answers = Statistics.get_exploration_stats(
+        default_answers = Statistics.get_exploration_stats(
             STATS_ENUMS.default_case_hit, exploration.id)
 
         state_counts = Statistics.get_exploration_stats(
             STATS_ENUMS.state_hit, exploration.id)
- 
+
         state_stats = []
-        for state_id in answers.keys():
-           state_stats.append({
-               'id': state_id, 
-               'name': answers[state_id]['name'],
-               'answers': answers[state_id]['answers'],
-               'count': state_counts[state_id]['count'],
-           }) 
+        for state_id in default_answers.keys():
+            state_stats.append({
+                'id': state_id,
+                'name': default_answers[state_id]['name'],
+                'answers': default_answers[state_id]['answers'],
+                'count': state_counts[state_id]['count'],
+            })
         self.values.update({
             'exploration_title': exploration.title,
             'exploration_id': exploration.id,
