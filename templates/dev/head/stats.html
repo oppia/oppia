@@ -9,8 +9,8 @@
 
     <h3>Statistics for '{{exploration_title}}'</h3>
 
-    <h4>Completions</h4>
     {% if num_visits > 0 %}
+    <h4>Completions</h4>
       <div style="position: relative;">
       <table width=200 style="border: 1px solid black;">
         <tr height = 30>
@@ -44,7 +44,7 @@
         <th class="oppia-stats-table">Times hit</th>
         <th class="oppia-stats-table">Answers in the default category</th>
       </tr>
-      {% for state in state_stats %}
+      {% for state in state_stats|sort(attribute='count', reverse=True) %}
         <tr>
           <td class="oppia-stats-table">
             <a href="/create/{{exploration_id}}#/gui/{{state.id}}">
