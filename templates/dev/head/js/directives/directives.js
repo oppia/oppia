@@ -23,7 +23,7 @@ oppia.directive('list', function (warningsData) {
     restrict: 'E',
     scope: {items: '=', largeInput: '@'},
     templateUrl: '/templates/list',
-    controller: function ($scope, $http, $attrs) {
+    controller: function ($scope, $attrs) {
 
       $scope.activeItem = null;
 
@@ -71,7 +71,7 @@ oppia.directive('string', function (warningsData) {
     restrict: 'E',
     scope: {item: '='},
     templateUrl: '/templates/string',
-    controller: function ($scope, $http, $attrs) {
+    controller: function ($scope, $attrs) {
 
       $scope.active = false;
 

@@ -31,6 +31,7 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
+    Content-Type: 'text/css'
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always

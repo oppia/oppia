@@ -14,24 +14,6 @@
   limitations under the License.
 */
 
-@-ms-viewport {
-  user-zoom: zoom;
-  width: device-width;
-  zoom: 1;
-}
-
-@-o-viewport {
-  user-zoom: zoom;
-  width: device-width;
-  zoom: 1;
-}
-
-@viewport {
-  user-zoom: zoom;
-  width: device-width;
-  zoom: 1;
-}
-
 html {
   height: 100%;
 }
