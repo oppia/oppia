@@ -186,7 +186,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     explorationData.saveStateData(
         $scope.stateId, {'state_name': $scope.stateName});
-    activeInputData.clear();
+    activeInputData.name = 'explorationMetadata';
   };
 
 
@@ -292,11 +292,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.openAddNewEditorForm = function() {
-    activeInputData.name = 'addNewEditor';
+    activeInputData.name = 'explorationMetadata.addNewEditor';
   };
 
   $scope.addNewEditor = function(newEditorEmail) {
-    activeInputData.clear();
+    activeInputData.name = 'explorationMetadata';
     $scope.explorationEditors.push(newEditorEmail);
 
     $http.put(
@@ -330,7 +330,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.saveExplorationImage = function() {
-    activeInputData.clear();
+    activeInputData.name = 'explorationMetadata';
     $scope.saveImage(function(data) {
       $scope.explorationImageId = data.image_id;
       $scope.saveExplorationProperty(
@@ -357,7 +357,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     var requestParameters = {};
     requestParameters[backendName] = newValue;
 
-    activeInputData.clear();
+    activeInputData.name = 'explorationMetadata';
 
     $http.put(
         $scope.explorationDataUrl,

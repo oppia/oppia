@@ -52,8 +52,8 @@
 
           <ul class="nav nav-tabs" id="editorViewTab">
             <li class="active">
-              <a data-toggle="tab" href="#explorationEditor">
-                Exploration Editor
+              <a data-toggle="tab" href="#explorationMap">
+                Exploration Map
               </a>
             </li>
             <li ng-show="stateId">
@@ -64,19 +64,26 @@
           </ul>
 
           <div class="tab-content">
-            <div class="tab-pane active" id="explorationEditor">
+            <div class="tab-pane active" id="explorationMap">
 
-              <div class="container-fluid">
-                <div class="row-fluid">
+              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
+                <a ng-click="activeInputData.name = 'explorationMetadata'">
+                  View exploration properties
+                </a>
+              </div>
 
-                  <div class="span4">
-                    {% include 'editor/editor_metadata.html' %}
-                  </div>
+              <div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
+                <span class="pull-right">
+                  <a ng-click="activeInputData.clear()">
+                    Return to map
+                  </a>
+                </span>
+                <br>
+                {% include 'editor/editor_metadata.html' %}
+              </div>
 
-                  <div class="span7">
-                    {% include 'editor/editor_viz.html' %}
-                  </div>
-                </div>
+              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0">
+                {% include 'editor/editor_viz.html' %}
               </div>
             </div>
 

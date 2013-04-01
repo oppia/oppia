@@ -1,65 +1,61 @@
-<div>
-  <h4>Title</h4>
-  <input type="text" ng-model="explorationTitle" ng-model-onblur>
-</div>
-
-<div>
-  <h4>Category</h4>
-  <input type="text" ng-model="explorationCategory" ng-model-onblur>
-</div>
-
-<div ng-show="explorationEditors">
-  <h4>Collaborators</h4>
-  <ul>
-    <li ng-repeat="editor in explorationEditors">
-      <span ng-show="$index == 0">
-        <em><[editor]></em>
-      </span>
-      <span ng-hide="$index == 0">
-        <[editor]>
-      </span>
-    </li>
-  </ul>
-
-  <div ng-show="currentUser == explorationEditors[0]">
-    <button type="button" ng-click="openAddNewEditorForm()"
-            ng-hide="activeInputData.name == 'addNewEditor'">
-      Add Collaborator
-    </button>
+<div class="oppia-metadata-block">
   
-    <form ng-show="activeInputData.name == 'addNewEditor'"
-          ng-submit="addNewEditor(newEditorEmail)">
-      <input type="text" ng-model="newEditorEmail"
-             placeholder="New editor's email address">
-      <input type="submit" value="Add Editor">
-    </form>
+  <div>
+    <strong>Title</strong>: <input type="text" ng-model="explorationTitle" ng-model-onblur>
+    <br>
+    <strong>Category</strong>: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+  </div>
+
+  <div>
+    <strong>Cover image</strong> (for the <a href="/gallery">Gallery</a>):
+
+    <span ui-if="explorationImageId">
+      <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
+      <button type="button" class="btn" ng-click="deleteExplorationImage()"
+              title="Delete this image">
+        <i class="icon-trash"></i>
+      </button>
+    </span>
+    <span ui-if="!explorationImageId">
+      <em>No image supplied.</em>
+      <form id="newImageForm">
+        <input type="file" id="newImage" name="newImage" image-upload="true">
+        <button type="button" ng-click="saveExplorationImage()">
+          Save New Image
+        </button>
+      </form>
+    </span>
   </div>
 </div>
 
-<br>
-
-<div>
-  <h4>
-    Cover image
-    <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
-         title="This image is displayed on the Gallery page.">
-  </h4>
-
-  <span ui-if="explorationImageId">
-    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
-
-    <button type="button" class="btn" ng-click="deleteExplorationImage()"
-            title="Delete this image">
-      <i class="icon-trash"></i>
-    </button>
-  </span>
-  <span ui-if="!explorationImageId">
-    <em>No image supplied.</em>
-    <form id="newImageForm">
-      <input type="file" id="newImage" name="newImage" image-upload="true">
-      <button type="button" ng-click="saveExplorationImage()">
-        Save New Image
+<div class="oppia-metadata-block">
+  <div ng-show="explorationEditors">
+    <strong>Collaborator List</strong>
+    <span ng-show="currentUser == explorationEditors[0]">
+      <button type="button" ng-click="openAddNewEditorForm()"
+              ng-hide="activeInputData.name == 'explorationMetadata.addNewEditor'">
+        Add New
       </button>
-    </form>
-  </span>
+    </span>
+
+    <ul>
+      <li ng-repeat="editor in explorationEditors">
+        <span ng-show="$index == 0">
+          <em><[editor]></em>
+        </span>
+        <span ng-hide="$index == 0">
+          <[editor]>
+        </span>
+      </li>
+    </ul>
+
+    <div ng-show="currentUser == explorationEditors[0]">  
+      <form ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'"
+            ng-submit="addNewEditor(newEditorEmail)">
+        <input type="text" ng-model="newEditorEmail"
+               placeholder="New editor's email address">
+        <input type="submit" value="Add Editor">
+      </form>
+    </div>
+  </div>
 </div>

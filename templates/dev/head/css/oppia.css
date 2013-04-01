@@ -314,6 +314,12 @@ textarea {
   list-style-type: none;
 }
 
+.oppia-metadata-block {
+  display: inline-block;
+  padding: 20px;
+  vertical-align: top;
+}
+
 
 /* Graph styles */
 
