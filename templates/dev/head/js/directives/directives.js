@@ -24,7 +24,6 @@ oppia.directive('list', function (warningsData) {
     scope: {items: '=', largeInput: '@'},
     templateUrl: '/templates/list',
     controller: function ($scope, $attrs) {
-
       $scope.activeItem = null;
 
       $scope.openItemEditor = function(index) {
