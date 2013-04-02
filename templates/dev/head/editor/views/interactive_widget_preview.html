@@ -1,5 +1,20 @@
 <div ng-controller="InteractiveWidgetPreview" class="oppia-iframe-container">
+
+  <h4>
+    Interactivity
+    <img class="oppia-help" src="/images/help.png"
+         ui-jq="tooltip"
+         title="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity.">
+  </h4>
+
+  <[interactiveWidget.name]>
+
   <span class="pull-right">
+    <span ng-show="showPreview" class="oppia-grayed">Preview |</span>
+    <span ng-hide="showPreview">
+      <a ng-click="setShowPreview(true)">Preview</a> |
+    </span>
+
     <span ng-hide="isEmpty(interactiveWidget.params)">
       <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
         Customize
@@ -10,16 +25,13 @@
     </a>
   </span>
 
-  <h4>
-    Interactivity Preview
-    <img class="oppia-help" src="/images/help.png"
-         ui-jq="tooltip"
-         title="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below.">
-  </h4>
-  <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
-  </iframe>
+  <div ui-if="showPreview">
+    <a class="pull-right" ng-click="setShowPreview(false)"><b>&times;</b></a>
+    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
+    </iframe>
+  </div>
 
-  <hr>
+  <br><br>
 
   <h4>
     Answer classification rules
@@ -28,10 +40,13 @@
          title="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown.">
   </h4>
   <div ng-repeat="(action, properties) in interactiveWidget.actions">
-    <h5>On user <[action]>:</h5>
-    <table>
-      <tr ng-repeat="rule in interactiveRulesets[action]">
-        <td style="width: 80%">
+    <h5>When readers <[action]>:</h5>
+    <table style="width: 100%">
+      <tr ng-repeat="rule in interactiveRulesets[action]" ng-hide="$last">
+        <td style="width: 5%">
+          ■
+        </td>
+        <td style="width: 75%">
           <[rule | parameterizeRule: interactiveParams.choices]>:
           (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
         </td>
@@ -40,10 +55,10 @@
             Edit
           </a>
 
-          <span ng-show="$index != 0 && $index != interactiveRulesets[action].length - 1">
+          <span ng-show="$index != 0">
             | <a ng-click="swapRules(action, $index, $index - 1)"> ⇑ </a>
           </span>
-          <span ng-hide="$index != 0 && $index != interactiveRulesets[action].length - 1">
+          <span ng-hide="$index != 0">
             | <span class="oppia-grayed"> ⇑ </span>
           </span>
 
@@ -54,20 +69,46 @@
             | <span class="oppia-grayed"> ⇓ </span>
           </span>
 
-          <span ng-show="$index != interactiveRulesets[action].length - 1">
+          <span>
             | <a ng-click="deleteRule(action, $index)"> &times; </a>
           </span>
-          <span ng-hide="$index != interactiveRulesets[action].length - 1">
+        </td>
+      </tr>
+      <tr>
+        <td>■</td>
+        <td>
+          <a href="#" ng-show="properties.rules" data-toggle="modal"
+            data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
+            Add new rule...
+          </a>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>■</td>
+        <td>
+          <[interactiveRulesets[action][interactiveRulesets[action].length - 1] | parameterizeRule: interactiveParams.choices]>:
+          (<[getStateName(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)]><span ng-show="interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback">, <[interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback|truncate]></span>)
+        </td>
+        <td>
+          <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, interactiveRulesets[action].length - 1)">
+            Edit
+          </a>
+
+          <span>
+            | <span class="oppia-grayed"> ⇑ </span>
+          </span>
+
+          <span>
+            | <span class="oppia-grayed"> ⇓ </span>
+          </span>
+
+          <span>
             | <span class="oppia-grayed"> &times; </span>
           </span>
         </td>
       </tr>
     </table>
-    <button ng-show="properties.rules"
-            type="button" class="btn btn-primary" data-toggle="modal"
-            data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
-      Add rule
-    </button>
   </div>
 
   <div class="modal hide fade" id="customizeWidgetModal">

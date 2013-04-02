@@ -226,6 +226,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       $scope.changeMode($scope.getMode());
     } else {
       $location.path('');
+      explorationData.stateId = '';
       explorationData.getData();
     }
   });

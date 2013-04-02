@@ -21,6 +21,17 @@
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
   var data = explorationData.getStateData($scope.stateId);
 
+  $scope.showPreview = false;
+
+  // Sets the 'showPreview' variable. The input is a boolean.
+  $scope.setShowPreview = function(input) {
+    $scope.showPreview = input;
+    $scope.$apply();
+    if (input) {
+      $scope.addContentToIframe('interactiveWidgetPreview', $scope.interactiveWidget.raw);
+    }
+  };
+
   // Tests whether an object is a JavaScript array.
   $scope.isArray = function(obj) {
     return toString.call(obj) === '[object Array]';
@@ -32,9 +43,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         $scope.createRequest({params: widgetParams, state_params: $scope.paramChanges}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
-        $scope.addContentToIframe('interactiveWidgetPreview', widgetData.widget.raw);
         $scope.interactiveWidget = widgetData.widget;
         $scope.interactiveParams = widgetParams;
+        if ($scope.showPreview) {
+          $scope.addContentToIframe('interactiveWidgetPreview', $scope.interactiveWidget.raw);
+        }
       }
     );
   };
