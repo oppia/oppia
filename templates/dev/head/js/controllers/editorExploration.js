@@ -294,6 +294,21 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     activeInputData.name = 'explorationMetadata.addNewEditor';
   };
 
+  $scope.closeAddNewEditorForm = function() {
+    $scope.newEditorEmail = '';
+    activeInputData.name = 'explorationMetadata';
+  };
+
+
+  $scope.openAddExplorationImageForm = function() {
+    activeInputData.name = 'explorationMetadata.addNewImage';
+  };
+
+  $scope.closeAddExplorationImageForm = function() {
+    activeInputData.name = 'explorationMetadata';
+  };
+
+
   $scope.addNewEditor = function(newEditorEmail) {
     activeInputData.name = 'explorationMetadata';
     $scope.explorationEditors.push(newEditorEmail);
@@ -329,6 +344,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   };
 
   $scope.saveExplorationImage = function() {
+    activeInputData.name = 'explorationMetadata';
     $scope.saveImage(function(data) {
       $scope.explorationImageId = data.image_id;
       $scope.saveExplorationProperty(

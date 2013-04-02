@@ -262,6 +262,10 @@ textarea {
   top: 100px;
 }
 
+.oppia-conversation-log {
+  opacity: 0.7;
+}
+
 .oppia-editable-name {
   color: #8f8661;
 }
@@ -313,13 +317,6 @@ textarea {
   border-collapse: collapse;
   list-style-type: none;
 }
-
-.oppia-metadata-block {
-  display: inline-block;
-  padding: 20px;
-  vertical-align: top;
-}
-
 
 /* Graph styles */
 

@@ -1,62 +1,78 @@
-<div class="oppia-metadata-block">
+<div class="row-fluid">
+  <div class="span6">
+    <div>
+      <strong>Title</strong>: <input type="text" ng-model="explorationTitle" ng-model-onblur>
+      <br>
+      <strong>Category</strong>: <input type="text" ng-model="explorationCategory" ng-model-onblur>
+    </div>
   
-  <div>
-    <strong>Title</strong>: <input type="text" ng-model="explorationTitle" ng-model-onblur>
-    <br>
-    <strong>Category</strong>: <input type="text" ng-model="explorationCategory" ng-model-onblur>
-  </div>
-
-  <div>
-    <strong>Cover image</strong> (for the <a href="/gallery">Gallery</a>):
-
-    <span ui-if="explorationImageId">
-      <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
-      <button type="button" class="btn" ng-click="deleteExplorationImage()"
-              title="Delete this image">
-        <i class="icon-trash"></i>
-      </button>
-    </span>
-    <span ui-if="!explorationImageId">
-      <em>No image supplied.</em>
-      <form id="newImageForm">
-        <input type="file" id="newImage" name="newImage" image-upload="true">
-        <br><br>
-        <button type="button" ng-click="saveExplorationImage()">
-          Save New Image
+    <div>
+      <strong>Cover image</strong> (for the <a href="/gallery">Gallery</a>):
+  
+      <span ui-if="explorationImageId">
+        <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
+        <button type="button" class="btn" ng-click="deleteExplorationImage()"
+                title="Delete this image">
+          <i class="icon-trash"></i>
         </button>
-      </form>
-    </span>
+      </span>
+      <div ui-if="!explorationImageId">
+        <em>No image supplied.</em>
+
+        <button type="button" ng-click="openAddExplorationImageForm()"
+                ng-hide="activeInputData.name == 'explorationMetadata.addNewImage'">
+          Add Image
+        </button>
+
+        <div ng-show="activeInputData.name == 'explorationMetadata.addNewImage'">
+          <form id="newImageForm">
+            <input type="file" id="newImage" name="newImage" image-upload="true">
+            <br><br>
+            <button type="button" ng-click="saveExplorationImage()">
+              Save
+            </button>
+            <button type="button" ng-click="closeAddExplorationImageForm()">
+              Cancel
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="oppia-metadata-block">
-  <div ng-show="explorationEditors">
-    <strong>Collaborator List</strong>
-    <span ng-show="currentUser == explorationEditors[0]">
-      <button type="button" ng-click="openAddNewEditorForm()"
-              ng-hide="activeInputData.name == 'explorationMetadata.addNewEditor'">
-        Add New
-      </button>
-    </span>
-
-    <ul>
-      <li ng-repeat="editor in explorationEditors">
-        <span ng-show="$index == 0">
-          <em><[editor]></em>
-        </span>
-        <span ng-hide="$index == 0">
-          <[editor]>
-        </span>
-      </li>
-    </ul>
-
-    <div ng-show="currentUser == explorationEditors[0]">  
-      <form ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'"
-            ng-submit="addNewEditor(newEditorEmail)">
-        <input type="text" ng-model="newEditorEmail"
-               placeholder="New editor's email address">
-        <input type="submit" value="Add Editor">
-      </form>
+  
+  <div class="span6">
+    <div ng-show="explorationEditors">
+      <strong>Collaborator List</strong>
+      <span ng-show="currentUser == explorationEditors[0]">
+        <button type="button" ng-click="openAddNewEditorForm()"
+                ng-hide="activeInputData.name == 'explorationMetadata.addNewEditor'">
+          Add New
+        </button>
+      </span>
+  
+      <ul>
+        <li ng-repeat="editor in explorationEditors">
+          <span ng-show="$index == 0">
+            <em><[editor]></em>
+          </span>
+          <span ng-hide="$index == 0">
+            <[editor]>
+          </span>
+        </li>
+      </ul>
+  
+      <div ng-show="currentUser == explorationEditors[0]">  
+        <form ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'"
+              ng-submit="addNewEditor(newEditorEmail)">
+          <input type="text" ng-model="newEditorEmail"
+                 placeholder="New editor's email address">
+          <input type="submit" value="Add Editor">
+          <button type="button" ng-click="closeAddNewEditorForm()"
+            ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'">
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

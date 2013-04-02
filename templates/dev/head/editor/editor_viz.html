@@ -14,6 +14,7 @@
   <div class="tab-pane active" id="graph">
     <div ng-controller="EditorGraph">
       {% include 'editor/add_state.html' %}
+      <em>Click on a state node in the diagram below to edit it.</em>
       <state-graph-viz val="graphData" grouped="grouped">
       </state-graph-viz>
     </div>
@@ -21,6 +22,7 @@
   <div class="tab-pane" id="tree">
     <div ng-controller="EditorTree">
       {% include 'editor/add_state.html' %}
+      <em>Click 'Edit' to edit the corresponding node.</em>
       <state-tree-viz val="treeData" grouped="grouped">
       </state-tree-viz>
     </div>
