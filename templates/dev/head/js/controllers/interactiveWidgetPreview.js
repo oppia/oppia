@@ -21,7 +21,7 @@
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
   var data = explorationData.getStateData($scope.stateId);
 
-  $scope.showPreview = false;
+  $scope.showPreview = true;
 
   // Sets the 'showPreview' variable. The input is a boolean.
   $scope.setShowPreview = function(input) {
