@@ -48,7 +48,7 @@
         </td>
         <td style="width: 75%">
           <[rule | parameterizeRule: interactiveParams.choices]>:
-          (<[getStateName(rule.dest)]><span ng-show="rule.feedback">, <[rule.feedback|truncate]></span>)
+          (<[getStateName(rule.dest)]>, <[rule.feedback|truncate]>)
         </td>
         <td style="width: 20%">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
@@ -74,23 +74,23 @@
           </span>
         </td>
       </tr>
-      <tr>
-        <td>■</td>
-        <td>
-          <a href="#" ng-show="properties.rules" data-toggle="modal"
+      <tr ng-show="properties.rules">
+        <td style="width: 5%">■</td>
+        <td style="width: 75%">
+          <a href="#" data-toggle="modal"
             data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
             Add new rule...
           </a>
         </td>
-        <td></td>
+        <td style="width: 20%"></td>
       </tr>
       <tr>
-        <td>■</td>
-        <td>
+        <td style="width: 5%">■</td>
+        <td style="width: 75%">
           <[interactiveRulesets[action][interactiveRulesets[action].length - 1] | parameterizeRule: interactiveParams.choices]>:
-          (<[getStateName(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)]><span ng-show="interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback">, <[interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback|truncate]></span>)
+          (<[getStateName(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)]>, <[interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback|truncate]>)
         </td>
-        <td>
+        <td style="width: 20%">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, interactiveRulesets[action].length - 1)">
             Edit
           </a>
