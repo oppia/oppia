@@ -43,14 +43,19 @@
     <h5>When readers <[action]>:</h5>
     <table style="width: 100%">
       <tr ng-repeat="rule in interactiveRulesets[action]" ng-hide="$last">
-        <td style="width: 5%">
-          ■
+        <td style="width: 5%; vertical-align: top">
+          <span ng-show="rule.feedback.length || !isCurrentStateId(rule.dest)">
+            •
+          </span>
+          <span ng-hide="rule.feedback.length || !isCurrentStateId(rule.dest)">
+            <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+          </span>
         </td>
-        <td style="width: 75%">
+        <td style="width: 75%; vertical-align: top">
           <[rule | parameterizeRule: interactiveParams.choices]>:
-          (<[getStateName(rule.dest)]>, <[rule.feedback|truncate]>)
+          (<[getStateNameForRule(rule.dest)]>, <[rule.feedback|truncate]>)
         </td>
-        <td style="width: 20%">
+        <td style="width: 20%; vertical-align: top">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, $index)">
             Edit
           </a>
@@ -75,22 +80,31 @@
         </td>
       </tr>
       <tr ng-show="properties.rules">
-        <td style="width: 5%">■</td>
-        <td style="width: 75%">
+        <td style="width: 5%; vertical-align: top">
+          •
+        </td>
+        <td style="width: 75%; vertical-align: top">
           <a href="#" data-toggle="modal"
             data-target="#addRuleModal" ng-click="openAddRuleModal(action)">
             Add new rule...
           </a>
         </td>
-        <td style="width: 20%"></td>
+        <td style="width: 20%; vertical-align: top"></td>
       </tr>
       <tr>
-        <td style="width: 5%">■</td>
-        <td style="width: 75%">
-          <[interactiveRulesets[action][interactiveRulesets[action].length - 1] | parameterizeRule: interactiveParams.choices]>:
-          (<[getStateName(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)]>, <[interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback|truncate]>)
+        <td style="width: 5%; vertical-align: top">
+          <span ng-show="interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback.length || !isCurrentStateId(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)">
+            •
+          </span>
+          <span ng-hide="interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback.length || !isCurrentStateId(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)">
+            <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+          </span>
         </td>
-        <td style="width: 20%">
+        <td style="width: 75%; vertical-align: top">
+          <[interactiveRulesets[action][interactiveRulesets[action].length - 1] | parameterizeRule: interactiveParams.choices]>:
+          (<[getStateNameForRule(interactiveRulesets[action][interactiveRulesets[action].length - 1].dest)]>, <[interactiveRulesets[action][interactiveRulesets[action].length - 1].feedback|truncate]>)
+        </td>
+        <td style="width: 20%; vertical-align: top">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(action, interactiveRulesets[action].length - 1)">
             Edit
           </a>

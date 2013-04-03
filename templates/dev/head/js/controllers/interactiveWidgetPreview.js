@@ -70,8 +70,18 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.initInteractiveWidget(data);
   }
 
-  $scope.getStateName = function(stateId) {
-    return (stateId === END_DEST ? END_DEST : $scope.states[stateId].name);
+  $scope.getStateNameForRule = function(stateId) {
+    if (stateId === $scope.stateId) {
+      return '⟳';
+    } else if (stateId === END_DEST) {
+      return END_DEST;
+    } else {
+      return $scope.states[stateId].name;
+    }
+  };
+
+  $scope.isCurrentStateId = function(stateId) {
+    return stateId === $scope.stateId;
   };
 
   $scope.getAllStates = function() {
@@ -84,7 +94,15 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   };
 
   $scope.getDestName = function(stateId) {
-    return stateId === '?' ? 'Add New State...' : $scope.getStateName(stateId);
+    if (stateId === '?') {
+      return 'Add New State...';
+    } else if (stateId === END_DEST) {
+      return END_DEST;
+    } else if (stateId === $scope.stateId) {
+      return $scope.states[stateId].name + ' ⟳';
+    } else {
+      return $scope.states[stateId].name;
+    }
   };
 
   // Returns a list of all states, as well as an 'Add New State' option.

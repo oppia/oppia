@@ -34,10 +34,12 @@ oppia.filter('truncate', function() {
       length = 70;
     if (suffix === undefined)
       suffix = '...';
+    if (!angular.isString(input))
+      input = String(input);
     if (input.length <= length || input.length - suffix.length <= length)
       return input;
     else
-      return String(input).substring(0, length - suffix.length) + suffix;
+      return input.substring(0, length - suffix.length) + suffix;
   };
 });
 
