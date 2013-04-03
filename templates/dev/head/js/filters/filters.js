@@ -43,6 +43,16 @@ oppia.filter('truncate', function() {
   };
 });
 
+// Filter that rounds a number to 1 decimal place.
+oppia.filter('round1', function() {
+  return function(input) {
+    console.log('h');
+    console.log(input);
+    console.log(input* 10);
+    return Math.round(input * 10) / 10;
+  };
+});
+
 // Filter that changes {{...}} tags into INPUT indicators.
 oppia.filter('bracesToText', function() {
   return function(input) {

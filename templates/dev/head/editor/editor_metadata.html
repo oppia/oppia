@@ -76,3 +76,61 @@
     </div>
   </div>
 </div>
+
+<br>
+
+<div ng-show="stats.numVisits > 0">
+  <strong>Completion rate</strong>
+  <table width="200" style="border: 1px solid black;">
+    <tr height="20">
+      <td style="background-color:green;" width="<[stats.numCompletions* 200.0 / stats.numVisits]>">
+      </td>
+      <td style="background-color:firebrick;" width="<[200 - (stats.numCompletions * 200.0 / stats.numVisits)]>"></td>
+    </tr>
+  </table>
+  <br>
+  <table>
+    <tr height="15">
+      <td width="20" style="background-color: green;"></td>
+      <td>&nbsp; Number of completions: <[stats.numCompletions]></td>
+    </tr>
+    <tr>
+      <td width="20" style="background-color: firebrick;"></td>
+      <td>&nbsp; Number of non-completions: <[stats.numVisits - stats.numCompletions]></td>
+    </tr>
+  </table>
+
+  <br><br>
+
+  <table>
+    <tr>
+      <th class="oppia-stats-table">State name</th>
+      <th class="oppia-stats-table">Times hit</th>
+      <th class="oppia-stats-table">Answers in the default category</th>
+    </tr>
+
+    <tr ng-repeat="state in stats.stateStats | orderBy:'count':true">
+      <td class="oppia-stats-table">
+        <a href="/create/<[explorationId]>#/gui/<[state.id]>">
+          <[state.name]>
+        </a>
+      </td>
+      <td class="oppia-stats-table">
+        <[state.count]>
+      </td>
+      <td class="oppia-stats-table">
+        <div ng-repeat="answer in state.answers">
+          <[answer[0]]>
+          (<em><[answer[1]]> time<span ng-show="answer[1] > 1">s</span></em>)
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div ng-hide="stats.numVisits > 0">
+  <em>
+    This exploration has not been viewed by readers yet, so there are no
+    statistics to display.
+  </em>
+</div>

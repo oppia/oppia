@@ -29,7 +29,6 @@ from controllers import gallery
 from controllers import pages
 from controllers import reader
 from controllers import resources
-from controllers import stats
 from controllers import widgets
 import feconf
 
@@ -85,8 +84,6 @@ urls = [
     (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
     (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
     (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidgetHandler),
-
-    (r'/stats/(%s)/?' % r, stats.StatsHandler),
 
     # 404 error handler.
     (r'/.*', Error404Handler),

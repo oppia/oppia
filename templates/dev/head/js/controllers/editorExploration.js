@@ -257,6 +257,13 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
     $scope.parameters = data.parameters || [];//TODO(yanamal): make sure this works when explorations actually have parameters
+
+    $scope.stats = {
+      'numVisits': data.num_visits,
+      'numCompletions': data.num_completions,
+      'stateStats': data.state_stats
+    };
+
     explorationFullyLoaded = true;
 
     if ($scope.stateId) {

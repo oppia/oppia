@@ -31,6 +31,8 @@ from models.state import AnswerHandlerInstance
 from models.state import Content
 from models.state import Rule
 from models.state import State
+from models.statistics import Statistics
+from models.statistics import STATS_ENUMS
 from models.widget import InteractiveWidget
 import utils
 
@@ -69,6 +71,37 @@ def get_state_for_frontend(state, exploration):
 
     state_repr['yaml'] = utils.get_yaml_from_dict(modified_state_dict)
     return state_repr
+
+
+def get_exploration_stats(exploration):
+    """Returns a dict with stats for the given exploration."""
+
+    num_visits = Statistics.get_exploration_stats(
+        STATS_ENUMS.exploration_visited, exploration.id)
+
+    num_completions = Statistics.get_exploration_stats(
+        STATS_ENUMS.exploration_completed, exploration.id)
+
+    default_answers = Statistics.get_exploration_stats(
+        STATS_ENUMS.default_case_hit, exploration.id)
+
+    state_counts = Statistics.get_exploration_stats(
+        STATS_ENUMS.state_hit, exploration.id)
+
+    state_stats = []
+    for state_id in default_answers.keys():
+        state_stats.append({
+            'id': state_id,
+            'name': default_answers[state_id]['name'],
+            'answers': default_answers[state_id]['answers'],
+            'count': state_counts[state_id]['count'],
+        })
+
+    return {
+        'num_visits': num_visits,
+        'num_completions': num_completions,
+        'state_stats': state_stats,
+    }
 
 
 class NewExploration(BaseHandler):
@@ -176,6 +209,13 @@ class ExplorationHandler(BaseHandler):
             'editors': [editor.nickname() for editor in exploration.editors],
             'states': state_list,
             'parameters': parameters,
+        })
+
+        statistics = get_exploration_stats(exploration)
+        self.values.update({
+            'num_visits': statistics['num_visits'],
+            'num_completions': statistics['num_completions'],
+            'state_stats': statistics['state_stats'],
         })
         self.response.write(json.dumps(self.values))
 
