@@ -137,7 +137,11 @@ verb endings:
         name: equals(x)
         param_changes: {}
       - dest: verb endings
-        feedback: []
+        feedback:
+        - "That doesn't look right. Here is the conjugation of hablo (to speak): yo\
+          \ hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as hablamos, vosotros/as\
+          \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
+          \ the corresponding ending for 'yo' is?"
         inputs: {}
         name: Default
         param_changes: {}
