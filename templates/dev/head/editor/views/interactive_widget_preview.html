@@ -125,6 +125,17 @@
     </table>
   </div>
 
+  <br><br>
+
+  <div ng-show="stats.stateStats[stateId].answers">
+    <h4>Answers received that hit the 'Default' rule</h4>
+    <div ng-repeat="answer in stats.stateStats[stateId].answers">
+      <[answer[0]]>
+      (<em>submitted <[answer[1]]> time<span ng-show="answer[1] > 1">s</span></em>)
+    </div>
+  </div>
+
+
   <div class="modal hide fade" id="customizeWidgetModal">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">

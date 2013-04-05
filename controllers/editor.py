@@ -88,14 +88,13 @@ def get_exploration_stats(exploration):
     state_counts = Statistics.get_exploration_stats(
         STATS_ENUMS.state_hit, exploration.id)
 
-    state_stats = []
+    state_stats = {}
     for state_id in default_answers.keys():
-        state_stats.append({
-            'id': state_id,
+        state_stats[state_id] = {
             'name': default_answers[state_id]['name'],
             'answers': default_answers[state_id]['answers'],
             'count': state_counts[state_id]['count'],
-        })
+        }
 
     return {
         'num_visits': num_visits,

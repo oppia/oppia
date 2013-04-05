@@ -109,17 +109,17 @@
       <th class="oppia-stats-table">Answers in the default category</th>
     </tr>
 
-    <tr ng-repeat="state in stats.stateStats | orderBy:'count':true">
+    <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'count':true">
       <td class="oppia-stats-table">
         <a href="/create/<[explorationId]>#/gui/<[state.id]>">
-          <[state.name]>
+          <[stateData.name]>
         </a>
       </td>
       <td class="oppia-stats-table">
-        <[state.count]>
+        <[stateData.count]>
       </td>
       <td class="oppia-stats-table">
-        <div ng-repeat="answer in state.answers">
+        <div ng-repeat="answer in stateData.answers">
           <[answer[0]]>
           (<em><[answer[1]]> time<span ng-show="answer[1] > 1">s</span></em>)
         </div>
