@@ -38,7 +38,7 @@ find . -iname "*.pyc" -exec rm -f {} \;
 RUNTIME_HOME=../oppia_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.4/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2:./third_party/mock-1.0.1
 export PYTHONPATH=$PYTHONPATH
 
 # webtest is used for tests.
@@ -50,6 +50,16 @@ if [ ! -d "third_party/webtest-1.4.2" ]; then
   rm webtest-download.zip
   mv third_party/WebTest-1.4.2 third_party/webtest-1.4.2
 fi
+
+# mock is also used for tests.
+echo Checking if mock is installed in third_party
+if [ ! -d "third_party/mock-1.0.1" ]; then
+  echo Installing webtest framework
+  wget https://pypi.python.org/packages/source/m/mock/mock-1.0.1.zip#md5=869f08d003c289a97c1a6610faf5e913 -O mock-1.0.1.zip
+  unzip mock-1.0.1.zip -d third_party
+  rm mock-1.0.1.zip
+fi
+
 
 # Note: you can safely delete all of the following code (up to the end of the
 # file) if it leads to errors on your system. It runs checks to see how well

@@ -224,16 +224,6 @@ if [ ! -d "third_party/static/yui3-gallery-20121107" ]; then
 fi
 
 
-# webtest is used for tests.
-echo Checking if webtest is installed in third_party
-if [ ! -d "third_party/webtest-1.4.2" ]; then
-  echo Installing webtest framework
-  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
-  unzip webtest-download.zip -d third_party
-  rm webtest-download.zip
-  mv third_party/WebTest-1.4.2 third_party/webtest-1.4.2
-fi
-
 # Set up a local dev instance
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
