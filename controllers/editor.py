@@ -323,6 +323,7 @@ class StateHandler(BaseHandler):
         interactive_params = payload.get('interactive_params')
         interactive_rulesets = payload.get('interactive_rulesets')
         content = payload.get('content')
+        unresolved_answers = payload.get('unresolved_answers')
 
         if state_name:
             # Replace the state name with this one, after checking validity.
@@ -413,6 +414,12 @@ class StateHandler(BaseHandler):
         if content:
             state.content = [Content(type=item['type'], value=item['value'])
                              for item in content]
+
+        if 'unresolved_answers' in payload:
+            state.unresolved_answers = {}
+            for answer, count in unresolved_answers.iteritems():
+                if count > 0:
+                    state.unresolved_answers[answer] = count
 
         state.put()
         self.response.write(json.dumps(

@@ -50,6 +50,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'interactive_rulesets',
     'param_changes',
     'state_name',
+    'unresolved_answers',
     'yaml_file'
   ];
 

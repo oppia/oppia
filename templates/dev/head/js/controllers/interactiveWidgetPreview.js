@@ -52,6 +52,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     );
   };
 
+  $scope.generateUnresolvedAnswersMap = function() {
+    $scope.unresolvedAnswersMap = [];
+    for (var answerItem in $scope.unresolvedAnswers) {
+      $scope.unresolvedAnswersMap.push({
+        'answer': answerItem,
+        'count': $scope.unresolvedAnswers[answerItem]
+      });
+    }
+  };
+
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding action and the value has several keys:
@@ -64,6 +74,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.interactiveRulesets = data.widget.rules;
     $scope.interactiveParams = data.widget.params;
     $scope.generateWidgetPreview(data.widget.id, data.widget.params);
+    $scope.unresolvedAnswers = data.unresolved_answers;
+    $scope.generateUnresolvedAnswersMap();
   };
 
   if (data) {
@@ -321,6 +333,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         'interactive_params': $scope.interactiveParams,
         'interactive_rulesets': $scope.interactiveRulesets
     });
+  };
+
+  $scope.deleteUnresolvedAnswer = function(answer) {
+    $scope.unresolvedAnswers[answer] = 0;
+    explorationData.saveStateData($scope.stateId, {
+      'unresolved_answers': $scope.unresolvedAnswers,
+    });
+    $scope.generateUnresolvedAnswersMap();
   };
 }
 
