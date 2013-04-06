@@ -4,7 +4,7 @@ id: InteractiveMap
 # The human-readable name of the widget.
 name: Interactive map
 # The category the widget falls under in the widget repository.
-category: Basic Input
+category: Custom
 # A description of the widget.
 description: |
   A map input widget for users to specify a position.

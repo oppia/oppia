@@ -22,6 +22,7 @@ import jinja2
 # Code contributors, in alphabetical order.
 CODE_CONTRIBUTORS = [
     'Jeremy Emerson',
+    'Koji Ashida',
     'Manas Tungare',
     'Sean Lip',
     'Stephanie Federwisch',
@@ -49,11 +50,12 @@ IDEA_CONTRIBUTORS = [
 # The fourth element is optional. Note that the filename omits the .yaml suffix.
 # The images are in /data/images.
 DEMO_EXPLORATIONS = [
-    ('welcome', 'Welcome to Oppia!', 'Other'),
+    ('welcome', 'Welcome to Oppia!', 'Welcome'),
     ('pitch', 'Pitch Perfect', 'Music', 'pitch.png'),
     ('counting', 'Three Balls', 'Mathematics', 'counting.png'),
     ('boot_verbs', 'Boot Verbs', 'Languages', 'boot_verbs.png'),
     ('hola', '¡Hola!', 'Languages'),
+    ('landmarks', 'Landmarks', 'Geography'),
 ]
 
 # Ensure that there is at least one demo exploration.

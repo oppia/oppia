@@ -1,0 +1,33 @@
+Taj Mahal on map:
+  content:
+  - type: text
+    value: '<div><span style="font-style: italic;">This is a test exploration that
+      showcases the interactive map widget.</span></div><div><br></div>Below is a
+      Google Map. See if you can find, and click on, the location of the Taj Mahal.<div><br></div><div><br></div>'
+  param_changes: {}
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: END
+        feedback:
+        - Yes, you found it!
+        inputs:
+          d: 0.05
+          p:
+          - 27.171781
+          - 78.04217
+        name: within(p, d)
+        param_changes: {}
+      - dest: Taj Mahal on map
+        feedback:
+        - No, try zooming into Agra.
+        - Try zooming into Agra. It's east of the Agra Fort.
+        inputs: {}
+        name: Default
+        param_changes: {}
+    params:
+      latitude: '27.171781'
+      longitude: '78.04217'
+      zoom: '10'
+    widget_id: InteractiveMap
