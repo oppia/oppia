@@ -135,6 +135,12 @@ class ExplorationHandler(BaseHandler):
         if default_recorded_answer:
             EventHandler.record_default_case_hit(
                 exploration_id, state_id, default_recorded_answer)
+            # Add this answer to the state's 'unresolved answers' list.
+            if default_recorded_answer not in old_state.unresolved_answers:
+                old_state.unresolved_answers[default_recorded_answer] = 0
+            old_state.unresolved_answers[default_recorded_answer] += 1
+            # TODO(sll): Make this async?
+            old_state.put()
 
         assert dest_id
 

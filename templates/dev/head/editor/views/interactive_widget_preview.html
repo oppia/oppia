@@ -127,14 +127,21 @@
 
   <br><br>
 
-  <div ng-show="stats.stateStats[stateId].answers">
+  
     <h4>Answers received that hit the 'Default' rule</h4>
-    <div ng-repeat="answer in stats.stateStats[stateId].answers">
-      <[answer[0]]>
-      (<em>submitted <[answer[1]]> time<span ng-show="answer[1] > 1">s</span></em>)
+    <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
+      <span ng-show="item.count == 0">
+        <del>
+          <[item.answer]>
+        </del>
+      </span>
+      <span ng-show="item.count > 0">
+        <[item.answer]>
+        (<em>submitted <[item.count]> time<span ng-show="item.count != 1">s</span></em>)
+        <a ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</a>
+      </span>
     </div>
-  </div>
-
+  
 
   <div class="modal hide fade" id="customizeWidgetModal">
     <div class="modal-header">

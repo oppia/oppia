@@ -99,6 +99,9 @@ class State(BaseModel):
     param_changes = ndb.JsonProperty(default={})
     # The interactive widget associated with this state.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
+    # A dict whose keys are unresolved answers associated with this state, and
+    # whose values are their counts.
+    unresolved_answers = ndb.JsonProperty(default={})
 
     @classmethod
     def create(cls, state_id, exploration, name):
