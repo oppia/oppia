@@ -1,0 +1,29 @@
+<html ng-app="im">
+  <head>
+    <script src="/third_party/static/jquery-1.7.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.8.17/jquery-ui.min.js"></script>
+    <script src="/third_party/static/bootstrap/js/bootstrap.js"></script>
+    <script src="/third_party/static/angularjs-1.0.3/angular.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.coords = [{{latitude}}, {{longitude}}];
+      GLOBALS.zoom = {{zoom}};
+    </script>
+
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVzSQrZdd0p_ydBaxtbRL9NJRVacRkH4w&sensor=false">
+    </script>
+    <script src="/data/widgets/InteractiveMap/static/js/InteractiveMap.js">
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"/>
+  </body>
+</html>

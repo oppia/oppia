@@ -31,6 +31,23 @@ def List(val):
     return val
 
 
+def Coord2D(val):
+    """The given value should be two reals."""
+    try:
+        if isinstance(val, list):
+            assert len(val) == 2
+            r0, r1 = val
+        else:
+            reals = val.lstrip('[').rstrip(']').split(',')
+            r0 = float(reals[0])
+            r1 = float(reals[1])
+        assert isinstance(r0, numbers.Real)
+        assert isinstance(r1, numbers.Real)
+    except:
+        return None
+    return [r0, r1]
+
+
 def MusicNote(val):
     """The given value is a music note between C4 and F5."""
     # TODO(sll): Make this a lot more general! E.g., enum.
