@@ -235,8 +235,6 @@ class State(BaseModel):
             is valid. The second element is a string providing an error message
             if applicable.
         """
-        logging.info(description)
-
         # Check the main keys.
         for key in description:
             if key not in ['content', 'param_changes', 'widget']:
