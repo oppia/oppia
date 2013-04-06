@@ -2,6 +2,15 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+v1.0.2 (6 Apr 2013)
+-------------------
+* Add an interactive map widget, a classifier for 2D coordinates, and a simple exploration showcasing these.
+* Show exploration statistics directly in the state editor, so that it is easy to view and act on readers' answers for individual states. 
+* Add an 'unresolved answers' list which keeps track of answers that need to be acted on.
+* Add a warning to the editor UI when there are self-loops that do not give the reader any feedback.
+* Add more unit tests for the Exploration model.
+* Add the Python 2.7 backport of unittest.mock for testing.
+* Various UI fixes.
 
 v1.0.1 (29 Mar 2013)
 --------------------
