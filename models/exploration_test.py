@@ -32,7 +32,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
     def test_exploration_class(self):
         """Test the Exploration class."""
-        exploration = Exploration(id='The hash id')
+        exploration = Exploration(id='The exploration hash id')
 
         # A new exploration should have a default title property.
         self.assertEqual(exploration.title, 'New exploration')
@@ -50,13 +50,16 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The 'init_state' property must be a valid State.
         with self.assertRaises(BadValueError):
             exploration.init_state = 'The State'
-        state = State(id='The hash id')
+        state = State(id='The state hash id')
+        state.put()
         exploration.init_state = state.key
 
         # The 'states' property must be a list.
         with self.assertRaises(BadValueError):
             exploration.states = 'A string'
+        # TODO(emersoj): We should put the initial state in the states list it should not be empty
         exploration.states = []
+        
 
         # The 'states property must be a list of State keys.
         with self.assertRaises(BadValueError):
@@ -98,7 +101,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         # Put and Retrieve the exploration.
         exploration.put()
-        retrieved_exploration = Exploration.get_by_id('The hash id')
+        retrieved_exploration = Exploration.get_by_id('The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.init_state, state.key)
         self.assertEqual(retrieved_exploration.title, 'New exploration')
@@ -126,3 +129,22 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(demo.is_demo(), True)
         notdemo = Exploration(id='abcd')
         self.assertEqual(notdemo.is_demo(), False)
+
+        # Ad Exploration has a 'as_yaml' method.
+        exploration3 = Exploration.create(user, 'A title', 'A category', 'A different exploration_id')
+        self.assertEqual(exploration3.as_yaml(), """Activity 1:
+  content: []
+  param_changes: {}
+  unresolved_answers: {}
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Activity 1
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: {}
+    params: {}
+    widget_id: Continue
+""")
