@@ -173,8 +173,8 @@ class InteractiveWidget(Widget):
             assert widget_id == widget_config['id']
 
             html_file = os.path.join(widget_id, '%s.html' % widget_id)
-            template = utils.get_file_contents(
-                feconf.SAMPLE_WIDGETS_DIR, html_file)
+            template = utils.get_file_contents(os.path.join(
+                feconf.SAMPLE_WIDGETS_DIR, html_file))
 
             params = []
             for param in widget_config['params']:

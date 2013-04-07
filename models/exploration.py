@@ -52,7 +52,6 @@ class Exploration(BaseModel):
             raise BadValueError('This exploration does not have any editors.')
 
     # The category this exploration belongs to.
-    # TODO(sll): Should this be a 'repeated' property?
     category = ndb.StringProperty(required=True)
     # What this exploration is called.
     title = ndb.StringProperty(default='New exploration')
@@ -77,11 +76,11 @@ class Exploration(BaseModel):
                init_state_name='Activity 1', image_id=None):
         """Creates and returns a new exploration."""
         if exploration_id is None:
-            exploration_id = utils.get_new_id(Exploration, title)
+            exploration_id = cls.get_new_id(title)
 
         # Temporarily create a fake initial state key.
         # TODO(sll): Do this in a transaction so it doesn't break other things.
-        state_id = utils.get_new_id(State, init_state_name)
+        state_id = State.get_new_id(init_state_name)
         fake_state_key = ndb.Key(Exploration, exploration_id, State, state_id)
 
         # Note that demo explorations do not have owners, so user may be None.
@@ -144,7 +143,7 @@ class Exploration(BaseModel):
 
     def add_state(self, state_name):
         """Adds a new state to the exploration, and returns the state."""
-        state_id = utils.get_new_id(State, state_name)
+        state_id = State.get_new_id(state_name)
         state = State.create(state_id, self, state_name)
 
         self.states.append(state.key)

@@ -16,6 +16,11 @@
 
 __author__ = 'Sean Lip'
 
+import base64
+import hashlib
+
+import utils
+
 from google.appengine.ext import ndb
 
 
@@ -24,3 +29,24 @@ class BaseModel(ndb.Model):
     @property
     def id(self):
         return self.key.id()
+
+    @classmethod
+    def get_new_id(cls, entity_name):
+        """Gets a new 12-character id for an entity, based on its name.
+
+        Raises:
+            Exception: if an id cannot be generated within a reasonable number
+              of attempts.
+        """
+        MAX_RETRIES = 10
+        RAND_RANGE = 127*127
+        for i in range(MAX_RETRIES):
+            new_id = base64.urlsafe_b64encode(
+                hashlib.sha1(
+                    '%s%s' % (entity_name.encode('utf-8'),
+                              utils.get_random_int(RAND_RANGE))
+                ).digest())[:12]
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')

@@ -16,9 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64
 import copy
-import hashlib
 import json
 import logging
 import os
@@ -43,11 +41,7 @@ class EntityIdNotFoundError(Exception):
 
 
 def log(message):
-    """Logs info messages in development/debug mode.
-
-    Args:
-        message: the message to be logged.
-    """
+    """Logs info messages in development/debug mode."""
     if feconf.DEV or feconf.DEBUG:
         if isinstance(message, dict):
             logging.info(json.dumps(message, sort_keys=True, indent=4))
@@ -60,56 +54,17 @@ def create_enum(*sequential, **names):
     return type('Enum', (), enums)
 
 
-def get_new_id(entity, entity_name):
-    """Gets a new id for an entity, based on its name.
-
-    Args:
-        entity: the entity's class.
-        entity_name: string representing the name of the entity
-
-    Returns:
-        string - the 12-character id representing the entity
-    """
-    seed = 0
-    new_id = base64.urlsafe_b64encode(
-        hashlib.sha1(entity_name.encode('utf-8')).digest())[:12]
-
-    while entity.get_by_id(new_id):
-        seed += 1
-        new_id = base64.urlsafe_b64encode(
-            hashlib.sha1('%s%s' % (
-                entity_name.encode('utf-8'), seed)).digest())[:12]
-
-    return new_id
-
-
-def get_file_contents(root, filepath):
-    """Gets the contents of a file.
-
-    Args:
-        root: the path to prepend to the filepath.
-        filepath: a path to a HTML, JS or CSS file. It should not include the
-            template/dev/head or template/prod/head prefix.
-
-    Returns:
-        the file contents.
-    """
-    with open(os.path.join(root, filepath)) as f:
+def get_file_contents(filepath):
+    """Gets the contents of a file, given a relative filepath from oppia/."""
+    with open(filepath) as f:
         return f.read().decode('utf-8')
 
 
 def get_js_controllers(filenames):
-    """Gets the concatenated contents of some JS controllers.
-
-    Args:
-        filenames: an array with names of JS files (without the '.js' suffix).
-
-    Returns:
-        the concatenated contents of these JS files.
-    """
+    """Concatenates the given JS files (specified without the '.js' suffix)."""
     return '\n'.join([
         get_file_contents(
-            feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename
+            os.path.join(feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename)
         ) for filename in filenames
     ])
 
@@ -268,7 +223,7 @@ def normalize_classifier_return(*args):
 
 
 def recursively_remove_key(d, key_to_remove):
-    """Recursively removes keys gfrom a dict."""
+    """Recursively removes keys from a dict."""
     if isinstance(d, list):
         for item in d:
             recursively_remove_key(item, key_to_remove)

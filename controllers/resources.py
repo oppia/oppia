@@ -29,7 +29,7 @@ class LibHandler(BaseHandler):
 
     def get_footer_js_code(self):
         return '\n'.join(
-            [utils.get_file_contents('', filepath)
+            [utils.get_file_contents(filepath)
              for filepath in feconf.FOOTER_JS_FILES])
 
     def get(self, lib_type):
