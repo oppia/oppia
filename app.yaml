@@ -55,7 +55,7 @@ handlers:
   upload: data/widgets/(.*)/static/(.*)
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=600'
+    Cache-Control: 'public, max-age=60'
 - url: /.*
   script: main.app
   secure: always

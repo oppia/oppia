@@ -7,8 +7,8 @@
 
     <script>
       var GLOBALS = {};
-      GLOBALS.coords = [{{latitude}}, {{longitude}}];
-      GLOBALS.zoom = {{zoom}};
+      GLOBALS.coords = [JSON.parse('{{latitude}}'), JSON.parse('{{longitude}}')];
+      GLOBALS.zoom = JSON.parse('{{zoom}}');
     </script>
 
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />

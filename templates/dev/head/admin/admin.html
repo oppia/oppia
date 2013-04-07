@@ -15,9 +15,16 @@
         $scope.message = '';
 
         $scope.reloadDemos = function() {
-          $scope.message = 'Processing...'
-          $http.post('/admin').success(function(data) {
-              $scope.message = 'Data reloaded successfully.';
+          $scope.message = 'Processing...';
+          var request = $.param({payload: JSON.stringify(
+              {action: 'reload_demos'})}, true);
+
+          $http.post(
+            '/admin',
+            request,
+            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+          success(function(data) {
+              $scope.message = 'Data reloaded successfully. Please remember to flush memcache so that users do not see stale values.';
             }).error(function(errorResponse) {
               $scope.message = 'Server error: ' + errorResponse.error;
             });
@@ -30,7 +37,7 @@
     <button ng-click="reloadDemos()">
       Reload demo widgets and explorations
     </button>
-    <br>
+    <br><br>
     <[message]>
   </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-  <!--Created by Phil Wagner 2013, feel free to reuse and share
-  Thanks to jQuery and MIDI.js for their libraires-->
+  <!--Created by Phil Wagner 2013, feel free to reuse and share.
+  Thanks to jQuery and MIDI.js for their libraries. -->
     <style>
       body {
         margin: 0px;
@@ -12,9 +12,9 @@
 
     <script>
       var GLOBALS = {};
-      GLOBALS.noteToGuess = {{noteToGuess}};
-      GLOBALS.notesToPlayAtStart = {{notesToPlayAtStart}};
-      GLOBALS.previousAnswer = {{previousAnswer}};
+      GLOBALS.noteToGuess = JSON.parse('{{noteToGuess}}');
+      GLOBALS.notesToPlayAtStart = JSON.parse('{{notesToPlayAtStart}}');
+      GLOBALS.previousAnswer = JSON.parse('{{previousAnswer}}');
     </script>
 
     <!-- midi.js package -->

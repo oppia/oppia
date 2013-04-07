@@ -69,54 +69,17 @@ def get_js_controllers(filenames):
     ])
 
 
-def js_escape(string):
-    """Escapes a string so it can be safely inserted into JavaScript code."""
-    if not string:
-        return string
-    return string.replace('\\', '\\\\').replace('"', '\\"').replace(
-        "'", "\\'").replace('\n', '\\n').replace('\r', '\\r').replace(
-            '\b', '\\b')
-
-
 def convert_to_js_string(value):
-    """Converts a value to a unicode string without extra 'u' characters."""
+    """Converts a value to a JavaScript string."""
+    string = json.dumps(value)
 
-    def recursively_convert_to_unicode(value, built_string):
-        if value is None:
-            return '%s%s' % (built_string, 'null')
-        if (isinstance(value, int) or isinstance(value, float)):
-            return '%s%s' % (built_string, value)
-        elif isinstance(value, unicode):
-            return "%s'%s'" % (built_string, js_escape(value))
-        elif isinstance(value, str):
-            return u"%s'%s'" % (
-                built_string, js_escape(value.decode('utf-8')))
-        elif isinstance(value, list) or isinstance(value, set):
-            string = u'['
-            for index, item in enumerate(value):
-                string = recursively_convert_to_unicode(item, string)
-                if index != len(value) - 1:
-                    string += ', '
-            string += ']'
-            return '%s%s' % (built_string, string)
-        elif isinstance(value, dict):
-            string = u'{'
-            index = 0
-            for key, val in value.iteritems():
-                string = recursively_convert_to_unicode(key, string)
-                string += ': '
-                string = recursively_convert_to_unicode(val, string)
-                if index != len(value) - 1:
-                    string += ', '
-                index += 1
-            string += '}'
-            return '%s%s' % (built_string, string)
-        else:
-            logging.info(
-                'Could not convert %s of type %s' % (value, type(value)))
-            return '%s%s' % (built_string, value)
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
+                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-    return recursively_convert_to_unicode(value, u'')
+    for replacement in replacements:
+        string = string.replace(replacement[0], replacement[1])
+    return string
 
 
 def parse_with_jinja(string, params, default=''):
@@ -137,7 +100,7 @@ def parse_with_jinja(string, params, default=''):
     for var in variables:
         if var not in new_params:
             new_params[var] = default
-            logging.info('Cannot parse %s properly using %s', string, params)
+            logging.info('Cannot parse %s fully using %s', string, params)
 
     return Environment().from_string(string).render(new_params)
 

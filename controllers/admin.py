@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import json
+
 from controllers.base import BaseHandler
 from controllers.base import require_admin
 from models.exploration import Exploration
@@ -25,7 +27,7 @@ from models.widget import Widget
 import utils
 
 
-def reload_default_data():
+def reload_demos():
     """Reload the default widgets, then reload the default explorations."""
     Widget.delete_all_widgets()
     InteractiveWidget.load_default_widgets()
@@ -49,4 +51,6 @@ class AdminPage(BaseHandler):
     @require_admin
     def post(self, user):
         """Reloads the default widgets and explorations."""
-        reload_default_data()
+        payload = json.loads(self.request.get('payload'))
+        if payload.get('action') == 'reload_demos':
+            reload_demos()

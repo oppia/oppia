@@ -46,18 +46,17 @@ class UtilsTests(test_utils.AppEngineTestBase):
     def test_convert_to_js_string(self):
         """Test convert_to_js_string method."""
         expected_values = [
-            ('a', "'a'"),
+            ('a', '\\"a\\"'),
             (2, '2'),
             (5.5, '5.5'),
-            ("'", "'\\''"),
-            (u'¡Hola!', u"'¡Hola!'"),
-            (['a', '¡Hola!', 2], u"['a', '¡Hola!', 2]"),
-            ({'a': 4, '¡Hola!': 2}, u"{'a': 4, '¡Hola!': 2}"),
-            (set(['a']), u"['a']"),
-            ('', u"''"),
+            ("'", '\\"\\\'\\"'),
+            (u'¡Hola!', '\\"\\\\u00a1Hola!\\"'),
+            (['a', '¡Hola!', 2], '[\\"a\\", \\"\\\\u00a1Hola!\\", 2]'),
+            ({'a': 4, '¡Hola!': 2}, '{\\"a\\": 4, \\"\\\\u00a1Hola!\\": 2}'),
+            ('', '\\"\\"'),
             (None, 'null'),
             (['a', {'b': 'c', 'd': ['e', None]}],
-                u"['a', {'b': 'c', 'd': ['e', null]}]")
+                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
         ]
 
         for tup in expected_values:
@@ -92,23 +91,23 @@ class UtilsTests(test_utils.AppEngineTestBase):
     def test_parse_dict_with_params(self):
         """Test parse_dict_with_params method."""
         parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {}, '')
-        self.assertEqual(parsed_dict, {'a': u"'b'"})
+        self.assertEqual(parsed_dict, {'a': '\\"b\\"'})
 
         parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {}, 'def')
-        self.assertEqual(parsed_dict, {'a': u"'def'"})
+        self.assertEqual(parsed_dict, {'a': '\\"def\\"'})
 
         parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3}, '')
-        self.assertEqual(parsed_dict, {'a': u"'3'"})
+        self.assertEqual(parsed_dict, {'a': '\\"3\\"'})
 
         parsed_dict = utils.parse_dict_with_params(
             {'a': '{{b}}'}, {'b': 'c'}, '')
-        self.assertEqual(parsed_dict, {'a': u"'c'"})
+        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
 
         # Test that the original dictionary is unchanged.
         orig_dict = {'a': '{{b}}'}
         parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'}, '')
         self.assertEqual(orig_dict, {'a': '{{b}}'})
-        self.assertEqual(parsed_dict, {'a': u"'c'"})
+        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
 
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""

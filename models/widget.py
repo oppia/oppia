@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import os
+import re
 
 import feconf
 import utils
@@ -27,9 +28,18 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 
 
+class AlphanumericProperty(ndb.StringProperty):
+    """A property for strings with alphanumeric characters."""
+
+    def _validate(self, value):
+        """Check that the value is alphanumeric."""
+        assert re.compile("^[a-zA-Z0-9]+$").match(value), (
+            'Only parameter names with characters in [a-zA-Z0-9] are accepted.')
+
+
 class WidgetParameter(ndb.Model):
     """A class for parameters."""
-    name = ndb.StringProperty(required=True)
+    name = AlphanumericProperty(required=True)
     description = ndb.TextProperty()
     param_type = ndb.StringProperty(required=True)
     # TODO(sll): Validate that this default value is of the correct type, or None.

@@ -31,7 +31,7 @@ class MainPage(BaseHandler):
     def get(self):
         """Handles GET requests."""
         if not Exploration.get('0', strict=False):
-            admin.reload_default_data()
+            admin.reload_demos()
 
         self.values.update({
             'gallery_login_url': users.create_login_url('/gallery'),
