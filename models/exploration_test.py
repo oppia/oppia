@@ -17,7 +17,6 @@
 __author__ = 'Jeremy Emerson'
 
 import test_utils
-import utils
 
 from exploration import Exploration
 from exploration import Parameter

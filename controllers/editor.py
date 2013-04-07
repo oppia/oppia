@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import copy
 import json
 
 from controllers.base import BaseHandler
