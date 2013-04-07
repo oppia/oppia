@@ -187,6 +187,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     explorationData.saveStateData(
         $scope.stateId, {'state_name': $scope.stateName});
+    activeInputData.clear();
   };
 
 
