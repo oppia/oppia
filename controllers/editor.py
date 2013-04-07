@@ -44,12 +44,7 @@ def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
     state_repr = state.as_dict()
-    # Modify the YAML representation to use names instead of ids.
-    modified_state_dict = copy.deepcopy(state.internals_as_dict())
-    for handler in modified_state_dict['widget']['handlers']:
-        for rule in handler['rules']:
-            if rule['dest'] != feconf.END_DEST:
-                rule['dest'] = State.get(rule['dest'], exploration).name
+    modified_state_dict = state.internals_as_dict(human_readable_dests=True)
 
     # TODO(sll): The following is for backwards-compatibility and should be
     # deleted later.
@@ -68,7 +63,7 @@ def get_state_for_frontend(state, exploration):
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
-    state_repr['yaml'] = utils.get_yaml_from_dict(modified_state_dict)
+    state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
     return state_repr
 
 
@@ -223,12 +218,6 @@ class ExplorationHandler(BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        # Check that the state_name has not been taken.
-        if exploration.contains_state_with_name(state_name):
-            raise self.InvalidInputException(
-                'Duplicate state name for exploration %s: %s' %
-                (exploration.title, state_name))
-
         state = exploration.add_state(state_name)
         self.response.write(json.dumps(state.as_dict()))
 
@@ -307,7 +296,7 @@ class StateHandler(BaseHandler):
             # The user has uploaded a YAML file. Process only this action.
             state = State.modify_using_dict(
                 exploration, state,
-                utils.get_dict_from_yaml(yaml_file))
+                utils.dict_from_yaml(yaml_file))
             self.response.write(json.dumps(
                 get_state_for_frontend(state, exploration)))
             return
@@ -324,12 +313,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            if (state_name != state.name and
-                    exploration.contains_state_with_name(state_name)):
-                raise self.InvalidInputException(
-                    'Duplicate state name: %s', state_name)
-            state.name = state_name
-            state.put()
+            exploration.rename_state(state, state_name)
 
         if param_changes:
             state.param_changes = param_changes

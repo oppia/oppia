@@ -121,7 +121,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         # An Exploration has a 'delete' method.
         exploration2.delete()
-        with self.assertRaises(utils.EntityIdNotFoundError):
+        with self.assertRaises(Exception):
             retrieved_exploration2 = Exploration.get('A exploration_id')
         # The get() should fail silently when strict == False.
         retrieved_exploration2 = Exploration.get(

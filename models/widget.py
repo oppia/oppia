@@ -130,7 +130,7 @@ class Widget(polymodel.PolyModel):
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,
                         '%sRules.yaml' % classifier)) as f:
-                    rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+                    rules = utils.dict_from_yaml(f.read().decode('utf-8'))
                     rule_dict = {}
                     for rule in rules:
                         rule_dict[rules[rule]['name']] = {'classifier': rule}
@@ -177,7 +177,7 @@ class InteractiveWidget(Widget):
             with open(os.path.join(
                     feconf.SAMPLE_WIDGETS_DIR, widget_id,
                     '%s.config.yaml' % widget_id)) as f:
-                widget_config = utils.get_dict_from_yaml(
+                widget_config = utils.dict_from_yaml(
                     f.read().decode('utf-8'))
 
             assert widget_id == widget_config['id']
@@ -223,6 +223,6 @@ class InteractiveWidget(Widget):
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,
                         '%sRules.yaml' % classifier)) as f:
-                    rules = utils.get_dict_from_yaml(f.read().decode('utf-8'))
+                    rules = utils.dict_from_yaml(f.read().decode('utf-8'))
                     return rules[rule_name]['name']
         raise Exception('No rule name found for %s' % rule_name)

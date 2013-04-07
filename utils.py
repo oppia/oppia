@@ -143,12 +143,12 @@ def to_ascii(string):
         'NFKD', unicode(string)).encode('ascii', 'ignore')
 
 
-def get_yaml_from_dict(dictionary):
+def yaml_from_dict(dictionary):
     """Gets the YAML representation of a dict."""
     return yaml.safe_dump(dictionary, default_flow_style=False)
 
 
-def get_dict_from_yaml(yaml_file):
+def dict_from_yaml(yaml_file):
     """Gets the dict representation of a YAML file."""
     try:
         yaml_dict = yaml.safe_load(yaml_file)

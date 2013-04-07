@@ -104,8 +104,9 @@ class State(BaseModel):
     unresolved_answers = ndb.JsonProperty(default={})
 
     @classmethod
-    def create(cls, state_id, exploration, name):
+    def create(cls, exploration, name, state_id=None):
         """Creates a new state."""
+        state_id = state_id or cls.get_new_id(name)
         new_state = cls(id=state_id, parent=exploration.key, name=name)
         new_state.widget = new_state.get_default_widget()
         new_state.put()
@@ -123,10 +124,18 @@ class State(BaseModel):
         state_dict['name'] = self.name
         return state_dict
 
-    def internals_as_dict(self):
+    def internals_as_dict(self, human_readable_dests=False):
         """Gets a Python dict of the internals of the state."""
         state_dict = copy.deepcopy(self.to_dict(
             exclude=['name', 'unresolved_answers']))
+        if human_readable_dests:
+            # Change the dest ids to human-readable names.
+            for handler in state_dict['widget']['handlers']:
+                for rule in handler['rules']:
+                    if rule['dest'] != feconf.END_DEST:
+                        dest_state = State.get_by_id(
+                            rule['dest'], parent=self.key.parent())
+                        rule['dest'] = dest_state.name
         return state_dict
 
     @classmethod

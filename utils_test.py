@@ -135,16 +135,16 @@ class UtilsTests(test_utils.AppEngineTestBase):
         self.assertEqual(parsed_str, '')
 
     def test_yaml_dict_conversion(self):
-        """Test get_yaml_from_dict and get_dict_from_yaml methods."""
+        """Test yaml_from_dict and dict_from_yaml methods."""
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = utils.get_yaml_from_dict(adict)
-            yaml_dict = utils.get_dict_from_yaml(yaml_str)
+            yaml_str = utils.yaml_from_dict(adict)
+            yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
         with self.assertRaises(utils.InvalidInputException):
-            yaml_str = utils.get_dict_from_yaml('{')
+            yaml_str = utils.dict_from_yaml('{')
 
     def test_normalize_classifier_return(self):
         """Test normalize_classifier_return method."""
