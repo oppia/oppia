@@ -17,6 +17,7 @@
 __author__ = 'Jeremy Emerson'
 
 import test_utils
+import utils
 
 from exploration import Exploration
 from exploration import Parameter
@@ -59,7 +60,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             exploration.states = 'A string'
         # TODO(emersoj): We should put the initial state in the states list it should not be empty
         exploration.states = []
-        
 
         # The 'states property must be a list of State keys.
         with self.assertRaises(BadValueError):
@@ -121,23 +121,26 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         # An Exploration has a 'delete' method.
         exploration2.delete()
-        retrieved_exploration2 = Exploration.get('A exploration_id')
+        with self.assertRaises(utils.EntityIdNotFoundError):
+            retrieved_exploration2 = Exploration.get('A exploration_id')
+        # The get() should fail silently when strict == False.
+        retrieved_exploration2 = Exploration.get(
+            'A exploration_id', strict=False)
         self.assertIsNone(retrieved_exploration2)
 
-        # An Exploration has a 'is_demo' method.
+        # An Exploration has a 'is_demo_exploration' method.
         demo = Exploration(id='0')
-        self.assertEqual(demo.is_demo(), True)
+        self.assertEqual(demo.is_demo_exploration(), True)
         notdemo1 = Exploration(id='a')
-        self.assertEqual(notdemo1.is_demo(), False)
+        self.assertEqual(notdemo1.is_demo_exploration(), False)
         notdemo2 = Exploration(id='abcd')
-        self.assertEqual(notdemo2.is_demo(), False)
+        self.assertEqual(notdemo2.is_demo_exploration(), False)
 
         # Ad Exploration has a 'as_yaml' method.
         exploration3 = Exploration.create(user, 'A title', 'A category', 'A different exploration_id')
         self.assertEqual(exploration3.as_yaml(), """Activity 1:
   content: []
   param_changes: {}
-  unresolved_answers: {}
   widget:
     handlers:
     - name: submit

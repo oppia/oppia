@@ -27,8 +27,9 @@ from models.image import Image
 from state import State
 import utils
 
-from google.appengine.ext import ndb
 from google.appengine.api import users
+from google.appengine.ext import ndb
+from google.appengine.ext.db import BadValueError
 
 
 class Parameter(ndb.Model):
@@ -42,6 +43,14 @@ class Parameter(ndb.Model):
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(BaseModel):
     """An exploration (which is made up of several states)."""
+
+    def _pre_put_hook(self):
+        """Validates the exploration before it is put into the datastore."""
+        if not self.states:
+            raise BadValueError('This exploration does not have any states.')
+        if not self.is_demo_exploration() and not self.editors:
+            raise BadValueError('This exploration does not have any editors.')
+
     # The category this exploration belongs to.
     # TODO(sll): Should this be a 'repeated' property?
     category = ndb.StringProperty(required=True)
@@ -49,7 +58,8 @@ class Exploration(BaseModel):
     title = ndb.StringProperty(default='New exploration')
     # The state which forms the start of this exploration.
     init_state = ndb.KeyProperty(kind=State, required=True)
-    # The list of states this exploration consists of.
+    # The list of states this exploration consists of. This list may not be
+    # empty.
     states = ndb.KeyProperty(kind=State, repeated=True)
     # The list of parameters associated with this exploration
     parameters = ndb.StructuredProperty(Parameter, repeated=True)
@@ -57,8 +67,9 @@ class Exploration(BaseModel):
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
-    # List of email addresses of users who can edit this exploration.
-    # The first element is the original creator of the exploration.
+    # List of users who can edit this exploration. If the exploration is a demo
+    # exploration, the list is empty. Otherwise, the first element is the
+    # original creator of the exploration.
     editors = ndb.UserProperty(repeated=True)
 
     @classmethod
@@ -67,35 +78,62 @@ class Exploration(BaseModel):
         """Creates and returns a new exploration."""
         if exploration_id is None:
             exploration_id = utils.get_new_id(Exploration, title)
-        state_id = utils.get_new_id(State, init_state_name)
 
         # Temporarily create a fake initial state key.
         # TODO(sll): Do this in a transaction so it doesn't break other things.
-        fake_state_key = ndb.Key(State, state_id)
+        state_id = utils.get_new_id(State, init_state_name)
+        fake_state_key = ndb.Key(Exploration, exploration_id, State, state_id)
 
-        default_editors = []
-        # Note that an exploration may not have a default owner, e.g. if it is
-        # a default exploration.
-        if user:
-            default_editors.append(user)
+        # Note that demo explorations do not have owners, so user may be None.
+        default_editors = [user] if user else []
 
         exploration = Exploration(
             id=exploration_id, title=title, init_state=fake_state_key,
-            category=category, image_id=image_id, editors=default_editors)
+            category=category, image_id=image_id, editors=default_editors,
+            states=[fake_state_key])
         exploration.put()
-        new_init_state = State.create(state_id, exploration, init_state_name)
 
-        # Replace the fake key with its real counterpart.
-        exploration.init_state = new_init_state.key
-        exploration.states = [new_init_state.key]
-        exploration.put()
+        new_init_state = State.create(state_id, exploration, init_state_name)
+        assert fake_state_key == new_init_state.key
+
         return exploration
+
+    @classmethod
+    def get(cls, exploration_id, strict=True):
+        """Gets an exploration by id. Fails noisily if strict == True.
+
+        Args:
+          exploration_id: the id of the exploration to retrieve
+          strict: if True, this method raises an Exception if the exploration
+              cannot be found. Otherwise, it returns None.
+
+        Raises:
+          Exception: if strict is True and the exploration cannot be found.
+        """
+        exploration = cls.get_by_id(exploration_id)
+        if strict and not exploration:
+            raise utils.EntityIdNotFoundError(
+                'Exploration with id %s not found' % exploration_id)
+        return exploration
+
+    def delete(self):
+        """Deletes an exploration."""
+        for state_key in self.states:
+            state_key.delete()
+        self.key.delete()
 
     def is_editable_by(self, user):
         """Checks whether the given user has rights to edit this exploration."""
         return users.is_current_user_admin() or user in self.editors
 
-    def contains_state_name(self, state_name):
+    @classmethod
+    def get_viewable_explorations(cls, user):
+        """Returns a list of explorations viewable by a given user."""
+        return cls.query().filter(ndb.OR(
+            cls.is_public == True, cls.editors == user,
+        ))
+
+    def contains_state_with_name(self, state_name):
         """Checks if a state with the given name exists in this exploration."""
         if not state_name:
             raise utils.EntityIdNotFoundError('No state name supplied')
@@ -104,12 +142,23 @@ class Exploration(BaseModel):
             State.name == state_name).get()
         return bool(state)
 
-    @classmethod
-    def get_viewable_explorations(cls, user):
-        """Returns a list of explorations viewable by a given user."""
-        return cls.query().filter(ndb.OR(
-            cls.is_public == True, cls.editors == user,
-        ))
+    def add_state(self, state_name):
+        """Adds a new state to the exploration, and returns the state."""
+        state_id = utils.get_new_id(State, state_name)
+        state = State.create(state_id, self, state_name)
+
+        self.states.append(state.key)
+        self.put()
+        return state
+
+    def is_demo_exploration(self):
+        """Checks if the exploration is one of the demo explorations."""
+        try:
+            id_int = int(self.id)
+        except Exception:
+            return False
+
+        return id_int >= 0 and id_int < len(feconf.DEMO_EXPLORATIONS)
 
     @classmethod
     def load_demo_explorations(cls):
@@ -144,7 +193,7 @@ class Exploration(BaseModel):
         """Deletes the demo explorations."""
         exploration_list = []
         for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-            exploration = cls.get(str(int_id))
+            exploration = cls.get(str(int_id), strict=False)
             if not exploration:
                 logging.info('No exploration with id %s found.' % int_id)
             else:
@@ -152,26 +201,6 @@ class Exploration(BaseModel):
 
         for exploration in exploration_list:
             exploration.delete()
-
-    @classmethod
-    def get(cls, exploration_id):
-        """Gets an exploration by id. If it does not exist, returns None."""
-        return cls.get_by_id(exploration_id)
-
-    def delete(self):
-        """Deletes an exploration."""
-        for state_key in self.states:
-            state_key.delete()
-        self.key.delete()
-
-    def is_demo(self):
-        """Checks if the exploration is one of the demos."""
-        try:
-            id_int = int(self.id)
-        except Exception:
-            return False
-
-        return id_int >= 0 and id_int < len(feconf.DEMO_EXPLORATIONS)
 
     def as_yaml(self):
         """Returns a copy of the exploration as YAML."""
@@ -223,7 +252,7 @@ class Exploration(BaseModel):
                 if state_name == init_state_name:
                     continue
                 else:
-                    if exploration.contains_state_name(state_name):
+                    if exploration.contains_state_with_name(state_name):
                         raise utils.InvalidInputException(
                             'Invalid YAML file: contains duplicate state '
                             'names %s' % state_name)
@@ -237,12 +266,3 @@ class Exploration(BaseModel):
             raise
 
         return exploration
-
-    def add_state(self, state_name):
-        """Adds a new state to the exploration, and returns the state."""
-        state_id = utils.get_new_id(State, state_name)
-        state = State.create(state_id, self, state_name)
-
-        self.states.append(state.key)
-        self.put()
-        return state

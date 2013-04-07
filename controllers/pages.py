@@ -30,7 +30,7 @@ class MainPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not Exploration.get('0'):
+        if not Exploration.get('0', strict=False):
             admin.reload_default_data()
 
         self.values.update({

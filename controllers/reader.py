@@ -100,10 +100,7 @@ class ExplorationPage(BaseHandler):
             'nav_mode': READER_MODE,
         })
 
-        exploration = Exploration.get(exploration_id)
-        if exploration is None:
-            raise self.InvalidInputException(
-                'Exploration %s not found' % exploration_id)
+        Exploration.get(exploration_id)
 
         # The following allows embedding of Oppia explorations in other pages.
         if self.request.get('iframed') == 'true':

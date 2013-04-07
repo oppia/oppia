@@ -125,7 +125,8 @@ class State(BaseModel):
 
     def internals_as_dict(self):
         """Gets a Python dict of the internals of the state."""
-        state_dict = copy.deepcopy(self.to_dict(exclude=['name']))
+        state_dict = copy.deepcopy(self.to_dict(
+            exclude=['name', 'unresolved_answers']))
         return state_dict
 
     @classmethod

@@ -66,7 +66,7 @@ class GalleryHandler(BaseHandler):
             categories[category_name].append({
                 'data': data,
                 'can_edit': can_edit,
-                'can_fork': user and exploration.is_demo(),
+                'can_fork': user and exploration.is_demo_exploration(),
                 'is_owner': (user and exploration.editors and
                              user == exploration.editors[0]),
             })

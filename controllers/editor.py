@@ -145,11 +145,7 @@ class ForkExploration(BaseHandler):
         exploration_id = payload.get('exploration_id')
 
         forked_exploration = Exploration.get(exploration_id)
-        if not forked_exploration:
-            raise self.InvalidInputException(
-                'Exploration %s does not exist.' % exploration_id)
-
-        if not forked_exploration.is_demo():
+        if not forked_exploration.is_demo_exploration():
             raise self.InvalidInputException('Exploration cannot be forked.')
 
         # Get the demo exploration as a YAML file, so that new states can be
@@ -228,7 +224,7 @@ class ExplorationHandler(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         # Check that the state_name has not been taken.
-        if exploration.contains_state_name(state_name):
+        if exploration.contains_state_with_name(state_name):
             raise self.InvalidInputException(
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
@@ -329,7 +325,7 @@ class StateHandler(BaseHandler):
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             if (state_name != state.name and
-                    exploration.contains_state_name(state_name)):
+                    exploration.contains_state_with_name(state_name)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
             state.name = state_name

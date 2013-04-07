@@ -69,8 +69,6 @@ def require_editor(handler):
             return
 
         exploration = Exploration.get(exploration_id)
-        if not exploration:
-            raise self.InvalidInputException('Exploration not found.')
 
         if not exploration.is_editable_by(user):
             raise self.UnauthorizedUserException(
