@@ -127,7 +127,7 @@
 
   <br><br>
 
-  
+  <div ng-show="!isEmpty(unresolvedAnswersMap)">
     <h4>Answers received that hit the 'Default' rule</h4>
     <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
       <span ng-show="item.count == 0">
@@ -141,7 +141,7 @@
         <a ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</a>
       </span>
     </div>
-  
+  </div>
 
   <div class="modal hide fade" id="customizeWidgetModal">
     <div class="modal-header">

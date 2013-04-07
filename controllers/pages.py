@@ -16,9 +16,10 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+from controllers import admin
 from controllers.base import BaseHandler
-import controller_utils
 import feconf
+from models.exploration import Exploration
 import utils
 
 from google.appengine.api import users
@@ -29,7 +30,9 @@ class MainPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        controller_utils.ensure_default_data_is_loaded()
+        if not Exploration.get('0'):
+            admin.reload_default_data()
+
         self.values.update({
             'gallery_login_url': users.create_login_url('/gallery'),
         })

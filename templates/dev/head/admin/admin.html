@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html ng-app="oppia">
+  <head>
+    <title>Oppia Admin Panel</title>
+
+    {% include 'header_js_libs.html' %}
+    <script>
+      var oppia = angular.module('oppia', []);
+      oppia.config(function($interpolateProvider) {
+        $interpolateProvider.startSymbol('<[');
+        $interpolateProvider.endSymbol(']>');
+      });
+
+      function Admin($scope, $http) {
+        $scope.message = '';
+
+        $scope.reloadDemos = function() {
+          $scope.message = 'Processing...'
+          $http.post('/admin').success(function(data) {
+              $scope.message = 'Data reloaded successfully.';
+            }).error(function(errorResponse) {
+              $scope.message = 'Server error: ' + errorResponse.error;
+            });
+        };
+      };
+    </script>
+  </head>
+
+  <body ng-controller="Admin">
+    <button ng-click="reloadDemos()">
+      Reload demo widgets and explorations
+    </button>
+    <br>
+    <[message]>
+  </body>
+</html>

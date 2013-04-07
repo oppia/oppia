@@ -22,6 +22,7 @@ import sys
 
 import webapp2
 
+from controllers import admin
 from controllers import base
 from controllers import editor
 from controllers import feedback
@@ -56,6 +57,8 @@ urls = [
     (r'/?', pages.MainPage),
     (r'/about/?', pages.AboutPage),
     (r'/terms/?', pages.TermsPage),
+
+    (r'/admin/?', admin.AdminPage),
 
     (r'/feedback/?', feedback.FeedbackPage),
 

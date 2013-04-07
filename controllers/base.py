@@ -21,7 +21,6 @@ import logging
 import sys
 import traceback
 
-import controller_utils
 import feconf
 import jinja2
 from models.exploration import Exploration
@@ -73,7 +72,7 @@ def require_editor(handler):
         if not exploration:
             raise self.InvalidInputException('Exploration not found.')
 
-        if not controller_utils.check_can_edit(user, exploration):
+        if not exploration.is_editable_by(user):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
                 user)
@@ -84,6 +83,22 @@ def require_editor(handler):
         return handler(self, user, exploration, state, **kwargs)
 
     return test_editor
+
+
+def require_admin(handler):
+    """Decorator that checks if the current user is an admin."""
+    def test_admin(self, **kwargs):
+        """Checks if the user is logged in and is an admin."""
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
+        if not users.is_current_user_admin():
+            raise self.UnauthorizedUserException(
+                '%s is not an admin of this application', user)
+        return handler(self, user, **kwargs)
+
+    return test_admin
 
 
 class BaseHandler(webapp2.RequestHandler):

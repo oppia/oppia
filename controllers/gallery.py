@@ -17,13 +17,11 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import controller_utils
 from controllers.base import BaseHandler
 from models.exploration import Exploration
 import utils
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
 
 
 class GalleryPage(BaseHandler):
@@ -48,14 +46,12 @@ class GalleryHandler(BaseHandler):
         used_keys = []
 
         categories = {}
-        explorations = Exploration.query().filter(ndb.OR(
-            Exploration.is_public == True, Exploration.editors == user,
-        ))
+        explorations = Exploration.get_viewable_explorations(user)
 
         for exploration in explorations:
             category_name = exploration.category
 
-            can_edit = user and controller_utils.check_can_edit(user, exploration)
+            can_edit = user and exploration.is_editable_by(user)
 
             used_keys.append(exploration.key)
 

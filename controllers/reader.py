@@ -20,17 +20,74 @@ import cgi
 import json
 
 from controllers.base import BaseHandler
-import controller_utils
 import feconf
 from models.exploration import Exploration
 from models.state import Content
 from models.state import State
 from models.statistics import EventHandler
 from models.widget import InteractiveWidget
+from models.widget import NonInteractiveWidget
 import utils
 
 READER_MODE = 'reader'
 DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
+
+
+def parse_content_into_html(content_array, block_number, params=None):
+    """Takes a Content array and transforms it into HTML.
+
+    Args:
+        content_array: an array, each of whose members is of type Content. This
+            object has two keys: type and value. The 'type' is one of the
+            following:
+                - 'text'; then the value is a text string
+                - 'image'; then the value is an image ID
+                - 'video'; then the value is a video ID
+                - 'widget'; then the value is a widget ID
+        block_number: the number of content blocks preceding this one.
+        params: any parameters used for templatizing text strings.
+
+    Returns:
+        the HTML string representing the array.
+
+    Raises:
+        InvalidInputException: if content has no 'type' attribute, or an invalid
+            'type' attribute.
+    """
+    if params is None:
+        params = {}
+
+    html = ''
+    widget_array = []
+    widget_counter = 0
+    for content in content_array:
+        if content.type == 'widget':
+            try:
+                widget = NonInteractiveWidget.get_with_params(
+                    content.value, params)
+                widget_counter += 1
+                html += feconf.JINJA_ENV.get_template('content.html').render({
+                    'type': content.type, 'blockIndex': block_number,
+                    'index': widget_counter})
+                widget_array.append({
+                    'blockIndex': block_number,
+                    'index': widget_counter,
+                    'code': widget.raw})
+            except utils.EntityIdNotFoundError:
+                # Ignore empty widget content.
+                pass
+        elif (content.type in ['text', 'image', 'video']):
+            if content.type == 'text':
+                value = utils.parse_with_jinja(content.value, params)
+            else:
+                value = content.value
+
+            html += feconf.JINJA_ENV.get_template('content.html').render({
+                'type': content.type, 'value': value})
+        else:
+            raise utils.InvalidInputException(
+                'Invalid content type %s', content.type)
+    return html, widget_array
 
 
 class ExplorationPage(BaseHandler):
@@ -79,7 +136,7 @@ class ExplorationHandler(BaseHandler):
         exploration = Exploration.get(exploration_id)
         init_state = exploration.init_state.get()
         params = self.get_params(init_state)
-        init_html, init_widgets = controller_utils.parse_content_into_html(
+        init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_with_params(
             init_state.widget.widget_id,
@@ -158,7 +215,7 @@ class ExplorationHandler(BaseHandler):
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                action_html, action_widgets = controller_utils.parse_content_into_html(
+                action_html, action_widgets = parse_content_into_html(
                     [Content(type='text', value=cgi.escape(feedback))],
                     block_number,
                     params)
@@ -171,7 +228,7 @@ class ExplorationHandler(BaseHandler):
 
             # Append Oppia's feedback, if any.
             if feedback:
-                action_html, action_widgets = controller_utils.parse_content_into_html(
+                action_html, action_widgets = parse_content_into_html(
                     [Content(type='text', value=cgi.escape(feedback))],
                     block_number,
                     params)
@@ -180,7 +237,7 @@ class ExplorationHandler(BaseHandler):
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
-                state_html, state_widgets = controller_utils.parse_content_into_html(
+                state_html, state_widgets = parse_content_into_html(
                     state.content, block_number, params)
                 # Separate text for the new state and feedback for the old state
                 # by an additional line.

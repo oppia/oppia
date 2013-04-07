@@ -131,6 +131,13 @@ class Widget(polymodel.PolyModel):
 
         return result
 
+    @classmethod
+    def delete_all_widgets(cls):
+        """Deletes all widgets."""
+        widget_list = Widget.query()
+        for widget in widget_list:
+            widget.key.delete()
+
 
 class NonInteractiveWidget(Widget):
     """A generic non-interactive widget."""

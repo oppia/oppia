@@ -125,10 +125,12 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertIsNone(retrieved_exploration2)
 
         # An Exploration has a 'is_demo' method.
-        demo = Exploration(id='a')
+        demo = Exploration(id='0')
         self.assertEqual(demo.is_demo(), True)
-        notdemo = Exploration(id='abcd')
-        self.assertEqual(notdemo.is_demo(), False)
+        notdemo1 = Exploration(id='a')
+        self.assertEqual(notdemo1.is_demo(), False)
+        notdemo2 = Exploration(id='abcd')
+        self.assertEqual(notdemo2.is_demo(), False)
 
         # Ad Exploration has a 'as_yaml' method.
         exploration3 = Exploration.create(user, 'A title', 'A category', 'A different exploration_id')

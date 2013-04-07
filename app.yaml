@@ -12,6 +12,11 @@ builtins:
 - appstats: on
 - remote_api: on
 
+admin_console:
+  pages:
+  - name: Oppia Admin Page
+    url: /admin
+
 handlers:
 - url: /favicon.ico
   static_files: static/images/favicon.ico
@@ -32,6 +37,7 @@ handlers:
   mime_type: 'text/css'
   http_headers:
     Cache-Control: 'public, max-age=600'
+    Vary: Accept-Encoding
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always

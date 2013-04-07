@@ -22,7 +22,6 @@ import json
 from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
-import controller_utils
 from data.classifiers import normalizers
 import feconf
 from models.exploration import Exploration
@@ -123,10 +122,10 @@ class NewExploration(BaseHandler):
         yaml = self.request.get('yaml')
 
         if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exploration = controller_utils.create_exploration_from_yaml(
+            exploration = Exploration.create_from_yaml(
                 yaml_file=yaml, user=user, title=title, category=category)
         else:
-            exploration = controller_utils.create_new_exploration(
+            exploration = Exploration.create(
                 user, title=title, category=category)
 
         self.response.write(json.dumps({
@@ -159,7 +158,7 @@ class ForkExploration(BaseHandler):
         title = 'Copy of %s' % forked_exploration.title
         category = forked_exploration.category
 
-        exploration = controller_utils.create_exploration_from_yaml(
+        exploration = Exploration.create_from_yaml(
             yaml_file=yaml, user=user, title=title, category=category)
 
         self.response.write(json.dumps({
@@ -229,7 +228,7 @@ class ExplorationHandler(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         # Check that the state_name has not been taken.
-        if controller_utils.check_existence_of_name(State, state_name, exploration):
+        if exploration.contains_state_name(state_name):
             raise self.InvalidInputException(
                 'Duplicate state name for exploration %s: %s' %
                 (exploration.title, state_name))
@@ -278,7 +277,7 @@ class ExplorationHandler(BaseHandler):
     @require_editor
     def delete(self, unused_user, exploration):
         """Deletes the given exploration."""
-        controller_utils.delete_exploration(exploration)
+        exploration.delete()
 
 
 class ExplorationDownloadHandler(BaseHandler):
@@ -329,8 +328,8 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            if (state_name != state.name and controller_utils.check_existence_of_name(
-                    State, state_name, exploration)):
+            if (state_name != state.name and
+                    exploration.contains_state_name(state_name)):
                 raise self.InvalidInputException(
                     'Duplicate state name: %s', state_name)
             state.name = state_name
