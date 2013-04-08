@@ -3,9 +3,16 @@
     <em>None</em>
   </span>
 
-  <ol start="0">
+  <ol start="1">
     <li ng-repeat="item in items">
-      <[item]> (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
+      <span ng-hide="largeInput">
+        <[item]>
+      </span>
+      <span ng-show="largeInput">
+        <textarea disabled="true"><[item]></textarea>
+        <br>
+      </span>
+      (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
       <span ng-show="activeItem == $index">
         <input ng-hide="largeInput" type="text" ng-model="replacementItem" placeholder="Replacement Item">
         <textarea ng-show="largeInput" ng-model="replacementItem" placeholder="Replacement Item">

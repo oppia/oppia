@@ -212,8 +212,9 @@ class ExplorationHandler(BaseHandler):
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
+                feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
                 action_html, action_widgets = parse_content_into_html(
-                    [Content(type='text', value=cgi.escape(feedback))],
+                    [Content(type='text', value='<br>'.join(feedback_bits))],
                     block_number,
                     params)
                 html_output += action_html
@@ -225,8 +226,9 @@ class ExplorationHandler(BaseHandler):
 
             # Append Oppia's feedback, if any.
             if feedback:
+                feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
                 action_html, action_widgets = parse_content_into_html(
-                    [Content(type='text', value=cgi.escape(feedback))],
+                    [Content(type='text', value='<br>'.join(feedback_bits))],
                     block_number,
                     params)
                 html_output += action_html

@@ -219,9 +219,6 @@ What country:
           for.
 
 
-          <br><br>
-
-
           (Please feel free to search on the Web for the answer, by the way; this
           is admittedly a factual question which not many people will know the answer
           to.)'
@@ -235,9 +232,6 @@ What country:
           by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
           comes from, and Oppius isn''t the language (or person) that we''re looking
           for.
-
-
-          <br><br>
 
 
           (Please feel free to search on the Web for the answer, by the way; this
@@ -272,7 +266,7 @@ What country:
         param_changes: {}
       - dest: Numeric input
         feedback:
-        - 'Yes! Oppia is the Finnish word for learn.<br><br>
+        - 'Yes! Oppia is the Finnish word for learn.
 
 
           As you can see, you''re not limited to multiple-choice questions here. For

@@ -31,7 +31,10 @@ Hola:
         param_changes: {}
       - dest: Hola
         feedback:
-        - Hola means Hello. <br><br> Say Hello back (in Spanish).
+        - 'Hola means Hello.
+
+
+          Say Hello back (in Spanish).'
         inputs: {}
         name: Default
         param_changes: {}
@@ -95,7 +98,7 @@ Colores:
         param_changes: {}
       - dest: Adios
         feedback:
-        - "\xA1S\xED! That's right -- apples are red and green.</em>"
+        - "\xA1S\xED! That's right -- apples are red and green."
         inputs:
           x: '2'
         name: equals(x)
@@ -111,7 +114,7 @@ Colores:
         feedback:
         - 'Colores is easy to translate.
 
-          <br>manzanas is apples.<br>
+          manzanas is apples.
 
           So this is asking, what colors are apples?'
         inputs: {}
@@ -139,7 +142,7 @@ Como meaning:
         feedback:
         - 'Yes!
 
-          <br>So, let''s try this again...Introduce yourself.'
+          So, let''s try this again...Introduce yourself.'
         inputs:
           x: what is your name?
         name: equals(x)
@@ -148,7 +151,7 @@ Como meaning:
         feedback:
         - 'Great!
 
-          <br>So, let''s try this again...Introduce yourself.'
+          So, let''s try this again...Introduce yourself.'
         inputs:
           x: what do you call yourself?
         name: equals(x)
@@ -157,7 +160,7 @@ Como meaning:
         feedback:
         - 'So this means "What is your name?"
 
-          <br>So, let''s try this again...Introduce yourself.'
+          So, let''s try this again...Introduce yourself.'
         inputs: {}
         name: Default
         param_changes: {}
@@ -234,7 +237,7 @@ Me llamo meaning:
         feedback:
         - 'Me llamo means "My name is"
 
-          <br>So "Me llamo Oppia" means "My name is Oppia".'
+          So "Me llamo Oppia" means "My name is Oppia".'
         inputs: {}
         name: Default
         param_changes: {}
@@ -253,8 +256,9 @@ Supermercado:
       rules:
       - dest: Supermercado
         feedback:
-        - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou\
-          \ can't buy windows in a supermarket. If you need more help, select \"I\
+        - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!
+
+          You can't buy windows in a supermarket. If you need more help, select \"I\
           \ don't know\""
         inputs:
           x: '0'
@@ -262,7 +266,9 @@ Supermercado:
         param_changes: {}
       - dest: Supermercado
         feedback:
-        - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n<br>\nYou can't\
+        - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n
+
+          You can't\
           \ buy cars in a supermarket. If you need more help, select \"I don't know\""
         inputs:
           x: '1'
@@ -278,8 +284,6 @@ Supermercado:
       - dest: Supermercado
         feedback:
         - 'Supermercado is supermarket.
-
-          <br><br>
 
           What can you buy at a supermarket?'
         inputs: {}
