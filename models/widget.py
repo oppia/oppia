@@ -56,7 +56,7 @@ class AnswerHandler(ndb.Model):
 class Widget(polymodel.PolyModel):
     """A superclass for NonInteractiveWidget and InteractiveWidget.
 
-    NB: The ids for this class are strings that are similar to the
+    NB: The ids for this class are strings that are camel-cased versions of the
     human-readable names.
     """
     @property

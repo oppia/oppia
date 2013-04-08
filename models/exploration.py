@@ -43,7 +43,6 @@ class Parameter(ndb.Model):
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(BaseModel):
     """An exploration (which is made up of several states)."""
-
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)
     # What this exploration is called.
