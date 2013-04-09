@@ -25,7 +25,7 @@ assert normalizers.List([3, 'a']) == [3, 'a']
 assert normalizers.List(3.0) is None
 
 assert normalizers.Coord2D('-1, 2.2') == [-1, 2.2]
-assert normalizers.List('123') is None
+assert normalizers.Coord2D('123') is None
 assert normalizers.Coord2D([0, 1]) == [0, 1]
 assert normalizers.Coord2D([0, 1, 2]) is None
 

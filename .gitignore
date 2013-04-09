@@ -3,3 +3,4 @@
 third_party/*
 templates/prod/*
 .coverage
+.viminfo
