@@ -83,6 +83,15 @@ SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_IMAGES_DIR = 'data/images'
 SAMPLE_WIDGETS_DIR = 'data/widgets'
 
+OBJECT_TEMPLATES_DIR = 'data/objects/templates'
+
+# The jinja environment used for loading object view and edit templates.
+OBJECT_JINJA_ENV = jinja2.Environment(
+    autoescape=True,
+    loader=jinja2.FileSystemLoader(os.path.join(
+        os.path.dirname(__file__), OBJECT_TEMPLATES_DIR))
+)
+
 # The jinja environment used for loading frontend templates.
 JINJA_ENV = jinja2.Environment(
     autoescape=True, loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
@@ -90,13 +99,6 @@ JINJA_ENV.filters.update({
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),
 })
-
-# The jinja environment used for loading widget previews.
-WIDGET_JINJA_ENV = jinja2.Environment(
-    autoescape=True,
-    loader=jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), SAMPLE_WIDGETS_DIR))
-)
 
 # List of filepaths to JS libraries to include at the bottom of the HTML
 # response, in order.
