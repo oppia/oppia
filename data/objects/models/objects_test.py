@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,6 +58,25 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
             except TypeError:
                 pass
 
+    def test_real_validation(self):
+        """Tests objects of type Real."""
+        cls = objects.Real
+        normalization_mappings = [
+            (20, 20),
+            ('20', 20),
+            ('02', 2),
+            ('0', 0),
+            (-1, -1),
+            ('-1', -1),
+            (3.00, 3),
+            (3.05, 3.05),
+            ('3.05', 3.05)
+        ]
+        invalid_values = ['a', '', {'a': 3}, [3], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
     def test_int_validation(self):
         """Tests objects of type Int."""
         cls = objects.Int
@@ -67,8 +88,101 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
             (-1, -1),
             ('-1', -1),
             (3.00, 3),
+            (3.05, 3),
         ]
         invalid_values = ['a', '', {'a': 3}, [3], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_nonnegative_int_validation(self):
+        """Tests objects of type NonnegativeInt."""
+        cls = objects.NonnegativeInt
+        normalization_mappings = [
+            (20, 20),
+            ('20', 20),
+            ('02', 2),
+            ('0', 0),
+            (3.00, 3),
+            (3.05, 3),
+        ]
+        invalid_values = ['a', '', {'a': 3}, [3], None, -1, '-1']
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_coord_2d_validation(self):
+        """Tests objects of type Coord2D."""
+        cls = objects.Coord2D
+        normalization_mappings = [
+            ('-1, 2.2', [-1, 2.2]),
+            ([0, 1], [0, 1]),
+            (' -1 , 3.5', [-1, 3.5]),
+        ]
+        invalid_values = ['123', 'a', [0, 1, 2], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_list_validation(self):
+        """Tests objects of type List."""
+        cls = objects.List
+        normalization_mappings = [
+            ([3, 'a'], [3, 'a']),
+            ([], []),
+            ([1, 2, 1], [1, 2, 1]),
+        ]
+        invalid_values = ['123', {'a': 1}, 3.0, None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_set_validation(self):
+        """Tests objects of type Set."""
+        cls = objects.Set
+        normalization_mappings = [
+            ([3, 'a'], [3, 'a']),
+            ([], []),
+        ]
+        invalid_values = ['123', {'a': 1}, 3.0, None, [1, 2, 1]]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_unicode_string_validation(self):
+        """Tests objects of type UnicodeString."""
+        cls = objects.UnicodeString
+        normalization_mappings = [
+            ('Abc   def', u'Abc   def'),
+            (u'¡Hola!', u'¡Hola!'),
+            (3.0, '3.0'),
+        ]
+        invalid_values = [{'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_normalized_string_validation(self):
+        """Tests objects of type NormalizedString."""
+        cls = objects.NormalizedString
+        normalization_mappings = [
+            ('Abc   def', u'abc def'),
+            (u'¡hola!', u'¡hola!'),
+            (3.0, '3.0'),
+        ]
+        invalid_values = [{'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
+    def test_music_note_validation(self):
+        """Tests objects of type MusicNote."""
+        cls = objects.MusicNote
+        normalization_mappings = [
+            ('A4', 'A4'),
+            ('B4', 'B4'),
+        ]
+        invalid_values = ['D6', 'B3', 'CA4', 2, None]
 
         self.check_normalization(cls, normalization_mappings)
         self.check_invalid_values(cls, invalid_values)

@@ -100,7 +100,7 @@ def Set(val):
 
 
 def String(x):
-    """Collapses spaces and makes all characters of a string lowercase."""
+    """Collapses spaces of a string."""
     try:
         return ' '.join(unicode(x).split())
     except:
