@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import numbers
 
 import feconf
+from lxml.html.clean import clean_html
 
 
 class BaseObject(object):
@@ -62,7 +63,7 @@ class BaseObject(object):
 
     @classmethod
     def render_view(cls, data):
-        """Renders a view-only version of the Object.
+        """Renders a view-only version of the Object, suitable for editors of it.
 
         The default implementation uses takes the Jinja template supplied in the
         class and renders against it. This template has autoescape=True turned
@@ -226,7 +227,7 @@ class UnicodeString(BaseObject):
 
     description = 'A unicode string.'
     icon_filename = ''
-    view_html_filename = 'unicode'
+    view_html_filename = 'unicode_view'
     edit_html_filename = None
 
     @classmethod
@@ -256,6 +257,26 @@ class NormalizedString(UnicodeString):
             raise TypeError('Cannot convert to NormalizedString: %s' % raw)
 
 
+class Html(UnicodeString):
+    """HTML string class."""
+
+    description = 'An HTML string.'
+    icon_filename = ''
+    view_html_filename = 'html_view'
+    edit_html_filename = None
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        # TODO(sll): write tests for this.
+        try:
+            assert isinstance(raw, basestring)
+            return clean_html(unicode(raw))
+        except Exception as e:
+            raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
+                            (raw, e))
+
+
 class MusicNote(UnicodeString):
     """String that represents a music note between C4 and F5."""
     # TODO(sll): Make this more general -- i.e. an Enum.
@@ -274,3 +295,21 @@ class MusicNote(UnicodeString):
             return result
         except Exception:
             raise TypeError('Cannot convert to MusicNote: %s' % raw)
+
+
+class Video(UnicodeString):
+    """String that represents a Youtube video id."""
+
+    description = 'A string representing a video id.'
+    icon_filename = ''
+    view_html_filename = 'video_view'
+    edit_html_filename = None
+
+
+class Image(UnicodeString):
+    """String that represents an image key in the datastore."""
+
+    description = 'A string representing an image key.'
+    icon_filename = ''
+    view_html_filename = 'image_view'
+    edit_html_filename = None

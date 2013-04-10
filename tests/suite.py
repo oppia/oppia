@@ -20,7 +20,7 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 41
+EXPECTED_TEST_COUNT = 42
 
 
 def main():

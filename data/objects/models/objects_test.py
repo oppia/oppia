@@ -162,6 +162,23 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
         self.check_normalization(cls, normalization_mappings)
         self.check_invalid_values(cls, invalid_values)
 
+    def test_html_validation(self):
+        """Tests objects of type HTML."""
+        # TODO(sll): Add more tests.
+        cls = objects.Html
+        normalization_mappings = [
+            ('<p onclick="evil_function()">a paragraph</p>',
+             '<p>a paragraph</p>'),
+            ('<iframe src="evil-site"></iframe>', '<div></div>'),
+            (u'¡Hola!', u'<p>¡Hola!</p>'),
+            ('<a href="evil-site">spam spam SPAM!</a>',
+             '<a href="evil-site">spam spam SPAM!</a>'),
+        ]
+        invalid_values = [{'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
     def test_normalized_string_validation(self):
         """Tests objects of type NormalizedString."""
         cls = objects.NormalizedString
