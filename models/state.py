@@ -368,29 +368,28 @@ class State(BaseModel):
 
         return dest_id, feedback, default_recorded_answer
 
+    def get_normalizer(self, mutable_rule, param):
+        param_spec = mutable_rule[
+            mutable_rule.find('{{' + param) + 2:]
+        param_spec = param_spec[param_spec.find('|') + 1:]
+        normalizer_string = param_spec[: param_spec.find('}}')]
+
+        return getattr(normalizers, normalizer_string)
+
     def get_code(self, widget_id, handler_name, rule):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
-        result = classifier_func[: first_bracket + 1]
-
         mutable_rule = InteractiveWidget.get(widget_id).get_readable_name(
             handler_name, rule.name)
 
+        result = classifier_func[: first_bracket + 1]
         params = classifier_func[first_bracket + 1: -1].split(',')
         for index, param in enumerate(params):
             if index != 0:
                 result += ','
 
-            # Get the normalizer specified in the rule.
-            param_spec = mutable_rule[
-                mutable_rule.find('{{' + param) + 2:]
-            param_spec = param_spec[param_spec.find('|') + 1:]
-            normalizer_string = param_spec[: param_spec.find('}}')]
-
-            normalizer = getattr(normalizers, normalizer_string)
-
-            if (normalizer.__name__ == 'String' or
-                    normalizer.__name__ == 'MusicNote'):
+            normalizer = self.get_normalizer(mutable_rule, param)
+            if (normalizer.__name__ in ['String', 'MusicNote']):
                 result += 'u\'' + unicode(rule.inputs[param]) + '\''
             else:
                 result += str(rule.inputs[param])

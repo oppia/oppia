@@ -356,7 +356,6 @@ class StateHandler(BaseHandler):
                 # Normalize the params here, then store them.
                 classifier_func = state_rule.name.replace(' ', '')
                 first_bracket = classifier_func.find('(')
-
                 mutable_rule = rule['rule']
 
                 params = classifier_func[first_bracket + 1: -1].split(',')
@@ -365,13 +364,7 @@ class StateHandler(BaseHandler):
                         raise self.InvalidInputException(
                             'Parameter %s could not be replaced.' % param)
 
-                    # Get the normalizer specified in the rule.
-                    param_spec = mutable_rule[
-                        mutable_rule.find('{{' + param) + 2:]
-                    param_spec = param_spec[param_spec.find('|') + 1:]
-                    normalizer_string = param_spec[: param_spec.find('}}')]
-
-                    normalizer = getattr(normalizers, normalizer_string)
+                    normalizer = state.get_normalizer(mutable_rule, param)
                     # TODO(sll): Make the following check more robust.
                     if (not isinstance(rule['inputs'][param], basestring) or
                             '{{' not in rule['inputs'][param] or
