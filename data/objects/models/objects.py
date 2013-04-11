@@ -27,10 +27,8 @@ from lxml.html.clean import clean_html
 class BaseObject(object):
     """Base object class.
 
-    This is the superclass for typed object specifications in Oppia. Subclasses
-    are named by concatenating the CamelCased object type and the string
-    'Object'. Examples of valid names include VideoObject, ImageObject and
-    Coord2DObject.
+    This is the superclass for typed object specifications in Oppia, such as
+    Video, Image and Coord2D.
 
     Typed objects are initialized from a raw Python object which is expected to
     be derived from a JSON object. They are validated and normalized to basic
