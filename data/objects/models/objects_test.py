@@ -58,6 +58,25 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
             except TypeError:
                 pass
 
+    def test_number_validation(self):
+        """Tests objects of type Number."""
+        cls = objects.Number
+        normalization_mappings = [
+            (20, 20),
+            ('20', 20),
+            ('02', 2),
+            ('0', 0),
+            (-1, -1),
+            ('-1', -1),
+            (3.00, 3),
+            (3.05, 3.05),
+            ('3.05', 3.05)
+        ]
+        invalid_values = ['a', '', {'a': 3}, [3], None]
+
+        self.check_normalization(cls, normalization_mappings)
+        self.check_invalid_values(cls, invalid_values)
+
     def test_real_validation(self):
         """Tests objects of type Real."""
         cls = objects.Real
@@ -183,7 +202,7 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
         """Tests objects of type NormalizedString."""
         cls = objects.NormalizedString
         normalization_mappings = [
-            ('Abc   def', u'abc def'),
+            ('Abc   def', u'Abc def'),
             (u'¡hola!', u'¡hola!'),
             (3.0, '3.0'),
         ]

@@ -21,7 +21,6 @@ import json
 from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
-from data.classifiers import normalizers
 import feconf
 from models.exploration import Exploration
 from models.exploration import Parameter
@@ -364,12 +363,13 @@ class StateHandler(BaseHandler):
                         raise self.InvalidInputException(
                             'Parameter %s could not be replaced.' % param)
 
-                    normalizer = state.get_normalizer(mutable_rule, param)
+                    typed_object = state.get_typed_object(mutable_rule, param)
                     # TODO(sll): Make the following check more robust.
                     if (not isinstance(rule['inputs'][param], basestring) or
                             '{{' not in rule['inputs'][param] or
                             '}}' not in rule['inputs'][param]):
-                        normalized_param = normalizer(rule['inputs'][param])
+                        normalized_param = typed_object.normalize(
+                            rule['inputs'][param])
                     else:
                         normalized_param = rule['inputs'][param]
 

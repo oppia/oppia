@@ -24,7 +24,7 @@ import logging
 import os
 
 from base_model import BaseModel
-from data.classifiers import normalizers
+from data.objects.models import objects
 import feconf
 import utils
 from widget import InteractiveWidget
@@ -316,7 +316,7 @@ class State(BaseModel):
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
 
-            norm_answer = Classifier.DEFAULT_NORMALIZER(answer)
+            norm_answer = Classifier.DEFAULT_NORMALIZER().normalize(answer)
             if norm_answer is None:
                 raise Exception(
                     'Invalid input: could not normalize the answer.')
@@ -368,13 +368,17 @@ class State(BaseModel):
 
         return dest_id, feedback, default_recorded_answer
 
-    def get_normalizer(self, mutable_rule, param):
+    def get_typed_object(self, mutable_rule, param):
         param_spec = mutable_rule[
             mutable_rule.find('{{' + param) + 2:]
         param_spec = param_spec[param_spec.find('|') + 1:]
         normalizer_string = param_spec[: param_spec.find('}}')]
 
-        return getattr(normalizers, normalizer_string)
+        # TODO(sll): This is to support legacy types; try and get rid of it.
+        if normalizer_string == 'String':
+            normalizer_string = 'NormalizedString'
+
+        return getattr(objects, normalizer_string)
 
     def get_code(self, widget_id, handler_name, rule):
         classifier_func = rule.name.replace(' ', '')
@@ -388,11 +392,12 @@ class State(BaseModel):
             if index != 0:
                 result += ','
 
-            normalizer = self.get_normalizer(mutable_rule, param)
-            if (normalizer.__name__ in ['String', 'MusicNote']):
-                result += 'u\'' + unicode(rule.inputs[param]) + '\''
+            typed_object = self.get_typed_object(mutable_rule, param)
+            normalized_param = rule.inputs[param]
+            if (typed_object.__name__ in ['NormalizedString', 'MusicNote']):
+                result += 'u\'' + unicode(normalized_param) + '\''
             else:
-                result += str(rule.inputs[param])
+                result += str(normalized_param)
 
         result += ')'
 

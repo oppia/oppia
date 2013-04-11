@@ -103,13 +103,30 @@ class BaseObject(object):
         raise NotImplementedError('Not implemented yet.')
 
 
-class Real(BaseObject):
+class Number(BaseObject):
+    """Generic number class."""
+
+    description = 'A number.'
+    icon_filename = ''
+    view_html_filename = 'number_view'
+    edit_html_filename = None
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            result = float(raw)
+            assert isinstance(result, numbers.Number)
+            return result
+        except Exception:
+            raise TypeError('Cannot convert to number: %s' % raw)
+
+
+class Real(Number):
     """Real number class."""
 
     description = 'A real number.'
     icon_filename = ''
-    view_html_filename = 'real_view'
-    edit_html_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -240,9 +257,9 @@ class UnicodeString(BaseObject):
 
 
 class NormalizedString(UnicodeString):
-    """Unicode string that is all lowercase with spaces collapsed."""
+    """Unicode string with spaces collapsed."""
 
-    description = 'A lowercase unicode string with adjacent whitespace collapsed.'
+    description = 'A unicode string with adjacent whitespace collapsed.'
     icon_filename = ''
 
     @classmethod
@@ -250,7 +267,7 @@ class NormalizedString(UnicodeString):
         """Validates and normalizes a raw Python object."""
         try:
             result = super(NormalizedString, cls).normalize(raw)
-            return ' '.join(result.split()).lower()
+            return ' '.join(result.split())
         except Exception:
             raise TypeError('Cannot convert to NormalizedString: %s' % raw)
 

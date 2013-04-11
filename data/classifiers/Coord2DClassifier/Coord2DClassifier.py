@@ -19,10 +19,10 @@
 __author__ = 'Koji Ashida'
 
 
-from data.classifiers import normalizers
+from data.objects.models import objects
 
 # Normalizer to use for reader answers.
-DEFAULT_NORMALIZER = normalizers.Coord2D
+DEFAULT_NORMALIZER = objects.Coord2D
 
 
 def within(val, p, d):

@@ -19,10 +19,10 @@
 __author__ = 'Sean Lip'
 
 
-from data.classifiers import normalizers
+from data.objects.models import objects
 
 # Normalizer to use for reader answers.
-DEFAULT_NORMALIZER = normalizers.String
+DEFAULT_NORMALIZER = objects.NormalizedString
 
 
 def equals(val, x):
