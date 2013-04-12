@@ -64,6 +64,14 @@ oppia.directive('list', function (warningsData) {
   };
 });
 
+oppia.directive('progressBar', function() {
+  return {
+    restrict: 'E',
+    scope: {height: '=', width: '=', showGuide: '@', color1: '@', color2: '@', stat: '=', total: '=', type: '@', remainderType: '@', borderWidth: '@'},
+    templateUrl: '/templates/progress_bar',
+  };
+});
+
 // An editable string directive.
 oppia.directive('string', function (warningsData) {
   return {

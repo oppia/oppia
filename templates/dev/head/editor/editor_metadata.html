@@ -81,25 +81,7 @@
 
 <div ng-show="stats.numVisits > 0">
   <strong>Completion rate</strong>
-  <table width="200" style="border: 1px solid black;">
-    <tr height="20">
-      <td style="background-color:green;" width="<[stats.numCompletions* 200.0 / stats.numVisits]>">
-      </td>
-      <td style="background-color:firebrick;" width="<[200 - (stats.numCompletions * 200.0 / stats.numVisits)]>"></td>
-    </tr>
-  </table>
-  <br>
-  <table>
-    <tr height="15">
-      <td width="20" style="background-color: green;"></td>
-      <td>&nbsp; Number of completions: <[stats.numCompletions]></td>
-    </tr>
-    <tr>
-      <td width="20" style="background-color: firebrick;"></td>
-      <td>&nbsp; Number of non-completions: <[stats.numVisits - stats.numCompletions]></td>
-    </tr>
-  </table>
-
+  <progress-bar width="200" height="20" show-guide="true" color1="green" color2="firebrick" stat="stats.numCompletions" total="stats.numVisits" type="completions" remainder-type="non-completions" border-width="1"></progress-bar>
   <br><br>
 
   <table>
