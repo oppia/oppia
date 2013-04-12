@@ -308,7 +308,7 @@ class State(BaseModel):
         default_recorded_answer = None
 
         if interactive_widget_properties['classifier'] != 'None':
-            # Import the relevant classifier module to be used in eval() below.
+            # Import the relevant classifier module.
             classifier_module = '.'.join([
                 feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
                 interactive_widget_properties['classifier'],
@@ -346,19 +346,13 @@ class State(BaseModel):
                             if rule.feedback else '')
                 break
 
-            # Add the 'answer' variable, and prepend classifier.
-            code = 'Classifier.' + self.get_code(
-                self.widget.widget_id, handler.name, rule).replace(
-                    '(', '(norm_answer,', 1)
-
-            code = utils.parse_with_jinja(code, params)
-            if code is None:
-                continue
-
-            logging.info(code)
+            func_name, param_list = self.get_classifier_info(
+                self.widget.widget_id, handler.name, rule, params)
+            param_list = [norm_answer] + param_list
+            classifier_output = getattr(Classifier, func_name)(*param_list)
 
             return_value, unused_return_data = (
-                utils.normalize_classifier_return(eval(code)))
+                utils.normalize_classifier_return(classifier_output))
 
             if return_value:
                 dest_id = rule.dest
@@ -380,25 +374,24 @@ class State(BaseModel):
 
         return getattr(objects, normalizer_string)
 
-    def get_code(self, widget_id, handler_name, rule):
+    def get_classifier_info(self, widget_id, handler_name, rule, state_params):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
         mutable_rule = InteractiveWidget.get(widget_id).get_readable_name(
             handler_name, rule.name)
 
-        result = classifier_func[: first_bracket + 1]
-        params = classifier_func[first_bracket + 1: -1].split(',')
-        for index, param in enumerate(params):
-            if index != 0:
-                result += ','
+        func_name = classifier_func[: first_bracket]
+        str_params = classifier_func[first_bracket + 1: -1].split(',')
+
+        param_list = []
+        for index, param in enumerate(str_params):
+            parsed_param = rule.inputs[param]
+            if isinstance(parsed_param, basestring) and '{{' in parsed_param:
+                parsed_param = utils.parse_with_jinja(
+                    parsed_param, state_params)
 
             typed_object = self.get_typed_object(mutable_rule, param)
-            normalized_param = rule.inputs[param]
-            if (typed_object.__name__ in ['NormalizedString', 'MusicNote']):
-                result += 'u\'' + unicode(normalized_param) + '\''
-            else:
-                result += str(normalized_param)
+            normalized_param = typed_object.normalize(parsed_param)
+            param_list.append(normalized_param)
 
-        result += ')'
-
-        return result
+        return func_name, param_list

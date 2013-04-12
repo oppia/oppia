@@ -61,7 +61,7 @@ Adios:
       - dest: END
         feedback: []
         inputs:
-          x: adi\xF3s
+          x: adiós
         name: contains(x)
         param_changes: {}
       - dest: Adios
