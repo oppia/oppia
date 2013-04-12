@@ -30,6 +30,12 @@
     <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
     </iframe>
   </div>
+  <div style="margin-left:30px;">
+    <input type="checkbox"
+      ng-model="stickyInteractiveWidget"
+      ng-click="saveStickyInteractiveWidget()">
+    Do not reload if the previous state uses the same widget.
+  </div>
 
   <br><br>
 

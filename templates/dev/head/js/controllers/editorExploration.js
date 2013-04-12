@@ -48,6 +48,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'interactive_widget',
     'interactive_params',
     'interactive_rulesets',
+    'sticky_interactive_widget',
     'param_changes',
     'state_name',
     'unresolved_answers',
