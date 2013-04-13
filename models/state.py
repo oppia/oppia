@@ -321,7 +321,7 @@ class State(BaseModel):
 
         dest_id = None
         feedback = None
-        default_recorded_answer = None
+        recorded_answer = answer
 
         if interactive_widget_properties['classifier'] != 'None':
             # Import the relevant classifier module.
@@ -349,12 +349,9 @@ class State(BaseModel):
                 # not very interesting anyway because the reader's answer
                 # in this case is already known (it's just the last of the
                 # multiple-choice options given).
-                recorded_answer = answer
                 if self.widget.widget_id == 'MultipleChoiceInput':
                     recorded_answer = (
                         self.widget.params['choices'][int(answer)])
-
-                default_recorded_answer = recorded_answer
 
             if rule.name == 'Default':
                 dest_id = rule.dest
@@ -376,7 +373,7 @@ class State(BaseModel):
                             if rule.feedback else '')
                 break
 
-        return dest_id, feedback, default_recorded_answer
+        return dest_id, feedback, rule, recorded_answer
 
     def get_typed_object(self, mutable_rule, param):
         param_spec = mutable_rule[

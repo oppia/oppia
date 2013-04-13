@@ -183,16 +183,16 @@ class ExplorationHandler(BaseHandler):
             InteractiveWidget.get_with_params(
                 state.widget.widget_id)['actions']['submit'])
 
-        dest_id, feedback, default_recorded_answer = state.transition(
+        dest_id, feedback, rule, recorded_answer = state.transition(
             answer, params, interactive_widget_properties)
 
-        if default_recorded_answer:
-            EventHandler.record_default_case_hit(
-                exploration_id, state_id, default_recorded_answer)
+        if recorded_answer:
+            EventHandler.record_rule_hit(
+                exploration_id, state_id, rule, recorded_answer)
             # Add this answer to the state's 'unresolved answers' list.
-            if default_recorded_answer not in old_state.unresolved_answers:
-                old_state.unresolved_answers[default_recorded_answer] = 0
-            old_state.unresolved_answers[default_recorded_answer] += 1
+            if recorded_answer not in old_state.unresolved_answers:
+                old_state.unresolved_answers[recorded_answer] = 0
+            old_state.unresolved_answers[recorded_answer] += 1
             # TODO(sll): Make this async?
             old_state.put()
 
