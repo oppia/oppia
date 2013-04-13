@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for typed instances and parameters."""
+"""Models for typed instances."""
 
 __author__ = 'Sean Lip'
 
@@ -34,7 +34,7 @@ def get_object_class(cls_name):
     return object_class
 
 
-class TypedInstanceModel(ndb.Model):
+class TypedInstance(ndb.Model):
     """Represents an instance of a typed object."""
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore.
@@ -55,53 +55,15 @@ class TypedInstanceModel(ndb.Model):
 class TypedInstanceProperty(ndb.StructuredProperty):
     """Represents an instance of a typed object."""
     def __init__(self, **kwds):
-        super(TypedInstanceProperty, self).__init__(TypedInstanceModel, **kwds)
+        super(TypedInstanceProperty, self).__init__(TypedInstance, **kwds)
 
     def _validate(self, val):
         object_class = get_object_class(val.obj_type)
-        return TypedInstanceModel(
+        return TypedInstance(
             obj_type=val.obj_type, value=object_class.normalize(val.value))
 
     def _to_base_type(self, val):
-        return TypedInstanceModel(obj_type=val.obj_type, value=val.value)
+        return TypedInstance(obj_type=val.obj_type, value=val.value)
 
     def _from_base_type(self, val):
-        return TypedInstanceModel(obj_type=val.obj_type, value=val.value)
-
-
-class ParameterModel(TypedInstanceModel):
-    """Represents a parameter.
-
-    Note that this class also has obj_type and value attributes, since it
-    inherits from Instance.
-
-    The 'value' attribute represents the default value of the parameter. The
-    difference between a Parameter and an Instance is that a Parameter can be
-    overridden (by specifying its name and a new value).
-    """
-    # The name of the parameter.
-    name = ndb.StringProperty(required=True)
-    # The description of the parameter.
-    description = ndb.TextProperty()
-
-
-class ParameterProperty(ndb.StructuredProperty):
-    """Represents a parameter."""
-    def __init__(self, **kwds):
-        super(ParameterProperty, self).__init__(ParameterModel, **kwds)
-
-    def _validate(self, val):
-        object_class = get_object_class(val.obj_type)
-        return ParameterModel(
-            obj_type=val.obj_type, value=object_class.normalize(val.value),
-            name=val.name, description=val.description)
-
-    def _to_base_type(self, val):
-        return ParameterModel(
-            obj_type=val.obj_type, value=val.value, name=val.name,
-            description=val.description)
-
-    def _from_base_type(self, val):
-        return ParameterModel(
-            obj_type=val.obj_type, value=val.value, name=val.name,
-            description=val.description)
+        return TypedInstance(obj_type=val.obj_type, value=val.value)

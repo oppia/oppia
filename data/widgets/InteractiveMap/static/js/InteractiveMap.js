@@ -17,6 +17,10 @@ function initialize() {
 
   google.maps.event.addListener(map, 'click', function(e) {
     var ll = e.latLng;
+    new google.maps.Marker({
+      position: ll,
+      map: map,
+    });
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
           JSON.stringify({'submit': ll.lat() + ',' + ll.lng()}),

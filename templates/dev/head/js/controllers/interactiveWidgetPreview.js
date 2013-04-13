@@ -73,6 +73,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     // - 'paramChanges' (parameter changes associated with this rule)
     $scope.interactiveRulesets = data.widget.rules;
     $scope.interactiveParams = data.widget.params;
+    $scope.stickyInteractiveWidget = data.widget.sticky;
     $scope.generateWidgetPreview(data.widget.id, data.widget.params);
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
@@ -341,6 +342,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       'unresolved_answers': $scope.unresolvedAnswers,
     });
     $scope.generateUnresolvedAnswersMap();
+  };
+
+  $scope.saveStickyInteractiveWidget = function() {
+    explorationData.saveStateData($scope.stateId, {
+      'sticky_interactive_widget': $scope.stickyInteractiveWidget
+    });
   };
 }
 

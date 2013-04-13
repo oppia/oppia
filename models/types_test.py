@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for typed instance and parameter models."""
+"""Tests for typed instance models."""
 
 __author__ = 'Sean Lip'
 
@@ -44,11 +44,11 @@ class GetObjectClassUnitTests(test_utils.AppEngineTestBase):
 
 
 class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
-    """Tests the TypedInstanceModel and TypedInstanceProperty classes."""
+    """Tests the TypedInstance and TypedInstanceProperty classes."""
 
-    def test_typed_instance_model(self):
-        """Tests the TypedInstanceModel class."""
-        model = types.TypedInstanceModel(obj_type='Int', value='Bad value')
+    def test_typed_instance_class(self):
+        """Tests the TypedInstance class."""
+        model = types.TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             model.put()
         model.value = 1
@@ -58,7 +58,7 @@ class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
         class StructuredTestModel(ndb.Model):
             typed_instance = types.TypedInstanceProperty(required=True)
 
-        model = types.TypedInstanceModel(obj_type='Int', value='Bad value')
+        model = types.TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             structured_model = StructuredTestModel(typed_instance=model)
 

@@ -32,7 +32,7 @@ Main window:
         inputs:
           x: '{{noteStart}}'
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Main window
         feedback:
         - No, but you're very close!
@@ -40,27 +40,27 @@ Main window:
           tol: '1'
           x: '{{noteStart}}'
         name: is_within_tolerance(x, tol)
-        param_changes: {}
+        param_changes: []
       - dest: Main window
         feedback:
         - I think the original note is higher.
         inputs:
           x: '{{noteStart}}'
         name: is_less_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Main window
         feedback:
         - I think the original pitch is lower.
         inputs:
           x: '{{noteStart}}'
         name: is_greater_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Main window
         feedback:
         - That's not right. Why not try again?
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       noteToGuess: '{{noteStart}}'
       notesToPlayAtStart: []

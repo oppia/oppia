@@ -3,7 +3,7 @@ Sentence:
   - type: text
     value: "Yo __________ (jugar) al f\xFAtbol con amigos los domingos\n\nWhat verb\
       \ conjugation goes in the blank? \nOr type 'I don't know'"
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -14,7 +14,7 @@ Sentence:
         inputs:
           x: juego
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: boot verb
         feedback:
         - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
@@ -22,12 +22,12 @@ Sentence:
         inputs:
           x: jugo
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: subject
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput
@@ -35,7 +35,7 @@ So...:
   content:
   - type: text
     value: So now put that stem together with the ending, and what is the answer?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -45,13 +45,13 @@ So...:
         inputs:
           x: juego
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: So...
         feedback:
         - Try that again. Put jueg- together with -o and you get...?
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput
@@ -66,7 +66,7 @@ boot verb:
       \ yo, t\xFA, \xE9l/ella/usted and ustedes forms. And if you draw a line around\
       \ those, it looks like a boot.<br>\n<br>\nIn the case of jugar, since it is\
       \ a verb ending in -gar, it uses the u > ue stem, so what does the stem become?"
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -76,13 +76,13 @@ boot verb:
         inputs:
           x: jueg
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: So...
         feedback:
         - Not quite. Just change the u to a ue and you get jueg-
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput
@@ -90,7 +90,7 @@ subject:
   content:
   - type: text
     value: So what is the subject of the sentence?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -100,14 +100,14 @@ subject:
         inputs:
           x: yo
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: subject
         feedback:
         - The subject of the sentence is the noun in the sentence that is doing the
           action. It is usually near the beginning of the sentence.
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput
@@ -115,7 +115,7 @@ verb endings:
   content:
   - type: text
     value: So what is the correct verb ending for yo?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -127,7 +127,7 @@ verb endings:
         inputs:
           x: -o
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: boot verb
         feedback:
         - But if you just drop the -ar and at -o, you get jugo which means juice,
@@ -135,7 +135,7 @@ verb endings:
         inputs:
           x: o
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: verb endings
         feedback:
         - "That doesn't look right. Here is the conjugation of hablo (to speak): yo\
@@ -144,7 +144,7 @@ verb endings:
           \ the corresponding ending for 'yo' is?"
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput

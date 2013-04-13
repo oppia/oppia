@@ -60,6 +60,7 @@ def get_state_for_frontend(state, exploration):
                     )
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
+    state_repr['widget']['sticky'] = state_repr['widget']['sticky']
 
     state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
     return state_repr
@@ -310,6 +311,7 @@ class StateHandler(BaseHandler):
         interactive_widget = payload.get('interactive_widget')
         interactive_params = payload.get('interactive_params')
         interactive_rulesets = payload.get('interactive_rulesets')
+        sticky_interactive_widget = payload.get('sticky_interactive_widget')
         content = payload.get('content')
         unresolved_answers = payload.get('unresolved_answers')
 
@@ -320,13 +322,21 @@ class StateHandler(BaseHandler):
             exploration.rename_state(state, state_name)
 
         if param_changes:
-            state.param_changes = param_changes
+            state.param_changes = [
+                parameter.MultiParameterChange(
+                    name=param_change['name'], value=param_change['value'],
+                    obj_type='UnicodeString'
+                ) for param_change in param_changes
+            ]
 
         if interactive_widget:
             state.widget.widget_id = interactive_widget
 
         if interactive_params:
             state.widget.params = interactive_params
+
+        if sticky_interactive_widget is not None:
+            state.widget.sticky = sticky_interactive_widget
 
         if interactive_rulesets:
             ruleset = interactive_rulesets['submit']

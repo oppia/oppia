@@ -26,6 +26,7 @@ import os
 from base_model import BaseModel
 from data.objects.models import objects
 import feconf
+import parameter
 import utils
 from widget import InteractiveWidget
 from widget import Widget
@@ -41,6 +42,8 @@ class Content(ndb.Model):
 
 class Rule(ndb.Model):
     """A rule for an answer classifier."""
+    # TODO(sll): Ensure the types for param_changes are consistent.
+
     # The name of the rule.
     name = ndb.StringProperty(required=True)
     # Parameters for the classification rule. TODO(sll): Make these the actual params.
@@ -49,8 +52,8 @@ class Rule(ndb.Model):
     dest = ndb.StringProperty()
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
-    # Parameter changes to make if this rule is triggered.
-    param_changes = ndb.JsonProperty(default={})
+    # State-level parameter changes to make if this rule is triggered.
+    param_changes = parameter.MultiParameterChangeProperty(repeated=True)
 
 
 class AnswerHandlerInstance(ndb.Model):
@@ -65,7 +68,11 @@ class WidgetInstance(ndb.Model):
     widget_id = ndb.StringProperty(default='Continue')
     # Parameter overrides for the interactive widget view, stored as key-value
     # pairs.
+    # TODO(sll): Ensure the types for param_changes are consistent.
     params = ndb.JsonProperty(default={})
+    # If true, keep the widget instance from the previous state if both are of
+    # the same type.
+    sticky = ndb.BooleanProperty(default=False)
     # Answer handlers and rulesets.
     handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
 
@@ -96,7 +103,7 @@ class State(BaseModel):
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
-    param_changes = ndb.JsonProperty(default={})
+    param_changes = parameter.MultiParameterChangeProperty(repeated=True)
     # The interactive widget associated with this state.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
     # A dict whose keys are unresolved answers associated with this state, and
@@ -168,7 +175,13 @@ class State(BaseModel):
                 for content in state_dict['content']
             ]
         if 'param_changes' in state_dict:
-            state.param_changes = state_dict['param_changes']
+            state.param_changes = []
+            for param_to_change in state_dict['param_changes']:
+                state.param_changes.append(parameter.MultiParameterChange(
+                    name=param_to_change,
+                    values=state_dict['param_changes'][param_to_change],
+                    obj_type='UnicodeString'
+                ))
 
         state.widget = WidgetInstance(widget_id=state_dict['widget']['widget_id'])
 
@@ -255,7 +268,7 @@ class State(BaseModel):
 
         # Validate 'widget'.
         for key in description['widget']:
-            if key not in ['widget_id', 'params', 'handlers']:
+            if key not in ['widget_id', 'params', 'sticky', 'handlers']:
                 return False, 'Invalid key in widget: %s' % key
         if 'widget_id' not in description['widget']:
             return False, 'No widget id supplied'

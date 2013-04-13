@@ -139,7 +139,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         exploration3 = Exploration.create(user, 'A title', 'A category', 'A different exploration_id')
         self.assertEqual(exploration3.as_yaml(), """Activity 1:
   content: []
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -148,7 +148,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params: {}
+    sticky: false
     widget_id: Continue
 """)

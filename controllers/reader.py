@@ -120,10 +120,10 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Define this behavior. Currently a new parameter is set
         # only if it doesn't exist, but it might be the case that the parameter
         # should be reset each time the state is entered.
-        for (key, values) in state.param_changes.iteritems():
-            if key not in existing_params:
+        for item in state.param_changes:
+            if item.name not in existing_params:
                 # Pick a random parameter for this key.
-                existing_params[key] = utils.get_random_choice(values)
+                existing_params[item.name] = utils.get_random_choice(item.values)
         return existing_params
 
     def get(self, exploration_id):
@@ -256,12 +256,17 @@ class ExplorationHandler(BaseHandler):
 
         if dest_id != feconf.END_DEST:
             values['finished'] = False
-            values['interactive_widget_html'] = (
-                InteractiveWidget.get_with_params(
-                    state.widget.widget_id,
-                    params=utils.parse_dict_with_params(
-                        state.widget.params, params)
-                )['raw']
+            if state.widget.sticky and (
+                state.widget.widget_id == old_state.widget.widget_id):
+              values['interactive_widget_html'] = ''
+              values['sticky_interactive_widget'] = True
+            else:
+              values['interactive_widget_html'] = (
+                  InteractiveWidget.get_with_params(
+                      state.widget.widget_id,
+                      params=utils.parse_dict_with_params(
+                          state.widget.params, params)
+                  )['raw']
             )
         else:
             values['finished'] = True
