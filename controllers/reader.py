@@ -256,12 +256,17 @@ class ExplorationHandler(BaseHandler):
 
         if dest_id != feconf.END_DEST:
             values['finished'] = False
-            values['interactive_widget_html'] = (
-                InteractiveWidget.get_with_params(
-                    state.widget.widget_id,
-                    params=utils.parse_dict_with_params(
-                        state.widget.params, params)
-                )['raw']
+            if state.widget.sticky and (
+                state.widget.widget_id == old_state.widget.widget_id):
+              values['interactive_widget_html'] = ''
+              values['sticky_interactive_widget'] = True
+            else:
+              values['interactive_widget_html'] = (
+                  InteractiveWidget.get_with_params(
+                      state.widget.widget_id,
+                      params=utils.parse_dict_with_params(
+                          state.widget.params, params)
+                  )['raw']
             )
         else:
             values['finished'] = True

@@ -70,6 +70,9 @@ class WidgetInstance(ndb.Model):
     # pairs.
     # TODO(sll): Ensure the types for param_changes are consistent.
     params = ndb.JsonProperty(default={})
+    # If true, keep the widget instance from the previous state if both are of
+    # the same type.
+    sticky = ndb.BooleanProperty(default=False)
     # Answer handlers and rulesets.
     handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
 
@@ -265,7 +268,7 @@ class State(BaseModel):
 
         # Validate 'widget'.
         for key in description['widget']:
-            if key not in ['widget_id', 'params', 'handlers']:
+            if key not in ['widget_id', 'params', 'sticky', 'handlers']:
                 return False, 'Invalid key in widget: %s' % key
         if 'widget_id' not in description['widget']:
             return False, 'No widget id supplied'

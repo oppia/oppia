@@ -150,5 +150,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         name: Default
         param_changes: []
     params: {}
+    sticky: false
     widget_id: Continue
 """)

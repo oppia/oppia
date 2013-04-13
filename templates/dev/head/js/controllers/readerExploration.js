@@ -115,7 +115,9 @@
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
-    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+    if (!data.sticky_interactive_widget) {
+      $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+    }
 
     $scope.$apply();
     $scope.updateMath();
