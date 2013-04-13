@@ -30,4 +30,5 @@ Taj Mahal on map:
       latitude: '27.171781'
       longitude: '78.04217'
       zoom: '10'
+    sticky: True
     widget_id: InteractiveMap

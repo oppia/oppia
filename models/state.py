@@ -226,6 +226,9 @@ class State(BaseModel):
                 state_handler.rules.append(rule_instance)
 
         state.widget.handlers = [state_handler]
+
+        if 'sticky' in state_dict['widget']:
+            state.widget.sticky = True
         state.put()
         return state
 
