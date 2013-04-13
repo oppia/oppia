@@ -2,6 +2,16 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+v1.0.3 (13 Apr 2013)
+--------------------
+* Allow the same interactive widget to persist through multiple rounds of reader answers so that the reader does not lose previous work. (The widget still disappears when the reader moves to a state that uses a different interactive widget.)
+* Add markers for previous reader answers to the interactive map widget, as an example of the previous point.
+* Add an admin handler that allows an admin to reload the default explorations.
+* In the statistics dashboard, show detailed exploration statistics for every rule (not just the default one).
+* Start a migration to typed objects with their own normalizers and view/edit templates. Remove the old normalizers.
+* Bug fixes and general tidying up.
+* Security fixes.
+
 v1.0.2 (6 Apr 2013)
 -------------------
 * Add an interactive map widget, a classifier for 2D coordinates, and a simple exploration showcasing these.
