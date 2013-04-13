@@ -27,8 +27,15 @@ from google.appengine.ext import ndb
 
 
 STATS_ENUMS = utils.create_enum(
-    'exploration_visited', 'default_case_hit', 'exploration_completed',
+    'exploration_visited', 'rule_hit', 'exploration_completed',
     'feedback_submitted', 'state_hit')
+
+def create_rule_name(rule):
+    name = rule.name
+    for key in rule.inputs.keys():
+        left_paren = name.index('(')
+        name = name[0:left_paren] + name[left_paren:].replace(key, str(rule.inputs[key]))
+    return name
 
 
 class EventHandler(object):
@@ -41,7 +48,7 @@ class EventHandler(object):
         if event_name == STATS_ENUMS.exploration_visited:
             event_key = 'e.%s' % key
             cls._inc(event_key)
-        if event_name == STATS_ENUMS.default_case_hit:
+        if event_name == STATS_ENUMS.rule_hit:
             event_key = 'default.%s' % key
             cls._add(event_key, unicode(extra_info))
         if event_name == STATS_ENUMS.exploration_completed:
@@ -53,12 +60,12 @@ class EventHandler(object):
         if event_name == STATS_ENUMS.state_hit:
             event_key = 's.%s' % key
             cls._inc(event_key)
-
+    
     @classmethod
-    def record_default_case_hit(cls, exploration_id, state_id, extra_info=''):
+    def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""
         cls._record_event(
-            STATS_ENUMS.default_case_hit, '%s.%s' % (exploration_id, state_id),
+            STATS_ENUMS.rule_hit, '%s.%s.%s' % (exploration_id, state_id, create_rule_name(rule)),
             extra_info)
 
     @classmethod
@@ -147,26 +154,32 @@ class Statistics(object):
                 return 0
             return counter.value
 
-        if event_name == STATS_ENUMS.default_case_hit:
+        if event_name == STATS_ENUMS.rule_hit:
             result = {}
 
             exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
-                event_key = 'default.%s.%s' % (exploration_id, state.id)
-
-                journal = Journal.get_by_id(event_key)
-
-                if journal:
-                    top_ten = collections.Counter(
-                        journal.values).most_common(10)
-                else:
-                    top_ten = []
-
                 result[state.id] = {
                     'name': state.name,
-                    'answers': top_ten,
+                    'rules': {}
                 }
+                for handler in state.widget.handlers:
+                    for rule in handler.rules:
+                        rule_name = create_rule_name(rule)
+                        event_key = 'default.%s.%s.%s' % (exploration_id, state.id, rule_name)
+
+                        journal = Journal.get_by_id(event_key)
+
+                        if journal:
+                            top_ten = collections.Counter(
+                                journal.values).most_common(10)
+                        else:
+                            top_ten = []
+
+                        result[state.id]['rules'][rule_name] = {
+                            'answers': top_ten,
+                        }
 
             return result
 

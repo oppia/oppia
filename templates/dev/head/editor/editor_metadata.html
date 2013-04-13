@@ -88,7 +88,7 @@
     <tr>
       <th class="oppia-stats-table">State name</th>
       <th class="oppia-stats-table">Times hit</th>
-      <th class="oppia-stats-table">Answers in the default category</th>
+      <th class="oppia-stats-table">Rules</th>
     </tr>
 
     <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'count':true">
@@ -101,10 +101,17 @@
         <[stateData.count]>
       </td>
       <td class="oppia-stats-table">
-        <div ng-repeat="answer in stateData.answers">
-          <[answer[0]]>
-          (<em><[answer[1]]> time<span ng-show="answer[1] > 1">s</span></em>)
-        </div>
+          <table ng-show="stateData.count > 0">
+            <tr ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'count':true">
+               <td valign="top" width="200"><[rule]></td>
+               <td valign="top" width="100"><progress-bar width="100" height="14" show-guide="false" color1="cornflowerblue" color2="transparent" stat="ruleData.count" total="stateData.count" border-width="0"></progress-bar></td>
+               <td>
+                 <ul>
+                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]>: <[answer[1]]></li>
+                 </ul>
+               </td>
+            </tr>
+          </table>
       </td>
     </tr>
   </table>

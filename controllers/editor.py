@@ -74,19 +74,25 @@ def get_exploration_stats(exploration):
     num_completions = Statistics.get_exploration_stats(
         STATS_ENUMS.exploration_completed, exploration.id)
 
-    default_answers = Statistics.get_exploration_stats(
-        STATS_ENUMS.default_case_hit, exploration.id)
+    answers = Statistics.get_exploration_stats(
+        STATS_ENUMS.rule_hit, exploration.id)
 
     state_counts = Statistics.get_exploration_stats(
         STATS_ENUMS.state_hit, exploration.id)
 
     state_stats = {}
-    for state_id in default_answers.keys():
+    for state_id in answers.keys():
         state_stats[state_id] = {
-            'name': default_answers[state_id]['name'],
-            'answers': default_answers[state_id]['answers'],
+            'name': answers[state_id]['name'],
             'count': state_counts[state_id]['count'],
+            'rule_stats': {},
         }
+        for rule in answers[state_id]['rules'].keys():
+            state_stats[state_id]['rule_stats'][rule] = answers[state_id]['rules'][rule]
+            state_stats[state_id]['rule_stats'][rule]['count'] = 0
+            for _, count in  answers[state_id]['rules'][rule]['answers']:
+                state_stats[state_id]['rule_stats'][rule]['count'] += count
+            
 
     return {
         'num_visits': num_visits,
