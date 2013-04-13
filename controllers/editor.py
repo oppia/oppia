@@ -314,7 +314,12 @@ class StateHandler(BaseHandler):
             exploration.rename_state(state, state_name)
 
         if param_changes:
-            state.param_changes = param_changes
+            state.param_changes = [
+                parameter.MultiParameterChange(
+                    name=param_change['name'], value=param_change['value'],
+                    obj_type='UnicodeString'
+                ) for param_change in param_changes
+            ]
 
         if interactive_widget:
             state.widget.widget_id = interactive_widget

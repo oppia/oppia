@@ -5,7 +5,7 @@ Welcome!:
       that can be continually improved over time. These allow students to learn by
       doing.<div><br></div><div>By the way, do you know where the name 'Oppia' comes
       from?<br></div>
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -16,7 +16,7 @@ Welcome!:
         inputs:
           x: 0
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Welcome!
         feedback:
         - Actually, I don't know of any such characters, so I must confess to making
@@ -24,14 +24,14 @@ Welcome!:
         inputs:
           x: 2
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - Hm, it certainly looks like it! But it's actually a word from a different
           language.
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       choices:
       - It's translated from a different language.
@@ -42,7 +42,7 @@ Estimate 100:
   content:
   - type: text
     value: What is 10 times 10?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -53,14 +53,14 @@ Estimate 100:
         inputs:
           x: 100.0
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Estimate 100
         feedback:
         - No; try again. Remember, multiplication by ten can be done by just adding
           a zero at the end.
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: None
     widget_id: NumericInput
@@ -75,7 +75,7 @@ Music widget:
       the black circle representing the note. It should turn red.</li><li>Move the
       note up and down using the <span style="font-weight: bold;">up</span>&nbsp;and
       <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li> </ol>'
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -86,14 +86,14 @@ Music widget:
         inputs:
           x: B4
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Music widget
         feedback:
         - I think the original note is lower.
         inputs:
           x: B4
         name: is_greater_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Music widget
         feedback:
         - Actually, the original note sounds higher. Try comparing both pitches and
@@ -101,12 +101,12 @@ Music widget:
         inputs:
           x: B4
         name: is_less_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Music widget
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       noteToGuess: B4
       notesToPlayAtStart: []
@@ -116,7 +116,7 @@ Numeric input:
   content:
   - type: text
     value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -127,14 +127,14 @@ Numeric input:
         inputs:
           x: 121.0
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Estimate 100
         feedback:
         - Nope. Let's make a quick estimate.
         inputs:
           x: 121.0
         name: is_less_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Numeric input
         feedback:
         - You are actually very close. Think about the last digit of the answer; what
@@ -143,28 +143,28 @@ Numeric input:
           tol: 9.0
           x: 121.0
         name: is_within_tolerance(x, tol)
-        param_changes: {}
+        param_changes: []
       - dest: Numeric input
         feedback:
         - That's too high! Try guessing lower.
         inputs:
           x: 121.0
         name: is_greater_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Numeric input
         feedback:
         - That's not large enough. Try guessing higher?
         inputs:
           x: 121.0
         name: is_less_than(x)
-        param_changes: {}
+        param_changes: []
       - dest: Numeric input
         feedback:
         - If you got here, something's gone a bit wrong with this exploration. Sorry
           about that. If you're wondering, the answer is 96721.
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: None
     widget_id: NumericInput
@@ -180,7 +180,7 @@ Things you can do:
       a new exploration" button in the gallery.</div><br><div>We hope you enjoy using Oppia. If you have feedback, let
       us know! You can find our discussion forum at&nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/oppia"
       target="_blank">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>'
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -189,7 +189,7 @@ Things you can do:
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params: {}
     widget_id: Continue
 What country:
@@ -197,7 +197,7 @@ What country:
   - type: text
     value: In fact, the word Oppia means 'learn'. Can you guess which language it
       comes from?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -210,7 +210,7 @@ What country:
         inputs:
           x: greek
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -225,7 +225,7 @@ What country:
         inputs:
           x: roman
         name: contains(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
@@ -240,7 +240,7 @@ What country:
         inputs:
           x: latin
         name: contains(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - That's not it, alas. But you're very close! Oppia is indeed a Nordic word,
@@ -248,7 +248,7 @@ What country:
         inputs:
           x: Swedish
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into a search
@@ -256,14 +256,14 @@ What country:
         inputs:
           x: translate oppia
         name: contains(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - Not quite; that's actually the opposite of 'start'. Check your spelling!
         inputs:
           x: finish
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: Numeric input
         feedback:
         - 'Yes! Oppia is the Finnish word for learn.
@@ -276,7 +276,7 @@ What country:
         inputs:
           x: Finnish
         name: case_sensitive_equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - (In general, the name of a language is a proper noun, so it should start
@@ -284,14 +284,14 @@ What country:
         inputs:
           x: finnish
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - I think your spelling isn't quite right; you might want to check it.
         inputs:
           x: finnish
         name: fuzzy_equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: What country
         feedback:
         - Actually, that's not where we got it from. But you can find out lots of
@@ -299,7 +299,7 @@ What country:
           favorite search engine?
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput

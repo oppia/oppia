@@ -2,7 +2,7 @@ Question:
   content:
   - type: text
     value: How many ways are there to arrange three balls in a row?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -12,12 +12,12 @@ Question:
         inputs:
           x: '6'
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: 0
     widget_id: NumericInput
@@ -30,7 +30,7 @@ List the ways:
       as:</div><div><ul><li>RBY</li></ul><div>This means that the red ball is on the
       left, the blue ball is in the middle, and the yellow ball is on the right. What
       are the other ways?</div></div>
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -46,7 +46,7 @@ List the ways:
         inputs:
           x: []
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - We've already counted RBY, so let's not do it again.
@@ -54,7 +54,7 @@ List the ways:
           x:
           - RBY
         name: has_elements_in(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - It looks like at least one of your list elements is invalid...
@@ -66,7 +66,7 @@ List the ways:
           - YRB
           - YBR
         name: has_elements_not_in(x)
-        param_changes: {}
+        param_changes: []
       - dest: Prompt for explanation with all ways listed
         feedback: []
         inputs:
@@ -77,7 +77,7 @@ List the ways:
           - YRB
           - YBR
         name: equals(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - Sorry about this, but please could you enter your answer using uppercase
@@ -91,7 +91,7 @@ List the ways:
           - yrb
           - ybr
         name: has_elements_in(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - How about arrangements in which the yellow ball is on the left?
@@ -100,7 +100,7 @@ List the ways:
           - YBR
           - YRB
         name: is_disjoint_from(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - How about arrangements for which the blue ball is on the left?
@@ -109,7 +109,7 @@ List the ways:
           - BRY
           - BYR
         name: is_disjoint_from(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - I think you've missed some...
@@ -121,20 +121,20 @@ List the ways:
           - BRY
           - BYR
         name: is_subset_of(x)
-        param_changes: {}
+        param_changes: []
       - dest: List the ways
         feedback:
         - Sorry, I don't think that's right. Try again?
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params: {}
     widget_id: SetInput
 Prompt for explanation:
   content:
   - type: text
     value: OK, why do you think it is 6?
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -143,7 +143,7 @@ Prompt for explanation:
         feedback: []
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput
@@ -152,7 +152,7 @@ Prompt for explanation with all ways listed:
   - type: text
     value: Do you think you've got all of them?<div><br></div><div>If so, how do you
       know?</div>
-  param_changes: {}
+  param_changes: []
   widget:
     handlers:
     - name: submit
@@ -162,7 +162,7 @@ Prompt for explanation with all ways listed:
         - 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and YBR. Great!'
         inputs: {}
         name: Default
-        param_changes: {}
+        param_changes: []
     params:
       placeholder: Type your answer here.
     widget_id: TextInput

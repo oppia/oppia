@@ -120,10 +120,10 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Define this behavior. Currently a new parameter is set
         # only if it doesn't exist, but it might be the case that the parameter
         # should be reset each time the state is entered.
-        for (key, values) in state.param_changes.iteritems():
-            if key not in existing_params:
+        for item in state.param_changes:
+            if item.name not in existing_params:
                 # Pick a random parameter for this key.
-                existing_params[key] = utils.get_random_choice(values)
+                existing_params[item.name] = utils.get_random_choice(item.values)
         return existing_params
 
     def get(self, exploration_id):
