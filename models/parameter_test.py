@@ -19,35 +19,13 @@ __author__ = 'Sean Lip'
 import test_utils
 import parameter
 
-from data.objects.models import objects
-from google.appengine.ext import ndb
-
 
 class ParameterUnitTests(test_utils.AppEngineTestBase):
     """Test the Parameter class."""
 
     def test_parameter_class(self):
         """Tests the Parameter class."""
-        model = parameter.Parameter(name='param1', value='hello')
-        # Raise an error because no obj_type is specified.
-        with self.assertRaises(TypeError):
-            model.put()
-
-        model.obj_type = 'Int'
-        # Raise an error because the value does not match the obj_type.
-        with self.assertRaises(TypeError):
-            model.put()
-
-        model.value = 6
-        model.put()
-
-
-class MultiParameterUnitTests(test_utils.AppEngineTestBase):
-    """Test the MultiParameter class."""
-
-    def test_multi_parameter_class(self):
-        """Tests the MultiParameter class."""
-        model = parameter.MultiParameter(name='param1', values=['hello'])
+        model = parameter.Parameter(name='param1', values=['hello'])
         # Raise an error because no obj_type is specified.
         with self.assertRaises(TypeError):
             model.put()

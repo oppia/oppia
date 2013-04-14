@@ -53,7 +53,7 @@ class Rule(ndb.Model):
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
     # State-level parameter changes to make if this rule is triggered.
-    param_changes = parameter.MultiParameterChangeProperty(repeated=True)
+    param_changes = parameter.ParameterChangeProperty(repeated=True)
 
 
 class AnswerHandlerInstance(ndb.Model):
@@ -103,7 +103,7 @@ class State(BaseModel):
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
-    param_changes = parameter.MultiParameterChangeProperty(repeated=True)
+    param_changes = parameter.ParameterChangeProperty(repeated=True)
     # The interactive widget associated with this state.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
     # A dict whose keys are unresolved answers associated with this state, and
@@ -177,7 +177,7 @@ class State(BaseModel):
         if 'param_changes' in state_dict:
             state.param_changes = []
             for param_to_change in state_dict['param_changes']:
-                state.param_changes.append(parameter.MultiParameterChange(
+                state.param_changes.append(parameter.ParameterChange(
                     name=param_to_change,
                     values=state_dict['param_changes'][param_to_change],
                     obj_type='UnicodeString'

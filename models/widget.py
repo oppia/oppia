@@ -55,7 +55,7 @@ class Widget(polymodel.PolyModel):
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used.
-    params = ndb.StructuredProperty(Parameter, repeated=True)
+    params = ndb.LocalStructuredProperty(Parameter, repeated=True)
 
     @classmethod
     def get(cls, widget_id):
@@ -167,7 +167,12 @@ class InteractiveWidget(Widget):
 
             assert widget_id == widget_config['id']
 
-            params = [Parameter(**param) for param in widget_config['params']]
+            params = []
+            for param in widget_config['params']:
+                param['values'] = [param['value']]
+                del param['value']
+                params.append(Parameter(**param))
+
             handlers = [AnswerHandler(**handler)
                         for handler in widget_config['handlers']]
             template = utils.get_file_contents(os.path.join(

@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import re
 
 from types import get_object_class
+import utils
 
 from google.appengine.ext import ndb
 
@@ -33,16 +34,19 @@ class AlphanumericProperty(ndb.StringProperty):
 
 
 class Parameter(ndb.Model):
-    """Represents a parameter.
+    """Represents a (multi-valued) parameter.
 
-    The 'value' attribute represents the default value of the parameter. The
-    difference between a Parameter and a TypedInstance is that a Parameter can
-    be overridden (by specifying its name and a new value).
+    The 'values' property represents the list of possible default values for
+    the parameter. The 'value' property returns one value from these, chosen
+    randomly; the 'values' property returns the entire list.
+
+    The difference between a Parameter and a TypedInstance is that a Parameter
+    can be overridden (by specifying its name and a new set of values).
     """
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore."""
         object_class = get_object_class(self.obj_type)
-        self.value = object_class.normalize(self.value)
+        self.values = [object_class.normalize(value) for value in self.values]
 
     # The name of the parameter.
     name = AlphanumericProperty(required=True)
@@ -51,11 +55,17 @@ class Parameter(ndb.Model):
     # The type of the parameter.
     obj_type = ndb.StringProperty(required=True)
     # The default value of the parameter.
-    value = ndb.JsonProperty()
+    values = ndb.JsonProperty(repeated=True)
+
+    @property
+    def value(self):
+        if not self.values:
+            return None
+        return utils.get_random_choice(self.values)
 
 
 class ParameterProperty(ndb.LocalStructuredProperty):
-    """Represents a parameter."""
+    """Represents a multi-valued parameter."""
     def __init__(self, **kwds):
         super(ParameterProperty, self).__init__(Parameter, **kwds)
 
@@ -63,25 +73,25 @@ class ParameterProperty(ndb.LocalStructuredProperty):
         object_class = get_object_class(val.obj_type)
         return Parameter(
             obj_type=val.obj_type,
-            values=object_class.normalize(val.value),
+            values=[object_class.normalize(value) for value in val.values],
             name=val.name, description=val.description)
 
     def _to_base_type(self, val):
         return Parameter(
-            obj_type=val.obj_type, value=val.value, name=val.name,
+            obj_type=val.obj_type, values=val.values, name=val.name,
             description=val.description)
 
     def _from_base_type(self, val):
         return Parameter(
-            obj_type=val.obj_type, value=val.value, name=val.name,
+            obj_type=val.obj_type, values=val.values, name=val.name,
             description=val.description)
 
 
 class ParameterChange(Parameter):
-    """Represents a parameter change.
+    """Represents a change to a multi-valued parameter.
 
-    This has the effect of replacing the value that can be taken by an
-    existing parameter.
+    This has the effect of replacing the set of values that can be taken
+    by an existing parameter.
     """
     description = None
 
@@ -97,88 +107,12 @@ class ParameterChangeProperty(ndb.LocalStructuredProperty):
         object_class = get_object_class(val.obj_type)
         return ParameterChange(
             obj_type=val.obj_type, name=val.name,
-            values=object_class.normalize(val.value))
-
-    def _to_base_type(self, val):
-        return ParameterChange(
-            obj_type=val.obj_type, name=val.name, value=val.value)
-
-    def _from_base_type(self, val):
-        return ParameterChange(
-            obj_type=val.obj_type, name=val.name, value=val.value)
-
-
-class MultiParameter(ndb.Model):
-    """Represents a multi-valued parameter.
-
-    The 'values' attribute represents the list of possible default values for the
-    parameter. At resolution, exactly one of these values is chosen.
-    """
-    def _pre_put_hook(self):
-        """Does validation before the model is put into the datastore."""
-        object_class = get_object_class(self.obj_type)
-        assert self.values, 'Parameter %s has no values supplied.' % self.name
-        self.values = [object_class.normalize(value) for value in self.values]
-
-    # The name of the parameter.
-    name = ndb.StringProperty(required=True)
-    # The description of the parameter.
-    description = ndb.TextProperty()
-    # The type of the parameter.
-    obj_type = ndb.StringProperty(required=True)
-    # The default values that can be taken by the parameter.
-    values = ndb.JsonProperty(repeated=True)
-
-
-class MultiParameterProperty(ndb.LocalStructuredProperty):
-    """Represents a multi-valued parameter."""
-    def __init__(self, **kwds):
-        super(MultiParameterProperty, self).__init__(MultiParameter, **kwds)
-
-    def _validate(self, val):
-        object_class = get_object_class(val.obj_type)
-        return MultiParameter(
-            obj_type=val.obj_type,
-            values=[object_class.normalize(value) for value in val.values],
-            name=val.name, description=val.description)
-
-    def _to_base_type(self, val):
-        return MultiParameter(
-            obj_type=val.obj_type, values=val.values, name=val.name,
-            description=val.description)
-
-    def _from_base_type(self, val):
-        return MultiParameter(
-            obj_type=val.obj_type, values=val.values, name=val.name,
-            description=val.description)
-
-
-class MultiParameterChange(MultiParameter):
-    """Represents a change to a multi-valued parameter.
-
-    This has the effect of replacing the set of values that can be taken
-    by an existing parameter.
-    """
-    description = None
-
-
-class MultiParameterChangeProperty(ndb.LocalStructuredProperty):
-    """Represents a parameter change."""
-    def __init__(self, **kwds):
-        super(MultiParameterChangeProperty, self).__init__(MultiParameterChange, **kwds)
-
-    def _validate(self, val):
-        # Parent classes must do validation to check that the object type here
-        # matches the object type of the parameter with the corresponding name.
-        object_class = get_object_class(val.obj_type)
-        return MultiParameterChange(
-            obj_type=val.obj_type, name=val.name,
             values=[object_class.normalize(value) for value in val.values])
 
     def _to_base_type(self, val):
-        return MultiParameterChange(
+        return ParameterChange(
             obj_type=val.obj_type, name=val.name, values=val.values)
 
     def _from_base_type(self, val):
-        return MultiParameterChange(
+        return ParameterChange(
             obj_type=val.obj_type, name=val.name, values=val.values)

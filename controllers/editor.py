@@ -23,8 +23,8 @@ from controllers.base import require_editor
 from controllers.base import require_user
 import feconf
 from models.exploration import Exploration
-from models.parameter import MultiParameterChange
 from models.parameter import Parameter
+from models.parameter import ParameterChange
 from models.state import AnswerHandlerInstance
 from models.state import Content
 from models.state import Rule
@@ -92,9 +92,8 @@ def get_exploration_stats(exploration):
         for rule in answers[state_id]['rules'].keys():
             state_stats[state_id]['rule_stats'][rule] = answers[state_id]['rules'][rule]
             state_stats[state_id]['rule_stats'][rule]['count'] = 0
-            for _, count in  answers[state_id]['rules'][rule]['answers']:
+            for _, count in answers[state_id]['rules'][rule]['answers']:
                 state_stats[state_id]['rule_stats'][rule]['count'] += count
-            
 
     return {
         'num_visits': num_visits,
@@ -324,7 +323,7 @@ class StateHandler(BaseHandler):
 
         if 'param_changes' in payload:
             state.param_changes = [
-                MultiParameterChange(
+                ParameterChange(
                     name=param_change['name'], values=param_change['values'],
                     obj_type='UnicodeString'
                 ) for param_change in param_changes

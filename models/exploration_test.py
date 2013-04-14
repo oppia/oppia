@@ -71,7 +71,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         with self.assertRaises(BadValueError):
             exploration.parameters = 'A string'
         exploration.parameters = []
-        parameter = Parameter(id='The parameter')
+        parameter = Parameter(name='theParameter', obj_type='Int')
         with self.assertRaises(BadValueError):
             exploration.parameters = [parameter.key]
         exploration.parameters = [parameter]

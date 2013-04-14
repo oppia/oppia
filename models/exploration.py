@@ -46,7 +46,7 @@ class Exploration(BaseModel):
     # empty.
     states = ndb.KeyProperty(kind=State, repeated=True)
     # The list of parameters associated with this exploration
-    parameters = ndb.StructuredProperty(Parameter, repeated=True)
+    parameters = ndb.LocalStructuredProperty(Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
