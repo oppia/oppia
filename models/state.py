@@ -192,7 +192,7 @@ class State(BaseModel):
                 parameters[param.name] = state_dict['widget']['params'][param.name]
                 del state_dict['widget']['params'][param.name]
             else:
-                parameters[param.name] = param.default_value
+                parameters[param.name] = param.value
 
         if state_dict['widget']['params']:
             raise Exception('Extra parameters not used: %s' %

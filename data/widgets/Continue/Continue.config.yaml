@@ -13,7 +13,7 @@ description: |
 # interaction, and the associated classifiers.
 handlers:
 - name: submit
-  classifier: None
+  classifier: null
 
 # Customization parameters and their descriptions, types and default values.
 params: []

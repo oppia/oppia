@@ -17,7 +17,7 @@ handlers:
 
 # Customization parameters and their descriptions, types and default values.
 params:
-  - name: choices
-    description: The options that the reader can select from.
-    param_type: list
-    default_value: ['Default choice']
+- name: choices
+  description: The options that the reader can select from.
+  obj_type: List
+  value: ['Default choice']

@@ -23,7 +23,8 @@ from controllers.base import require_editor
 from controllers.base import require_user
 import feconf
 from models.exploration import Exploration
-from models.exploration import Parameter
+from models.parameter import MultiParameterChange
+from models.parameter import Parameter
 from models.state import AnswerHandlerInstance
 from models.state import Content
 from models.state import Rule
@@ -191,7 +192,7 @@ class ExplorationHandler(BaseHandler):
 
         parameters = []
         for param in exploration.parameters:
-            parameters.append({'name': param.name, 'type': param.param_type})
+            parameters.append({'name': param.name, 'type': param.obj_type})
 
         self.values.update({
             'exploration_id': exploration.id,
@@ -258,7 +259,7 @@ class ExplorationHandler(BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                Parameter(name=item['name'], param_type=item['type'])
+                Parameter(name=item['name'], obj_type=item['type'])
                 for item in parameters
             ]
 
@@ -315,16 +316,16 @@ class StateHandler(BaseHandler):
         content = payload.get('content')
         unresolved_answers = payload.get('unresolved_answers')
 
-        if state_name:
+        if 'state_name' in payload:
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             exploration.rename_state(state, state_name)
 
-        if param_changes:
+        if 'param_changes' in payload:
             state.param_changes = [
-                parameter.MultiParameterChange(
-                    name=param_change['name'], value=param_change['value'],
+                MultiParameterChange(
+                    name=param_change['name'], values=param_change['values'],
                     obj_type='UnicodeString'
                 ) for param_change in param_changes
             ]
@@ -392,7 +393,8 @@ class StateHandler(BaseHandler):
                     if normalized_param is None:
                         raise self.InvalidInputException(
                             '%s has the wrong type. Please replace it with a '
-                            '%s.' % (rule['inputs'][param], normalizer_string))
+                            '%s.' % (rule['inputs'][param],
+                                     typed_object.__name__))
 
                     state_rule.inputs[param] = normalized_param
 

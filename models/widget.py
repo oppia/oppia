@@ -19,31 +19,13 @@
 __author__ = 'Sean Lip'
 
 import os
-import re
 
 import feconf
 import utils
+from parameter import Parameter
 
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
-
-
-class AlphanumericProperty(ndb.StringProperty):
-    """A property for strings with alphanumeric characters."""
-
-    def _validate(self, value):
-        """Check that the value is alphanumeric."""
-        assert re.compile("^[a-zA-Z0-9]+$").match(value), (
-            'Only parameter names with characters in [a-zA-Z0-9] are accepted.')
-
-
-class WidgetParameter(ndb.Model):
-    """A class for parameters."""
-    name = AlphanumericProperty(required=True)
-    description = ndb.TextProperty()
-    param_type = ndb.StringProperty(required=True)
-    # TODO(sll): Validate that this default value is of the correct type, or None.
-    default_value = ndb.JsonProperty()
 
 
 class AnswerHandler(ndb.Model):
@@ -73,7 +55,7 @@ class Widget(polymodel.PolyModel):
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used.
-    params = ndb.StructuredProperty(WidgetParameter, repeated=True)
+    params = ndb.StructuredProperty(Parameter, repeated=True)
 
     @classmethod
     def get(cls, widget_id):
@@ -98,7 +80,7 @@ class Widget(polymodel.PolyModel):
                 parameters[param.name] = params[param.name]
             else:
                 parameters[param.name] = utils.convert_to_js_string(
-                    param.default_value)
+                    param.value)
 
         raw = utils.parse_with_jinja(widget.template, parameters)
 
@@ -108,13 +90,13 @@ class Widget(polymodel.PolyModel):
             if param.name in params:
                 actual_params[param.name] = params[param.name]
             else:
-                actual_params[param.name] = param.default_value
+                actual_params[param.name] = param.value
 
         result = widget.to_dict()
         result['id'] = widget_id
         result['raw'] = raw
         # TODO(sll): Restructure this so that it is
-        # {key: {value: ..., param_type: ..., default_value: ...}}
+        # {key: {value: ..., obj_type: ..., value: ...}}
         result['params'] = actual_params
         if 'handlers' in result:
             actions = {}
@@ -174,42 +156,31 @@ class InteractiveWidget(Widget):
         widget_ids = os.listdir(os.path.join(feconf.SAMPLE_WIDGETS_DIR))
 
         for widget_id in widget_ids:
+            widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
+            if not os.path.isdir(widget_dir):
+                continue
+
             with open(os.path.join(
-                    feconf.SAMPLE_WIDGETS_DIR, widget_id,
-                    '%s.config.yaml' % widget_id)) as f:
+                    widget_dir, '%s.config.yaml' % widget_id)) as f:
                 widget_config = utils.dict_from_yaml(
                     f.read().decode('utf-8'))
 
             assert widget_id == widget_config['id']
 
-            html_file = os.path.join(widget_id, '%s.html' % widget_id)
+            params = [Parameter(**param) for param in widget_config['params']]
+            handlers = [AnswerHandler(**handler)
+                        for handler in widget_config['handlers']]
             template = utils.get_file_contents(os.path.join(
-                feconf.SAMPLE_WIDGETS_DIR, html_file))
-
-            params = []
-            for param in widget_config['params']:
-                params.append(WidgetParameter(
-                    name=param.get('name'),
-                    description=param.get('description'),
-                    param_type=param.get('param_type'),
-                    default_value=param.get('default_value'),
-                ))
-
-            handlers = []
-            for handler in widget_config['handlers']:
-                handlers.append(AnswerHandler(
-                    name=handler.get('name'),
-                    classifier=handler.get('classifier')),
-                )
+                feconf.SAMPLE_WIDGETS_DIR, widget_id, '%s.html' % widget_id))
 
             widget = cls(
                 id=widget_config['id'],
                 name=widget_config['name'],
                 category=widget_config['category'],
                 description=widget_config['description'],
-                template=template,
                 params=params,
                 handlers=handlers,
+                template=template,
             )
 
             widget.put()

@@ -18,8 +18,7 @@ Question:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: 0
+    params: []
     widget_id: NumericInput
 List the ways:
   content:

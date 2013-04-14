@@ -20,13 +20,13 @@ handlers:
 params:
   - name: noteToGuess
     description: The note that the reader should guess.
-    param_type: str
-    default_value: B4
+    obj_type: UnicodeString
+    value: B4
   - name: notesToPlayAtStart
     description: A sequence of notes to play when the widget is loaded.
-    param_type: list
-    default_value: []
+    obj_type: List
+    value: []
   - name: previousAnswer
     description: The reader's previous answer.
-    param_type: str
-    default_value: ''
+    obj_type: UnicodeString
+    value: ''

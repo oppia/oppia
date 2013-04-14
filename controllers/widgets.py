@@ -94,9 +94,10 @@ class InteractiveWidgetHandler(BaseHandler):
         state_params_dict = {}
         state_params_given = payload.get('state_params')
         if state_params_given:
-            for (key, values) in state_params_given.iteritems():
+            for param in state_params_given:
                 # Pick a random parameter for each key.
-                state_params_dict[key] = utils.get_random_choice(values)
+                state_params_dict[param['name']] = (
+                    utils.get_random_choice(param['values']))
 
         response = InteractiveWidget.get_with_params(
             widget_id, params=utils.parse_dict_with_params(

@@ -17,8 +17,4 @@ handlers:
   classifier: NumericClassifier
 
 # Customization parameters and their descriptions, types and default values.
-params:
-  - name: placeholder
-    description: The placeholder for the numeric input field.
-    param_type: str
-    default_value: None
+params: []

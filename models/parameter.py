@@ -16,18 +16,28 @@
 
 __author__ = 'Sean Lip'
 
-from types import TypedInstanceProperty
+import re
+
 from types import get_object_class
 
 from google.appengine.ext import ndb
+
+
+class AlphanumericProperty(ndb.StringProperty):
+    """A property for strings with alphanumeric characters."""
+
+    def _validate(self, value):
+        """Check that the value is alphanumeric."""
+        assert re.compile("^[a-zA-Z0-9]+$").match(value), (
+            'Only parameter names with characters in [a-zA-Z0-9] are accepted.')
 
 
 class Parameter(ndb.Model):
     """Represents a parameter.
 
     The 'value' attribute represents the default value of the parameter. The
-    difference between a Parameter and a TypedInstance is that a Parameter can be
-    overridden (by specifying its name and a new value).
+    difference between a Parameter and a TypedInstance is that a Parameter can
+    be overridden (by specifying its name and a new value).
     """
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore."""
@@ -35,7 +45,7 @@ class Parameter(ndb.Model):
         self.value = object_class.normalize(self.value)
 
     # The name of the parameter.
-    name = ndb.StringProperty(required=True)
+    name = AlphanumericProperty(required=True)
     # The description of the parameter.
     description = ndb.TextProperty()
     # The type of the parameter.
@@ -51,18 +61,18 @@ class ParameterProperty(ndb.LocalStructuredProperty):
 
     def _validate(self, val):
         object_class = get_object_class(val.obj_type)
-        return ParameterModel(
+        return Parameter(
             obj_type=val.obj_type,
             values=object_class.normalize(val.value),
             name=val.name, description=val.description)
 
     def _to_base_type(self, val):
-        return ParameterModel(
+        return Parameter(
             obj_type=val.obj_type, value=val.value, name=val.name,
             description=val.description)
 
     def _from_base_type(self, val):
-        return ParameterModel(
+        return Parameter(
             obj_type=val.obj_type, value=val.value, name=val.name,
             description=val.description)
 
@@ -127,18 +137,18 @@ class MultiParameterProperty(ndb.LocalStructuredProperty):
 
     def _validate(self, val):
         object_class = get_object_class(val.obj_type)
-        return ParameterModel(
+        return MultiParameter(
             obj_type=val.obj_type,
             values=[object_class.normalize(value) for value in val.values],
             name=val.name, description=val.description)
 
     def _to_base_type(self, val):
-        return ParameterModel(
+        return MultiParameter(
             obj_type=val.obj_type, values=val.values, name=val.name,
             description=val.description)
 
     def _from_base_type(self, val):
-        return ParameterModel(
+        return MultiParameter(
             obj_type=val.obj_type, values=val.values, name=val.name,
             description=val.description)
 

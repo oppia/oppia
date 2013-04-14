@@ -353,31 +353,33 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.initSelectorOptions();
   };
 
-  $scope.startEditParamChange = function(pName) {
+
+  // TODO(sll): Change the following to take an $index.
+  $scope.startEditParamChange = function(index) {
+    var pName = $scope.paramChanges[index].name;
     $scope.tmpParamName = {id:pName, text: pName};
-    $scope.editingParamChange = pName;
-    if (pName in $scope.paramChanges) {
-      $scope.tmpParamValues = [];
-      ($scope.paramChanges[pName]).forEach(function(change){
-        if(typeof change === "string") { // I think other stuff, like hashes, ends up in this object
-          var txt = "";
-          if(change.lastIndexOf("{{", 0) === 0) { // if change starts with "{{" - it is a variable
-            txt = change.substring(2, change.length-2);
-          }
-          else { // it's a literal; display in quotes
-            txt = '"'+change+'"';
-          }
-          $scope.tmpParamValues.push({id:change, text:txt});
+    $scope.editingParamChange = index;
+
+    $scope.tmpParamValues = [];
+    ($scope.paramChanges[index].values).forEach(function(change){
+      if(typeof change === "string") { // I think other stuff, like hashes, ends up in this object
+        var txt = "";
+        if(change.lastIndexOf("{{", 0) === 0) { // if change starts with "{{" - it is a variable
+          txt = change.substring(2, change.length-2);
         }
-      });
-      console.log($scope.paramChanges[pName]);
-      console.log($scope.tmpParamValues);
-      //$scope.tmpParamValues = $scope.paramChanges[pName];
-      //TODO: correctly fill the param values field. 
-      //need to either change the structure of paramChanges to fit with the select2 structure (probably the best way) 
-      //or manually re-construct the display text every time from the value string
-      //e.g. {{pname}} -> pname, literalvalue -> "literalvalue"
-    }
+        else { // it's a literal; display in quotes
+          txt = '"'+change+'"';
+        }
+        $scope.tmpParamValues.push({id:change, text:txt});
+      }
+    });
+
+    //$scope.tmpParamValues = $scope.paramChanges[index].values;
+    //TODO: correctly fill the param values field. 
+    //need to either change the structure of paramChanges to fit with the select2 structure (probably the best way) 
+    //or manually re-construct the display text every time from the value string
+    //e.g. {{pname}} -> pname, literalvalue -> "literalvalue"
+
     $scope.initSelectorOptions();
   };
 
@@ -391,7 +393,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
 
   $scope.resetParamChangeInput();
 
-  $scope.addParamChange = function() {
+  $scope.addParamChange = function(index) {
     if (!$scope.tmpParamName) {
       warningsData.addWarning('Please specify a parameter name.');
       return;
@@ -404,7 +406,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     // tmpParamName as output by the selector is usually of the format {id:param_name, text:param_name}
     // except when the user is creating a new parameter, then it is {id:'new', text:param_name}
     var name = $scope.tmpParamName.text;
-    // tmpParamValuies comes back with the string that needs to be stored as the id;
+    // tmpParamValues comes back with the string that needs to be stored as the id;
     // for changing to other parameter values or student input, this is {{pname}} or {{input}}
     // otherwise the value option is interpreted as a string literal
     var vals = [];
@@ -413,23 +415,31 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     });
     // if it was a new parameter, add it to the exploration's parameter list
     if($scope.tmpParamName.id === 'new') {
-      $scope.addParameter(name, 'string');//TODO:ask for type(modal?)
+      $scope.addParameter(name, 'UnicodeString');//TODO:ask for type(modal?)
     }
-    console.log($scope.tmpParamValues);
-    $scope.paramChanges[name] = vals;
+
+    if (index !== 'New change') {
+      $scope.paramChanges[index] = {
+        'obj_type': 'UnicodeString', 'values': vals, 'name': name};
+    } else {
+      $scope.paramChanges.push(
+        {'obj_type': 'UnicodeString', 'values': vals, 'name': name});
+    }
+
     $scope.saveParamChanges();
     $scope.resetParamChangeInput();
   };
 
-  $scope.deleteParamChange = function (paramName) {
+  $scope.deleteParamChange = function (index) {
     //TODO(yanamal): add category index when this is per-category
-    //TODO: why does this break when deleting the only parameter change?
-    delete $scope.paramChanges[paramName];
+    $scope.paramChanges.splice(index, 1);
     $scope.saveParamChanges();
   };
 
   $scope.saveParamChanges = function() {
-    explorationData.saveStateData($scope.stateId, {'param_changes': $scope.paramChanges});
+    explorationData.saveStateData(
+      $scope.stateId,
+      {'param_changes': $scope.paramChanges});
   };
 }
 

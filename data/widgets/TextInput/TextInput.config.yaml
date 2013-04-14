@@ -19,5 +19,5 @@ handlers:
 params:
   - name: placeholder
     description: The placeholder for the text input field.
-    param_type: str
-    default_value: Type your answer here.
+    obj_type: UnicodeString
+    value: Type your answer here.

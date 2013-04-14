@@ -61,8 +61,7 @@ Estimate 100:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: None
+    params: []
     widget_id: NumericInput
 Music widget:
   content:
@@ -165,8 +164,7 @@ Numeric input:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: None
+    params: []
     widget_id: NumericInput
 Things you can do:
   content:

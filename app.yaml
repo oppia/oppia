@@ -34,10 +34,6 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: templates/dev/head/css
   secure: always
-  mime_type: 'text/css'
-  http_headers:
-    Cache-Control: 'public, max-age=600'
-    Vary: Accept-Encoding
 - url: /img
   static_dir: third_party/bootstrap/img
   secure: always

@@ -141,6 +141,9 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       }
     }
 
+    console.log(propertyValueMap);
+    console.log(JSON.stringify(propertyValueMap));
+
     $http.put(
         explorationUrl + '/' + stateId + '/data',
         $.param({payload: JSON.stringify(propertyValueMap)}, true),

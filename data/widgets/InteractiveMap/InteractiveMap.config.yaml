@@ -19,13 +19,13 @@ handlers:
 params:
   - name: latitude
     description: Starting map center latitude (-90 to 90).
-    param_type: float
-    default_value: 0.0
+    obj_type: Real
+    value: 0.0
   - name: longitude
     description: Starting map center longitude (-180 to 180).
-    param_type: float
-    default_value: 0.0
+    obj_type: Real
+    value: 0.0
   - name: zoom
     description: Starting map zoom level (0 shows the entire earth).
-    param_type: float
-    default_value: 0.0
+    obj_type: Real
+    value: 0.0

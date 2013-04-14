@@ -24,20 +24,13 @@ from base_model import BaseModel
 import feconf
 import logging
 from models.image import Image
+from models.parameter import Parameter
 from state import State
 import utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
-
-
-class Parameter(ndb.Model):
-    """A parameter definition for an exploration."""
-    # The name of the parameter
-    name = ndb.StringProperty(required=True)
-    # The data type of the parameter - for now only unicode or list
-    param_type = ndb.StringProperty(default='unicode')
 
 
 # TODO(sll): Add an anyone-can-edit mode.
