@@ -28,8 +28,8 @@ Sentence:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False
     widget_id: TextInput
 So...:
   content:
@@ -52,8 +52,8 @@ So...:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False      
     widget_id: TextInput
 boot verb:
   content:
@@ -83,8 +83,8 @@ boot verb:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False      
     widget_id: TextInput
 subject:
   content:
@@ -108,8 +108,8 @@ subject:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False      
     widget_id: TextInput
 verb endings:
   content:
@@ -145,6 +145,6 @@ verb endings:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False      
     widget_id: TextInput

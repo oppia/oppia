@@ -10,7 +10,7 @@ Welcome!:
     handlers:
     - name: submit
       rules:
-      - dest: What country
+      - dest: What language
         feedback:
         - Yes!
         inputs:
@@ -25,7 +25,7 @@ Welcome!:
           x: 2
         name: equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - Hm, it certainly looks like it! But it's actually a word from a different
           language.
@@ -33,10 +33,12 @@ Welcome!:
         name: Default
         param_changes: []
     params:
-      choices:
+    - name: choices
+      values:
       - It's translated from a different language.
       - It's a nonsense word that someone made up.
       - It's the name of a popular cartoon character.
+    sticky: False      
     widget_id: MultipleChoiceInput
 Estimate 100:
   content:
@@ -62,6 +64,7 @@ Estimate 100:
         name: Default
         param_changes: []
     params: []
+    sticky: False    
     widget_id: NumericInput
 Music widget:
   content:
@@ -107,9 +110,10 @@ Music widget:
         name: Default
         param_changes: []
     params:
-      noteToGuess: B4
-      notesToPlayAtStart: []
-      previousAnswer: ''
+    - name: noteToGuess
+      values:
+      - B4
+    sticky: True
     widget_id: MusicStaff
 Numeric input:
   content:
@@ -165,6 +169,7 @@ Numeric input:
         name: Default
         param_changes: []
     params: []
+    sticky: False    
     widget_id: NumericInput
 Things you can do:
   content:
@@ -188,9 +193,10 @@ Things you can do:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    params: []
+    sticky: False    
     widget_id: Continue
-What country:
+What language:
   content:
   - type: text
     value: In fact, the word Oppia means 'learn'. Can you guess which language it
@@ -200,7 +206,7 @@ What country:
     handlers:
     - name: submit
       rules:
-      - dest: What country
+      - dest: What language
         feedback:
         - That's a pretty good guess. Several Greek words end with 'ia', such as 'thexia'
           and 'paralia'. But Oppia is not a Greek word, though it's from a country
@@ -209,7 +215,7 @@ What country:
           x: greek
         name: equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
           by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
@@ -224,7 +230,7 @@ What country:
           x: roman
         name: contains(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
           by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
@@ -239,7 +245,7 @@ What country:
           x: latin
         name: contains(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - That's not it, alas. But you're very close! Oppia is indeed a Nordic word,
           but it's not from Sweden.
@@ -247,7 +253,7 @@ What country:
           x: Swedish
         name: equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - 'Oops, I was unclear, sorry. I meant: type ''translate oppia'' into a search
           engine, such as Google.'
@@ -255,7 +261,7 @@ What country:
           x: translate oppia
         name: contains(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - Not quite; that's actually the opposite of 'start'. Check your spelling!
         inputs:
@@ -275,7 +281,7 @@ What country:
           x: Finnish
         name: case_sensitive_equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - (In general, the name of a language is a proper noun, so it should start
           with a capital letter. Please could you fix that?)
@@ -283,14 +289,14 @@ What country:
           x: finnish
         name: equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - I think your spelling isn't quite right; you might want to check it.
         inputs:
           x: finnish
         name: fuzzy_equals(x)
         param_changes: []
-      - dest: What country
+      - dest: What language
         feedback:
         - Actually, that's not where we got it from. But you can find out lots of
           things on the Web. Why not try doing a search for [translate oppia] on your
@@ -298,6 +304,6 @@ What country:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    params: []
+    sticky: False
     widget_id: TextInput

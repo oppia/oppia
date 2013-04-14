@@ -20,4 +20,5 @@ params:
   - name: placeholder
     description: The placeholder for the text input field.
     obj_type: UnicodeString
-    value: Type your answer here.
+    values:
+    - Type your answer here.

@@ -178,8 +178,8 @@ class State(BaseModel):
             state.param_changes = []
             for param_to_change in state_dict['param_changes']:
                 state.param_changes.append(parameter.ParameterChange(
-                    name=param_to_change,
-                    values=state_dict['param_changes'][param_to_change],
+                    name=param_to_change['name'],
+                    values=param_to_change['values'],
                     obj_type='UnicodeString'
                 ))
 
@@ -187,16 +187,16 @@ class State(BaseModel):
 
         widget_params = Widget.get(state_dict['widget']['widget_id']).params
         parameters = {}
-        for param in widget_params:
-            if param.name in state_dict['widget']['params']:
-                parameters[param.name] = state_dict['widget']['params'][param.name]
-                del state_dict['widget']['params'][param.name]
-            else:
-                parameters[param.name] = param.value
 
-        if state_dict['widget']['params']:
-            raise Exception('Extra parameters not used: %s' %
-                            state_dict['widget']['params'])
+        widget_param_names = [widget_param.name for widget_param in widget_params]
+
+        for param in state_dict['widget']['params']:
+            assert param['name'] in widget_param_names
+            parameters[param['name']] = param['values']
+
+        for widget_param in widget_params:
+            if widget_param.name not in parameters:
+                parameters[widget_param.name] = widget_param.value
 
         state.widget.params = parameters
 
@@ -323,7 +323,7 @@ class State(BaseModel):
         feedback = None
         recorded_answer = answer
 
-        if interactive_widget_properties['classifier'] != 'None':
+        if interactive_widget_properties['classifier']:
             # Import the relevant classifier module.
             classifier_module = '.'.join([
                 feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),

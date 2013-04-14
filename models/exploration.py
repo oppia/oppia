@@ -146,9 +146,6 @@ class Exploration(BaseModel):
         cls, yaml_file, user, title, category, exploration_id=None,
             image_id=None):
         """Creates an exploration from a YAML file."""
-        yaml_file = yaml_file.strip()
-        # TODO(sll): Make this more flexible by allowing spaces between ':'
-        # and '\n'.
         init_state_name = yaml_file[:yaml_file.find(':\n')]
         if not init_state_name or '\n' in init_state_name:
             raise Exception('Invalid YAML file: the name of the initial state '

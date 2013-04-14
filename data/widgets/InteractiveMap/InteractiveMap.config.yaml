@@ -20,12 +20,15 @@ params:
   - name: latitude
     description: Starting map center latitude (-90 to 90).
     obj_type: Real
-    value: 0.0
+    values:
+    - 0.0
   - name: longitude
     description: Starting map center longitude (-180 to 180).
     obj_type: Real
-    value: 0.0
+    values:
+    - 0.0
   - name: zoom
     description: Starting map zoom level (0 shows the entire earth).
     obj_type: Real
-    value: 0.0
+    values:
+    - 0.0

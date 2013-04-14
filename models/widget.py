@@ -23,6 +23,7 @@ import os
 import feconf
 import utils
 from parameter import Parameter
+from parameter import ParameterProperty
 
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
@@ -55,7 +56,7 @@ class Widget(polymodel.PolyModel):
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used.
-    params = ndb.LocalStructuredProperty(Parameter, repeated=True)
+    params = ParameterProperty(repeated=True)
 
     @classmethod
     def get(cls, widget_id):
@@ -167,12 +168,7 @@ class InteractiveWidget(Widget):
 
             assert widget_id == widget_config['id']
 
-            params = []
-            for param in widget_config['params']:
-                param['values'] = [param['value']]
-                del param['value']
-                params.append(Parameter(**param))
-
+            params = [Parameter(**param) for param in widget_config['params']]
             handlers = [AnswerHandler(**handler)
                         for handler in widget_config['handlers']]
             template = utils.get_file_contents(os.path.join(

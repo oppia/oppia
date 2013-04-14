@@ -21,12 +21,25 @@ params:
   - name: noteToGuess
     description: The note that the reader should guess.
     obj_type: UnicodeString
-    value: B4
+    values:
+    - C4
+    - D4
+    - E4
+    - F4
+    - G4
+    - A4
+    - B4
+    - C5
+    - D5
+    - E5
+    - F5
   - name: notesToPlayAtStart
     description: A sequence of notes to play when the widget is loaded.
     obj_type: List
-    value: []
+    values:
+    - []
   - name: previousAnswer
     description: The reader's previous answer.
     obj_type: UnicodeString
-    value: ''
+    values: 
+    - ''

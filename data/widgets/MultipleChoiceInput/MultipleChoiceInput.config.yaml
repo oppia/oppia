@@ -20,4 +20,5 @@ params:
 - name: choices
   description: The options that the reader can select from.
   obj_type: List
-  value: ['Default choice']
+  values:
+  - ['Default choice']

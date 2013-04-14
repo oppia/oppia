@@ -27,8 +27,14 @@ Taj Mahal on map:
         name: Default
         param_changes: []
     params:
-      latitude: '27.171781'
-      longitude: '78.04217'
-      zoom: '10'
+    - name: latitude
+      values:
+      - '27.171781'
+    - name: longitude
+      values:
+      - '78.04217'
+    - name: zoom
+      values:
+      - '10'
     sticky: True
     widget_id: InteractiveMap
