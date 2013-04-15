@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import os
 
 import feconf
@@ -70,30 +71,22 @@ class Widget(polymodel.PolyModel):
             params = {}
 
         widget = cls.get(widget_id)
-        if widget is None:
-            raise Exception('Widget %s does not exist.' % widget_id)
+        assert widget, 'Widget %s does not exist.' % widget_id
 
         # Get the raw code by parameterizing widget with params.
         parameters = {}
         for param in widget.params:
-            if param.name in params:
-                # TODO(sll): Do type-checking.
-                parameters[param.name] = params[param.name]
-            else:
-                parameters[param.name] = utils.convert_to_js_string(
-                    param.value)
+            parameters[param.name] = params.get(
+                param.name, utils.convert_to_js_string(param.value))
 
         raw = utils.parse_with_jinja(widget.template, parameters)
 
         # The following are NOT stringified.
         actual_params = {}
         for param in widget.params:
-            if param.name in params:
-                actual_params[param.name] = params[param.name]
-            else:
-                actual_params[param.name] = param.value
+            actual_params[param.name] = params.get(param.name, param.value)
 
-        result = widget.to_dict()
+        result = copy.deepcopy(widget.to_dict())
         result['id'] = widget_id
         result['raw'] = raw
         # TODO(sll): Restructure this so that it is
@@ -108,7 +101,7 @@ class Widget(polymodel.PolyModel):
 
         for unused_action, properties in result['actions'].iteritems():
             classifier = properties['classifier']
-            if classifier and classifier != 'None':
+            if classifier:
                 with open(os.path.join(
                         feconf.SAMPLE_CLASSIFIERS_DIR,
                         classifier,

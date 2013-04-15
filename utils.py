@@ -70,7 +70,7 @@ def get_js_controllers(filenames):
 
 
 def convert_to_js_string(value):
-    """Converts a value to a JavaScript string."""
+    """Converts a value to a JSON string for use in JavaScript code."""
     string = json.dumps(value)
 
     replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
