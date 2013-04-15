@@ -95,14 +95,9 @@ class Widget(polymodel.PolyModel):
         # {key: {value: ..., obj_type: ...}}
         result['params'] = dict((param.name, params.get(param.name, param.value))
                                 for param in widget.params)
-        if 'handlers' in result:
-            result['actions'] = dict((
-                item['name'], {'classifier': item['classifier']})
-                for item in result['handlers'])
-            del result['handlers']
 
-        for unused_action, properties in result['actions'].iteritems():
-            classifier = properties['classifier']
+        for handler in result['handlers']:
+            classifier = handler['classifier']
             if classifier:
                 with open(os.path.join(
                         feconf.SAMPLE_CLASSIFIERS_DIR,
@@ -115,7 +110,7 @@ class Widget(polymodel.PolyModel):
                         if 'checks' in rules[rule]:
                             rule_dict[rules[rule]['name']]['checks'] = (
                                 rules[rule]['checks'])
-                    properties['rules'] = rule_dict
+                    handler['rules'] = rule_dict
 
         return result
 

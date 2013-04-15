@@ -163,6 +163,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     }
   };
 
+  $scope.getRules = function(action) {
+    if (!action || !$scope.interactiveWidget) {
+      return;
+    }
+    for (var i = 0; i < $scope.interactiveWidget.handlers.length; i++) {
+      if ($scope.interactiveWidget.handlers[i].name == action) {
+        return $scope.interactiveWidget.handlers[i].rules;
+      }
+    }
+  };
+
   $scope.deselectAllRules = function() {
     $scope.addRuleActionIndex = null;
     $scope.addRuleActionRule = null;
