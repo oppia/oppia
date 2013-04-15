@@ -194,68 +194,62 @@ class State(BaseModel):
         state.put()
         return state
 
-    def transition(self, answer, params, interactive_widget_properties):
+    def transition(self, answer, params, handler):
         """Handle feedback interactions with readers."""
 
-        dest_id = None
-        feedback = None
         recorded_answer = answer
 
-        if interactive_widget_properties['classifier']:
+        widget = InteractiveWidget.get(self.widget.widget_id)
+        for w_handler in widget.handlers:
+            if w_handler.name == handler:
+                classifier = w_handler.classifier
+
+        if classifier:
             # Import the relevant classifier module.
             classifier_module = '.'.join([
                 feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
-                interactive_widget_properties['classifier'],
-                interactive_widget_properties['classifier']])
+                classifier, classifier])
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
 
             norm_answer = Classifier.DEFAULT_NORMALIZER().normalize(answer)
             if norm_answer is None:
-                raise Exception(
-                    'Invalid input: could not normalize the answer.')
+                raise Exception('Could not normalize %s.' % answer)
+
+        # TODO(sll): This is a special case for multiple-choice input
+        # which should really be handled generically.
+        if self.widget.widget_id == 'MultipleChoiceInput':
+            recorded_answer = self.widget.params['choices'][int(answer)]
 
         answer_handler = None
-        for handler in self.widget.handlers:
-            if handler.name == 'submit':
-                answer_handler = handler
+        for wi_handler in self.widget.handlers:
+            if wi_handler.name == handler:
+                answer_handler = wi_handler
+
+        selected_rule = None
 
         for ind, rule in enumerate(answer_handler.rules):
-            if ind == len(answer_handler.rules) - 1:
-                # TODO(sll): This is a special case for multiple-choice input
-                # which should really be handled generically. However, it's
-                # not very interesting anyway because the reader's answer
-                # in this case is already known (it's just the last of the
-                # multiple-choice options given).
-                if self.widget.widget_id == 'MultipleChoiceInput':
-                    recorded_answer = (
-                        self.widget.params['choices'][int(answer)])
-
             if rule.name == 'Default':
-                dest_id = rule.dest
-                feedback = (utils.get_random_choice(rule.feedback)
-                            if rule.feedback else '')
+                selected_rule = rule
                 break
 
             func_name, param_list = self.get_classifier_info(
-                self.widget.widget_id, handler.name, rule, params)
+                self.widget.widget_id, answer_handler.name, rule, params)
             param_list = [norm_answer] + param_list
             classifier_output = getattr(Classifier, func_name)(*param_list)
 
-            return_value, unused_return_data = (
-                utils.normalize_classifier_return(classifier_output))
+            match, _ = utils.normalize_classifier_return(classifier_output)
 
-            if return_value:
-                dest_id = rule.dest
-                feedback = (utils.get_random_choice(rule.feedback)
-                            if rule.feedback else '')
+            if match:
+                selected_rule = rule
                 break
 
-        return dest_id, feedback, rule, recorded_answer
+        feedback = (utils.get_random_choice(selected_rule.feedback)
+                    if selected_rule.feedback else '')
+        return selected_rule.dest, feedback, rule, recorded_answer
 
     def get_typed_object(self, mutable_rule, param):
-        param_spec = mutable_rule[
-            mutable_rule.find('{{' + param) + 2:]
+        param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
         param_spec = param_spec[param_spec.find('|') + 1:]
         normalizer_string = param_spec[: param_spec.find('}}')]
         return getattr(objects, normalizer_string)

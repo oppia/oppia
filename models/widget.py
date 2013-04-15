@@ -96,10 +96,9 @@ class Widget(polymodel.PolyModel):
         result['params'] = dict((param.name, params.get(param.name, param.value))
                                 for param in widget.params)
         if 'handlers' in result:
-            actions = {}
-            for item in result['handlers']:
-                actions[item['name']] = {'classifier': item['classifier']}
-            result['actions'] = actions
+            result['actions'] = dict((
+                item['name'], {'classifier': item['classifier']})
+                for item in result['handlers'])
             del result['handlers']
 
         for unused_action, properties in result['actions'].iteritems():

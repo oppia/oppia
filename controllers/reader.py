@@ -186,17 +186,15 @@ class ExplorationHandler(BaseHandler):
         params = self.get_params(state, payload.get('params'))
         # The reader's answer.
         answer = payload.get('answer')
+        # The answer handler (submit, click, etc.)
+        handler = payload.get('handler')
 
         # Add the reader's answer to the parameter list. This must happen before
         # the interactive widget is constructed.
         params['answer'] = answer
 
-        interactive_widget_properties = (
-            InteractiveWidget.get_with_params(
-                state.widget.widget_id)['actions']['submit'])
-
         dest_id, feedback, rule, recorded_answer = state.transition(
-            answer, params, interactive_widget_properties)
+            answer, params, handler)
 
         if recorded_answer:
             EventHandler.record_rule_hit(
@@ -249,12 +247,11 @@ class ExplorationHandler(BaseHandler):
 
         if state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
-        values['exploration_id'] = exploration.id
-        values['state_id'] = state.id
-        values['oppia_html'] = html_output
-        values['widgets'] = widget_output
-        values['block_number'] = block_number + 1
-        values['params'] = params
+        values.update({
+            'exploration_id': exploration.id, 'state_id': state.id,
+            'oppia_html': html_output, 'widgets': widget_output,
+            'block_number': block_number + 1, 'params': params
+        })
 
         if dest_id != feconf.END_DEST:
             values['finished'] = False

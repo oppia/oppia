@@ -70,7 +70,7 @@
     }
   };
 
-  $scope.submitAnswer = function(answer, channel) {
+  $scope.submitAnswer = function(answer, handler) {
     if ($scope.answerIsBeingProcessed) {
       return;
     }
@@ -78,7 +78,7 @@
     var requestMap = {
       answer: answer,
       block_number: $scope.blockNumber,
-      channel: channel,
+      handler: handler,
       params: $scope.params
     };
 
