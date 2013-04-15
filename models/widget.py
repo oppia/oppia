@@ -65,33 +65,36 @@ class Widget(polymodel.PolyModel):
         return cls.get_by_id(widget_id)
 
     @classmethod
+    def get_raw_code(cls, widget_id, params=None):
+        """Gets the raw code for a parameterized widget."""
+        if params is None:
+            params = {}
+
+        widget = cls.get(widget_id)
+
+        # Parameters used to generate the raw code for the widget.
+        parameters = {}
+        for param in widget.params:
+            parameters[param.name] = params.get(
+                param.name, utils.convert_to_js_string(param.value))
+
+        return utils.parse_with_jinja(widget.template, parameters)
+
+    @classmethod
     def get_with_params(cls, widget_id, params=None):
         """Gets a parameterized widget."""
         if params is None:
             params = {}
 
         widget = cls.get(widget_id)
-        assert widget, 'Widget %s does not exist.' % widget_id
-
-        # Get the raw code by parameterizing widget with params.
-        parameters = {}
-        for param in widget.params:
-            parameters[param.name] = params.get(
-                param.name, utils.convert_to_js_string(param.value))
-
-        raw = utils.parse_with_jinja(widget.template, parameters)
-
-        # The following are NOT stringified.
-        actual_params = {}
-        for param in widget.params:
-            actual_params[param.name] = params.get(param.name, param.value)
 
         result = copy.deepcopy(widget.to_dict())
         result['id'] = widget_id
-        result['raw'] = raw
+        result['raw'] = cls.get_raw_code(widget_id, params)
         # TODO(sll): Restructure this so that it is
-        # {key: {value: ..., obj_type: ..., value: ...}}
-        result['params'] = actual_params
+        # {key: {value: ..., obj_type: ...}}
+        result['params'] = dict((param.name, params.get(param.name, param.value))
+                                for param in widget.params)
         if 'handlers' in result:
             actions = {}
             for item in result['handlers']:

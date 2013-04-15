@@ -1,8 +1,6 @@
 var staff;
 var note01;
 var noteToGuess = GLOBALS.noteToGuess;
-var notesToPlayAtStart = GLOBALS.notesToPlayAtStart;
-var previousAnswer = GLOBALS.previousAnswer;
 var numberOfNotes = 0;
 
 var pitches = {
@@ -31,31 +29,12 @@ $(window).load(function() {
   var staff = document.getElementsByTagName("line");
   note01 = document.getElementById("note01");
 
-  if (previousAnswer) {
-    for (var pitch in pitches) {
-      if (pitches[pitch] == previousAnswer) {
-        moveNote(note01.getAttribute("cy"), pitch - note01.getAttribute("cy"));
-        break;
-      }
-    }
-  }
-
   MIDI.loadPlugin({
     soundfontUrl: "/data/widgets/MusicStaff/static/soundfont/",
     instrument: "acoustic_grand_piano",
     callback: function() {
       $('#playNote').removeAttr("disabled");  //enable the button
       $('#playCurrent').removeAttr("disabled");  //enable the button
-      var index = 0;
-      if (notesToPlayAtStart.length > 0) {
-        var interval = setInterval(function() {
-          playNote(notesToPlayAtStart[index]);
-          index++;
-          if (index >= notesToPlayAtStart.length) {
-            clearInterval(interval);
-          }
-        }, 1000);
-      }
     }
   });
 

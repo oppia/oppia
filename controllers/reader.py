@@ -126,6 +126,18 @@ class ExplorationHandler(BaseHandler):
                 existing_params[item.name] = utils.get_random_choice(item.values)
         return existing_params
 
+    def append_feedback(self, feedback, html_output, widget_output,
+                        block_number, params):
+        """Appends Oppia's feedback to the output variables."""
+        feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
+        action_html, action_widgets = parse_content_into_html(
+            [Content(type='text', value='<br>'.join(feedback_bits))],
+            block_number,
+            params)
+        html_output += action_html
+        widget_output.append(action_widgets)
+        return html_output, widget_output
+
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
@@ -135,11 +147,11 @@ class ExplorationHandler(BaseHandler):
         params = self.get_params(init_state)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
-        interactive_widget_html = InteractiveWidget.get_with_params(
+        interactive_widget_html = InteractiveWidget.get_raw_code(
             init_state.widget.widget_id,
             params=utils.parse_dict_with_params(
                 init_state.widget.params, params)
-        )['raw']
+        )
 
         self.values.update({
             'block_number': 0,
@@ -212,27 +224,17 @@ class ExplorationHandler(BaseHandler):
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-                action_html, action_widgets = parse_content_into_html(
-                    [Content(type='text', value='<br>'.join(feedback_bits))],
-                    block_number,
-                    params)
-                html_output += action_html
-                widget_output.append(action_widgets)
+                html_output, widget_output = self.append_feedback(
+                    feedback, html_output, widget_output, block_number, params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
             state = State.get(dest_id, exploration)
             EventHandler.record_state_hit(exploration_id, state_id)
 
-            # Append Oppia's feedback, if any.
             if feedback:
-                feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-                action_html, action_widgets = parse_content_into_html(
-                    [Content(type='text', value='<br>'.join(feedback_bits))],
-                    block_number,
-                    params)
-                html_output += action_html
-                widget_output.append(action_widgets)
+                html_output, widget_output = self.append_feedback(
+                    feedback, html_output, widget_output, block_number, params)
+
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
@@ -257,17 +259,17 @@ class ExplorationHandler(BaseHandler):
         if dest_id != feconf.END_DEST:
             values['finished'] = False
             if state.widget.sticky and (
-                state.widget.widget_id == old_state.widget.widget_id):
-              values['interactive_widget_html'] = ''
-              values['sticky_interactive_widget'] = True
+                    state.widget.widget_id == old_state.widget.widget_id):
+                values['interactive_widget_html'] = ''
+                values['sticky_interactive_widget'] = True
             else:
-              values['interactive_widget_html'] = (
-                  InteractiveWidget.get_with_params(
-                      state.widget.widget_id,
-                      params=utils.parse_dict_with_params(
-                          state.widget.params, params)
-                  )['raw']
-            )
+                values['interactive_widget_html'] = (
+                    InteractiveWidget.get_raw_code(
+                        state.widget.widget_id,
+                        params=utils.parse_dict_with_params(
+                            state.widget.params, params)
+                    )
+                )
         else:
             values['finished'] = True
             values['interactive_widget_html'] = ''
@@ -283,10 +285,8 @@ class RandomExplorationPage(BaseHandler):
         explorations = Exploration.query().filter(
             Exploration.is_public == True).fetch(100)
 
-        # Don't use the default exploration; users will have seen that already
+        # Don't use the first exploration; users will have seen that already
         # on the main page.
-        # TODO(sll): Is the first exploration in the list always the default
-        # one?
         selected_exploration = utils.get_random_choice(explorations[1:])
 
         self.redirect('/learn/%s' % selected_exploration.id)

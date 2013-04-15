@@ -65,7 +65,5 @@ Main window:
         param_changes: []
     params:
       noteToGuess: '{{noteStart}}'
-      notesToPlayAtStart: []
-      previousAnswer: '{{answer}}'
     sticky: True
     widget_id: MusicStaff
