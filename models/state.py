@@ -60,6 +60,9 @@ class AnswerHandlerInstance(ndb.Model):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     rules = ndb.LocalStructuredProperty(Rule, repeated=True)
+    # This is a derived property from the corresponding AnswerHandler in
+    # widget.py. It is added automatically on State.put().
+    classifier = ndb.StringProperty()
 
 
 class WidgetInstance(ndb.Model):
@@ -97,6 +100,13 @@ class State(BaseModel):
         elif not self.widget.handlers:
             self.widget.handlers = [self.get_default_handler()]
         # TODO(sll): Do other validation.
+
+        # Add the corresponding AnswerHandler classifiers for easy reference.
+        widget = InteractiveWidget.get(self.widget.widget_id)
+        for curr_handler in self.widget.handlers:
+            for w_handler in widget.handlers:
+                if w_handler.name == curr_handler.name:
+                    curr_handler.classifier = w_handler.classifier
 
     # Human-readable name for the state.
     name = ndb.StringProperty(default='Activity 1')
@@ -137,6 +147,7 @@ class State(BaseModel):
         if human_readable_dests:
             # Change the dest ids to human-readable names.
             for handler in state_dict['widget']['handlers']:
+                del handler['classifier']
                 for rule in handler['rules']:
                     if rule['dest'] != feconf.END_DEST:
                         dest_state = State.get_by_id(
@@ -199,16 +210,16 @@ class State(BaseModel):
 
         recorded_answer = answer
 
-        widget = InteractiveWidget.get(self.widget.widget_id)
-        for w_handler in widget.handlers:
-            if w_handler.name == handler:
-                classifier = w_handler.classifier
+        answer_handler = None
+        for wi_handler in self.widget.handlers:
+            if wi_handler.name == handler:
+                answer_handler = wi_handler
 
-        if classifier:
+        if answer_handler.classifier:
             # Import the relevant classifier module.
             classifier_module = '.'.join([
                 feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
-                classifier, classifier])
+                answer_handler.classifier, answer_handler.classifier])
             Classifier = importlib.import_module(classifier_module)
             logging.info(Classifier.__name__)
 
@@ -220,11 +231,6 @@ class State(BaseModel):
         # which should really be handled generically.
         if self.widget.widget_id == 'MultipleChoiceInput':
             recorded_answer = self.widget.params['choices'][int(answer)]
-
-        answer_handler = None
-        for wi_handler in self.widget.handlers:
-            if wi_handler.name == handler:
-                answer_handler = wi_handler
 
         selected_rule = None
 

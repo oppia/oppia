@@ -21,6 +21,7 @@ import test_utils
 from exploration import Exploration
 from exploration import Parameter
 from state import State
+from widget import InteractiveWidget
 from image import Image
 
 from google.appengine.ext.db import BadValueError
@@ -29,6 +30,11 @@ from google.appengine.api.users import User
 
 class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
+
+    def setUp(self):
+        """Loads the default widgets."""
+        super(ExplorationModelUnitTests, self).setUp()
+        InteractiveWidget.load_default_widgets()
 
     def test_exploration_class(self):
         """Test the Exploration class."""
