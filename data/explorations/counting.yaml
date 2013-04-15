@@ -18,7 +18,7 @@ Question:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False    
     widget_id: NumericInput
 List the ways:
@@ -128,7 +128,7 @@ List the ways:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False    
     widget_id: SetInput
 Prompt for explanation:
@@ -145,7 +145,7 @@ Prompt for explanation:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Prompt for explanation with all ways listed:
@@ -165,7 +165,6 @@ Prompt for explanation with all ways listed:
         name: Default
         param_changes: []
     params:
-    - name: placeholder
-      values: Type your answer here.
+      placeholder: Type your answer here.
     sticky: False      
     widget_id: TextInput

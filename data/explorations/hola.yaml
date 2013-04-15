@@ -38,7 +38,7 @@ Hola:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Adios:
@@ -70,7 +70,7 @@ Adios:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Colores:
@@ -121,8 +121,7 @@ Colores:
         name: Default
         param_changes: []
     params:
-    - name: choices
-      values:
+      choices:
       - negro y azul
       - anaranjado y blanco
       - rojo y verde
@@ -166,7 +165,7 @@ Como meaning:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Me llamo:
@@ -202,7 +201,7 @@ Me llamo:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Me llamo meaning:
@@ -243,7 +242,7 @@ Me llamo meaning:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 Supermercado:
@@ -292,8 +291,7 @@ Supermercado:
         name: Default
         param_changes: []
     params:
-    - name: choices
-      values:
+      choices:
       - Ventanas
       - Coches
       - Manzanas

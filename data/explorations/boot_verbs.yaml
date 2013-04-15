@@ -28,7 +28,7 @@ Sentence:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False
     widget_id: TextInput
 So...:
@@ -52,7 +52,7 @@ So...:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 boot verb:
@@ -83,7 +83,7 @@ boot verb:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 subject:
@@ -108,7 +108,7 @@ subject:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput
 verb endings:
@@ -145,6 +145,6 @@ verb endings:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False      
     widget_id: TextInput

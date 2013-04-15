@@ -64,14 +64,8 @@ Main window:
         name: Default
         param_changes: []
     params:
-    - name: noteToGuess
-      values:
-      - '{{noteStart}}'
-    - name: notesToPlayAtStart
-      values:
-      - []
-    - name: previousAnswer
-      values:
-      - '{{answer}}'
+      noteToGuess: '{{noteStart}}'
+      notesToPlayAtStart: []
+      previousAnswer: '{{answer}}'
     sticky: True
     widget_id: MusicStaff

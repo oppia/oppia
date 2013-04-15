@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for the widget repository."""
+"""Main package for interactive widgets."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
+import logging
 
 from controllers.base import BaseHandler
 from models.widget import InteractiveWidget
@@ -83,6 +84,7 @@ class InteractiveWidgetHandler(BaseHandler):
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
         payload = json.loads(self.request.get('payload'))
+        logging.info(payload)
 
         params = payload.get('params', {})
         if isinstance(params, list):

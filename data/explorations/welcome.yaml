@@ -33,8 +33,7 @@ Welcome!:
         name: Default
         param_changes: []
     params:
-    - name: choices
-      values:
+      choices:
       - It's translated from a different language.
       - It's a nonsense word that someone made up.
       - It's the name of a popular cartoon character.
@@ -63,7 +62,7 @@ Estimate 100:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False    
     widget_id: NumericInput
 Music widget:
@@ -110,9 +109,7 @@ Music widget:
         name: Default
         param_changes: []
     params:
-    - name: noteToGuess
-      values:
-      - B4
+      noteToGuess: B4
     sticky: True
     widget_id: MusicStaff
 Numeric input:
@@ -168,7 +165,7 @@ Numeric input:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False    
     widget_id: NumericInput
 Things you can do:
@@ -193,7 +190,7 @@ Things you can do:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False    
     widget_id: Continue
 What language:
@@ -304,6 +301,6 @@ What language:
         inputs: {}
         name: Default
         param_changes: []
-    params: []
+    params: {}
     sticky: False
     widget_id: TextInput

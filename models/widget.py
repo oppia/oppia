@@ -55,7 +55,7 @@ class Widget(polymodel.PolyModel):
     # The widget html template (this is the entry point).
     template = ndb.TextProperty(required=True)
     # Parameter specifications for this widget. The default parameters can be
-    # overridden when the widget is used.
+    # overridden when the widget is used within a State.
     params = ParameterProperty(repeated=True)
 
     @classmethod

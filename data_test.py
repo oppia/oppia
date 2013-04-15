@@ -25,6 +25,8 @@ import string
 import feconf
 import test_utils
 from models.types import get_object_class
+from models.widget import InteractiveWidget
+from models.widget import Widget
 import utils
 
 
@@ -53,12 +55,17 @@ class DataUnitTest(test_utils.AppEngineTestBase):
         for item in dict_schema:
             self.assertTrue(
                 isinstance(adict[item[0]], item[1]),
-                'Value %s for key %s is not of type %s in:\n\n %s' % (
+                'Value \'%s\' for key \'%s\' is not of type %s in:\n\n %s' % (
                     adict[item[0]], item[0], item[1], adict))
 
 
 class ExplorationDataUnitTests(DataUnitTest):
     """Tests that all the default explorations are valid."""
+
+    def setUp(self):
+        """Loads the default widgets."""
+        super(ExplorationDataUnitTests, self).setUp()
+        InteractiveWidget.load_default_widgets()
 
     def verify_is_valid_widget(self, widget_id):
         """Checks that a widget id is valid (i.e., its directory exists)."""
@@ -79,14 +86,14 @@ class ExplorationDataUnitTests(DataUnitTest):
             self.assertIn(content_item['type'], ['text', 'image', 'video'])
 
         PARAM_CHANGES_SCHEMA = [
-            ('name', basestring), ('obj_type', basestring), ('values', list)]
+            ('name', basestring), ('values', list), ('obj_type', basestring)]
         for param_change in state_dict['param_changes']:
             self.verify_dict_keys_and_types(param_change, PARAM_CHANGES_SCHEMA)
             # TODO(sll): Test that the elements of 'values' are of the correct
             # type.
 
         WIDGET_SCHEMA = [
-            ('widget_id', basestring), ('params', list), ('handlers', list),
+            ('widget_id', basestring), ('params', dict), ('handlers', list),
             ('sticky', bool)]
         self.verify_dict_keys_and_types(state_dict['widget'], WIDGET_SCHEMA)
 
@@ -123,6 +130,27 @@ class ExplorationDataUnitTests(DataUnitTest):
                         param_change, PARAM_CHANGES_SCHEMA)
                     # TODO(sll): Test that the elements of 'values' are of the
                     # correct type.
+
+        for wp_name, wp_value in state_dict['widget']['params'].iteritems():
+            self.assertTrue(isinstance(wp_name, basestring))
+
+            # Check that the parameter name is valid.
+            widget_params = Widget.get(state_dict['widget']['widget_id']).params
+            widget_param_names = [wp.name for wp in widget_params]
+            self.assertIn(
+                wp_name, widget_param_names,
+                msg='Parameter %s is not a valid parameter for widget %s' % (
+                    wp_name, state_dict['widget']['widget_id']))
+
+            # Get the object class used to normalize the value for this param.
+            for wp in widget_params:
+                if wp.name == wp_name:
+                    obj_class = get_object_class(wp.obj_type)
+                    self.assertIsNotNone(obj_class)
+                    break
+
+            # Check that the parameter value has the correct type.
+            obj_class.normalize(wp_value)
 
     def verify_all_states_reachable(self, exploration_dict, init_state_name):
         """Verifies that all states are reachable from the initial state."""

@@ -21,7 +21,6 @@ __author__ = 'Sean Lip'
 import copy
 import importlib
 import logging
-import os
 
 from base_model import BaseModel
 from data.objects.models import objects
@@ -66,9 +65,9 @@ class WidgetInstance(ndb.Model):
     """An instance of a widget."""
     # The id of the interactive widget class for this state.
     widget_id = ndb.StringProperty(default='Continue')
-    # Parameter overrides for the interactive widget view, stored as key-value
-    # pairs.
-    # TODO(sll): Ensure the types for param_changes are consistent.
+    # Parameters for the interactive widget view, stored as key-value pairs.
+    # Each parameter is single-valued. The values may be Jinja templates that
+    # refer to state parameters.
     params = ndb.JsonProperty(default={})
     # If true, keep the widget instance from the previous state if both are of
     # the same type.
@@ -146,12 +145,14 @@ class State(BaseModel):
         return state_dict
 
     @classmethod
-    def get_by_name(cls, name, exploration):
-        """Gets a state by name. If it does not exist, returns None."""
-        assert name
-        assert exploration
-        return cls.query(ancestor=exploration.key).filter(
+    def get_by_name(cls, name, exploration, strict=True):
+        """Gets a state by name. Fails noisily if strict == True."""
+        assert name and exploration
+        state = cls.query(ancestor=exploration.key).filter(
             cls.name == name).get()
+        if strict and not state:
+            raise Exception('State %s not found.' % name)
+        return state
 
     @classmethod
     def modify_using_dict(cls, exploration, state, state_dict):
@@ -160,161 +161,49 @@ class State(BaseModel):
         Args:
             exploration: the exploration containing this state.
             state: the state.
-            state_dict: the dict used to modify the state.
+            state_dict: a valid dict representing the state.
 
         Returns:
             The modified state.
         """
-        is_valid, error_log = cls.verify(state_dict)
-        if not is_valid:
-            raise Exception(error_log)
+        state.content = [
+            Content(type=item['type'], value=item['value'])
+            for item in state_dict['content']
+        ]
 
-        if 'content' in state_dict:
-            state.content = [
-                Content(type=content['type'], value=content['value'])
-                for content in state_dict['content']
-            ]
-        if 'param_changes' in state_dict:
-            state.param_changes = []
-            for param_to_change in state_dict['param_changes']:
-                state.param_changes.append(parameter.ParameterChange(
-                    name=param_to_change['name'],
-                    values=param_to_change['values'],
-                    obj_type='UnicodeString'
-                ))
+        state.param_changes = [
+            parameter.ParameterChange(**param_change)
+            for param_change in state_dict['param_changes']
+        ]
 
-        state.widget = WidgetInstance(widget_id=state_dict['widget']['widget_id'])
+        state.widget = WidgetInstance(
+            widget_id=state_dict['widget']['widget_id'],
+            sticky=state_dict['widget']['sticky'])
 
+        state.widget.params = state_dict['widget']['params']
         widget_params = Widget.get(state_dict['widget']['widget_id']).params
-        parameters = {}
+        for wp in widget_params:
+            if wp.name not in state_dict['widget']['params']:
+                state.widget.params[wp.name] = wp.value
 
-        widget_param_names = [widget_param.name for widget_param in widget_params]
-
-        for param in state_dict['widget']['params']:
-            assert param['name'] in widget_param_names
-            parameters[param['name']] = param['values']
-
-        for widget_param in widget_params:
-            if widget_param.name not in parameters:
-                parameters[widget_param.name] = widget_param.value
-
-        state.widget.params = parameters
-
+        state.widget.handlers = []
         for handler in state_dict['widget']['handlers']:
-
             state_handler = AnswerHandlerInstance(name=handler['name'])
 
             for rule in handler['rules']:
-                rule_instance = Rule()
-                rule_instance.feedback = rule.get('feedback', [])
+                rule_dest = (
+                    feconf.END_DEST if rule['dest'] == feconf.END_DEST
+                    else State.get_by_name(rule['dest'], exploration).id)
 
-                if rule['dest'] == feconf.END_DEST:
-                    rule_instance.dest = feconf.END_DEST
-                else:
-                    dest_state = State.get_by_name(rule['dest'], exploration)
-                    if dest_state:
-                        rule_instance.dest = dest_state.id
-                    else:
-                        raise Exception(
-                            'Invalid destination: %s' % rule['dest'])
+                state_handler.rules.append(Rule(
+                    feedback=rule['feedback'], inputs=rule['inputs'],
+                    name=rule['name'], dest=rule_dest
+                ))
 
-                if 'inputs' in rule:
-                    rule_instance.inputs = rule['inputs']
+            state.widget.handlers.append(state_handler)
 
-                rule_instance.name = rule['name']
-
-                state_handler.rules.append(rule_instance)
-
-        state.widget.handlers = [state_handler]
-
-        if 'sticky' in state_dict['widget']:
-            state.widget.sticky = True
         state.put()
         return state
-
-    @classmethod
-    def verify(cls, description):
-        """Verifies a state representation without referencing other states.
-
-        The following constraints are enforced either here or in the state
-        model:
-        - The only permitted fields are ['content', 'param_changes', 'widget'].
-            - 'content' is optional and defaults to [].
-            - 'param_changes' is optional and defaults to {}.
-            - 'widget' must be present.
-        - Each item in the 'content' array must have the keys
-           ['type', 'value'].
-            - The type must be one of ['text', 'image', 'video', 'widget'].
-        - Permitted subfields of 'widget' are ['widget_id', 'params', 'handlers'].
-            - The field 'widget_id' is mandatory, and must correspond to an actual
-                widget in the feconf.SAMPLE_WIDGETS_DIR directory.
-        - Each ruleset in ['widget']['handlers'] must have a non-empty array value,
-            and each value should contain at least the fields ['name', 'dest'].
-            - For the last value in each ruleset, the 'name' field should equal
-                'Default'.
-
-        Args:
-            description: A dict representation of a state.
-
-        Returns:
-            A 2-tuple. The first element is a boolean stating whether the state
-            is valid. The second element is a string providing an error message
-            if applicable.
-        """
-        # Check the main keys.
-        for key in description:
-            if key not in ['content', 'param_changes', 'widget']:
-                return False, 'Invalid key: %s' % key
-
-        if 'widget' not in description:
-            return False, 'Missing key: \'widget\''
-
-        # Validate 'widget'.
-        for key in description['widget']:
-            if key not in ['widget_id', 'params', 'sticky', 'handlers']:
-                return False, 'Invalid key in widget: %s' % key
-        if 'widget_id' not in description['widget']:
-            return False, 'No widget id supplied'
-
-        # Check that the widget_id refers to an actual widget.
-        widget_id = description['widget']['widget_id']
-        try:
-            with open(os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id,
-                                   '%s.config.yaml' % widget_id)):
-                pass
-        except IOError:
-            return False, 'No widget with widget id %s exists.' % widget_id
-
-        # Check each of the rulesets.
-        if 'handlers' in description['widget']:
-            handlers = description['widget']['handlers']
-            for handler in handlers:
-                for ind, rule in enumerate(handler['rules']):
-                    if 'name' not in rule:
-                        return (False,
-                                'Rule %s is missing a \'name\' field.' % ind)
-                    if 'dest' not in rule:
-                        return (False,
-                                'Rule %s is missing a destination.' % ind)
-
-                    if ind == len(handler['rules']) - 1:
-                        if rule['name'] != 'Default':
-                            return (False, 'The \'name\' field of the last '
-                                    'rule should be \'Default\'')
-                    else:
-                        # TODO(sll): Check that the rule corresponds to a
-                        # valid one from the relevant classifier.
-                        pass
-
-                    if 'feedback' in rule:
-                        if not rule['feedback']:
-                            rule['feedback'] = []
-                        elif isinstance(rule['feedback'], basestring):
-                            rule['feedback'] = [rule['feedback']]
-                    else:
-                        rule['feedback'] = []
-
-        return True, ''
 
     def transition(self, answer, params, interactive_widget_properties):
         """Handle feedback interactions with readers."""
