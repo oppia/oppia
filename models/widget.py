@@ -152,38 +152,25 @@ class InteractiveWidget(Widget):
 
     @classmethod
     def load_default_widgets(cls):
-        """Loads the default widgets."""
+        """Loads the default widgets.
 
+        Assumes that everything is valid (directories exist, widget config files
+        are formatted correctly, etc.).
+        """
         widget_ids = os.listdir(os.path.join(feconf.SAMPLE_WIDGETS_DIR))
 
         for widget_id in widget_ids:
             widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
-            if not os.path.isdir(widget_dir):
-                continue
+            widget_conf_filename = '%s.config.yaml' % widget_id
+            with open(os.path.join(widget_dir, widget_conf_filename)) as f:
+                conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
-            with open(os.path.join(
-                    widget_dir, '%s.config.yaml' % widget_id)) as f:
-                widget_config = utils.dict_from_yaml(
-                    f.read().decode('utf-8'))
+            conf['params'] = [Parameter(**param) for param in conf['params']]
+            conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
+            conf['template'] = utils.get_file_contents(
+                os.path.join(widget_dir, '%s.html' % widget_id))
 
-            assert widget_id == widget_config['id']
-
-            params = [Parameter(**param) for param in widget_config['params']]
-            handlers = [AnswerHandler(**handler)
-                        for handler in widget_config['handlers']]
-            template = utils.get_file_contents(os.path.join(
-                feconf.SAMPLE_WIDGETS_DIR, widget_id, '%s.html' % widget_id))
-
-            widget = cls(
-                id=widget_config['id'],
-                name=widget_config['name'],
-                category=widget_config['category'],
-                description=widget_config['description'],
-                params=params,
-                handlers=handlers,
-                template=template,
-            )
-
+            widget = cls(**conf)
             widget.put()
 
     def get_readable_name(self, handler_name, rule_name):

@@ -45,7 +45,7 @@ class Exploration(BaseModel):
     # The list of states this exploration consists of. This list may not be
     # empty.
     states = ndb.KeyProperty(kind=State, repeated=True)
-    # The list of parameters associated with this exploration
+    # The list of parameters associated with this exploration.
     parameters = ndb.LocalStructuredProperty(Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
