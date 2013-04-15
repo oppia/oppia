@@ -24,7 +24,7 @@ from controllers.base import require_user
 import feconf
 from models.exploration import Exploration
 from models.parameter import Parameter
-from models.parameter import ParameterChange
+from models.parameter import ParamChange
 from models.state import AnswerHandlerInstance
 from models.state import Content
 from models.state import Rule
@@ -323,7 +323,7 @@ class StateHandler(BaseHandler):
 
         if 'param_changes' in payload:
             state.param_changes = [
-                ParameterChange(
+                ParamChange(
                     name=param_change['name'], values=param_change['values'],
                     obj_type='UnicodeString'
                 ) for param_change in param_changes

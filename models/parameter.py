@@ -87,7 +87,7 @@ class ParameterProperty(ndb.LocalStructuredProperty):
             description=val.description)
 
 
-class ParameterChange(Parameter):
+class ParamChange(Parameter):
     """Represents a change to a multi-valued parameter.
 
     This has the effect of replacing the set of values that can be taken
@@ -96,23 +96,23 @@ class ParameterChange(Parameter):
     description = None
 
 
-class ParameterChangeProperty(ndb.LocalStructuredProperty):
+class ParamChangeProperty(ndb.LocalStructuredProperty):
     """Represents a parameter change."""
     def __init__(self, **kwds):
-        super(ParameterChangeProperty, self).__init__(ParameterChange, **kwds)
+        super(ParamChangeProperty, self).__init__(ParamChange, **kwds)
 
     def _validate(self, val):
         # Parent classes must do validation to check that the object type here
         # matches the object type of the parameter with the corresponding name.
         object_class = get_object_class(val.obj_type)
-        return ParameterChange(
+        return ParamChange(
             obj_type=val.obj_type, name=val.name,
             values=[object_class.normalize(value) for value in val.values])
 
     def _to_base_type(self, val):
-        return ParameterChange(
+        return ParamChange(
             obj_type=val.obj_type, name=val.name, values=val.values)
 
     def _from_base_type(self, val):
-        return ParameterChange(
+        return ParamChange(
             obj_type=val.obj_type, name=val.name, values=val.values)

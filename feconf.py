@@ -58,9 +58,6 @@ DEMO_EXPLORATIONS = [
     ('landmarks', 'Landmarks', 'Geography'),
 ]
 
-# Ensure that there is at least one demo exploration.
-assert DEMO_EXPLORATIONS
-
 # Whether to unconditionally log info messages.
 DEBUG = False
 

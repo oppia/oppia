@@ -124,7 +124,8 @@ class ExplorationDataUnitTests(DataUnitTest):
 
                 # TODO(sll): Does 'inputs' need any tests?
                 # TODO(sll): Check that the name corresponds to a valid one
-                # from the relevant classifier.
+                # from the relevant exploration -- maybe. (Need to decide if
+                # we allow initialization of parameters midway through states.)
                 for param_change in state_dict['param_changes']:
                     self.verify_dict_keys_and_types(
                         param_change, PARAM_CHANGES_SCHEMA)
@@ -177,7 +178,7 @@ class ExplorationDataUnitTests(DataUnitTest):
             unseen_states = list(
                 set(exploration_dict.keys()) - set(processed_queue))
             raise Exception('The following states are not reachable from the'
-                            'initial state: %s' % ','.join(unseen_states))
+                            'initial state: %s' % ', '.join(unseen_states))
 
     def verify_no_dead_ends(self, exploration_dict):
         """Verifies that the END state is reachable from all states."""
@@ -207,7 +208,7 @@ class ExplorationDataUnitTests(DataUnitTest):
             dead_end_states = list(
                 set(exploration_dict.keys()) - set(processed_queue))
             raise Exception('The END state is not reachable from the following'
-                            'states: %s' % ','.join(dead_end_states))
+                            'states: %s' % ', '.join(dead_end_states))
 
     def verify_exploration_dict(self, exploration_dict, init_state_name):
         """Verifies an exploration dict."""
@@ -242,11 +243,19 @@ class ExplorationDataUnitTests(DataUnitTest):
         exploration_files = os.listdir(
             os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR))
 
+        self.assertTrue(feconf.DEMO_EXPLORATIONS,
+                        msg='There must be at least one demo exploration.')
+
+        self.assertEqual(len(exploration_files), len(feconf.DEMO_EXPLORATIONS),
+                         msg='Files in data/explorations do not match the '
+                             'demo explorations specified in feconf.py.')
+
         for exploration_filename in exploration_files:
             filepath = os.path.join(
                 feconf.SAMPLE_EXPLORATIONS_DIR, exploration_filename)
             self.assertTrue(
                 os.path.isfile(filepath), msg='%s is not a file.' % filepath)
+            self.assertTrue(exploration_filename.endswith('.yaml'))
 
             # Read the exploration dictionary from the yaml file.
             with open(filepath) as f:

@@ -25,7 +25,8 @@ import logging
 from base_model import BaseModel
 from data.objects.models import objects
 import feconf
-import parameter
+from parameter import ParamChange
+from parameter import ParamChangeProperty
 import utils
 from widget import InteractiveWidget
 from widget import Widget
@@ -52,7 +53,7 @@ class Rule(ndb.Model):
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
     # State-level parameter changes to make if this rule is triggered.
-    param_changes = parameter.ParameterChangeProperty(repeated=True)
+    param_changes = ParamChangeProperty(repeated=True)
 
 
 class AnswerHandlerInstance(ndb.Model):
@@ -102,7 +103,7 @@ class State(BaseModel):
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
-    param_changes = parameter.ParameterChangeProperty(repeated=True)
+    param_changes = ParamChangeProperty(repeated=True)
     # The interactive widget associated with this state.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
     # A dict whose keys are unresolved answers associated with this state, and
@@ -126,8 +127,7 @@ class State(BaseModel):
     def as_dict(self):
         """Gets a Python dict representation of the state."""
         state_dict = self.internals_as_dict()
-        state_dict['id'] = self.id
-        state_dict['name'] = self.name
+        state_dict.update({'id': self.id, 'name': self.name})
         return state_dict
 
     def internals_as_dict(self, human_readable_dests=False):
@@ -155,39 +155,28 @@ class State(BaseModel):
         return state
 
     @classmethod
-    def modify_using_dict(cls, exploration, state, state_dict):
-        """Modifies the properties of a state using values from a dictionary.
-
-        Args:
-            exploration: the exploration containing this state.
-            state: the state.
-            state_dict: a valid dict representing the state.
-
-        Returns:
-            The modified state.
-        """
+    def modify_using_dict(cls, exploration, state, sdict):
+        """Modifies the properties of a state using values from a dict."""
         state.content = [
             Content(type=item['type'], value=item['value'])
-            for item in state_dict['content']
+            for item in sdict['content']
         ]
 
         state.param_changes = [
-            parameter.ParameterChange(**param_change)
-            for param_change in state_dict['param_changes']
+            ParamChange(**pc) for pc in sdict['param_changes']
         ]
 
+        wdict = sdict['widget']
         state.widget = WidgetInstance(
-            widget_id=state_dict['widget']['widget_id'],
-            sticky=state_dict['widget']['sticky'])
+            widget_id=wdict['widget_id'], sticky=wdict['sticky'])
 
-        state.widget.params = state_dict['widget']['params']
-        widget_params = Widget.get(state_dict['widget']['widget_id']).params
-        for wp in widget_params:
-            if wp.name not in state_dict['widget']['params']:
+        state.widget.params = wdict['params']
+        for wp in Widget.get(wdict['widget_id']).params:
+            if wp.name not in wdict['params']:
                 state.widget.params[wp.name] = wp.value
 
         state.widget.handlers = []
-        for handler in state_dict['widget']['handlers']:
+        for handler in wdict['handlers']:
             state_handler = AnswerHandlerInstance(name=handler['name'])
 
             for rule in handler['rules']:
@@ -269,11 +258,6 @@ class State(BaseModel):
             mutable_rule.find('{{' + param) + 2:]
         param_spec = param_spec[param_spec.find('|') + 1:]
         normalizer_string = param_spec[: param_spec.find('}}')]
-
-        # TODO(sll): This is to support legacy types; try and get rid of it.
-        if normalizer_string == 'String':
-            normalizer_string = 'NormalizedString'
-
         return getattr(objects, normalizer_string)
 
     def get_classifier_info(self, widget_id, handler_name, rule, state_params):
