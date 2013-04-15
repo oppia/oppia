@@ -51,7 +51,6 @@ def get_state_for_frontend(state, exploration):
     for handler in state_repr['widget']['handlers']:
         rules[handler['name']] = handler['rules']
         for item in rules[handler['name']]:
-            item['attrs'] = {'classifier': item['name']}
             if item['name'] == 'Default':
                 item['rule'] = 'Default'
             else:
@@ -354,8 +353,7 @@ class StateHandler(BaseHandler):
                 rule = ruleset[rule_ind]
 
                 state_rule = Rule()
-                if 'attrs' in rule and 'classifier' in rule['attrs']:
-                    state_rule.name = rule['attrs']['classifier']
+                state_rule.name = rule.get('name')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')
                 state_rule.feedback = rule.get('feedback')

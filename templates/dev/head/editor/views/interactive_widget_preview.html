@@ -87,7 +87,7 @@
           </span>
         </td>
       </tr>
-      <tr ng-show="getRules(handler.name)">
+      <tr ng-show="interactiveWidget.id != 'Continue'">
         <td style="width: 5%; vertical-align: top">
           •
         </td>
@@ -209,11 +209,11 @@
       <h4><[addRuleAction.type]></h4>
 
       <div ng-hide="addRuleActionRule">
-        <div ng-repeat="(rule, attrs) in getRules(addRuleAction)"
+        <div ng-repeat="(rule, name) in getRules(addRuleAction)"
              class="oppia-rule">
           <span ng-bind-html="rule | bracesToText"></span>
           <button type="button" class="pull-right"
-                  ng-click="selectRule(rule, attrs)">
+                  ng-click="selectRule(rule, name)">
             Select
           </button>
         </div>
@@ -244,7 +244,7 @@
     <div class="modal-footer">
       <span ng-show="addRuleActionRule">
         <button type="button"
-                ng-click="saveRule(addRuleActionRule, addRuleActionAttrs,
+                ng-click="saveRule(addRuleActionRule, addRuleActionName,
                           addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
           Save
         </button>
