@@ -26,29 +26,23 @@ from data.objects.models import objects
 class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
     """Tests normalization of typed objects."""
 
-    def check_normalization(self, cls, item_list):
+    def check_normalization(self, cls, mappings, invalid_items):
         """Test that values are normalized correctly.
 
         Args:
           cls: the class whose normalize() method is to be tested.
-          item_list: a list of 2-element tuples. The first element of
+          mappings: a list of 2-element tuples. The first element of
             each item is expected to be normalized to the second.
+          invalid_items: a list of values. Each of these is expected to raise
+            a TypeError when normalized.
         """
-        for item in item_list:
+        for item in mappings:
             assert cls.normalize(item[0]) == item[1], (
                 'Expected %s when normalizing %s as a %s, got %s' %
                 (item[1], item[0], cls.__name__, cls.normalize(item[0]))
             )
 
-    def check_invalid_values(self, cls, item_list):
-        """Test that invalid values raise TypeError when normalized.
-
-        Args:
-          cls: the class whose normalize() method is to be tested.
-          item_list: a list of values. Each of these is expected to raise
-            a TypeError when normalized.
-        """
-        for item in item_list:
+        for item in invalid_items:
             try:
                 normalized_item = cls.normalize(item)
                 error_msg = ('Expected %s to be invalid, but it was '
@@ -60,132 +54,71 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
 
     def test_number_validation(self):
         """Tests objects of type Number."""
-        cls = objects.Number
-        normalization_mappings = [
-            (20, 20),
-            ('20', 20),
-            ('02', 2),
-            ('0', 0),
-            (-1, -1),
-            ('-1', -1),
-            (3.00, 3),
-            (3.05, 3.05),
-            ('3.05', 3.05)
-        ]
+        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
+                    ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
         invalid_values = ['a', '', {'a': 3}, [3], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Number, mappings, invalid_values)
 
     def test_real_validation(self):
         """Tests objects of type Real."""
-        cls = objects.Real
-        normalization_mappings = [
-            (20, 20),
-            ('20', 20),
-            ('02', 2),
-            ('0', 0),
-            (-1, -1),
-            ('-1', -1),
-            (3.00, 3),
-            (3.05, 3.05),
-            ('3.05', 3.05)
-        ]
+        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
+                    ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
         invalid_values = ['a', '', {'a': 3}, [3], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Real, mappings, invalid_values)
 
     def test_int_validation(self):
         """Tests objects of type Int."""
-        cls = objects.Int
-        normalization_mappings = [
-            (20, 20),
-            ('20', 20),
-            ('02', 2),
-            ('0', 0),
-            (-1, -1),
-            ('-1', -1),
-            (3.00, 3),
-            (3.05, 3),
-        ]
+        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
+                    ('-1', -1), (3.00, 3), (3.05, 3), ]
         invalid_values = ['a', '', {'a': 3}, [3], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Int, mappings, invalid_values)
 
     def test_nonnegative_int_validation(self):
         """Tests objects of type NonnegativeInt."""
-        cls = objects.NonnegativeInt
-        normalization_mappings = [
-            (20, 20),
-            ('20', 20),
-            ('02', 2),
-            ('0', 0),
-            (3.00, 3),
-            (3.05, 3),
-        ]
-        invalid_values = ['a', '', {'a': 3}, [3], None, -1, '-1']
+        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (3.00, 3),
+                    (3.05, 3), ]
+        invalid_vals = ['a', '', {'a': 3}, [3], None, -1, '-1']
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.NonnegativeInt, mappings, invalid_vals)
 
     def test_coord_2d_validation(self):
         """Tests objects of type Coord2D."""
-        cls = objects.Coord2D
-        normalization_mappings = [
-            ('-1, 2.2', [-1, 2.2]),
-            ([0, 1], [0, 1]),
-            (' -1 , 3.5', [-1, 3.5]),
-        ]
+        mappings = [('-1, 2.2', [-1, 2.2]), ([0, 1], [0, 1]),
+                    (' -1 , 3.5', [-1, 3.5]), ]
         invalid_values = ['123', 'a', [0, 1, 2], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Coord2D, mappings, invalid_values)
 
     def test_list_validation(self):
         """Tests objects of type List."""
-        cls = objects.List
-        normalization_mappings = [
-            ([3, 'a'], [3, 'a']),
-            ([], []),
-            ([1, 2, 1], [1, 2, 1]),
-        ]
+        mappings = [([3, 'a'], [3, 'a']), ([], []), ([1, 2, 1], [1, 2, 1]), ]
         invalid_values = ['123', {'a': 1}, 3.0, None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.List, mappings, invalid_values)
 
     def test_set_validation(self):
         """Tests objects of type Set."""
-        cls = objects.Set
-        normalization_mappings = [
-            ([3, 'a'], [3, 'a']),
-            ([], []),
-        ]
+        mappings = [([3, 'a'], [3, 'a']), ([], []), ]
         invalid_values = ['123', {'a': 1}, 3.0, None, [1, 2, 1]]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Set, mappings, invalid_values)
 
     def test_unicode_string_validation(self):
         """Tests objects of type UnicodeString."""
-        cls = objects.UnicodeString
-        normalization_mappings = [
-            ('Abc   def', u'Abc   def'),
-            (u'¡Hola!', u'¡Hola!'),
-            (3.0, '3.0'),
+        mappings = [
+            ('Abc   def', u'Abc   def'), (u'¡Hola!', u'¡Hola!'), (3.0, '3.0'),
         ]
-        invalid_values = [{'a': 1}, [1, 2, 1], None]
+        invalid_vals = [{'a': 1}, [1, 2, 1], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.UnicodeString, mappings, invalid_vals)
 
     def test_html_validation(self):
         """Tests objects of type HTML."""
         # TODO(sll): Add more tests.
-        cls = objects.Html
-        normalization_mappings = [
+        mappings = [
             ('<p onclick="evil_function()">a paragraph</p>',
              '<p>a paragraph</p>'),
             ('<iframe src="evil-site"></iframe>', '<div></div>'),
@@ -195,30 +128,21 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
         ]
         invalid_values = [{'a': 1}, [1, 2, 1], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.Html, mappings, invalid_values)
 
     def test_normalized_string_validation(self):
         """Tests objects of type NormalizedString."""
-        cls = objects.NormalizedString
-        normalization_mappings = [
-            ('Abc   def', u'Abc def'),
-            (u'¡hola!', u'¡hola!'),
-            (3.0, '3.0'),
+        mappings = [
+            ('Abc   def', u'Abc def'), (u'¡hola!', u'¡hola!'), (3.0, '3.0'),
         ]
         invalid_values = [{'a': 1}, [1, 2, 1], None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(
+            objects.NormalizedString, mappings, invalid_values)
 
     def test_music_note_validation(self):
         """Tests objects of type MusicNote."""
-        cls = objects.MusicNote
-        normalization_mappings = [
-            ('A4', 'A4'),
-            ('B4', 'B4'),
-        ]
+        mappings = [('A4', 'A4'), ('B4', 'B4'), ]
         invalid_values = ['D6', 'B3', 'CA4', 2, None]
 
-        self.check_normalization(cls, normalization_mappings)
-        self.check_invalid_values(cls, invalid_values)
+        self.check_normalization(objects.MusicNote, mappings, invalid_values)
