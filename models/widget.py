@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import copy
 import os
 
+from classifier import Classifier
 import feconf
 import utils
 from parameter import Parameter
@@ -33,8 +34,14 @@ from google.appengine.ext.ndb import polymodel
 class AnswerHandler(ndb.Model):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
-    # TODO(sll): Change the following to become a reference.
+    # TODO(sll): Store a reference instead?
     classifier = ndb.StringProperty()
+
+    @property
+    def rules(self):
+        if not self.classifier:
+            return []
+        return Classifier.get_by_id(self.classifier).rules
 
 
 class Widget(polymodel.PolyModel):
@@ -96,21 +103,14 @@ class Widget(polymodel.PolyModel):
         result['params'] = dict((param.name, params.get(param.name, param.value))
                                 for param in widget.params)
 
-        for handler in result['handlers']:
-            classifier = handler['classifier']
-            if classifier:
-                with open(os.path.join(
-                        feconf.SAMPLE_CLASSIFIERS_DIR,
-                        classifier,
-                        '%sRules.yaml' % classifier)) as f:
-                    rules = utils.dict_from_yaml(f.read().decode('utf-8'))
+        for handler in widget.handlers:
+            for r_handler in result['handlers']:
+                if r_handler['classifier'] == handler.classifier:
                     rule_dict = {}
-                    for rule in rules:
-                        rule_dict[rules[rule]['name']] = {'classifier': rule}
-                        if 'checks' in rules[rule]:
-                            rule_dict[rules[rule]['name']]['checks'] = (
-                                rules[rule]['checks'])
-                    handler['rules'] = rule_dict
+                    for rule in handler.rules:
+                        rule_dict[rule.name] = {
+                            'classifier': rule.rule, 'checks': rule.checks}
+                    r_handler['rules'] = rule_dict
 
         return result
 
@@ -140,6 +140,13 @@ class InteractiveWidget(Widget):
         """Ensures that at least one handler exists."""
         assert len(self.handlers)
 
+    def _get_handler(self, handler_name):
+        """Get the handler object corresponding to a given handler name."""
+        for handler in self.handlers:
+            if handler.name == handler_name:
+                return handler
+        return None
+
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets.
@@ -147,7 +154,7 @@ class InteractiveWidget(Widget):
         Assumes that everything is valid (directories exist, widget config files
         are formatted correctly, etc.).
         """
-        widget_ids = os.listdir(os.path.join(feconf.SAMPLE_WIDGETS_DIR))
+        widget_ids = os.listdir(feconf.SAMPLE_WIDGETS_DIR)
 
         for widget_id in widget_ids:
             widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
@@ -163,15 +170,11 @@ class InteractiveWidget(Widget):
             widget = cls(**conf)
             widget.put()
 
-    def get_readable_name(self, handler_name, rule_name):
-        """Get the human-readable name for a rule."""
-        for handler in self.handlers:
-            if handler.name == handler_name:
-                classifier = handler.classifier
-                with open(os.path.join(
-                        feconf.SAMPLE_CLASSIFIERS_DIR,
-                        classifier,
-                        '%sRules.yaml' % classifier)) as f:
-                    rules = utils.dict_from_yaml(f.read().decode('utf-8'))
-                    return rules[rule_name]['name']
-        raise Exception('No rule name found for %s' % rule_name)
+    def get_readable_name(self, handler_name, rule_rule):
+        """Get the human-readable text for a rule."""
+        handler = self._get_handler(handler_name)
+        for rule in handler.rules:
+            if rule.rule == rule_rule:
+                return rule.name
+
+        raise Exception('No rule name found for %s' % rule_rule)

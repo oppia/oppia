@@ -197,6 +197,7 @@ class ExplorationHandler(BaseHandler):
             answer, params, handler)
 
         if recorded_answer:
+            recorded_answer = json.dumps(recorded_answer)
             EventHandler.record_rule_hit(
                 exploration_id, state_id, rule, recorded_answer)
             # Add this answer to the state's 'unresolved answers' list.

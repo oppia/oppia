@@ -20,6 +20,7 @@ import json
 
 from controllers.base import BaseHandler
 from controllers.base import require_admin
+from models.classifier import Classifier
 from models.exploration import Exploration
 from models.widget import InteractiveWidget
 from models.widget import NonInteractiveWidget
@@ -28,7 +29,10 @@ import utils
 
 
 def reload_demos():
-    """Reload the default widgets, then reload the default explorations."""
+    """Reload default classifiers, widgets, and explorations (in that order)."""
+    Classifier.delete_all_classifiers()
+    Classifier.load_default_classifiers()
+
     Widget.delete_all_widgets()
     InteractiveWidget.load_default_widgets()
     NonInteractiveWidget.load_default_widgets()
