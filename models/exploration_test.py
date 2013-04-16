@@ -35,6 +35,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         """Loads the default widgets."""
         super(ExplorationModelUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
+        self.user = User(email='test@example.com')
 
     def test_exploration_class(self):
         """Test the Exploration class."""
@@ -101,8 +102,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         exploration.editors = []
         with self.assertRaises(BadValueError):
             exploration.editors = ['A string']
-        user = User(email='noreply@google.com')
-        exploration.editors = [user]
+        exploration.editors = [self.user]
 
         # Put and Retrieve the exploration.
         exploration.put()
@@ -114,10 +114,10 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.parameters, [parameter])
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
-        self.assertEqual(retrieved_exploration.editors, [user])
+        self.assertEqual(retrieved_exploration.editors, [self.user])
 
         # The Exploration class has a 'create' class method.
-        exploration2 = Exploration.create(user, 'A title', 'A category', 'A exploration_id')
+        exploration2 = Exploration.create(self.user, 'A title', 'A category', 'A exploration_id')
         exploration2.put()
 
         # The Exploration class has a 'get' class method.
@@ -141,8 +141,10 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         notdemo2 = Exploration(id='abcd')
         self.assertEqual(notdemo2.is_demo_exploration(), False)
 
-        # Ad Exploration has a 'as_yaml' method.
-        exploration3 = Exploration.create(user, 'A title', 'A category', 'A different exploration_id')
+    def test_as_yaml_method(self):
+        """Test the as_yaml() method."""
+        exploration3 = Exploration.create(
+            self.user, 'A title', 'A category', 'A different exploration_id')
         self.assertEqual(exploration3.as_yaml(), """Activity 1:
   content: []
   param_changes: []
@@ -159,3 +161,13 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     sticky: false
     widget_id: Continue
 """)
+
+    def test_loading_and_deletion_of_demo_explorations(self):
+        """Test loading and deletion of the demo explorations."""
+        self.assertEqual(Exploration.query().count(), 0)
+
+        Exploration.load_demo_explorations()
+        self.assertEqual(Exploration.query().count(), 6)
+
+        Exploration.delete_demo_explorations()
+        self.assertEqual(Exploration.query().count(), 0)

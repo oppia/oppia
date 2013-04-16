@@ -16,29 +16,23 @@
 
 __author__ = 'Jeremy Emerson'
 
+from widget import InteractiveWidget
+from widget import NonInteractiveWidget
 from widget import Widget
 import test_utils
-
-from google.appengine.ext.db import BadValueError
 
 
 class WidgetUnitTests(test_utils.AppEngineTestBase):
     """Test widget models."""
 
-    """
-    def test_widget_class(self):
-        Test the Widget class.
-        # A Widget must have the 'raw' property set.
-        widget = Widget(id='The hash id')
-        with self.assertRaises(BadValueError):
-            widget.put()
+    def test_loading_and_deletion_of_widgets(self):
+        """Test loading and deletion of the default widgets."""
+        self.assertEqual(Widget.query().count(), 0)
 
-        # Set the 'raw' property to be a valid string, then do a put().
-        widget.raw = 'Some code here'
-        widget.put()
+        InteractiveWidget.load_default_widgets()
+        self.assertEqual(Widget.query().count(), 7)
+        self.assertEqual(InteractiveWidget.query().count(), 7)
+        self.assertEqual(NonInteractiveWidget.query().count(), 0)
 
-        # Retrieve the widget.
-        retrieved_widget = Widget.get_by_id('The hash id')
-        self.assertEqual(retrieved_widget.raw, 'Some code here')
-    """
-    pass
+        Widget.delete_all_widgets()
+        self.assertEqual(Widget.query().count(), 0)
