@@ -37,3 +37,9 @@ class ParameterUnitTests(test_utils.AppEngineTestBase):
 
         model.values = [6]
         model.put()
+
+        self.assertEqual(model.value, 6)
+
+        model.values = []
+        model.put()
+        self.assertIsNone(model.value)

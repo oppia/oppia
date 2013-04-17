@@ -146,7 +146,7 @@ class Exploration(BaseModel):
         cls, yaml_file, user, title, category, exploration_id=None,
             image_id=None):
         """Creates an exploration from a YAML file."""
-        init_state_name = yaml_file[:yaml_file.find(':\n')]
+        init_state_name = yaml_file[:yaml_file.index(':\n')]
         if not init_state_name or '\n' in init_state_name:
             raise Exception('Invalid YAML file: the name of the initial state '
                             'should be left-aligned on the first line and '

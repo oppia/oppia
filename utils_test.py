@@ -184,3 +184,7 @@ class UtilsTests(test_utils.AppEngineTestBase):
         d = {'a': 'b', 'c': {'a': 'b'}}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': {}})
+
+        d = ['a', 'b', {'c': 'd'}]
+        utils.recursively_remove_key(d, 'c')
+        self.assertEqual(d, ['a', 'b', {}])

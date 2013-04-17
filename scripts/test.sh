@@ -96,6 +96,6 @@ if [ $IS_COVERAGE_INSTALLED = 0 ]; then
 fi
 
 coverage run ./tests/suite.py
-coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*"
+coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*" --show-missing
 
 echo Done!

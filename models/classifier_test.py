@@ -30,7 +30,10 @@ class ClassifierModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(Classifier.query().count(), 0)
 
         Classifier.load_default_classifiers()
-        self.assertEqual(Classifier.query().count(), 7)
+        classifiers = Classifier.query()
+        classifier_ids = [classifier.id for classifier in classifiers]
+        self.assertIn('Coord2DClassifier', classifier_ids)
+        self.assertEqual(classifiers.count(), 7)
 
         Classifier.delete_all_classifiers()
         self.assertEqual(Classifier.query().count(), 0)

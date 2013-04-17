@@ -30,6 +30,7 @@ STATS_ENUMS = utils.create_enum(
     'exploration_visited', 'rule_hit', 'exploration_completed',
     'feedback_submitted', 'state_hit')
 
+
 def create_rule_name(rule):
     name = rule.name
     for key in rule.inputs.keys():
@@ -60,7 +61,7 @@ class EventHandler(object):
         if event_name == STATS_ENUMS.state_hit:
             event_key = 's.%s' % key
             cls._inc(event_key)
-    
+
     @classmethod
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""

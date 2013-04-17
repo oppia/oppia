@@ -36,6 +36,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         super(ExplorationModelUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
         self.user = User(email='test@example.com')
+        self.another_user = User(email='another@user.com')
 
     def test_exploration_class(self):
         """Test the Exploration class."""
@@ -64,7 +65,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The 'states' property must be a list.
         with self.assertRaises(BadValueError):
             exploration.states = 'A string'
-        # TODO(emersoj): We should put the initial state in the states list it should not be empty
+        # TODO(emersoj): We should put the initial state in the states list. It
+        # should not be empty
         exploration.states = []
 
         # The 'states property must be a list of State keys.
@@ -99,9 +101,12 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The 'editors' property must be a list of User objects.
         with self.assertRaises(BadValueError):
             exploration.editors = 'A string'
-        exploration.editors = []
         with self.assertRaises(BadValueError):
             exploration.editors = ['A string']
+        exploration.editors = []
+        # There must be at least one editor.
+        with self.assertRaises(BadValueError):
+            exploration.put()
         exploration.editors = [self.user]
 
         # Put and Retrieve the exploration.
@@ -116,36 +121,82 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editors, [self.user])
 
-        # The Exploration class has a 'create' class method.
-        exploration2 = Exploration.create(self.user, 'A title', 'A category', 'A exploration_id')
-        exploration2.put()
+    def test_create_get_and_delete_exploration(self):
+        """Test the create(), get() and delete() methods."""
+        exploration = Exploration.create(
+            self.user, 'A title', 'A category', 'A exploration_id')
+        exploration.put()
 
-        # The Exploration class has a 'get' class method.
-        retrieved_exploration2 = Exploration.get('A exploration_id')
-        self.assertEqual(exploration2, retrieved_exploration2)
+        retrieved_exploration = Exploration.get('A exploration_id')
+        self.assertEqual(exploration, retrieved_exploration)
 
-        # An Exploration has a 'delete' method.
-        exploration2.delete()
+        exploration.delete()
         with self.assertRaises(Exception):
-            retrieved_exploration2 = Exploration.get('A exploration_id')
+            retrieved_exploration = Exploration.get('A exploration_id')
+
+    def test_get_exploration_error_cases(self):
+        """Test the error cases for the get() method."""
+        with self.assertRaises(Exception):
+            Exploration.get('Invalid id')
+        with self.assertRaises(Exception):
+            Exploration.get('Invalid id', strict=True)
+
         # The get() should fail silently when strict == False.
-        retrieved_exploration2 = Exploration.get(
-            'A exploration_id', strict=False)
-        self.assertIsNone(retrieved_exploration2)
+        self.assertIsNone(Exploration.get('Invalid id', strict=False))
 
-        # An Exploration has a 'is_demo_exploration' method.
-        demo = Exploration(id='0')
-        self.assertEqual(demo.is_demo_exploration(), True)
-        notdemo1 = Exploration(id='a')
-        self.assertEqual(notdemo1.is_demo_exploration(), False)
-        notdemo2 = Exploration(id='abcd')
-        self.assertEqual(notdemo2.is_demo_exploration(), False)
+    def test_editor_permissions(self):
+        """Test permissions."""
+        exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')
+        exploration.put()
+        self.assertTrue(exploration.is_editable_by(self.user))
+        self.assertFalse(exploration.is_editable_by(self.another_user))
 
-    def test_as_yaml_method(self):
-        """Test the as_yaml() method."""
-        exploration3 = Exploration.create(
+        self.assertItemsEqual(
+            Exploration.get_viewable_explorations(self.user), [exploration])
+        self.assertItemsEqual(
+            Exploration.get_viewable_explorations(self.another_user), [])
+
+    def test_state_operations(self):
+        """Test adding, renaming and checking existence of states."""
+        exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')
+        exploration.put()
+
+        self.assertEqual(len(exploration.states), 1)
+
+        default_state = exploration.states[0].get()
+        default_state_name = default_state.name
+        exploration.rename_state(default_state, 'Renamed state')
+
+        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(default_state.name, 'Renamed state')
+
+        # Add a new state.
+        second_state = exploration.add_state('State 2')
+        self.assertEqual(len(exploration.states), 2)
+
+        # It is OK to rename a state to itself.
+        exploration.rename_state(second_state, second_state.name)
+        self.assertEqual(second_state.name, 'State 2')
+
+        # But it is not OK to add or rename a state using a name that already
+        # exists.
+        with self.assertRaises(Exception):
+            exploration.add_state('State 2')
+        with self.assertRaises(Exception):
+            exploration.rename_state(second_state, 'Renamed state')
+
+        # The exploration now has exactly two states.
+        self.assertFalse(exploration._has_state_named(default_state_name))
+        self.assertTrue(exploration._has_state_named('Renamed state'))
+        self.assertTrue(exploration._has_state_named('State 2'))
+
+    def test_yaml_methods(self):
+        """Test the as_yaml() and create_from_yaml() methods."""
+        exploration = Exploration.create(
             self.user, 'A title', 'A category', 'A different exploration_id')
-        self.assertEqual(exploration3.as_yaml(), """Activity 1:
+        exploration.add_state('New state')
+        yaml_file = exploration.as_yaml()
+        self.assertEqual(yaml_file, """Activity 1:
   content: []
   param_changes: []
   widget:
@@ -160,7 +211,54 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     params: {}
     sticky: false
     widget_id: Continue
+New state:
+  content: []
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: New state
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: Continue
 """)
+
+        exploration2 = Exploration.create_from_yaml(
+            yaml_file, self.user, 'Title', 'Category')
+        self.assertEqual(len(exploration2.states), 2)
+        self.assertEqual(exploration2.as_yaml(), yaml_file)
+
+        self.assertEqual(Exploration.query().count(), 2)
+
+        with self.assertRaises(Exception):
+            Exploration.create_from_yaml(
+                'No_initial_state_name', self.user, 'Title', 'category')
+
+        with self.assertRaises(Exception):
+            Exploration.create_from_yaml(
+                'Invalid\ninit_state_name:\nMore stuff',
+                self.user, 'Title', 'category')
+
+        with self.assertRaises(Exception):
+            Exploration.create_from_yaml(
+                'State1:\n(\nInvalid yaml', self.user, 'Title', 'category')
+
+        # Check that no new exploration was created.
+        self.assertEqual(Exploration.query().count(), 2)
+
+    def test_is_demo_exploration_method(self):
+        """Test the is_demo_exploration() method."""
+        demo = Exploration(id='0')
+        self.assertEqual(demo.is_demo_exploration(), True)
+        notdemo1 = Exploration(id='a')
+        self.assertEqual(notdemo1.is_demo_exploration(), False)
+        notdemo2 = Exploration(id='abcd')
+        self.assertEqual(notdemo2.is_demo_exploration(), False)
 
     def test_loading_and_deletion_of_demo_explorations(self):
         """Test loading and deletion of the demo explorations."""
