@@ -59,7 +59,6 @@ class Classifier(BaseModel):
     @classmethod
     def load_default_classifiers(cls):
         """Loads the default classifiers."""
-        # raise Exception(os.listdir(feconf.SAMPLE_CLASSIFIERS_DIR))
         classifier_ids = [d for d in os.listdir(feconf.SAMPLE_CLASSIFIERS_DIR)
                           if os.path.isdir(
                               os.path.join(feconf.SAMPLE_CLASSIFIERS_DIR, d))]
