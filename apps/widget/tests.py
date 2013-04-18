@@ -16,9 +16,9 @@
 
 __author__ = 'Jeremy Emerson'
 
-from widget import InteractiveWidget
-from widget import NonInteractiveWidget
-from widget import Widget
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import NonInteractiveWidget
+from apps.widget.models import Widget
 import test_utils
 
 

@@ -18,9 +18,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 
+from apps.image.models import Image
 from controllers.base import BaseHandler
 import feconf
-from models.image import Image
 import utils
 
 

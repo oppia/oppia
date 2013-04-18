@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 import imghdr
 
-from base_model import BaseModel
+from apps.base_model.models import BaseModel
 import feconf
 
 from google.appengine.ext import ndb

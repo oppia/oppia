@@ -18,7 +18,7 @@ __author__ = 'Sean Lip'
 
 import re
 
-from types import get_object_class
+from apps.types.models import get_object_class
 import utils
 
 from google.appengine.ext import ndb

@@ -18,11 +18,11 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
-from exploration import Exploration
-from exploration import Parameter
-from state import State
-from widget import InteractiveWidget
-from image import Image
+from apps.exploration.models import Exploration
+from apps.image.models import Image
+from apps.parameter.models import Parameter
+from apps.state.models import State
+from apps.widget.models import InteractiveWidget
 
 from google.appengine.ext.db import BadValueError
 from google.appengine.api.users import User

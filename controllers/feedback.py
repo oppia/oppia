@@ -19,8 +19,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 import urllib
 
+from apps.statistics.models import EventHandler
 from controllers.base import BaseHandler
-from models.statistics import EventHandler
 import utils
 
 

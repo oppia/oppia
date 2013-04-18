@@ -19,14 +19,14 @@ __author__ = 'Sean Lip'
 import cgi
 import json
 
+from apps.exploration.models import Exploration
+from apps.state.models import Content
+from apps.state.models import State
+from apps.statistics.models import EventHandler
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import NonInteractiveWidget
 from controllers.base import BaseHandler
 import feconf
-from models.exploration import Exploration
-from models.state import Content
-from models.state import State
-from models.statistics import EventHandler
-from models.widget import InteractiveWidget
-from models.widget import NonInteractiveWidget
 import utils
 
 READER_MODE = 'reader'

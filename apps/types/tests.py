@@ -17,7 +17,9 @@
 __author__ = 'Sean Lip'
 
 import test_utils
-import types
+from apps.types.models import get_object_class
+from apps.types.models import TypedInstance
+from apps.types.models import TypedInstanceProperty
 
 from data.objects.models import objects
 from google.appengine.ext import ndb
@@ -28,19 +30,19 @@ class GetObjectClassUnitTests(test_utils.AppEngineTestBase):
 
     def test_get_object_class_method(self):
         """Tests the normal behavior of get_object_class()."""
-        IntClass = types.get_object_class('Int')
+        IntClass = get_object_class('Int')
         assert IntClass.__name__ == 'Int'
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""
         with self.assertRaises(TypeError):
-            types.get_object_class('FakeClass')
+            get_object_class('FakeClass')
 
     def test_base_object_is_not_gettable(self):
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
         with self.assertRaises(TypeError):
-            types.get_object_class('BaseObject')
+            get_object_class('BaseObject')
 
 
 class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
@@ -48,7 +50,7 @@ class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
 
     def test_typed_instance_class(self):
         """Tests the TypedInstance class."""
-        model = types.TypedInstance(obj_type='Int', value='Bad value')
+        model = TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             model.put()
         model.value = 1
@@ -56,9 +58,9 @@ class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
 
     def test_typed_instance_property(self):
         class StructuredTestModel(ndb.Model):
-            typed_instance = types.TypedInstanceProperty(required=True)
+            typed_instance = TypedInstanceProperty(required=True)
 
-        model = types.TypedInstance(obj_type='Int', value='Bad value')
+        model = TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             structured_model = StructuredTestModel(typed_instance=model)
 

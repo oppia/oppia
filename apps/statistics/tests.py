@@ -18,8 +18,8 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
-from statistics import Counter
-from statistics import Journal
+from apps.statistics.models import Counter
+from apps.statistics.models import Journal
 
 
 class StatisticsUnitTests(test_utils.AppEngineTestBase):

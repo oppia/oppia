@@ -16,10 +16,10 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+from apps.exploration.models import Exploration
 from controllers import admin
 from controllers.base import BaseHandler
 import feconf
-from models.exploration import Exploration
 import utils
 
 from google.appengine.api import users

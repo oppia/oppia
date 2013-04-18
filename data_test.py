@@ -22,11 +22,11 @@ import os
 import re
 import string
 
+from apps.types.models import get_object_class
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import Widget
 import feconf
 import test_utils
-from models.types import get_object_class
-from models.widget import InteractiveWidget
-from models.widget import Widget
 import utils
 
 

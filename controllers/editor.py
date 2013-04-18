@@ -18,20 +18,20 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 
+from apps.exploration.models import Exploration
+from apps.parameter.models import Parameter
+from apps.parameter.models import ParamChange
+from apps.state.models import AnswerHandlerInstance
+from apps.state.models import Content
+from apps.state.models import Rule
+from apps.state.models import State
+from apps.statistics.models import Statistics
+from apps.statistics.models import STATS_ENUMS
+from apps.widget.models import InteractiveWidget
 from controllers.base import BaseHandler
 from controllers.base import require_editor
 from controllers.base import require_user
 import feconf
-from models.exploration import Exploration
-from models.parameter import Parameter
-from models.parameter import ParamChange
-from models.state import AnswerHandlerInstance
-from models.state import Content
-from models.state import Rule
-from models.state import State
-from models.statistics import Statistics
-from models.statistics import STATS_ENUMS
-from models.widget import InteractiveWidget
 import utils
 
 from google.appengine.api import users

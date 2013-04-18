@@ -18,13 +18,13 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 
+from apps.classifier.models import Classifier
+from apps.exploration.models import Exploration
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import NonInteractiveWidget
+from apps.widget.models import Widget
 from controllers.base import BaseHandler
 from controllers.base import require_admin
-from models.classifier import Classifier
-from models.exploration import Exploration
-from models.widget import InteractiveWidget
-from models.widget import NonInteractiveWidget
-from models.widget import Widget
 import utils
 
 

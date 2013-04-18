@@ -22,14 +22,14 @@ import copy
 import importlib
 import logging
 
-from base_model import BaseModel
+from apps.base_model.models import BaseModel
+from apps.parameter.models import ParamChange
+from apps.parameter.models import ParamChangeProperty
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import Widget
 from data.objects.models import objects
 import feconf
-from parameter import ParamChange
-from parameter import ParamChangeProperty
 import utils
-from widget import InteractiveWidget
-from widget import Widget
 
 from google.appengine.ext import ndb
 

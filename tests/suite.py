@@ -40,15 +40,19 @@ def main():
         root_dir, pattern='*_test.py', top_level_dir=root_dir)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
 
-    if result.errors or result.failures:
+    suite2 = unittest.loader.TestLoader().discover(
+        root_dir, pattern='tests.py', top_level_dir=root_dir)
+    result2 = unittest.TextTestRunner(verbosity=2).run(suite2)
+
+    if result.errors or result.failures or result2.errors or result2.failures:
         raise Exception(
             'Functional test suite failed: %s errors, %s failures of '
             ' %s tests run.' % (
                 len(result.errors), len(result.failures), result.testsRun))
 
-    if result.testsRun != EXPECTED_TEST_COUNT:
+    if result.testsRun + result2.testsRun != EXPECTED_TEST_COUNT:
         raise Exception('Expected %s tests to be run, not %s.' %
-                        (EXPECTED_TEST_COUNT, result.testsRun))
+                        (EXPECTED_TEST_COUNT, result.testsRun + result2.testsRun))
 
 
 if __name__ == '__main__':

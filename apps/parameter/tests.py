@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 import test_utils
-import parameter
+from apps.parameter.models import Parameter
 
 
 class ParameterUnitTests(test_utils.AppEngineTestBase):
@@ -25,7 +25,7 @@ class ParameterUnitTests(test_utils.AppEngineTestBase):
 
     def test_parameter_class(self):
         """Tests the Parameter class."""
-        model = parameter.Parameter(name='param1', values=['hello'])
+        model = Parameter(name='param1', values=['hello'])
         # Raise an error because no obj_type is specified.
         with self.assertRaises(TypeError):
             model.put()

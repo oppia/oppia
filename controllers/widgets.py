@@ -19,9 +19,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 import logging
 
+from apps.widget.models import InteractiveWidget
+from apps.widget.models import NonInteractiveWidget
 from controllers.base import BaseHandler
-from models.widget import InteractiveWidget
-from models.widget import NonInteractiveWidget
 import utils
 
 from google.appengine.api import users

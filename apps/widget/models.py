@@ -21,11 +21,11 @@ __author__ = 'Sean Lip'
 import copy
 import os
 
-from classifier import Classifier
+from apps.classifier.models import Classifier
+from apps.parameter.models import Parameter
+from apps.parameter.models import ParameterProperty
 import feconf
 import utils
-from parameter import Parameter
-from parameter import ParameterProperty
 
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel

@@ -21,7 +21,7 @@ __author__ = 'Sean Lip'
 import collections
 import utils
 
-from exploration import Exploration
+from apps.exploration.models import Exploration
 
 from google.appengine.ext import ndb
 

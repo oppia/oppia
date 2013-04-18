@@ -18,7 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-from classifier import Classifier
+from apps.classifier.models import Classifier
 import test_utils
 
 

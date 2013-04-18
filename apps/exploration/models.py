@@ -20,12 +20,12 @@ __author__ = 'Sean Lip'
 
 import os
 
-from base_model import BaseModel
+from apps.base_model.models import BaseModel
+from apps.image.models import Image
+from apps.parameter.models import Parameter
+from apps.state.models import State
 import feconf
 import logging
-from models.image import Image
-from models.parameter import Parameter
-from state import State
 import utils
 
 from google.appengine.api import users

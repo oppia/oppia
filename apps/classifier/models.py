@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 import os
 
-from base_model import BaseModel
+from apps.base_model.models import BaseModel
 import feconf
 import utils
 

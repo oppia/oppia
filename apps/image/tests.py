@@ -16,7 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
-from image import Image
+from apps.image.models import Image
 import test_utils
 
 from google.appengine.ext.db import BadValueError
