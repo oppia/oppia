@@ -36,7 +36,7 @@ echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
-GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.4/google_appengine
+GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
@@ -45,8 +45,8 @@ echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.4.zip -O gae-download.zip
-  unzip gae-download.zip -d $RUNTIME_HOME/google_appengine_1.7.4/
+  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.7.zip -O gae-download.zip
+  unzip gae-download.zip -d $RUNTIME_HOME/google_appengine_1.7.7/
   rm gae-download.zip
 fi
 
@@ -227,7 +227,7 @@ fi
 # Set up a local dev instance
 echo Starting GAE development server in a new shell
 gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
---address=0.0.0.0 --port=8181 --clear_datastore ."
+--host=0.0.0.0 --port=8181 --clear_datastore=yes ."
 
 sleep 5
 
