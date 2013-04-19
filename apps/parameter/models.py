@@ -90,8 +90,13 @@ class ParameterProperty(ndb.LocalStructuredProperty):
 class ParamChange(Parameter):
     """Represents a change to a multi-valued parameter.
 
-    This has the effect of replacing the set of values that can be taken
-    by an existing parameter.
+    This is used to replace or create the corresponding parameter in a reader's
+    instance of an exploration. It does not result in changes in any backend
+    models.
+
+    The caller of this class is responsible for ensuring that the obj_type
+    attribute is set correctly. The obj_type attribute should match the
+    obj_type for the corresponding Parameter.
     """
     description = None
 
