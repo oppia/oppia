@@ -176,9 +176,12 @@ class State(BaseModel):
             for item in sdict['content']
         ]
 
-        state.param_changes = [
-            ParamChange(**pc) for pc in sdict['param_changes']
-        ]
+        state.param_changes = []
+        for pc in sdict['param_changes']:
+            instance = exploration.get_param_change_instance(
+                pc['name'], pc['obj_type'])
+            instance.values = pc['values']
+            state.param_changes.append(instance)
 
         wdict = sdict['widget']
         state.widget = WidgetInstance(

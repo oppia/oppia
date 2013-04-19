@@ -323,12 +323,12 @@ class StateHandler(BaseHandler):
             exploration.rename_state(state, state_name)
 
         if 'param_changes' in payload:
-            state.param_changes = [
-                ParamChange(
-                    name=param_change['name'], values=param_change['values'],
-                    obj_type='UnicodeString'
-                ) for param_change in param_changes
-            ]
+            state.param_changes = []
+            for param_change in param_changes:
+                instance = exploration.get_param_change_instance(
+                    param_change['name'])
+                instance.values = param_change['values']
+                state.param_changes.append(instance)
 
         if interactive_widget:
             state.widget.widget_id = interactive_widget

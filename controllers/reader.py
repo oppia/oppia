@@ -123,7 +123,7 @@ class ExplorationHandler(BaseHandler):
         for item in state.param_changes:
             if item.name not in existing_params:
                 # Pick a random parameter for this key.
-                existing_params[item.name] = utils.get_random_choice(item.values)
+                existing_params[item.name] = item.value
         return existing_params
 
     def append_feedback(self, feedback, html_output, widget_output,
