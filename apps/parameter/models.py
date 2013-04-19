@@ -116,3 +116,9 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
     def _from_base_type(self, val):
         return ParamChange(
             obj_type=val.obj_type, name=val.name, values=val.values)
+
+
+class ParamSet(ndb.Model):
+    """A list of parameters."""
+    # An ordered list of parameters.
+    params = ParameterProperty(repeated=True)

@@ -21,6 +21,7 @@ import test_utils
 from apps.exploration.models import Exploration
 from apps.image.models import Image
 from apps.parameter.models import Parameter
+from apps.parameter.models import ParamSet
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
@@ -269,3 +270,60 @@ New state:
 
         Exploration.delete_demo_explorations()
         self.assertEqual(Exploration.query().count(), 0)
+
+    def test_dataset_operations(self):
+        """Test adding, deleting and adding values to a dataset."""
+        exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')
+        exploration.put()
+
+        self.assertEqual(len(exploration.datasets), 0)
+
+        exploration.add_dataset('Dataset 1', ['Name', 'Number'])
+        self.assertEqual(len(exploration.datasets), 1)
+        self.assertEqual(exploration.datasets[0].name, 'Dataset 1')
+        self.assertIsNone(exploration.datasets[0].get_random_param_set())
+
+        # The same dataset name cannot be used more than once.
+        with self.assertRaises(Exception):
+            exploration.add_dataset('Dataset 1', ['Name', 'Number'])
+
+        # Parameter names cannot be repeated across datasets.
+        with self.assertRaises(Exception):
+            exploration.add_dataset('Dataset 2', ['Name'])
+
+        # It is not possible to add data to a non-existent dataset.
+        with self.assertRaises(Exception):
+            exploration.add_data_to_dataset('Fake dataset', [])
+
+        exploration.add_data_to_dataset('Dataset 1', [])
+        self.assertIsNone(exploration.datasets[0].get_random_param_set())
+
+        # Parameter set keys must match the dataset schema.
+        with self.assertRaises(Exception):
+            exploration.add_data_to_dataset('Dataset 1', [{'Fake Key': 'John'}])
+        with self.assertRaises(KeyError):
+            exploration.add_data_to_dataset('Dataset 1', [{'Name': 'John'}])
+
+        exploration.add_data_to_dataset(
+            'Dataset 1', [{'Name': 'John', 'Number': '123'}])
+        param_set = exploration.datasets[0].get_random_param_set()
+        self.assertEqual(len(param_set.params), 2)
+        self.assertEqual(param_set.params[0].name, 'Name')
+        self.assertEqual(param_set.params[0].obj_type, 'UnicodeString')
+        self.assertEqual(param_set.params[0].values[0], 'John')
+        self.assertEqual(param_set.params[1].name, 'Number')
+        self.assertEqual(param_set.params[1].obj_type, 'UnicodeString')
+        self.assertEqual(param_set.params[1].values[0], '123')
+
+        param_set_key = param_set.key
+        self.assertTrue(ParamSet.get_by_id(param_set_key.id()))
+
+        with self.assertRaises(Exception):
+            exploration.delete_dataset('Fake dataset')
+
+        exploration.add_dataset('Dataset 2', ['Address', 'Zip code'])
+        self.assertEqual(len(exploration.datasets), 2)
+
+        exploration.delete_dataset('Dataset 1')
+        self.assertEqual(len(exploration.datasets), 1)
+        self.assertIsNone(ParamSet.get_by_id(param_set_key.id()))

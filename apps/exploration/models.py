@@ -23,6 +23,7 @@ import os
 from apps.base_model.models import BaseModel
 from apps.image.models import Image
 from apps.parameter.models import Parameter
+from apps.parameter.models import ParamSet
 from apps.state.models import State
 import feconf
 import logging
@@ -31,6 +32,25 @@ import utils
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
+
+
+class Dataset(BaseModel):
+    """A dataset for an exploration. Consists of repeated ParamSets."""
+    # The name of the dataset.
+    name = ndb.StringProperty()
+    # The schema for the dataset. This is a list of strings with the names of
+    # each parameter.
+    schema = ndb.StringProperty(repeated=True)
+    # A list of parameter sets, each of which fits the schema.
+    param_sets = ndb.KeyProperty(kind=ParamSet, repeated=True)
+
+    def get_random_param_set(self):
+        """Returns a list of parameter values. This is a parameter set that is
+        chosen at random from the dataset."""
+        if not self.param_sets:
+            return None
+        param_set_key = utils.get_random_choice(self.param_sets)
+        return ParamSet.get_by_id(param_set_key.id())
 
 
 # TODO(sll): Add an anyone-can-edit mode.
@@ -55,6 +75,10 @@ class Exploration(BaseModel):
     # exploration, the list is empty. Otherwise, the first element is the
     # original creator of the exploration.
     editors = ndb.UserProperty(repeated=True)
+    # Datasets for this exploration. One set of parameter values is chosen at
+    # random for each dataset when the exploration is loaded. No parameter
+    # name should be repeated between datasets.
+    datasets = ndb.LocalStructuredProperty(Dataset, repeated=True)
 
     def _has_state_named(self, state_name):
         """Checks if a state with the given name exists in this exploration."""
@@ -244,3 +268,71 @@ class Exploration(BaseModel):
 
         for exploration in exploration_list:
             exploration.delete()
+
+    def add_dataset(self, new_name, new_schema):
+        """Adds a new dataset to the exploration."""
+        # Check types.
+        assert isinstance(new_name, str)
+        assert isinstance(new_schema, list)
+        for item in new_schema:
+            assert isinstance(item, str)
+
+        # Check that there are no name collisions.
+        for dataset in self.datasets:
+            if dataset.name == new_name:
+                raise self.InvalidInputException(
+                    'A dataset called %s already exists.' % new_name)
+            for param_name in dataset.schema:
+                if param_name in new_schema:
+                    raise self.InvalidInputException(
+                        'Parameter name %s is already used by another dataset'
+                        % param_name)
+
+        new_dataset = Dataset(name=new_name, schema=new_schema)
+        self.datasets.append(new_dataset)
+        self.put()
+
+    def add_data_to_dataset(self, ds_name, data):
+        """Adds data to the end of a dataset. The data is a list of dicts, with
+        each dict representing a parameter set."""
+        ds_list = [ds for ds in self.datasets if ds.name == ds_name]
+        if not ds_list:
+            raise self.InvalidInputException(
+                'No dataset with name %s found.' % ds_name)
+
+        dataset = ds_list[0]
+
+        assert isinstance(data, list)
+        for params in data:
+            assert isinstance(params, dict)
+            param_set = ParamSet()
+            for key in dataset.schema:
+                if not key in params:
+                    raise KeyError('Key %s not found in parameter set' % key)
+                param = Parameter(name=key, obj_type='UnicodeString',
+                                  values=[params[key]])
+                param_set.params.append(param)
+
+            param_set_key = param_set.put()
+            dataset.param_sets.append(param_set_key)
+
+        self.put()
+
+    def delete_dataset(self, ds_name):
+        """Deletes a dataset and all its parameter sets."""
+        deleted_dataset = None
+        kept_datasets = []
+        for dataset in self.datasets:
+            if dataset.name == ds_name:
+                deleted_dataset = dataset
+            else:
+                kept_datasets.append(dataset)
+
+        if not deleted_dataset:
+            raise Exception('Dataset with name %s does not exist' % ds_name)
+
+        for param_set in deleted_dataset.param_sets:
+            param_set.delete()
+
+        self.datasets = kept_datasets
+        self.put()
