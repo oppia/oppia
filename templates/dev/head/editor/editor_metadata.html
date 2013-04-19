@@ -107,7 +107,7 @@
                <td valign="top" width="100"><progress-bar width="100" height="14" show-guide="false" color1="cornflowerblue" color2="transparent" stat="ruleData.count" total="stateData.count" border-width="0"></progress-bar></td>
                <td>
                  <ul>
-                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]>: <[answer[1]]></li>
+                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="<[answer[1]]> > 1">s</div>)</i></li>
                  </ul>
                </td>
             </tr>
