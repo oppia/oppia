@@ -59,7 +59,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The 'init_state' property must be a valid State.
         with self.assertRaises(BadValueError):
             exploration.init_state = 'The State'
-        state = State(id='The state hash id')
+        state = State(id='The state hash id', parent=exploration.key)
         state.put()
         exploration.init_state = state.key
 

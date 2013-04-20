@@ -18,22 +18,61 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
-from apps.state.models import Content
+from apps.exploration.models import Exploration
 from apps.state.models import State
+from apps.widget.models import InteractiveWidget
+
+from google.appengine.ext.db import BadValueError
+from google.appengine.api.users import User
 
 
 class StateModelUnitTests(test_utils.AppEngineTestBase):
     """Test the state model."""
 
-    def testStateClass(self):
+    def setUp(self):
+        """Loads the default widgets and create sample users and explorations."""
+        super(StateModelUnitTests, self).setUp()
+        InteractiveWidget.load_default_widgets()
+
+        self.user = User(email='test@example.com')
+        self.another_user = User(email='another@user.com')
+
+        self.exploration = Exploration.create(
+            self.user, 'A title', 'A category', 'A exploration_id')
+        self.exploration.put()
+
+    def test_state_class(self):
         """Test State Class."""
-        # TODO(sll): Need to test that this model's parent must be an
+        state = State(id='The exploration hash id')
+
+        # A new state should have a default name property.
+        self.assertEqual(state.name, 'Activity 1')
+
+        # A state that is put into the datastore must have a parent
         # exploration.
-        o = State(id='The hash id')
-        o.name = 'The name'
-        o.content = [Content(type='text', value='The content')]
-        self.assertEqual(o.key.id(), 'The hash id')
-        self.assertEqual(o.name, 'The name')
-        self.assertEqual(len(o.content), 1)
-        self.assertEqual(o.content[0].type, 'text')
-        self.assertEqual(o.content[0].value, 'The content')
+        with self.assertRaises(Exception):
+            state.put()
+
+    def test_create_and_get_state(self):
+        """Test creation and retrieval of states."""
+        id_1 = '123'
+        name_1 = 'State 1'
+        state_1 = State.create(self.exploration, name_1, state_id=id_1)
+        fetched_state_1 = State.get(id_1, self.exploration)
+        self.assertEqual(fetched_state_1, state_1)
+
+        fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)
+        self.assertEqual(fetched_state_by_name_1, state_1)
+
+        # Test the failure cases.
+        fetched_state_2 = State.get('fake_id', self.exploration)
+        self.assertIsNone(fetched_state_2)
+
+        fetched_state_by_name_2 = State.get_by_name(
+            'fake_name', self.exploration, strict=False)
+        self.assertIsNone(fetched_state_by_name_2)
+        with self.assertRaises(Exception):
+            State.get_by_name(name_2, self.exploration, strict=True)
+        # The default behavior is to fail noisily.
+        with self.assertRaises(Exception):
+            State.get_by_name(name_2, self.exploration)

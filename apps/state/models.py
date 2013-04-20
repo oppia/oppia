@@ -95,10 +95,16 @@ class State(BaseModel):
 
     def _pre_put_hook(self):
         """Ensures that the widget and at least one handler for it exists."""
+        # Every state should have a parent exploration.
+        if not self.key.parent():
+            raise Exception('This state does not have a parent exploration.')
+
+        # Every state should have an interactive widget.
         if not self.widget:
             self.widget = self.get_default_widget()
         elif not self.widget.handlers:
             self.widget.handlers = [self.get_default_handler()]
+
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
@@ -114,7 +120,8 @@ class State(BaseModel):
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
     param_changes = ParamChangeProperty(repeated=True)
-    # The interactive widget associated with this state.
+    # The interactive widget associated with this state. Set to be the default
+    # widget if not explicitly specified by the caller.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
     # A dict whose keys are unresolved answers associated with this state, and
     # whose values are their counts.
@@ -125,7 +132,6 @@ class State(BaseModel):
         """Creates a new state."""
         state_id = state_id or cls.get_new_id(name)
         new_state = cls(id=state_id, parent=exploration.key, name=name)
-        new_state.widget = new_state.get_default_widget()
         new_state.put()
         return new_state
 

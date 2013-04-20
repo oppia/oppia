@@ -16,8 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-
 from apps.image.models import Image
 from controllers.base import BaseHandler
 import feconf
@@ -73,6 +71,6 @@ class ImageHandler(BaseHandler):
         raw = self.request.get('image')
         if raw:
             image_id = Image.create(raw)
-            self.response.write(json.dumps({'image_id': image_id}))
+            self.render_json({'image_id': image_id})
         else:
             raise self.InvalidInputException('No image supplied')

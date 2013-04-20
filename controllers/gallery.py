@@ -16,8 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-
 from apps.exploration.models import Exploration
 from controllers.base import BaseHandler
 import utils
@@ -75,4 +73,4 @@ class GalleryHandler(BaseHandler):
         self.values.update({
             'categories': categories,
         })
-        self.response.write(json.dumps(self.values))
+        self.render_json(self.values)

@@ -127,6 +127,10 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values['login_url'] = users.create_login_url(self.request.uri)
 
+    def render_json(self, values):
+        self.response.content_type = 'application/json'
+        self.response.write(json.dumps(values))
+
     def render_template(self, filename, values=None):
         if values is None:
             values = self.values
@@ -144,6 +148,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # This checks if the response should be JSON or HTML.
         if self.request.get('payload'):
+            self.response.content_type = 'application/json'
             self.response.write(json.dumps(values))
         else:
             self.values.update(values)

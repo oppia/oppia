@@ -16,10 +16,36 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
+from controllers import admin
+from controllers.reader import ExplorationHandler
 
-class ReaderTest(test_utils.AppEngineTestBase):
+import json
+import webapp2
+import webtest
 
-    def testReaderPage(self):
-        """Test the reader exploration page."""
-        # TODO(sll): Write tests here.
-        pass
+
+class ReaderControllerUnitTests(test_utils.AppEngineTestBase):
+    """Test the reader controller."""
+
+    def test_exploration_end_to_end(self):
+        """Test a reader's progression through the default exploration."""
+        admin.reload_demos()
+
+        response = self.testapp.get('/learn/0/data')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+        exploration_json = json.loads(response.body)
+        self.assertIn('do you know where the name \'Oppia\'',
+                      exploration_json['oppia_html'])
+        self.assertEqual(exploration_json['title'], 'Welcome to Oppia!')
+        state_id = exploration_json['state_id']
+
+        payload = {'answer': '0', 'block_number': 0, 'handler': 'submit'}
+        response = self.testapp.post(
+            str('/learn/0/%s' % state_id), {'payload': json.dumps(payload)})
+        self.assertEqual(response.status_int, 200)
+
+        exploration_json = json.loads(response.body)
+        self.assertIn('In fact, the word Oppia means \'learn\'.',
+                      exploration_json['oppia_html'])

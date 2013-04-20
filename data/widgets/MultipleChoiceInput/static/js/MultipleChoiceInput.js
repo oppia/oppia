@@ -11,7 +11,6 @@ function MultipleChoiceInput($scope) {
   $scope.$apply();
 
   $scope.submitAnswer = function(answer) {
-    console.log('t');
     if (!answer) {
       return;
     }

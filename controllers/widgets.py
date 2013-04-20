@@ -70,7 +70,7 @@ class WidgetRepositoryHandler(BaseHandler):
         else:
             response = self.get_widgets(NonInteractiveWidget)
 
-        self.response.write(json.dumps({'widgets': response}))
+        self.render_json({'widgets': response})
 
 
 class InteractiveWidgetHandler(BaseHandler):
@@ -79,7 +79,7 @@ class InteractiveWidgetHandler(BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         response = InteractiveWidget.get_with_params(widget_id)
-        self.response.write(json.dumps({'widget': response}))
+        self.render_json({'widget': response})
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
@@ -106,4 +106,4 @@ class InteractiveWidgetHandler(BaseHandler):
                 params, state_params_dict)
         )
 
-        self.response.write(json.dumps({'widget': response}))
+        self.render_json({'widget': response})

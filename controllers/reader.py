@@ -166,7 +166,7 @@ class ExplorationHandler(BaseHandler):
         if init_state.widget.widget_id in DEFAULT_ANSWERS:
             self.values['default_answer'] = (
                 DEFAULT_ANSWERS[init_state.widget.widget_id])
-        self.response.write(json.dumps(self.values))
+        self.render_json(self.values)
 
         EventHandler.record_exploration_visited(exploration_id)
         EventHandler.record_state_hit(exploration_id, init_state.id)
@@ -272,7 +272,7 @@ class ExplorationHandler(BaseHandler):
             values['finished'] = True
             values['interactive_widget_html'] = ''
 
-        self.response.write(json.dumps(values))
+        self.render_json(values)
 
 
 class RandomExplorationPage(BaseHandler):

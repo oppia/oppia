@@ -129,9 +129,7 @@ class NewExploration(BaseHandler):
             exploration = Exploration.create(
                 user, title=title, category=category)
 
-        self.response.write(json.dumps({
-            'explorationId': exploration.id,
-        }))
+        self.render_json({'explorationId': exploration.id})
 
 
 class ForkExploration(BaseHandler):
@@ -158,9 +156,7 @@ class ForkExploration(BaseHandler):
         exploration = Exploration.create_from_yaml(
             yaml_file=yaml, user=user, title=title, category=category)
 
-        self.response.write(json.dumps({
-            'explorationId': exploration.id,
-        }))
+        self.render_json({'explorationId': exploration.id})
 
 
 class ExplorationPage(BaseHandler):
@@ -212,7 +208,7 @@ class ExplorationHandler(BaseHandler):
             'num_completions': statistics['num_completions'],
             'state_stats': statistics['state_stats'],
         })
-        self.response.write(json.dumps(self.values))
+        self.render_json(self.values)
 
     @require_editor
     def post(self, unused_user, exploration):
@@ -225,7 +221,7 @@ class ExplorationHandler(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         state = exploration.add_state(state_name)
-        self.response.write(json.dumps(state.as_dict()))
+        self.render_json(state.as_dict())
 
     @require_editor
     def put(self, user, exploration):
@@ -303,8 +299,7 @@ class StateHandler(BaseHandler):
             state = State.modify_using_dict(
                 exploration, state,
                 utils.dict_from_yaml(yaml_file))
-            self.response.write(json.dumps(
-                get_state_for_frontend(state, exploration)))
+            self.render_json(get_state_for_frontend(state, exploration))
             return
 
         state_name = payload.get('state_name')
@@ -410,8 +405,7 @@ class StateHandler(BaseHandler):
                     state.unresolved_answers[answer] = count
 
         state.put()
-        self.response.write(json.dumps(
-            get_state_for_frontend(state, exploration)))
+        self.render_json(get_state_for_frontend(state, exploration))
 
     @require_editor
     def delete(self, unused_user, exploration, state):
