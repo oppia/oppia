@@ -188,9 +188,15 @@ class Exploration(BaseModel):
             state_list = []
 
             for state_name, state_description in exploration_dict.iteritems():
-                state = (init_state if state_name == init_state_name
-                         else exploration.add_state(state_name))
-                state_list.append({'state': state, 'desc': state_description})
+                if state_name == 'parameters': # not actually a state; list of parameters
+                    params = state_description
+                    for param in params:
+                        exploration.parameters.append(
+                            Parameter(name=param['name'], obj_type=param['obj_type'], values = param['values']))
+                else:
+                    state = (init_state if state_name == init_state_name
+                             else exploration.add_state(state_name))
+                    state_list.append({'state': state, 'desc': state_description})
 
             for index, state in enumerate(state_list):
                 State.modify_using_dict(

@@ -386,7 +386,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   //reset and/or initialize variables for parameter change input
   $scope.resetParamChangeInput = function() {
     $scope.editingParamChange = null; //used to determine what to display in the html
-    //TODO: this can be consolidated with tmpParamName if we decide to keep keying by name
     $scope.tmpParamName = '';
     $scope.tmpParamValues = [];
   };
@@ -415,7 +414,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     });
     // if it was a new parameter, add it to the exploration's parameter list
     if($scope.tmpParamName.id === 'new') {
-      $scope.addParameter(name, 'UnicodeString');//TODO:ask for type(modal?)
+      //$scope.addParameter(name, 'UnicodeString');//TODO:ask for type(modal?)
     }
 
     if (index !== 'New change') {

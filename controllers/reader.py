@@ -121,10 +121,16 @@ class ExplorationHandler(BaseHandler):
         # only if it doesn't exist, but it might be the case that the parameter
         # should be reset each time the state is entered.
         for item in state.param_changes:
-            if item.name not in existing_params:
+            if item.name not in existing_params: # TODO: do this for all params, not just existing
                 # Pick a random parameter for this key.
                 existing_params[item.name] = item.value
         return existing_params
+
+    def get_exploration_params(self, exploration): # TODO: consider merging with get_params somehow, since the process is largely the same
+        params = {};
+        for item in exploration.parameters:
+            params[item.name] = item.value;
+        return params;
 
     def append_feedback(self, feedback, html_output, widget_output,
                         block_number, params):
@@ -144,7 +150,7 @@ class ExplorationHandler(BaseHandler):
         # frontend, and all interaction would happen client-side?
         exploration = Exploration.get(exploration_id)
         init_state = exploration.init_state.get()
-        params = self.get_params(init_state)
+        params = self.get_exploration_params(exploration) # TODO: get params from exploration specification instead
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_raw_code(
@@ -183,7 +189,7 @@ class ExplorationHandler(BaseHandler):
 
         # The 0-based index of the last content block already on the page.
         block_number = payload.get('block_number')
-        params = self.get_params(state, payload.get('params'))
+        params = self.get_params(state, payload.get('params')) # TODO: why does this load params at roughly the same time as the student's answer? params for which state(prev/current/next)?
         # The reader's answer.
         answer = payload.get('answer')
         # The answer handler (submit, click, etc.)
@@ -191,7 +197,8 @@ class ExplorationHandler(BaseHandler):
 
         # Add the reader's answer to the parameter list. This must happen before
         # the interactive widget is constructed.
-        params['answer'] = answer
+        params['answer'] = answer 
+        # TODO: params calculated for old state, then passed to new state? this is probably untested since explorations that use params usually set it in the initial state and params=constants
 
         dest_id, feedback, rule, recorded_answer = state.transition(
             answer, params, handler)

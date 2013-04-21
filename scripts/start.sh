@@ -226,7 +226,7 @@ fi
 
 # Set up a local dev instance
 echo Starting GAE development server in a new shell
-gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
+echo "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
 --host=0.0.0.0 --port=8181 --clear_datastore=yes ."
 
 sleep 5
@@ -238,6 +238,6 @@ echo Opening browser window pointing to an end user interface
 # Do a build.
 python build.py
 
-sh scripts/test.sh
+#sh scripts/test.sh
 
 echo Done!
