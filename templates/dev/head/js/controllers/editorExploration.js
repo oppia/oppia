@@ -287,6 +287,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         'explorationTitle', 'title', newValue, oldValue);
   });
 
+  //TODO: also add values list 
   $scope.addParameter = function(name, type) {
     console.log("adding parameter to exploration");
     $scope.parameters.push({name:name, type:type});

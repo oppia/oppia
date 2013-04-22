@@ -340,7 +340,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     });
     angular.extend($scope.paramSelector.data, namedata);
 
-    var changedata = [{id:'{{input}}', text:'Input'}]; //TODO the student input option only applies to parameter changes that are associated with actions
+    var changedata = [{id:'{{answer}}', text:'Answer'}]; //TODO the student input option only applies to parameter changes that are associated with actions
     $scope.parameters.forEach(function(param){
       changedata.push({id:'{{'+param.name+'}}', text:param.name});
     });
@@ -374,12 +374,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       }
     });
 
-    //$scope.tmpParamValues = $scope.paramChanges[index].values;
-    //TODO: correctly fill the param values field. 
-    //need to either change the structure of paramChanges to fit with the select2 structure (probably the best way) 
-    //or manually re-construct the display text every time from the value string
-    //e.g. {{pname}} -> pname, literalvalue -> "literalvalue"
-
     $scope.initSelectorOptions();
   };
 
@@ -412,10 +406,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.tmpParamValues.forEach(function(val){
       vals.push(val.id);
     });
-    // if it was a new parameter, add it to the exploration's parameter list
-    if($scope.tmpParamName.id === 'new') {
-      //$scope.addParameter(name, 'UnicodeString');//TODO:ask for type(modal?)
-    }
 
     if (index !== 'New change') {
       $scope.paramChanges[index] = {
@@ -430,7 +420,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 
   $scope.deleteParamChange = function (index) {
-    //TODO(yanamal): add category index when this is per-category
     $scope.paramChanges.splice(index, 1);
     $scope.saveParamChanges();
   };

@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 import cgi
 import json
+import logging
 
 from apps.exploration.models import Exploration
 from apps.state.models import Content
@@ -117,19 +118,25 @@ class ExplorationHandler(BaseHandler):
         if existing_params is None:
             existing_params = {}
         # Modify params using param_changes.
-        # TODO(sll): Define this behavior. Currently a new parameter is set
-        # only if it doesn't exist, but it might be the case that the parameter
-        # should be reset each time the state is entered.
         for item in state.param_changes:
-            if item.name not in existing_params: # TODO: do this for all params, not just existing
-                # Pick a random parameter for this key.
-                existing_params[item.name] = item.value
+            # Pick a random parameter for this key.
+            value = item.value;
+            if not value is None:
+              existing_params[item.name] = utils.parse_with_jinja(value, existing_params, value)
+            else:
+                params[item.name] = None
+        logging.info(existing_params);
         return existing_params
 
     def get_exploration_params(self, exploration): # TODO: consider merging with get_params somehow, since the process is largely the same
         params = {};
         for item in exploration.parameters:
-            params[item.name] = item.value;
+            value = item.value;
+            if not value is None:
+                params[item.name] = utils.parse_with_jinja(value, params, value)
+            else:
+                params[item.name] = None
+        logging.info(params);
         return params;
 
     def append_feedback(self, feedback, html_output, widget_output,
