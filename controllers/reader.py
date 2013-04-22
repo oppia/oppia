@@ -156,6 +156,7 @@ class ExplorationHandler(BaseHandler):
         init_state = exploration.init_state.get()
         # TODO: get params from exploration specification instead
         params = self.get_exploration_params(exploration)
+        params = self.get_params(init_state, params)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_raw_code(
