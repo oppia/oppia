@@ -240,6 +240,9 @@ class ExplorationHandler(BaseHandler):
             state = State.get(dest_id, exploration)
             EventHandler.record_state_hit(exploration_id, state_id)
 
+            # Populate new parameters.
+            params = self.get_params(state, existing_params=params)
+
             if feedback:
                 html_output, widget_output = self.append_feedback(
                     feedback, html_output, widget_output, block_number, params)
@@ -261,7 +264,7 @@ class ExplorationHandler(BaseHandler):
         values.update({
             'exploration_id': exploration.id, 'state_id': state.id,
             'oppia_html': html_output, 'widgets': widget_output,
-            'block_number': block_number + 1,
+            'block_number': block_number + 1, 'params': params,
             'finished': (dest_id == feconf.END_DEST),
         })
 
@@ -278,9 +281,6 @@ class ExplorationHandler(BaseHandler):
                             state.widget.params, params)
                     )
                 )
-
-            # Populate new parameters.
-            values['params'] = self.get_params(state, existing_params=params)
         else:
             values['interactive_widget_html'] = ''
 
