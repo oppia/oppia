@@ -240,14 +240,14 @@ class ExplorationHandler(BaseHandler):
             state = State.get(dest_id, exploration)
             EventHandler.record_state_hit(exploration_id, state_id)
 
-            # Populate new parameters.
-            params = self.get_params(state, existing_params=params)
-
             if feedback:
                 html_output, widget_output = self.append_feedback(
                     feedback, html_output, widget_output, block_number, params)
 
+            # Populate new parameters.
+            params = self.get_params(state, existing_params=params)
             # Append text for the new state only if the new and old states
+
             # differ.
             if old_state.id != state.id:
                 state_html, state_widgets = parse_content_into_html(
