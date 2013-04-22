@@ -171,11 +171,8 @@ class Exploration(BaseModel):
         cls, yaml_file, user, title, category, exploration_id=None,
             image_id=None):
         """Creates an exploration from a YAML file."""
-        init_state_name = yaml_file[:yaml_file.index(':\n')]
-        if not init_state_name or '\n' in init_state_name:
-            raise Exception('Invalid YAML file: the name of the initial state '
-                            'should be left-aligned on the first line and '
-                            'followed by a colon')
+        exploration_dict = utils.dict_from_yaml(yaml_file)
+        init_state_name = exploration_dict['states'][0]['name']
 
         exploration = cls.create(
             user, title, category, exploration_id=exploration_id,
@@ -184,19 +181,19 @@ class Exploration(BaseModel):
         init_state = State.get_by_name(init_state_name, exploration)
 
         try:
-            exploration_dict = utils.dict_from_yaml(yaml_file)
-            state_list = []
+            for param in exploration_dict['parameters']:
+                exploration.parameters.append(Parameter(
+                    name=param['name'], obj_type=param['obj_type'],
+                    values=param['values'])
+                )
 
-            for state_name, state_description in exploration_dict.iteritems():
-                if state_name == 'parameters': # not actually a state; list of parameters
-                    params = state_description
-                    for param in params:
-                        exploration.parameters.append(
-                            Parameter(name=param['name'], obj_type=param['obj_type'], values = param['values']))
-                else:
-                    state = (init_state if state_name == init_state_name
-                             else exploration.add_state(state_name))
-                    state_list.append({'state': state, 'desc': state_description})
+            state_list = []
+            exploration_states = exploration_dict['states']
+            for state_description in exploration_states:
+                state_name = state_description['name']
+                state = (init_state if state_name == init_state_name
+                         else exploration.add_state(state_name))
+                state_list.append({'state': state, 'desc': state_description})
 
             for index, state in enumerate(state_list):
                 State.modify_using_dict(
@@ -209,21 +206,26 @@ class Exploration(BaseModel):
 
     def as_yaml(self):
         """Returns a YAML version of the exploration."""
-        init_dict = {}
-        others_dict = {}
+        params = []
+        for param in self.parameters:
+            params.append({'name': param.name, 'obj_type': param.obj_type,
+                           'values': param.values})
+
+        init_states_list = []
+        others_states_list = []
 
         for state_key in self.states:
             state = state_key.get()
             state_internals = state.internals_as_dict(human_readable_dests=True)
 
             if self.init_state.get().id == state.id:
-                init_dict[state.name] = state_internals
+                init_states_list.append(state_internals)
             else:
-                others_dict[state.name] = state_internals
+                others_states_list.append(state_internals)
 
-        result = utils.yaml_from_dict(init_dict)
-        result += utils.yaml_from_dict(others_dict) if others_dict else ''
-        return result
+        full_state_list = init_states_list + others_states_list
+        result_dict = {'parameters': params, 'states': full_state_list}
+        return utils.yaml_from_dict(result_dict)
 
     def is_demo_exploration(self):
         """Checks if the exploration is one of the demo explorations."""

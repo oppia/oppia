@@ -1,4 +1,6 @@
-Taj Mahal on map:
+parameters: []
+states:
+- name: Taj Mahal on map
   content:
   - type: text
     value: '<div><span style="font-style: italic;">This is a test exploration that

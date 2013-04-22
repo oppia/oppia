@@ -1,4 +1,6 @@
-Sentence:
+parameters: []
+states:
+- name: Sentence
   content:
   - type: text
     value: "Yo __________ (jugar) al f\xFAtbol con amigos los domingos\n\nWhat verb\
@@ -31,7 +33,7 @@ Sentence:
     params: {}
     sticky: False
     widget_id: TextInput
-So...:
+- name: So...
   content:
   - type: text
     value: So now put that stem together with the ending, and what is the answer?
@@ -55,7 +57,7 @@ So...:
     params: {}
     sticky: False      
     widget_id: TextInput
-boot verb:
+- name: boot verb
   content:
   - type: text
     value: "Boot verbs can also be called stem-changing verbs.<br>\nWhat is it that\
@@ -86,7 +88,7 @@ boot verb:
     params: {}
     sticky: False      
     widget_id: TextInput
-subject:
+- name: subject
   content:
   - type: text
     value: So what is the subject of the sentence?
@@ -111,7 +113,7 @@ subject:
     params: {}
     sticky: False      
     widget_id: TextInput
-verb endings:
+- name: verb endings
   content:
   - type: text
     value: So what is the correct verb ending for yo?

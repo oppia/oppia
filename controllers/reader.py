@@ -120,24 +120,21 @@ class ExplorationHandler(BaseHandler):
         # Modify params using param_changes.
         for item in state.param_changes:
             # Pick a random parameter for this key.
-            value = item.value;
-            if not value is None:
-              existing_params[item.name] = utils.parse_with_jinja(value, existing_params, value)
-            else:
-                params[item.name] = None
-        logging.info(existing_params);
+            value = item.value
+            existing_params[item.name] = (
+                None if value is None else utils.parse_with_jinja(
+                    value, existing_params, value))
         return existing_params
 
-    def get_exploration_params(self, exploration): # TODO: consider merging with get_params somehow, since the process is largely the same
-        params = {};
+    def get_exploration_params(self, exploration):
+        # TODO(yanamal/sll): consider merging with get_params somehow, since the
+        # process is largely the same
+        params = {}
         for item in exploration.parameters:
-            value = item.value;
-            if not value is None:
-                params[item.name] = utils.parse_with_jinja(value, params, value)
-            else:
-                params[item.name] = None
-        logging.info(params);
-        return params;
+            value = item.value
+            params[item.name] = (None if value is None else
+                                 utils.parse_with_jinja(value, params, value))
+        return params
 
     def append_feedback(self, feedback, html_output, widget_output,
                         block_number, params):
@@ -157,7 +154,8 @@ class ExplorationHandler(BaseHandler):
         # frontend, and all interaction would happen client-side?
         exploration = Exploration.get(exploration_id)
         init_state = exploration.init_state.get()
-        params = self.get_exploration_params(exploration) # TODO: get params from exploration specification instead
+        # TODO: get params from exploration specification instead
+        params = self.get_exploration_params(exploration)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_raw_code(
@@ -196,16 +194,14 @@ class ExplorationHandler(BaseHandler):
 
         # The 0-based index of the last content block already on the page.
         block_number = payload.get('block_number')
-        params = self.get_params(state, payload.get('params')) # TODO: why does this load params at roughly the same time as the student's answer? params for which state(prev/current/next)?
         # The reader's answer.
         answer = payload.get('answer')
         # The answer handler (submit, click, etc.)
         handler = payload.get('handler')
 
-        # Add the reader's answer to the parameter list. This must happen before
-        # the interactive widget is constructed.
-        params['answer'] = answer 
-        # TODO: params calculated for old state, then passed to new state? this is probably untested since explorations that use params usually set it in the initial state and params=constants
+        params = payload.get('params', {})
+        # Add the reader's answer to the parameter list.
+        params['answer'] = answer
 
         dest_id, feedback, rule, recorded_answer = state.transition(
             answer, params, handler)
@@ -265,11 +261,11 @@ class ExplorationHandler(BaseHandler):
         values.update({
             'exploration_id': exploration.id, 'state_id': state.id,
             'oppia_html': html_output, 'widgets': widget_output,
-            'block_number': block_number + 1, 'params': params
+            'block_number': block_number + 1,
+            'finished': (dest_id == feconf.END_DEST),
         })
 
         if dest_id != feconf.END_DEST:
-            values['finished'] = False
             if state.widget.sticky and (
                     state.widget.widget_id == old_state.widget.widget_id):
                 values['interactive_widget_html'] = ''
@@ -282,8 +278,10 @@ class ExplorationHandler(BaseHandler):
                             state.widget.params, params)
                     )
                 )
+
+            # Populate new parameters.
+            values['params'] = self.get_params(state, existing_params=params)
         else:
-            values['finished'] = True
             values['interactive_widget_html'] = ''
 
         self.render_json(values)

@@ -197,8 +197,10 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             self.user, 'A title', 'A category', 'A different exploration_id')
         exploration.add_state('New state')
         yaml_file = exploration.as_yaml()
-        self.assertEqual(yaml_file, """Activity 1:
-  content: []
+        self.assertEqual(yaml_file, """parameters: []
+states:
+- content: []
+  name: Activity 1
   param_changes: []
   widget:
     handlers:
@@ -212,8 +214,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     params: {}
     sticky: false
     widget_id: Continue
-New state:
-  content: []
+- content: []
+  name: New state
   param_changes: []
   widget:
     handlers:

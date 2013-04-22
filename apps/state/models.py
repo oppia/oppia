@@ -149,7 +149,7 @@ class State(BaseModel):
     def internals_as_dict(self, human_readable_dests=False):
         """Gets a Python dict of the internals of the state."""
         state_dict = copy.deepcopy(self.to_dict(
-            exclude=['name', 'unresolved_answers']))
+            exclude=['unresolved_answers']))
         # Remove the computed 'classifier' property.
         for handler in state_dict['widget']['handlers']:
             del handler['classifier']

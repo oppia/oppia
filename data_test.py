@@ -72,14 +72,17 @@ class ExplorationDataUnitTests(DataUnitTest):
         widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
         self.assertTrue(os.path.isdir(widget_dir))
 
-    def verify_state_dict(self, state_dict, curr_state, state_name_list):
+    def verify_state_dict(self, state_dict, state_name_list):
         """Verifies a state dictionary."""
         STATE_DICT_SCHEMA = [
+            ('name', basestring),
             ('content', list), ('param_changes', list), ('widget', dict)]
         self.verify_dict_keys_and_types(state_dict, STATE_DICT_SCHEMA)
 
+        curr_state = state_dict['name']
+
         # TODO(sll): Change the following verification once we move 'content'
-        # to become a parameter.
+        # to become a typed object.
         CONTENT_ITEM_SCHEMA = [('type', basestring), ('value', basestring)]
         for content_item in state_dict['content']:
             self.verify_dict_keys_and_types(content_item, CONTENT_ITEM_SCHEMA)
@@ -153,10 +156,17 @@ class ExplorationDataUnitTests(DataUnitTest):
             # Check that the parameter value has the correct type.
             obj_class.normalize(wp_value)
 
-    def verify_all_states_reachable(self, exploration_dict, init_state_name):
+    def get_state_ind_from_name(self, states_list, state_name):
+        """Given a state name, returns its index in the state list."""
+        for ind, state in enumerate(states_list):
+            if state['name'] == state_name:
+                return ind
+
+    def verify_all_states_reachable(self, states_list):
         """Verifies that all states are reachable from the initial state."""
+        # Stores state names.
         processed_queue = []
-        curr_queue = [init_state_name]
+        curr_queue = [states_list[0]['name']]
         while curr_queue:
             curr_state = curr_queue[0]
             curr_queue = curr_queue[1:]
@@ -166,7 +176,10 @@ class ExplorationDataUnitTests(DataUnitTest):
 
             processed_queue.append(curr_state)
 
-            for handler in exploration_dict[curr_state]['widget']['handlers']:
+            curr_state_ind = self.get_state_ind_from_name(
+                states_list, curr_state)
+
+            for handler in states_list[curr_state_ind]['widget']['handlers']:
                 for rule in handler['rules']:
                     dest_state = rule['dest']
                     if (dest_state not in curr_queue and
@@ -174,14 +187,15 @@ class ExplorationDataUnitTests(DataUnitTest):
                             dest_state != feconf.END_DEST):
                         curr_queue.append(dest_state)
 
-        if len(exploration_dict) != len(processed_queue):
+        if len(states_list) != len(processed_queue):
             unseen_states = list(
-                set(exploration_dict.keys()) - set(processed_queue))
+                set([s['name'] for s in states_list]) - set(processed_queue))
             raise Exception('The following states are not reachable from the'
                             'initial state: %s' % ', '.join(unseen_states))
 
-    def verify_no_dead_ends(self, exploration_dict):
+    def verify_no_dead_ends(self, states_list):
         """Verifies that the END state is reachable from all states."""
+        # Stores state names.
         processed_queue = []
         curr_queue = [feconf.END_DEST]
         while curr_queue:
@@ -194,49 +208,55 @@ class ExplorationDataUnitTests(DataUnitTest):
             if curr_state != feconf.END_DEST:
                 processed_queue.append(curr_state)
 
-            for state_name in exploration_dict:
+            for ind, state in enumerate(states_list):
+                state_name = state['name']
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
-                    state_widget = exploration_dict[state_name]['widget']
+                    state_widget = states_list[ind]['widget']
                     for handler in state_widget['handlers']:
                         for rule in handler['rules']:
                             if rule['dest'] == curr_state:
                                 curr_queue.append(state_name)
                                 break
 
-        if len(exploration_dict) != len(processed_queue):
+        if len(states_list) != len(processed_queue):
             dead_end_states = list(
-                set(exploration_dict.keys()) - set(processed_queue))
+                set([s['name'] for s in states_list]) - set(processed_queue))
             raise Exception('The END state is not reachable from the following'
                             'states: %s' % ', '.join(dead_end_states))
 
-    def verify_exploration_dict(self, exploration_dict, init_state_name):
+    def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""
+        EXPLORATION_SCHEMA = [('parameters', list), ('states', list)]
+        self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
+
+        PARAMETER_SCHEMA = [('name', basestring), ('values', list),
+                            ('obj_type', basestring)]
+        for param in exploration_dict['parameters']:
+            self.verify_dict_keys_and_types(param, PARAMETER_SCHEMA)
+            # TODO(sll): Test that the elements of 'values' are of the correct
+            # type.
+
+        # Verify there is at least one state.
+        self.assertTrue(exploration_dict['states'])
+
         state_name_list = []
-        for state_name in exploration_dict:
+        for state_desc in exploration_dict['states']:
+            state_name = state_desc['name']
             if state_name in state_name_list:
                 raise Exception('Duplicate state name: %s' % state_name)
-            if state_name == init_state_name:
-                state_name_list = [init_state_name] + state_name_list
-            else:
-                state_name_list.append(state_name)
+            state_name_list.append(state_name)
 
-        for state_name, state_dict in exploration_dict.iteritems():
-            self.verify_state_dict(state_dict, state_name, state_name_list)
+        for state_desc in exploration_dict['states']:
+            self.verify_state_dict(state_desc, state_name_list)
 
-        self.verify_all_states_reachable(exploration_dict, init_state_name)
-        self.verify_no_dead_ends(exploration_dict)
+        self.verify_all_states_reachable(exploration_dict['states'])
+        self.verify_no_dead_ends(exploration_dict['states'])
 
     def verify_exploration_yaml(self, exploration_yaml):
         """Verifies an exploration YAML file."""
-        init_state_name = exploration_yaml[:exploration_yaml.find(':\n')]
-        if not init_state_name or '\n' in init_state_name:
-            raise Exception('Invalid YAML file: the name of the initial state '
-                            'should be left-aligned on the first line and '
-                            'followed by a colon')
-
         exploration_dict = utils.dict_from_yaml(exploration_yaml)
-        self.verify_exploration_dict(exploration_dict, init_state_name)
+        self.verify_exploration_dict(exploration_dict)
 
     def test_default_explorations_are_valid(self):
         """Test the default explorations."""

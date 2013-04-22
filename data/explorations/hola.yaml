@@ -1,4 +1,6 @@
-Hola:
+parameters: []
+states:
+- name: Hola
   content:
   - type: text
     value: "Let's speak Spanish. If you ever don't understand what is being said,\
@@ -32,8 +34,6 @@ Hola:
       - dest: Hola
         feedback:
         - 'Hola means Hello.
-
-
           Say Hello back (in Spanish).'
         inputs: {}
         name: Default
@@ -41,7 +41,7 @@ Hola:
     params: {}
     sticky: False      
     widget_id: TextInput
-Adios:
+- name: Adios
   content:
   - type: text
     value: "\xA1Ay! \xBF\xA150 pesos para una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
@@ -73,7 +73,7 @@ Adios:
     params: {}
     sticky: False      
     widget_id: TextInput
-Colores:
+- name: Colores
   content:
   - type: text
     value: "\xBFDe qu\xE9 colores son las manzanas?"
@@ -129,7 +129,7 @@ Colores:
       - I don't know
     sticky: False      
     widget_id: MultipleChoiceInput
-Como meaning:
+- name: Como meaning
   content:
   - type: text
     value: "So, \"te llamas\" looks a lot like \"me llamo.\"\n<br>And this sentence\
@@ -168,7 +168,7 @@ Como meaning:
     params: {}
     sticky: False      
     widget_id: TextInput
-Me llamo:
+- name: Me llamo
   content:
   - type: text
     value: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
@@ -204,7 +204,7 @@ Me llamo:
     params: {}
     sticky: False      
     widget_id: TextInput
-Me llamo meaning:
+- name: Me llamo meaning
   content:
   - type: text
     value: Can you say what "Me llamo" means?
@@ -245,7 +245,7 @@ Me llamo meaning:
     params: {}
     sticky: False      
     widget_id: TextInput
-Supermercado:
+- name: Supermercado
   content:
   - type: text
     value: "\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\

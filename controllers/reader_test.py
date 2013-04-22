@@ -17,11 +17,8 @@ __author__ = 'Sean Lip'
 import test_utils
 
 from controllers import admin
-from controllers.reader import ExplorationHandler
 
 import json
-import webapp2
-import webtest
 
 
 class ReaderControllerUnitTests(test_utils.AppEngineTestBase):

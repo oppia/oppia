@@ -1,4 +1,6 @@
-Welcome!:
+parameters: []
+states:
+- name: Welcome!
   content:
   - type: text
     value: Oppia is a tool that helps you create interactive learning explorations
@@ -39,7 +41,7 @@ Welcome!:
       - It's the name of a popular cartoon character.
     sticky: False      
     widget_id: MultipleChoiceInput
-Estimate 100:
+- name: Estimate 100
   content:
   - type: text
     value: What is 10 times 10?
@@ -65,7 +67,7 @@ Estimate 100:
     params: {}
     sticky: False    
     widget_id: NumericInput
-Music widget:
+- name: Music widget
   content:
   - type: text
     value: 'You might want to build something more complicated than that, though.
@@ -112,7 +114,7 @@ Music widget:
       noteToGuess: B4
     sticky: True
     widget_id: MusicStaff
-Numeric input:
+- name: Numeric input
   content:
   - type: text
     value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
@@ -168,7 +170,7 @@ Numeric input:
     params: {}
     sticky: False    
     widget_id: NumericInput
-Things you can do:
+- name: Things you can do
   content:
   - type: text
     value: 'That''s a very quick sample of Oppia. For more sample explorations, check
@@ -193,7 +195,7 @@ Things you can do:
     params: {}
     sticky: False    
     widget_id: Continue
-What language:
+- name: What language
   content:
   - type: text
     value: In fact, the word Oppia means 'learn'. Can you guess which language it
@@ -218,8 +220,6 @@ What language:
           by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
           comes from, and Oppius isn''t the language (or person) that we''re looking
           for.
-
-
           (Please feel free to search on the Web for the answer, by the way; this
           is admittedly a factual question which not many people will know the answer
           to.)'
@@ -233,8 +233,6 @@ What language:
           by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
           comes from, and Oppius isn''t the language (or person) that we''re looking
           for.
-
-
           (Please feel free to search on the Web for the answer, by the way; this
           is admittedly a factual question which not many people will know the answer
           to.)'
@@ -268,8 +266,6 @@ What language:
       - dest: Numeric input
         feedback:
         - 'Yes! Oppia is the Finnish word for learn.
-
-
           As you can see, you''re not limited to multiple-choice questions here. For
           example, you could ask for numeric answers, text answers, sets of strings,
           and so on. You can even write your own types of questions. Here is a question

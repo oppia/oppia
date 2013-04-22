@@ -1,4 +1,6 @@
-Question:
+parameters: []
+states:
+- name: Question
   content:
   - type: text
     value: How many ways are there to arrange three balls in a row?
@@ -21,7 +23,7 @@ Question:
     params: {}
     sticky: False    
     widget_id: NumericInput
-List the ways:
+- name: List the ways
   content:
   - type: text
     value: All right! So you think there are {{answer}} ways to arrange the balls.
@@ -38,8 +40,6 @@ List the ways:
       - dest: List the ways
         feedback:
         - 'What? No more ways? There''s at least one, surely -- for example, RYB.
-
-
           Or maybe you clicked the ''Submit'' button before you clicked the ''Add
           element'' button. You''ll need to build up the set first, and then, once
           you''re happy with your answer, click Submit.'
@@ -131,7 +131,7 @@ List the ways:
     params: {}
     sticky: False    
     widget_id: SetInput
-Prompt for explanation:
+- name: Prompt for explanation
   content:
   - type: text
     value: OK, why do you think it is 6?
@@ -148,7 +148,7 @@ Prompt for explanation:
     params: {}
     sticky: False      
     widget_id: TextInput
-Prompt for explanation with all ways listed:
+- name: Prompt for explanation with all ways listed
   content:
   - type: text
     value: Do you think you've got all of them?<div><br></div><div>If so, how do you
