@@ -248,7 +248,6 @@ class ExplorationHandler(BaseHandler):
             # Populate new parameters.
             params = self.get_params(state, existing_params=params)
             # Append text for the new state only if the new and old states
-
             # differ.
             if old_state.id != state.id:
                 state_html, state_widgets = parse_content_into_html(

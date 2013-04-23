@@ -223,21 +223,19 @@ if [ ! -d "third_party/static/yui3-gallery-20121107" ]; then
   rm -rf third_party/static/yui3-gallery-gallery-2012.11.07-21-32
 fi
 
+# Do a build.
+python build.py
+
+# Run the tests.
+sh scripts/test.sh
 
 # Set up a local dev instance
-echo Starting GAE development server in a new shell
-gnome-terminal -e "python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py \
---host=0.0.0.0 --port=8181 --clear_datastore=yes ."
+echo Starting GAE development server
+python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
 
 sleep 5
 
 echo Opening browser window pointing to an end user interface
 /opt/google/chrome/chrome http://localhost:8181/ &
-
-
-# Do a build.
-python build.py
-
-sh scripts/test.sh
 
 echo Done!
