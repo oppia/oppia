@@ -28,10 +28,7 @@ states:
     - name: submit
       rules:
       - dest: Road
-        feedback:
-        - 'You get: a name tag. It says "Hello, I''m {{answer}}!"
-
-          You also get a pretty red towel.'
+        feedback: []
         inputs: {}
         name: Default
         param_changes: []
@@ -241,8 +238,10 @@ states:
     widget_id: TextInput
 - content:
   - type: text
-    value: You are standing in a small courtyard. To the north is a gate, with a sign:<div>"This
-      way to adventure!"</div>
+    value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
+      also get a pretty red <span style="font-weight: bold;">towel</span>.</div></div><div><br></div>You
+      are standing in a small courtyard. To the north is a gate, with a sign:<div>"This
+      way to adventure!"</div>'
   name: Road
   param_changes:
   - name: Name
@@ -283,7 +282,7 @@ states:
     widget_id: MultipleChoiceInput
 - content:
   - type: text
-    value: You pick a pretty bouquet of flowers.
+    value: 'You pick a pretty bouquet of <span style="font-weight: bold;">flowers</span>.'
   name: picking
   param_changes:
   - name: sneezeitem
@@ -357,7 +356,7 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: He gives you the coins and uses his magic to return you back to the troll
+    value: He gives you the <span style="font-weight: bold;">coins</span> and uses his magic to return you back to the troll
   name: get coins
   param_changes:
   - name: payitem
