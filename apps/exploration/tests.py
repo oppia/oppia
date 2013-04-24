@@ -268,7 +268,7 @@ states:
         self.assertEqual(Exploration.query().count(), 0)
 
         Exploration.load_demo_explorations()
-        self.assertEqual(Exploration.query().count(), 6)
+        self.assertEqual(Exploration.query().count(), 7)
 
         Exploration.delete_demo_explorations()
         self.assertEqual(Exploration.query().count(), 0)

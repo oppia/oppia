@@ -1,0 +1,410 @@
+parameters:
+- name: Name
+  obj_type: UnicodeString
+  values: []
+- name: Weapon
+  obj_type: UnicodeString
+  values: []
+- name: sneezeitem
+  obj_type: UnicodeString
+  values: []
+- name: payitem
+  obj_type: UnicodeString
+  values: []
+- name: numcoins
+  obj_type: UnicodeString
+  values: []
+- name: Test
+  obj_type: UnicodeString
+  values: []
+states:
+- content:
+  - type: text
+    value: Hello, brave adventurer! What is your name?&nbsp;
+  name: Welcome
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Road
+        feedback:
+        - 'You get: a name tag. It says "Hello, I''m {{answer}}!"
+
+          You also get a pretty red towel.'
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      placeholder: Type your answer here.
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: 'You are standing at a fork in the road. The main road goes to the <span
+      style="font-weight: bold;">northeast</span>, while a smaller path winds to the
+      <span style="font-weight: bold;">northwest</span>.'
+  name: Fork
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Troll
+        feedback:
+        - You go northeast
+        inputs:
+          x: northeast
+        name: contains(x)
+        param_changes: []
+      - dest: Clearing
+        feedback:
+        - You go northwest
+        inputs:
+          x: northwest
+        name: contains(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You go northeast
+        inputs:
+          x: ne
+        name: starts_with(x)
+        param_changes: []
+      - dest: Clearing
+        feedback:
+        - You go northwest
+        inputs:
+          x: nw
+        name: starts_with(x)
+        param_changes: []
+      - dest: Fork
+        feedback:
+        - You cannot go back
+        - The gate is closed
+        - There is no way back. You must carry on!
+        inputs:
+          x: back
+        name: contains(x)
+        param_changes: []
+      - dest: Fork
+        feedback:
+        - Pardon?
+        - Nothing happens
+        - Maybe you should pick a direction to go in. Northwest or Northeast?
+        - I'm not sure how to {{answer}}
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      placeholder: Type your answer here.
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: 'You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
+      {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
+      is a path leading back to the <span style="font-weight: bold;">southwest</span>.</div>'
+  name: Troll
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Fork
+        feedback:
+        - You go southwest
+        inputs:
+          x: southwest
+        name: contains(x)
+        param_changes: []
+      - dest: Fork
+        feedback:
+        - You go southwest
+        inputs:
+          x: sw
+        name: starts_with(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You use nothing. Nothing happens.
+        inputs:
+          x: use nothing
+        name: starts_with(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You do nothing. nothing happens.
+        inputs:
+          x: nothing
+        name: contains(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You flail at the troll with your {{Weapon}}. He is not amused.
+        inputs:
+          x: '{{Weapon}}'
+        name: contains(x)
+        param_changes: []
+      - dest: pre-rainbow
+        feedback:
+        - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
+          he sneezes really loudly and you are carried away by the gust...
+        inputs:
+          x: '{{sneezeitem}}'
+        name: contains(x)
+        param_changes: []
+      - dest: END
+        feedback:
+        - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
+          \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
+          \ and toward victory!"
+        inputs:
+          x: '{{payitem}}'
+        name: contains(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You don't have that!
+        inputs:
+          x: use
+        name: starts_with(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - You flail at the troll with your bare hands. He is not amused.
+        inputs:
+          x: troll
+        name: contains(x)
+        param_changes: []
+      - dest: Troll
+        feedback:
+        - Pardon?
+        - I don't know how to {{answer}}
+        - I don't understand
+        - Have you tried using things? (use [item])
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      placeholder: Type your answer here.
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: 'You are at a clearing. There are lots of pretty <span style="font-weight:
+      bold;">flowers</span> here.<div>There is a path leading back to the <span style="font-weight:
+      bold;">southeast</span>.</div>'
+  name: Clearing
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: picking
+        feedback: []
+        inputs:
+          x: pick
+        name: contains(x)
+        param_changes: []
+      - dest: picking
+        feedback: []
+        inputs:
+          x: flower
+        name: contains(x)
+        param_changes: []
+      - dest: Fork
+        feedback:
+        - You go southeast
+        inputs:
+          x: southeast
+        name: contains(x)
+        param_changes: []
+      - dest: Fork
+        feedback:
+        - You go southeast
+        inputs:
+          x: se
+        name: starts_with(x)
+        param_changes: []
+      - dest: Clearing
+        feedback:
+        - Pardon?
+        - Huh?
+        - Did you mean "pick some flowers"?
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      placeholder: Type your answer here.
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: You are standing in a small courtyard. To the north is a gate, with a sign:<div>"This
+      way to adventure!"</div>
+  name: Road
+  param_changes:
+  - name: Name
+    obj_type: UnicodeString
+    values:
+    - '{{answer}}'
+  - name: Weapon
+    obj_type: UnicodeString
+    values:
+    - towel
+  - name: sneezeitem
+    obj_type: UnicodeString
+    values:
+    - nothing
+  - name: payitem
+    obj_type: UnicodeString
+    values:
+    - nothing
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Fork
+        feedback: []
+        inputs:
+          x: 0
+        name: equals(x)
+        param_changes: []
+      - dest: Fork
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      choices:
+      - Go north
+    sticky: false
+    widget_id: MultipleChoiceInput
+- content:
+  - type: text
+    value: You pick a pretty bouquet of flowers.
+  name: picking
+  param_changes:
+  - name: sneezeitem
+    obj_type: UnicodeString
+    values:
+    - flowers
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Clearing
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: Continue
+- content:
+  - type: text
+    value: '<span style="line-height: 1.22;">"Guess how many coins I''m holding!"</span><br>'
+  name: Rainbow
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: get coins
+        feedback:
+        - Correct!
+        inputs:
+          x: '{{numcoins}}'
+        name: equals(x)
+        param_changes: []
+      - dest: Rainbow
+        feedback:
+        - Actually, I can't hold any more than 10 coins. My hands are too small.
+        inputs:
+          x: 10.0
+        name: is_greater_than(x)
+        param_changes: []
+      - dest: Rainbow
+        feedback:
+        - I do have some coins!
+        inputs:
+          x: 1.0
+        name: is_less_than(x)
+        param_changes: []
+      - dest: Rainbow
+        feedback:
+        - No, fewer than that!
+        inputs:
+          x: '{{numcoins}}'
+        name: is_greater_than(x)
+        param_changes: []
+      - dest: Rainbow
+        feedback:
+        - More than that!
+        inputs:
+          x: '{{numcoins}}'
+        name: is_less_than(x)
+        param_changes: []
+      - dest: Rainbow
+        feedback:
+        - This should never happen
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: NumericInput
+- content:
+  - type: text
+    value: He gives you the coins and uses his magic to return you back to the troll
+  name: get coins
+  param_changes:
+  - name: payitem
+    obj_type: UnicodeString
+    values:
+    - coins
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Troll
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: Continue
+- content:
+  - type: text
+    value: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
+      says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
+  name: pre-rainbow
+  param_changes:
+  - name: numcoins
+    obj_type: UnicodeString
+    values:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+    - '6'
+    - '7'
+    - '8'
+    - '9'
+    - '10'
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: Rainbow
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params:
+      placeholder: Type your answer here.
+    sticky: false
+    widget_id: TextInput

@@ -56,6 +56,7 @@ DEMO_EXPLORATIONS = [
     ('boot_verbs', 'Boot Verbs', 'Languages', 'boot_verbs.png'),
     ('hola', '¡Hola!', 'Languages'),
     ('landmarks', 'Landmarks', 'Geography'),
+    ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
 ]
 
 # Whether to unconditionally log info messages.
