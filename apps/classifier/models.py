@@ -57,11 +57,16 @@ class Classifier(BaseModel):
             classifier.key.delete()
 
     @classmethod
+    def get_classifier_ids(cls):
+        """Gets a list of the classifiers in the system."""
+        return [d for d in os.listdir(feconf.SAMPLE_CLASSIFIERS_DIR)
+                if os.path.isdir(
+                    os.path.join(feconf.SAMPLE_CLASSIFIERS_DIR, d))]
+
+    @classmethod
     def load_default_classifiers(cls):
         """Loads the default classifiers."""
-        classifier_ids = [d for d in os.listdir(feconf.SAMPLE_CLASSIFIERS_DIR)
-                          if os.path.isdir(
-                              os.path.join(feconf.SAMPLE_CLASSIFIERS_DIR, d))]
+        classifier_ids = cls.get_classifier_ids()
 
         for classifier_id in classifier_ids:
             rules_filepath = os.path.join(

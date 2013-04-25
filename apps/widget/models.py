@@ -28,6 +28,7 @@ import feconf
 import utils
 
 from google.appengine.ext import ndb
+from google.appengine.ext.db import BadValueError
 from google.appengine.ext.ndb import polymodel
 
 
@@ -35,7 +36,7 @@ class AnswerHandler(ndb.Model):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     # TODO(sll): Store a reference instead?
-    classifier = ndb.StringProperty()
+    classifier = ndb.StringProperty(choices=Classifier.get_classifier_ids())
 
     @property
     def rules(self):
@@ -70,6 +71,12 @@ class Widget(polymodel.PolyModel):
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
         return cls.get_by_id(widget_id)
+
+    def put(self):
+        """The put() method should only be called on subclasses of Widget."""
+        if self.__class__.__name__ == 'Widget':
+            raise NotImplementedError
+        super(Widget, self).put()
 
     @classmethod
     def get_raw_code(cls, widget_id, params=None):
@@ -138,7 +145,8 @@ class InteractiveWidget(Widget):
 
     def _pre_put_hook(self):
         """Ensures that at least one handler exists."""
-        assert len(self.handlers)
+        if not self.handlers:
+            raise BadValueError('Widget %s has no handlers defined' % self.name)
 
     def _get_handler(self, handler_name):
         """Get the handler object corresponding to a given handler name."""

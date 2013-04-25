@@ -356,7 +356,7 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: He gives you the <span style="font-weight: bold;">coins</span> and uses his magic to return you back to the troll
+    value: 'He gives you the <span style="font-weight: bold;">coins</span> and uses his magic to return you back to the troll.'
   name: get coins
   param_changes:
   - name: payitem

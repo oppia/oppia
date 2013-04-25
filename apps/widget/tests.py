@@ -16,10 +16,43 @@
 
 __author__ = 'Jeremy Emerson'
 
+from apps.classifier.models import Classifier
+from apps.widget.models import AnswerHandler
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
 from apps.widget.models import Widget
 import test_utils
+
+from google.appengine.ext.db import BadValueError
+
+
+class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
+    """Test AnswerHandler models."""
+
+    def setUp(self):
+        """Loads the default classifiers."""
+        super(AnswerHandlerUnitTests, self).setUp()
+        Classifier.load_default_classifiers()
+
+    def test_rules_property(self):
+        """Test that answer_handler.rules behaves as expected."""
+        answer_handler = AnswerHandler()
+        answer_handler.put()
+        self.assertEqual(answer_handler.name, 'submit')
+        self.assertEqual(answer_handler.rules, [])
+
+        answer_handler.classifier = 'MultipleChoiceClassifier'
+        answer_handler.put()
+        self.assertEqual(len(answer_handler.rules), 1)
+
+    def test_fake_classifier_is_not_accepted(self):
+        """Test validation of answer_handler.classifier."""
+        answer_handler = AnswerHandler()
+        with self.assertRaises(BadValueError):
+            answer_handler.classifier = 'FakeClassifier'
+
+        answer_handler = AnswerHandler(classifier='MultipleChoiceClassifier')
+        answer_handler.put()
 
 
 class WidgetUnitTests(test_utils.AppEngineTestBase):
@@ -36,3 +69,32 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
         Widget.delete_all_widgets()
         self.assertEqual(Widget.query().count(), 0)
+
+    def test_put_method(self):
+        """Test that put() only works when called on a Widget subclass."""
+        widget = Widget(
+            name='Widget Name', category='Category', template='Template')
+        with self.assertRaises(NotImplementedError):
+            widget.put()
+
+        widget = InteractiveWidget(
+            name='Widget Name', category='Category', template='Template',
+            handlers=[AnswerHandler()])
+        widget.put()
+
+    def test_required_properties(self):
+        """Test validation of required widget properties."""
+        widget = InteractiveWidget(name='Widget Name')
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.category = 'Category'
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.template = 'Template'
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.handlers = [AnswerHandler()]
+        widget.put()
