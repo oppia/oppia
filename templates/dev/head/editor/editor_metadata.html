@@ -111,7 +111,12 @@
                </td>
             </tr>
             <tr>
-               <td valign="top" width="200">No answer</td>
+               <td valign="top" width="200">No answer given 
+                  <img class="oppia-help" src="/images/help.png" 
+                    ui-jq="tooltip" ng-hide="isPublic" 
+                    title="The student navigated away from the page 
+                           without entering an answer." />
+               </td>
                <td valign="top" width="100"><bar-chart width=100 height=30 show-legend="false" chart-colors="ruleChartColors" chart-data="stateData.no_answer_chartdata"></bar-chart></td>
                <td></td>
             </tr>
