@@ -55,7 +55,6 @@ oppia.directive('list', function (warningsData) {
         }
         $scope.closeItemEditor();
       };
-
       $scope.deleteItem = function(index) {
         $scope.deleteIndex = '';
         $scope.items.splice(index, 1);
@@ -64,11 +63,32 @@ oppia.directive('list', function (warningsData) {
   };
 });
 
-oppia.directive('progressBar', function() {
+oppia.directive('barChart', function() {
   return {
     restrict: 'E',
-    scope: {height: '=', width: '=', showGuide: '@', color1: '@', color2: '@', stat: '=', total: '=', type: '@', remainderType: '@', borderWidth: '@'},
-    templateUrl: '/templates/progress_bar',
+    scope: {chartData: '=', chartColors: '='},
+    controller: function($scope, $element, $attrs) {
+      var chart = new google.visualization.BarChart($element[0]);
+      $scope.$watch($attrs.chartData, function(value) {
+        value = $scope.chartData;
+        var data = google.visualization.arrayToDataTable(value);
+        var legendPosition = 'right';
+        if ($attrs.showLegend == 'false') {
+          legendPosition = 'none';
+        }
+        var options =  {
+          title: $attrs.chartTitle,
+          colors: $scope.chartColors,
+          isStacked: true,
+          width: $attrs.width,
+          height: $attrs.height,
+          legend: {position: legendPosition},
+          hAxis: {gridlines: {color: 'transparent'}},
+          chartArea: {width: $attrs.chartAreaWidth, left:0}
+        }
+        chart.draw(data, options);
+      });
+    }
   };
 });
 

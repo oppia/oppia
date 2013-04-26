@@ -95,7 +95,8 @@ def get_exploration_stats(exploration):
             for _, count in answers[state_id]['rules'][rule]['answers']:
                 state_stats[state_id]['rule_stats'][rule]['count'] += count
                 full_count += count
-        state_stats[state_id]['no_answer_count'] = state_counts[state_id]['count'] - full_count
+            state_stats[state_id]['rule_stats'][rule]['chartData'] = [['', 'This rule', 'Other answers'], ['', state_stats[state_id]['rule_stats'][rule]['count'], state_stats[state_id]['count'] - state_stats[state_id]['rule_stats'][rule]['count']]]
+        state_stats[state_id]['no_answer_chartdata'] =  [['', 'This rule', 'Other answers'], ['',  state_counts[state_id]['count'] - full_count, full_count]];
     return {
         'num_visits': num_visits,
         'num_completions': num_completions,
