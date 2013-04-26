@@ -270,6 +270,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       'stateStats': data.state_stats
     };
 
+    $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
+    $scope.chartColors = ['green', 'firebrick'];
+    $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
+
     explorationFullyLoaded = true;
 
     if ($scope.stateId) {

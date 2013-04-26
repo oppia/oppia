@@ -78,10 +78,8 @@
 </div>
 
 <br>
-
 <div ng-show="stats.numVisits > 0">
-  <strong>Completion rate</strong>
-  <progress-bar width="200" height="20" show-guide="true" color1="green" color2="firebrick" stat="stats.numCompletions" total="stats.numVisits" type="completions" remainder-type="non-completions" border-width="1"></progress-bar>
+  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width=500 height=100 chart-area-width=300></bar-chart>
   <br><br>
 
   <table>
@@ -104,7 +102,8 @@
           <table ng-show="stateData.count > 0">
             <tr ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'count':true">
                <td valign="top" width="200"><[rule]></td>
-               <td valign="top" width="100"><progress-bar width="100" height="14" show-guide="false" color1="cornflowerblue" color2="transparent" stat="ruleData.count" total="stateData.count" border-width="0"></progress-bar></td>
+               <td valign="top" width="100">
+                 <bar-chart chart-colors="ruleChartColors" chart-data="ruleData.chartData" width=100 height=30 show-legend="false"></bar-chart></td>
                <td>
                  <ul>
                    <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="<[answer[1]]> > 1">s</div>)</i></li>
@@ -112,8 +111,13 @@
                </td>
             </tr>
             <tr>
-               <td valign="top" width="200">No answer</td>
-               <td valign="top" width="100"><progress-bar width="100" height="14" show-guide="false" color1="cornflowerblue" color2="transparent" stat="stateData.no_answer_count" total="stateData.count" border-width="0"></progress-bar></td>
+               <td valign="top" width="200">No answer given 
+                  <img class="oppia-help" src="/images/help.png" 
+                    ui-jq="tooltip" ng-hide="isPublic" 
+                    title="The student navigated away from the page 
+                           without entering an answer." />
+               </td>
+               <td valign="top" width="100"><bar-chart width=100 height=30 show-legend="false" chart-colors="ruleChartColors" chart-data="stateData.no_answer_chartdata"></bar-chart></td>
                <td></td>
             </tr>
           </table>

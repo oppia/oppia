@@ -88,14 +88,20 @@ def get_exploration_stats(exploration):
             'count': state_counts[state_id]['count'],
             'rule_stats': {},
         }
-        full_count = 0
+        all_rule_count = 0
+        state_count = state_counts[state_id]['count']
         for rule in answers[state_id]['rules'].keys():
             state_stats[state_id]['rule_stats'][rule] = answers[state_id]['rules'][rule]
-            state_stats[state_id]['rule_stats'][rule]['count'] = 0
+            rule_count = 0
             for _, count in answers[state_id]['rules'][rule]['answers']:
-                state_stats[state_id]['rule_stats'][rule]['count'] += count
-                full_count += count
-        state_stats[state_id]['no_answer_count'] = state_counts[state_id]['count'] - full_count
+                rule_count += count
+                all_rule_count += count
+            state_stats[state_id]['rule_stats'][rule]['chartData'] = [
+                ['', 'This rule', 'Other answers'],
+                ['', rule_count, state_count - rule_count]]
+        state_stats[state_id]['no_answer_chartdata'] = [
+                ['', 'No answer', 'Answer given'], 
+                ['',  state_count - all_rule_count, all_rule_count]]
     return {
         'num_visits': num_visits,
         'num_completions': num_completions,
