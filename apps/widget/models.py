@@ -95,11 +95,8 @@ class Widget(polymodel.PolyModel):
         return utils.parse_with_jinja(widget.template, parameters)
 
     @classmethod
-    def get_with_params(cls, widget_id, params=None):
+    def get_with_params(cls, widget_id, params):
         """Gets a parameterized widget."""
-        if params is None:
-            params = {}
-
         widget = cls.get(widget_id)
 
         result = copy.deepcopy(widget.to_dict())
@@ -109,15 +106,6 @@ class Widget(polymodel.PolyModel):
         # {key: {value: ..., obj_type: ...}}
         result['params'] = dict((param.name, params.get(param.name, param.value))
                                 for param in widget.params)
-
-        for handler in widget.handlers:
-            for r_handler in result['handlers']:
-                if r_handler['classifier'] == handler.classifier:
-                    rule_dict = {}
-                    for rule in handler.rules:
-                        rule_dict[rule.name] = {
-                            'classifier': rule.rule, 'checks': rule.checks}
-                    r_handler['rules'] = rule_dict
 
         return result
 
@@ -141,19 +129,25 @@ class NonInteractiveWidget(Widget):
 
 class InteractiveWidget(Widget):
     """A generic interactive widget."""
+
     handlers = ndb.StructuredProperty(AnswerHandler, repeated=True)
 
     def _pre_put_hook(self):
-        """Ensures that at least one handler exists."""
+        # Checks that at least one handler exists.
         if not self.handlers:
-            raise BadValueError('Widget %s has no handlers defined' % self.name)
+            raise BadValueError(
+                'Widget %s has no handlers defined' % self.name)
+
+        # Checks that all handler names are unique.
+        names = [handler.name for handler in self.handlers]
+        if len(set(names)) != len(names):
+            raise BadValueError(
+                'There are duplicate names in the handler for widget %s'
+                % self.id)
 
     def _get_handler(self, handler_name):
         """Get the handler object corresponding to a given handler name."""
-        for handler in self.handlers:
-            if handler.name == handler_name:
-                return handler
-        return None
+        return next((h for h in self.handlers if h.name == handler_name), None)
 
     @classmethod
     def load_default_widgets(cls):
@@ -181,8 +175,21 @@ class InteractiveWidget(Widget):
     def get_readable_name(self, handler_name, rule_rule):
         """Get the human-readable text for a rule."""
         handler = self._get_handler(handler_name)
-        for rule in handler.rules:
-            if rule.rule == rule_rule:
-                return rule.name
+        rule = next(r.name for r in handler.rules if r.rule == rule_rule)
 
+        if rule:
+            return rule
         raise Exception('No rule name found for %s' % rule_rule)
+
+    @classmethod
+    def get_with_params(cls, widget_id, params):
+        result = super(InteractiveWidget, cls).get_with_params(widget_id, params)
+
+        widget = cls.get(widget_id)
+
+        for idx, handler in enumerate(widget.handlers):
+            result['handlers'][idx]['rules'] = dict(
+                (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
+                for rule in handler.rules)
+
+        return result

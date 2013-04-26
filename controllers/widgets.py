@@ -49,6 +49,8 @@ class WidgetRepositoryHandler(BaseHandler):
 
     def get_widgets(self, widget_class):
         """Load widgets from the datastore."""
+        assert widget_class in [InteractiveWidget, NonInteractiveWidget]
+
         response = {}
 
         for widget in widget_class.query():
