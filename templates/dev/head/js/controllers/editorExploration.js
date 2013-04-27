@@ -103,7 +103,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
     console.log('Getting state data for state ' + stateId);
     explorationData.stateId = stateId;
-    if ('states' in explorationData.data && stateId in explorationData.data.states) {
+    if (explorationData.data && 'states' in explorationData.data &&
+        stateId in explorationData.data.states) {
       return explorationData.data.states[stateId];
     } else {
       explorationData.getData();
