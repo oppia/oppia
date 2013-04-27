@@ -82,6 +82,27 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
             handlers=[AnswerHandler()])
         widget.put()
 
+    def test_pre_put_validation(self):
+        """Test pre-put checks for widget handlers."""
+        widget = InteractiveWidget(
+            name='Widget Name', category='Category', template='Template')
+        widget.handlers = []
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.handlers = [AnswerHandler(), AnswerHandler()]
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.handlers = [
+            AnswerHandler(name='click'), AnswerHandler(name='click')]
+        with self.assertRaises(BadValueError):
+            widget.put()
+
+        widget.handlers = [
+            AnswerHandler(name='submit'), AnswerHandler(name='click')]
+        widget.put()
+
     def test_required_properties(self):
         """Test validation of required widget properties."""
         widget = InteractiveWidget(name='Widget Name')
@@ -98,3 +119,40 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
         widget.handlers = [AnswerHandler()]
         widget.put()
+
+    def test_parameterized_widget(self):
+        """Test that parameterized widgets are correctly handled."""
+        self.assertEqual(Widget.query().count(), 0)
+
+        Classifier.load_default_classifiers()
+        InteractiveWidget.load_default_widgets()
+
+        widget = InteractiveWidget.get('MusicStaff')
+        self.assertEqual(widget.id, 'MusicStaff')
+        self.assertEqual(widget.name, 'Music staff')
+
+        code = Widget.get_raw_code('MusicStaff')
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
+
+        code = Widget.get_raw_code('MusicStaff', {'noteToGuess': 'abc'})
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');', code)
+
+        # The get_with_params() method cannot be called directly on Widget.
+        # It must be called on a subclass.
+        with self.assertRaises(AttributeError):
+            parameterized_widget_dict = Widget.get_with_params(
+                'MusicStaff', {'noteToGuess': 'abc'})
+        with self.assertRaises(NotImplementedError):
+            parameterized_widget_dict = Widget._get_with_params(
+                'MusicStaff', {'noteToGuess': 'abc'})
+
+        parameterized_widget_dict = InteractiveWidget.get_with_params(
+            'MusicStaff', {'noteToGuess': 'abc'})
+        self.assertItemsEqual(parameterized_widget_dict.keys(), [
+            'id', 'name', 'category', 'description', 'template', 'params',
+            'handlers', 'raw'])
+        self.assertEqual(parameterized_widget_dict['id'], 'MusicStaff')
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');',
+                      parameterized_widget_dict['raw'])
+        self.assertEqual(parameterized_widget_dict['params'],
+                         {'noteToGuess': 'abc'})

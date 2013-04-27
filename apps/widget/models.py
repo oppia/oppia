@@ -87,26 +87,32 @@ class Widget(polymodel.PolyModel):
         widget = cls.get(widget_id)
 
         # Parameters used to generate the raw code for the widget.
-        parameters = {}
-        for param in widget.params:
-            parameters[param.name] = params.get(
-                param.name, utils.convert_to_js_string(param.value))
+        parameters = dict(
+            (param.name, utils.convert_to_js_string(
+                params.get(param.name, param.value))
+            ) for param in widget.params)
 
         return utils.parse_with_jinja(widget.template, parameters)
 
     @classmethod
-    def get_with_params(cls, widget_id, params):
-        """Gets a parameterized widget."""
+    def _get_with_params(cls, widget_id, params):
+        """Gets a dict representing a parameterized widget.
+
+        This method must be called on a subclass of Widget.
+        """
+        if cls.__name__ == 'Widget':
+            raise NotImplementedError
+
         widget = cls.get(widget_id)
-
-        result = copy.deepcopy(widget.to_dict())
-        result['id'] = widget_id
-        result['raw'] = cls.get_raw_code(widget_id, params)
-        # TODO(sll): Restructure this so that it is
-        # {key: {value: ..., obj_type: ...}}
-        result['params'] = dict((param.name, params.get(param.name, param.value))
-                                for param in widget.params)
-
+        result = copy.deepcopy(widget.to_dict(exclude=['class_']))
+        result.update({
+            'id': widget_id,
+            'raw': cls.get_raw_code(widget_id, params),
+            # TODO(sll): Restructure this so that it is
+            # {key: {value: ..., obj_type: ...}}
+            'params': dict((param.name, params.get(param.name, param.value))
+                           for param in widget.params),
+        })
         return result
 
     @classmethod
@@ -123,7 +129,7 @@ class NonInteractiveWidget(Widget):
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets."""
-        # TODO(sll): Implement this.
+        # TODO(sll): Implement this method.
         pass
 
 
@@ -183,7 +189,8 @@ class InteractiveWidget(Widget):
 
     @classmethod
     def get_with_params(cls, widget_id, params):
-        result = super(InteractiveWidget, cls).get_with_params(widget_id, params)
+        """Gets a dict representing a parameterized widget."""
+        result = super(InteractiveWidget, cls)._get_with_params(widget_id, params)
 
         widget = cls.get(widget_id)
 
