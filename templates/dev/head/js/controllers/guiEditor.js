@@ -53,9 +53,14 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
   };
 
-  // Initializes the GuiEditor.
-  $scope.init(explorationData.getStateData($scope.$parent.stateId));
-  console.log('Initializing GUI editor');
+  explorationData.get().success(
+    function(data) {
+      explorationData.data = data;
+      // Initializes the GuiEditor.
+      $scope.init(explorationData.getStateData($scope.$parent.stateId));
+      console.log('Initializing GUI editor');
+    }
+  );
 
   $scope.$on('explorationData', function() {
     // TODO(sll): Does this actually receive anything?

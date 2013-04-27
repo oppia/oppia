@@ -69,6 +69,9 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
+  explorationData.get = function() {
+    return $http.get(explorationUrl + '/data');
+  };
 
   explorationData.getData = function() {
     // Retrieve data from the server.

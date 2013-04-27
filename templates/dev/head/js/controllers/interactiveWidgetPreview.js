@@ -19,7 +19,12 @@
  */
 
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
-  var data = explorationData.getStateData($scope.stateId);
+  explorationData.get().success(
+    function(data) {
+      explorationData.data = data;
+      $scope.initInteractiveWidget(explorationData.getStateData($scope.stateId));
+    }
+  );
 
   $scope.showPreview = true;
 
@@ -78,10 +83,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
   };
-
-  if (data) {
-    $scope.initInteractiveWidget(data);
-  }
 
   $scope.getStateNameForRule = function(stateId) {
     if (stateId === $scope.stateId) {
