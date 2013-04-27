@@ -87,9 +87,10 @@ class Widget(polymodel.PolyModel):
         widget = cls.get(widget_id)
 
         # Parameters used to generate the raw code for the widget.
+        # TODO(sll): Why do we convert only the default value to a JS string?
         parameters = dict(
-            (param.name, utils.convert_to_js_string(
-                params.get(param.name, param.value))
+            (param.name, params.get(
+                param.name, utils.convert_to_js_string(param.value))
             ) for param in widget.params)
 
         return utils.parse_with_jinja(widget.template, parameters)

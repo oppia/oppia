@@ -135,7 +135,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
 
         code = Widget.get_raw_code('MusicStaff', {'noteToGuess': 'abc'})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');', code)
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');', code)
 
         # The get_with_params() method cannot be called directly on Widget.
         # It must be called on a subclass.
@@ -152,7 +152,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
             'id', 'name', 'category', 'description', 'template', 'params',
             'handlers', 'raw'])
         self.assertEqual(parameterized_widget_dict['id'], 'MusicStaff')
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');',
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');',
                       parameterized_widget_dict['raw'])
         self.assertEqual(parameterized_widget_dict['params'],
                          {'noteToGuess': 'abc'})
