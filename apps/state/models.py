@@ -143,7 +143,8 @@ class State(BaseModel):
     def as_dict(self):
         """Gets a Python dict representation of the state."""
         state_dict = self.internals_as_dict()
-        state_dict.update({'id': self.id, 'name': self.name})
+        state_dict.update({'id': self.id, 'name': self.name,
+                           'unresolved_answers': self.unresolved_answers})
         return state_dict
 
     def internals_as_dict(self, human_readable_dests=False):

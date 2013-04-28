@@ -60,7 +60,6 @@ def get_state_for_frontend(state, exploration):
                     )
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
-    state_repr['widget']['sticky'] = state_repr['widget']['sticky']
 
     state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
     return state_repr
