@@ -2,6 +2,19 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+v1.0.4 (28 Apr 2013)
+--------------------
+* Add tooltips for progress bars in the exploration statistics page.
+* Add information in the exploration statistics page about the number of readers who left an exploration without submitting an answer.
+* Add a new exploration ('Parametrized Adventure') showing how parameters can be used to retain the reader's state.
+* Fix a routing bug that caused the state editor page to occasionally break when reloaded.
+* Upgrade App Engine version from 1.7.4 to 1.7.7.
+* In progress: Add dataset functionality, so that editors can easily upload many questions that have the same type but different parameters; Oppia would pick a random one to show the reader.
+* In progress: Add exploration-level parameter initialization.
+* Change the format of the exploration YAML files used to store the default explorations, to include exploration-level initial parameters.
+* Add tests to cover all models except Statistics.
+* Restructure the codebase slightly to ease the upcoming port of Oppia to the django-nonrel framework.
+
 v1.0.3 (13 Apr 2013)
 --------------------
 * Allow the same interactive widget to persist through multiple rounds of reader answers so that the reader does not lose previous work. (The widget still disappears when the reader moves to a state that uses a different interactive widget.)
