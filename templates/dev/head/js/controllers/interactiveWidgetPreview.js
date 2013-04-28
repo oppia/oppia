@@ -19,13 +19,6 @@
  */
 
 function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
-  explorationData.get().success(
-    function(data) {
-      explorationData.data = data;
-      $scope.initInteractiveWidget(explorationData.getStateData($scope.stateId));
-    }
-  );
-
   $scope.showPreview = true;
 
   // Sets the 'showPreview' variable. The input is a boolean.
@@ -83,6 +76,20 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
   };
+
+  if ($scope.stateId) {
+    var dataOrPromise = explorationData.getStateData($scope.stateId);
+    console.log(dataOrPromise);
+    if (dataOrPromise) {
+      if ('then' in dataOrPromise) {
+        dataOrPromise.then($scope.initInteractiveWidget);
+      } else {
+        $scope.initInteractiveWidget(dataOrPromise);
+      }
+    } else {
+      console.log('No state data exists for state ' + $scope.stateId);
+    }
+  }
 
   $scope.getStateNameForRule = function(stateId) {
     if (stateId === $scope.stateId) {
