@@ -69,28 +69,24 @@
 
           <div class="tab-content">
             <div class="tab-pane active" id="explorationMap">
-              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
-                <a ng-click="activeInputData.name = 'explorationMetadata'">
-                  View exploration properties
-                </a>
-              </div>
+
+              <button ng-click="activeInputData.name = 'explorationMetadata'" ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
+                Show exploration metadata
+              </button>
+
+              <button ng-click="activeInputData.clear()" ng-show="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
+                Hide exploration metadata
+              </button>
 
               <div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
-                <span class="pull-right">
-                  <a ng-click="activeInputData.clear()">
-                    Return to map
-                  </a>
-                </span>
-                <br>
                 {% include 'editor/views/editor_metadata.html' %}
+                <br>
               </div>
 
-              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0">
-                {% include 'editor/views/editor_viz.html' %}
-              </div>
+              {% include 'editor/views/editor_viz.html' %}
             </div>
 
-            <div class="tab-pane active" id="statsViewer">
+            <div class="tab-pane" id="statsViewer">
               {% include 'editor/views/stats_viewer.html' %}
             </div>
 
