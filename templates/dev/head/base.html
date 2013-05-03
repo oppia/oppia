@@ -119,12 +119,12 @@
     {% include 'footer_js_libs.html' %}
 
     <script>
-      {{ include_js_file('js/app.js') }}
-      {{ include_js_file('js/directives/directives.js') }}
-      {{ include_js_file('js/filters/filters.js') }}
-      {{ include_js_file('js/services/activeInputData.js') }}
-      {{ include_js_file('js/services/warningsData.js') }}
-      {{ include_js_file('js/controllers/base.js') }}
+      {{ include_js_lib_file('app.js') }}
+      {{ include_js_lib_file('directives/directives.js') }}
+      {{ include_js_lib_file('filters/filters.js') }}
+      {{ include_js_lib_file('services/activeInputData.js') }}
+      {{ include_js_lib_file('services/warningsData.js') }}
+      {{ include_js_lib_file('controllers/base.js') }}
     </script>
 
     {% block additional_footer_js %}

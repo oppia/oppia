@@ -32,7 +32,7 @@ class GalleryPage(BaseHandler):
             'js': utils.get_js_controllers(['gallery']),
             'nav_mode': 'gallery',
         })
-        self.render_template('gallery.html')
+        self.render_template('gallery/gallery.html')
 
 
 class GalleryHandler(BaseHandler):

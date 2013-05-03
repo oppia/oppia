@@ -33,7 +33,7 @@ class FeedbackPage(BaseHandler):
             'js': utils.get_js_controllers(['feedback']),
             'nav_mode': 'feedback',
         })
-        self.render_template('feedback.html')
+        self.render_template('feedback/feedback.html')
 
     def post(self):
         """Handles POST requests."""

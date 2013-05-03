@@ -36,7 +36,7 @@ class MainPage(BaseHandler):
         self.values.update({
             'gallery_login_url': users.create_login_url('/gallery'),
         })
-        self.render_template('index.html')
+        self.render_template('pages/index.html')
 
 
 class AboutPage(BaseHandler):
@@ -49,7 +49,7 @@ class AboutPage(BaseHandler):
             'idea_contributors_str': utils.get_comma_sep_string_from_list(
                 feconf.IDEA_CONTRIBUTORS),
         })
-        self.render_template('about.html')
+        self.render_template('pages/about.html')
 
 
 class TermsPage(BaseHandler):
@@ -57,4 +57,4 @@ class TermsPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        self.render_template('terms.html')
+        self.render_template('pages/terms.html')

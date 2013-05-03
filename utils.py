@@ -64,7 +64,7 @@ def get_js_controllers(filenames):
     """Concatenates the given JS files (specified without the '.js' suffix)."""
     return '\n'.join([
         get_file_contents(
-            os.path.join(feconf.TEMPLATE_DIR, 'js/controllers/%s.js' % filename)
+            os.path.join(feconf.TEMPLATE_DIR, 'lib/js/controllers/%s.js' % filename)
         ) for filename in filenames
     ])
 
