@@ -1,9 +1,18 @@
+{% macro add_state_form() -%}
+  <form ng-submit="addState(newStateDesc)">
+    <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add New State Name" required>
+    <datalist id="states">
+      <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
+    </datalist>
+  </form>
+{%- endmacro %}
+
+
 <h4>
   Visualizations
   <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
        title="These visualizations show how the exploration's states are linked. You can access each state's editor by clicking on its node.">
 </h4>
-
 
 <ul class="nav nav-tabs">
   <li class="active"><a href="#graph" data-toggle="tab">Graph</a></li>
@@ -13,7 +22,7 @@
 <div class="tab-content">
   <div class="tab-pane active" id="graph">
     <div ng-controller="EditorGraph">
-      {% include 'editor/add_state.html' %}
+      {{ add_state_form() }}
       <em>Click on a state node in the diagram below to edit it.</em>
       <state-graph-viz val="graphData" grouped="grouped">
       </state-graph-viz>
@@ -21,7 +30,7 @@
   </div>
   <div class="tab-pane" id="tree">
     <div ng-controller="EditorTree">
-      {% include 'editor/add_state.html' %}
+      {{ add_state_form() }}
       <em>Click 'Edit' to edit the corresponding node.</em>
       <state-tree-viz val="treeData" grouped="grouped">
       </state-tree-viz>

@@ -62,7 +62,7 @@ urls = [
 
     (r'/feedback/?', feedback.FeedbackPage),
 
-    (r'/resources/(%s)/?' % r, resources.LibHandler),
+    (r'/editor_views/(%s)/?' % r, resources.EditorViewHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),
     (r'/imagehandler/?', resources.ImageHandler),
     (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),

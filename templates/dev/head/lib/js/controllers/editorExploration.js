@@ -29,10 +29,10 @@ var YAML_EDITOR_URL = '/text';
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
       when(YAML_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/yaml', controller: YamlEditor}).
+           {templateUrl: '/editor_views/yaml_editor', controller: YamlEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/gui', controller: GuiEditor}).
-      when('/', {templateUrl: '/templates/gui', controller: ExplorationTab}).
+           {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
+      when('/', {templateUrl: '/editor_views/gui_editor', controller: ExplorationTab}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -325,10 +325,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
-              explorationData.getData();
-              if (successCallback) {
-                successCallback(data);
-              }
+              window.location = $scope.explorationUrl;
             }).error(function(data) {
               warningsData.addWarning(
                   'Server error when adding state: ' + data.error);

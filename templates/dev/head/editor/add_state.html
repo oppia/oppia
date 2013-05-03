@@ -1,6 +1,0 @@
-<form ng-submit="addState(newStateDesc)">
-  <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add New State Name" required>
-  <datalist id="states">
-    <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
-  </datalist>
-</form>
