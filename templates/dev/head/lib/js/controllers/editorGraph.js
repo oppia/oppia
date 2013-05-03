@@ -31,6 +31,7 @@ function EditorGraph($scope, $filter, explorationData) {
     var VERT_OFFSET = 20;
     var HORIZ_SPACING = 150;
     var VERT_SPACING = 100;
+    var HORIZ_OFFSET = 100;
     var nodes = {};
     nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
     for (var state in states) {
@@ -41,9 +42,9 @@ function EditorGraph($scope, $filter, explorationData) {
     var maxDepth = 0;
     var seenNodes = [initStateId];
     var queue = [initStateId];
-    var maxXDistPerLevel = {0: 50};
+    var maxXDistPerLevel = {0: HORIZ_OFFSET};
     nodes[initStateId].y0 = VERT_OFFSET;
-    nodes[initStateId].x0 = 50;
+    nodes[initStateId].x0 = HORIZ_OFFSET;
 
     while (queue.length > 0) {
       var currNode = queue[0];
@@ -60,8 +61,8 @@ function EditorGraph($scope, $filter, explorationData) {
               nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
               maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
             } else {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = 50;
-              maxXDistPerLevel[nodes[currNode].depth + 1] = 50;
+              nodes[states[currNode].widget.rules.submit[i].dest].x0 = HORIZ_OFFSET;
+              maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
             }
             maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
             queue.push(states[currNode].widget.rules.submit[i].dest);
@@ -70,7 +71,7 @@ function EditorGraph($scope, $filter, explorationData) {
       }
     }
 
-    var horizPositionForLastRow = 50;
+    var horizPositionForLastRow = HORIZ_OFFSET;
     for (var node in nodes) {
       if (nodes[node].depth == SENTINEL_DEPTH) {
         nodes[node].depth = maxDepth + 1;
@@ -121,7 +122,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
   var MAX_CATEGORY_LENGTH = 20;
 
   var getEllipseWidth = function(text) {
-    return 20 + text.length * 3;
+    return 20 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 3;
   };
 
   return {
@@ -281,7 +282,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('width', 20)
             .attr('opacity', 0)
             .attr('transform', function(d) {
-              return 'translate(' + (d.name.length * 3) + ',' + (-30) + ')'; }
+              return 'translate(' + (getEllipseWidth(d.name) - 20) + ',' + (-30) + ')'; }
             )
             .attr('stroke-width', '0')
             .on('click', function (d) {
@@ -292,7 +293,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
             });
 
         nodeEnter.append('svg:text')
-            .attr('dx', function(d) { return d.x0 + d.name.length * 3; })
+            .attr('dx', function(d) { return d.x0 + getEllipseWidth(d.name) - 20; })
             .attr('dy', function(d) { return d.y0 - 20; })
             .text(function(d) {
               if (d.hashId == initStateId || d.hashId == END_DEST) {
