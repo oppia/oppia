@@ -120,6 +120,10 @@ oppia.directive('stateGraphViz', function(explorationData) {
   // The following variable must be at least 3.
   var MAX_CATEGORY_LENGTH = 20;
 
+  var getEllipseWidth = function(text) {
+    return 20 + text.length * 3;
+  };
+
   return {
     restrict: 'E',
     scope: {
@@ -221,14 +225,21 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('class', 'node');
 
         // Add nodes to the canvas.
-        nodeEnter.append('svg:circle')
+        nodeEnter.append('svg:ellipse')
             .attr('cy', function(d) { return d.y0; })
             .attr('cx', function(d) { return d.x0; })
-            .attr('r', function(d) {
+            .attr('rx', function(d) {
               if (d.hashId == initStateId) {
                 return 40;
               } else {
-                return DEFAULT_CIRCLE_RADIUS;
+                return getEllipseWidth(d.name);
+              }
+            })
+            .attr('ry', function(d) {
+              if (d.hashId == initStateId) {
+                return 40;
+              } else {
+                return 30;
               }
             })
             .attr('class', function(d) {
@@ -257,7 +268,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .text(function(d) { return d.name; });
 
         nodeEnter.append('svg:text')
-            .attr('dx', function(d) { return d.x0 - DEFAULT_CIRCLE_RADIUS + 5; })
+            .attr('dx', function(d) { return d.x0 - getEllipseWidth(d.name) + 5; })
             .attr('dy', function(d) { return d.y0; })
             .text(function(d) { return scope.truncate(d.name); });
 
@@ -269,17 +280,19 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('height', 20)
             .attr('width', 20)
             .attr('opacity', 0)
-            .attr('transform', function(d) { return 'translate(' + (20) + ',' + (-30) + ')'; })
+            .attr('transform', function(d) {
+              return 'translate(' + (d.name.length * 3) + ',' + (-30) + ')'; }
+            )
             .attr('stroke-width', '0')
             .on('click', function (d) {
-              if (d.hashId == initStateId) {
+              if (d.hashId == initStateId || d.hashId == END_DEST) {
                 return;
               }
               scope.$parent.$parent.openDeleteStateModal(d.hashId);
             });
 
         nodeEnter.append('svg:text')
-            .attr('dx', function(d) { return d.x0 + 20; })
+            .attr('dx', function(d) { return d.x0 + d.name.length * 3; })
             .attr('dy', function(d) { return d.y0 - 20; })
             .text(function(d) {
               if (d.hashId == initStateId || d.hashId == END_DEST) {

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $routeParams, explorationData, warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
     promise.then(function(data) {
@@ -428,5 +428,5 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
+GuiEditor.$inject = ['$scope', '$routeParams', 'explorationData',
     'warningsData', 'activeInputData'];

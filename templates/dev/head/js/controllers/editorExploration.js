@@ -20,13 +20,11 @@
 
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
-// TODO(sll): Internationalize these.
 var GUI_EDITOR_URL = '/gui';
 var YAML_EDITOR_URL = '/text';
 
-// TODO(sll): Move all strings to the top of the file, particularly
-// warning messages and activeInputData.name.
-// TODO(sll): console.log is not supported in IE. Fix before launch.
+// TODO(sll): Move all strings to the top of the file and internationalize them.
+// TODO(sll): console.log is not supported in IE.
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
@@ -154,7 +152,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     explorationFullyLoaded = true;
 
     if ($scope.stateId) {
-      $scope.processStateData(explorationData.getStateData($scope.stateId));
+      $scope.stateName = data.name;
     }
   });
 
@@ -337,25 +335,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             });
   };
 
-  $scope.$on('stateData', function() {
-    $scope.stateId = explorationData.stateId;
-    $scope.processStateData(explorationData.getStateData($scope.stateId));
-  });
-
-  /**
-   * Sets up the state editor, given its data from the backend.
-   * @param {Object} data Data received from the backend about the state.
-   */
-  $scope.processStateData = function(data) {
-    $scope.stateId = explorationData.stateId;
-    $scope.stateName = data.name;
-  };
-
   $scope.getStateName = function(stateId) {
-    if (!stateId) {
-      return '[none]';
-    }
-    return explorationData.getStateProperty(stateId, 'name');
+    return stateId ? explorationData.data.states[stateId].name : '[none]';
   };
 
   $scope.openDeleteStateModal = function(stateId) {
@@ -378,7 +359,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
     .success(function(data) {
-      // TODO(sll): Try and handle this without reloading the page.
       window.location = $scope.explorationUrl;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');

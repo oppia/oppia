@@ -24,7 +24,6 @@
   // Initializes the YAML textarea using data from the backend.
   explorationData.getData().then(function(data) {
     var stateData = explorationData.getStateData($scope.stateId);
-    $scope.processStateData(stateData);
     $scope.yaml = stateData.yaml;
   });
 

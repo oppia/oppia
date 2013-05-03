@@ -361,7 +361,7 @@ textarea {
   stroke-width: 1.5px;
 }
 
-.oppia-graph-viz circle {
+.oppia-graph-viz ellipse {
   fill: #ccc;
   stroke: #333;
   stroke-width: 1.5px;

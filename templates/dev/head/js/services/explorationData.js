@@ -92,16 +92,13 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
     console.log(
         'Getting state property ' + property + ' for state ' + stateId);
-    var stateData = explorationData.getStateData(stateId);
-    if (!stateData) {
-      warningsData.addWarning('Cannot get data for state ' + stateId);
-      return;
-    }
-    if (!stateData.hasOwnProperty(property)) {
-      warningsData.addWarning('Invalid property name: ' + property);
-      return;
-    }
-    return stateData[property];
+    return explorationData.getStateData(stateId).then(function(stateData) {
+      if (!stateData.hasOwnProperty(property)) {
+        warningsData.addWarning('Invalid property name: ' + property);
+        return;
+      }
+      return stateData[property];
+    });
   };
 
   // Saves data for a given state to the backend, and, on a success callback,
