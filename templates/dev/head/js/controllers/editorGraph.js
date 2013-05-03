@@ -21,7 +21,6 @@
 function EditorGraph($scope, $filter, explorationData) {
   // When the exploration data is loaded, construct the graph.
   explorationData.getData().then(function(data) {
-    console.log(data);
     $scope.graphData = $scope.reformatResponse(
         data.states, data.init_state_id);
   });

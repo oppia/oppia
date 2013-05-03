@@ -110,7 +110,10 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     } else {
       $location.path('');
       explorationData.stateId = '';
-      explorationData.getData();
+      $scope.stateId = '';
+      // TODO(sll): If $apply() is not called, the $scope.stateId change does
+      // not propagate and the 'State Details' tab is still shown. Why?
+      $scope.$apply();
     }
   });
 
@@ -156,13 +159,19 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    $scope.saveExplorationProperty(
-        'explorationCategory', 'category', newValue, oldValue);
+    // Do not save on the initial data load.
+    if (oldValue !== undefined) {
+      $scope.saveExplorationProperty(
+          'explorationCategory', 'category', newValue, oldValue);
+    }
   });
 
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
-    $scope.saveExplorationProperty(
-        'explorationTitle', 'title', newValue, oldValue);
+    // Do not save on the initial data load.
+    if (oldValue !== undefined) {
+      $scope.saveExplorationProperty(
+          'explorationTitle', 'title', newValue, oldValue);
+    }
   });
 
   //TODO: also add values list 

@@ -39,21 +39,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   var explorationUrl = '/create/' + pathnameArray[2];
 
-  // There should be one GET request made for an exploration when the editor page
-  // is initially loaded. This results in a broadcast that will initialize the
-  // relevant frontend controllers.
-  // Any further GET requests will be state-specific and will be obtained by
-  // calling getStateData(stateId).
-  // Thereafter, any updates to the model would be PUT by calling
-  // saveStateData(). This would send a PUT request to the backend to update the
-  // backend model. On success, it will update the model stored here, too.
-
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
-  explorationData.get = function() {
-    return $http.get(explorationUrl + '/data');
-  };
 
+  // Returns a promise that supplies the data for the current exploration.
   explorationData.getData = function() {
     if (explorationData.data) {
       console.log('Found exploration data in cache.');
@@ -63,8 +52,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       return deferred.promise;
     } else {
       // Retrieve data from the server.
-      console.log('Retrieving exploration data from the server');
-
       var promise = $http.get(explorationUrl + '/data').then(
         function(response) {
           console.log('Retrieved exploration data.');
@@ -77,33 +64,23 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
   };
 
-  explorationData.broadcastState = function(stateId) {
-    if (!stateId) {
-      return;
-    }
-    explorationData.stateId = stateId;
-    console.log('Broadcasting data for state ' + explorationData.stateId);
-    $rootScope.$broadcast('explorationData');
-  };
-
+  // Returns a promise that supplies the data for the given state.
   explorationData.getStateData = function(stateId) {
-    // Returns the data for the given state, or a promise that supplies it.
     if (!stateId) {
       return;
     }
+
     console.log('Getting state data for state ' + stateId);
     explorationData.stateId = stateId;
     console.log(explorationData.data);
 
     if (explorationData.data && 'states' in explorationData.data &&
         stateId in explorationData.data.states) {
-      return explorationData.data.states[stateId];
+      var deferred = $q.defer();
+      deferred.resolve(explorationData.data.states[stateId]);
+      return deferred.promise;
     } else {
-      console.log('Retrieving data from server.');
-      return explorationData.get().then(function(response) {
-        console.log('Received data from server.');
-        console.log(response.data);
-        explorationData.data = response.data;
+      return explorationData.getData().then(function(response) {
         return explorationData.data.states[stateId];
       });
     }
@@ -113,7 +90,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     if (!stateId) {
       return;
     }
-    // NB: This does not broadcast an event.
     console.log(
         'Getting state property ' + property + ' for state ' + stateId);
     var stateData = explorationData.getStateData(stateId);
@@ -129,8 +105,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   };
 
   // Saves data for a given state to the backend, and, on a success callback,
-  // updates the data for that state in the frontend and broadcasts an
-  // 'state updated' event.
+  // updates the data for that state in the frontend.
   explorationData.saveStateData = function(stateId, propertyValueMap) {
     for (var property in propertyValueMap) {
       if (validStateProperties.indexOf(property) < 0) {
@@ -150,7 +125,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       warningsData.clear();
       console.log('Changes to this state were saved successfully.');
       explorationData.data['states'][stateId] = data;
-      explorationData.broadcastState(stateId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
