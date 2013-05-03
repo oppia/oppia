@@ -106,6 +106,9 @@ FOOTER_JS_FILES = [
     os.path.join(TEMPLATE_DIR, 'js/filters/filters.js'),
     os.path.join(TEMPLATE_DIR, 'js/services/activeInputData.js'),
     os.path.join(TEMPLATE_DIR, 'js/services/warningsData.js'),
+    # TODO(sll): The following file should not be necessary unless we are on
+    # the exploration editor page.
+    os.path.join(TEMPLATE_DIR, 'js/services/explorationData.js'),
     os.path.join(TEMPLATE_DIR, 'js/controllers/base.js'),
 ]
 

@@ -20,9 +20,9 @@
 
 function EditorTree($scope, $filter, explorationData) {
   // When the exploration data is loaded, construct the tree.
-  $scope.$on('explorationData', function() {
+  explorationData.getData().then(function(data) {
     $scope.treeData = $scope.reformatResponse(
-        explorationData.data.states, explorationData.data.init_state_id);
+        data.states, data.init_state_id);
   });
 
   $scope.truncate = function(text) {

@@ -19,6 +19,14 @@
  */
 
 function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
+  explorationData.getData().then(function(data) {
+    var dataOrPromise = explorationData.getStateData($scope.$parent.stateId);
+    if (dataOrPromise) {
+      $scope.init(explorationData.getStateData($scope.$parent.stateId));
+      $scope.updateMath();
+    }
+  });
+
   $scope.$parent.stateId = $routeParams.stateId;
 
   $scope.init = function(data) {
@@ -69,16 +77,6 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       console.log('No state data exists for state ' + $scope.$parent.stateId);
     }
   }
-
-  $scope.$on('explorationData', function() {
-    // TODO(sll): Does this actually receive anything?
-    console.log('Init content');
-    var dataOrPromise = explorationData.getStateData($scope.$parent.stateId);
-    if (dataOrPromise) {
-      $scope.init(explorationData.getStateData($scope.$parent.stateId));
-      $scope.updateMath();
-    }
-  });
 
   var editors = {};
 

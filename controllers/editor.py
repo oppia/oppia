@@ -20,7 +20,6 @@ import json
 
 from apps.exploration.models import Exploration
 from apps.parameter.models import Parameter
-from apps.parameter.models import ParamChange
 from apps.state.models import AnswerHandlerInstance
 from apps.state.models import Content
 from apps.state.models import Rule

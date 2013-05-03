@@ -20,9 +20,10 @@
 
 function EditorGraph($scope, $filter, explorationData) {
   // When the exploration data is loaded, construct the graph.
-  $scope.$on('explorationData', function() {
+  explorationData.getData().then(function(data) {
+    console.log(data);
     $scope.graphData = $scope.reformatResponse(
-        explorationData.data.states, explorationData.data.init_state_id);
+        data.states, data.init_state_id);
   });
 
   // Reformat the model into a response that is processable by d3.js.
