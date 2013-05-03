@@ -6,7 +6,10 @@
     <title>Oppia - {% block subtitle %}{% endblock %}</title>
 
     {% include 'header_css_libs.html' %}
+    {% block additional_header_css %}{% endblock %}
+
     {% include 'header_js_libs.html' %}
+    {% block additional_header_js %}{% endblock %}
 
     <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
     <script type="text/x-mathjax-config">
@@ -19,12 +22,6 @@
     <script type="text/javascript"
             src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});</script>
-
-    {% block additional_js %}
-    {% endblock additional_js %}
 
   </head>
 
@@ -130,10 +127,8 @@
       {{ include_js_file('js/controllers/base.js') }}
     </script>
 
-    <script>
-      {% block additional_footer_js_libs %}
-      {% endblock %}
-    </script>
+    {% block additional_footer_js %}
+    {% endblock additional_footer_js %}
 
     <script type="text/javascript" async>{{js | safe}}</script>
   </body>
