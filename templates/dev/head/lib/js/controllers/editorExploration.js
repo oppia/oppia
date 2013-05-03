@@ -105,7 +105,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
       $scope.changeMode($scope.getMode());
-    } else {
+    } else if (e.target.hash == '#explorationMap') {
       $location.path('');
       explorationData.stateId = '';
       $scope.stateId = '';

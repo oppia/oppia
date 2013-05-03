@@ -57,23 +57,21 @@
 
           <ul class="nav nav-tabs" id="editorViewTab">
             <li class="active">
-              <a data-toggle="tab" href="#explorationMap">
-                Exploration Details
-              </a>
+              <a data-toggle="tab" href="#explorationMap">Exploration Details</a>
+            </li>
+            <li>
+              <a data-toggle="tab" href="#statsViewer">Exploration Stats</a>
             </li>
             <li ng-show="stateId">
-              <a data-toggle="tab" href="#stateEditor">
-                State Editor
-              </a>
+              <a data-toggle="tab" href="#stateEditor">State Editor</a>
             </li>
           </ul>
 
           <div class="tab-content">
             <div class="tab-pane active" id="explorationMap">
-
               <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
                 <a ng-click="activeInputData.name = 'explorationMetadata'">
-                  View exploration properties and stats
+                  View exploration properties
                 </a>
               </div>
 
@@ -92,8 +90,11 @@
               </div>
             </div>
 
-            <div class="tab-pane" id="stateEditor" ng-cloak>
+            <div class="tab-pane active" id="statsViewer">
+              {% include 'editor/views/stats_viewer.html' %}
+            </div>
 
+            <div class="tab-pane" id="stateEditor" ng-cloak>
               <div class="container-fluid">
                 <div class="row-fluid">
                   <div class="span5">
