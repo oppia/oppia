@@ -25,19 +25,10 @@ import utils
 class LibHandler(BaseHandler):
     """Assembles and returns library code."""
 
-    def get_footer_js_code(self):
-        return '\n'.join(
-            [utils.get_file_contents(filepath)
-             for filepath in feconf.FOOTER_JS_FILES])
-
     def get(self, lib_type):
         """Handles GET requests for CSS and JS library code."""
 
-        if lib_type == 'footer_js':
-            self.response.headers['Content-Type'] = 'application/javascript'
-            self.response.write(self.get_footer_js_code())
-        else:
-            self.error(404)
+        self.error(404)
 
 
 class TemplateHandler(BaseHandler):
