@@ -1,0 +1,54 @@
+<div ng-show="stats.numVisits > 0">
+  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width=500 height=100 chart-area-width=300></bar-chart>
+  <br><br>
+
+  <table>
+    <tr>
+      <th class="oppia-stats-table">State name</th>
+      <th class="oppia-stats-table">Times hit</th>
+      <th class="oppia-stats-table">Rules</th>
+    </tr>
+
+    <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'count':true">
+      <td class="oppia-stats-table">
+        <a href="/create/<[explorationId]>#/gui/<[state]>">
+          <[stateData.name]>
+        </a>
+      </td>
+      <td class="oppia-stats-table">
+        <[stateData.count]>
+      </td>
+      <td class="oppia-stats-table">
+          <table ng-show="stateData.count > 0">
+            <tr ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'count':true">
+               <td valign="top" width="200"><[rule]></td>
+               <td valign="top" width="100">
+                 <bar-chart chart-colors="ruleChartColors" chart-data="ruleData.chartData" width=100 height=30 show-legend="false"></bar-chart></td>
+               <td>
+                 <ul>
+                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="<[answer[1]]> > 1">s</div>)</i></li>
+                 </ul>
+               </td>
+            </tr>
+            <tr>
+               <td valign="top" width="200">No answer given 
+                  <img class="oppia-help" src="/images/help.png" 
+                    ui-jq="tooltip" ng-hide="isPublic" 
+                    title="The student navigated away from the page 
+                           without entering an answer." />
+               </td>
+               <td valign="top" width="100"><bar-chart width=100 height=30 show-legend="false" chart-colors="ruleChartColors" chart-data="stateData.no_answer_chartdata"></bar-chart></td>
+               <td></td>
+            </tr>
+          </table>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div ng-hide="stats.numVisits > 0">
+  <em>
+    This exploration has not been viewed by readers yet, so there are no
+    statistics to display.
+  </em>
+</div>
