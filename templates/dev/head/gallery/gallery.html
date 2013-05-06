@@ -10,15 +10,16 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
 
-        {% if user %}
-          <div class="pull-right">
-            <button class="btn" ng-click="toggleExplorationView()">
-              <[getToggleText()]>
-            </button>
-          </div>
-        {% endif %}
-
-        <h3 class="oppia-page-title"><[getHeadingText()]></h3>
+        <h3 class="oppia-page-title">
+          <[getHeadingText()]>
+          {% if user %}
+            <div class="pull-right">
+              <button class="btn" ng-click="toggleExplorationView()">
+                <[getToggleText()]>
+              </button>
+            </div>
+          {% endif %}
+        </h3>
 
         <div class="tabbable tabs-left" ui-if="categories">
           <ul class="nav nav-tabs" id="navTabs">

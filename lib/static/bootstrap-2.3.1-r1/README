@@ -1,0 +1,13 @@
+This is a customized version of Bootstrap 2.3.1 generated from this page:
+
+    http://twitter.github.io/bootstrap/customize.html
+
+ by overriding the variables:
+
+    @sansFontFamily --> Helvetica, Arial, sans-serif
+    @navbarCollapseWidth --> 479px
+
+
+ Bootstrap is licensed under the Apache License v2.0. See
+
+    http://twitter.github.io/bootstrap/index.html

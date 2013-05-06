@@ -4,17 +4,19 @@
   Editor View
 {% endblock subtitle %}
 
-{% block additional_header_css %}
+{% block header_css %}
+  {{ super() }}
   <link rel="stylesheet" type="text/css"
         href="/third_party/static/select2/select2.css" media="screen">
-{% endblock %}
+{% endblock header_css %}
 
-{% block additional_header_js %}
+{% block header_js %}
+  {{ super() }}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
   </script>
-{% endblock %}
+{% endblock header_js %}
 
 {% block content %}
   <div ng-controller="EditorExploration" ng-cloak>
@@ -91,50 +93,6 @@
             </div>
 
             <div class="tab-pane" id="stateEditor" ng-cloak>
-              <div class="container-fluid">
-                <div class="row-fluid">
-                  <div class="span5">
-                    <form ng-submit="saveStateName()">
-                      <h3>
-                        <span class="oppia-editable-name"
-                              ng-hide="activeInputData.name == 'stateName'"
-                              ng-click="initializeNewActiveInput('stateName')">
-                          <[stateName]>
-                        </span>
-                        <span ng-show="activeInputData.name == 'stateName'">
-                          <input type="text" ng-model="stateName">
-                          <input type="submit" value="Save">
-                        </span>
-                      </h3>
-                    </form>
-                  </div>
-
-                  <div class="span5">
-
-                    {% if allow_yaml_file_upload %}  
-                      <div class="pull-right">
-                        <span ng-show="getMode() == 'gui'">
-                          Graphical Editor | 
-                        </span>
-                        <span ng-hide="getMode() == 'gui'">
-                          <a ng-click="changeMode('gui')">Graphical Editor</a> |
-                        </span>
-
-                        <span ng-show="getMode() == 'text'">
-                          Plaintext Editor
-                          <img class="oppia-help" src="/images/help.png"
-                               ui-jq="tooltip"
-                               title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
-                        </span>
-                        <span ng-hide="getMode() == 'text'">
-                          <a ng-click="changeMode('text')">Plaintext Editor</a>
-                        </span>
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-
               <div ng-view ng-cloak></div>
             </div>
           </div>
@@ -184,11 +142,12 @@
 
 {% endblock %}
 
-{% block additional_footer_js %}
+{% block footer_js %}
+  {{ super() }}
   <script src="/third_party/static/d3js-3/d3.min.js"></script>
   <script async src="/third_party/static/yui3-3.8.1/build/yui/yui-min.js"></script>
   <script async src="/third_party/static/select2/select2.js"></script>
   <script>
     {{ include_js_lib_file('services/explorationData.js') }}
   </script>
-{% endblock additional_footer_js %}
+{% endblock footer_js %}

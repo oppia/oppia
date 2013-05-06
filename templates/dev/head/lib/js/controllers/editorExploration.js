@@ -54,22 +54,6 @@ function ExplorationTab($scope, explorationData) {
 function EditorExploration($scope, $http, $location, $route, $routeParams,
     explorationData, warningsData, activeInputData) {
 
-  $scope.saveStateName = function() {
-    if (!$scope.isValidEntityName($scope.stateName, true))
-      return;
-    if ($scope.isDuplicateInput(
-            $scope.states, 'name', $scope.stateId, $scope.stateName)) {
-      warningsData.addWarning(
-          'The name \'' + $scope.stateName + '\' is already in use.');
-      return;
-    }
-
-    explorationData.saveStateData(
-        $scope.stateId, {'state_name': $scope.stateName});
-    activeInputData.clear();
-  };
-
-
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
@@ -105,6 +89,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
       $scope.changeMode($scope.getMode());
+      $scope.stateName = explorationData.data.states[stateId].name;
     } else if (e.target.hash == '#explorationMap') {
       $location.path('');
       explorationData.stateId = '';
@@ -150,10 +135,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
 
     explorationFullyLoaded = true;
-
-    if ($scope.stateId) {
-      $scope.stateName = data.name;
-    }
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {

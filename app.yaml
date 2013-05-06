@@ -46,6 +46,12 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /lib/static
+  static_dir: lib/static
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=2592000'
+    Vary: Accept-Encoding
 - url: /data/widgets/(.*)/static/(.*)
   static_files: data/widgets/\1/static/\2
   upload: data/widgets/(.*)/static/(.*)
