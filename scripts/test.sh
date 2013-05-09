@@ -36,7 +36,7 @@ echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
 RUNTIME_HOME=../oppia_runtime
-GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.4/google_appengine
+GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2:./third_party/mock-1.0.1
 export PYTHONPATH=$PYTHONPATH
