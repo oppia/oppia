@@ -39,6 +39,20 @@ def create_rule_name(rule):
     return name
 
 
+def get_event_key(event_name, key):
+        if event_name == STATS_ENUMS.exploration_visited:
+            return 'e.%s' % key
+        if event_name == STATS_ENUMS.rule_hit:
+            return 'default.%s' % key
+        if event_name == STATS_ENUMS.exploration_completed:
+            return 'c.%s' % key
+        if event_name == STATS_ENUMS.feedback_submitted:
+            return 'f.%s' % key
+        if event_name == STATS_ENUMS.state_hit:
+            return 's.%s' % key
+
+
+
 class EventHandler(object):
     """Records events."""
 
@@ -46,20 +60,17 @@ class EventHandler(object):
     def _record_event(cls, event_name, key, extra_info=''):
         """Updates statistics based on recorded events."""
 
+        event_key = get_event_key(event_name, key)
+
         if event_name == STATS_ENUMS.exploration_visited:
-            event_key = 'e.%s' % key
             cls._inc(event_key)
         if event_name == STATS_ENUMS.rule_hit:
-            event_key = 'default.%s' % key
             cls._add(event_key, unicode(extra_info))
         if event_name == STATS_ENUMS.exploration_completed:
-            event_key = 'c.%s' % key
             cls._inc(event_key)
         if event_name == STATS_ENUMS.feedback_submitted:
-            event_key = 'f.%s' % key
             cls._add(event_key, unicode(extra_info))
         if event_name == STATS_ENUMS.state_hit:
-            event_key = 's.%s' % key
             cls._inc(event_key)
 
     @classmethod
@@ -121,6 +132,15 @@ class Counter(ndb.Model):
     # When this counter was last incremented.
     last_updated = ndb.DateTimeProperty(auto_now=True)
 
+    @classmethod
+    def get_value_by_id(cls, key):
+        counter = Counter.get_by_id(key)
+        if not counter:
+            return 0
+        else:
+            return counter.value
+    
+
 
 class Journal(ndb.Model):
     """A list of values."""
@@ -133,6 +153,14 @@ class Journal(ndb.Model):
     # When this counter was last updated.
     last_updated = ndb.DateTimeProperty(auto_now=True)
 
+    @classmethod
+    def get_value_count_by_id(cls, key):
+        journal = Journal.get_by_id(key)
+        if journal:
+           return len(journal.values)
+        else:
+           return 0
+
 
 class Statistics(object):
     """Retrieves statistics to display in the views."""
@@ -142,14 +170,14 @@ class Statistics(object):
         """Retrieves statistics for the given event name and exploration id."""
 
         if event_name == STATS_ENUMS.exploration_visited:
-            event_key = 'e.%s' % exploration_id
+            event_key = get_event_key(event_name, exploration_id)
             counter = Counter.get_by_id(event_key)
             if not counter:
                 return 0
             return counter.value
 
         if event_name == STATS_ENUMS.exploration_completed:
-            event_key = 'c.%s' % exploration_id
+            event_key = get_event_key(event_name, exploration_id)
             counter = Counter.get_by_id(event_key)
             if not counter:
                 return 0
@@ -168,7 +196,7 @@ class Statistics(object):
                 for handler in state.widget.handlers:
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
-                        event_key = 'default.%s.%s.%s' % (exploration_id, state.id, rule_name)
+                        event_key = get_event_key(event_name, (exploration_id, state.id, rule_name))
 
                         journal = Journal.get_by_id(event_key)
 
@@ -190,7 +218,7 @@ class Statistics(object):
             exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
-                event_key = 's.%s.%s' % (exploration_id, state.id)
+                event_key = get_event_key(event_name, (exploration_id, state.id))
 
                 counter = Counter.get_by_id(event_key)
                 if not counter:
@@ -203,3 +231,48 @@ class Statistics(object):
                     'count': count,
                 }
             return result
+
+    @classmethod
+    def get_top_ten_improvable_states(cls, exploration_ids):
+        ranked_states = [] 
+        for exp in exploration_ids:
+            exploration = Exploration.get(exp)
+            for state_db_key in exploration.states:
+                state = state_db_key.get()
+                state_key = '%s.%s' % (exp, state.id)
+
+                # Get count of how many times state was hit
+                event_key = get_event_key(STATS_ENUMS.state_hit, state_key)
+                all_count = Counter.get_value_by_id(event_key)
+                if all_count == 0:
+                    continue
+
+                completed_count = 0
+                event_key = get_event_key(STATS_ENUMS.rule_hit, '%s.Default' % state_key)
+                default_count = Journal.get_value_count_by_id(event_key)
+                for handler in state.widget.handlers:
+                    for rule in handler.rules:
+                        rule_name = create_rule_name(rule)
+                        event_key = get_event_key(STATS_ENUMS.rule_hit, '%s.%s' % (state_key, rule_name))
+                        completed_count += Journal.get_value_count_by_id(event_key)
+                incomplete_count = all_count - completed_count
+                if (float(default_count) / all_count > .2):
+                    if (float(incomplete_count) / all_count > .2):
+                        if (default_count > incomplete_count):
+                            state_rank = default_count
+                            improve_type = 'default'
+                        else:
+                            state_rank = incomplete_count
+                            improve_type = 'incomplete'
+                    else:
+                        state_rank = default_count
+                        improve_type = 'default'
+                elif (float(incomplete_count) / all_count > .2):
+                    state_rank = incomplete_count
+                    improve_type = 'incomplete'
+                else:
+                    state_rank = 0
+                    improve_type = ''
+                ranked_states.append({'exp_id': exp, 'state_id': state.id, 'rank': state_rank, 'type': improve_type})
+        problem_states = [i for i in ranked_states if i['rank'] != 0]
+        return sorted(problem_states, key=lambda state: state['rank'])[:10]
