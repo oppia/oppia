@@ -32,7 +32,7 @@ handlers:
     Cache-Control: 'public, max-age=600'
 - url: /css
   # NB: not minified. TODO(sll): fix.
-  static_dir: templates/dev/head/css
+  static_dir: templates/dev/head/lib/css
   secure: always
 - url: /img
   static_dir: third_party/bootstrap/img
@@ -42,6 +42,12 @@ handlers:
     Vary: Accept-Encoding
 - url: /third_party/static
   static_dir: third_party/static
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=2592000'
+    Vary: Accept-Encoding
+- url: /lib/static
+  static_dir: lib/static
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'

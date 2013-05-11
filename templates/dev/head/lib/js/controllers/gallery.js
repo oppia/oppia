@@ -70,7 +70,7 @@ function Gallery($scope, $http, warningsData, GalleryData) {
   };
 
   $scope.getHeadingText = function() {
-    return $scope.showMyExplorations ? 'Explorations I can edit' :
+    return $scope.showMyExplorations ? 'Explorations you can edit' :
         'All Explorations';
   };
 

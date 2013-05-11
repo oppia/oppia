@@ -1,5 +1,48 @@
 <div class="container-fluid">
   <div class="row-fluid">
+    <div class="span5">
+      <form ng-submit="saveStateName()">
+        <h3>
+          <span class="oppia-editable-name"
+                ng-hide="activeInputData.name == 'stateName'"
+                ng-click="initializeNewActiveInput('stateName')">
+            <[stateName]>
+          </span>
+          <span ng-show="activeInputData.name == 'stateName'">
+            <input type="text" ng-model="stateName">
+            <input type="submit" value="Save">
+          </span>
+        </h3>
+      </form>
+    </div>
+
+    {% if allow_yaml_file_upload %}  
+      <div class="span5">
+        <div class="pull-right">
+          <span ng-show="getMode() == 'gui'">
+            Graphical Editor | 
+          </span>
+          <span ng-hide="getMode() == 'gui'">
+            <a ng-click="changeMode('gui')">Graphical Editor</a> |
+          </span>
+
+          <span ng-show="getMode() == 'text'">
+            Plaintext Editor
+            <img class="oppia-help" src="/images/help.png"
+                 ui-jq="tooltip"
+                 title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
+          </span>
+          <span ng-hide="getMode() == 'text'">
+            <a ng-click="changeMode('text')">Plaintext Editor</a>
+          </span>
+        </div>
+      </div>
+    {% endif %}                    
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
     <div class="span10">
       <div id="editorWindow" ng-show="stateId">
 
@@ -10,7 +53,7 @@
                title="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields.">
         </h4>
 
-        {% include 'editor/views/parameter_change.html' %}
+        {% include 'generic/parameter_change.html' %}
 
         <br>
 

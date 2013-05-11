@@ -4,11 +4,25 @@
   Editor View
 {% endblock subtitle %}
 
+{% block header_css %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css"
+        href="/third_party/static/select2/select2.css" media="screen">
+{% endblock header_css %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+  </script>
+{% endblock header_js %}
+
 {% block content %}
   <div ng-controller="EditorExploration" ng-cloak>
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
-           
+
         <div class="span12">
 
           <span class="pull-right" style="margin: 10px 50px 0 0">
@@ -45,87 +59,40 @@
 
           <ul class="nav nav-tabs" id="editorViewTab">
             <li class="active">
-              <a data-toggle="tab" href="#explorationMap">
-                Exploration Details
-              </a>
+              <a data-toggle="tab" href="#explorationMap">Exploration Details</a>
+            </li>
+            <li>
+              <a data-toggle="tab" href="#statsViewer">Exploration Stats</a>
             </li>
             <li ng-show="stateId">
-              <a data-toggle="tab" href="#stateEditor">
-                State Editor
-              </a>
+              <a data-toggle="tab" href="#stateEditor">State Editor</a>
             </li>
           </ul>
 
           <div class="tab-content">
             <div class="tab-pane active" id="explorationMap">
 
-              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
-                <a ng-click="activeInputData.name = 'explorationMetadata'">
-                  View exploration properties and stats
-                </a>
-              </div>
+              <button ng-click="activeInputData.name = 'explorationMetadata'" ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
+                Show exploration metadata
+              </button>
+
+              <button ng-click="activeInputData.clear()" ng-show="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
+                Hide exploration metadata
+              </button>
 
               <div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
-                <span class="pull-right">
-                  <a ng-click="activeInputData.clear()">
-                    Return to map
-                  </a>
-                </span>
+                {% include 'editor/views/editor_metadata.html' %}
                 <br>
-                {% include 'editor/editor_metadata.html' %}
               </div>
 
-              <div ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0">
-                {% include 'editor/editor_viz.html' %}
-              </div>
+              {% include 'editor/views/editor_viz.html' %}
+            </div>
+
+            <div class="tab-pane" id="statsViewer">
+              {% include 'editor/views/stats_viewer.html' %}
             </div>
 
             <div class="tab-pane" id="stateEditor" ng-cloak>
-
-              <div class="container-fluid">
-                <div class="row-fluid">
-                  <div class="span5">
-                    <form ng-submit="saveStateName()">
-                      <h3>
-                        <span class="oppia-editable-name"
-                              ng-hide="activeInputData.name == 'stateName'"
-                              ng-click="initializeNewActiveInput('stateName')">
-                          <[stateName]>
-                        </span>
-                        <span ng-show="activeInputData.name == 'stateName'">
-                          <input type="text" ng-model="stateName">
-                          <input type="submit" value="Save">
-                        </span>
-                      </h3>
-                    </form>
-                  </div>
-
-                  <div class="span5">
-
-                    {% if allow_yaml_file_upload %}  
-                      <div class="pull-right">
-                        <span ng-show="getMode() == 'gui'">
-                          Graphical Editor | 
-                        </span>
-                        <span ng-hide="getMode() == 'gui'">
-                          <a ng-click="changeMode('gui')">Graphical Editor</a> |
-                        </span>
-
-                        <span ng-show="getMode() == 'text'">
-                          Plaintext Editor
-                          <img class="oppia-help" src="/images/help.png"
-                               ui-jq="tooltip"
-                               title="This is an alternative representation of the state in plaintext (YAML) format. If you are not familiar with this representation, please use the Graphical Editor to edit the state instead.">
-                        </span>
-                        <span ng-hide="getMode() == 'text'">
-                          <a ng-click="changeMode('text')">Plaintext Editor</a>
-                        </span>
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-
               <div ng-view ng-cloak></div>
             </div>
           </div>
@@ -162,7 +129,7 @@
       </div>
       <div class="modal-body">
         <p>
-          Really delete state <[getStateName(deleteStateId)]>? This action cannot be reversed.
+          Are you sure you want to delete the state "<[getStateName(deleteStateId)]>"? <strong>This action cannot be reversed.</strong>
         </p>
       </div>
       <div class="modal-footer">
@@ -174,3 +141,13 @@
   </div>
 
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/d3js-3/d3.min.js"></script>
+  <script async src="/third_party/static/yui3-3.8.1/build/yui/yui-min.js"></script>
+  <script async src="/third_party/static/select2/select2.js"></script>
+  <script>
+    {{ include_js_lib_file('services/explorationData.js') }}
+  </script>
+{% endblock footer_js %}

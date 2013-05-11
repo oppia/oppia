@@ -1,12 +1,14 @@
 parameters: []
 states:
-- name: Welcome!
-  content:
+- content:
   - type: text
-    value: Oppia is a tool that helps you create interactive learning explorations
-      that can be continually improved over time. These allow students to learn by
-      doing.<div><br></div><div>By the way, do you know where the name 'Oppia' comes
-      from?<br></div>
+    value: '<div>Hi, welcome to Oppia!</div><div><br></div><div><span style="line-height:
+      1.22;">Oppia is a tool that helps you create interactive learning explorations
+      that can be continually improved over time. You can find more information at&nbsp;<a
+      href="http://code.google.com/p/oppia/">http://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
+      first,<span style="line-height: 1.22;">&nbsp;do you know where the name ''Oppia''
+      comes from?</span></div>'
+  name: Welcome!
   param_changes: []
   widget:
     handlers:
@@ -39,12 +41,12 @@ states:
       - It's translated from a different language.
       - It's a nonsense word that someone made up.
       - It's the name of a popular cartoon character.
-    sticky: False      
+    sticky: false
     widget_id: MultipleChoiceInput
-- name: Estimate 100
-  content:
+- content:
   - type: text
     value: What is 10 times 10?
+  name: Estimate 100
   param_changes: []
   widget:
     handlers:
@@ -65,10 +67,9 @@ states:
         name: Default
         param_changes: []
     params: {}
-    sticky: False    
+    sticky: false
     widget_id: NumericInput
-- name: Music widget
-  content:
+- content:
   - type: text
     value: 'You might want to build something more complicated than that, though.
       The good news is that you can integrate your own interactive questions into
@@ -78,6 +79,7 @@ states:
       the black circle representing the note. It should turn red.</li><li>Move the
       note up and down using the <span style="font-weight: bold;">up</span>&nbsp;and
       <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li> </ol>'
+  name: Music widget
   param_changes: []
   widget:
     handlers:
@@ -112,12 +114,12 @@ states:
         param_changes: []
     params:
       noteToGuess: B4
-    sticky: True
+    sticky: true
     widget_id: MusicStaff
-- name: Numeric input
-  content:
+- content:
   - type: text
     value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
+  name: Numeric input
   param_changes: []
   widget:
     handlers:
@@ -168,20 +170,20 @@ states:
         name: Default
         param_changes: []
     params: {}
-    sticky: False    
+    sticky: false
     widget_id: NumericInput
-- name: Things you can do
-  content:
+- content:
   - type: text
-    value: 'That''s a very quick sample of Oppia. For more sample explorations, check
-      out the gallery, which you can get to by clicking the ''Gallery'' tab on the
-      top.<div><br></div><div>If you want to add custom question types, or run your
-      own instance of Oppia, have a look at our code site:</div><div><br></div><div>&nbsp;
-      &nbsp; &nbsp;<a href="https://code.google.com/p/oppia/" target="_blank">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You
+    value: That's a very quick sample of Oppia. For more sample explorations, check
+      out the gallery, which you can get to by clicking the 'Gallery' tab on the top.<div><br></div><div>If
+      you want to add custom question types, or run your own instance of Oppia, have
+      a look at our code site:</div><div><br></div><div>&nbsp; &nbsp; &nbsp;<a href="https://code.google.com/p/oppia/"
+      target="_blank">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You
       can also create new explorations, like this one, by clicking on the "Create
-      a new exploration" button in the gallery.</div><br><div>We hope you enjoy using Oppia. If you have feedback, let
-      us know! You can find our discussion forum at&nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/oppia"
-      target="_blank">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>'
+      a new exploration" button in the gallery.</div><br><div>We hope you enjoy using
+      Oppia. If you have feedback, let us know! You can find our discussion forum
+      at&nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/oppia" target="_blank">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>
+  name: Things you can do
   param_changes: []
   widget:
     handlers:
@@ -193,13 +195,13 @@ states:
         name: Default
         param_changes: []
     params: {}
-    sticky: False    
+    sticky: false
     widget_id: Continue
-- name: What language
-  content:
+- content:
   - type: text
     value: In fact, the word Oppia means 'learn'. Can you guess which language it
       comes from?
+  name: What language
   param_changes: []
   widget:
     handlers:
@@ -216,26 +218,24 @@ states:
         param_changes: []
       - dest: What language
         feedback:
-        - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
-          by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
-          comes from, and Oppius isn''t the language (or person) that we''re looking
-          for.
-          (Please feel free to search on the Web for the answer, by the way; this
-          is admittedly a factual question which not many people will know the answer
-          to.)'
+        - There is indeed an ancient Roman law named Lex Oppia, which was instituted
+          by Gaius Oppius, a friend of Julius Caesar. But this isn't where our word
+          comes from, and Oppius isn't the language (or person) that we're looking
+          for. (Please feel free to search on the Web for the answer, by the way;
+          this is admittedly a factual question which not many people will know the
+          answer to.)
         inputs:
           x: roman
         name: contains(x)
         param_changes: []
       - dest: What language
         feedback:
-        - 'There is indeed an ancient Roman law named Lex Oppia, which was instituted
-          by Gaius Oppius, a friend of Julius Caesar. But this isn''t where our word
-          comes from, and Oppius isn''t the language (or person) that we''re looking
-          for.
-          (Please feel free to search on the Web for the answer, by the way; this
-          is admittedly a factual question which not many people will know the answer
-          to.)'
+        - There is indeed an ancient Roman law named Lex Oppia, which was instituted
+          by Gaius Oppius, a friend of Julius Caesar. But this isn't where our word
+          comes from, and Oppius isn't the language (or person) that we're looking
+          for. (Please feel free to search on the Web for the answer, by the way;
+          this is admittedly a factual question which not many people will know the
+          answer to.)
         inputs:
           x: latin
         name: contains(x)
@@ -265,19 +265,10 @@ states:
         param_changes: []
       - dest: Numeric input
         feedback:
-        - 'Yes! Oppia is the Finnish word for learn.
-          As you can see, you''re not limited to multiple-choice questions here. For
-          example, you could ask for numeric answers, text answers, sets of strings,
-          and so on. You can even write your own types of questions. Here is a question
-          that takes numeric input:'
-        inputs:
-          x: Finnish
-        name: case_sensitive_equals(x)
-        param_changes: []
-      - dest: What language
-        feedback:
-        - (In general, the name of a language is a proper noun, so it should start
-          with a capital letter. Please could you fix that?)
+        - 'Yes! Oppia is the Finnish word for learn. As you can see, you''re not limited
+          to multiple-choice questions here. For example, you could ask for numeric
+          answers, text answers, sets of strings, and so on. You can even write your
+          own types of questions. Here is a question that takes numeric input:'
         inputs:
           x: finnish
         name: equals(x)
@@ -291,12 +282,39 @@ states:
         param_changes: []
       - dest: What language
         feedback:
-        - Actually, that's not where we got it from. But you can find out lots of
-          things on the Web. Why not try doing a search for [translate oppia] on your
-          favorite search engine?
+        - Great, glad to hear that. Which language is it?
+        inputs:
+          x: 'yes'
+        name: equals(x)
+        param_changes: []
+      - dest: What language
+        feedback:
+        - Nein! Ahem... no, it's not German. But it's a European language. From a
+          place that's colder than Germany. Have another go?
+        inputs:
+          x: German
+        name: contains(x)
+        param_changes: []
+      - dest: What language
+        feedback:
+        - 'Mais non! Well, no, it''s not French. But it''s pretty close. Here, I''ll
+          give you a hint: Oppia is a word from one of the Scandinavian countries.
+          Can you guess which one?'
+        inputs:
+          x: French
+        name: contains(x)
+        param_changes: []
+      - dest: What language
+        feedback:
+        - Sorry, nope, we didn't get it from {{answer}}. But you can find out lots
+          of things on the Web. Why not try doing a search for [translate oppia] on
+          your favorite search engine?
+        - Sorry, nope, we didn't get it from {{answer}}. Here's a hint, though. It's
+          a European language you're looking for.
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
-    sticky: False
+    params:
+      placeholder: Type your answer here.
+    sticky: false
     widget_id: TextInput

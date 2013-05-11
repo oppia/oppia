@@ -2,11 +2,16 @@
 <html ng-app="oppia">
   <head>
     <meta charset=utf-8>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Oppia - {% block subtitle %}{% endblock %}</title>
 
-    {% include 'header_css_libs.html' %}
-    {% include 'header_js_libs.html' %}
+    {% block header_css %}
+      {% include 'header_css_libs.html' %}
+    {% endblock header_css %}
+
+    {% block header_js %}
+      {% include 'header_js_libs.html' %}
+    {% endblock header_js %}
 
     <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
     <script type="text/x-mathjax-config">
@@ -19,12 +24,6 @@
     <script type="text/javascript"
             src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});</script>
-
-    {% block additional_js %}
-    {% endblock additional_js %}
 
   </head>
 
@@ -36,53 +35,65 @@
           <div class="navbar navbar-static-top">
             <div class="navbar-inner">
               <div class="container oppia-content">
+                <a href="#" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </a>
+
                 <a class="brand" href="/">Oppia</a>
-                <ul class="nav">
-                  <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
-                    <a href="/gallery">Gallery</a>
-                  </li>
-                  {% if nav_mode == 'reader' %}
-                    <li class="active">
-                      <a href="">Learn</a>
+
+                <div class="nav-collapse collapse">
+
+                  <ul class="nav">
+                    <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
+                      <a href="/gallery">Gallery</a>
                     </li>
-                  {% endif %}
-                  {% if nav_mode == 'editor' %}
-                    <li class="active">
-                      <a href="">Create</a>
-                    </li>
-                  {% endif %}
-                </ul>
-                <ul class="nav pull-right">
-                  {% if nav_mode != 'feedback' %}
-                    <li>
-                      <a href="" ng-click="openFeedbackPage()">
-                        Give Feedback
-                      </a>
-                    </li>
-                  {% else %}
-                    <li class="active">
-                      <a href="">Give Feedback</a>
-                    </li>
-                  {% endif %}
-                  {% if user %}
-                    <li>
-                      &nbsp;
-                      <span class="navbar-text">
-                        {{user}}
-                        {% if is_admin %}
-                          (Admin)
-                        {% endif %}
-                      </span>
-                    </li>
-                    <li>
-                      <a href="{{logout_url}}">Logout</a>
-                    </li>
-                  {% else %}
-                    <li>
-                      <a href="{{login_url}}">Login</a>
-                    </li>
-                  {% endif %}
-                </ul>
+                    {% if nav_mode == 'reader' %}
+                      <li class="active">
+                        <a href="">Learn</a>
+                      </li>
+                    {% endif %}
+                    {% if nav_mode == 'editor' %}
+                      <li class="active">
+                        <a href="">Create</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+
+                  <ul class="nav pull-right">
+                    {% if nav_mode != 'feedback' %}
+                      <li>
+                        <a href="" ng-click="openFeedbackPage()">
+                          Give Feedback
+                        </a>
+                      </li>
+                    {% else %}
+                      <li class="active">
+                        <a href="">Give Feedback</a>
+                      </li>
+                    {% endif %}
+                    {% if user %}
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                          {{user}}
+                          {% if is_admin %} (Admin) {% endif %}
+                          <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li>
+                            <a href="{{logout_url}}">Logout</a>
+                          </li>
+                        </ul>
+                      </li>
+                    {% else %}
+                      <li>
+                        <a href="{{login_url}}">Login</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </div>
+
               </div>
             </div>
           </div>
@@ -120,7 +131,19 @@
     </div>
 
     {% include 'footer_js_libs.html' %}
-    <script src="/resources/footer_js"></script>
+
+    <script>
+      {{ include_js_lib_file('app.js') }}
+      {{ include_js_lib_file('directives/directives.js') }}
+      {{ include_js_lib_file('filters/filters.js') }}
+      {{ include_js_lib_file('services/activeInputData.js') }}
+      {{ include_js_lib_file('services/warningsData.js') }}
+      {{ include_js_lib_file('controllers/base.js') }}
+    </script>
+
+    {% block footer_js %}
+    {% endblock footer_js %}
+
     <script type="text/javascript" async>{{js | safe}}</script>
   </body>
 </html>

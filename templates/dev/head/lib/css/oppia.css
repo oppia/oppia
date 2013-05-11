@@ -14,6 +14,8 @@
   limitations under the License.
 */
 
+/* Bootstrap overrides and additions. */
+
 html {
   height: 100%;
 }
@@ -22,6 +24,28 @@ body {
   height: 100%;
   margin: 0 auto;
   padding: 0;
+  width: 100%;
+}
+
+h3 {
+  color: #222;
+  line-height: 1.1;
+}
+
+p {
+  color: #444;
+  line-height: 1.5;
+  /* The following should be the same as the line-height (1.5). */
+  margin: 1.5em 0;
+  text-align: left;
+  word-spacing: 0;
+}
+
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+  margin: 0 auto;
+  width: 98%;
 }
 
 #wrapper {
@@ -64,7 +88,6 @@ textarea {
 
 .oppia-page-title {
   color: #222;
-  font-family: Helvetica, Arial, sans-serif;
   font-size: 30px;
   margin: 0 0 20px 0;
 }
@@ -94,7 +117,9 @@ textarea {
 .oppia-reader-response-container {
   margin: 20px 0;
 }
-
+.oppia-reader-response-container:before {
+  content: "\2767";
+}
 .oppia-reader-response {
   border-radius: 6px;
   font-style: italic;
@@ -102,7 +127,8 @@ textarea {
 }
 
 .oppia-response {
-  background: rgba(0,0,0,0.06);
+  background: #f3f3f3;
+  background: rgba(0,0,0,0.04);
   border-radius: 6px;
   padding: 10px 20px;
 }
@@ -361,7 +387,7 @@ textarea {
   stroke-width: 1.5px;
 }
 
-.oppia-graph-viz circle {
+.oppia-graph-viz ellipse {
   fill: #ccc;
   stroke: #333;
   stroke-width: 1.5px;
@@ -430,4 +456,12 @@ textarea {
 .oppia-stats-table {
   border: 1px solid black;
   padding: 10px;
+}
+
+
+@media screen and (max-width: 460px) {
+  .pull-right {
+    float: none;
+    width: auto;
+  }
 }

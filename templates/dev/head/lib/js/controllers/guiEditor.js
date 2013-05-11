@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $routeParams, explorationData, warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
     promise.then(function(data) {
@@ -30,6 +30,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.$parent.stateId = $routeParams.stateId;
 
   $scope.init = function(data) {
+    $scope.stateName = data.name;
     $scope.content = data.content || [];
     $scope.paramChanges = data.param_changes || [];
 
@@ -60,6 +61,22 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
     // Switch to the stateEditor tab when this controller is activated.
     $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
   };
+
+  $scope.saveStateName = function() {
+    if (!$scope.isValidEntityName($scope.stateName, true))
+      return;
+    if ($scope.isDuplicateInput(
+            $scope.states, 'name', $scope.stateId, $scope.stateName)) {
+      warningsData.addWarning(
+          'The name \'' + $scope.stateName + '\' is already in use.');
+      return;
+    }
+
+    explorationData.saveStateData(
+        $scope.stateId, {'state_name': $scope.stateName});
+    activeInputData.clear();
+  };
+
 
   var editors = {};
 
@@ -428,5 +445,5 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
+GuiEditor.$inject = ['$scope', '$routeParams', 'explorationData',
     'warningsData', 'activeInputData'];

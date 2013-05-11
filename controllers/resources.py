@@ -22,31 +22,22 @@ import feconf
 import utils
 
 
-class LibHandler(BaseHandler):
-    """Assembles and returns library code."""
+class EditorViewHandler(BaseHandler):
+    """Retrieves an editor view in the 'editor/views' directory."""
 
-    def get_footer_js_code(self):
-        return '\n'.join(
-            [utils.get_file_contents(filepath)
-             for filepath in feconf.FOOTER_JS_FILES])
-
-    def get(self, lib_type):
-        """Handles GET requests for CSS and JS library code."""
-
-        if lib_type == 'footer_js':
-            self.response.headers['Content-Type'] = 'application/javascript'
-            self.response.write(self.get_footer_js_code())
-        else:
-            self.error(404)
+    def get(self, view_type):
+        """Handles GET requests."""
+        self.response.write(feconf.JINJA_ENV.get_template(
+            'editor/views/%s.html' % view_type).render({}))
 
 
 class TemplateHandler(BaseHandler):
-    """Retrieves an editor template."""
+    """Retrieves a template in the 'generic' directory."""
 
     def get(self, template_type):
         """Handles GET requests."""
         self.response.write(feconf.JINJA_ENV.get_template(
-            'editor/views/%s_editor.html' % template_type).render({}))
+            'generic/%s.html' % template_type).render({}))
 
 
 class ImageHandler(BaseHandler):

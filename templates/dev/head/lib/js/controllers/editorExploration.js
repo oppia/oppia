@@ -20,21 +20,19 @@
 
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
-// TODO(sll): Internationalize these.
 var GUI_EDITOR_URL = '/gui';
 var YAML_EDITOR_URL = '/text';
 
-// TODO(sll): Move all strings to the top of the file, particularly
-// warning messages and activeInputData.name.
-// TODO(sll): console.log is not supported in IE. Fix before launch.
+// TODO(sll): Move all strings to the top of the file and internationalize them.
+// TODO(sll): console.log is not supported in IE.
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
       when(YAML_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/yaml', controller: YamlEditor}).
+           {templateUrl: '/editor_views/yaml_editor', controller: YamlEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
-           {templateUrl: '/templates/gui', controller: GuiEditor}).
-      when('/', {templateUrl: '/templates/gui', controller: ExplorationTab}).
+           {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
+      when('/', {templateUrl: '/editor_views/gui_editor', controller: ExplorationTab}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -55,22 +53,6 @@ function ExplorationTab($scope, explorationData) {
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
     explorationData, warningsData, activeInputData) {
-
-  $scope.saveStateName = function() {
-    if (!$scope.isValidEntityName($scope.stateName, true))
-      return;
-    if ($scope.isDuplicateInput(
-            $scope.states, 'name', $scope.stateId, $scope.stateName)) {
-      warningsData.addWarning(
-          'The name \'' + $scope.stateName + '\' is already in use.');
-      return;
-    }
-
-    explorationData.saveStateData(
-        $scope.stateId, {'state_name': $scope.stateName});
-    activeInputData.clear();
-  };
-
 
   /********************************************
   * Methods affecting the URL location hash.
@@ -107,7 +89,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
       $scope.changeMode($scope.getMode());
-    } else {
+      $scope.stateName = explorationData.data.states[stateId].name;
+    } else if (e.target.hash == '#explorationMap') {
       $location.path('');
       explorationData.stateId = '';
       $scope.stateId = '';
@@ -152,10 +135,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
 
     explorationFullyLoaded = true;
-
-    if ($scope.stateId) {
-      $scope.processStateData(explorationData.getStateData($scope.stateId));
-    }
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
@@ -327,35 +306,15 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
-              explorationData.getData();
-              if (successCallback) {
-                successCallback(data);
-              }
+              window.location = $scope.explorationUrl;
             }).error(function(data) {
               warningsData.addWarning(
                   'Server error when adding state: ' + data.error);
             });
   };
 
-  $scope.$on('stateData', function() {
-    $scope.stateId = explorationData.stateId;
-    $scope.processStateData(explorationData.getStateData($scope.stateId));
-  });
-
-  /**
-   * Sets up the state editor, given its data from the backend.
-   * @param {Object} data Data received from the backend about the state.
-   */
-  $scope.processStateData = function(data) {
-    $scope.stateId = explorationData.stateId;
-    $scope.stateName = data.name;
-  };
-
   $scope.getStateName = function(stateId) {
-    if (!stateId) {
-      return '[none]';
-    }
-    return explorationData.getStateProperty(stateId, 'name');
+    return stateId ? explorationData.data.states[stateId].name : '[none]';
   };
 
   $scope.openDeleteStateModal = function(stateId) {
@@ -378,7 +337,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
     .success(function(data) {
-      // TODO(sll): Try and handle this without reloading the page.
       window.location = $scope.explorationUrl;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');

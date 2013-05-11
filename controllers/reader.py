@@ -67,9 +67,10 @@ def parse_content_into_html(content_array, block_number, params=None):
                 widget = NonInteractiveWidget.get_with_params(
                     content.value, params)
                 widget_counter += 1
-                html += feconf.JINJA_ENV.get_template('content.html').render({
-                    'type': content.type, 'blockIndex': block_number,
-                    'index': widget_counter})
+                html += feconf.JINJA_ENV.get_template(
+                    'generic/content.html').render({
+                        'type': content.type, 'blockIndex': block_number,
+                        'index': widget_counter})
                 widget_array.append({
                     'blockIndex': block_number,
                     'index': widget_counter,
@@ -83,8 +84,9 @@ def parse_content_into_html(content_array, block_number, params=None):
             else:
                 value = content.value
 
-            html += feconf.JINJA_ENV.get_template('content.html').render({
-                'type': content.type, 'value': value})
+            html += feconf.JINJA_ENV.get_template(
+                'generic/content.html').render({
+                    'type': content.type, 'value': value})
         else:
             raise utils.InvalidInputException(
                 'Invalid content type %s', content.type)
@@ -229,7 +231,7 @@ class ExplorationHandler(BaseHandler):
 
         # Append reader's answer.
         values['reader_html'] = feconf.JINJA_ENV.get_template(
-            'reader_response.html').render({'response': answer})
+            'generic/reader_response.html').render({'response': answer})
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.

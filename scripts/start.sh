@@ -78,15 +78,6 @@ if [ ! -d "third_party/static/angular-ui-0.4.0" ]; then
   rm angular-ui-download.zip
 fi
 
-echo Checking whether bootstrap is installed in third_party
-if [ ! -d "third_party/static/bootstrap" ]; then
-  echo Installing Bootstrap
-  mkdir -p third_party/static/
-  wget http://twitter.github.com/bootstrap/assets/bootstrap.zip -O bootstrap-download.zip
-  unzip bootstrap-download.zip -d third_party/static/
-  rm bootstrap-download.zip
-fi
-
 echo Checking whether select2 is installed in third_party
 if [ ! -d "third_party/static/select2" ]; then
   echo Installing select2

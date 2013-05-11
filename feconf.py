@@ -91,27 +91,20 @@ OBJECT_JINJA_ENV = jinja2.Environment(
 )
 
 # The jinja environment used for loading frontend templates.
-JINJA_ENV = jinja2.Environment(
-    autoescape=True, loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
+loader = jinja2.FileSystemLoader(TEMPLATE_DIR)
+JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
+
+def include_js_lib_file(name):
+    """Include a raw JS lib file in the template without evaluating it."""
+    assert name.endswith('.js')
+    return jinja2.Markup(loader.get_source(
+        JINJA_ENV, os.path.join('lib/js', name))[0])
+
+JINJA_ENV.globals['include_js_lib_file'] = include_js_lib_file
 JINJA_ENV.filters.update({
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),
 })
-
-# List of filepaths to JS libraries to include at the bottom of the HTML
-# response, in order.
-FOOTER_JS_FILES = [
-    os.path.join(TEMPLATE_DIR, 'js/app.js'),
-    os.path.join(TEMPLATE_DIR, 'js/directives/directives.js'),
-    os.path.join(TEMPLATE_DIR, 'js/filters/filters.js'),
-    os.path.join(TEMPLATE_DIR, 'js/services/activeInputData.js'),
-    os.path.join(TEMPLATE_DIR, 'js/services/warningsData.js'),
-    # TODO(sll): The following file should not be necessary unless we are on
-    # the exploration editor page.
-    os.path.join(TEMPLATE_DIR, 'js/services/explorationData.js'),
-    os.path.join(TEMPLATE_DIR, 'js/controllers/base.js'),
-]
-
 
 END_DEST = 'END'
 
