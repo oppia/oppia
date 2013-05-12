@@ -35,22 +35,22 @@ def create_rule_name(rule):
     name = rule.name
     for key in rule.inputs.keys():
         left_paren = name.index('(')
-        name = name[0:left_paren] + name[left_paren:].replace(key, str(rule.inputs[key]))
+        name = name[0:left_paren] + name[left_paren:].replace(
+            key, str(rule.inputs[key]))
     return name
 
 
 def get_event_key(event_name, key):
-        if event_name == STATS_ENUMS.exploration_visited:
-            return 'e.%s' % key
-        if event_name == STATS_ENUMS.rule_hit:
-            return 'default.%s' % key
-        if event_name == STATS_ENUMS.exploration_completed:
-            return 'c.%s' % key
-        if event_name == STATS_ENUMS.feedback_submitted:
-            return 'f.%s' % key
-        if event_name == STATS_ENUMS.state_hit:
-            return 's.%s' % key
-
+    if event_name == STATS_ENUMS.exploration_visited:
+        return 'e.%s' % key
+    if event_name == STATS_ENUMS.rule_hit:
+        return 'default.%s' % str(key)
+    if event_name == STATS_ENUMS.exploration_completed:
+        return 'c.%s' % key
+    if event_name == STATS_ENUMS.feedback_submitted:
+        return 'f.%s' % key
+    if event_name == STATS_ENUMS.state_hit:
+        return 's.%s' % str(key)
 
 
 class EventHandler(object):
@@ -77,7 +77,8 @@ class EventHandler(object):
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""
         cls._record_event(
-            STATS_ENUMS.rule_hit, '%s.%s.%s' % (exploration_id, state_id, create_rule_name(rule)),
+            STATS_ENUMS.rule_hit, '%s.%s.%s' % 
+                (exploration_id, state_id, create_rule_name(rule)),
             extra_info)
 
     @classmethod
@@ -100,7 +101,8 @@ class EventHandler(object):
     @classmethod
     def record_state_hit(cls, exploration_id, state_id):
         """Record an event when a state is loaded."""
-        cls._record_event(STATS_ENUMS.state_hit, '%s.%s' % (exploration_id, state_id))
+        cls._record_event(STATS_ENUMS.state_hit, '%s.%s' %
+                          (exploration_id, state_id))
 
     @classmethod
     def _inc(cls, event_key):
@@ -139,7 +141,6 @@ class Counter(ndb.Model):
             return 0
         else:
             return counter.value
-    
 
 
 class Journal(ndb.Model):
@@ -157,9 +158,9 @@ class Journal(ndb.Model):
     def get_value_count_by_id(cls, key):
         journal = Journal.get_by_id(key)
         if journal:
-           return len(journal.values)
+            return len(journal.values)
         else:
-           return 0
+            return 0
 
 
 class Statistics(object):
@@ -196,7 +197,8 @@ class Statistics(object):
                 for handler in state.widget.handlers:
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
-                        event_key = get_event_key(event_name, (exploration_id, state.id, rule_name))
+                        event_key = get_event_key(
+                            event_name, (exploration_id, state.id, rule_name))
 
                         journal = Journal.get_by_id(event_key)
 
@@ -218,7 +220,8 @@ class Statistics(object):
             exploration = Exploration.get(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
-                event_key = get_event_key(event_name, (exploration_id, state.id))
+                event_key = get_event_key(
+                    event_name, (exploration_id, state.id))
 
                 counter = Counter.get_by_id(event_key)
                 if not counter:
@@ -234,7 +237,7 @@ class Statistics(object):
 
     @classmethod
     def get_top_ten_improvable_states(cls, exploration_ids):
-        ranked_states = [] 
+        ranked_states = []
         for exp in exploration_ids:
             exploration = Exploration.get(exp)
             for state_db_key in exploration.states:
@@ -248,12 +251,15 @@ class Statistics(object):
                     continue
 
                 completed_count = 0
-                event_key = get_event_key(STATS_ENUMS.rule_hit, '%s.Default' % state_key)
+                event_key = get_event_key(
+                    STATS_ENUMS.rule_hit, '%s.Default' % state_key)
                 default_count = Journal.get_value_count_by_id(event_key)
                 for handler in state.widget.handlers:
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
-                        event_key = get_event_key(STATS_ENUMS.rule_hit, '%s.%s' % (state_key, rule_name))
+                        event_key = get_event_key(
+                            STATS_ENUMS.rule_hit, '%s.%s' %
+                            (state_key, rule_name))
                         completed_count += Journal.get_value_count_by_id(event_key)
                 incomplete_count = all_count - completed_count
                 if (float(default_count) / all_count > .2):
@@ -273,6 +279,7 @@ class Statistics(object):
                 else:
                     state_rank = 0
                     improve_type = ''
-                ranked_states.append({'exp_id': exp, 'state_id': state.id, 'rank': state_rank, 'type': improve_type})
+                ranked_states.append({'exp_id': exp, 'state_id': state.id,
+                                      'rank': state_rank, 'type': improve_type})
         problem_states = [i for i in ranked_states if i['rank'] != 0]
         return sorted(problem_states, key=lambda state: state['rank'])[:10]
