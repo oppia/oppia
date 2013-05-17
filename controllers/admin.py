@@ -28,8 +28,8 @@ from controllers.base import require_admin
 import utils
 
 
-def reload_demos():
-    """Reload default classifiers, widgets, and explorations (in that order)."""
+def reload_widgets():
+    """Reload the default classifiers and widgets."""
     Classifier.delete_all_classifiers()
     Classifier.load_default_classifiers()
 
@@ -37,8 +37,17 @@ def reload_demos():
     InteractiveWidget.load_default_widgets()
     NonInteractiveWidget.load_default_widgets()
 
+
+def reload_explorations():
+    """Reload the default explorations."""
     Exploration.delete_demo_explorations()
     Exploration.load_demo_explorations()
+
+
+def reload_demos():
+    """Reload default classifiers, widgets, and explorations (in that order)."""
+    reload_widgets()
+    reload_explorations()   
 
 
 class AdminPage(BaseHandler):
@@ -56,5 +65,8 @@ class AdminPage(BaseHandler):
     def post(self, user):
         """Reloads the default widgets and explorations."""
         payload = json.loads(self.request.get('payload'))
-        if payload.get('action') == 'reload_demos':
-            reload_demos()
+        if payload.get('action') == 'reload':
+            if payload.get('item') == 'explorations':
+                reload_explorations()
+            elif payload.get('item') == 'widgets':
+                reload_widgets()

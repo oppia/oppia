@@ -14,10 +14,10 @@
       function Admin($scope, $http) {
         $scope.message = '';
 
-        $scope.reloadDemos = function() {
+        $scope.reload = function(item) {
           $scope.message = 'Processing...';
           var request = $.param({payload: JSON.stringify(
-              {action: 'reload_demos'})}, true);
+              {action: 'reload', item: item})}, true);
 
           $http.post(
             '/admin',
@@ -34,8 +34,12 @@
   </head>
 
   <body ng-controller="Admin">
-    <button ng-click="reloadDemos()">
-      Reload demo widgets and explorations
+    <button ng-click="reload('widgets')">
+      Reload widgets
+    </button>
+    <br><br>
+    <button ng-click="reload('explorations')">
+      Reload explorations
     </button>
     <br><br>
     <[message]>

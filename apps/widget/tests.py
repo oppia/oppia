@@ -63,8 +63,8 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(Widget.query().count(), 0)
 
         InteractiveWidget.load_default_widgets()
-        self.assertEqual(Widget.query().count(), 7)
-        self.assertEqual(InteractiveWidget.query().count(), 7)
+        self.assertEqual(Widget.query().count(), 8)
+        self.assertEqual(InteractiveWidget.query().count(), 8)
         self.assertEqual(NonInteractiveWidget.query().count(), 0)
 
         Widget.delete_all_widgets()
