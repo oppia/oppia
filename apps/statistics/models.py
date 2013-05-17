@@ -26,6 +26,9 @@ from apps.exploration.models import Exploration
 from google.appengine.ext import ndb
 
 
+IMPROVE_TYPE_DEFAULT = 'default'
+IMPROVE_TYPE_INCOMPLETE = 'incomplete'
+
 STATS_ENUMS = utils.create_enum(
     'exploration_visited', 'rule_hit', 'exploration_completed',
     'feedback_submitted', 'state_hit')
@@ -77,8 +80,8 @@ class EventHandler(object):
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""
         cls._record_event(
-            STATS_ENUMS.rule_hit, '%s.%s.%s' % 
-                (exploration_id, state_id, create_rule_name(rule)),
+            STATS_ENUMS.rule_hit, '%s.%s.%s' % (
+                exploration_id, state_id, create_rule_name(rule)),
             extra_info)
 
     @classmethod
@@ -250,36 +253,48 @@ class Statistics(object):
                 if all_count == 0:
                     continue
 
-                completed_count = 0
+                # Count the number of times the default rule was hit.
                 event_key = get_event_key(
                     STATS_ENUMS.rule_hit, '%s.Default' % state_key)
                 default_count = Journal.get_value_count_by_id(event_key)
+
+                # Count the number of times an answer was submitted, regardless
+                # of which rule it hits.
+                completed_count = 0
                 for handler in state.widget.handlers:
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
                         event_key = get_event_key(
                             STATS_ENUMS.rule_hit, '%s.%s' %
                             (state_key, rule_name))
-                        completed_count += Journal.get_value_count_by_id(event_key)
+                        completed_count += Journal.get_value_count_by_id(
+                            event_key)
+
                 incomplete_count = all_count - completed_count
-                if (float(default_count) / all_count > .2):
-                    if (float(incomplete_count) / all_count > .2):
-                        if (default_count > incomplete_count):
-                            state_rank = default_count
-                            improve_type = 'default'
-                        else:
-                            state_rank = incomplete_count
-                            improve_type = 'incomplete'
-                    else:
-                        state_rank = default_count
-                        improve_type = 'default'
-                elif (float(incomplete_count) / all_count > .2):
-                    state_rank = incomplete_count
-                    improve_type = 'incomplete'
-                else:
-                    state_rank = 0
-                    improve_type = ''
+
+                state_rank, improve_type = 0, ''
+
+                eligible_flags = []
+                if float(default_count) / all_count > .2:
+                    eligible_flags.append({
+                        'rank': default_count,
+                        'improve_type': IMPROVE_TYPE_DEFAULT})
+                if float(incomplete_count) / all_count > .2:
+                    eligible_flags.append({
+                        'rank': incomplete_count,
+                        'improve_type': IMPROVE_TYPE_INCOMPLETE})
+
+                eligible_flags = sorted(
+                    eligible_flags, key=lambda flag: flag['rank'], reverse=True)
+                if eligible_flags:
+                    state_rank = eligible_flags[0]['rank']
+                    improve_type = eligible_flags[0]['improve_type']
+
                 ranked_states.append({'exp_id': exp, 'state_id': state.id,
                                       'rank': state_rank, 'type': improve_type})
-        problem_states = [i for i in ranked_states if i['rank'] != 0]
-        return sorted(problem_states, key=lambda state: state['rank'])[:10]
+
+        problem_states = sorted(
+            [state for state in ranked_states if state['rank'] != 0],
+            key=lambda state: state['rank'],
+            reverse=True)
+        return problem_states[:10]

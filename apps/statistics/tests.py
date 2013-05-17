@@ -51,13 +51,17 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_get_top_ten_improvable_states(self):
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(User(email='fake@user.com'), 'exploration', 'category', 'eid')
+        exp = Exploration.create(
+            User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
         state_id = exp.init_state.get().id
 
-        EventHandler.record_rule_hit('eid', state_id, Rule(name='Default', dest=state_id), '1') 
-        EventHandler.record_rule_hit('eid', state_id, Rule(name='Default', dest=state_id), '2') 
-        EventHandler.record_rule_hit('eid', state_id, Rule(name='Default', dest=state_id), '1') 
+        EventHandler.record_rule_hit(
+            'eid', state_id, Rule(name='Default', dest=state_id), '1')
+        EventHandler.record_rule_hit(
+            'eid', state_id, Rule(name='Default', dest=state_id), '2')
+        EventHandler.record_rule_hit(
+            'eid', state_id, Rule(name='Default', dest=state_id), '1')
 
         EventHandler.record_state_hit('eid', state_id)
         EventHandler.record_state_hit('eid', state_id)
