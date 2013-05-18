@@ -247,7 +247,7 @@ class Statistics(object):
                 state = state_db_key.get()
                 state_key = '%s.%s' % (exp, state.id)
 
-                # Get count of how many times state was hit
+                # Get count of how many times the state was hit
                 event_key = get_event_key(STATS_ENUMS.state_hit, state_key)
                 all_count = Counter.get_value_by_id(event_key)
                 if all_count == 0:

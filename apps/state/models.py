@@ -23,7 +23,6 @@ import importlib
 import logging
 
 from apps.base_model.models import BaseModel
-from apps.parameter.models import ParamChange
 from apps.parameter.models import ParamChangeProperty
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import Widget
