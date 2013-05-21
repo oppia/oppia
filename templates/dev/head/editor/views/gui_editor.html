@@ -85,8 +85,15 @@
               <ng-switch on="item.type">
 
                 <div ng-switch-when="text">
-                  <!-- The display of this element is controlled manually, outside Angular JS. -->
-                  <div id="yuiEditor<[$index]>" class="yuiEditor"></div>
+                  <div ng-show="activeInputData.name == 'content.' + $index">
+                    <!-- The display of this element is controlled manually, outside Angular JS. -->
+                    <div class="yui-skin-sam">
+                      <textarea name="yuiEditor<[$index]>" id="yuiEditor<[$index]>" cols="50" rows="10">
+                        <[content[$index]]>
+                      </textarea>
+                    </div>
+                    <button ng-click="saveContent($index)">Save</button>
+                  </div>
 
                   <div ng-hide="activeInputData.name == 'content.' + $index">
                     <span ng-show="item.value == ''" class="oppia-placeholder">

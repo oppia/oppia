@@ -118,100 +118,12 @@ if [ ! -d "third_party/static/d3js-3" ]; then
   wget http://d3js.org/d3.v3.min.js -O third_party/static/d3js-3/d3.min.js
 fi
 
-echo Checking whether YUI is installed in third_party
-if [ ! -d "third_party/static/yui3-3.8.1/build" ]; then
-  echo Installing yui
-  mkdir -p third_party/static/yui3-tmp
-  wget https://github.com/yui/yui3/archive/v3.8.1.zip -O yui3-3.8.1.zip
-  unzip yui3-3.8.1.zip -d third_party/static/yui3-tmp
-  rm yui3-3.8.1.zip
-
-  # Just get the modules we need.
-  mkdir -p third_party/static/yui3-3.8.1/build
-
-  # Contains yui-min.js
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/yui third_party/static/yui3-3.8.1/build
-
-  # Derived using the YUI Configurator: http://yuilibrary.com/yui/configurator/
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/yui-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/oop third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/attribute-core third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-custom-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-custom-complex third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/attribute-observable third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/attribute-extras third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/attribute-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/base-core third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/base-observable third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/base-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/pluginhost-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/pluginhost-config third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/base-pluginhost third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/base-build third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/features third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/dom-core third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/dom-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/selector-native third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/selector third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-core third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-delegate third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-event-delegate third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-pluginhost third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/dom-style third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/dom-screen third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-screen third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/node-style third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/selector-css2 third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/selector-css3 third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/yui-throttle third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/frame third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/exec-command third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-selection third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-bidi third_party/static/yui3-3.8.1/build
-
-  # More dependencies that the YUI configurator didn't pick up
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/cssbutton third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/plugin third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-para-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-para third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-br third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/editor-tab third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/createlink-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/widget-base third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/attribute-complex third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/classnamemanager third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-synthetic third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-focus third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/event-outside third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/substitute third_party/static/yui3-3.8.1/build
-  mv third_party/static/yui3-tmp/yui3-3.8.1/build/stylesheet third_party/static/yui3-3.8.1/build
-
-  mv third_party/static/yui3-tmp/yui3-3.8.1/HISTORY.md third_party/static/yui3-3.8.1
-  mv third_party/static/yui3-tmp/yui3-3.8.1/index.js third_party/static/yui3-3.8.1
-  mv third_party/static/yui3-tmp/yui3-3.8.1/LICENSE.md third_party/static/yui3-3.8.1
-  mv third_party/static/yui3-tmp/yui3-3.8.1/package.json third_party/static/yui3-3.8.1
-  mv third_party/static/yui3-tmp/yui3-3.8.1/README.md third_party/static/yui3-3.8.1
-  rm -rf third_party/static/yui3-tmp
-fi
-
-echo Checking whether YUI Gallery is installed in third_party
-if [ ! -d "third_party/static/yui3-gallery-20121107" ]; then
-  echo Installing yui3 gallery
-  mkdir -p third_party/static/
-  wget https://github.com/yui/yui3-gallery/archive/gallery-2012.11.07-21-32.zip -O yui3-gallery-20121107.zip
-  unzip yui3-gallery-20121107.zip -d third_party/static
-  rm yui3-gallery-20121107.zip
-  # Just get the modules we need.
-  mkdir -p third_party/static/yui3-gallery-20121107/build
-  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32/build/gallery-itsa* third_party/static/yui3-gallery-20121107/build
-  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32/sandbox third_party/static/yui3-gallery-20121107/sandbox
-  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32/gallery.js third_party/static/yui3-gallery-20121107
-  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32/package.json third_party/static/yui3-gallery-20121107
-  mv third_party/static/yui3-gallery-gallery-2012.11.07-21-32/README third_party/static/yui3-gallery-20121107
-  rm -rf third_party/static/yui3-gallery-gallery-2012.11.07-21-32
+echo Checking whether YUI2 is installed in third_party
+if [ ! -d "third_party/static/yui2-2.9.0" ]; then
+  echo Downloading YUI2 JavaScript and CSS files
+  mkdir -p third_party/static/yui2-2.9.0
+  wget "http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/container/container_core-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/element/element-min.js&2.9.0/build/button/button-min.js&2.9.0/build/editor/editor-min.js" -O third_party/static/yui2-2.9.0/yui2-2.9.0.js
+  wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O third_party/static/yui2-2.9.0/yui2-2.9.0.css
 fi
 
 # Do a build.

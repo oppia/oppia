@@ -83,44 +83,55 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
   $scope.initYui = function(index, initContent) {
     var divId = 'yuiEditor' + index;
 
-    YUI({
-        base: '/third_party/static/yui3-3.8.1/build/',
-        combine: false,
-        groups: {
-          gallery: {
-            base: '/third_party/static/yui3-gallery-20121107/build/',
-            patterns: {
-              'gallery-': {}
-            }
+    var myEditor = new YAHOO.widget.Editor(divId, {
+      height: '300px',
+      width: '522px',
+      handleSubmit: true,
+      animate: true,
+      toolbar: {
+        titlebar: 'Rich Text Editor',
+        buttons: [
+          {
+            group: 'textstyle', label: 'Font Style',
+            buttons: [
+              { type: 'push', label: 'Bold', value: 'bold' },
+              { type: 'push', label: 'Italic', value: 'italic' },
+              { type: 'push', label: 'Underline', value: 'underline' },
+              { type: 'separator' },
+              { type: 'select', label: 'Arial', value: 'fontname', disabled: true,
+                menu: [
+                  { text: 'Arial', checked: true },
+                  { text: 'Courier New' },
+                  { text: 'Lucida Console' },
+                  { text: 'Times New Roman' },
+                  { text: 'Verdana' }
+                ]
+              },
+              { type: 'spin', label: '13', value: 'fontsize', range: [ 9, 75 ], disabled: true },
+              { type: 'separator' },
+              { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
+              { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
+            ]
           }
-        }
-    }).use('editor-base', 'gallery-itsatoolbar', function (Y) {
-      var config = {height: '10px'};
-
-      editors[index] = new Y.EditorBase({
-        content: initContent || 'Click \'Edit\' to enter text here.'
-      });
-
-      editors[index].plug(Y.Plugin.ITSAToolbar);
-      editors[index].plug(Y.Plugin.EditorBidi);
-
-      editors[index].on('frame:ready', function() {
-        //Focus the Editor when the frame is ready..
-        this.focus();
-
-        // Adjust the iframe's height.
-        this.frame._iframe._node.height = 10;
-      });
-
-      //Rendering the Editor.
-      editors[index].render('#' + divId);
+        ]
+      }
     });
+    myEditor.render();
+
+    myEditor.on('windowRender', function() {
+      myEditor.setEditorHTML(initContent || 'Click \'Edit\' to enter text here.');
+    });
+
+    editors[index] = myEditor;
   };
 
   $scope.saveContent = function(index) {
     if ($scope.content[index].type == 'text' && editors.hasOwnProperty(index)) {
-      $scope.content[index].value = editors[index].getContent();
+      editors[index].saveHTML();
+      $scope.content[index].value = editors[index].getEditorHTML();
       $scope.saveStateContent();
+      editors[index].destroy();
+      delete editors[index];
     }
     activeInputData.name = '';
   };
@@ -135,8 +146,6 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
 
     if (oldValue && oldValue.indexOf('content.') === 0) {
       $scope.saveContent(oldValue.substring(8));
-      // Remove all old YUI editors from the DOM.
-      $('.yuiEditor').empty();
     }
 
     if (newValue && newValue.indexOf('content.') === 0) {

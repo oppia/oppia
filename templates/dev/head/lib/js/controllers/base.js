@@ -198,7 +198,6 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
         type: 'POST',
         datatype: 'json',
         success: function(data) {
-          data = jQuery.parseJSON(data);
           if (data.image_id) {
             $scope.$apply(successCallback(data));
           }
