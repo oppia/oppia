@@ -49,7 +49,6 @@ function WidgetRepository($scope, $http, activeInputData) {
     for (var category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
         var rawCode = $scope.widgets[category][i].raw;
-        $scope.$apply();
         $scope.addContentToIframe(
             'widget-' + category + '-' + i,
             $scope.createCustomizedCode(
@@ -142,7 +141,6 @@ function WidgetRepository($scope, $http, activeInputData) {
         for (var i = 0; i < $scope.widgets[category].length; ++i) {
           if ($scope.widgets[category][i].name == widgetData.widget.name) {
             var rawCode = $scope.widgets[category][i].raw;
-            $scope.$apply();
             $scope.addContentToIframe(
                 'widget-' + category + '-' + i,
                 $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));

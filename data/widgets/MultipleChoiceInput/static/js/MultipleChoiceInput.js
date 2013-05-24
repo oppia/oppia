@@ -8,7 +8,6 @@ mc.config(function($interpolateProvider) {
 
 function MultipleChoiceInput($scope) {
   $scope.choices = GLOBALS.choices;
-  $scope.$apply();
 
   $scope.submitAnswer = function(answer) {
     if (!answer) {

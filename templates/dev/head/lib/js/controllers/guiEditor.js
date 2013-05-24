@@ -36,30 +36,8 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
 
     console.log('Content updated.');
 
-    /*
-    // NB: /widgets/ does not exist anymore!
-    //
-    // If a (non-interactive) widget exists, show its compiled version and
-    // populate the widget view fields.
-    for (var i = 0; i < $scope.content.length; ++i) {
-      if ($scope.content.type == 'widget') {
-        var widgetFrameId = 'widgetPreview' + i;
-        if ($scope.content.value) {
-          $http.get('/widgets/' + $scope.content.value).
-              success(function(data) {
-                $scope.widgetCode = data.raw;
-                $scope.addContentToIframe(widgetFrameId, $scope.widgetCode);
-              }).error(function(data) {
-                warningsData.addWarning(
-                    'Widget could not be loaded: ' + String(data.error));
-              });
-        }
-      }
-    }
-    */
-
     // Switch to the stateEditor tab when this controller is activated.
-    $scope.$apply($('#editorViewTab a[href="#stateEditor"]').tab('show'));
+    $('#editorViewTab a[href="#stateEditor"]').tab('show');
   };
 
   $scope.saveStateName = function() {
@@ -283,27 +261,6 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
 
   $scope.saveWidget = function(widgetCode, index) {
     var widgetId = $scope.content[index].value || '';
-    console.log(widgetId);
-
-    // NB: /widgets/ does not exist anymore!
-    /*
-    $http.post(
-      '/widgets/' + widgetId,
-      $scope.createRequest({'raw': widgetCode}),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(widgetData) {
-      // Check that the data has been saved correctly.
-      console.log(widgetData);
-      $('#widgetTabs' + index + ' a:first').tab('show');
-      $scope.content[index].value = widgetData.widgetId;
-      $scope.$apply();
-      $scope.addContentToIframe('widgetPreview' + index, widgetCode);
-      $scope.widgetCode = widgetCode;
-      $scope.saveStateContent();
-      // TODO(sll): Display multiple widget div's here.
-      activeInputData.clear();
-    });
-    */
   };
 
   $scope.isWidgetInStateContent = function() {

@@ -58,10 +58,8 @@
     $scope.title = data.title;
     $scope.widgets = data.widgets;
     // We need to generate the HTML (with the iframe) before populating it.
-    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
     $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
 
-    $scope.$apply();
     $scope.updateMath();
 
     if (data.widgets.length > 0) {
@@ -119,7 +117,6 @@
       $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
     }
 
-    $scope.$apply();
     $scope.updateMath();
 
     if ($scope.widgets.length > 0) {

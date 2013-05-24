@@ -8,7 +8,6 @@ numeric.config(function($interpolateProvider) {
 
 function NumericInput($scope) {
   $scope.placeholder = GLOBALS.placeholder;
-  $scope.$apply();
 
   $scope.submitAnswer = function(answer) {
     if (parent.location.pathname.indexOf('/learn') === 0) {
