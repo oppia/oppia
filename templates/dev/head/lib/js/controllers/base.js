@@ -91,7 +91,6 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     doc.writeln(content);
     doc.close();
 
-    $scope.$apply();
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
   };
 

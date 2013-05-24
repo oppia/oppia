@@ -8,7 +8,6 @@ app.config(function($interpolateProvider) {
 
 function IFrame($scope) {
   $scope.childPageUrl = GLOBALS.childPageUrl;
-  $scope.$apply();
 
   window.addEventListener('message', receiveMessage, false);
 
