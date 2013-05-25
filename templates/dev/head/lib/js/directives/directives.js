@@ -24,7 +24,21 @@ oppia.directive('list', function (warningsData) {
     scope: {items: '=', largeInput: '@'},
     templateUrl: '/templates/list',
     controller: function ($scope, $attrs) {
-      $scope.activeItem = null;
+      $scope.largeInput = ($scope.largeInput || false);
+
+      // Reset the component each time the item list changes.
+      $scope.$watch('items', function(newValue, oldValue) {
+        // Maintain a local copy of 'items'. This is needed because it is not
+        // possible to modify 'item' directly when using "for item in items";
+        // we need a 'constant key'. So we represent each item as {label: ...}
+        // instead, and manipulate item.label.
+        $scope.localItems = [];
+        for (var i = 0; i < $scope.items.length; i++) {
+          $scope.localItems.push({label: $scope.items[i]});
+        }
+        $scope.activeItem = null;
+        $scope.newItem = '';
+      });
 
       $scope.openItemEditor = function(index) {
         $scope.activeItem = index;
@@ -40,6 +54,7 @@ oppia.directive('list', function (warningsData) {
           return;
         }
         $scope.newItem = '';
+        $scope.localItems.push({label: newItem});
         $scope.items.push(newItem);
       };
 
@@ -51,12 +66,14 @@ oppia.directive('list', function (warningsData) {
         $scope.index = '';
         $scope.replacementItem = '';
         if (index < $scope.items.length && index >= 0) {
+          $scope.localItems[index] = {label: newItem};
           $scope.items[index] = newItem;
         }
         $scope.closeItemEditor();
       };
+
       $scope.deleteItem = function(index) {
-        $scope.deleteIndex = '';
+        $scope.localItems.splice(index, 1);
         $scope.items.splice(index, 1);
       };
     }

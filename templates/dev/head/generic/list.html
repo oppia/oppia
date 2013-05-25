@@ -4,24 +4,26 @@
   </span>
 
   <ol start="1">
-    <li ng-repeat="item in items">
-      <span ng-hide="largeInput">
-        <[item]>
-      </span>
-      <span ng-show="largeInput">
-        <textarea disabled="true"><[item]></textarea>
-        <br>
-      </span>
-      (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
-      <span ng-show="activeItem == $index">
-        <input ng-hide="largeInput" type="text" ng-model="replacementItem" placeholder="Replacement Item">
-        <textarea ng-show="largeInput" ng-model="replacementItem" placeholder="Replacement Item">
-        </textarea>
-        <span ng-show="inputSize == 'small'">
-          <input type="text" ng-model="replacementItem" placeholder="Replacement Item">
+    <li ng-repeat="item in localItems">
+      <span ng-hide="activeItem == $index">
+        <span ng-hide="largeInput">
+          <[item.label]>
         </span>
-        <button type="button" ng-click="replaceItem($index, replacementItem)">Replace</button>
+        <span ng-show="largeInput">
+          <textarea disabled="true"><[item.label]></textarea>
+          <br>
+        </span>
       </span>
+
+      <span ng-show="activeItem == $index">
+        <input ng-hide="largeInput" type="text" ng-model="item.label">
+        <textarea ng-show="largeInput" ng-model="item.label">
+        </textarea>
+        <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
+      </span>
+
+      (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
+
     </li>
   </ol>
 
