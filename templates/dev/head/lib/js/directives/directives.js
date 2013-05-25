@@ -32,6 +32,7 @@ oppia.directive('list', function (warningsData) {
         // possible to modify 'item' directly when using "for item in items";
         // we need a 'constant key'. So we represent each item as {label: ...}
         // instead, and manipulate item.label.
+        $scope.items = ($scope.items || []);
         $scope.localItems = [];
         for (var i = 0; i < $scope.items.length; i++) {
           $scope.localItems.push({label: $scope.items[i]});
@@ -119,8 +120,12 @@ oppia.directive('string', function (warningsData) {
     scope: {item: '='},
     templateUrl: '/templates/string',
     controller: function ($scope, $attrs) {
-
-      $scope.active = false;
+      // Reset the component each time the item changes.
+      $scope.$watch('item', function(newValue, oldValue) {
+        // Maintain a local copy of 'item'.
+        $scope.localItem = {label: $scope.item};
+        $scope.active = false;
+      });
 
       $scope.openItemEditor = function() {
         $scope.active = true;
@@ -135,7 +140,7 @@ oppia.directive('string', function (warningsData) {
           warningsData.addWarning('Please enter a non-empty item.');
           return;
         }
-        $scope.replacementItem = '';
+        $scope.localItem = {label: newItem};
         $scope.item = newItem;
         $scope.closeItemEditor();
       };
