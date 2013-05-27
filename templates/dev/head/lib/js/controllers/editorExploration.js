@@ -46,7 +46,7 @@ oppia.run(function($rootScope) {
 
 function ExplorationTab($scope, explorationData) {
   // Changes the tab to the Exploration Editor view.
-  $('#editorViewTab a[href="#explorationEditor"]').tab('show');
+  $('#editorViewTab a[href="#explorationMap"]').tab('show');
   $scope.stateId = '';
   explorationData.stateId = '';
 }
@@ -89,7 +89,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
       $scope.changeMode($scope.getMode());
-      $scope.stateName = explorationData.data.states[stateId].name;
+      $scope.stateName = explorationData.data.states[explorationData.stateId].name;
     } else if (e.target.hash == '#explorationMap') {
       $location.path('');
       explorationData.stateId = '';
@@ -97,6 +97,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       // TODO(sll): If $apply() is not called, the $scope.stateId change does
       // not propagate and the 'State Details' tab is still shown. Why?
       $scope.$apply();
+      $scope.$broadcast('updateViz', null);
     }
   });
 
@@ -306,6 +307,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
+              if (successCallback) {
+                successCallback(data);
+              }
               window.location = $scope.explorationUrl;
             }).error(function(data) {
               warningsData.addWarning(

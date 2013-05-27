@@ -19,11 +19,18 @@
  */
 
 function EditorGraph($scope, $filter, explorationData) {
-  // When the exploration data is loaded, construct the graph.
-  explorationData.getData().then(function(data) {
-    $scope.graphData = $scope.reformatResponse(
-        data.states, data.init_state_id);
-  });
+  $scope.updateViz = function() {
+    explorationData.getData().then(function(data) {
+      $scope.graphData = $scope.reformatResponse(
+          data.states, data.init_state_id);
+    });
+  };
+
+  // At the start, update the graph.
+  $scope.updateViz();
+
+  // Also update the graph when an update event is broadcast.
+  $scope.$on('updateViz', $scope.updateViz);
 
   // Reformat the model into a response that is processable by d3.js.
   $scope.reformatResponse = function(states, initStateId) {

@@ -55,6 +55,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       var promise = $http.get(explorationUrl + '/data').then(
         function(response) {
           console.log('Retrieved exploration data.');
+          console.log(response.data);
 
           explorationData.data = response.data;
           return response.data;

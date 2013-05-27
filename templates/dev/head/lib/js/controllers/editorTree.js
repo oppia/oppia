@@ -19,11 +19,18 @@
  */
 
 function EditorTree($scope, $filter, explorationData) {
-  // When the exploration data is loaded, construct the tree.
-  explorationData.getData().then(function(data) {
-    $scope.treeData = $scope.reformatResponse(
-        data.states, data.init_state_id);
-  });
+  $scope.updateViz = function() {
+    explorationData.getData().then(function(data) {
+      $scope.treeData = $scope.reformatResponse(
+          data.states, data.init_state_id);
+    });
+  };
+
+  // At the start, update the tree.
+  $scope.updateViz();
+
+  // Also update the tree when an update event is broadcast.
+  $scope.$on('updateViz', $scope.updateViz);
 
   $scope.truncate = function(text) {
     if (text.length > 40) {

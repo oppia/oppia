@@ -220,16 +220,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionParamChanges = rule.paramChanges;
   };
 
-  $scope.saveRuleset = function(action, ruleset) {
+  $scope.saveExtendedRule = function(action, extendedRule) {
     if (!$scope.interactiveRulesets.hasOwnProperty(action)) {
       $scope.interactiveRulesets[action] = [];
     }
 
     var rules = $scope.interactiveRulesets[action];
     if ($scope.addRuleActionIndex !== null) {
-      rules[$scope.addRuleActionIndex] = ruleset;
+      rules[$scope.addRuleActionIndex] = extendedRule;
     } else {
-      rules.splice(rules.length - 1, 0, ruleset);
+      rules.splice(rules.length - 1, 0, extendedRule);
     }
 
     $('#addRuleModal').modal('hide');
@@ -237,14 +237,14 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.saveInteractiveWidget();
   };
 
-  $scope.saveRulesetWithNewDest = function(action, ruleset, dest) {
-    ruleset['dest'] = dest.id;
-    $scope.saveRuleset(action, ruleset);
+  $scope.saveExtendedRuleWithNewDest = function(action, extendedRule, dest) {
+    extendedRule['dest'] = dest.id;
+    $scope.saveExtendedRule(action, extendedRule);
   };
 
   $scope.saveRule = function(rule, name, inputs, dest, newDest, feedback) {
     if (rule) {
-      var ruleset = {
+      var extendedRule = {
         rule: rule,
         name: name,
         inputs: inputs,
@@ -259,17 +259,19 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
           warningsData.addWarning('Error: destination state is empty.');
         } else if ($scope.convertDestToId(newDest, true)) {
           // The new state already exists.
-          ruleset.dest = $scope.convertDestToId(newDest);
+          extendedRule.dest = $scope.convertDestToId(newDest);
         } else {
-          ruleset.dest = newDest;
+          extendedRule.dest = newDest;
+          // Adds the new state, then saves the rule.
           $scope.addState(
               $scope.addRuleActionDestNew,
-              $scope.saveRulesetWithNewDest.bind(null, $scope.addRuleAction, ruleset));
+              $scope.saveExtendedRuleWithNewDest.bind(
+                  null, $scope.addRuleAction, extendedRule));
           return;
         }
       }
 
-      $scope.saveRuleset($scope.addRuleAction, ruleset);
+      $scope.saveExtendedRule($scope.addRuleAction, extendedRule);
     }
 
     $scope.addRuleAction = null;
