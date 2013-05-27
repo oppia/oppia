@@ -16,13 +16,13 @@
 
 __author__ = 'Jeremy Emerson'
 
+import feconf
 import test_utils
 
 from apps.exploration.models import Exploration
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
-from google.appengine.ext.db import BadValueError
 from google.appengine.api.users import User
 
 
@@ -65,14 +65,31 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(fetched_state_by_name_1, state_1)
 
         # Test the failure cases.
-        fetched_state_2 = State.get('fake_id', self.exploration)
+        id_2 = 'fake_id'
+        name_2 = 'fake_name'
+        fetched_state_2 = State.get(id_2, self.exploration)
         self.assertIsNone(fetched_state_2)
 
         fetched_state_by_name_2 = State.get_by_name(
-            'fake_name', self.exploration, strict=False)
+            name_2, self.exploration, strict=False)
         self.assertIsNone(fetched_state_by_name_2)
         with self.assertRaises(Exception):
             State.get_by_name(name_2, self.exploration, strict=True)
         # The default behavior is to fail noisily.
         with self.assertRaises(Exception):
             State.get_by_name(name_2, self.exploration)
+
+    def test_get_id_from_name(self):
+        """Test converting state names to ids."""
+        id_1 = '123'
+        name_1 = 'State 1'
+        State.create(self.exploration, name_1, state_id=id_1)
+        self.assertEqual(
+            State._get_id_from_name(name_1, self.exploration), id_1)
+
+        with self.assertRaises(Exception):
+            State._get_id_from_name('fake_name', self.exploration)
+
+        self.assertEqual(
+            State._get_id_from_name(feconf.END_DEST, self.exploration),
+            feconf.END_DEST)

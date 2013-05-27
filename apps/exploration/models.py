@@ -289,7 +289,7 @@ class Exploration(BaseModel):
                 if obj_type and param.obj_type != obj_type:
                     raise Exception(
                         'Parameter %s has wrong obj_type: was %s, expected %s'
-                        % (param_name, obj_type, test_pc.obj_type))
+                        % (param_name, obj_type, param.obj_type))
                 return ParamChange(name=param.name, obj_type=param.obj_type)
 
         # The parameter was not found, so add it.
