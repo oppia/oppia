@@ -60,6 +60,9 @@
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
 
+    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    // The call to $apply() is needed before updateMath() is called.
+    $scope.$apply();
     $scope.updateMath();
 
     if (data.widgets.length > 0) {
@@ -112,11 +115,13 @@
 
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
-    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
     if (!data.sticky_interactive_widget) {
       $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
     }
 
+    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
+    // The call to $apply() is needed before updateMath() is called.
+    $scope.$apply();
     $scope.updateMath();
 
     if ($scope.widgets.length > 0) {
