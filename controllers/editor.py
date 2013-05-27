@@ -98,8 +98,9 @@ def get_exploration_stats(exploration):
                 ['', 'This rule', 'Other answers'],
                 ['', rule_count, state_count - rule_count]]
         state_stats[state_id]['no_answer_chartdata'] = [
-                ['', 'No answer', 'Answer given'], 
-                ['',  state_count - all_rule_count, all_rule_count]]
+            ['', 'No answer', 'Answer given'],
+            ['',  state_count - all_rule_count, all_rule_count]]
+
     return {
         'num_visits': num_visits,
         'num_completions': num_completions,

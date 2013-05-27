@@ -8,7 +8,7 @@ im.config(function($interpolateProvider) {
 
 function initialize() {
   var coords = GLOBALS.coords || [0, 0];
-  var zoom_level = parseInt(GLOBALS.zoom) || 0;
+  var zoom_level = parseInt(GLOBALS.zoom, 10) || 0;
   var map = new google.maps.Map(document.getElementById("map-canvas"), {
       center: new google.maps.LatLng(coords[0], coords[1]),
       zoom: zoom_level,
@@ -19,7 +19,7 @@ function initialize() {
     var ll = e.latLng;
     new google.maps.Marker({
       position: ll,
-      map: map,
+      map: map
     });
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(

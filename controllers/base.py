@@ -24,7 +24,6 @@ import traceback
 from apps.exploration.models import Exploration
 from apps.state.models import State
 import feconf
-import jinja2
 import webapp2
 
 from google.appengine.api import users

@@ -8,15 +8,19 @@ app.config(function($interpolateProvider) {
 
 function IFrame($scope) {
   $scope.childPageUrl = GLOBALS.childPageUrl;
+  $scope.childUrlArray = $scope.childPageUrl.split('/');
+  $scope.childUrlProtocol = $scope.childUrlArray[0];
+  $scope.childUrlHost = $scope.childUrlArray[2];
 
   window.addEventListener('message', receiveMessage, false);
 
   function receiveMessage(evt) {
     console.log('Event received from child iframe.');
-    if (evt.origin == window.location.protocol + '//' + window.location.host
-        && parent.location.pathname.indexOf('/learn') === 0) {
+    console.log(evt);
+    if (evt.origin == $scope.childUrlProtocol + '//' + $scope.childUrlHost &&
+      parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
-          JSON.stringify({'submit': answer}),
+          JSON.stringify({'submit': evt.data}),
           window.location.protocol + '//' + window.location.host
       );
     }

@@ -134,6 +134,7 @@
 
   function receiveMessage(evt) {
     console.log('Event received.');
+    console.log(evt.data);
     if (evt.origin == window.location.protocol + '//' + window.location.host) {
       $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }
