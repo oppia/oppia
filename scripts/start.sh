@@ -109,6 +109,10 @@ if [ ! -d "third_party/static/angularjs-1.0.3" ]; then
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/static/angularjs-1.0.3/angular.min.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/static/angularjs-1.0.3/angular-resource.min.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/static/angularjs-1.0.3/angular-sanitize.min.js
+
+  # Files for tests.
+  wget http://code.angularjs.org/1.0.3/angular-mocks.js -O third_party/static/angularjs-1.0.3/angular-mocks.js
+  wget http://code.angularjs.org/1.0.3/angular-scenario.js -O third_party/static/angularjs-1.0.3/angular-scenario.js
 fi
 
 echo Checking whether d3.js is installed in third_party
