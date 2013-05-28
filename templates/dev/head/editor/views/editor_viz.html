@@ -24,6 +24,12 @@
     <div ng-controller="EditorGraph">
       {{ add_state_form() }}
       <em>Click on a state node in the diagram below to edit it.</em>
+
+      <br><br>
+
+      <center ng-hide="graphData">
+        <img src="/images/loading.gif" alt="Loading..." width="100px">
+      </center>
       <state-graph-viz val="graphData" grouped="grouped">
       </state-graph-viz>
     </div>
@@ -32,6 +38,12 @@
     <div ng-controller="EditorTree">
       {{ add_state_form() }}
       <em>Click 'Edit' to edit the corresponding node.</em>
+
+      <br><br>
+
+      <center ng-hide="treeData">
+        <img src="/images/loading.gif" alt="Loading..." width="100px">
+      </center>
       <state-tree-viz val="treeData" grouped="grouped">
       </state-tree-viz>
     </div>
