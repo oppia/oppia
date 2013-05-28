@@ -21,7 +21,6 @@ import urllib
 
 from apps.statistics.models import EventHandler
 from controllers.base import BaseHandler
-import utils
 
 
 class FeedbackPage(BaseHandler):
@@ -30,7 +29,6 @@ class FeedbackPage(BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_controllers(['feedback']),
             'nav_mode': 'feedback',
         })
         self.render_template('feedback/feedback.html')

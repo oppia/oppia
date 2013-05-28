@@ -171,9 +171,6 @@ class ExplorationPage(BaseHandler):
     def get(self, unused_user, unused_exploration):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_controllers(
-                ['editorExploration', 'editorTree', 'editorGraph',
-                 'guiEditor', 'yamlEditor', 'interactiveWidgetPreview']),
             'nav_mode': EDITOR_MODE,
         })
         self.render_template('editor/editor_exploration.html')

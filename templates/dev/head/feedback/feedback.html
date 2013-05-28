@@ -68,3 +68,10 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('feedback/Feedback.js') }}
+  </script>
+{% endblock footer_js %}

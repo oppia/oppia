@@ -68,7 +68,7 @@ def parse_content_into_html(content_array, block_number, params=None):
                     content.value, params)
                 widget_counter += 1
                 html += feconf.JINJA_ENV.get_template(
-                    'generic/content.html').render({
+                    'reader/content.html').render({
                         'type': content.type, 'blockIndex': block_number,
                         'index': widget_counter})
                 widget_array.append({
@@ -85,7 +85,7 @@ def parse_content_into_html(content_array, block_number, params=None):
                 value = content.value
 
             html += feconf.JINJA_ENV.get_template(
-                'generic/content.html').render({
+                'reader/content.html').render({
                     'type': content.type, 'value': value})
         else:
             raise utils.InvalidInputException(
@@ -99,7 +99,6 @@ class ExplorationPage(BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
-            'js': utils.get_js_controllers(['readerExploration']),
             'nav_mode': READER_MODE,
         })
 
@@ -231,7 +230,7 @@ class ExplorationHandler(BaseHandler):
 
         # Append reader's answer.
         values['reader_html'] = feconf.JINJA_ENV.get_template(
-            'generic/reader_response.html').render({'response': answer})
+            'reader/reader_response.html').render({'response': answer})
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.

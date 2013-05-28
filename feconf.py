@@ -24,6 +24,7 @@ CODE_CONTRIBUTORS = [
     'Jeremy Emerson',
     'Koji Ashida',
     'Manas Tungare',
+    'Reinaldo Aguiar',
     'Sean Lip',
     'Stephanie Federwisch',
     'Wilson Hong',
@@ -34,12 +35,12 @@ CODE_CONTRIBUTORS = [
 IDEA_CONTRIBUTORS = [
     'Alex Kauffmann',
     'Catherine Colman',
+    'John Cox',
     'Neil Fraser',
     'Pavel Simakov',
     'Peter Norvig',
     'Phil Wagner',
     'Philip Guo',
-    'Reinaldo Aguiar',
 ]
 
 # Demo explorations to load on startup. The id assigned to each exploration
@@ -94,13 +95,13 @@ OBJECT_JINJA_ENV = jinja2.Environment(
 loader = jinja2.FileSystemLoader(TEMPLATE_DIR)
 JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
 
-def include_js_lib_file(name):
-    """Include a raw JS lib file in the template without evaluating it."""
-    assert name.endswith('.js')
-    return jinja2.Markup(loader.get_source(
-        JINJA_ENV, os.path.join('lib/js', name))[0])
 
-JINJA_ENV.globals['include_js_lib_file'] = include_js_lib_file
+def include_js_file(name):
+    """Include a raw JS file in the template without evaluating it."""
+    assert name.endswith('.js')
+    return jinja2.Markup(loader.get_source(JINJA_ENV, name)[0])
+
+JINJA_ENV.globals['include_js_file'] = include_js_file
 JINJA_ENV.filters.update({
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),

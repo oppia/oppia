@@ -19,7 +19,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 from apps.image.models import Image
 from controllers.base import BaseHandler
 import feconf
-import utils
 
 
 class EditorViewHandler(BaseHandler):
@@ -32,12 +31,12 @@ class EditorViewHandler(BaseHandler):
 
 
 class TemplateHandler(BaseHandler):
-    """Retrieves a template in the 'generic' directory."""
+    """Retrieves a template for a UI component."""
 
     def get(self, template_type):
         """Handles GET requests."""
         self.response.write(feconf.JINJA_ENV.get_template(
-            'generic/%s.html' % template_type).render({}))
+            'components/%s.html' % template_type).render({}))
 
 
 class ImageHandler(BaseHandler):

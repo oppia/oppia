@@ -32,16 +32,13 @@ class WidgetRepositoryPage(BaseHandler):
 
     def get(self):
         """Returns the widget repository page."""
-        self.values.update({
-            'js': utils.get_js_controllers(['widgetRepository']),
-        })
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
         if self.request.get('interactive') == 'true':
             self.values['interactive'] = True
         if users.is_current_user_admin():
             self.values['admin'] = True
-        self.render_template('widgets/widget_repository.html')
+        self.render_template('editor/widget_repository.html')
 
 
 class WidgetRepositoryHandler(BaseHandler):

@@ -3,7 +3,7 @@ basePath = '../';
 files = [
   ANGULAR_SCENARIO,
   ANGULAR_SCENARIO_ADAPTER,
-  'templates/dev/head/js/tests/e2e/*.js'
+  'templates/dev/head/tests/e2e/*.js'
 ];
 
 autoWatch = false;

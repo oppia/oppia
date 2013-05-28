@@ -32,7 +32,7 @@ handlers:
     Cache-Control: 'public, max-age=600'
 - url: /css
   # NB: not minified. TODO(sll): fix.
-  static_dir: templates/dev/head/lib/css
+  static_dir: templates/dev/head/assets/css
   secure: always
 - url: /img
   static_dir: third_party/bootstrap/img

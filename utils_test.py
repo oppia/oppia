@@ -32,17 +32,6 @@ class UtilsTests(test_utils.AppEngineTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
-    def test_get_js_controllers(self):
-        """Test get_js_controllers method."""
-        js_file = utils.get_js_controllers(['base', 'yamlEditor'])
-        self.assertIn('Base', js_file)
-        self.assertIn('function YamlEditor(', js_file)
-        self.assertNotIn('function EditorExploration(', js_file)
-
-        # Try the case where no controllers are needed.
-        js_file = utils.get_js_controllers([])
-        self.assertEqual(js_file, '')
-
     def test_convert_to_js_string(self):
         """Test convert_to_js_string method."""
         expected_values = [

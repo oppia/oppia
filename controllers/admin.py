@@ -25,7 +25,6 @@ from apps.widget.models import NonInteractiveWidget
 from apps.widget.models import Widget
 from controllers.base import BaseHandler
 from controllers.base import require_admin
-import utils
 
 
 def reload_widgets():
@@ -47,7 +46,7 @@ def reload_explorations():
 def reload_demos():
     """Reload default classifiers, widgets, and explorations (in that order)."""
     reload_widgets()
-    reload_explorations()   
+    reload_explorations()
 
 
 class AdminPage(BaseHandler):
@@ -56,9 +55,6 @@ class AdminPage(BaseHandler):
     @require_admin
     def get(self, user):
         """Handles GET requests."""
-        self.values.update({
-            'js': utils.get_js_controllers([]),
-        })
         self.render_template('admin/admin.html')
 
     @require_admin

@@ -60,15 +60,6 @@ def get_file_contents(filepath):
         return f.read().decode('utf-8')
 
 
-def get_js_controllers(filenames):
-    """Concatenates the given JS files (specified without the '.js' suffix)."""
-    return '\n'.join([
-        get_file_contents(
-            os.path.join(feconf.TEMPLATE_DIR, 'lib/js/controllers/%s.js' % filename)
-        ) for filename in filenames
-    ])
-
-
 def convert_to_js_string(value):
     """Converts a value to a JSON string for use in JavaScript code."""
     string = json.dumps(value)

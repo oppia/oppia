@@ -148,8 +148,7 @@
     </div>
 
   </div>
-
-{% endblock %}
+{% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
@@ -157,6 +156,12 @@
   <script async src="/third_party/static/yui2-2.9.0/yui2-2.9.0.js"></script>
   <script async src="/third_party/static/select2/select2.js"></script>
   <script>
-    {{ include_js_lib_file('services/explorationData.js') }}
+    {{ include_js_file('assets/js/services/explorationData.js') }}
+    {{ include_js_file('editor/EditorExploration.js') }}
+    {{ include_js_file('editor/views/EditorGraph.js') }}
+    {{ include_js_file('editor/views/EditorTree.js') }}
+    {{ include_js_file('editor/views/GuiEditor.js') }}
+    {{ include_js_file('editor/views/YamlEditor.js') }}
+    {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}
   </script>
 {% endblock footer_js %}

@@ -186,3 +186,10 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('gallery/Gallery.js') }}
+  </script>
+{% endblock footer_js %}

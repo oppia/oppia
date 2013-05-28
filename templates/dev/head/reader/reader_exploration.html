@@ -27,3 +27,10 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('reader/ReaderExploration.js') }}
+  </script>
+{% endblock footer_js %}

@@ -278,3 +278,10 @@
 </script>
 
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('editor/WidgetRepository.js') }}
+  </script>
+{% endblock footer_js %}
