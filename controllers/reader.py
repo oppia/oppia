@@ -232,6 +232,8 @@ class ExplorationHandler(BaseHandler):
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({'response': answer})
 
+        EventHandler.record_state_hit(exploration_id, state_id)
+
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
@@ -240,7 +242,6 @@ class ExplorationHandler(BaseHandler):
             EventHandler.record_exploration_completed(exploration_id)
         else:
             state = State.get(dest_id, exploration)
-            EventHandler.record_state_hit(exploration_id, state_id)
 
             if feedback:
                 html_output, widget_output = self.append_feedback(
