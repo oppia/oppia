@@ -208,7 +208,7 @@ class ExplorationHandler(BaseHandler):
         dest_id, feedback, rule, recorded_answer = state.transition(
             answer, params, handler)
 
-        if recorded_answer:
+        if recorded_answer is not None:
             recorded_answer = json.dumps(recorded_answer)
             EventHandler.record_rule_hit(
                 exploration_id, state_id, rule, recorded_answer)
