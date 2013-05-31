@@ -128,7 +128,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.stats = {
       'numVisits': data.num_visits,
       'numCompletions': data.num_completions,
-      'stateStats': data.state_stats
+      'stateStats': data.state_stats,
+      'imp': data.imp,
     };
 
     $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
