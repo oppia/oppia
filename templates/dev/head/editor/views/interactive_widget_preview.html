@@ -136,7 +136,7 @@
   <br><br>
 
   <div ng-show="!isEmpty(unresolvedAnswersMap)">
-    <h4>Answers received that hit the 'Default' rule</h4>
+    <h4>Answers received</h4>
     <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
       <span ng-show="item.count == 0">
         <del>
