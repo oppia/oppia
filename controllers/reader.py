@@ -44,7 +44,6 @@ def parse_content_into_html(content_array, block_number, params=None):
                 - 'text'; then the value is a text string
                 - 'image'; then the value is an image ID
                 - 'video'; then the value is a video ID
-                - 'widget'; then the value is a widget ID
         block_number: the number of content blocks preceding this one.
         params: any parameters used for templatizing text strings.
 
@@ -59,26 +58,8 @@ def parse_content_into_html(content_array, block_number, params=None):
         params = {}
 
     html = ''
-    widget_array = []
-    widget_counter = 0
     for content in content_array:
-        if content.type == 'widget':
-            try:
-                widget = NonInteractiveWidget.get_with_params(
-                    content.value, params)
-                widget_counter += 1
-                html += feconf.JINJA_ENV.get_template(
-                    'reader/content.html').render({
-                        'type': content.type, 'blockIndex': block_number,
-                        'index': widget_counter})
-                widget_array.append({
-                    'blockIndex': block_number,
-                    'index': widget_counter,
-                    'code': widget.raw})
-            except utils.EntityIdNotFoundError:
-                # Ignore empty widget content.
-                pass
-        elif (content.type in ['text', 'image', 'video']):
+        if content.type in ['text', 'image', 'video']:
             if content.type == 'text':
                 value = utils.parse_with_jinja(content.value, params)
             else:
@@ -90,7 +71,7 @@ def parse_content_into_html(content_array, block_number, params=None):
         else:
             raise utils.InvalidInputException(
                 'Invalid content type %s', content.type)
-    return html, widget_array
+    return html
 
 
 class ExplorationPage(BaseHandler):
@@ -141,12 +122,10 @@ class ExplorationHandler(BaseHandler):
                         block_number, params):
         """Appends Oppia's feedback to the output variables."""
         feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-        action_html, action_widgets = parse_content_into_html(
+        action_html = parse_content_into_html(
             [Content(type='text', value='<br>'.join(feedback_bits))],
-            block_number,
-            params)
+            block_number, params)
         html_output += action_html
-        widget_output.append(action_widgets)
         return html_output, widget_output
 
     def get(self, exploration_id):
@@ -158,7 +137,7 @@ class ExplorationHandler(BaseHandler):
         # TODO: get params from exploration specification instead
         params = self.get_exploration_params(exploration)
         params = self.get_params(init_state, params)
-        init_html, init_widgets = parse_content_into_html(
+        init_html = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_raw_code(
             init_state.widget.widget_id,
@@ -174,7 +153,7 @@ class ExplorationHandler(BaseHandler):
             'params': params,
             'state_id': init_state.id,
             'title': exploration.title,
-            'widgets': init_widgets,
+            'widgets': [],
         })
         if init_state.widget.widget_id in DEFAULT_ANSWERS:
             self.values['default_answer'] = (
@@ -251,14 +230,13 @@ class ExplorationHandler(BaseHandler):
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:
-                state_html, state_widgets = parse_content_into_html(
+                state_html = parse_content_into_html(
                     state.content, block_number, params)
                 # Separate text for the new state and feedback for the old state
                 # by an additional line.
                 if state_html and feedback:
                     html_output += '<br>'
                 html_output += state_html
-                widget_output.append(state_widgets)
 
         if state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
