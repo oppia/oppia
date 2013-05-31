@@ -46,7 +46,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         state = State(id='The exploration hash id')
 
         # A new state should have a default name property.
-        self.assertEqual(state.name, 'Activity 1')
+        self.assertEqual(state.name, feconf.DEFAULT_STATE_NAME)
 
         # A state that is put into the datastore must have a parent
         # exploration.
