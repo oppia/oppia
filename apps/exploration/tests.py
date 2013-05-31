@@ -200,13 +200,13 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(yaml_file, """parameters: []
 states:
 - content: []
-  name: Activity 1
+  name: '[untitled state]'
   param_changes: []
   widget:
     handlers:
     - name: submit
       rules:
-      - dest: Activity 1
+      - dest: '[untitled state]'
         feedback: []
         inputs: {}
         name: Default

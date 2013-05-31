@@ -96,7 +96,7 @@ class Exploration(BaseModel):
 
     @classmethod
     def create(cls, user, title, category, exploration_id=None,
-               init_state_name='Activity 1', image_id=None):
+               init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
         """Creates and returns a new exploration."""
         # Generate a new exploration id, if one wasn't passed in.
         exploration_id = exploration_id or cls.get_new_id(title)

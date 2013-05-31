@@ -109,6 +109,9 @@ JINJA_ENV.filters.update({
 
 END_DEST = 'END'
 
+# Default name for a state.
+DEFAULT_STATE_NAME = '[untitled state]'
+
 # Default file name for newly-created files for download.
 DEFAULT_FILE_NAME = 'New file'
 

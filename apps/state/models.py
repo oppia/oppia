@@ -31,7 +31,6 @@ import utils
 
 from google.appengine.ext import ndb
 
-
 class Content(ndb.Model):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
@@ -113,7 +112,7 @@ class State(BaseModel):
                     curr_handler.classifier = w_handler.classifier
 
     # Human-readable name for the state.
-    name = ndb.StringProperty(default='Activity 1')
+    name = ndb.StringProperty(default=feconf.DEFAULT_STATE_NAME)
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
