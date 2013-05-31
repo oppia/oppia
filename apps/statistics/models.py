@@ -201,7 +201,7 @@ class Statistics(object):
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
                         event_key = get_event_key(
-                            event_name, (exploration_id, state.id, rule_name))
+                            event_name, '.'.join([exploration_id, state.id, rule_name]))
 
                         journal = Journal.get_by_id(event_key)
 
@@ -224,7 +224,7 @@ class Statistics(object):
             for state_key in exploration.states:
                 state = state_key.get()
                 event_key = get_event_key(
-                    event_name, (exploration_id, state.id))
+                    event_name, '.'.join([exploration_id, state.id]))
 
                 counter = Counter.get_by_id(event_key)
                 if not counter:
