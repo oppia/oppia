@@ -22,6 +22,7 @@ var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
 var GUI_EDITOR_URL = '/gui';
 var YAML_EDITOR_URL = '/text';
+var STATS_VIEWER_URL = '/stats';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
 // TODO(sll): console.log is not supported in IE.
@@ -32,6 +33,8 @@ oppia.config(['$routeProvider', function($routeProvider) {
            {templateUrl: '/editor_views/yaml_editor', controller: YamlEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
+      when(STATS_VIEWER_URL,
+           {templateUrl: '/editor_views/gui_editor', controller: StatsViewerTab}).
       when('/', {templateUrl: '/editor_views/gui_editor', controller: ExplorationTab}).
       otherwise({redirectTo: '/'});
 }]);
@@ -43,6 +46,13 @@ oppia.run(function($rootScope) {
   });
 });
 
+
+function StatsViewerTab($scope, explorationData) {
+  // Changes the tab to the Stats Viewer view.
+  $('#editorViewTab a[href="#statsViewer"]').tab('show');
+  $scope.stateId = '';
+  explorationData.stateId = '';
+}
 
 function ExplorationTab($scope, explorationData) {
   // Changes the tab to the Exploration Editor view.
@@ -90,6 +100,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       explorationData.getStateData(explorationData.stateId);
       $scope.changeMode($scope.getMode());
       $scope.stateName = explorationData.data.states[explorationData.stateId].name;
+    } else if (e.target.hash == '#statsViewer') {
+      $location.path('stats');
+      explorationData.stateId = '';
+      $scope.stateId = '';
+      $scope.$apply();
     } else if (e.target.hash == '#explorationMap') {
       $location.path('');
       explorationData.stateId = '';

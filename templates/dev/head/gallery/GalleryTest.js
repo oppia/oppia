@@ -1,5 +1,15 @@
 describe('Gallery controller', function() {
 
+  describe('GalleryCtrl', function() {
+
+    it('should show all explorations by default', function() {
+      var scope = {$on: function() {}};
+      var ctrl = new Gallery(scope, null, null, null);
+      expect(scope.showMyExplorations).toBe(false);
+    });
+
+  });
+
   describe('Gallery', function(){
     var $scope = {
       $on: function() {}
