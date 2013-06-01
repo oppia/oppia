@@ -22,7 +22,7 @@ states:
         param_changes: []
     params: {}
     sticky: False    
-    widget_id: NumericInput
+    widget_id: interactive-NumericInput
 - name: List the ways
   content:
   - type: text
@@ -130,7 +130,7 @@ states:
         param_changes: []
     params: {}
     sticky: False    
-    widget_id: SetInput
+    widget_id: interactive-SetInput
 - name: Prompt for explanation
   content:
   - type: text
@@ -147,7 +147,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Prompt for explanation with all ways listed
   content:
   - type: text
@@ -167,4 +167,4 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput

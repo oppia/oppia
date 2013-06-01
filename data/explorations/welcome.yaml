@@ -42,7 +42,7 @@ states:
       - It's a nonsense word that someone made up.
       - It's the name of a popular cartoon character.
     sticky: false
-    widget_id: MultipleChoiceInput
+    widget_id: interactive-MultipleChoiceInput
 - content:
   - type: text
     value: What is 10 times 10?
@@ -68,7 +68,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: NumericInput
+    widget_id: interactive-NumericInput
 - content:
   - type: text
     value: 'You might want to build something more complicated than that, though.
@@ -115,7 +115,7 @@ states:
     params:
       noteToGuess: B4
     sticky: true
-    widget_id: MusicStaff
+    widget_id: interactive-MusicStaff
 - content:
   - type: text
     value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
@@ -171,7 +171,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: NumericInput
+    widget_id: interactive-NumericInput
 - content:
   - type: text
     value: That's a very quick sample of Oppia. For more sample explorations, check
@@ -196,7 +196,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: Continue
+    widget_id: interactive-Continue
 - content:
   - type: text
     value: In fact, the word Oppia means 'learn'. Can you guess which language it
@@ -317,4 +317,4 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput

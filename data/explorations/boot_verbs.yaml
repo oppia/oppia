@@ -32,7 +32,7 @@ states:
         param_changes: []
     params: {}
     sticky: False
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: So...
   content:
   - type: text
@@ -56,7 +56,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: boot verb
   content:
   - type: text
@@ -87,7 +87,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: subject
   content:
   - type: text
@@ -112,7 +112,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: verb endings
   content:
   - type: text
@@ -149,4 +149,4 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput

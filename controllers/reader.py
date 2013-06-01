@@ -204,7 +204,7 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): The following is a special-case for multiple choice input,
         # in which the choice text must be displayed instead of the choice
         # number. We might need to find a way to do this more generically.
-        if state.widget.widget_id == 'MultipleChoiceInput':
+        if state.widget.widget_id == 'interactive-MultipleChoiceInput':
             answer = state.widget.params['choices'][int(answer)]
 
         # Append reader's answer.

@@ -32,10 +32,6 @@ from google.appengine.ext.db import BadValueError
 from google.appengine.ext.ndb import polymodel
 
 
-INTERACTIVE_PREFIX = 'interactive'
-NONINTERACTIVE_PREFIX = 'noninteractive'
-
-
 class AnswerHandler(ndb.Model):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
@@ -77,7 +73,7 @@ class Widget(polymodel.PolyModel):
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
         # TODO(sll): Modify this to handle non-interactive widgets.
-        return cls.get_by_id('%s-%s' % (INTERACTIVE_PREFIX, widget_id))
+        return cls.get_by_id(widget_id)
 
     def put(self):
         """The put() method should only be called on subclasses of Widget."""
@@ -98,7 +94,7 @@ class Widget(polymodel.PolyModel):
         parameters = dict(
             (param.name, params.get(
                 param.name, utils.convert_to_js_string(param.value))
-            ) for param in widget.params)
+             ) for param in widget.params)
 
         return utils.parse_with_jinja(widget.template, parameters)
 
@@ -111,7 +107,6 @@ class Widget(polymodel.PolyModel):
         if cls.__name__ == 'Widget':
             raise NotImplementedError
 
-        # TODO(sll): Not working. Why?
         widget = cls.get(widget_id)
         result = copy.deepcopy(widget.to_dict(exclude=['class_']))
         result.update({
@@ -141,12 +136,13 @@ class NonInteractiveWidget(Widget):
         widget_ids = os.listdir(feconf.NONINTERACTIVE_WIDGETS_DIR)
 
         for widget_id in widget_ids:
-            widget_dir = os.path.join(feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
+            widget_dir = os.path.join(
+                feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
             widget_conf_filename = '%s.config.yaml' % widget_id
             with open(os.path.join(widget_dir, widget_conf_filename)) as f:
                 conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
-            conf['id'] = '%s-%s' % (NONINTERACTIVE_PREFIX, widget_id)
+            conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
             conf['template'] = utils.get_file_contents(
                 os.path.join(widget_dir, '%s.html' % widget_id))
@@ -192,7 +188,7 @@ class InteractiveWidget(Widget):
             with open(os.path.join(widget_dir, widget_conf_filename)) as f:
                 conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
-            conf['id'] = '%s-%s' % (INTERACTIVE_PREFIX, widget_id)
+            conf['id'] = '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
             conf['template'] = utils.get_file_contents(
@@ -213,7 +209,8 @@ class InteractiveWidget(Widget):
     @classmethod
     def get_with_params(cls, widget_id, params):
         """Gets a dict representing a parameterized widget."""
-        result = super(InteractiveWidget, cls)._get_with_params(widget_id, params)
+        result = super(InteractiveWidget, cls)._get_with_params(
+            widget_id, params)
 
         widget = cls.get(widget_id)
 

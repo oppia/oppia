@@ -31,6 +31,7 @@ import utils
 
 from google.appengine.ext import ndb
 
+
 class Content(ndb.Model):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
@@ -65,7 +66,7 @@ class AnswerHandlerInstance(ndb.Model):
 class WidgetInstance(ndb.Model):
     """An instance of a widget."""
     # The id of the interactive widget class for this state.
-    widget_id = ndb.StringProperty(default='Continue')
+    widget_id = ndb.StringProperty(default='interactive-Continue')
     # Parameters for the interactive widget view, stored as key-value pairs.
     # Each parameter is single-valued. The values may be Jinja templates that
     # refer to state parameters.
@@ -225,7 +226,7 @@ class State(BaseModel):
         recorded_answer = answer
         # TODO(sll): This is a special case for multiple-choice input
         # which should really be handled generically.
-        if self.widget.widget_id == 'MultipleChoiceInput':
+        if self.widget.widget_id == 'interactive-MultipleChoiceInput':
             recorded_answer = self.widget.params['choices'][int(answer)]
 
         handlers = [h for h in self.widget.handlers if h.name == handler_name]

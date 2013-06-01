@@ -213,7 +213,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: Continue
+    widget_id: interactive-Continue
 - content: []
   name: New state
   param_changes: []
@@ -228,7 +228,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: Continue
+    widget_id: interactive-Continue
 """)
 
         exploration2 = Exploration.create_from_yaml(

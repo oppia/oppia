@@ -33,4 +33,4 @@ states:
       longitude: '78.04217'
       zoom: '10'
     sticky: True
-    widget_id: InteractiveMap
+    widget_id: interactive-InteractiveMap

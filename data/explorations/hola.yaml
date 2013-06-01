@@ -40,7 +40,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Adios
   content:
   - type: text
@@ -72,7 +72,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Colores
   content:
   - type: text
@@ -128,7 +128,7 @@ states:
       - amarillo y gris
       - I don't know
     sticky: False      
-    widget_id: MultipleChoiceInput
+    widget_id: interactive-MultipleChoiceInput
 - name: Como meaning
   content:
   - type: text
@@ -167,7 +167,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Me llamo
   content:
   - type: text
@@ -203,7 +203,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Me llamo meaning
   content:
   - type: text
@@ -244,7 +244,7 @@ states:
         param_changes: []
     params: {}
     sticky: False      
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - name: Supermercado
   content:
   - type: text
@@ -297,4 +297,4 @@ states:
       - Manzanas
       - I don't know
     sticky: False      
-    widget_id: MultipleChoiceInput
+    widget_id: interactive-MultipleChoiceInput

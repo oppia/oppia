@@ -35,7 +35,7 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - content:
   - type: text
     value: 'You are standing at a fork in the road. The main road goes to the <span
@@ -96,7 +96,7 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - content:
   - type: text
     value: 'You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
@@ -186,7 +186,7 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - content:
   - type: text
     value: 'You are at a clearing. There are lots of pretty <span style="font-weight:
@@ -235,7 +235,7 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput
 - content:
   - type: text
     value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
@@ -279,7 +279,7 @@ states:
       choices:
       - Go north
     sticky: false
-    widget_id: MultipleChoiceInput
+    widget_id: interactive-MultipleChoiceInput
 - content:
   - type: text
     value: 'You pick a pretty bouquet of <span style="font-weight: bold;">flowers</span>.'
@@ -300,7 +300,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: Continue
+    widget_id: interactive-Continue
 - content:
   - type: text
     value: '<span style="line-height: 1.22;">"Guess how many coins I''m holding!"</span><br>'
@@ -353,7 +353,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: NumericInput
+    widget_id: interactive-NumericInput
 - content:
   - type: text
     value: 'He gives you the <span style="font-weight: bold;">coins</span> and uses his magic to return you back to the troll.'
@@ -374,7 +374,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: Continue
+    widget_id: interactive-Continue
 - content:
   - type: text
     value: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
@@ -406,4 +406,4 @@ states:
     params:
       placeholder: Type your answer here.
     sticky: false
-    widget_id: TextInput
+    widget_id: interactive-TextInput

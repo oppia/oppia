@@ -120,3 +120,7 @@ ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
 
 # Set this to True to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
+
+# Prefixes for widget ids in the datastore.
+INTERACTIVE_PREFIX = 'interactive'
+NONINTERACTIVE_PREFIX = 'noninteractive'
