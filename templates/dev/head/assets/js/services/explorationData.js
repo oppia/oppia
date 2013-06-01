@@ -20,9 +20,6 @@
  */
 
 oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData, $q) {
-  // Put exploration variables here.
-  var explorationData = {};
-
   // Valid state properties
   var validStateProperties = [
     'content',
@@ -42,26 +39,26 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
 
-  // Returns a promise that supplies the data for the current exploration.
-  explorationData.getData = function() {
-    if (explorationData.data) {
-      console.log('Found exploration data in cache.');
-
-      var deferred = $q.defer();
-      deferred.resolve(explorationData.data);
-      return deferred.promise;
-    } else {
-      // Retrieve data from the server.
-      var promise = $http.get(explorationUrl + '/data').then(
-        function(response) {
+  // Put exploration variables here.
+  var explorationData = {
+    // Returns a promise that supplies the data for the current exploration.
+    getData: function() {
+      if (explorationData.data) {
+        console.log('Found exploration data in cache.');
+  
+        var deferred = $q.defer();
+        deferred.resolve(explorationData.data);
+        return deferred.promise;
+      } else {
+        // Retrieve data from the server.
+        return $http.get(explorationUrl + '/data').then(function(response) {
           console.log('Retrieved exploration data.');
           console.log(response.data);
-
+  
           explorationData.data = response.data;
           return response.data;
-        }
-      );
-      return promise;
+        });
+      }
     }
   };
 

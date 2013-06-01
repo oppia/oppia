@@ -35,7 +35,7 @@
                 <div class="row-fluid">
 
                   <div class="oppia-gallery-block">
-                    <div ng-repeat="exploration in explorations | filter: filterExplorations" class="oppia-gallery-box">
+                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-box">
                       <div>
                         <center>
                           <a href="/learn/<[exploration.data.id]>">
@@ -67,7 +67,7 @@
                                 <span class="oppia-small-font">Edit</span>
                               </a> |
                             </span>
-                            <a ng-click="showModal(exploration.data.id)">
+                            <a ng-click="showEmbedModal(exploration.data.id)">
                               <i class="icon-share-alt" title="Embed this exploration"></i>
                               <span class="oppia-small-font">Embed</span>
                             </a>

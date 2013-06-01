@@ -18,72 +18,33 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('GalleryData', function($rootScope, $http, warningsData) {
-  var GalleryData = {};
-  var galleryUrl = '/gallery/data/';
-
-  GalleryData.getData = function() {
-    var obj = this;
-    $http.get(galleryUrl).success(function(data) {
-      obj.data = data;
-      obj.broadcastGalleryData();
-    }).error(function(data) {
-      warningsData.addWarning('Server error: ' + data.error);
-    });
-  };
-
-  GalleryData.broadcastGalleryData = function() {
-    $rootScope.$broadcast('galleryData');
-  };
-
-  GalleryData.getData();
-
-  return GalleryData;
-});
-
-
-function Gallery($scope, $http, warningsData, GalleryData) {
+function Gallery($scope, $http, warningsData) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
-  $scope.showMyExplorations = false;
+  $scope.galleryUrl = '/gallery/data/';
 
-  $scope.$on('galleryData', function() {
-    console.log(GalleryData.data.categories);
-    $scope.categories = GalleryData.data.categories;
+  // Retrieves gallery data from the server.
+  $http.get($scope.galleryUrl).success(function(galleryData) {
+    $scope.categories = galleryData.categories;
   });
 
+  /**
+   * Returns whether the current URL corresponds to the demo playground server.
+   */
   $scope.isDemoServer = function() {
     return location.host == 'oppiaserver.appspot.com';
   };
 
-  /**
-   * Toggles the user's preference for whether to show just explorations he/she
-   * can edit, or all explorations.
-   */
-  $scope.toggleExplorationView = function() {
-    $scope.showMyExplorations = !$scope.showMyExplorations;
-  };
-
-  $scope.getToggleText = function() {
-    return $scope.showMyExplorations ?
-        '◂ Show all explorations' : 'Show editable explorations ▸';
-  };
-
-  $scope.getHeadingText = function() {
-    return $scope.showMyExplorations ? 'Explorations you can edit' :
-        'All Explorations';
-  };
-
-  $scope.filterExplorations = function(exploration) {
-    return !$scope.showMyExplorations || exploration.is_owner || exploration.can_edit;
-  };
+  /******************************************
+  * Methods controlling the modal dialogs.
+  ******************************************/
 
   /**
-   * Displays a model explaining how to embed the exploration.
+   * Displays a modal explaining how to embed the exploration.
    * @param {string} id The id of the exploration to be embedded.
    */
-  $scope.showModal = function(id) {
-    $scope.currentId = id;
+  $scope.showEmbedModal = function(explorationId) {
+    $scope.currentId = explorationId;
     $('#embedModal').modal();
   };
 
@@ -100,6 +61,9 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     warningsData.clear();
   };
 
+  /*************************************
+  * Methods for handling categories.
+  *************************************/
   $scope.getCategoryList = function() {
     var categoryList = [];
     for (var category in $scope.categories) {
@@ -113,6 +77,9 @@ function Gallery($scope, $http, warningsData, GalleryData) {
     return category === '?' ? 'Add New Category...' : category;
   };
 
+  /***************************************************
+  * Methods representing 'create' and 'copy' actions.
+  ***************************************************/
   $scope.createNewExploration = function() {
     if (!$scope.newExplorationTitle) {
       warningsData.addWarning('Please specify an exploration title.');
@@ -191,9 +158,35 @@ function Gallery($scope, $http, warningsData, GalleryData) {
                   'Error: Could not add new exploration.');
             });
   };
+
+
+  /*********************************************************************
+  * Variables and methods for storing and applying user preferences.
+  *********************************************************************/
+
+  // Whether to show just explorations the user can edit, or all explorations.
+  $scope.showMyExplorations = false;
+
+  $scope.toggleExplorationView = function() {
+    $scope.showMyExplorations = !$scope.showMyExplorations;
+  };
+
+  $scope.getToggleText = function() {
+    return $scope.showMyExplorations ?
+        '◂ Show all explorations' : 'Show editable explorations ▸';
+  };
+
+  $scope.getHeadingText = function() {
+    return $scope.showMyExplorations ? 'Explorations you can edit' :
+        'All Explorations';
+  };
+
+  $scope.canViewExploration = function(exploration) {
+    return !$scope.showMyExplorations || exploration.is_owner || exploration.can_edit;
+  };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', 'warningsData', 'GalleryData'];
+Gallery.$inject = ['$scope', '$http', 'warningsData'];
