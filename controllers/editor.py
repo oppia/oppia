@@ -210,6 +210,10 @@ class ExplorationHandler(BaseHandler):
             'num_completions': statistics['num_completions'],
             'state_stats': statistics['state_stats'],
         })
+        improvments = Statistics.get_top_ten_improvable_states([exploration.id])
+        self.values.update({
+            'imp': improvments,
+        })
         self.render_json(self.values)
 
     @require_editor
