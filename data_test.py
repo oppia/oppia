@@ -69,7 +69,7 @@ class ExplorationDataUnitTests(DataUnitTest):
 
     def verify_is_valid_widget(self, widget_id):
         """Checks that a widget id is valid (i.e., its directory exists)."""
-        widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
+        widget_dir = os.path.join(feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
         self.assertTrue(os.path.isdir(widget_dir))
 
     def verify_state_dict(self, state_dict, state_name_list):
@@ -295,14 +295,14 @@ class WidgetDataUnitTests(DataUnitTest):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
-        widget_ids = os.listdir(os.path.join(feconf.SAMPLE_WIDGETS_DIR))
+        widget_ids = os.listdir(os.path.join(feconf.INTERACTIVE_WIDGETS_DIR))
 
         for widget_id in widget_ids:
             # Check that the widget_id name is valid.
             self.assertTrue(self.is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
-            widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
+            widget_dir = os.path.join(feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config.yaml file, an html

@@ -80,7 +80,8 @@ THIRD_PARTY_DIR = 'third_party'
 SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_IMAGES_DIR = 'data/images'
-SAMPLE_WIDGETS_DIR = 'data/widgets'
+INTERACTIVE_WIDGETS_DIR = 'data/widgets/interactive'
+NONINTERACTIVE_WIDGETS_DIR = 'data/widgets/noninteractive'
 
 OBJECT_TEMPLATES_DIR = 'data/objects/templates'
 

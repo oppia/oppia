@@ -30,7 +30,7 @@ $(window).load(function() {
   note01 = document.getElementById("note01");
 
   MIDI.loadPlugin({
-    soundfontUrl: "/data/widgets/MusicStaff/static/soundfont/",
+    soundfontUrl: "/data/widgets/interactive/MusicStaff/static/soundfont/",
     instrument: "acoustic_grand_piano",
     callback: function() {
       $('#playNote').removeAttr("disabled");  //enable the button

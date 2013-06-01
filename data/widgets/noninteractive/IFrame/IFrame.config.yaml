@@ -1,0 +1,19 @@
+# The system name for this widget. This should match this file's name.
+id: IFrame
+
+# The human-readable name of the widget.
+name: IFrame of arbitrary URL
+# The category the widget falls under in the widget repository.
+category: Custom
+# A description of the widget.
+description: |
+  An iframe for an arbitrary page.
+
+# Customization parameters and their descriptions, types and default values.
+params:
+  - name: childPageUrl
+    description: The URL of the page to iframe.
+    obj_type: UnicodeString
+    values:
+    - ''
+

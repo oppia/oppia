@@ -128,7 +128,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         InteractiveWidget.load_default_widgets()
 
         widget = InteractiveWidget.get('MusicStaff')
-        self.assertEqual(widget.id, 'MusicStaff')
+        self.assertEqual(widget.id, 'interactive-MusicStaff')
         self.assertEqual(widget.name, 'Music staff')
 
         code = Widget.get_raw_code('MusicStaff')

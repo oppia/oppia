@@ -32,6 +32,10 @@ from google.appengine.ext.db import BadValueError
 from google.appengine.ext.ndb import polymodel
 
 
+INTERACTIVE_PREFIX = 'interactive'
+NONINTERACTIVE_PREFIX = 'noninteractive'
+
+
 class AnswerHandler(ndb.Model):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
@@ -48,8 +52,10 @@ class AnswerHandler(ndb.Model):
 class Widget(polymodel.PolyModel):
     """A superclass for NonInteractiveWidget and InteractiveWidget.
 
-    NB: The ids for this class are strings that are camel-cased versions of the
-    human-readable names.
+    NB: The ids for this class are strings that are the concatenations of:
+      - the widget type (interactive|noninteractive)
+      - a hyphen
+      - the camel-cased version of the human-readable names.
     """
     @property
     def id(self):
@@ -70,7 +76,8 @@ class Widget(polymodel.PolyModel):
     @classmethod
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
-        return cls.get_by_id(widget_id)
+        # TODO(sll): Modify this to handle non-interactive widgets.
+        return cls.get_by_id('%s-%s' % (INTERACTIVE_PREFIX, widget_id))
 
     def put(self):
         """The put() method should only be called on subclasses of Widget."""
@@ -104,6 +111,7 @@ class Widget(polymodel.PolyModel):
         if cls.__name__ == 'Widget':
             raise NotImplementedError
 
+        # TODO(sll): Not working. Why?
         widget = cls.get(widget_id)
         result = copy.deepcopy(widget.to_dict(exclude=['class_']))
         result.update({
@@ -130,8 +138,21 @@ class NonInteractiveWidget(Widget):
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets."""
-        # TODO(sll): Implement this method.
-        pass
+        widget_ids = os.listdir(feconf.NONINTERACTIVE_WIDGETS_DIR)
+
+        for widget_id in widget_ids:
+            widget_dir = os.path.join(feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
+            widget_conf_filename = '%s.config.yaml' % widget_id
+            with open(os.path.join(widget_dir, widget_conf_filename)) as f:
+                conf = utils.dict_from_yaml(f.read().decode('utf-8'))
+
+            conf['id'] = '%s-%s' % (NONINTERACTIVE_PREFIX, widget_id)
+            conf['params'] = [Parameter(**param) for param in conf['params']]
+            conf['template'] = utils.get_file_contents(
+                os.path.join(widget_dir, '%s.html' % widget_id))
+
+            widget = cls(**conf)
+            widget.put()
 
 
 class InteractiveWidget(Widget):
@@ -163,14 +184,15 @@ class InteractiveWidget(Widget):
         Assumes that everything is valid (directories exist, widget config files
         are formatted correctly, etc.).
         """
-        widget_ids = os.listdir(feconf.SAMPLE_WIDGETS_DIR)
+        widget_ids = os.listdir(feconf.INTERACTIVE_WIDGETS_DIR)
 
         for widget_id in widget_ids:
-            widget_dir = os.path.join(feconf.SAMPLE_WIDGETS_DIR, widget_id)
+            widget_dir = os.path.join(feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
             widget_conf_filename = '%s.config.yaml' % widget_id
             with open(os.path.join(widget_dir, widget_conf_filename)) as f:
                 conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
+            conf['id'] = '%s-%s' % (INTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
             conf['template'] = utils.get_file_contents(

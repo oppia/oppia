@@ -77,13 +77,13 @@ class InteractiveWidgetHandler(BaseHandler):
 
     def get(self, widget_id):
         """Handles GET requests."""
-        response = InteractiveWidget.get_with_params(widget_id)
-        self.render_json({'widget': response})
+        self.render_json({
+            'widget': InteractiveWidget.get_with_params(widget_id),
+        })
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
         payload = json.loads(self.request.get('payload'))
-        logging.info(payload)
 
         params = payload.get('params', {})
         if isinstance(params, list):

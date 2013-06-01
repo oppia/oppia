@@ -1,0 +1,20 @@
+<html ng-app="app">
+  <head>
+    <script src="/third_party/static/jquery-1.7.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.8.17/jquery-ui.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.3/angular.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.childPageUrl = JSON.parse('{{childPageUrl}}');
+    </script>
+
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+
+    <script src="/data/widgets/interactive/IFrame/static/js/IFrame.js">
+    </script>
+  </head>
+  <body ng-controller="IFrame">
+    <iframe id="iframe" src="<[childPageUrl]>" width="90%" height="400px">
+  </body>
+</html>
