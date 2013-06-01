@@ -20,7 +20,7 @@
 
 oppia.filter('spacesToUnderscores', function() {
   return function(input) {
-    return input.trim().replace(' ', '_');
+    return input.trim().replace(/ /g, '_');
   };
 });
 
@@ -52,12 +52,9 @@ oppia.filter('round1', function() {
 
 // Filter that changes {{...}} tags into INPUT indicators.
 oppia.filter('bracesToText', function() {
+  var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
   return function(input) {
-    if (!input) {
-      return '';
-    }
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
-    return input.replace(pattern, '<code>INPUT</code>');
+    return input ? input.replace(pattern, '<code>INPUT</code>') : '';
   };
 });
 
