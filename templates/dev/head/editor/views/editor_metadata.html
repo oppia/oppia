@@ -38,6 +38,17 @@
         </div>
       </div>
     </div>
+
+    <div>
+      <strong>Parameters</strong>
+      <ol>
+        <li ng-repeat="param in parameters">
+          <span ng-show="param.name"><b><[param.name]></b></span>
+          <span ng-show="param.description"><[param.description]></span>
+          <span ng-show="param.values">initialize to one of: <[param.values]></span>
+        </li>
+      </ol>
+    </div>
   </div>
   
   <div class="span6">
