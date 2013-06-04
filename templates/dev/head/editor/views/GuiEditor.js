@@ -273,59 +273,9 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
   };
 
   //logic for parameter change interface
-  //TODO: discuss changing back to not be keyed by parameter name, in case
-  //someone wants to change the same parameter several times? e.g.
-  //x=y+z; x=x/2
-  //could also be useful if order of changes matters, e.g.
-  //temp=x; x=y; y=temp
 
   //TODO: (in html) see if there's a clean way of having the editor pop-up in
   //the list itself
-
-  //controllers for ui boxes: parameter to be changed, and change options/list
-  $scope.paramSelector = {
-    createSearchChoice:function(term, data) {
-      if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
-        {
-          return {id:'new', text:term};
-        }
-    },
-    data:[],
-    formatNoMatches:function(term) {
-      return "(choose a parameter name)";
-    }
-  };
-  $scope.valueSelector = {
-    createSearchChoice:function(term, data) {
-      if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0)
-        {
-          return {id:term, text:'"'+term+'"'};
-        }
-    },
-    data:[],
-    tokenSeparators:[","],
-    formatNoMatches:function(term) {
-      return "(list new values)";
-    }
-  };
-
-
-  // initialize dropdown options for both selectors in the parameter change interface
-  // (parameter to change and new value(s) to change to)
-  // the select2 library expects the options to have 'id' and 'text' fields.
-  $scope.initSelectorOptions = function() {
-    var namedata = [];
-    $scope.parameters.forEach(function(param){
-      namedata.push({id:param.name, text:param.name});
-    });
-    angular.extend($scope.paramSelector.data, namedata);
-
-    var changedata = [{id:'{{answer}}', text:'Answer'}]; //TODO the student input option only applies to parameter changes that are associated with actions
-    $scope.parameters.forEach(function(param){
-      changedata.push({id:'{{'+param.name+'}}', text:param.name});
-    });
-    angular.extend($scope.valueSelector.data, changedata);
-  };
 
   //start editing/adding a parameter change
   $scope.startAddParamChange = function() {
@@ -333,28 +283,13 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
     $scope.initSelectorOptions();
   };
 
-
   // TODO(sll): Change the following to take an $index.
   $scope.startEditParamChange = function(index) {
-    var pName = $scope.paramChanges[index].name;
-    $scope.tmpParamName = {id:pName, text: pName};
+    var param = $scope.paramChanges[index];
+    fields = $scope.initParamFields(param);
+    $scope.tmpParamName = fields[0];   // There are $scope issues that don't let me 
+    $scope.tmpParamValues = fields[2]; // reuse the exploration-level tmp* variables
     $scope.editingParamChange = index;
-
-    $scope.tmpParamValues = [];
-    ($scope.paramChanges[index].values).forEach(function(change){
-      if(typeof change === "string") { // I think other stuff, like hashes, ends up in this object
-        var txt = "";
-        if(change.lastIndexOf("{{", 0) === 0) { // if change starts with "{{" - it is a variable
-          txt = change.substring(2, change.length-2);
-        }
-        else { // it's a literal; display in quotes
-          txt = '"'+change+'"';
-        }
-        $scope.tmpParamValues.push({id:change, text:txt});
-      }
-    });
-
-    $scope.initSelectorOptions();
   };
 
   //reset and/or initialize variables for parameter change input

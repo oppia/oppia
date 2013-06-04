@@ -190,7 +190,7 @@ class ExplorationHandler(BaseHandler):
 
         parameters = []
         for param in exploration.parameters:
-            parameters.append({'name': param.name, 'type': param.obj_type})
+            parameters.append({'name': param.name, 'obj_type': param.obj_type, 'description': param.description, 'values':param.values})
 
         self.values.update({
             'exploration_id': exploration.id,
@@ -261,7 +261,7 @@ class ExplorationHandler(BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                Parameter(name=item['name'], obj_type=item['type'])
+                Parameter(name=item['name'], obj_type=item['obj_type'], description=item['description'], values=item['values'])
                 for item in parameters
             ]
 
