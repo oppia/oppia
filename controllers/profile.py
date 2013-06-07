@@ -20,6 +20,7 @@ from apps.exploration.models import Exploration
 from apps.statistics.models import Statistics
 from controllers.base import BaseHandler
 import utils
+import logging
 
 from google.appengine.api import users
 
@@ -41,10 +42,18 @@ class ProfileHandler(BaseHandler):
     def get(self):
         """Handles GET requests."""
         user = users.get_current_user()
-        explorations = Exploration.get_explorations_user_can_edit(user)
-        improvable = Statistics.get_top_ten_improvable_states(explorations)        
+        exp_ids = Exploration.get_explorations_user_can_edit(user)
+        improvable = Statistics.get_top_ten_improvable_states(exp_ids)
+        explorations = []
+        for exp_id in exp_ids:
+          exp = Exploration.get(exp_id)
+          explorations.append(
+              {'name': exp.title, 
+               'id': exp.id,
+               'image_id': exp.image_id})
 
         self.values.update({
-            'explorations': improvable,
+            'improvable': improvable,
+            'explorations': explorations,
         })
         self.render_json(self.values)

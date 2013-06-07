@@ -27,6 +27,7 @@ function Profile($scope, $http, warningsData) {
   // Retrieves profile data from the server.
   $http.get($scope.profileUrl).success(function(profileData) {
     $scope.explorations = profileData.explorations;
+    $scope.improvable = profileData.improvable;
   });
 
 }
