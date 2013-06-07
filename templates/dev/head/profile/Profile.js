@@ -1,4 +1,3 @@
-
 // Copyright 2012 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +26,15 @@ function Profile($scope, $http, warningsData) {
   // Retrieves profile data from the server.
   $http.get($scope.profileUrl).success(function(profileData) {
     $scope.explorations = profileData.explorations;
+    $scope.exploration_rows = [];
+    $i = 0;
+    while (($i * 3)<$scope.explorations.length)
+    {
+        console.log($i);
+        console.log($scope.explorations.length);
+        $scope.exploration_rows[$i] = [$scope.explorations[$i*3], $scope.explorations[($i*3)+1], $scope.explorations[($i*3)+2]];
+        $i++;
+    }
     $scope.improvable = profileData.improvable;
   });
 

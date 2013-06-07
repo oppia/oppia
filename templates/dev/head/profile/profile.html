@@ -9,8 +9,28 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
         <h3 class="oppia-page-title">
-          Profile  
+          My Explorations 
         </h3>
+        <table>
+        <tr ng-repeat="row in exploration_rows">
+           <td ng-repeat="exp in row" style="border: 1px solid #CCC; width: 200px;">
+            <span class="oppia-gallery-block">
+              <center>
+                <a href="/create/<[exp.id]>">
+                 <span ui-if="exp.image_id">
+                    <img ng-src="/imagehandler/<[exp.image_id]>"
+                         class="oppia-large-image">
+                    <h5 class="oppia-gallery-title"><[exp.name]></h5>
+                  </span>
+                  <span ng-hide="exp.image_id">
+                     <h4 class="oppia-gallery-title"><[exp.name]></h4>
+                  </span>
+                </a>
+              </center>
+            </span>
+           </td>
+          </tr>
+        </table>
         <div ng-show="explorations.length == 0">
           <em>You don't have any explorations yet.</em>
         </div>
@@ -41,23 +61,6 @@
             <em>All your explorations are doing good!</em>
           </div>
         </div>
-        <h4>My Explorations</h4>
-        <ul>
-          <li ng-repeat="exp in explorations">
-            <div class="oppia-gallery-block">
-              <a href="/create/<[exp.id]>">
-                <span ui-if="exp.image_id">
-                  <img ng-src="/imagehandler/<[exp.image_id]>"
-                       class="oppia-large-image">
-                  <h5 class="oppia-gallery-title"><[exp.name]></h5>
-                </span>
-                <span ng-hide="exp.image_id">
-                  <h4 class="oppia-gallery-title"><[exp.name]></h4>
-                </span>
-              </a>
-            </div>
-          </li>
-        </ul>
       </div>
     </div>
   </div>
