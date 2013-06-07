@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import collections
 import utils
+import logging
 
 from apps.exploration.models import Exploration
 
@@ -281,7 +282,9 @@ class Statistics(object):
                 state_rank, improve_type = 0, ''
 
                 eligible_flags = []
-                if float(default_count) / all_count > .2:
+                default_rule = filter(lambda rule: rule.name == 'Default', state.widget.handlers[0].rules)[0]
+                default_self_loop = default_rule.dest == state.id
+                if float(default_count) / all_count > .2 and default_self_loop:
                     eligible_flags.append({
                         'rank': default_count,
                         'improve_type': IMPROVE_TYPE_DEFAULT})
