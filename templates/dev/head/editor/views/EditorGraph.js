@@ -129,7 +129,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
   var MAX_CATEGORY_LENGTH = 20;
 
   var getTextWidth = function(text) {
-    return 40 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 10;
+    return 40 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 5;
   };
 
   return {
