@@ -1,5 +1,5 @@
 <div ng-show="stats.numVisits > 0">
-  <b>States that need a little help</b>
+  <b ng-show="stats.imp.length > 0">States that need a little help</b>
   <ol>
     <li ng-repeat="foo in stats.imp">
       <a href="/create/<[foo.exp_id]>#/gui/<[foo.state_id]>"><[stats.stateStats[foo.state_id].name]></a>
