@@ -128,8 +128,8 @@ oppia.directive('stateGraphViz', function(explorationData) {
   // The following variable must be at least 3.
   var MAX_CATEGORY_LENGTH = 20;
 
-  var getEllipseWidth = function(text) {
-    return 20 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 3;
+  var getTextWidth = function(text) {
+    return 40 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 10;
   };
 
   return {
@@ -192,6 +192,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
         linkEnter.insert('svg:path', 'g')
             .style('stroke-width', 3)
             .style('stroke', 'red')
+            .attr('opacity', .3)
             .attr('class', 'link')
             .attr('d', function(d) {
               // Draw elliptical arcs.
@@ -233,31 +234,29 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('class', 'node');
 
         // Add nodes to the canvas.
-        nodeEnter.append('svg:ellipse')
-            .attr('cy', function(d) { return d.y0; })
-            .attr('cx', function(d) { return d.x0; })
-            .attr('rx', function(d) {
-              if (d.hashId == initStateId) {
-                return 40;
-              } else {
-                return getEllipseWidth(d.name);
-              }
-            })
-            .attr('ry', function(d) {
-              if (d.hashId == initStateId) {
-                return 40;
-              } else {
-                return 30;
-              }
-            })
+        nodeEnter.append('svg:rect')
+            .attr('x', function(d) { return d.x0; })
+            .attr('y', function(d) { return d.y0; })
+            .attr('ry', function(d) { return 4; })
+            .attr('rx', function(d) { return 4; })
+            .attr('width', function(d) { return getTextWidth(d.name); })
+            .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               if (d.hashId != END_DEST) {
                 return 'clickable';
               }
             })
+            .style('stroke', 'black')
+            .style('stroke-width', function(d) {
+              if (d.hashId == initStateId || d.hashId == END_DEST) {
+                return '3';
+              }
+              return '2'; })
             .style('fill', function(d) {
-              if (d.hashId == END_DEST) {
+              if (d.hashId == initStateId) {
                 return 'olive';
+              } else if (d.hashId == END_DEST) {
+                return 'green';
               } else if (d.reachable === false) {
                 return 'pink';
               } else {
@@ -276,8 +275,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .text(function(d) { return d.name; });
 
         nodeEnter.append('svg:text')
-            .attr('dx', function(d) { return d.x0 - getEllipseWidth(d.name) + 5; })
-            .attr('dy', function(d) { return d.y0; })
+            .attr('text-anchor', 'middle')
+            .attr('dx', function(d) { return d.x0 + (getTextWidth(d.name) / 2); })
+            .attr('dy', function(d) { return d.y0 + 25; })
             .text(function(d) { return scope.truncate(d.name); });
 
 
@@ -287,11 +287,12 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('x', function(d) { return d.x0; })
             .attr('height', 20)
             .attr('width', 20)
-            .attr('opacity', 0)
+            .attr('opacity', 0) // comment out this line to see the delete target
             .attr('transform', function(d) {
-              return 'translate(' + (getEllipseWidth(d.name) - 20) + ',' + (-30) + ')'; }
+              return 'translate(' + (getTextWidth(d.name) - 15) + ',' + (+0) + ')'; }
             )
             .attr('stroke-width', '0')
+            .style('fill', 'pink')
             .on('click', function (d) {
               if (d.hashId == initStateId || d.hashId == END_DEST) {
                 return;
@@ -300,8 +301,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
             });
 
         nodeEnter.append('svg:text')
-            .attr('dx', function(d) { return d.x0 + getEllipseWidth(d.name) - 20; })
-            .attr('dy', function(d) { return d.y0 - 20; })
+            .attr('text-anchor', 'right')
+            .attr('dx', function(d) { return d.x0 + getTextWidth(d.name) -10; })
+            .attr('dy', function(d) { return d.y0 + 10; })
             .text(function(d) {
               if (d.hashId == initStateId || d.hashId == END_DEST) {
                 return;
