@@ -36,9 +36,11 @@
         </div>
         <div ng-show="explorations.length > 0">
           <h4>States that need a little help</h4>
+          <small><em>sorted by priority score, higher scores indicate larger impact</em></small>
           <div ng-show="improvable.length > 0">
             <ol>
               <li ng-repeat="state in improvable">
+                <small><em>(score: <[state.rank]>)</em></small>
                 <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
                    <[state.exp_name]>: <[state.state_name]>
                 </a>
