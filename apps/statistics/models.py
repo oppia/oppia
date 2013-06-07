@@ -258,6 +258,11 @@ class Statistics(object):
                     STATS_ENUMS.rule_hit, '%s.Default' % state_key)
                 # TODO(sfederwisch): Need to check for self-loops?
                 default_count = Journal.get_value_count_by_id(event_key)
+                journal = Journal.get_by_id(event_key)
+                if journal:
+                    top_default_answers = collections.Counter(journal.values).most_common(5)
+                else:
+                    top_default_answers = []
 
                 # Count the number of times an answer was submitted, regardless
                 # of which rule it hits.
@@ -293,7 +298,8 @@ class Statistics(object):
 
                 ranked_states.append({'exp_id': exp, 'exp_name': exploration.title,
                                       'state_id': state.id, 'state_name': state.name,
-                                      'rank': state_rank, 'type': improve_type})
+                                      'rank': state_rank, 'type': improve_type,
+                                      'top_default_answers': top_default_answers})
 
         problem_states = sorted(
             [state for state in ranked_states if state['rank'] != 0],
