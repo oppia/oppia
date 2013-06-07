@@ -257,7 +257,6 @@ class Statistics(object):
                 # Count the number of times the default rule was hit.
                 event_key = get_event_key(
                     STATS_ENUMS.rule_hit, '%s.Default' % state_key)
-                # TODO(sfederwisch): Need to check for self-loops?
                 default_count = Journal.get_value_count_by_id(event_key)
                 journal = Journal.get_by_id(event_key)
                 if journal:
