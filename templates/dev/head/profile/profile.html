@@ -9,26 +9,57 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
         <h3 class="oppia-page-title">
-          Profile  
+          My Explorations 
         </h3>
-        <h4>States that need a little help</h4>
-        <div ng-show="explorations.length > 0">
-          <ol>
-            <li ng-repeat="state in explorations">
-              <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
-                 <[state.exp_name]>: <[state.state_name]>
-              </a>
-              <span ng-show="state.type == 'incomplete'"> 
-                 may be confusing. Students often quit when they get to this state.
-              </span>
-              <span ng-show="state.type == 'default'"> 
-                 may need a bit more feedback. Students seem to keep hitting a no feedback state.
-              </span>
-             </li>
-          </ol>
-        </div>
+        <table>
+        <tr ng-repeat="row in exploration_rows">
+           <td ng-repeat="exp in row" style="border: 1px solid #CCC; width: 200px;">
+            <span class="oppia-gallery-block">
+              <center>
+                <a href="/create/<[exp.id]>">
+                 <span ui-if="exp.image_id">
+                    <img ng-src="/imagehandler/<[exp.image_id]>"
+                         class="oppia-large-image">
+                    <h5 class="oppia-gallery-title"><[exp.name]></h5>
+                  </span>
+                  <span ng-hide="exp.image_id">
+                     <h4 class="oppia-gallery-title"><[exp.name]></h4>
+                  </span>
+                </a>
+              </center>
+            </span>
+           </td>
+          </tr>
+        </table>
         <div ng-show="explorations.length == 0">
-          <em>All your explorations are doing good!</em>
+          <em>You don't have any explorations yet.</em>
+        </div>
+        <div ng-show="explorations.length > 0">
+          <h4>States that need a little help</h4>
+          <div ng-show="improvable.length > 0">
+            <ol>
+              <li ng-repeat="state in improvable">
+                <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
+                   <[state.exp_name]>: <[state.state_name]>
+                </a>
+                <span ng-show="state.type == 'incomplete'"> 
+                   may be confusing. Students often quit when they get to this state.
+                </span>
+                <span ng-show="state.type == 'default'"> 
+                   may need a bit more feedback. Students seem to keep hitting a no feedback state. 
+                   <br> Common answers:
+                   <ul>
+                     <li ng-repeat="answer in state.top_default_answers">
+                       <[answer[0]]> <em>(<[answer[1]]> time<span ng-show="answer[1] > 1">s</span>)</em>
+                     </li>
+                   </ul>
+                </span>
+               </li>
+            </ol>
+          </div>
+          <div ng-show="improvable.length == 0">
+            <em>All your explorations are doing good!</em>
+          </div>
         </div>
       </div>
     </div>

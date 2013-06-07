@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import collections
 import utils
+import logging
 
 from apps.exploration.models import Exploration
 
@@ -256,8 +257,12 @@ class Statistics(object):
                 # Count the number of times the default rule was hit.
                 event_key = get_event_key(
                     STATS_ENUMS.rule_hit, '%s.Default' % state_key)
-                # TODO(sfederwisch): Need to check for self-loops?
                 default_count = Journal.get_value_count_by_id(event_key)
+                journal = Journal.get_by_id(event_key)
+                if journal:
+                    top_default_answers = collections.Counter(journal.values).most_common(5)
+                else:
+                    top_default_answers = []
 
                 # Count the number of times an answer was submitted, regardless
                 # of which rule it hits.
@@ -276,7 +281,9 @@ class Statistics(object):
                 state_rank, improve_type = 0, ''
 
                 eligible_flags = []
-                if float(default_count) / all_count > .2:
+                default_rule = filter(lambda rule: rule.name == 'Default', state.widget.handlers[0].rules)[0]
+                default_self_loop = default_rule.dest == state.id
+                if float(default_count) / all_count > .2 and default_self_loop:
                     eligible_flags.append({
                         'rank': default_count,
                         'improve_type': IMPROVE_TYPE_DEFAULT})
@@ -293,7 +300,8 @@ class Statistics(object):
 
                 ranked_states.append({'exp_id': exp, 'exp_name': exploration.title,
                                       'state_id': state.id, 'state_name': state.name,
-                                      'rank': state_rank, 'type': improve_type})
+                                      'rank': state_rank, 'type': improve_type,
+                                      'top_default_answers': top_default_answers})
 
         problem_states = sorted(
             [state for state in ranked_states if state['rank'] != 0],
