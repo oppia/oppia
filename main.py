@@ -28,6 +28,7 @@ from controllers import editor
 from controllers import feedback
 from controllers import gallery
 from controllers import pages
+from controllers import profile
 from controllers import reader
 from controllers import resources
 from controllers import widgets
@@ -69,6 +70,9 @@ urls = [
 
     (r'/gallery/?', gallery.GalleryPage),
     (r'/gallery/data/?', gallery.GalleryHandler),
+
+    (r'/profile/?', profile.ProfilePage),
+    (r'/profile/data/?', profile.ProfileHandler),
 
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),

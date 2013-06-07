@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Profile
+{% endblock subtitle %}
+
+{% block content %}
+  <div ng-controller="Profile">
+    <div class="oppia-content">
+      <div class="oppia-gallery-frame">
+        <h3 class="oppia-page-title">
+          Profile  
+        </h3>
+        <h4>States that need a little help</h4>
+        <div ng-show="explorations.length > 0">
+          <ol>
+            <li ng-repeat="state in explorations">
+              <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
+                 <[state.exp_name]>: <[state.state_name]>
+              </a>
+              <span ng-show="state.type == 'incomplete'"> 
+                 may be confusing. Students often quit when they get to this state.
+              </span>
+              <span ng-show="state.type == 'default'"> 
+                 may need a bit more feedback. Students seem to keep hitting a no feedback state.
+              </span>
+             </li>
+          </ol>
+        </div>
+        <div ng-show="explorations.length == 0">
+          <em>All your explorations are doing good!</em>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('/profile/Profile.js') }}
+  </script>
+{% endblock footer_js %}

@@ -144,6 +144,16 @@ class Exploration(BaseModel):
             ndb.OR(cls.is_public == True, cls.editors == user)
         )
 
+    @classmethod
+    def get_explorations_user_can_edit(cls, user):
+        explorations = cls.get_viewable_explorations(user)
+        editable_explorations = []
+        for exploration in explorations:
+            can_edit = user and exploration.is_editable_by(user)
+            if can_edit:
+                editable_explorations += [exploration.id]
+        return editable_explorations
+
     def add_state(self, state_name):
         """Adds a new state, and returns it."""
         if self._has_state_named(state_name):

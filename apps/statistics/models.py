@@ -291,7 +291,8 @@ class Statistics(object):
                     state_rank = eligible_flags[0]['rank']
                     improve_type = eligible_flags[0]['improve_type']
 
-                ranked_states.append({'exp_id': exp, 'state_id': state.id,
+                ranked_states.append({'exp_id': exp, 'exp_name': exploration.title,
+                                      'state_id': state.id, 'state_name': state.name,
                                       'rank': state_rank, 'type': improve_type})
 
         problem_states = sorted(
