@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $routeParams, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
     promise.then(function(data) {
@@ -33,11 +33,32 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
     $scope.stateName = data.name;
     $scope.content = data.content || [];
     $scope.paramChanges = data.param_changes || [];
+    $scope.initAllWidgets();
 
     console.log('Content updated.');
 
     // Switch to the stateEditor tab when this controller is activated.
     $('#editorViewTab a[href="#stateEditor"]').tab('show');
+  };
+
+  $scope.initAllWidgets = function(index) {
+    for (var i = 0; i < $scope.content.length; i++) {
+      if ($scope.content[i].type == 'widget' && $scope.content[i].value) {
+        $scope.initWidget(i);
+      }
+    }
+  };
+
+  $scope.initWidget = function(index) {
+    var widget = JSON.parse($scope.content[index].value);
+    $http.post(
+      '/noninteractive_widgets/' + widget.id + '?parent_index=' + index,
+      $scope.createRequest({params: widget.params, state_params: $scope.paramChanges}),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(widgetData) {
+      $scope.addContentToIframe(
+          'widgetPreview' + widgetData.parent_index, widgetData.widget.raw);
+    });
   };
 
   $scope.saveStateName = function() {
@@ -206,6 +227,7 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
     activeInputData.clear();
     $scope.content.splice(index, 1);
     $scope.saveStateContent();
+    $scope.initAllWidgets();
   };
 
   $scope.swapContent = function(index1, index2) {
@@ -244,33 +266,49 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
-    var index = -1;
-    for (var i = 0; i < $scope.content.length; ++i) {
-      if ($scope.content[i].type == 'widget') {
-        index = i;
-        break;
-      }
-    }
-    if (index == -1) {
-      // TODO(sll): Do more substantial error-checking here.
+    if (!arg.data.widgetType || arg.data.widgetType != 'noninteractive') {
       return;
     }
 
-    $scope.saveWidget(arg.data.raw, index);
+    $scope.saveWidget(arg.data.widget, arg.data.parentIndex);
   });
 
-  $scope.saveWidget = function(widgetCode, index) {
-    var widgetId = $scope.content[index].value || '';
+  $scope.hasCustomizableParams = function(widgetValue) {
+    return Boolean(JSON.parse(widgetValue).params);
   };
 
-  $scope.isWidgetInStateContent = function() {
-    for (var i = 0; i < $scope.content.length; ++i) {
-      if ($scope.content[i] && $scope.content[i]['type'] == 'widget') {
-        return true;
-      }
-    }
-    return false;
+  $scope.customizeWidget = function(index) {
+    $scope.customizationParams = JSON.parse($scope.content[index].value).params;
+    $scope.customizeWidgetIndex = index;
   };
+
+  $scope.saveNonInteractiveWidgetParams = function() {
+    var index = $scope.customizeWidgetIndex;
+    var widget = JSON.parse($scope.content[index].value);
+    widget.params = $scope.customizationParams;
+    $scope.content[index].value = JSON.stringify(widget);
+
+    $scope.initWidget(index);
+    $scope.saveStateContent();
+
+    $scope.customizationParams = null;
+    $scope.customizeWidgetIndex = null;
+  };
+
+  $scope.saveWidget = function(widget, index) {
+    $scope.content[index].value = JSON.stringify({
+      'id': widget.id,
+      'params': widget.params
+    });
+
+    $scope.initWidget(index);
+    $scope.saveStateContent();
+  };
+
+  $scope.deleteWidget = function(index) {
+    $scope.content[index].value = '';
+    $scope.saveStateContent();
+  }
 
   //logic for parameter change interface
 
@@ -346,5 +384,5 @@ function GuiEditor($scope, $routeParams, explorationData, warningsData, activeIn
   };
 }
 
-GuiEditor.$inject = ['$scope', '$routeParams', 'explorationData',
+GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
     'warningsData', 'activeInputData'];

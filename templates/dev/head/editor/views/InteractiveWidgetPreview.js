@@ -337,6 +337,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
+    if (!arg.data.widgetType || arg.data.widgetType != 'interactive') {
+      return;
+    }
+
     $scope.addContentToIframe('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
     if ($scope.interactiveWidget.id != arg.data.widget.id) {

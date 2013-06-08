@@ -45,7 +45,6 @@
   $scope.answerIsBeingProcessed = false;
 
   $scope.loadPage = function(data) {
-    console.log(data);
     $scope.answer = data.default_answer;
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
@@ -65,9 +64,10 @@
     $scope.$apply();
     $scope.updateMath();
 
-    if (data.widgets.length > 0) {
-      $scope.addContentToIframe('widgetCompiled' + data.widgets[0].blockIndex + '-' +
-          data.widgets[0].index, data.widgets[0].code);
+    for (var i = 0; i < data.widgets.length; i++) {
+      $scope.addContentToIframe(
+        'widgetCompiled' + data.widgets[i].blockIndex + '-' + data.widgets[i].index,
+        data.widgets[i].raw);  
     }
   };
 
@@ -100,7 +100,6 @@
   $scope.refreshPage = function(data) {
     $scope.answerIsBeingProcessed = false;
 
-    console.log(data);
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.inputTemplate = data.interactive_widget_html;
@@ -113,6 +112,10 @@
     $scope.html += data.reader_html;
     $scope.oppiaHtml = data.oppia_html;
 
+    for (var i = 0; i < data.widgets.length; i++) {
+      $scope.widgets.push(data.widgets[i]);
+    }
+
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     if (!data.sticky_interactive_widget) {
@@ -124,9 +127,11 @@
     $scope.$apply();
     $scope.updateMath();
 
-    if ($scope.widgets.length > 0) {
-      $scope.addContentToIframe('widgetCompiled' + $scope.widgets[0].blockIndex + '-' +
-          $scope.widgets[0].index, $scope.widgets[0].code);
+    // TODO(sll): Can this be done without forcing a reload of all the existing widgets?
+    for (var i = 0; i < $scope.widgets.length; i++) {
+      $scope.addContentToIframe(
+        'widgetCompiled' + $scope.widgets[i].blockIndex + '-' + $scope.widgets[i].index,
+        $scope.widgets[i].raw);
     }
 
     var currentScrollTop = $('body').scrollTop();

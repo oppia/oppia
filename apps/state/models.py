@@ -35,6 +35,7 @@ from google.appengine.ext import ndb
 class Content(ndb.Model):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
+    # TODO(sll): Generalize this so that the value can be a dict (for a widget).
     value = ndb.TextProperty(default='')
 
 

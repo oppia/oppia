@@ -144,11 +144,19 @@ class NonInteractiveWidget(Widget):
 
             conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
+            # TODO(sll): Should this be a template *location* instead?
             conf['template'] = utils.get_file_contents(
                 os.path.join(widget_dir, '%s.html' % widget_id))
 
             widget = cls(**conf)
             widget.put()
+
+    @classmethod
+    def get_with_params(cls, widget_id, params):
+        """Gets a dict representing a parameterized widget."""
+        result = super(NonInteractiveWidget, cls)._get_with_params(
+            widget_id, params)
+        return result
 
 
 class InteractiveWidget(Widget):

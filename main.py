@@ -90,6 +90,7 @@ urls = [
 
     (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
     (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
+    (r'/noninteractive_widgets/(%s)/?' % r, widgets.NonInteractiveWidgetHandler),
     (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidgetHandler),
 
     # 404 error handler.

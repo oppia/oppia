@@ -43,8 +43,8 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.widgetParams = [];
 
   $scope.loadPage = function(data) {
+    $scope.parentIndex = data.parent_index || null;
     $scope.widgets = data.widgets;
-    console.log(data);
     // Display previews of each widget.
     for (var category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
@@ -79,6 +79,10 @@ function WidgetRepository($scope, $http, activeInputData) {
   var dataUrl = $scope.widgetDataUrl;
   if ('interactive' in WidgetRepositoryConfig) {
     dataUrl += '?interactive=true';
+  }
+  if ('parent_index' in WidgetRepositoryConfig) {
+    dataUrl += '?parent_index=';
+    dataUrl += WidgetRepositoryConfig['parent_index'];
   }
 
   // Initializes the widget list using data from the server.
@@ -192,7 +196,6 @@ function WidgetRepository($scope, $http, activeInputData) {
   $scope.submitCustomization = function() {
     var category = $scope.customizeCategory;
     var index = $scope.customizeIndex;
-    console.log($scope.customizedParams);
     // Display the new widget, but DO NOT save the code.
     var customizedCode = $scope.createCustomizedCode(
         $scope.widgets[category][index].params, $scope.customizedParams,
@@ -216,6 +219,13 @@ function WidgetRepository($scope, $http, activeInputData) {
       raw: customizedCode,
       widget: $scope.widgets[category][index]
     };
+    // Parent index for non-interactive widgets.
+    if ($scope.parentIndex !== null) {
+      data.parentIndex = $scope.parentIndex;
+      data.widgetType = 'noninteractive';
+    } else {
+      data.widgetType = 'interactive';
+    }
 
     window.parent.postMessage(data, '*');
   };

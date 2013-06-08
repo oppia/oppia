@@ -275,6 +275,9 @@
   {% if interactive %}
     WidgetRepositoryConfig['interactive'] = true;
   {% endif %}
+  {% if parent_index is defined %}
+    WidgetRepositoryConfig['parent_index'] = {{parent_index}}
+  {% endif %}
 </script>
 
 {% endblock %}
