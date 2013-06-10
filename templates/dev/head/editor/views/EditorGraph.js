@@ -179,27 +179,49 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('viewBox', '0 -5 10 10')
             .attr('refX', 25)
             .attr('refY', -1.5)
-            .attr('markerWidth', 6)
-            .attr('markerHeight', 6)
+            .attr('markerWidth', 3)
+            .attr('markerHeight', 3)
             .attr('orient', 'auto')
           .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
-            .attr('fill', 'red');
+            .attr('fill', 'black');
 
         var linkEnter = link.enter().append('svg:g')
             .attr('class', 'link');
 
         linkEnter.insert('svg:path', 'g')
             .style('stroke-width', 3)
-            .style('stroke', 'red')
-            .attr('opacity', .3)
+            .style('stroke', 'grey')
+            .attr('opacity', 0.6)
             .attr('class', 'link')
             .attr('d', function(d) {
-              // Draw elliptical arcs.
-              var dx = d.target.x0 - d.source.x0,
-                  dy = d.target.y0 - d.source.y0,
-                  dr = Math.sqrt(dx * dx + dy * dy);
-              return 'M' + d.source.x0 + ',' + d.source.y0 + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x0 + ',' + d.target.y0;
+              var sourcex = d.source.x0 + (getTextWidth(d.source.name) / 2);
+              var sourcey = d.source.y0 + 25;
+              var targetx = d.target.x0 + (getTextWidth(d.target.name) / 2);
+              var targety = d.target.y0 + 25;
+
+              if (d.source == d.target) {
+                return 'M' + sourcex + ' ' + sourcey;
+              }
+
+              var dx = targetx - sourcex;
+              var dy = targety - sourcey;
+
+              var dxperp = targety - sourcey;
+              var dyperp = sourcex - targetx;
+              var norm = Math.sqrt(dxperp*dxperp + dyperp*dyperp);
+              dxperp /= norm;
+              dyperp /= norm;
+
+              var midx = sourcex + dx/2 + dxperp*20;
+              var midy = sourcey + dy/2 + dyperp*20;
+
+              // Draw a quadratic bezier curve.
+              // TODO(sll): Add a point in the middle so that the arrowhead
+              // can be moved there, using marker-mid. Alternatively, truncate
+              // the links so that the arrows stay outside the boxes.
+              return 'M' + sourcex + ' ' + sourcey + ' Q ' + midx + ' ' + midy +
+                  ' ' + targetx + ' ' + targety;
             })
             .attr('marker-end', function(d) {
               if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
@@ -251,7 +273,8 @@ oppia.directive('stateGraphViz', function(explorationData) {
               if (d.hashId == initStateId || d.hashId == END_DEST) {
                 return '3';
               }
-              return '2'; })
+              return '2';
+            })
             .style('fill', function(d) {
               if (d.hashId == initStateId) {
                 return 'olive';
