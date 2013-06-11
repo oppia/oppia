@@ -195,10 +195,13 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('opacity', 0.6)
             .attr('class', 'link')
             .attr('d', function(d) {
-              var sourcex = d.source.x0 + (getTextWidth(d.source.name) / 2);
-              var sourcey = d.source.y0 + 25;
-              var targetx = d.target.x0 + (getTextWidth(d.target.name) / 2);
-              var targety = d.target.y0 + 25;
+              var sourceWidth = getTextWidth(d.source.name);
+              var targetWidth = getTextWidth(d.target.name);
+
+              var sourcex = d.source.x0 + sourceWidth/2;
+              var sourcey = d.source.y0 + 20;
+              var targetx = d.target.x0 + targetWidth/2;
+              var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
                 return 'M' + sourcex + ' ' + sourcey;
@@ -206,6 +209,17 @@ oppia.directive('stateGraphViz', function(explorationData) {
 
               var dx = targetx - sourcex;
               var dy = targety - sourcey;
+
+              /* Fractional amount of truncation to be applied to the end of
+                 each link. */
+              var startCutoff = (sourceWidth/2)/Math.abs(dx);
+              var endCutoff = (targetWidth/2)/Math.abs(dx);
+              if (dx === 0 || dy !== 0) {
+                startCutoff = (dx === 0) ? 20.0/Math.abs(dy) : Math.min(
+                    startCutoff, 20.0/Math.abs(dy));
+                endCutoff = (dx === 0) ? 20.0/Math.abs(dy) : Math.min(
+                    endCutoff, 20.0/Math.abs(dy));
+              }
 
               var dxperp = targety - sourcey;
               var dyperp = sourcex - targetx;
@@ -216,12 +230,14 @@ oppia.directive('stateGraphViz', function(explorationData) {
               var midx = sourcex + dx/2 + dxperp*20;
               var midy = sourcey + dy/2 + dyperp*20;
 
+              var startx = sourcex + startCutoff*dx;
+              var starty = sourcey + startCutoff*dy;
+              var endx = targetx - endCutoff*dx;
+              var endy = targety - endCutoff*dy;
+
               // Draw a quadratic bezier curve.
-              // TODO(sll): Add a point in the middle so that the arrowhead
-              // can be moved there, using marker-mid. Alternatively, truncate
-              // the links so that the arrows stay outside the boxes.
-              return 'M' + sourcex + ' ' + sourcey + ' Q ' + midx + ' ' + midy +
-                  ' ' + targetx + ' ' + targety;
+              return 'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
+                  ' ' + endx + ' ' + endy;
             })
             .attr('marker-end', function(d) {
               if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
