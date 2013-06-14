@@ -108,7 +108,7 @@ if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   sudo rm -rf third_party/coverage
 fi
 
-coverage run ./tests/suite.py
+coverage run ./tests/suite.py $@
 coverage report --omit="third_party/*","../oppia_runtime/*","/usr/share/pyshared/*" --show-missing
 
 echo Done!
