@@ -124,7 +124,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
   var w = 960,
       h = 4000,
       i = 0;
-  var DEFAULT_CIRCLE_RADIUS = 30;
+  var NODE_PADDING_X = 8;
   // The following variable must be at least 3.
   var MAX_CATEGORY_LENGTH = 20;
 
@@ -247,22 +247,6 @@ oppia.directive('stateGraphViz', function(explorationData) {
               }
             });
 
-        linkEnter.append('svg:text')
-            .attr('dy', function(d) { return d.source.y0*0.5 + d.target.y0*0.5; })
-            .attr('dx', function(d) {
-              return d.source.x0*0.5 + d.target.x0*0.5 - DEFAULT_CIRCLE_RADIUS;
-            })
-            .attr('color', 'black')
-            .text(function(d) {
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return '';
-              }
-              return '';
-              // TODO(sll): display link text (return d.name) when we can do so
-              // without all the text overlapping.
-            });
-
-
         // Update the nodes
         // TODO(sll): Put a blue border around the current node.
         var node = vis.selectAll('g.node')
@@ -273,11 +257,11 @@ oppia.directive('stateGraphViz', function(explorationData) {
 
         // Add nodes to the canvas.
         nodeEnter.append('svg:rect')
-            .attr('x', function(d) { return d.x0; })
+            .attr('x', function(d) { return d.x0 - NODE_PADDING_X; })
             .attr('y', function(d) { return d.y0; })
             .attr('ry', function(d) { return 4; })
             .attr('rx', function(d) { return 4; })
-            .attr('width', function(d) { return getTextWidth(d.name); })
+            .attr('width', function(d) { return getTextWidth(d.name) + 2*NODE_PADDING_X; })
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               if (d.hashId != END_DEST) {
@@ -315,8 +299,8 @@ oppia.directive('stateGraphViz', function(explorationData) {
 
         nodeEnter.append('svg:text')
             .attr('text-anchor', 'middle')
-            .attr('dx', function(d) { return d.x0 + (getTextWidth(d.name) / 2); })
-            .attr('dy', function(d) { return d.y0 + 25; })
+            .attr('x', function(d) { return d.x0 + (getTextWidth(d.name) / 2); })
+            .attr('y', function(d) { return d.y0 + 25; })
             .text(function(d) { return scope.truncate(d.name); });
 
 
