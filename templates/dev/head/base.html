@@ -49,20 +49,16 @@
                     <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
                       <a href="/gallery">Gallery</a>
                     </li>
-                    {% if user %}
-                      <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
-                        <a href="/profile">My Explorations</a>
-                      </li>
-                    {% endif %}
                     {% if nav_mode == 'reader' %}
                       <li class="active">
                         <a href="">Learn</a>
                       </li>
-                    {% endif %}
-                    {% if nav_mode == 'editor' %}
-                      <li class="active">
-                        <a href="">Create</a>
-                      </li>
+                    {% else %}
+                      {% if user %}
+                        <li {% if nav_mode == 'profile' or nav_mode == 'editor' %} class="active" {% endif %}>
+                          <a href="/profile">My Explorations</a>
+                        </li>
+                      {% endif %}
                     {% endif %}
                   </ul>
 
