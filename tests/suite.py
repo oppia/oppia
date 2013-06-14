@@ -18,7 +18,7 @@ Invoke this test script from the command line by running
 
     python tests/suite.py
 
-from the oppia/ root directory.
+from the oppia root folder.
 
 Optionally, you can append a path to run tests in a particular
 subdirectory, e.g.:
