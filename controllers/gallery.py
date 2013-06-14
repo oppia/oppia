@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from controllers.base import BaseHandler
 import utils
 
@@ -44,30 +44,31 @@ class GalleryHandler(BaseHandler):
         used_keys = []
 
         categories = {}
-        editable_explorations = Exploration.get_explorations_user_can_edit(user)
-        explorations = Exploration.get_viewable_explorations(user)
+        editable_explorations = exp_services.get_editable_explorations(user)
+        editable_exploration_ids = [e.id for e in editable_explorations]
+        explorations = exp_services.get_viewable_explorations(user)
 
         for exploration in explorations:
-            category_name = exploration.category
-
-            can_edit = exploration.id in editable_explorations
-
             used_keys.append(exploration.key)
 
-            data = exploration.to_dict(
-                exclude=['states', 'init_state'])
-            data.update({'id': exploration.id})
-            data['editors'] = [editor.nickname() for
-                               editor in exploration.editors]
+            data = exploration.to_dict(exclude=['states', 'init_state'])
+            data.update({
+                'id': exploration.id,
+                'editors': [
+                    editor.nickname() for editor in exploration.editors
+                ]
+            })
 
+            category_name = exploration.category
             if not categories.get(category_name):
                 categories[category_name] = []
+
             categories[category_name].append({
                 'data': data,
-                'can_edit': can_edit,
-                'can_fork': user and exploration.is_demo_exploration(),
+                'can_edit': exploration.id in editable_exploration_ids,
+                'can_fork': user and exp_services.is_demo(exploration),
                 'is_owner': (user and exploration.editors and
-                             user == exploration.editors[0]),
+                             exp_services.is_owner(user, exploration)),
             })
 
         self.values.update({
