@@ -49,6 +49,11 @@
                     <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
                       <a href="/gallery">Gallery</a>
                     </li>
+                    {% if user %}
+                      <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
+                        <a href="/profile">My Explorations</a>
+                      </li>
+                    {% endif %}
                     {% if nav_mode == 'reader' %}
                       <li class="active">
                         <a href="">Learn</a>
@@ -81,9 +86,6 @@
                           <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                          <li>
-                            <a href="/profile">My Explorations</a>
-                          </li>
                           <li>
                             <a href="{{logout_url}}">Logout</a>
                           </li>
