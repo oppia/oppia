@@ -38,15 +38,15 @@
                     <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-box">
                       <div>
                         <center>
-                          <a href="/learn/<[exploration.data.id]>">
-                            <span ui-if="exploration.data.image_id">
-                              <img ng-src="/imagehandler/<[exploration.data.image_id]>"
+                          <a href="/learn/<[exploration.id]>">
+                            <span ui-if="exploration.image_id">
+                              <img ng-src="/imagehandler/<[exploration.image_id]>"
                                    class="oppia-large-image">
-                              <h5 class="oppia-gallery-title"><[exploration.data.title]></h5>
+                              <h5 class="oppia-gallery-title"><[exploration.title]></h5>
                             </span>
-                            <span ng-hide="exploration.data.image_id">
+                            <span ng-hide="exploration.image_id">
                               <center>
-                                <h4 class="oppia-gallery-title"><[exploration.data.title]></h4>
+                                <h4 class="oppia-gallery-title"><[exploration.title]></h4>
                               </center>
                             </span>
                           </a>
@@ -55,19 +55,19 @@
                         <center>
                           <div>
                             <span ui-if="exploration.can_fork">
-                              <a ng-click="forkExploration(exploration.data.id)">
+                              <a ng-click="forkExploration(exploration.id)">
                                 <i class="icon-share oppia-icon" title="Copy this exploration">
                                 </i>
                                 <span class="oppia-small-font">Copy</span>
                               </a> |
                             </span>
                             <span ui-if="exploration.can_edit">
-                              <a href="/create/<[exploration.data.id]>">
+                              <a href="/create/<[exploration.id]>">
                                 <i class="icon-pencil" title="Edit this exploration"></i>
                                 <span class="oppia-small-font">Edit</span>
                               </a> |
                             </span>
-                            <a ng-click="showEmbedModal(exploration.data.id)">
+                            <a ng-click="showEmbedModal(exploration.id)">
                               <i class="icon-share-alt" title="Embed this exploration"></i>
                               <span class="oppia-small-font">Embed</span>
                             </a>

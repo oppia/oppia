@@ -18,9 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import apps.exploration.services as exp_services
 from controllers.base import BaseHandler
-import utils
-
-from google.appengine.api import users
 
 
 class GalleryPage(BaseHandler):
@@ -39,36 +36,24 @@ class GalleryHandler(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        user = users.get_current_user()
-
-        used_keys = []
+        explorations = exp_services.get_viewable_explorations(self.user)
+        editable_exploration_ids = [
+            e.id for e in exp_services.get_editable_explorations(self.user)]
 
         categories = {}
-        editable_explorations = exp_services.get_editable_explorations(user)
-        editable_exploration_ids = [e.id for e in editable_explorations]
-        explorations = exp_services.get_viewable_explorations(user)
 
         for exploration in explorations:
-            used_keys.append(exploration.key)
-
-            data = exploration.to_dict(exclude=['states', 'init_state'])
-            data.update({
-                'id': exploration.id,
-                'editors': [
-                    editor.nickname() for editor in exploration.editors
-                ]
-            })
-
             category_name = exploration.category
             if not categories.get(category_name):
                 categories[category_name] = []
 
             categories[category_name].append({
-                'data': data,
                 'can_edit': exploration.id in editable_exploration_ids,
-                'can_fork': user and exp_services.is_demo(exploration),
-                'is_owner': (user and exploration.editors and
-                             exp_services.is_owner(user, exploration)),
+                'can_fork': self.user and exp_services.is_demo(exploration),
+                'id': exploration.id,
+                'image_id': exploration.image_id,
+                'is_owner': exp_services.is_owner(self.user, exploration),
+                'title': exploration.title,
             })
 
         self.values.update({

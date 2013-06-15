@@ -112,7 +112,7 @@ class NewExploration(BaseHandler):
     """Creates a new exploration."""
 
     @require_user
-    def post(self, user):
+    def post(self):
         """Handles POST requests."""
 
         payload = json.loads(self.request.get('payload'))
@@ -129,10 +129,10 @@ class NewExploration(BaseHandler):
 
         if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
             exploration = Exploration.create_from_yaml(
-                yaml_file=yaml, user=user, title=title, category=category)
+                yaml_file=yaml, user=self.user, title=title, category=category)
         else:
             exploration = Exploration.create(
-                user, title=title, category=category)
+                self.user, title=title, category=category)
 
         self.render_json({'explorationId': exploration.id})
 
@@ -141,7 +141,7 @@ class ForkExploration(BaseHandler):
     """Forks an existing exploration."""
 
     @require_user
-    def post(self, user):
+    def post(self):
         """Handles POST requests."""
 
         payload = json.loads(self.request.get('payload'))
@@ -159,7 +159,7 @@ class ForkExploration(BaseHandler):
         category = forked_exploration.category
 
         exploration = Exploration.create_from_yaml(
-            yaml_file=yaml, user=user, title=title, category=category)
+            yaml_file=yaml, user=self.user, title=title, category=category)
 
         self.render_json({'explorationId': exploration.id})
 
@@ -168,7 +168,7 @@ class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
     @require_editor
-    def get(self, unused_user, unused_exploration):
+    def get(self, unused_exploration):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': EDITOR_MODE,
@@ -180,7 +180,7 @@ class ExplorationHandler(BaseHandler):
     """Page with editor data for a single exploration."""
 
     @require_editor
-    def get(self, unused_user, exploration):
+    def get(self, exploration):
         """Gets the question name and state list for a question page."""
 
         state_list = {}
@@ -190,7 +190,10 @@ class ExplorationHandler(BaseHandler):
 
         parameters = []
         for param in exploration.parameters:
-            parameters.append({'name': param.name, 'obj_type': param.obj_type, 'description': param.description, 'values':param.values})
+            parameters.append({
+                'name': param.name, 'obj_type': param.obj_type,
+                'description': param.description, 'values': param.values
+            })
 
         self.values.update({
             'exploration_id': exploration.id,
@@ -217,7 +220,7 @@ class ExplorationHandler(BaseHandler):
         self.render_json(self.values)
 
     @require_editor
-    def post(self, unused_user, exploration):
+    def post(self, exploration):
         """Adds a new state to the given exploration."""
 
         payload = json.loads(self.request.get('payload'))
@@ -230,7 +233,7 @@ class ExplorationHandler(BaseHandler):
         self.render_json(state.as_dict())
 
     @require_editor
-    def put(self, user, exploration):
+    def put(self, exploration):
         """Updates properties of the given exploration."""
 
         payload = json.loads(self.request.get('payload'))
@@ -251,7 +254,7 @@ class ExplorationHandler(BaseHandler):
         if 'image_id' in payload:
             exploration.image_id = None if image_id == 'null' else image_id
         if editors:
-            if exploration.editors and user == exploration.editors[0]:
+            if exploration.editors and self.user == exploration.editors[0]:
                 exploration.editors = []
                 for email in editors:
                     editor = users.User(email=email)
@@ -261,14 +264,16 @@ class ExplorationHandler(BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                Parameter(name=item['name'], obj_type=item['obj_type'], description=item['description'], values=item['values'])
-                for item in parameters
+                Parameter(
+                    name=item['name'], obj_type=item['obj_type'],
+                    description=item['description'], values=item['values']
+                ) for item in parameters
             ]
 
         exploration.put()
 
     @require_editor
-    def delete(self, unused_user, exploration):
+    def delete(self, exploration):
         """Deletes the given exploration."""
         exploration.delete()
 
@@ -277,7 +282,7 @@ class ExplorationDownloadHandler(BaseHandler):
     """Downloads an exploration as a YAML file."""
 
     @require_editor
-    def get(self, unused_user, exploration):
+    def get(self, exploration):
         """Handles GET requests."""
         filename = 'oppia-%s' % utils.to_ascii(exploration.title)
         if not filename:
@@ -294,7 +299,7 @@ class StateHandler(BaseHandler):
     """Handles state transactions."""
 
     @require_editor
-    def put(self, unused_user, exploration, state):
+    def put(self, exploration, state):
         """Saves updates to a state."""
 
         payload = json.loads(self.request.get('payload'))
@@ -414,7 +419,7 @@ class StateHandler(BaseHandler):
         self.render_json(get_state_for_frontend(state, exploration))
 
     @require_editor
-    def delete(self, unused_user, exploration, state):
+    def delete(self, exploration, state):
         """Deletes the state with id state_id."""
 
         # Do not allow deletion of initial states.

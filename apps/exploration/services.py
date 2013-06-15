@@ -28,12 +28,16 @@ from google.appengine.ext import ndb
 # Methods for managing rights.
 def is_owner(user, exploration):
     """Returns whether the given user owns the exploration."""
-    return user == exploration.editors[0]
+    if is_demo(exploration):
+        return users.is_current_user_admin()
+    else:
+        return user and user == exploration.editors[0]
 
 
 def is_editor(user, exploration):
     """Checks whether the given user has rights to edit this exploration."""
-    return user in exploration.editors or users.is_current_user_admin()
+    return user and (
+        user in exploration.editors or users.is_current_user_admin())
 
 
 def get_viewable_explorations(user):

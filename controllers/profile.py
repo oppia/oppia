@@ -19,15 +19,13 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 from apps.exploration.models import Exploration
 from apps.statistics.models import Statistics
 from controllers.base import BaseHandler
-import utils
-import logging
-
-from google.appengine.api import users
+from controllers.base import require_user
 
 
 class ProfilePage(BaseHandler):
     """The profile page."""
 
+    @require_user
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -41,16 +39,16 @@ class ProfileHandler(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        user = users.get_current_user()
-        exp_ids = Exploration.get_explorations_user_can_edit(user)
+        exp_ids = Exploration.get_explorations_user_can_edit(self.user)
         improvable = Statistics.get_top_ten_improvable_states(exp_ids)
         explorations = []
         for exp_id in exp_ids:
-          exp = Exploration.get(exp_id)
-          explorations.append(
-              {'name': exp.title, 
-               'id': exp.id,
-               'image_id': exp.image_id})
+            exp = Exploration.get(exp_id)
+            explorations.append({
+                'name': exp.title,
+                'id': exp.id,
+                'image_id': exp.image_id
+            })
 
         self.values.update({
             'improvable': improvable,

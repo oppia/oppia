@@ -53,12 +53,12 @@ class AdminPage(BaseHandler):
     """Admin page shown in the App Engine admin console."""
 
     @require_admin
-    def get(self, user):
+    def get(self):
         """Handles GET requests."""
         self.render_template('admin/admin.html')
 
     @require_admin
-    def post(self, user):
+    def post(self):
         """Reloads the default widgets and explorations."""
         payload = json.loads(self.request.get('payload'))
         if payload.get('action') == 'reload':
