@@ -37,6 +37,7 @@ class ProfilePage(BaseHandler):
 class ProfileHandler(BaseHandler):
     """Provides data for the profile gallery."""
 
+    @require_user
     def get(self):
         """Handles GET requests."""
         exp_ids = Exploration.get_explorations_user_can_edit(self.user)
