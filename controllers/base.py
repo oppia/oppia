@@ -65,7 +65,10 @@ def require_editor(handler):
             self.redirect(users.create_login_url(self.request.uri))
             return
 
-        exploration = Exploration.get(exploration_id)
+        try:
+            exploration = Exploration.get(exploration_id)
+        except:
+            raise self.PageNotFoundException
 
         if not exploration.is_editable_by(self.user):
             raise self.UnauthorizedUserException(
@@ -75,6 +78,8 @@ def require_editor(handler):
         if not state_id:
             return handler(self, exploration, **kwargs)
         state = State.get(state_id, exploration)
+        if state is None:
+            return self.PageNotFoundException
         return handler(self, exploration, state, **kwargs)
 
     return test_editor
@@ -121,6 +126,22 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values['login_url'] = users.create_login_url(self.request.uri)
 
+    def get(self, *args):
+        """Base method to handle GET requests."""
+        raise self.PageNotFoundException
+
+    def post(self, *args):
+        """Base method to handle POST requests."""
+        raise self.PageNotFoundException
+
+    def put(self, *args):
+        """Base method to handle PUT requests."""
+        raise self.PageNotFoundException
+
+    def delete(self, *args):
+        """Base method to handle PUT requests."""
+        raise self.PageNotFoundException
+
     def render_json(self, values):
         self.response.content_type = 'application/json'
         self.response.write(json.dumps(values))
@@ -153,6 +174,12 @@ class BaseHandler(webapp2.RequestHandler):
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)
 
+        if isinstance(exception, self.PageNotFoundException):
+            logging.error('Invalid URL requested: %s', self.request.uri)
+            self.error(404)
+            self.redirect('/gallery')
+            return
+
         if isinstance(exception, self.NotLoggedInException):
             self.redirect(users.create_login_url(self.request.uri))
             return
@@ -183,6 +210,9 @@ class BaseHandler(webapp2.RequestHandler):
 
     class InvalidInputException(Exception):
         """Error class for invalid input on the user's side (error code 400)."""
+
+    class PageNotFoundException(Exception):
+        """Error class for a page not found error (error code 404)."""
 
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""

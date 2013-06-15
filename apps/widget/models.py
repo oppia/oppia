@@ -108,6 +108,9 @@ class Widget(polymodel.PolyModel):
             raise NotImplementedError
 
         widget = cls.get(widget_id)
+        if widget is None:
+            raise Exception('No widget found with id %s' % widget_id)
+
         result = copy.deepcopy(widget.to_dict(exclude=['class_']))
         result.update({
             'id': widget_id,

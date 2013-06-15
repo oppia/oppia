@@ -26,8 +26,11 @@ class EditorViewHandler(BaseHandler):
 
     def get(self, view_type):
         """Handles GET requests."""
-        self.response.write(feconf.JINJA_ENV.get_template(
-            'editor/views/%s.html' % view_type).render({}))
+        try:
+            self.response.write(feconf.JINJA_ENV.get_template(
+                'editor/views/%s.html' % view_type).render({}))
+        except:
+            raise self.PageNotFoundException
 
 
 class TemplateHandler(BaseHandler):
@@ -35,8 +38,11 @@ class TemplateHandler(BaseHandler):
 
     def get(self, template_type):
         """Handles GET requests."""
-        self.response.write(feconf.JINJA_ENV.get_template(
-            'components/%s.html' % template_type).render({}))
+        try:
+            self.response.write(feconf.JINJA_ENV.get_template(
+                'components/%s.html' % template_type).render({}))
+        except:
+            raise self.PageNotFoundException
 
 
 class ImageHandler(BaseHandler):
@@ -48,13 +54,16 @@ class ImageHandler(BaseHandler):
         Args:
             image_id: string representing the image id.
         """
-        image = Image.get_by_id(image_id)
-        if image:
+        try:
+            image = Image.get_by_id(image_id)
+            if image is None:
+                raise self.PageNotFoundException
+
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = str('image/%s' % image.format)
             self.response.write(image.raw)
-        else:
-            self.response.write('No image')
+        except:
+            raise self.PageNotFoundException
 
     def post(self):
         """Saves an image uploaded by a content creator."""

@@ -30,6 +30,18 @@ def empty_environ():
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
+    def assertSubstring(self, needle, haystack, strict=True):
+        """Tests whether 'needle' is a substring of 'haystack'.
+
+        If strict is False, then all whitespace is stripped from both strings
+        strings before the comparison.
+        """
+        if not strict:
+            needle = ''.join(needle.split())
+            haystack = ''.join(haystack.split())
+
+        assert needle in haystack
+
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.

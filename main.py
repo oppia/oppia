@@ -16,7 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-import logging
 import os
 import sys
 
@@ -45,9 +44,7 @@ class Error404Handler(base.BaseHandler):
 
     def get(self):
         """Redirects users to the main gallery if an invalid URL is entered."""
-
-        logging.error('Invalid URL requested: %s', self.request.uri)
-        self.redirect('/gallery')
+        raise self.PageNotFoundException
 
 
 # Regex for base64 id encoding
@@ -65,7 +62,6 @@ urls = [
 
     (r'/editor_views/(%s)/?' % r, resources.EditorViewHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-    (r'/imagehandler/?', resources.ImageHandler),
     (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
 
     (r'/gallery/?', gallery.GalleryPage),
@@ -77,7 +73,7 @@ urls = [
     (r'/learn/(%s)/?' % r, reader.ExplorationPage),
     (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/learn/(%s)/(%s)/?' % (r, r), reader.ExplorationHandler),
+    (r'/learn/(%s)/(%s)/?' % (r, r), reader.FeedbackHandler),
     (r'/learn_random/?', reader.RandomExplorationPage),
 
     (r'/create_new/?', editor.NewExploration),

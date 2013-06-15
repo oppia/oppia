@@ -18,7 +18,6 @@ __author__ = 'Sean Lip'
 
 import cgi
 import json
-import logging
 
 from apps.exploration.models import Exploration
 from apps.state.models import Content
@@ -32,6 +31,20 @@ import utils
 
 READER_MODE = 'reader'
 DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
+
+
+def get_params(state, existing_params=None):
+    """Updates existing parameters based on changes in the given state."""
+    if existing_params is None:
+        existing_params = {}
+    # Modify params using param_changes.
+    for item in state.param_changes:
+        # Pick a random parameter for this key.
+        value = item.value
+        existing_params[item.name] = (
+            None if value is None else utils.parse_with_jinja(
+                value, existing_params, value))
+    return existing_params
 
 
 def parse_content_into_html(content_array, block_number, params=None):
@@ -102,13 +115,11 @@ def parse_content_into_html(content_array, block_number, params=None):
 class ExplorationPage(BaseHandler):
     """Page describing a single exploration."""
 
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': READER_MODE,
         })
-
-        Exploration.get(exploration_id)
 
         # The following allows embedding of Oppia explorations in other pages.
         if self.request.get('iframed') == 'true':
@@ -118,22 +129,9 @@ class ExplorationPage(BaseHandler):
 
 
 class ExplorationHandler(BaseHandler):
-    """Provides the data for a single exploration."""
+    """Provides the initial data for a single exploration."""
 
-    def get_params(self, state, existing_params=None):
-        """Updates existing parameters based on changes in the given state."""
-        if existing_params is None:
-            existing_params = {}
-        # Modify params using param_changes.
-        for item in state.param_changes:
-            # Pick a random parameter for this key.
-            value = item.value
-            existing_params[item.name] = (
-                None if value is None else utils.parse_with_jinja(
-                    value, existing_params, value))
-        return existing_params
-
-    def get_exploration_params(self, exploration):
+    def _get_exploration_params(self, exploration):
         # TODO(yanamal/sll): consider merging with get_params somehow, since the
         # process is largely the same
         params = {}
@@ -143,26 +141,19 @@ class ExplorationHandler(BaseHandler):
                                  utils.parse_with_jinja(value, params, value))
         return params
 
-    def append_feedback(self, feedback, html_output, widget_output,
-                        block_number, params):
-        """Appends Oppia's feedback to the output variables."""
-        feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-        action_html, action_widgets = parse_content_into_html(
-            [Content(type='text', value='<br>'.join(feedback_bits))],
-            block_number, params)
-        html_output += action_html
-        widget_output += action_widgets
-        return html_output, widget_output
-
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
-        exploration = Exploration.get(exploration_id)
+        try:
+            exploration = Exploration.get(exploration_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         init_state = exploration.init_state.get()
         # TODO: get params from exploration specification instead
-        params = self.get_exploration_params(exploration)
-        params = self.get_params(init_state, params)
+        params = self._get_exploration_params(exploration)
+        params = get_params(init_state, params)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_widget_html = InteractiveWidget.get_raw_code(
@@ -188,6 +179,21 @@ class ExplorationHandler(BaseHandler):
 
         EventHandler.record_exploration_visited(exploration_id)
         EventHandler.record_state_hit(exploration_id, init_state.id)
+
+
+class FeedbackHandler(BaseHandler):
+    """Handles feedback to readers."""
+
+    def _append_feedback(self, feedback, html_output, widget_output,
+                         block_number, params):
+        """Appends Oppia's feedback to the output variables."""
+        feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
+        action_html, action_widgets = parse_content_into_html(
+            [Content(type='text', value='<br>'.join(feedback_bits))],
+            block_number, params)
+        html_output += action_html
+        widget_output += action_widgets
+        return html_output, widget_output
 
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
@@ -240,7 +246,7 @@ class ExplorationHandler(BaseHandler):
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
-                html_output, widget_output = self.append_feedback(
+                html_output, widget_output = self._append_feedback(
                     feedback, html_output, widget_output, block_number, params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
@@ -248,11 +254,11 @@ class ExplorationHandler(BaseHandler):
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:
-                html_output, widget_output = self.append_feedback(
+                html_output, widget_output = self._append_feedback(
                     feedback, html_output, widget_output, block_number, params)
 
             # Populate new parameters.
-            params = self.get_params(state, existing_params=params)
+            params = get_params(state, existing_params=params)
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != state.id:

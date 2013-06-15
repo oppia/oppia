@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import collections
+
 import apps.exploration.services as exp_services
 from controllers.base import BaseHandler
 
@@ -40,14 +42,10 @@ class GalleryHandler(BaseHandler):
         editable_exploration_ids = [
             e.id for e in exp_services.get_editable_explorations(self.user)]
 
-        categories = {}
+        categories = collections.defaultdict(list)
 
         for exploration in explorations:
-            category_name = exploration.category
-            if not categories.get(category_name):
-                categories[category_name] = []
-
-            categories[category_name].append({
+            categories[exploration.category].append({
                 'can_edit': exploration.id in editable_exploration_ids,
                 'can_fork': self.user and exp_services.is_demo(exploration),
                 'id': exploration.id,

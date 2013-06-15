@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for interactive widgets."""
+"""Controllers for interactive and non-interactive widgets."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
 import json
-import logging
 
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
@@ -87,9 +86,12 @@ class NonInteractiveWidgetHandler(BaseHandler):
 
     def get(self, widget_id):
         """Handles GET requests."""
-        self.render_json({
-            'widget': NonInteractiveWidget.get_with_params(widget_id),
-        })
+        try:
+            self.render_json({
+                'widget': NonInteractiveWidget.get_with_params(widget_id, {}),
+            })
+        except:
+            raise self.PageNotFoundException
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
@@ -126,9 +128,12 @@ class InteractiveWidgetHandler(BaseHandler):
 
     def get(self, widget_id):
         """Handles GET requests."""
-        self.render_json({
-            'widget': InteractiveWidget.get_with_params(widget_id),
-        })
+        try:
+            self.render_json({
+                'widget': InteractiveWidget.get_with_params(widget_id, {}),
+            })
+        except:
+            raise self.PageNotFoundException
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
