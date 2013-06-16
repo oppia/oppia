@@ -28,14 +28,16 @@ function Profile($scope, $http, warningsData) {
     $scope.explorations = profileData.explorations;
     $scope.exploration_rows = [];
     var i = 0;
-    while ((i * 3)<$scope.explorations.length)
-    {
-        $scope.exploration_rows[i] = [$scope.explorations[i*3], $scope.explorations[(i*3)+1], $scope.explorations[(i*3)+2]];
+    while ((i * 3) < $scope.explorations.length) {
+        $scope.exploration_rows[i] = [
+          $scope.explorations[i*3],
+          $scope.explorations[(i*3)+1],
+          $scope.explorations[(i*3)+2]
+        ];
         i++;
     }
     $scope.improvable = profileData.improvable;
   });
-
 }
 
 /**
