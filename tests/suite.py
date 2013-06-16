@@ -74,7 +74,6 @@ def main():
             os.path.dirname(__file__),
             '../../oppia_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')))
 
-    import webtest
     import dev_appserver
     dev_appserver.fix_sys_path()
 

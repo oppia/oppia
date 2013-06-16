@@ -16,9 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-import os
-import sys
-
 import webapp2
 
 from controllers import admin
@@ -32,11 +29,6 @@ from controllers import reader
 from controllers import resources
 from controllers import widgets
 import feconf
-
-# Import the sympy library.
-if 'third_party/sympy-0.7.2/sympy-0.7.2' not in sys.path:
-    sys.path.insert(0, os.path.join(
-        os.getcwd(), 'third_party/sympy-0.7.2/sympy-0.7.2'))
 
 
 class Error404Handler(base.BaseHandler):

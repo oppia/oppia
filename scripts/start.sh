@@ -59,15 +59,6 @@ if [ ! -d "third_party/closure-compiler" ]; then
   rm closure-compiler-download.zip
 fi
 
-echo Checking whether sympy is installed in third_party
-if [ ! -d "third_party/sympy-0.7.2" ]; then
-  echo Installing sympy
-  mkdir -p third_party/sympy-0.7.2/
-  wget https://sympy.googlecode.com/files/sympy-0.7.2.tar.gz -O third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
-  tar -C third_party/sympy-0.7.2 -zxvf third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
-  rm third_party/sympy-0.7.2/sympy-0.7.2.tar.gz
-fi
-
 # Static resources.
 echo Checking whether angular-ui is installed in third_party
 if [ ! -d "third_party/static/angular-ui-0.4.0" ]; then
