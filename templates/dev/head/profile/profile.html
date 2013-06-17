@@ -11,6 +11,11 @@
         <h3 class="oppia-page-title">
           My Explorations 
         </h3>
+
+        <center ng-hide="pageLoaded">
+          <img src="/images/loading.gif" alt="Loading..." width="50px">
+        </center>
+
         <table>
         <tr ng-repeat="row in exploration_rows">
            <td ng-repeat="exp in row" style="border: 1px solid #CCC; width: 200px;">

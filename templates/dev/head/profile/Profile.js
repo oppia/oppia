@@ -22,6 +22,7 @@ function Profile($scope, $http, warningsData) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
   $scope.profileUrl = '/profile/data/';
+  $scope.pageLoaded = false;
 
   // Retrieves profile data from the server.
   $http.get($scope.profileUrl).success(function(profileData) {
@@ -37,6 +38,7 @@ function Profile($scope, $http, warningsData) {
         i++;
     }
     $scope.improvable = profileData.improvable;
+    $scope.pageLoaded = true;
   });
 }
 
