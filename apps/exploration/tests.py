@@ -145,18 +145,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The get() should fail silently when strict == False.
         self.assertIsNone(Exploration.get('Invalid id', strict=False))
 
-    def test_editor_permissions(self):
-        """Test permissions."""
-        exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')
-        exploration.put()
-        self.assertTrue(exploration.is_editable_by(self.user))
-        self.assertFalse(exploration.is_editable_by(self.another_user))
-
-        self.assertItemsEqual(
-            Exploration.get_viewable_explorations(self.user), [exploration])
-        self.assertItemsEqual(
-            Exploration.get_viewable_explorations(self.another_user), [])
-
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
         exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')

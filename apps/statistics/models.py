@@ -240,13 +240,12 @@ class Statistics(object):
             return result
 
     @classmethod
-    def get_top_ten_improvable_states(cls, exploration_ids):
+    def get_top_ten_improvable_states(cls, explorations):
         ranked_states = []
-        for exp in exploration_ids:
-            exploration = Exploration.get(exp)
+        for exploration in explorations:
             for state_db_key in exploration.states:
                 state = state_db_key.get()
-                state_key = '%s.%s' % (exp, state.id)
+                state_key = '%s.%s' % (exploration.id, state.id)
 
                 # Get count of how many times the state was hit
                 event_key = get_event_key(STATS_ENUMS.state_hit, state_key)
@@ -298,10 +297,15 @@ class Statistics(object):
                     state_rank = eligible_flags[0]['rank']
                     improve_type = eligible_flags[0]['improve_type']
 
-                ranked_states.append({'exp_id': exp, 'exp_name': exploration.title,
-                                      'state_id': state.id, 'state_name': state.name,
-                                      'rank': state_rank, 'type': improve_type,
-                                      'top_default_answers': top_default_answers})
+                ranked_states.append({
+                    'exp_id': exploration.id,
+                    'exp_name': exploration.title,
+                    'state_id': state.id,
+                    'state_name': state.name,
+                    'rank': state_rank,
+                    'type': improve_type,
+                    'top_default_answers': top_default_answers
+                })
 
         problem_states = sorted(
             [state for state in ranked_states if state['rank'] != 0],

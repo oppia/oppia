@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 
 from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.parameter.models import Parameter
 from apps.state.models import AnswerHandlerInstance
 from apps.state.models import Content
@@ -149,7 +150,7 @@ class ForkExploration(BaseHandler):
         exploration_id = payload.get('exploration_id')
 
         forked_exploration = Exploration.get(exploration_id)
-        if not forked_exploration.is_demo_exploration():
+        if not exp_services.is_demo(forked_exploration):
             raise self.InvalidInputException('Exploration cannot be forked.')
 
         # Get the demo exploration as a YAML file, so that new states can be
@@ -213,7 +214,7 @@ class ExplorationHandler(BaseHandler):
             'num_completions': statistics['num_completions'],
             'state_stats': statistics['state_stats'],
         })
-        improvements = Statistics.get_top_ten_improvable_states([exploration.id])
+        improvements = Statistics.get_top_ten_improvable_states([exploration])
         self.values.update({
             'imp': improvements,
         })

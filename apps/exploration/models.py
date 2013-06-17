@@ -126,27 +126,6 @@ class Exploration(IdModel):
             state_key.delete()
         self.key.delete()
 
-    def is_editable_by(self, user):
-        """Checks whether the given user has rights to edit this exploration."""
-        return users.is_current_user_admin() or user in self.editors
-
-    @classmethod
-    def get_viewable_explorations(cls, user):
-        """Returns a list of explorations viewable by a given user."""
-        return cls.query().filter(
-            ndb.OR(cls.is_public == True, cls.editors == user)
-        )
-
-    @classmethod
-    def get_explorations_user_can_edit(cls, user):
-        explorations = cls.get_viewable_explorations(user)
-        editable_explorations = []
-        for exploration in explorations:
-            can_edit = user and exploration.is_editable_by(user)
-            if can_edit:
-                editable_explorations += [exploration.id]
-        return editable_explorations
-
     def add_state(self, state_name):
         """Adds a new state, and returns it."""
         if self._has_state_named(state_name):

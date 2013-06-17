@@ -16,7 +16,7 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.statistics.models import Statistics
 from controllers.base import BaseHandler
 from controllers.base import require_user
@@ -40,19 +40,14 @@ class ProfileHandler(BaseHandler):
     @require_user
     def get(self):
         """Handles GET requests."""
-        exp_ids = Exploration.get_explorations_user_can_edit(self.user)
-        improvable = Statistics.get_top_ten_improvable_states(exp_ids)
-        explorations = []
-        for exp_id in exp_ids:
-            exp = Exploration.get(exp_id)
-            explorations.append({
-                'name': exp.title,
-                'id': exp.id,
-                'image_id': exp.image_id
-            })
+        exps = exp_services.get_editable_explorations(self.user)
 
         self.values.update({
-            'improvable': improvable,
-            'explorations': explorations,
+            'explorations': [{
+                'id': exp.id,
+                'image_id': exp.image_id,
+                'name': exp.title,
+            } for exp in exps],
+            'improvable': Statistics.get_top_ten_improvable_states(exps),
         })
         self.render_json(self.values)
