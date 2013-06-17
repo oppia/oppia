@@ -200,7 +200,7 @@ class FeedbackHandler(BaseHandler):
         values = {'error': []}
 
         exploration = Exploration.get(exploration_id)
-        state = State.get(state_id, exploration)
+        state = State.get(state_id, parent=exploration.key)
         old_state = state
 
         payload = json.loads(self.request.get('payload'))
@@ -250,7 +250,7 @@ class FeedbackHandler(BaseHandler):
                     feedback, html_output, widget_output, block_number, params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = State.get(dest_id, exploration)
+            state = State.get(dest_id, parent=exploration.key)
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:

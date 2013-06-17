@@ -135,11 +135,6 @@ class State(IdModel):
         new_state.put()
         return new_state
 
-    @classmethod
-    def get(cls, state_id, exploration):
-        """Gets a state by id. If it does not exist, returns None."""
-        return cls.get_by_id(state_id, parent=exploration.key)
-
     def as_dict(self):
         """Gets a Python dict representation of the state."""
         state_dict = self.internals_as_dict()
@@ -160,7 +155,7 @@ class State(IdModel):
             for handler in state_dict['widget']['handlers']:
                 for rule in handler['rules']:
                     if rule['dest'] != feconf.END_DEST:
-                        dest_state = State.get_by_id(
+                        dest_state = State.get(
                             rule['dest'], parent=self.key.parent())
                         rule['dest'] = dest_state.name
         return state_dict

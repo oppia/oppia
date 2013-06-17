@@ -43,7 +43,7 @@ class AnswerHandler(BaseModel):
     def rules(self):
         if not self.classifier:
             return []
-        return Classifier.get_by_id(self.classifier).rules
+        return Classifier.get(self.classifier).rules
 
 
 class Widget(polymodel.PolyModel):

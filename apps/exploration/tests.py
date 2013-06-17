@@ -112,7 +112,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         # Put and Retrieve the exploration.
         exploration.put()
-        retrieved_exploration = Exploration.get_by_id('The exploration hash id')
+        retrieved_exploration = Exploration.get('The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.init_state, state.key)
         self.assertEqual(retrieved_exploration.title, 'New exploration')

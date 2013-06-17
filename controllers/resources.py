@@ -55,9 +55,7 @@ class ImageHandler(BaseHandler):
             image_id: string representing the image id.
         """
         try:
-            image = Image.get_by_id(image_id)
-            if image is None:
-                raise self.PageNotFoundException
+            image = Image.get(image_id)
 
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = str('image/%s' % image.format)

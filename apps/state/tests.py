@@ -58,7 +58,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         id_1 = '123'
         name_1 = 'State 1'
         state_1 = State.create(self.exploration, name_1, state_id=id_1)
-        fetched_state_1 = State.get(id_1, self.exploration)
+        fetched_state_1 = State.get(id_1, parent=self.exploration.key)
         self.assertEqual(fetched_state_1, state_1)
 
         fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)
@@ -67,8 +67,8 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         # Test the failure cases.
         id_2 = 'fake_id'
         name_2 = 'fake_name'
-        fetched_state_2 = State.get(id_2, self.exploration)
-        self.assertIsNone(fetched_state_2)
+        with self.assertRaises(Exception):
+            State.get(id_2, parent=self.exploration.key)
 
         fetched_state_by_name_2 = State.get_by_name(
             name_2, self.exploration, strict=False)

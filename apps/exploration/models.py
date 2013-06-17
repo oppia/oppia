@@ -120,14 +120,6 @@ class Exploration(IdModel):
 
         return exploration
 
-    @classmethod
-    def get(cls, exploration_id, strict=True):
-        """Gets an exploration by id. Fails noisily if strict == True."""
-        exploration = cls.get_by_id(exploration_id)
-        if strict and not exploration:
-            raise Exception('Exploration id %s not found' % exploration_id)
-        return exploration
-
     def delete(self):
         """Deletes an exploration."""
         for state_key in self.states:
