@@ -19,8 +19,6 @@
  */
 
 function Profile($scope, $http, warningsData) {
-  $scope.currentUrl = document.URL;
-  $scope.root = location.protocol + '//' + location.host;
   $scope.profileUrl = '/profile/data/';
   $scope.pageLoaded = false;
 
