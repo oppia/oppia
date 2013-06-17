@@ -21,13 +21,14 @@ __author__ = 'Sean Lip'
 import os
 
 from apps.base_model.models import BaseModel
+from apps.base_model.models import IdModel
 import feconf
 import utils
 
 from google.appengine.ext import ndb
 
 
-class RuleSpec(ndb.Model):
+class RuleSpec(BaseModel):
     """A rule specification in a classifier."""
     # Python code for the rule, e.g. "equals(x)"
     rule = ndb.StringProperty()
@@ -38,16 +39,16 @@ class RuleSpec(ndb.Model):
     checks = ndb.TextProperty(repeated=True)
 
 
-class Classifier(BaseModel):
-    """An Oppia classifier."""
-
-    # The id is the same as the directory name for this classifier.
-    @property
-    def id(self):
-        return self.key.id()
+class Classifier(IdModel):
+    """An Oppia classifier. Its id is the same as its directory name."""
 
     # Rule specifications for the classifier.
     rules = ndb.LocalStructuredProperty(RuleSpec, repeated=True)
+
+    @classmethod
+    def get_new_id(cls, entity_name):
+        """This method should not be called."""
+        raise NotImplementedError
 
     @classmethod
     def delete_all_classifiers(cls):

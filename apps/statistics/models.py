@@ -20,8 +20,8 @@ __author__ = 'Sean Lip'
 
 import collections
 import utils
-import logging
 
+from apps.base_model.models import BaseModel
 from apps.exploration.models import Exploration
 
 from google.appengine.ext import ndb
@@ -127,7 +127,7 @@ class EventHandler(object):
         journal.put()
 
 
-class Counter(ndb.Model):
+class Counter(BaseModel):
     """An integer-valued counter."""
     # The name of the property.
     name = ndb.StringProperty()
@@ -147,7 +147,7 @@ class Counter(ndb.Model):
             return counter.value
 
 
-class Journal(ndb.Model):
+class Journal(BaseModel):
     """A list of values."""
     # The name of the list
     name = ndb.StringProperty()

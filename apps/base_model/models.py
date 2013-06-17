@@ -25,7 +25,14 @@ from google.appengine.ext import ndb
 
 
 class BaseModel(ndb.Model):
-    """A model stub which has an explicit id property."""
+    """Base model for all object classes in Oppia."""
+
+    def _pre_put_hook(self):
+        pass
+
+
+class IdModel(BaseModel):
+    """An abstract model class with an explicit id property."""
     @property
     def id(self):
         return self.key.id()

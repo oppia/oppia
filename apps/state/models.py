@@ -22,6 +22,7 @@ import copy
 import importlib
 
 from apps.base_model.models import BaseModel
+from apps.base_model.models import IdModel
 from apps.parameter.models import ParamChangeProperty
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import Widget
@@ -32,14 +33,14 @@ import utils
 from google.appengine.ext import ndb
 
 
-class Content(ndb.Model):
+class Content(BaseModel):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
     # TODO(sll): Generalize this so that the value can be a dict (for a widget).
     value = ndb.TextProperty(default='')
 
 
-class Rule(ndb.Model):
+class Rule(BaseModel):
     """A rule for an answer classifier."""
     # TODO(sll): Ensure the types for param_changes are consistent.
 
@@ -55,7 +56,7 @@ class Rule(ndb.Model):
     param_changes = ParamChangeProperty(repeated=True)
 
 
-class AnswerHandlerInstance(ndb.Model):
+class AnswerHandlerInstance(BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     rules = ndb.LocalStructuredProperty(Rule, repeated=True)
@@ -64,7 +65,7 @@ class AnswerHandlerInstance(ndb.Model):
     classifier = ndb.StringProperty()
 
 
-class WidgetInstance(ndb.Model):
+class WidgetInstance(BaseModel):
     """An instance of a widget."""
     # The id of the interactive widget class for this state.
     widget_id = ndb.StringProperty(default='interactive-Continue')
@@ -79,7 +80,7 @@ class WidgetInstance(ndb.Model):
     handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
 
 
-class State(BaseModel):
+class State(IdModel):
     """A state which forms part of an exploration."""
     # NB: This element's parent should be an Exploration.
 

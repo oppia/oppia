@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 import re
 
+from apps.base_model.models import BaseModel
 from apps.types.models import get_object_class
 import utils
 
@@ -33,7 +34,7 @@ class AlphanumericProperty(ndb.StringProperty):
             'Only parameter names with characters in [a-zA-Z0-9] are accepted.')
 
 
-class Parameter(ndb.Model):
+class Parameter(BaseModel):
     """Represents a (multi-valued) parameter.
 
     The 'values' property represents the list of possible default values for
@@ -123,7 +124,7 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
             obj_type=val.obj_type, name=val.name, values=val.values)
 
 
-class ParamSet(ndb.Model):
+class ParamSet(BaseModel):
     """A list of parameters."""
     # An ordered list of parameters.
     params = ParameterProperty(repeated=True)

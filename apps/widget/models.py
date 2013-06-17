@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import copy
 import os
 
+from apps.base_model.models import BaseModel
 from apps.classifier.models import Classifier
 from apps.parameter.models import Parameter
 from apps.parameter.models import ParameterProperty
@@ -32,7 +33,7 @@ from google.appengine.ext.db import BadValueError
 from google.appengine.ext.ndb import polymodel
 
 
-class AnswerHandler(ndb.Model):
+class AnswerHandler(BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     # TODO(sll): Store a reference instead?

@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import os
 
 from apps.base_model.models import BaseModel
+from apps.base_model.models import IdModel
 from apps.image.models import Image
 from apps.parameter.models import Parameter
 from apps.parameter.models import ParamChange
@@ -55,7 +56,7 @@ class Dataset(BaseModel):
 
 
 # TODO(sll): Add an anyone-can-edit mode.
-class Exploration(BaseModel):
+class Exploration(IdModel):
     """An exploration (which is made up of several states)."""
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)

@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 import imghdr
 
-from apps.base_model.models import BaseModel
+from apps.base_model.models import IdModel
 import feconf
 
 from google.appengine.ext import ndb
@@ -38,7 +38,7 @@ class ImageProperty(ndb.BlobProperty):
         assert is_valid, error_message
 
 
-class Image(BaseModel):
+class Image(IdModel):
     """An image."""
     # The raw image blob.
     raw = ImageProperty(required=True)
