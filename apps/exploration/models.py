@@ -64,7 +64,7 @@ class Exploration(IdModel):
     title = ndb.StringProperty(default='New exploration')
     # The state which forms the start of this exploration.
     init_state = ndb.KeyProperty(kind=State, required=True)
-    # The list of states this exploration consists of. This list may not be
+    # The list of states this exploration consists of. This list should not be
     # empty.
     states = ndb.KeyProperty(kind=State, repeated=True)
     # The list of parameters associated with this exploration.
@@ -80,6 +80,8 @@ class Exploration(IdModel):
     # Datasets for this exploration. One set of parameter values is chosen at
     # random for each dataset when the exploration is loaded. No parameter
     # name should be repeated between datasets.
+    # TODO(sll): Implement the rest of this feature at the controller and view
+    # levels.
     datasets = ndb.LocalStructuredProperty(Dataset, repeated=True)
 
     def _has_state_named(self, state_name):
