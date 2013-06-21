@@ -151,8 +151,8 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         parameterized_widget_dict = InteractiveWidget.get_with_params(
             MUSIC_STAFF_ID, {'noteToGuess': 'abc'})
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
-            'id', 'name', 'category', 'description', 'template', 'params',
-            'handlers', 'raw'])
+            'id', 'name', 'category', 'description', 'template',
+            'static_template', 'params', 'handlers', 'raw'])
         self.assertEqual(parameterized_widget_dict['id'], MUSIC_STAFF_ID)
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');',
                       parameterized_widget_dict['raw'])

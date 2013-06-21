@@ -73,11 +73,14 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 
   /**
    * Adds content to an iframe.
-   * @param {string} iframeId The id of the iframe to add content to.
+   * @param {string|Element} iframe The iframe element or its id to add
+   *     content to.
    * @param {string} content The code for the iframe.
    */
-  $scope.addContentToIframe = function(iframeId, content) {
-    var iframe = document.getElementById(iframeId);
+  $scope.addContentToIframe = function(iframe, content) {
+    if (typeof(iframe) == 'string') {
+      iframe = document.getElementById(iframe);
+    }
     if (!iframe) {
       // TODO(sll): Raise an error here.
       return;

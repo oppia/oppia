@@ -67,7 +67,7 @@
     for (var i = 0; i < data.widgets.length; i++) {
       $scope.addContentToIframe(
         'widgetCompiled' + data.widgets[i].blockIndex + '-' + data.widgets[i].index,
-        data.widgets[i].raw);  
+        data.widgets[i].raw);
     }
   };
 
@@ -132,6 +132,16 @@
       $scope.addContentToIframe(
         'widgetCompiled' + $scope.widgets[i].blockIndex + '-' + $scope.widgets[i].index,
         $scope.widgets[i].raw);
+    }
+
+    if (data.static_interactive) {
+      // The previous response needs to be rendered in static interactive in an
+      // iframe.
+      var iframes = document.getElementsByClassName('logTemplate');
+      if (iframes.length) {
+        $scope.addContentToIframe(
+            iframes[iframes.length - 1], data.static_interactive);
+      }
     }
 
     var currentScrollTop = $('body').scrollTop();

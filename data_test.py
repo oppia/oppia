@@ -306,9 +306,10 @@ class WidgetDataUnitTests(DataUnitTest):
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config.yaml file, an html
-            # entry-point file, and (optionally) a directory named 'static'.
+            # entry-point file, and (optionally) a static.html and a directory
+            # named 'static'.
             dir_contents = os.listdir(widget_dir)
-            self.assertLessEqual(len(dir_contents), 3)
+            self.assertLessEqual(len(dir_contents), 4)
 
             if len(dir_contents) == 3:
                 self.assertIn('static', dir_contents)

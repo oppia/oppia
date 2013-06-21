@@ -66,6 +66,9 @@ class Widget(polymodel.PolyModel):
     description = ndb.TextProperty()
     # The widget html template (this is the entry point).
     template = ndb.TextProperty(required=True)
+    # The widget static html template used for the response logging of
+    # interactive widgets.
+    static_template = ndb.TextProperty()
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used within a State.
     params = ParameterProperty(repeated=True)
@@ -151,6 +154,7 @@ class NonInteractiveWidget(Widget):
             # TODO(sll): Should this be a template *location* instead?
             conf['template'] = utils.get_file_contents(
                 os.path.join(widget_dir, '%s.html' % widget_id))
+            conf['static_template'] = ''
 
             widget = cls(**conf)
             widget.put()
@@ -205,6 +209,10 @@ class InteractiveWidget(Widget):
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
             conf['template'] = utils.get_file_contents(
                 os.path.join(widget_dir, '%s.html' % widget_id))
+            conf['static_template'] = ''
+            static_path = os.path.join(widget_dir, '%s.static.html' % widget_id)
+            if os.path.exists(static_path):
+              conf['static_template'] = utils.get_file_contents(static_path)
 
             widget = cls(**conf)
             widget.put()
@@ -232,3 +240,14 @@ class InteractiveWidget(Widget):
                 for rule in handler.rules)
 
         return result
+
+    @classmethod
+    def get_raw_static_code(cls, widget_id, params=None):
+        """Gets the static rendering raw code for a parameterized widget."""
+        # TODO(kashida): Make this consistent with get_raw_code.
+        if params is None:
+            params = {}
+
+        widget = cls.get(widget_id)
+        return utils.parse_with_jinja(widget.static_template, params)
+
