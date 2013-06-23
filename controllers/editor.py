@@ -363,6 +363,7 @@ class StateHandler(BaseHandler):
 
                 state_rule = Rule()
                 state_rule.name = rule.get('name')
+                state_rule.compare = rule.get('compare')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')
                 state_rule.feedback = rule.get('feedback')

@@ -109,6 +109,12 @@ oppia.filter('bracesToInput', function() {
       input = input.replace(pattern, ' ');
       index++;
     }
+
+    // replace "Answer" with variable selector (with answer as default)
+    // TODO(yanamal): allow arbitrary expressions rather than just variables?
+    finalInput = finalInput.replace('Answer', '<input ng-model="addRuleActionComp" ui-select2="paramSelector"' +
+                 'placeholder="Answer" style="width:100px">');
+
     return finalInput;
   };
 });

@@ -46,6 +46,8 @@ class Rule(BaseModel):
 
     # The name of the rule.
     name = ndb.StringProperty(required=True)
+    # The comparison parameter (what parameter the rule applies to - student answer by default)
+    compare = ndb.StringProperty(default='answer')
     # Parameters for the classification rule. TODO(sll): Make these the actual params.
     inputs = ndb.JsonProperty(default={})
     # The id of the destination state.
@@ -255,6 +257,13 @@ class State(IdModel):
         for ind, rule in enumerate(handler.rules):
             if rule.name == 'Default':
                 return rule
+
+            # if comparing to parameter other than answer, 
+            # replace norm_answer with normalized parameter 
+            # TODO(yanamal): parse with jinja instead if we allow arbitrary expressions here
+            # TODO: consider normalizing at this level; can get rid of if then.
+            if rule.compare != 'answer':
+                norm_answer =  Classifier.DEFAULT_NORMALIZER().normalize(params[rule.compare])
 
             func_name, param_list = self.get_classifier_info(
                 self.widget.widget_id, handler.name, rule, params)
