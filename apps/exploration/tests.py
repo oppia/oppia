@@ -194,8 +194,7 @@ states:
     handlers:
     - name: submit
       rules:
-      - compare: answer
-        dest: '[untitled state]'
+      - dest: '[untitled state]'
         feedback: []
         inputs: {}
         name: Default
@@ -210,8 +209,7 @@ states:
     handlers:
     - name: submit
       rules:
-      - compare: answer
-        dest: New state
+      - dest: New state
         feedback: []
         inputs: {}
         name: Default

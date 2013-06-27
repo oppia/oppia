@@ -192,7 +192,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionIndex = null;
     $scope.addRuleActionRule = null;
     $scope.addRuleActionName = null;
-    $scope.addRuleActionComp = null;
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
     $scope.addRuleActionDestNew = '';
@@ -201,14 +200,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   };
 
   $scope.openAddRuleModal = function(action) {
-    $scope.initSelectorOptions();
     $scope.addRuleModalTitle = 'Add Rule';
     $scope.addRuleAction = action;
     $scope.deselectAllRules();
   };
 
   $scope.openEditRuleModal = function(action, index) {
-    $scope.initSelectorOptions();
     $scope.addRuleModalTitle = 'Edit Rule';
     $scope.addRuleAction = action;
 
@@ -216,7 +213,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     var rule = $scope.interactiveRulesets[action][index];
     $scope.addRuleActionRule = rule.rule;
     $scope.addRuleActionName = rule.name;
-    $scope.addRuleActionComp = rule.compare;
     $scope.addRuleActionInputs = rule.inputs;
     $scope.addRuleActionDest = rule.dest;
     $scope.addRuleActionDestNew = '';
@@ -246,21 +242,15 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.saveExtendedRule(action, extendedRule);
   };
 
-  $scope.saveRule = function(rule, name, compare, inputs, dest, newDest, feedback) {
+  $scope.saveRule = function(rule, name, inputs, dest, newDest, feedback) {
     if (rule) {
       var extendedRule = {
         rule: rule,
         name: name,
-        compare: compare,
         inputs: inputs,
         dest: dest,
         feedback: feedback
       };
-
-      // if no custom comparison variable is provided, use student answer
-      if (extendedRule.compare == null) {
-        extendedRule.compare = 'answer';
-      }
 
       // TODO(sll): Do more error-checking here.
       if (dest === '?') {
