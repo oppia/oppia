@@ -304,6 +304,17 @@ states:
           x: French
         name: contains(x)
         param_changes: []
+      - dest: Numeric input
+        feedback:
+        - 'Yes! Suomi is Finnish for Finnish and Oppia is the Finnish word for learn.
+          As you can see, you''re not limited to multiple-choice questions here. For
+          example, you could ask for numeric answers, text answers, sets of strings,
+          and so on. You can even write your own types of questions. Here is a question
+          that takes numeric input:'
+        inputs:
+          x: suomi
+        name: equals(x)
+        param_changes: []
       - dest: What language
         feedback:
         - Sorry, nope, we didn't get it from {{answer}}. But you can find out lots
