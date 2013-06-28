@@ -272,15 +272,14 @@ class FeedbackHandler(BaseHandler):
         # Render the response in the static widget if
         # - the response is not rendered in the sticky interactive widget, and
         # - there is a static rendering html provided for that widget.
-        static_interactive = (
-            dest_id == feconf.END_DEST or
-            not state.widget.sticky or
-            state.widget.widget_id != old_state.widget.widget_id
+        sticky = (
+            state.widget.sticky and
+            state.widget.widget_id == old_state.widget.widget_id
         )
+        static_interactive = dest_id == feconf.END_DEST or not sticky
         if static_interactive:
             response_params = utils.parse_dict_with_params(
                 old_state.widget.params, old_params)
-                state.widget.params, params)
             response_params['answer'] = old_params['answer']
             template = InteractiveWidget.get_raw_static_code(
                 old_state.widget.widget_id, response_params)
@@ -293,7 +292,7 @@ class FeedbackHandler(BaseHandler):
         # Append reader's answer.
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({
-                'response': answer,
+                'response': '' if sticky else answer,
                 'static_interactive': static_interactive,
             })
 
@@ -307,8 +306,7 @@ class FeedbackHandler(BaseHandler):
         })
 
         if dest_id != feconf.END_DEST:
-            if state.widget.sticky and (
-                    state.widget.widget_id == old_state.widget.widget_id):
+            if sticky:
                 values['interactive_widget_html'] = ''
                 values['sticky_interactive_widget'] = True
             else:
