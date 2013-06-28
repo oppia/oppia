@@ -212,7 +212,7 @@ class InteractiveWidget(Widget):
             conf['static_template'] = ''
             static_path = os.path.join(widget_dir, '%s.static.html' % widget_id)
             if os.path.exists(static_path):
-              conf['static_template'] = utils.get_file_contents(static_path)
+                conf['static_template'] = utils.get_file_contents(static_path)
 
             widget = cls(**conf)
             widget.put()

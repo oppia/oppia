@@ -246,25 +246,25 @@ class FeedbackHandler(BaseHandler):
             dest_id == feconf.END_DEST or
             not state.widget.sticky or
             state.widget.widget_id != old_state.widget.widget_id
-            )
+        )
         if static_interactive:
-          response_params = utils.parse_dict_with_params(
-              state.widget.params, params)
-          response_params['answer'] = params['answer']
-          template = InteractiveWidget.get_raw_static_code(
-              old_state.widget.widget_id, response_params)
+            response_params = utils.parse_dict_with_params(
+                state.widget.params, params)
+            response_params['answer'] = params['answer']
+            template = InteractiveWidget.get_raw_static_code(
+                old_state.widget.widget_id, response_params)
 
-          if template:
-            values['static_interactive'] = template
-          else:
-            static_interactive = False
+            if template:
+                values['static_interactive'] = template
+            else:
+                static_interactive = False
 
         # Append reader's answer.
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({
                 'response': answer,
                 'static_interactive': static_interactive,
-                })
+            })
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
@@ -312,7 +312,7 @@ class FeedbackHandler(BaseHandler):
                 values['interactive_widget_html'] = (
                     InteractiveWidget.get_raw_code(
                         state.widget.widget_id,
-                        utils.parse_dict_with_params(
+                        params=utils.parse_dict_with_params(
                             state.widget.params, params)
                     )
                 )
