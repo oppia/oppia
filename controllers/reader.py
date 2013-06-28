@@ -239,36 +239,6 @@ class FeedbackHandler(BaseHandler):
         if state.widget.widget_id == 'interactive-MultipleChoiceInput':
             answer = state.widget.params['choices'][int(answer)]
 
-<<<<<<< HEAD
-=======
-        # Render the response in the static widget if
-        # - the response is not rendered in the sticky interactive widget, and
-        # - there is static rendering html provided for that widget.
-        static_interactive = (
-            dest_id == feconf.END_DEST or
-            not state.widget.sticky or
-            state.widget.widget_id != old_state.widget.widget_id
-        )
-        if static_interactive:
-            response_params = utils.parse_dict_with_params(
-                state.widget.params, params)
-            response_params['answer'] = params['answer']
-            template = InteractiveWidget.get_raw_static_code(
-                old_state.widget.widget_id, response_params)
-
-            if template:
-                values['static_interactive'] = template
-            else:
-                static_interactive = False
-
-        # Append reader's answer.
-        values['reader_html'] = feconf.JINJA_ENV.get_template(
-            'reader/reader_response.html').render({
-                'response': answer,
-                'static_interactive': static_interactive,
-            })
-
->>>>>>> 3df09e8f067a95fdc1b708dedf624a1dffa078ff
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             if feedback:
@@ -306,25 +276,26 @@ class FeedbackHandler(BaseHandler):
             dest_id == feconf.END_DEST or
             not state.widget.sticky or
             state.widget.widget_id != old_state.widget.widget_id
-            )
+        )
         if static_interactive:
-          response_params = utils.parse_dict_with_params(
-              old_state.widget.params, old_params)
-          response_params['answer'] = old_params['answer']
-          template = InteractiveWidget.get_raw_static_code(
-              old_state.widget.widget_id, response_params)
+            response_params = utils.parse_dict_with_params(
+                old_state.widget.params, old_params)
+                state.widget.params, params)
+            response_params['answer'] = old_params['answer']
+            template = InteractiveWidget.get_raw_static_code(
+                old_state.widget.widget_id, response_params)
 
-          if template:
-            values['static_interactive'] = template
-          else:
-            static_interactive = False
+            if template:
+                values['static_interactive'] = template
+            else:
+                static_interactive = False
 
         # Append reader's answer.
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({
                 'response': answer,
                 'static_interactive': static_interactive,
-                })
+            })
 
         if state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
