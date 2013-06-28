@@ -218,6 +218,7 @@ class FeedbackHandler(BaseHandler):
 
         dest_id, feedback, rule, recorded_answer = state.transition(
             answer, params, handler)
+        assert dest_id
 
         if recorded_answer is not None:
             recorded_answer = json.dumps(recorded_answer)
@@ -230,18 +231,47 @@ class FeedbackHandler(BaseHandler):
             # TODO(sll): Make this async?
             old_state.put()
 
-        assert dest_id
-
         html_output, widget_output = '', []
         # TODO(sll): The following is a special-case for multiple choice input,
         # in which the choice text must be displayed instead of the choice
         # number. We might need to find a way to do this more generically.
+        old_params = params
         if state.widget.widget_id == 'interactive-MultipleChoiceInput':
             answer = state.widget.params['choices'][int(answer)]
 
+        if dest_id == feconf.END_DEST:
+            # This leads to a FINISHED state.
+            if feedback:
+                html_output, widget_output = self._append_feedback(
+                    feedback, html_output, widget_output, block_number,
+                    old_params)
+            EventHandler.record_exploration_completed(exploration_id)
+        else:
+            state = State.get(dest_id, parent=exploration.key)
+            EventHandler.record_state_hit(exploration_id, dest_id)
+
+            if feedback:
+                html_output, widget_output = self._append_feedback(
+                    feedback, html_output, widget_output, block_number,
+                    old_params)
+
+            # Populate new parameters.
+            params = get_params(state, existing_params=old_params)
+            # Append text for the new state only if the new and old states
+            # differ.
+            if old_state.id != state.id:
+                state_html, state_widgets = parse_content_into_html(
+                    state.content, block_number, params)
+                # Separate text for the new state and feedback for the old state
+                # by an additional line.
+                if state_html and feedback:
+                    html_output += '<br>'
+                html_output += state_html
+                widget_output += state_widgets
+
         # Render the response in the static widget if
         # - the response is not rendered in the sticky interactive widget, and
-        # - there is static rendering html provided for that widget.
+        # - there is a static rendering html provided for that widget.
         static_interactive = (
             dest_id == feconf.END_DEST or
             not state.widget.sticky or
@@ -249,8 +279,8 @@ class FeedbackHandler(BaseHandler):
             )
         if static_interactive:
           response_params = utils.parse_dict_with_params(
-              state.widget.params, params)
-          response_params['answer'] = params['answer']
+              old_state.widget.params, old_params)
+          response_params['answer'] = old_params['answer']
           template = InteractiveWidget.get_raw_static_code(
               old_state.widget.widget_id, response_params)
 
@@ -265,34 +295,6 @@ class FeedbackHandler(BaseHandler):
                 'response': answer,
                 'static_interactive': static_interactive,
                 })
-
-        if dest_id == feconf.END_DEST:
-            # This leads to a FINISHED state.
-            if feedback:
-                html_output, widget_output = self._append_feedback(
-                    feedback, html_output, widget_output, block_number, params)
-            EventHandler.record_exploration_completed(exploration_id)
-        else:
-            state = State.get(dest_id, parent=exploration.key)
-            EventHandler.record_state_hit(exploration_id, dest_id)
-
-            if feedback:
-                html_output, widget_output = self._append_feedback(
-                    feedback, html_output, widget_output, block_number, params)
-
-            # Populate new parameters.
-            params = get_params(state, existing_params=params)
-            # Append text for the new state only if the new and old states
-            # differ.
-            if old_state.id != state.id:
-                state_html, state_widgets = parse_content_into_html(
-                    state.content, block_number, params)
-                # Separate text for the new state and feedback for the old state
-                # by an additional line.
-                if state_html and feedback:
-                    html_output += '<br>'
-                html_output += state_html
-                widget_output += state_widgets
 
         if state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
