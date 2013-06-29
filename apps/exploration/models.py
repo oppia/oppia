@@ -88,9 +88,7 @@ class Exploration(IdModel):
 
     def _has_state_named(self, state_name):
         """Checks if a state with the given name exists in this exploration."""
-        state = State.query(ancestor=self.key).filter(
-            State.name == state_name).count(limit=1)
-        return bool(state)
+        return any([state.get().name == state_name for state in self.states])
 
     def _pre_put_hook(self):
         """Validates the exploration before it is put into the datastore."""
@@ -106,21 +104,13 @@ class Exploration(IdModel):
         # Generate a new exploration id, if one wasn't passed in.
         exploration_id = exploration_id or cls.get_new_id(title)
 
-        # Temporarily create a fake initial state key.
-        state_id = State.get_new_id(init_state_name)
-        fake_state_key = ndb.Key(Exploration, exploration_id, State, state_id)
-
         # Note that demo explorations do not have owners, so user may be None.
         exploration = cls(
             id=exploration_id, title=title, category=category,
-            image_id=image_id, states=[fake_state_key],
+            image_id=image_id, states=[],
             editors=[user] if user else [])
+        exploration.add_state(init_state_name)
         exploration.put()
-
-        # Finally, create the initial state and check that it has the right key.
-        new_init_state = State.create(
-            exploration, init_state_name, state_id=state_id)
-        assert fake_state_key == new_init_state.key
 
         return exploration
 
@@ -130,16 +120,19 @@ class Exploration(IdModel):
             state_key.delete()
         self.key.delete()
 
-    def add_state(self, state_name):
+    def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it."""
         if self._has_state_named(state_name):
             raise Exception('Duplicate state name %s' % state_name)
 
-        state = State.create(self, state_name)
-        self.states.append(state.key)
+        state_id = state_id or State.get_new_id(state_name)
+        new_state = State(id=state_id, name=state_name)
+        new_state.put()
+
+        self.states.append(new_state.key)
         self.put()
 
-        return state
+        return new_state
 
     def rename_state(self, state, new_state_name):
         """Renames a state of this exploration."""
@@ -151,6 +144,12 @@ class Exploration(IdModel):
 
         state.name = new_state_name
         state.put()
+
+    def get_state_by_id(self, state_id):
+        """Returns a state of this exploration, given its id."""
+        for state_key in self.states:
+            if state_key.id() == state_id:
+                return state_key.get()
 
     @classmethod
     def create_from_yaml(
@@ -202,7 +201,8 @@ class Exploration(IdModel):
 
         for state_key in self.states:
             state = state_key.get()
-            state_internals = state.internals_as_dict(human_readable_dests=True)
+            state_internals = state.internals_as_dict(
+                self, human_readable_dests=True)
 
             if self.init_state.id == state.id:
                 init_states_list.append(state_internals)

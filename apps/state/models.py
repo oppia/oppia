@@ -82,7 +82,6 @@ class WidgetInstance(BaseModel):
 
 class State(IdModel):
     """A state which forms part of an exploration."""
-    # NB: This element's parent should be an Exploration.
 
     def get_default_rule(self):
         return Rule(name='Default', dest=self.id)
@@ -95,10 +94,6 @@ class State(IdModel):
 
     def _pre_put_hook(self):
         """Ensures that the widget and at least one handler for it exists."""
-        # Every state should have a parent exploration.
-        if not self.key.parent():
-            raise Exception('This state does not have a parent exploration.')
-
         # Every state should have an interactive widget.
         if not self.widget:
             self.widget = self.get_default_widget()
@@ -127,22 +122,14 @@ class State(IdModel):
     # whose values are their counts.
     unresolved_answers = ndb.JsonProperty(default={})
 
-    @classmethod
-    def create(cls, exploration, name, state_id=None):
-        """Creates a new state."""
-        state_id = state_id or cls.get_new_id(name)
-        new_state = cls(id=state_id, parent=exploration.key, name=name)
-        new_state.put()
-        return new_state
-
-    def as_dict(self):
+    def as_dict(self, exploration):
         """Gets a Python dict representation of the state."""
-        state_dict = self.internals_as_dict()
+        state_dict = self.internals_as_dict(exploration)
         state_dict.update({'id': self.id, 'name': self.name,
                            'unresolved_answers': self.unresolved_answers})
         return state_dict
 
-    def internals_as_dict(self, human_readable_dests=False):
+    def internals_as_dict(self, exploration, human_readable_dests=False):
         """Gets a Python dict of the internals of the state."""
         state_dict = copy.deepcopy(self.to_dict(
             exclude=['unresolved_answers']))
@@ -155,8 +142,7 @@ class State(IdModel):
             for handler in state_dict['widget']['handlers']:
                 for rule in handler['rules']:
                     if rule['dest'] != feconf.END_DEST:
-                        dest_state = State.get(
-                            rule['dest'], parent=self.key.parent())
+                        dest_state = exploration.get_state_by_id(rule['dest'])
                         rule['dest'] = dest_state.name
         return state_dict
 
@@ -164,8 +150,15 @@ class State(IdModel):
     def get_by_name(cls, name, exploration, strict=True):
         """Gets a state by name. Fails noisily if strict == True."""
         assert name and exploration
-        state = cls.query(ancestor=exploration.key).filter(
-            cls.name == name).get()
+
+        # TODO(sll): This is too slow; improve it.
+        state = None
+        for state_key in exploration.states:
+            candidate_state = state_key.get()
+            if candidate_state.name == name:
+                state = candidate_state
+                break
+
         if strict and not state:
             raise Exception('State %s not found.' % name)
         return state

@@ -23,7 +23,6 @@ import traceback
 
 from apps.exploration.models import Exploration
 import apps.exploration.services as exp_services
-from apps.state.models import State
 import feconf
 import webapp2
 
@@ -79,7 +78,7 @@ def require_editor(handler):
         if not state_id:
             return handler(self, exploration, **kwargs)
         try:
-            state = State.get(state_id, parent=exploration.key)
+            state = exploration.get_state_by_id(state_id)
         except:
             raise self.PageNotFoundException
         return handler(self, exploration, state, **kwargs)

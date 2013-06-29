@@ -42,8 +42,9 @@ EDITOR_MODE = 'editor'
 def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
-    state_repr = state.as_dict()
-    modified_state_dict = state.internals_as_dict(human_readable_dests=True)
+    state_repr = state.as_dict(exploration)
+    modified_state_dict = state.internals_as_dict(
+        exploration, human_readable_dests=True)
 
     # TODO(sll): The following is for backwards-compatibility and should be
     # deleted later.
@@ -231,7 +232,7 @@ class ExplorationHandler(BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         state = exploration.add_state(state_name)
-        self.render_json(state.as_dict())
+        self.render_json(state.as_dict(exploration))
 
     @require_editor
     def put(self, exploration):

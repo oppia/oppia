@@ -48,17 +48,15 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         # A new state should have a default name property.
         self.assertEqual(state.name, feconf.DEFAULT_STATE_NAME)
 
-        # A state that is put into the datastore must have a parent
-        # exploration.
-        with self.assertRaises(Exception):
-            state.put()
+        state.put()
 
     def test_create_and_get_state(self):
         """Test creation and retrieval of states."""
         id_1 = '123'
         name_1 = 'State 1'
-        state_1 = State.create(self.exploration, name_1, state_id=id_1)
-        fetched_state_1 = State.get(id_1, parent=self.exploration.key)
+        state_1 = self.exploration.add_state(name_1, state_id=id_1)
+
+        fetched_state_1 = self.exploration.get_state_by_id(id_1)
         self.assertEqual(fetched_state_1, state_1)
 
         fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)
@@ -68,7 +66,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         id_2 = 'fake_id'
         name_2 = 'fake_name'
         with self.assertRaises(Exception):
-            State.get(id_2, parent=self.exploration.key)
+            self.exploration.get(id_2)
 
         fetched_state_by_name_2 = State.get_by_name(
             name_2, self.exploration, strict=False)
@@ -83,7 +81,8 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         """Test converting state names to ids."""
         id_1 = '123'
         name_1 = 'State 1'
-        State.create(self.exploration, name_1, state_id=id_1)
+        self.exploration.add_state(name_1, state_id=id_1)
+
         self.assertEqual(
             State._get_id_from_name(name_1, self.exploration), id_1)
 

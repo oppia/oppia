@@ -21,7 +21,6 @@ import json
 
 from apps.exploration.models import Exploration
 from apps.state.models import Content
-from apps.state.models import State
 from apps.statistics.models import EventHandler
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
@@ -200,7 +199,7 @@ class FeedbackHandler(BaseHandler):
         values = {'error': []}
 
         exploration = Exploration.get(exploration_id)
-        state = State.get(state_id, parent=exploration.key)
+        state = exploration.get_state_by_id(state_id)
         old_state = state
 
         payload = json.loads(self.request.get('payload'))
@@ -242,7 +241,7 @@ class FeedbackHandler(BaseHandler):
                     old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = State.get(dest_id, parent=exploration.key)
+            state = exploration.get_state_by_id(dest_id)
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:

@@ -54,7 +54,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             exploration.put()
         exploration.category = 'The category'
 
-        state = State(id='The state hash id', parent=exploration.key)
+        state = State(id='The state hash id')
         state.put()
 
         # The 'states' property must be a list.
