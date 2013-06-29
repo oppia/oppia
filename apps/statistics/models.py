@@ -40,7 +40,7 @@ def create_rule_name(rule):
     for key in rule.inputs.keys():
         left_paren = name.index('(')
         name = name[0:left_paren] + name[left_paren:].replace(
-            key, str(rule.inputs[key]))
+            key, utils.to_ascii(rule.inputs[key]))
     return name
 
 
@@ -202,7 +202,8 @@ class Statistics(object):
                     for rule in handler.rules:
                         rule_name = create_rule_name(rule)
                         event_key = get_event_key(
-                            event_name, '.'.join([exploration_id, state.id, rule_name]))
+                            event_name, '.'.join(
+                                [exploration_id, state.id, rule_name]))
 
                         journal = Journal.get_by_id(event_key)
 
@@ -259,7 +260,8 @@ class Statistics(object):
                 default_count = Journal.get_value_count_by_id(event_key)
                 journal = Journal.get_by_id(event_key)
                 if journal:
-                    top_default_answers = collections.Counter(journal.values).most_common(5)
+                    top_default_answers = collections.Counter(
+                        journal.values).most_common(5)
                 else:
                     top_default_answers = []
 
@@ -280,7 +282,8 @@ class Statistics(object):
                 state_rank, improve_type = 0, ''
 
                 eligible_flags = []
-                default_rule = filter(lambda rule: rule.name == 'Default', state.widget.handlers[0].rules)[0]
+                default_rule = filter(lambda rule: rule.name == 'Default',
+                                      state.widget.handlers[0].rules)[0]
                 default_self_loop = default_rule.dest == state.id
                 if float(default_count) / all_count > .2 and default_self_loop:
                     eligible_flags.append({
