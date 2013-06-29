@@ -128,16 +128,16 @@
     // Move the last round of user response and oppia response to the previous
     // log element so we can render new ones.
     var prev_log = document.getElementsByClassName('previous-log')[0];
+
+    // Angular seems to skip re-rendering if the bound text did not change since
+    // the last rednering, which means we can not move the elements out into
+    // another element. Cloning them here to avoid the problem.
     var last_log = document.getElementsByClassName('last-log')[0];
-    while(last_log.firstChild) {
-      prev_log.appendChild(last_log.firstChild);
+    for (var i = 0; i < last_log.childNodes.length; i++) {
+      prev_log.appendChild(last_log.childNodes[i].cloneNode(true));
     }
     var oppia_response = document.getElementsByClassName('oppia-response')[0];
     for (var i = 0; i < oppia_response.childNodes.length; i++) {
-      // If $scope.oppiaHtml did not change since the last response, angular
-      // skips rendering it. That means if we move the elements out of
-      // oppia_response here, it might be left empty even though
-      // $scope.oppiaHtml is not empty. Cloning them here to avoid the problem.
       prev_log.appendChild(oppia_response.childNodes[i].cloneNode(true));
     }
 
