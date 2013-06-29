@@ -150,7 +150,7 @@ class ExplorationHandler(BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_state = exploration.init_state.get()
+        init_state = exploration.init_state
         # TODO: get params from exploration specification instead
         params = self._get_exploration_params(exploration)
         params = get_params(init_state, params)

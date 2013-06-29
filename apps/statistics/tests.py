@@ -53,7 +53,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         exp = Exploration.create(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
-        state_id = exp.init_state.get().id
+        state_id = exp.init_state.id
 
         EventHandler.record_rule_hit(
             'eid', state_id, Rule(name='Default', dest=state_id),
@@ -76,14 +76,14 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
         self.assertEquals(states[0]['rank'], 3)
-        self.assertEquals(states[0]['state_id'], exp.init_state.get().id)
+        self.assertEquals(states[0]['state_id'], exp.init_state.id)
 
     def test_single_default_rule_hit(self):
         InteractiveWidget.load_default_widgets()
         exp = Exploration.create(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
-        state_id = exp.init_state.get().id
+        state_id = exp.init_state.id
 
         EventHandler.record_rule_hit(
             'eid', state_id, Rule(name='Default', dest=state_id),
@@ -95,14 +95,14 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
         self.assertEquals(states[0]['rank'], 1)
-        self.assertEquals(states[0]['state_id'], exp.init_state.get().id)
+        self.assertEquals(states[0]['state_id'], exp.init_state.id)
 
     def test_no_improvement_flag_hit(self):
         InteractiveWidget.load_default_widgets()
         exp = Exploration.create(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
-        init_state = exp.init_state.get()
+        init_state = exp.init_state
         state_id = init_state.id
         init_state.widget.handlers[0].rules = [
             Rule(name='NotDefault', dest=state_id),
@@ -123,7 +123,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         exp = Exploration.create(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
-        state_id = exp.init_state.get().id
+        state_id = exp.init_state.id
 
         # Hit the default once, and do an incomplete twice. The result should
         # be classified as incomplete.
@@ -162,7 +162,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
         second_state = exp.add_state(SECOND_STATE)
 
-        state_1_id = exp.init_state.get().id
+        state_1_id = exp.init_state.id
         state_2_id = second_state.id
 
         # Hit the default rule of state 1 once, and the default rule of state 2

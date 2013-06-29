@@ -49,33 +49,29 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        # An Exploration must have properties 'category' and 'init_state' set.
+        # An Exploration must have the 'category' property set.
         with self.assertRaises(BadValueError):
             exploration.put()
         exploration.category = 'The category'
-        with self.assertRaises(BadValueError):
-            exploration.put()
 
-        # The 'init_state' property must be a valid State.
-        with self.assertRaises(BadValueError):
-            exploration.init_state = 'The State'
         state = State(id='The state hash id', parent=exploration.key)
         state.put()
-        exploration.init_state = state.key
 
         # The 'states' property must be a list.
         with self.assertRaises(BadValueError):
             exploration.states = 'A string'
-        # TODO(emersoj): We should put the initial state in the states list. It
-        # should not be empty
         exploration.states = []
 
-        # The 'states property must be a list of State keys.
+        # The 'states property must be a non-empty list of State keys.
         with self.assertRaises(BadValueError):
             exploration.states = ['A string']
         with self.assertRaises(BadValueError):
             exploration.states = [state]
         exploration.states = [state.key]
+
+        # The 'init_state' property should return the first state in the states
+        # list.
+        self.assertEqual(exploration.init_state.id, state.id)
 
         # The 'parameters' property must be a list of Parameter objects.
         with self.assertRaises(BadValueError):
@@ -114,7 +110,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         exploration.put()
         retrieved_exploration = Exploration.get('The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
-        self.assertEqual(retrieved_exploration.init_state, state.key)
+        self.assertEqual(retrieved_exploration.init_state, state)
         self.assertEqual(retrieved_exploration.title, 'New exploration')
         self.assertEqual(retrieved_exploration.states, [state.key])
         self.assertEqual(retrieved_exploration.parameters, [parameter])

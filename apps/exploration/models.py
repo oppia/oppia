@@ -31,7 +31,6 @@ import feconf
 import logging
 import utils
 
-from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
 
@@ -62,8 +61,6 @@ class Exploration(IdModel):
     category = ndb.StringProperty(required=True)
     # What this exploration is called.
     title = ndb.StringProperty(default='New exploration')
-    # The state which forms the start of this exploration.
-    init_state = ndb.KeyProperty(kind=State, required=True)
     # The list of states this exploration consists of. This list should not be
     # empty.
     states = ndb.KeyProperty(kind=State, repeated=True)
@@ -83,6 +80,11 @@ class Exploration(IdModel):
     # TODO(sll): Implement the rest of this feature at the controller and view
     # levels.
     datasets = ndb.LocalStructuredProperty(Dataset, repeated=True)
+
+    # The state which forms the start of this exploration.
+    @property
+    def init_state(self):
+        return self.states[0].get()
 
     def _has_state_named(self, state_name):
         """Checks if a state with the given name exists in this exploration."""
@@ -110,8 +112,8 @@ class Exploration(IdModel):
 
         # Note that demo explorations do not have owners, so user may be None.
         exploration = cls(
-            id=exploration_id, title=title, init_state=fake_state_key,
-            category=category, image_id=image_id, states=[fake_state_key],
+            id=exploration_id, title=title, category=category,
+            image_id=image_id, states=[fake_state_key],
             editors=[user] if user else [])
         exploration.put()
 
@@ -202,7 +204,7 @@ class Exploration(IdModel):
             state = state_key.get()
             state_internals = state.internals_as_dict(human_readable_dests=True)
 
-            if self.init_state.get().id == state.id:
+            if self.init_state.id == state.id:
                 init_states_list.append(state_internals)
             else:
                 others_states_list.append(state_internals)

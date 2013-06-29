@@ -198,7 +198,7 @@ class ExplorationHandler(BaseHandler):
 
         self.values.update({
             'exploration_id': exploration.id,
-            'init_state_id': exploration.init_state.get().id,
+            'init_state_id': exploration.init_state.id,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
             'category': exploration.category,
@@ -424,7 +424,7 @@ class StateHandler(BaseHandler):
         """Deletes the state with id state_id."""
 
         # Do not allow deletion of initial states.
-        if exploration.init_state == state.key:
+        if exploration.init_state.key == state.key:
             raise self.InvalidInputException(
                 'Cannot delete initial state of an exploration.')
 
