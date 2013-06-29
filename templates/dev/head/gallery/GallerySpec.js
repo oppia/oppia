@@ -8,7 +8,6 @@ describe('Gallery controller', function() {
       can_fork: false,
       data: {
         category: 'Geography',
-        datasets: [],
         editors: [],
         id: '5',
         image_id: null,
@@ -23,7 +22,6 @@ describe('Gallery controller', function() {
       can_fork: true,
       data: {
         category: 'Personal',
-        datasets: [],
         editors: [],
         id: '6',
         image_id: null,
