@@ -1,3 +1,4 @@
+{% if iframe_content %}
 <html ng-app="im">
   <head>
     <script src="/third_party/static/angularjs-1.0.3/angular.min.js"></script>
@@ -25,3 +26,7 @@
     <div id="map-canvas"></div>
   </body>
 </html>
+{% else %}
+<iframe class="logContent" width="100%" frameborder="0" height="400px">
+</iframe>
+{% endif %}

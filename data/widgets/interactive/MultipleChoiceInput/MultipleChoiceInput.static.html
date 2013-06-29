@@ -1,0 +1,14 @@
+{% if not iframe_content %}
+<span class="oppia-reader-response"></span>
+<script>
+  // We can not simply render choices[answer] in the span tag above because we
+  // need to JSON parse them first.
+  var choices = JSON.parse('{{choices}}');
+  var answer = JSON.parse('{{answer}}');
+  var elems = document.getElementsByClassName('oppia-reader-response');
+
+  // Since we have the span tag created before this script section, there should
+  // always be at least one element.
+  elems[elems.length - 1].innerHTML = choices[answer];
+</script>
+{% endif %}

@@ -38,6 +38,10 @@
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
         });
+    var prev_log = document.getElementsByClassName('previous-log')[0];
+    if (prev_log) {
+      prev_log.innerHTML = '';
+    }
   };
 
   $scope.initializePage();
@@ -108,8 +112,7 @@
 
     $scope.params = data.params;
 
-    $scope.html += $scope.oppiaHtml;
-    $scope.html += data.reader_html;
+    $scope.html = data.reader_html;
     $scope.oppiaHtml = data.oppia_html;
 
     for (var i = 0; i < data.widgets.length; i++) {
@@ -120,6 +123,22 @@
     // We need to generate the HTML (with the iframe) before populating it.
     if (!data.sticky_interactive_widget) {
       $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+    }
+
+    // Move the last round of user response and oppia response to the previous
+    // log element so we can render new ones.
+    var prev_log = document.getElementsByClassName('previous-log')[0];
+    var last_log = document.getElementsByClassName('last-log')[0];
+    while(last_log.firstChild) {
+      prev_log.appendChild(last_log.firstChild);
+    }
+    var oppia_response = document.getElementsByClassName('oppia-response')[0];
+    for (var i = 0; i < oppia_response.childNodes.length; i++) {
+      // If $scope.oppiaHtml did not change since the last response, angular
+      // skips rendering it. That means if we move the elements out of
+      // oppia_response here, it might be left empty even though
+      // $scope.oppiaHtml is not empty. Cloning them here to avoid the problem.
+      prev_log.appendChild(oppia_response.childNodes[i].cloneNode(true));
     }
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -134,13 +153,13 @@
         $scope.widgets[i].raw);
     }
 
-    if (data.static_interactive) {
-      // The previous response needs to be rendered in static interactive in an
-      // iframe.
-      var iframes = document.getElementsByClassName('logTemplate');
+    if (data.response_iframe) {
+      // The previous user response needs to be rendered in a custom html with
+      // an iframe.
+      var iframes = document.getElementsByClassName('logContent');
       if (iframes.length) {
         $scope.addContentToIframe(
-            iframes[iframes.length - 1], data.static_interactive);
+            iframes[iframes.length - 1], data.response_iframe);
       }
     }
 

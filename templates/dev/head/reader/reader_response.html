@@ -1,8 +1,7 @@
-{% if response or static_interactive %}
+{% if response %}
   <div class="oppia-reader-response-container">
-    {% if static_interactive %}
-      <iframe class="logTemplate" width="100%" frameborder="0" height="400px">
-      </iframe>
+    {% if custom_response %}
+      {{ response | safe }}
     {% else %}
       <span class="oppia-reader-response">
         {% if response | is_list %}

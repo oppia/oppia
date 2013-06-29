@@ -232,12 +232,7 @@ class FeedbackHandler(BaseHandler):
             old_state.put()
 
         html_output, widget_output = '', []
-        # TODO(sll): The following is a special-case for multiple choice input,
-        # in which the choice text must be displayed instead of the choice
-        # number. We might need to find a way to do this more generically.
         old_params = params
-        if state.widget.widget_id == 'interactive-MultipleChoiceInput':
-            answer = state.widget.params['choices'][int(answer)]
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
@@ -269,31 +264,38 @@ class FeedbackHandler(BaseHandler):
                 html_output += state_html
                 widget_output += state_widgets
 
-        # Render the response in the static widget if
+        # Render the response in the response in the customized html if
         # - the response is not rendered in the sticky interactive widget, and
         # - there is a static rendering html provided for that widget.
         sticky = (
+            dest_id != feconf.END_DEST and
             state.widget.sticky and
             state.widget.widget_id == old_state.widget.widget_id
         )
-        static_interactive = dest_id == feconf.END_DEST or not sticky
-        if static_interactive:
+        custom_response = ''
+        if not sticky:
             response_params = utils.parse_dict_with_params(
                 old_state.widget.params, old_params)
             response_params['answer'] = old_params['answer']
-            template = InteractiveWidget.get_raw_static_code(
+            response_params['iframe_content'] = False
+            custom_response = InteractiveWidget.get_raw_static_code(
                 old_state.widget.widget_id, response_params)
 
-            if template:
-                values['static_interactive'] = template
-            else:
-                static_interactive = False
+            if custom_response:
+                response_params['iframe_content'] = True
+                values['response_iframe'] = (
+                    InteractiveWidget.get_raw_static_code(
+                        old_state.widget.widget_id, response_params)
+                )
 
         # Append reader's answer.
+        response = custom_response if custom_response else answer
+        if sticky:
+          response = ''
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({
-                'response': '' if sticky else answer,
-                'static_interactive': static_interactive,
+                'response': response,
+                'custom_response': bool(custom_response),
             })
 
         if state.widget.widget_id in DEFAULT_ANSWERS:

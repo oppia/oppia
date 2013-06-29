@@ -11,7 +11,9 @@
         <a ng-click="initializePage()" class="pull-right">Start again?</a>
         <br><br>
 
-        <div angular-html-bind="html" class="oppia-conversation-log"></div>
+        <div class="oppia-conversation-log previous-log"></div>
+        <div angular-html-bind="html" class="oppia-conversation-log last-log">
+        </div>
         <div angular-html-bind="oppiaHtml" class="oppia-response" ng-show="oppiaHtml">
         </div>
         <br>
