@@ -46,7 +46,7 @@ class TemplateHandler(BaseHandler):
 
 
 class ImageHandler(BaseHandler):
-    """Handles image uploads and retrievals."""
+    """Handles image retrievals."""
 
     def get(self, image_id):
         """Returns an image.
@@ -62,6 +62,10 @@ class ImageHandler(BaseHandler):
             self.response.write(image.raw)
         except:
             raise self.PageNotFoundException
+
+
+class ImageUploadHandler(BaseHandler):
+    """Handles image uploads."""
 
     def post(self):
         """Saves an image uploaded by a content creator."""

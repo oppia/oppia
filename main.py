@@ -35,8 +35,13 @@ class Error404Handler(base.BaseHandler):
     """Handles 404 errors."""
 
     def get(self):
-        """Redirects users to the main gallery if an invalid URL is entered."""
-        raise self.PageNotFoundException
+        """Redirects users to the main gallery if an invalid URL is entered.
+
+        For robots.txt requests, returns an empty response so that the error
+        does not show up in the logs.
+        """
+        if not self.request.uri.endswith('robots.txt'):
+            raise self.PageNotFoundException
 
 
 # Regex for base64 id encoding
@@ -54,6 +59,7 @@ urls = [
 
     (r'/editor_views/(%s)/?' % r, resources.EditorViewHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),
+    (r'/imagehandler/?', resources.ImageUploadHandler),
     (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
 
     (r'/gallery/?', gallery.GalleryPage),
