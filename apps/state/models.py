@@ -18,14 +18,12 @@
 
 __author__ = 'Sean Lip'
 
-import copy
 import importlib
 
 from apps.base_model.models import BaseModel
 from apps.base_model.models import IdModel
 from apps.parameter.models import ParamChangeProperty
 from apps.widget.models import InteractiveWidget
-from apps.widget.models import Widget
 from data.objects.models import objects
 import feconf
 import utils

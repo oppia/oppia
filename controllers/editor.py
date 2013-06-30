@@ -23,7 +23,6 @@ from apps.parameter.models import Parameter
 from apps.state.models import AnswerHandlerInstance
 from apps.state.models import Content
 from apps.state.models import Rule
-from apps.state.models import State
 from apps.statistics.models import Statistics
 from apps.statistics.models import STATS_ENUMS
 from apps.widget.models import InteractiveWidget
