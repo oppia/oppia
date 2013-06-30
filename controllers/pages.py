@@ -30,7 +30,7 @@ class MainPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not exp_services.get_by_id('0', strict=False):
+        if not exp_services.get_exploration_by_id('0', strict=False):
             admin.reload_demos()
 
         self.values.update({

@@ -65,7 +65,7 @@ def require_editor(handler):
             return
 
         try:
-            exploration = exp_services.get_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 

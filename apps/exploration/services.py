@@ -17,10 +17,10 @@
 """Commands that can be used to operate on Oppia explorations.
 
 All functions here should be agnostic of how Exploration objects are stored in
-the database. In particular, the get_by_id(), query(), put() and delete()
-methods should delegate to the Exploration model class. This will enable the
-exploration storage model to be changed without affecting this class and others
-above it.
+the database. In particular, the get_exploration_by_id(), query(), put() and
+delete() methods should delegate to the Exploration model class. This will
+enable the exploration storage model to be changed without affecting this
+class and others above it.
 """
 
 __author__ = 'Sean Lip'
@@ -31,15 +31,21 @@ import os
 
 from apps.exploration.models import Exploration
 from apps.image.models import Image
+from apps.parameter.models import ParamChange
 from apps.parameter.models import Parameter
+from apps.state.models import AnswerHandlerInstance
+from apps.state.models import Content
+from apps.state.models import Rule
 from apps.state.models import State
+from apps.state.models import WidgetInstance
+from apps.widget.models import Widget
 
 import feconf
 import utils
 
 
 # Query methods.
-def get_by_id(exploration_id, strict=True):
+def get_exploration_by_id(exploration_id, strict=True):
     """Gets an exploration by id. Fails noisily if strict == True."""
     return Exploration.get(exploration_id, strict=strict)
 
@@ -65,10 +71,41 @@ def count_explorations():
     return Exploration.get_exploration_count()
 
 
+# Operations involving exploration parameters.
+def get_or_create_param(exploration_id, param_name, obj_type=None):
+    """Returns a ParamChange instance corresponding to the given inputs.
+
+    If the parameter does not exist in the given exploration, it is added to
+    the list of exploration parameters.
+
+    If the obj_type is not specified it is taken to be 'UnicodeString'.
+
+    If the obj_type does not match the obj_type for the parameter in the
+    exploration, an Exception is raised.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+
+    for param in exploration.parameters:
+        if param.name == param_name:
+            if obj_type and param.obj_type != obj_type:
+                raise Exception(
+                    'Parameter %s has wrong obj_type: was %s, expected %s'
+                    % (param_name, obj_type, param.obj_type))
+            return ParamChange(name=param.name, obj_type=param.obj_type)
+
+    # The parameter was not found, so add it.
+    if not obj_type:
+        obj_type = 'UnicodeString'
+    exploration.parameters.append(
+        Parameter(name=param_name, obj_type=obj_type))
+    exploration.put()
+    return ParamChange(name=param_name, obj_type=obj_type)
+
+
 # Operations on states belonging to an exploration.
 def add_state(exploration_id, state_name, state_id=None):
     """Adds a new state, and returns it."""
-    exploration = get_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     if exploration._has_state_named(state_name):
         raise Exception('Duplicate state name %s' % state_name)
@@ -85,7 +122,7 @@ def add_state(exploration_id, state_name, state_id=None):
 
 def rename_state(exploration_id, state, new_state_name):
     """Renames a state of this exploration."""
-    exploration = get_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     if state.name == new_state_name:
         return
@@ -99,7 +136,7 @@ def rename_state(exploration_id, state, new_state_name):
 
 def get_state_by_id(exploration_id, state_id):
     """Returns a state of this exploration, given its id."""
-    exploration = get_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     for state_key in exploration.states:
         if state_key.id() == state_id:
@@ -107,6 +144,49 @@ def get_state_by_id(exploration_id, state_id):
 
     raise Exception('State with id %s not found in exploration %s.' %
                     (state_id, exploration_id))
+
+
+def modify_using_dict(exploration_id, state_id, sdict):
+    """Modifies the properties of a state using values from a dict."""
+    exploration = get_exploration_by_id(exploration_id)
+    state = get_state_by_id(exploration_id, state_id)
+
+    state.content = [
+        Content(type=item['type'], value=item['value'])
+        for item in sdict['content']
+    ]
+
+    state.param_changes = []
+    for pc in sdict['param_changes']:
+        instance = get_or_create_param(
+            exploration_id, pc['name'], obj_type=pc['obj_type'])
+        instance.values = pc['values']
+        state.param_changes.append(instance)
+
+    wdict = sdict['widget']
+    state.widget = WidgetInstance(
+        widget_id=wdict['widget_id'], sticky=wdict['sticky'],
+        params=wdict['params'], handlers=[])
+
+    # Augment the list of parameters in state.widget with the default widget
+    # params.
+    for wp in Widget.get(wdict['widget_id']).params:
+        if wp.name not in wdict['params']:
+            state.widget.params[wp.name] = wp.value
+
+    for handler in wdict['handlers']:
+        handler_rules = [Rule(
+            name=rule['name'],
+            inputs=rule['inputs'],
+            dest=State._get_id_from_name(rule['dest'], exploration),
+            feedback=rule['feedback']
+        ) for rule in handler['rules']]
+
+        state.widget.handlers.append(AnswerHandlerInstance(
+            name=handler['name'], rules=handler_rules))
+
+    state.put()
+    return state
 
 
 # Creation and deletion methods.
@@ -133,7 +213,7 @@ def create_new(
 
 def delete(exploration_id):
     """Deletes the exploration corresponding to the given exploration_id."""
-    exploration = get_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     for state_key in exploration.states:
         state_key.delete()
     exploration.key.delete()
@@ -168,8 +248,7 @@ def create_from_yaml(
             state_list.append({'state': state, 'desc': state_description})
 
         for index, state in enumerate(state_list):
-            State.modify_using_dict(
-                exploration, state['state'], state['desc'])
+            modify_using_dict(exploration.id, state['state'].id, state['desc'])
     except Exception:
         delete(exploration.id)
         raise
@@ -209,7 +288,7 @@ def delete_demos():
     """Deletes the demo explorations."""
     exploration_list = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = get_by_id(str(int_id), strict=False)
+        exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
@@ -256,7 +335,7 @@ def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     # TODO(sll): Cache the return value?
 
-    exploration = get_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     params = []
     for param in exploration.parameters:

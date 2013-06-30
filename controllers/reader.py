@@ -145,7 +145,7 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = exp_services.get_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 

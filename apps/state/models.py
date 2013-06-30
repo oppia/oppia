@@ -146,46 +146,6 @@ class State(IdModel):
             return feconf.END_DEST
         return State.get_by_name(name, exploration).id
 
-    @classmethod
-    def modify_using_dict(cls, exploration, state, sdict):
-        """Modifies the properties of a state using values from a dict."""
-        state.content = [
-            Content(type=item['type'], value=item['value'])
-            for item in sdict['content']
-        ]
-
-        state.param_changes = []
-        for pc in sdict['param_changes']:
-            instance = exploration.get_param_change_instance(
-                pc['name'], pc['obj_type'])
-            instance.values = pc['values']
-            state.param_changes.append(instance)
-
-        wdict = sdict['widget']
-        state.widget = WidgetInstance(
-            widget_id=wdict['widget_id'], sticky=wdict['sticky'],
-            params=wdict['params'], handlers=[])
-
-        # Augment the list of parameters in state.widget with the default widget
-        # params.
-        for wp in Widget.get(wdict['widget_id']).params:
-            if wp.name not in wdict['params']:
-                state.widget.params[wp.name] = wp.value
-
-        for handler in wdict['handlers']:
-            handler_rules = [Rule(
-                name=rule['name'],
-                inputs=rule['inputs'],
-                dest=State._get_id_from_name(rule['dest'], exploration),
-                feedback=rule['feedback']
-            ) for rule in handler['rules']]
-
-            state.widget.handlers.append(AnswerHandlerInstance(
-                name=handler['name'], rules=handler_rules))
-
-        state.put()
-        return state
-
     def transition(self, answer, params, handler_name):
         """Handle feedback interactions with readers."""
 

@@ -149,7 +149,7 @@ class ForkExploration(BaseHandler):
 
         exploration_id = payload.get('exploration_id')
 
-        forked_exploration = exp_services.get_by_id(exploration_id)
+        forked_exploration = exp_services.get_exploration_by_id(exploration_id)
         if not forked_exploration.is_demo:
             raise self.InvalidInputException('Exploration cannot be forked.')
 
@@ -309,9 +309,8 @@ class StateHandler(BaseHandler):
         yaml_file = payload.get('yaml_file')
         if yaml_file and feconf.ALLOW_YAML_FILE_UPLOAD:
             # The user has uploaded a YAML file. Process only this action.
-            state = State.modify_using_dict(
-                exploration, state,
-                utils.dict_from_yaml(yaml_file))
+            state = exp_services.modify_using_dict(
+                exploration.id, state.id, utils.dict_from_yaml(yaml_file))
             self.render_json(get_state_for_frontend(state, exploration))
             return
 
@@ -333,8 +332,8 @@ class StateHandler(BaseHandler):
         if 'param_changes' in payload:
             state.param_changes = []
             for param_change in param_changes:
-                instance = exploration.get_param_change_instance(
-                    param_change['name'])
+                instance = exp_services.get_or_create_param(
+                    exploration.id, param_change['name'])
                 instance.values = param_change['values']
                 state.param_changes.append(instance)
 

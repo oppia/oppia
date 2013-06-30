@@ -128,44 +128,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The get() should fail silently when strict == False.
         self.assertIsNone(Exploration.get('Invalid id', strict=False))
 
-    def test_state_operations(self):
-        """Test adding, renaming and checking existence of states."""
-        exploration = exp_services.create_new(
-            self.user, 'Title', 'Category', 'eid')
-        exploration.put()
-
-        self.assertEqual(len(exploration.states), 1)
-
-        default_state = exploration.states[0].get()
-        default_state_name = default_state.name
-        exp_services.rename_state(
-            exploration.id, default_state, 'Renamed state')
-
-        self.assertEqual(len(exploration.states), 1)
-        self.assertEqual(default_state.name, 'Renamed state')
-
-        # Add a new state.
-        second_state = exp_services.add_state(exploration.id, 'State 2')
-        self.assertEqual(len(exploration.states), 2)
-
-        # It is OK to rename a state to itself.
-        exp_services.rename_state(
-            exploration.id, second_state, second_state.name)
-        self.assertEqual(second_state.name, 'State 2')
-
-        # But it is not OK to add or rename a state using a name that already
-        # exists.
-        with self.assertRaises(Exception):
-            exp_services.add_state(exploration.id, 'State 2')
-        with self.assertRaises(Exception):
-            exp_services.rename_state(
-                exploration.id, second_state, 'Renamed state')
-
-        # The exploration now has exactly two states.
-        self.assertFalse(exploration._has_state_named(default_state_name))
-        self.assertTrue(exploration._has_state_named('Renamed state'))
-        self.assertTrue(exploration._has_state_named('State 2'))
-
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = Exploration(id='0')

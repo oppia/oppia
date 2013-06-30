@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 from apps.base_model.models import IdModel
 from apps.parameter.models import Parameter
-from apps.parameter.models import ParamChange
 from apps.state.models import State
 import feconf
 
@@ -114,25 +113,3 @@ class Exploration(IdModel):
             return users.is_current_user_admin()
         else:
             return user and user == self.editors[0]
-
-    def get_param_change_instance(self, param_name, obj_type=None):
-        """Gets a ParamChange instance corresponding to the param_name.
-
-        Creates the parameter, defaulting to the given obj_type (or, if not
-        specified, UnicodeString), if no such param_name exists.
-        """
-        for param in self.parameters:
-            if param.name == param_name:
-                if obj_type and param.obj_type != obj_type:
-                    raise Exception(
-                        'Parameter %s has wrong obj_type: was %s, expected %s'
-                        % (param_name, obj_type, param.obj_type))
-                return ParamChange(name=param.name, obj_type=param.obj_type)
-
-        # The parameter was not found, so add it.
-        if not obj_type:
-            obj_type = 'UnicodeString'
-        self.parameters.append(
-            Parameter(name=param_name, obj_type=obj_type))
-        self.put()
-        return ParamChange(name=param_name, obj_type=obj_type)
