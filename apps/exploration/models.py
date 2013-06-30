@@ -23,7 +23,6 @@ from apps.parameter.models import Parameter
 from apps.parameter.models import ParamChange
 from apps.state.models import State
 import feconf
-import utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -40,12 +39,6 @@ class Exploration(IdModel):
     # TODO(sll): Write a test that ensures that the only two files that are
     # allowed to import this class are the exploration services file and the
     # Exploration tests file.
-
-    # TODO(sll): Consider splitting this file into a domain file and a model
-    # file. The former would contain all properties and methods that need not
-    # be re-implemented for multiple storage models. The latter would contain
-    # only the attributes and methods that need to be re-implemented for the
-    # different storage models.
 
     def _pre_put_hook(self):
         """Validates the exploration before it is put into the datastore."""
@@ -71,6 +64,29 @@ class Exploration(IdModel):
     # exploration, the list is empty. Otherwise, the first element is the
     # original creator of the exploration.
     editors = ndb.UserProperty(repeated=True)
+
+    @classmethod
+    def get_public_explorations(cls):
+        """Returns an iterable containing publicly-available explorations."""
+        return cls.query().filter(cls.is_public == True)
+
+    @classmethod
+    def get_viewable_explorations(cls, user):
+        """Returns a list of explorations viewable by the given user."""
+        return cls.query().filter(
+            ndb.OR(cls.is_public == True, cls.editors == user)
+        )
+
+    @classmethod
+    def get_exploration_count(cls):
+        """Returns the total number of explorations."""
+        return cls.query().count()
+
+    # TODO(sll): Consider splitting this file into a domain file and a model
+    # file. The former would contain all properties and methods that need not
+    # be re-implemented for multiple storage models (i.e., the ones located
+    # above this comment). The latter would contain only the attributes and
+    # methods that need to be re-implemented for the different storage models.
 
     @property
     def init_state(self):
@@ -98,79 +114,6 @@ class Exploration(IdModel):
             return users.is_current_user_admin()
         else:
             return user and user == self.editors[0]
-
-    @classmethod
-    def get_public_explorations(cls):
-        """Returns an iterable containing publicly-available explorations."""
-        return cls.query().filter(cls.is_public == True)
-
-    @classmethod
-    def get_viewable_explorations(cls, user):
-        """Returns a list of explorations viewable by the given user."""
-        return cls.query().filter(
-            ndb.OR(cls.is_public == True, cls.editors == user)
-        )
-
-    @classmethod
-    def get_exploration_count(cls):
-        """Returns the total number of explorations."""
-        return cls.query().count()
-
-    @property
-    def as_yaml(self):
-        """Returns a YAML version of the exploration."""
-        params = []
-        for param in self.parameters:
-            params.append({'name': param.name, 'obj_type': param.obj_type,
-                           'values': param.values})
-
-        init_states_list = []
-        others_states_list = []
-
-        for state_key in self.states:
-            state = state_key.get()
-            state_internals = state.internals_as_dict(
-                self, human_readable_dests=True)
-
-            if self.init_state.id == state.id:
-                init_states_list.append(state_internals)
-            else:
-                others_states_list.append(state_internals)
-
-        full_state_list = init_states_list + others_states_list
-        result_dict = {'parameters': params, 'states': full_state_list}
-        return utils.yaml_from_dict(result_dict)
-
-    def add_state(self, state_name, state_id=None):
-        """Adds a new state, and returns it."""
-        if self._has_state_named(state_name):
-            raise Exception('Duplicate state name %s' % state_name)
-
-        state_id = state_id or State.get_new_id(state_name)
-        new_state = State(id=state_id, name=state_name)
-        new_state.put()
-
-        self.states.append(new_state.key)
-        self.put()
-
-        return new_state
-
-    def rename_state(self, state, new_state_name):
-        """Renames a state of this exploration."""
-        if state.name == new_state_name:
-            return
-
-        if self._has_state_named(new_state_name):
-            raise Exception('Duplicate state name: %s' % new_state_name)
-
-        state.name = new_state_name
-        state.put()
-
-    def get_state_by_id(self, state_id):
-        """Returns a state of this exploration, given its id."""
-        for state_key in self.states:
-            if state_key.id() == state_id:
-                return state_key.get()
 
     def get_param_change_instance(self, param_name, obj_type=None):
         """Gets a ParamChange instance corresponding to the param_name.

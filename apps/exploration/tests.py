@@ -130,77 +130,41 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
-        exploration = exp_services.create_new(self.user, 'Title', 'Category', 'eid')
+        exploration = exp_services.create_new(
+            self.user, 'Title', 'Category', 'eid')
         exploration.put()
 
         self.assertEqual(len(exploration.states), 1)
 
         default_state = exploration.states[0].get()
         default_state_name = default_state.name
-        exploration.rename_state(default_state, 'Renamed state')
+        exp_services.rename_state(
+            exploration.id, default_state, 'Renamed state')
 
         self.assertEqual(len(exploration.states), 1)
         self.assertEqual(default_state.name, 'Renamed state')
 
         # Add a new state.
-        second_state = exploration.add_state('State 2')
+        second_state = exp_services.add_state(exploration.id, 'State 2')
         self.assertEqual(len(exploration.states), 2)
 
         # It is OK to rename a state to itself.
-        exploration.rename_state(second_state, second_state.name)
+        exp_services.rename_state(
+            exploration.id, second_state, second_state.name)
         self.assertEqual(second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
         # exists.
         with self.assertRaises(Exception):
-            exploration.add_state('State 2')
+            exp_services.add_state(exploration.id, 'State 2')
         with self.assertRaises(Exception):
-            exploration.rename_state(second_state, 'Renamed state')
+            exp_services.rename_state(
+                exploration.id, second_state, 'Renamed state')
 
         # The exploration now has exactly two states.
         self.assertFalse(exploration._has_state_named(default_state_name))
         self.assertTrue(exploration._has_state_named('Renamed state'))
         self.assertTrue(exploration._has_state_named('State 2'))
-
-    def test_as_yaml_property(self):
-        """Test the as_yaml property."""
-        exploration = exp_services.create_new(
-            self.user, 'A title', 'A category', 'A different exploration_id')
-        exploration.add_state('New state')
-        yaml_file = exploration.as_yaml
-        self.assertEqual(yaml_file, """parameters: []
-states:
-- content: []
-  name: '[untitled state]'
-  param_changes: []
-  widget:
-    handlers:
-    - name: submit
-      rules:
-      - dest: '[untitled state]'
-        feedback: []
-        inputs: {}
-        name: Default
-        param_changes: []
-    params: {}
-    sticky: false
-    widget_id: interactive-Continue
-- content: []
-  name: New state
-  param_changes: []
-  widget:
-    handlers:
-    - name: submit
-      rules:
-      - dest: New state
-        feedback: []
-        inputs: {}
-        name: Default
-        param_changes: []
-    params: {}
-    sticky: false
-    widget_id: interactive-Continue
-""")
 
     def test_is_demo_property(self):
         """Test the is_demo property."""

@@ -25,6 +25,7 @@ above it.
 
 __author__ = 'Sean Lip'
 
+import copy
 import logging
 import os
 
@@ -64,7 +65,51 @@ def count_explorations():
     return Exploration.get_exploration_count()
 
 
-# Direct creation and deletion methods.
+# Operations on states belonging to an exploration.
+def add_state(exploration_id, state_name, state_id=None):
+    """Adds a new state, and returns it."""
+    exploration = get_by_id(exploration_id)
+
+    if exploration._has_state_named(state_name):
+        raise Exception('Duplicate state name %s' % state_name)
+
+    state_id = state_id or State.get_new_id(state_name)
+    new_state = State(id=state_id, name=state_name)
+    new_state.put()
+
+    exploration.states.append(new_state.key)
+    exploration.put()
+
+    return new_state
+
+
+def rename_state(exploration_id, state, new_state_name):
+    """Renames a state of this exploration."""
+    exploration = get_by_id(exploration_id)
+
+    if state.name == new_state_name:
+        return
+
+    if exploration._has_state_named(new_state_name):
+        raise Exception('Duplicate state name: %s' % new_state_name)
+
+    state.name = new_state_name
+    state.put()
+
+
+def get_state_by_id(exploration_id, state_id):
+    """Returns a state of this exploration, given its id."""
+    exploration = get_by_id(exploration_id)
+
+    for state_key in exploration.states:
+        if state_key.id() == state_id:
+            return state_key.get()
+
+    raise Exception('State with id %s not found in exploration %s.' %
+                    (state_id, exploration_id))
+
+
+# Creation and deletion methods.
 def create_new(
     user, title, category, exploration_id=None,
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
@@ -72,12 +117,16 @@ def create_new(
     # Generate a new exploration id, if one wasn't passed in.
     exploration_id = exploration_id or Exploration.get_new_id(title)
 
+    state_id = State.get_new_id(init_state_name)
+    new_state = State(id=state_id, name=init_state_name)
+    new_state.put()
+
     # Note that demo explorations do not have owners, so user may be None.
     exploration = Exploration(
         id=exploration_id, title=title, category=category,
-        image_id=image_id, states=[],
+        image_id=image_id, states=[new_state.key],
         editors=[user] if user else [])
-    exploration.add_state(init_state_name)
+
     exploration.put()
     return exploration
 
@@ -115,7 +164,7 @@ def create_from_yaml(
         for state_description in exploration_states:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
-                     else exploration.add_state(state_name))
+                     else add_state(exploration.id, state_name))
             state_list.append({'state': state, 'desc': state_description})
 
         for index, state in enumerate(state_list):
@@ -169,3 +218,64 @@ def delete_demos():
 
     for exploration in exploration_list:
         delete(exploration.id)
+
+
+# Methods for exporting states and explorations to other formats.
+def export_state_internals_to_dict(
+        exploration_id, state_id, human_readable_dests=False):
+    """Gets a Python dict of the internals of the state."""
+
+    state = get_state_by_id(exploration_id, state_id)
+
+    state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
+    # Remove the computed 'classifier' property.
+    for handler in state_dict['widget']['handlers']:
+        del handler['classifier']
+
+    if human_readable_dests:
+        # Change the dest ids to human-readable names.
+        for handler in state_dict['widget']['handlers']:
+            for rule in handler['rules']:
+                if rule['dest'] != feconf.END_DEST:
+                    dest_state = get_state_by_id(exploration_id, rule['dest'])
+                    rule['dest'] = dest_state.name
+    return state_dict
+
+
+def export_state_to_dict(exploration_id, state_id):
+    """Gets a Python dict representation of the state."""
+    state = get_state_by_id(exploration_id, state_id)
+
+    state_dict = export_state_internals_to_dict(exploration_id, state_id)
+    state_dict.update({'id': state.id, 'name': state.name,
+                       'unresolved_answers': state.unresolved_answers})
+    return state_dict
+
+
+def export_to_yaml(exploration_id):
+    """Returns a YAML version of the exploration."""
+    # TODO(sll): Cache the return value?
+
+    exploration = get_by_id(exploration_id)
+
+    params = []
+    for param in exploration.parameters:
+        params.append({'name': param.name, 'obj_type': param.obj_type,
+                       'values': param.values})
+
+    init_states_list = []
+    others_states_list = []
+
+    for state_key in exploration.states:
+        state = state_key.get()
+        state_internals = export_state_internals_to_dict(
+            exploration.id, state.id, human_readable_dests=True)
+
+        if exploration.init_state.id == state.id:
+            init_states_list.append(state_internals)
+        else:
+            others_states_list.append(state_internals)
+
+    full_state_list = init_states_list + others_states_list
+    result_dict = {'parameters': params, 'states': full_state_list}
+    return utils.yaml_from_dict(result_dict)

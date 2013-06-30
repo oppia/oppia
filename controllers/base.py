@@ -77,7 +77,7 @@ def require_editor(handler):
         if not state_id:
             return handler(self, exploration, **kwargs)
         try:
-            state = exploration.get_state_by_id(state_id)
+            state = exp_services.get_state_by_id(exploration_id, state_id)
         except:
             raise self.PageNotFoundException
         return handler(self, exploration, state, **kwargs)

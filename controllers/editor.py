@@ -41,9 +41,9 @@ EDITOR_MODE = 'editor'
 def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
-    state_repr = state.as_dict(exploration)
-    modified_state_dict = state.internals_as_dict(
-        exploration, human_readable_dests=True)
+    state_repr = exp_services.export_state_to_dict(exploration.id, state.id)
+    modified_state_dict = exp_services.export_state_internals_to_dict(
+        exploration.id, state.id, human_readable_dests=True)
 
     # TODO(sll): The following is for backwards-compatibility and should be
     # deleted later.
@@ -155,7 +155,7 @@ class ForkExploration(BaseHandler):
 
         # Get the demo exploration as a YAML file, so that new states can be
         # created.
-        yaml = forked_exploration.as_yaml
+        yaml = exp_services.export_to_yaml(forked_exploration.id)
         title = 'Copy of %s' % forked_exploration.title
         category = forked_exploration.category
 
@@ -230,8 +230,9 @@ class ExplorationHandler(BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state = exploration.add_state(state_name)
-        self.render_json(state.as_dict(exploration))
+        state = exp_services.add_state(exploration.id, state_name)
+        self.render_json(
+            exp_services.export_state_to_dict(exploration.id, state.id))
 
     @require_editor
     def put(self, exploration):
@@ -292,8 +293,8 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.txt' % filename)
-        # TODO(sll): Cache the YAML file.
-        self.response.write(exploration.as_yaml)
+
+        self.response.write(exp_services.export_to_yaml(exploration.id))
 
 
 class StateHandler(BaseHandler):
@@ -327,7 +328,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            exploration.rename_state(state, state_name)
+            exp_services.rename_state(exploration.id, state, state_name)
 
         if 'param_changes' in payload:
             state.param_changes = []

@@ -198,8 +198,7 @@ class FeedbackHandler(BaseHandler):
         """Handles feedback interactions with readers."""
         values = {'error': []}
 
-        exploration = exp_services.get_by_id(exploration_id)
-        state = exploration.get_state_by_id(state_id)
+        state = exp_services.get_state_by_id(exploration_id, state_id)
         old_state = state
 
         payload = json.loads(self.request.get('payload'))
@@ -241,7 +240,7 @@ class FeedbackHandler(BaseHandler):
                     old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = exploration.get_state_by_id(dest_id)
+            state = exp_services.get_state_by_id(exploration_id, dest_id)
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:
@@ -300,7 +299,7 @@ class FeedbackHandler(BaseHandler):
         if state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
         values.update({
-            'exploration_id': exploration.id, 'state_id': state.id,
+            'exploration_id': exploration_id, 'state_id': state.id,
             'oppia_html': html_output, 'widgets': widget_output,
             'block_number': block_number, 'params': params,
             'finished': (dest_id == feconf.END_DEST),

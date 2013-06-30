@@ -54,9 +54,11 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         """Test creation and retrieval of states."""
         id_1 = '123'
         name_1 = 'State 1'
-        state_1 = self.exploration.add_state(name_1, state_id=id_1)
+        state_1 = exp_services.add_state(
+            self.exploration.id, name_1, state_id=id_1)
 
-        fetched_state_1 = self.exploration.get_state_by_id(id_1)
+        fetched_state_1 = exp_services.get_state_by_id(
+            self.exploration.id, id_1)
         self.assertEqual(fetched_state_1, state_1)
 
         fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)
@@ -81,7 +83,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         """Test converting state names to ids."""
         id_1 = '123'
         name_1 = 'State 1'
-        self.exploration.add_state(name_1, state_id=id_1)
+        exp_services.add_state(self.exploration.id, name_1, state_id=id_1)
 
         self.assertEqual(
             State._get_id_from_name(name_1, self.exploration), id_1)

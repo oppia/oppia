@@ -102,13 +102,14 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         """Test the create_from_yaml() method."""
         exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A different exploration_id')
-        exploration.add_state('New state')
-        yaml_file = exploration.as_yaml
+        exp_services.add_state(exploration.id, 'New state')
+        yaml_file = exp_services.export_to_yaml(exploration.id)
 
         exploration2 = exp_services.create_from_yaml(
             yaml_file, self.owner, 'Title', 'Category')
         self.assertEqual(len(exploration2.states), 2)
-        self.assertEqual(exploration2.as_yaml, yaml_file)
+        yaml_file_2 = exp_services.export_to_yaml(exploration2.id)
+        self.assertEqual(yaml_file_2, yaml_file)
 
         self.assertEqual(exp_services.count_explorations(), 2)
 
@@ -150,3 +151,43 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
 
         exp_services.delete_demos()
         self.assertEqual(exp_services.count_explorations(), 0)
+
+    def test_export_to_yaml(self):
+        """Test the export_to_yaml() method."""
+        exploration = exp_services.create_new(
+            self.owner, 'A title', 'A category', 'A different exploration_id')
+        exp_services.add_state(exploration.id, 'New state')
+        yaml_file = exp_services.export_to_yaml(exploration.id)
+        self.assertEqual(yaml_file, """parameters: []
+states:
+- content: []
+  name: '[untitled state]'
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: '[untitled state]'
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: interactive-Continue
+- content: []
+  name: New state
+  param_changes: []
+  widget:
+    handlers:
+    - name: submit
+      rules:
+      - dest: New state
+        feedback: []
+        inputs: {}
+        name: Default
+        param_changes: []
+    params: {}
+    sticky: false
+    widget_id: interactive-Continue
+""")

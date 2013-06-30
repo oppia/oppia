@@ -122,30 +122,6 @@ class State(IdModel):
     # whose values are their counts.
     unresolved_answers = ndb.JsonProperty(default={})
 
-    def as_dict(self, exploration):
-        """Gets a Python dict representation of the state."""
-        state_dict = self.internals_as_dict(exploration)
-        state_dict.update({'id': self.id, 'name': self.name,
-                           'unresolved_answers': self.unresolved_answers})
-        return state_dict
-
-    def internals_as_dict(self, exploration, human_readable_dests=False):
-        """Gets a Python dict of the internals of the state."""
-        state_dict = copy.deepcopy(self.to_dict(
-            exclude=['unresolved_answers']))
-        # Remove the computed 'classifier' property.
-        for handler in state_dict['widget']['handlers']:
-            del handler['classifier']
-
-        if human_readable_dests:
-            # Change the dest ids to human-readable names.
-            for handler in state_dict['widget']['handlers']:
-                for rule in handler['rules']:
-                    if rule['dest'] != feconf.END_DEST:
-                        dest_state = exploration.get_state_by_id(rule['dest'])
-                        rule['dest'] = dest_state.name
-        return state_dict
-
     @classmethod
     def get_by_name(cls, name, exploration, strict=True):
         """Gets a state by name. Fails noisily if strict == True."""
