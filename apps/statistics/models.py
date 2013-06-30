@@ -22,7 +22,7 @@ import collections
 import utils
 
 from apps.base_model.models import BaseModel
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 
 from google.appengine.ext import ndb
 
@@ -191,7 +191,7 @@ class Statistics(object):
         if event_name == STATS_ENUMS.rule_hit:
             result = {}
 
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_services.get_by_id(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
                 result[state.id] = {
@@ -222,7 +222,7 @@ class Statistics(object):
         if event_name == STATS_ENUMS.state_hit:
             result = {}
 
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_services.get_by_id(exploration_id)
             for state_key in exploration.states:
                 state = state_key.get()
                 event_key = get_event_key(

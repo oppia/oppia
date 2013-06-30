@@ -37,6 +37,12 @@ class IdModel(BaseModel):
     def id(self):
         return self.key.id()
 
+    def put(self):
+        super(IdModel, self).put()
+
+    def delete(self):
+        super(IdModel, self).delete()
+
     @classmethod
     def get_new_id(cls, entity_name):
         """Gets a new 12-character id for an entity, based on its name.

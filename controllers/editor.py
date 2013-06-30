@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 
-from apps.exploration.models import Exploration
 import apps.exploration.services as exp_services
 from apps.parameter.models import Parameter
 from apps.state.models import AnswerHandlerInstance
@@ -130,10 +129,10 @@ class NewExploration(BaseHandler):
         yaml = self.request.get('yaml')
 
         if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exploration = Exploration.create_from_yaml(
+            exploration = exp_services.create_from_yaml(
                 yaml_file=yaml, user=self.user, title=title, category=category)
         else:
-            exploration = Exploration.create(
+            exploration = exp_services.create_new(
                 self.user, title=title, category=category)
 
         self.render_json({'explorationId': exploration.id})
@@ -150,17 +149,17 @@ class ForkExploration(BaseHandler):
 
         exploration_id = payload.get('exploration_id')
 
-        forked_exploration = Exploration.get(exploration_id)
-        if not exp_services.is_demo(forked_exploration):
+        forked_exploration = exp_services.get_by_id(exploration_id)
+        if not forked_exploration.is_demo:
             raise self.InvalidInputException('Exploration cannot be forked.')
 
         # Get the demo exploration as a YAML file, so that new states can be
         # created.
-        yaml = forked_exploration.as_yaml()
+        yaml = forked_exploration.as_yaml
         title = 'Copy of %s' % forked_exploration.title
         category = forked_exploration.category
 
-        exploration = Exploration.create_from_yaml(
+        exploration = exp_services.create_from_yaml(
             yaml_file=yaml, user=self.user, title=title, category=category)
 
         self.render_json({'explorationId': exploration.id})
@@ -277,7 +276,7 @@ class ExplorationHandler(BaseHandler):
     @require_editor
     def delete(self, exploration):
         """Deletes the given exploration."""
-        exploration.delete()
+        exp_services.delete(exploration.id)
 
 
 class ExplorationDownloadHandler(BaseHandler):
@@ -294,7 +293,7 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.txt' % filename)
         # TODO(sll): Cache the YAML file.
-        self.response.write(exploration.as_yaml())
+        self.response.write(exploration.as_yaml)
 
 
 class StateHandler(BaseHandler):

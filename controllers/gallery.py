@@ -47,10 +47,10 @@ class GalleryHandler(BaseHandler):
         for exploration in explorations:
             categories[exploration.category].append({
                 'can_edit': exploration.id in editable_exploration_ids,
-                'can_fork': self.user and exp_services.is_demo(exploration),
+                'can_fork': self.user and exploration.is_demo,
                 'id': exploration.id,
                 'image_id': exploration.image_id,
-                'is_owner': exp_services.is_owner(self.user, exploration),
+                'is_owner': exploration.is_owned_by(self.user),
                 'title': exploration.title,
             })
 

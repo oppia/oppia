@@ -18,24 +18,42 @@
 
 __author__ = 'Sean Lip'
 
-import os
-
 from apps.base_model.models import IdModel
-from apps.image.models import Image
 from apps.parameter.models import Parameter
 from apps.parameter.models import ParamChange
 from apps.state.models import State
 import feconf
-import logging
 import utils
 
+from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
 
 
 # TODO(sll): Add an anyone-can-edit mode.
 class Exploration(IdModel):
-    """An exploration (which is made up of several states)."""
+    """Storage model for an Oppia exploration.
+
+    This class should only be imported by the exploration services file and the
+    Exploration model test file.
+    """
+    # TODO(sll): Write a test that ensures that the only two files that are
+    # allowed to import this class are the exploration services file and the
+    # Exploration tests file.
+
+    # TODO(sll): Consider splitting this file into a domain file and a model
+    # file. The former would contain all properties and methods that need not
+    # be re-implemented for multiple storage models. The latter would contain
+    # only the attributes and methods that need to be re-implemented for the
+    # different storage models.
+
+    def _pre_put_hook(self):
+        """Validates the exploration before it is put into the datastore."""
+        if not self.states:
+            raise BadValueError('This exploration has no states.')
+        if not self.is_demo and not self.editors:
+            raise BadValueError('This exploration has no editors.')
+
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)
     # What this exploration is called.
@@ -54,44 +72,74 @@ class Exploration(IdModel):
     # original creator of the exploration.
     editors = ndb.UserProperty(repeated=True)
 
-    # The state which forms the start of this exploration.
     @property
     def init_state(self):
+        """The state which forms the start of this exploration."""
         return self.states[0].get()
 
+    @property
+    def is_demo(self):
+        """Whether the exploration is one of the demo explorations."""
+        return self.id.isdigit() and (
+            0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
+
     def _has_state_named(self, state_name):
-        """Checks if a state with the given name exists in this exploration."""
+        """Whether the exploration contains a state with the given name."""
         return any([state.get().name == state_name for state in self.states])
 
-    def _pre_put_hook(self):
-        """Validates the exploration before it is put into the datastore."""
-        if not self.states:
-            raise BadValueError('This exploration has no states.')
-        if not self.is_demo_exploration() and not self.editors:
-            raise BadValueError('This exploration has no editors.')
+    def is_editable_by(self, user):
+        """Whether the given user has rights to edit this exploration."""
+        return user and (
+            user in self.editors or users.is_current_user_admin())
+
+    def is_owned_by(self, user):
+        """Whether the given user owns the exploration."""
+        if self.is_demo:
+            return users.is_current_user_admin()
+        else:
+            return user and user == self.editors[0]
 
     @classmethod
-    def create(cls, user, title, category, exploration_id=None,
-               init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
-        """Creates and returns a new exploration."""
-        # Generate a new exploration id, if one wasn't passed in.
-        exploration_id = exploration_id or cls.get_new_id(title)
+    def get_public_explorations(cls):
+        """Returns an iterable containing publicly-available explorations."""
+        return cls.query().filter(cls.is_public == True)
 
-        # Note that demo explorations do not have owners, so user may be None.
-        exploration = cls(
-            id=exploration_id, title=title, category=category,
-            image_id=image_id, states=[],
-            editors=[user] if user else [])
-        exploration.add_state(init_state_name)
-        exploration.put()
+    @classmethod
+    def get_viewable_explorations(cls, user):
+        """Returns a list of explorations viewable by the given user."""
+        return cls.query().filter(
+            ndb.OR(cls.is_public == True, cls.editors == user)
+        )
 
-        return exploration
+    @classmethod
+    def get_exploration_count(cls):
+        """Returns the total number of explorations."""
+        return cls.query().count()
 
-    def delete(self):
-        """Deletes an exploration."""
+    @property
+    def as_yaml(self):
+        """Returns a YAML version of the exploration."""
+        params = []
+        for param in self.parameters:
+            params.append({'name': param.name, 'obj_type': param.obj_type,
+                           'values': param.values})
+
+        init_states_list = []
+        others_states_list = []
+
         for state_key in self.states:
-            state_key.delete()
-        self.key.delete()
+            state = state_key.get()
+            state_internals = state.internals_as_dict(
+                self, human_readable_dests=True)
+
+            if self.init_state.id == state.id:
+                init_states_list.append(state_internals)
+            else:
+                others_states_list.append(state_internals)
+
+        full_state_list = init_states_list + others_states_list
+        result_dict = {'parameters': params, 'states': full_state_list}
+        return utils.yaml_from_dict(result_dict)
 
     def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it."""
@@ -123,119 +171,6 @@ class Exploration(IdModel):
         for state_key in self.states:
             if state_key.id() == state_id:
                 return state_key.get()
-
-    @classmethod
-    def create_from_yaml(
-        cls, yaml_file, user, title, category, exploration_id=None,
-            image_id=None):
-        """Creates an exploration from a YAML file."""
-        exploration_dict = utils.dict_from_yaml(yaml_file)
-        init_state_name = exploration_dict['states'][0]['name']
-
-        exploration = cls.create(
-            user, title, category, exploration_id=exploration_id,
-            init_state_name=init_state_name, image_id=image_id)
-
-        init_state = State.get_by_name(init_state_name, exploration)
-
-        try:
-            for param in exploration_dict['parameters']:
-                exploration.parameters.append(Parameter(
-                    name=param['name'], obj_type=param['obj_type'],
-                    values=param['values'])
-                )
-
-            state_list = []
-            exploration_states = exploration_dict['states']
-            for state_description in exploration_states:
-                state_name = state_description['name']
-                state = (init_state if state_name == init_state_name
-                         else exploration.add_state(state_name))
-                state_list.append({'state': state, 'desc': state_description})
-
-            for index, state in enumerate(state_list):
-                State.modify_using_dict(
-                    exploration, state['state'], state['desc'])
-        except Exception:
-            exploration.delete()
-            raise
-
-        return exploration
-
-    def as_yaml(self):
-        """Returns a YAML version of the exploration."""
-        params = []
-        for param in self.parameters:
-            params.append({'name': param.name, 'obj_type': param.obj_type,
-                           'values': param.values})
-
-        init_states_list = []
-        others_states_list = []
-
-        for state_key in self.states:
-            state = state_key.get()
-            state_internals = state.internals_as_dict(
-                self, human_readable_dests=True)
-
-            if self.init_state.id == state.id:
-                init_states_list.append(state_internals)
-            else:
-                others_states_list.append(state_internals)
-
-        full_state_list = init_states_list + others_states_list
-        result_dict = {'parameters': params, 'states': full_state_list}
-        return utils.yaml_from_dict(result_dict)
-
-    def is_demo_exploration(self):
-        """Checks if the exploration is one of the demo explorations."""
-        if not self.id.isdigit():
-            return False
-
-        id_int = int(self.id)
-        return id_int >= 0 and id_int < len(feconf.DEMO_EXPLORATIONS)
-
-    @classmethod
-    def load_demo_explorations(cls):
-        """Initializes the demo explorations."""
-        for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
-            assert len(exploration) in [3, 4], (
-                'Invalid format for demo exploration: %s' % exploration)
-
-            yaml_filename = '%s.yaml' % exploration[0]
-            yaml_file = utils.get_file_contents(
-                os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, yaml_filename))
-
-            title = exploration[1]
-            category = exploration[2]
-            image_filename = exploration[3] if len(exploration) == 4 else None
-
-            image_id = None
-            if image_filename:
-                with open(os.path.join(
-                        feconf.SAMPLE_IMAGES_DIR, image_filename)) as f:
-                    raw_image = f.read()
-                image_id = Image.create(raw_image)
-
-            exploration = cls.create_from_yaml(
-                yaml_file=yaml_file, user=None, title=title, category=category,
-                exploration_id=str(index), image_id=image_id)
-            exploration.is_public = True
-            exploration.put()
-
-    @classmethod
-    def delete_demo_explorations(cls):
-        """Deletes the demo explorations."""
-        exploration_list = []
-        for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-            exploration = cls.get(str(int_id), strict=False)
-            if not exploration:
-                # This exploration does not exist, so it cannot be deleted.
-                logging.info('No exploration with id %s found.' % int_id)
-            else:
-                exploration_list.append(exploration)
-
-        for exploration in exploration_list:
-            exploration.delete()
 
     def get_param_change_instance(self, param_name, obj_type=None):
         """Gets a ParamChange instance corresponding to the param_name.

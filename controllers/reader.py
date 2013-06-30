@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 import cgi
 import json
 
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.state.models import Content
 from apps.statistics.models import EventHandler
 from apps.widget.models import InteractiveWidget
@@ -145,7 +145,7 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_services.get_by_id(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -198,7 +198,7 @@ class FeedbackHandler(BaseHandler):
         """Handles feedback interactions with readers."""
         values = {'error': []}
 
-        exploration = Exploration.get(exploration_id)
+        exploration = exp_services.get_by_id(exploration_id)
         state = exploration.get_state_by_id(state_id)
         old_state = state
 
@@ -290,7 +290,7 @@ class FeedbackHandler(BaseHandler):
         # Append reader's answer.
         response = custom_response if custom_response else answer
         if sticky:
-          response = ''
+            response = ''
         values['reader_html'] = feconf.JINJA_ENV.get_template(
             'reader/reader_response.html').render({
                 'response': response,
@@ -329,8 +329,7 @@ class RandomExplorationPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        explorations = Exploration.query().filter(
-            Exploration.is_public == True).fetch(100)
+        explorations = exp_services.get_public_explorations().fetch(100)
 
         # Don't use the first exploration; users will have seen that already
         # on the main page.

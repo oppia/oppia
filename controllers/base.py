@@ -21,7 +21,6 @@ import logging
 import sys
 import traceback
 
-from apps.exploration.models import Exploration
 import apps.exploration.services as exp_services
 import feconf
 import webapp2
@@ -66,11 +65,11 @@ def require_editor(handler):
             return
 
         try:
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_services.get_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 
-        if not exp_services.is_editor(self.user, exploration):
+        if not exploration.is_editable_by(self.user):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
                 self.user)

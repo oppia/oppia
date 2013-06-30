@@ -19,9 +19,9 @@ __author__ = 'Jeremy Emerson'
 import test_utils
 
 from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.image.models import Image
 from apps.parameter.models import Parameter
-from apps.parameter.models import ParamSet
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
@@ -118,19 +118,6 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editors, [self.user])
 
-    def test_create_get_and_delete_exploration(self):
-        """Test the create(), get() and delete() methods."""
-        exploration = Exploration.create(
-            self.user, 'A title', 'A category', 'A exploration_id')
-        exploration.put()
-
-        retrieved_exploration = Exploration.get('A exploration_id')
-        self.assertEqual(exploration, retrieved_exploration)
-
-        exploration.delete()
-        with self.assertRaises(Exception):
-            retrieved_exploration = Exploration.get('A exploration_id')
-
     def test_get_exploration_error_cases(self):
         """Test the error cases for the get() method."""
         with self.assertRaises(Exception):
@@ -143,7 +130,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
-        exploration = Exploration.create(self.user, 'Title', 'Category', 'eid')
+        exploration = exp_services.create_new(self.user, 'Title', 'Category', 'eid')
         exploration.put()
 
         self.assertEqual(len(exploration.states), 1)
@@ -175,12 +162,12 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertTrue(exploration._has_state_named('Renamed state'))
         self.assertTrue(exploration._has_state_named('State 2'))
 
-    def test_yaml_methods(self):
-        """Test the as_yaml() and create_from_yaml() methods."""
-        exploration = Exploration.create(
+    def test_as_yaml_property(self):
+        """Test the as_yaml property."""
+        exploration = exp_services.create_new(
             self.user, 'A title', 'A category', 'A different exploration_id')
         exploration.add_state('New state')
-        yaml_file = exploration.as_yaml()
+        yaml_file = exploration.as_yaml
         self.assertEqual(yaml_file, """parameters: []
 states:
 - content: []
@@ -215,44 +202,43 @@ states:
     widget_id: interactive-Continue
 """)
 
-        exploration2 = Exploration.create_from_yaml(
-            yaml_file, self.user, 'Title', 'Category')
-        self.assertEqual(len(exploration2.states), 2)
-        self.assertEqual(exploration2.as_yaml(), yaml_file)
-
-        self.assertEqual(Exploration.query().count(), 2)
-
-        with self.assertRaises(Exception):
-            Exploration.create_from_yaml(
-                'No_initial_state_name', self.user, 'Title', 'category')
-
-        with self.assertRaises(Exception):
-            Exploration.create_from_yaml(
-                'Invalid\ninit_state_name:\nMore stuff',
-                self.user, 'Title', 'category')
-
-        with self.assertRaises(Exception):
-            Exploration.create_from_yaml(
-                'State1:\n(\nInvalid yaml', self.user, 'Title', 'category')
-
-        # Check that no new exploration was created.
-        self.assertEqual(Exploration.query().count(), 2)
-
-    def test_is_demo_exploration_method(self):
-        """Test the is_demo_exploration() method."""
+    def test_is_demo_property(self):
+        """Test the is_demo property."""
         demo = Exploration(id='0')
-        self.assertEqual(demo.is_demo_exploration(), True)
+        self.assertEqual(demo.is_demo, True)
         notdemo1 = Exploration(id='a')
-        self.assertEqual(notdemo1.is_demo_exploration(), False)
+        self.assertEqual(notdemo1.is_demo, False)
         notdemo2 = Exploration(id='abcd')
-        self.assertEqual(notdemo2.is_demo_exploration(), False)
+        self.assertEqual(notdemo2.is_demo, False)
 
-    def test_loading_and_deletion_of_demo_explorations(self):
-        """Test loading and deletion of the demo explorations."""
-        self.assertEqual(Exploration.query().count(), 0)
+    def test_is_owned_by(self):
+        """Test the is_owned_by() method."""
+        self.owner = User(email='owner@example.com')
+        self.editor = User(email='editor@example.com')
+        self.viewer = User(email='viewer@example.com')
 
-        Exploration.load_demo_explorations()
-        self.assertEqual(Exploration.query().count(), 7)
+        exploration = exp_services.create_new(
+            self.owner, 'A title', 'A category', 'A exploration_id')
+        exploration.editors.append(self.editor)
+        exploration.put()
 
-        Exploration.delete_demo_explorations()
-        self.assertEqual(Exploration.query().count(), 0)
+        self.assertTrue(exploration.is_owned_by(self.owner))
+        self.assertFalse(exploration.is_owned_by(self.editor))
+        self.assertFalse(exploration.is_owned_by(self.viewer))
+        self.assertFalse(exploration.is_owned_by(None))
+
+    def test_is_editable_by(self):
+        """Test the is_editable_by() method."""
+        self.owner = User(email='owner@example.com')
+        self.editor = User(email='editor@example.com')
+        self.viewer = User(email='viewer@example.com')
+
+        exploration = exp_services.create_new(
+            self.owner, 'A title', 'A category', 'A exploration_id')
+        exploration.editors.append(self.editor)
+        exploration.put()
+
+        self.assertTrue(exploration.is_editable_by(self.owner))
+        self.assertTrue(exploration.is_editable_by(self.editor))
+        self.assertFalse(exploration.is_editable_by(self.viewer))
+        self.assertFalse(exploration.is_editable_by(None))

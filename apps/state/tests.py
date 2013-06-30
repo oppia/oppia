@@ -19,7 +19,7 @@ __author__ = 'Jeremy Emerson'
 import feconf
 import test_utils
 
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
@@ -37,7 +37,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         self.user = User(email='test@example.com')
         self.another_user = User(email='another@user.com')
 
-        self.exploration = Exploration.create(
+        self.exploration = exp_services.create_new(
             self.user, 'A title', 'A category', 'A exploration_id')
         self.exploration.put()
 

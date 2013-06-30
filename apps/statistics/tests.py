@@ -22,7 +22,7 @@ from apps.statistics.models import Counter
 from apps.statistics.models import Journal
 from apps.statistics.models import Statistics
 from apps.statistics.models import EventHandler
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.widget.models import InteractiveWidget
 from apps.state.models import Rule
 
@@ -50,7 +50,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_get_top_ten_improvable_states(self):
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(
+        exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
         state_id = exp.init_state.id
@@ -80,7 +80,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_single_default_rule_hit(self):
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(
+        exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
         state_id = exp.init_state.id
@@ -99,7 +99,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_no_improvement_flag_hit(self):
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(
+        exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
         init_state = exp.init_state
@@ -120,7 +120,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_incomplete_and_default_flags(self):
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(
+        exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
 
         state_id = exp.init_state.id
@@ -158,7 +158,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         SECOND_STATE = 'State 2'
 
         InteractiveWidget.load_default_widgets()
-        exp = Exploration.create(
+        exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
         second_state = exp.add_state(SECOND_STATE)
 

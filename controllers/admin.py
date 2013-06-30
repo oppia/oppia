@@ -19,7 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 import json
 
 from apps.classifier.models import Classifier
-from apps.exploration.models import Exploration
+import apps.exploration.services as exp_services
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
 from apps.widget.models import Widget
@@ -39,8 +39,8 @@ def reload_widgets():
 
 def reload_explorations():
     """Reload the default explorations."""
-    Exploration.delete_demo_explorations()
-    Exploration.load_demo_explorations()
+    exp_services.delete_demos()
+    exp_services.load_demos()
 
 
 def reload_demos():
