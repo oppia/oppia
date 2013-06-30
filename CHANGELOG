@@ -2,6 +2,16 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+v1.0.5 (30 Jun 2013)
+--------------------
+* Add support for initializing parameters at the exploration level.
+* Allow custom static views to be specified for rendering reader responses. (Previously, the answer was simply rendered as a string in all cases.)
+* Allow an arbitrary number of non-interactive widgets to be included as part of the content of a state.
+* Add a "My Explorations" page which lists the improvable states for all explorations that a user can edit, ranked by priority.
+* Add more data to the exploration statistics page.
+* Tidy up the appearance of the exploration graph visualization.
+* Allow tests to be run on individual subdirectories by passing in a flag to the test script.
+
 v1.0.4 (28 Apr 2013)
 --------------------
 * Add tooltips for progress bars in the exploration statistics page.
