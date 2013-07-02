@@ -23,7 +23,6 @@ from apps.parameter.models import Parameter
 from apps.state.models import State
 import feconf
 
-from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.db import BadValueError
 
@@ -65,21 +64,26 @@ class Exploration(IdModel):
     editors = ndb.UserProperty(repeated=True)
 
     @classmethod
+    def get_all_explorations(cls):
+        """Returns an filterable iterable containing all explorations."""
+        return cls.query()
+
+    @classmethod
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
-        return cls.query().filter(cls.is_public == True)
+        return cls.get_all_explorations().filter(cls.is_public == True)
 
     @classmethod
     def get_viewable_explorations(cls, user):
         """Returns a list of explorations viewable by the given user."""
-        return cls.query().filter(
+        return cls.get_all_explorations().filter(
             ndb.OR(cls.is_public == True, cls.editors == user)
         )
 
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
-        return cls.query().count()
+        return cls.get_all_explorations().count()
 
     # TODO(sll): Consider splitting this file into a domain file and a model
     # file. The former would contain all properties and methods that need not
@@ -104,12 +108,8 @@ class Exploration(IdModel):
 
     def is_editable_by(self, user):
         """Whether the given user has rights to edit this exploration."""
-        return user and (
-            user in self.editors or users.is_current_user_admin())
+        return user and (user in self.editors)
 
     def is_owned_by(self, user):
         """Whether the given user owns the exploration."""
-        if self.is_demo:
-            return users.is_current_user_admin()
-        else:
-            return user and user == self.editors[0]
+        return user and user == self.editors[0]

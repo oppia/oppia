@@ -69,7 +69,8 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if not exploration.is_editable_by(self.user):
+        if (not users.is_current_user_admin() and
+                not exploration.is_editable_by(self.user)):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
                 self.user)

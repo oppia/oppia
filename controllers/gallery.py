@@ -21,6 +21,8 @@ import collections
 import apps.exploration.services as exp_services
 from controllers.base import BaseHandler
 
+from google.appengine.api import users
+
 
 class GalleryPage(BaseHandler):
     """The exploration gallery page."""
@@ -38,9 +40,13 @@ class GalleryHandler(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        explorations = exp_services.get_viewable_explorations(self.user)
-        editable_exploration_ids = [
-            e.id for e in exp_services.get_editable_explorations(self.user)]
+        if users.is_current_user_admin():
+            explorations = exp_services.get_all_explorations()
+            editable_exploration_ids = [e.id for e in explorations]
+        else:
+            explorations = exp_services.get_viewable_explorations(self.user)
+            editable_exploration_ids = [
+                e.id for e in exp_services.get_editable_explorations(self.user)]
 
         categories = collections.defaultdict(list)
 
@@ -50,7 +56,8 @@ class GalleryHandler(BaseHandler):
                 'can_fork': self.user and exploration.is_demo,
                 'id': exploration.id,
                 'image_id': exploration.image_id,
-                'is_owner': exploration.is_owned_by(self.user),
+                'is_owner': (users.is_current_user_admin() or
+                             exploration.is_owned_by(self.user)),
                 'title': exploration.title,
             })
 

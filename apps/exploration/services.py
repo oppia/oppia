@@ -50,6 +50,11 @@ def get_exploration_by_id(exploration_id, strict=True):
     return Exploration.get(exploration_id, strict=strict)
 
 
+def get_all_explorations():
+    """Returns a list of all explorations."""
+    return Exploration.get_all_explorations()
+
+
 def get_public_explorations():
     """Returns a list of publicly-available explorations."""
     return Exploration.get_public_explorations()

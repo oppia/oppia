@@ -36,6 +36,23 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         self.editor = User(email='editor@example.com')
         self.viewer = User(email='viewer@example.com')
 
+    def test_get_all_explorations(self):
+        self.exploration = exp_services.create_new(
+            self.owner, 'A title', 'A category', 'A exploration_id')
+        self.exploration.put()
+
+        self.assertItemsEqual(
+            exp_services.get_all_explorations(),
+            [self.exploration])
+
+        self.demo_exploration = exp_services.create_new(
+            self.owner, 'A new title', 'A category', 'A new exploration_id')
+        self.demo_exploration.put()
+
+        self.assertItemsEqual(
+            exp_services.get_all_explorations(),
+            [self.exploration, self.demo_exploration])
+
     def test_get_viewable_explorations(self):
         self.exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A exploration_id')
