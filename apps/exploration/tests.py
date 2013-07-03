@@ -18,6 +18,7 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
+from apps.base_model.models import BaseModel
 from apps.exploration.models import Exploration
 import apps.exploration.services as exp_services
 from apps.image.models import Image
@@ -58,27 +59,28 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        # An Exploration must have the 'category' property set.
-        with self.assertRaises(BadValueError):
-            exploration.put()
-        exploration.category = 'The category'
-
         state = State(id='The state hash id')
         state.put()
 
         # The 'state_ids' property must be a list.
+        # TODO(sll): Make BadValueErrors redirect to BaseModel.ValidationError.
         with self.assertRaises(BadValueError):
             exploration.state_ids = 'A string'
         exploration.state_ids = []
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(BaseModel.ValidationError):
             exploration.state_ids = ['A string']
             exploration.put()
         with self.assertRaises(BadValueError):
             exploration.state_ids = [state]
         exploration.state_ids = [state.id]
+
+        # An Exploration must have a category.
+        with self.assertRaises(BaseModel.ValidationError):
+            exploration.put()
+        exploration.category = 'The category'
 
         # The 'init_state' property should return the first state in the states
         # list.
@@ -113,7 +115,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             exploration.editors = ['A string']
         exploration.editors = []
         # There must be at least one editor.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(BaseModel.ValidationError):
             exploration.put()
         exploration.editors = [self.user]
 

@@ -24,7 +24,6 @@ from apps.state.models import State
 import feconf
 
 from google.appengine.ext import ndb
-from google.appengine.ext.db import BadValueError
 
 
 # TODO(sll): Add an anyone-can-edit mode.
@@ -44,17 +43,17 @@ class Exploration(IdModel):
     def _pre_put_hook(self):
         """Validates the exploration before it is put into the datastore."""
         if not self.state_ids:
-            raise BadValueError('This exploration has no states.')
+            raise self.ValidationError('This exploration has no states.')
 
         # TODO(sll): We may not need this once appropriate tests are in
         # place and all state deletion operations are guarded against. Then
         # we can remove it if speed becomes an issue.
         for state_id in self.state_ids:
             if not State.get(state_id, strict=False):
-                raise BadValueError('Invalid state_id %s.')
+                raise self.ValidationError('Invalid state_id %s.')
 
         if not self.is_demo and not self.editors:
-            raise BadValueError('This exploration has no editors.')
+            raise self.ValidationError('This exploration has no editors.')
 
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)
