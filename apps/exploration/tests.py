@@ -66,17 +66,19 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         state = State(id='The state hash id')
         state.put()
 
-        # The 'states' property must be a list.
+        # The 'state_ids' property must be a list.
         with self.assertRaises(BadValueError):
-            exploration.states = 'A string'
-        exploration.states = []
+            exploration.state_ids = 'A string'
+        exploration.state_ids = []
 
-        # The 'states property must be a non-empty list of State keys.
+        # The 'state_ids property must be a non-empty list of strings
+        # representing State ids.
         with self.assertRaises(BadValueError):
-            exploration.states = ['A string']
+            exploration.state_ids = ['A string']
+            exploration.put()
         with self.assertRaises(BadValueError):
-            exploration.states = [state]
-        exploration.states = [state.key]
+            exploration.state_ids = [state]
+        exploration.state_ids = [state.id]
 
         # The 'init_state' property should return the first state in the states
         # list.
@@ -121,8 +123,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.init_state, state)
         self.assertEqual(retrieved_exploration.title, 'New exploration')
-        self.assertEqual(len(retrieved_exploration.states), 1)
-        self.assertEqual(retrieved_exploration.states[0], state.key)
+        self.assertEqual(len(retrieved_exploration.state_ids), 1)
+        self.assertEqual(retrieved_exploration.state_ids[0], state.id)
         self.assertEqual(retrieved_exploration.parameters, [parameter])
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')

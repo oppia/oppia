@@ -43,8 +43,16 @@ class Exploration(IdModel):
 
     def _pre_put_hook(self):
         """Validates the exploration before it is put into the datastore."""
-        if not self.states:
+        if not self.state_ids:
             raise BadValueError('This exploration has no states.')
+
+        # TODO(sll): We may not need this once appropriate tests are in
+        # place and all state deletion operations are guarded against. Then
+        # we can remove it if speed becomes an issue.
+        for state_id in self.state_ids:
+            if not State.get(state_id, strict=False):
+                raise BadValueError('Invalid state_id %s.')
+
         if not self.is_demo and not self.editors:
             raise BadValueError('This exploration has no editors.')
 
@@ -52,9 +60,9 @@ class Exploration(IdModel):
     category = ndb.StringProperty(required=True)
     # What this exploration is called.
     title = ndb.StringProperty(default='New exploration')
-    # The list of states this exploration consists of. This list should not be
-    # empty.
-    states = ndb.KeyProperty(kind=State, repeated=True)
+    # The list of state ids this exploration consists of. This list should not
+    # be empty.
+    state_ids = ndb.StringProperty(repeated=True)
     # The list of parameters associated with this exploration.
     parameters = ndb.LocalStructuredProperty(Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
@@ -90,8 +98,8 @@ class Exploration(IdModel):
 
     def delete(self):
         """Deletes the exploration."""
-        for state_key in self.states:
-            state_key.delete()
+        for state_id in self.state_ids:
+            State.get(state_id).delete()
         super(Exploration, self).delete()
 
     # TODO(sll): Consider splitting this file into a domain file and a model
@@ -103,7 +111,7 @@ class Exploration(IdModel):
     @property
     def init_state(self):
         """The state which forms the start of this exploration."""
-        return self.states[0].get()
+        return State.get(self.state_ids[0])
 
     @property
     def is_demo(self):
@@ -113,7 +121,8 @@ class Exploration(IdModel):
 
     def _has_state_named(self, state_name):
         """Whether the exploration contains a state with the given name."""
-        return any([state.get().name == state_name for state in self.states])
+        return any([State.get(state_id).name == state_name
+                    for state_id in self.state_ids])
 
     def is_editable_by(self, user):
         """Whether the given user has rights to edit this exploration."""
@@ -132,7 +141,7 @@ class Exploration(IdModel):
         new_state = State(id=state_id, name=state_name)
         new_state.put()
 
-        self.states.append(new_state.key)
+        self.state_ids.append(new_state.id)
         self.put()
 
         return new_state

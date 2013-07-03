@@ -127,8 +127,8 @@ class State(IdModel):
 
         # TODO(sll): This is too slow; improve it.
         state = None
-        for state_key in exploration.states:
-            candidate_state = state_key.get()
+        for state_id in exploration.state_ids:
+            candidate_state = State.get(state_id)
             if candidate_state.name == name:
                 state = candidate_state
                 break

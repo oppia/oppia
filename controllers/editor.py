@@ -184,8 +184,8 @@ class ExplorationHandler(BaseHandler):
         """Gets the question name and state list for a question page."""
 
         state_list = {}
-        for state_key in exploration.states:
-            state = state_key.get()
+        for state_id in exploration.state_ids:
+            state = exp_services.get_state_by_id(exploration.id, state_id)
             state_list[state.id] = get_state_for_frontend(state, exploration)
 
         parameters = []
@@ -423,14 +423,15 @@ class StateHandler(BaseHandler):
         """Deletes the state with id state_id."""
 
         # Do not allow deletion of initial states.
-        if exploration.init_state.key == state.key:
+        if exploration.init_state.id == state.id:
             raise self.InvalidInputException(
                 'Cannot delete initial state of an exploration.')
 
         # Find all dests in this exploration which equal the state to be
         # deleted, and change them to loop back to their containing state.
-        for state_key in exploration.states:
-            origin_state = state_key.get()
+        for state_id in exploration.state_ids:
+            origin_state = exp_services.get_state_by_id(
+                exploration.id, state_id)
             changed = False
             for handler in origin_state.widget.handlers:
                 for rule in handler.rules:
@@ -442,5 +443,5 @@ class StateHandler(BaseHandler):
 
         # Delete the state with id state_id.
         state.key.delete()
-        exploration.states.remove(state.key)
+        exploration.state_ids.remove(state.id)
         exploration.put()

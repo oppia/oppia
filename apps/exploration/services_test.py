@@ -133,7 +133,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
 
         exploration2 = exp_services.create_from_yaml(
             yaml_file, self.owner, 'Title', 'Category')
-        self.assertEqual(len(exploration2.states), 2)
+        self.assertEqual(len(exploration2.state_ids), 2)
         yaml_file_2 = exp_services.export_to_yaml(exploration2.id)
         self.assertEqual(yaml_file_2, yaml_file)
 
@@ -226,19 +226,20 @@ states:
             self.owner, 'Title', 'Category', 'eid')
         exploration.put()
 
-        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(len(exploration.state_ids), 1)
 
-        default_state = exploration.states[0].get()
+        default_state = exp_services.get_state_by_id(
+            exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
         exp_services.rename_state(
             exploration.id, default_state, 'Renamed state')
 
-        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(len(exploration.state_ids), 1)
         self.assertEqual(default_state.name, 'Renamed state')
 
         # Add a new state.
         second_state = exploration.add_state('State 2')
-        self.assertEqual(len(exploration.states), 2)
+        self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
         exp_services.rename_state(

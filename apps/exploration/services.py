@@ -126,9 +126,9 @@ def get_state_by_id(exploration_id, state_id):
     """Returns a state of this exploration, given its id."""
     exploration = get_exploration_by_id(exploration_id)
 
-    for state_key in exploration.states:
-        if state_key.id() == state_id:
-            return state_key.get()
+    for candidate_state_id in exploration.state_ids:
+        if candidate_state_id == state_id:
+            return State.get(state_id)
 
     raise Exception('State with id %s not found in exploration %s.' %
                     (state_id, exploration_id))
@@ -192,7 +192,7 @@ def create_new(
     # Note that demo explorations do not have owners, so user may be None.
     exploration = Exploration(
         id=exploration_id, title=title, category=category,
-        image_id=image_id, states=[new_state.key],
+        image_id=image_id, state_ids=[state_id],
         editors=[user] if user else [])
 
     exploration.put()
@@ -325,12 +325,11 @@ def export_to_yaml(exploration_id):
     init_states_list = []
     others_states_list = []
 
-    for state_key in exploration.states:
-        state = state_key.get()
+    for state_id in exploration.state_ids:
         state_internals = export_state_internals_to_dict(
-            exploration.id, state.id, human_readable_dests=True)
+            exploration.id, state_id, human_readable_dests=True)
 
-        if exploration.init_state.id == state.id:
+        if exploration.init_state.id == state_id:
             init_states_list.append(state_internals)
         else:
             others_states_list.append(state_internals)
