@@ -63,14 +63,13 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         state.put()
 
         # The 'state_ids' property must be a list.
-        # TODO(sll): Make BadValueErrors redirect to BaseModel.ValidationError.
         with self.assertRaises(BadValueError):
             exploration.state_ids = 'A string'
         exploration.state_ids = []
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        with self.assertRaises(BaseModel.ValidationError):
+        with self.assertRaises(BaseModel.ModelValidationError):
             exploration.state_ids = ['A string']
             exploration.put()
         with self.assertRaises(BadValueError):
@@ -78,7 +77,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         exploration.state_ids = [state.id]
 
         # An Exploration must have a category.
-        with self.assertRaises(BaseModel.ValidationError):
+        with self.assertRaises(BaseModel.ModelValidationError):
             exploration.put()
         exploration.category = 'The category'
 
@@ -115,7 +114,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             exploration.editors = ['A string']
         exploration.editors = []
         # There must be at least one editor.
-        with self.assertRaises(BaseModel.ValidationError):
+        with self.assertRaises(BaseModel.ModelValidationError):
             exploration.put()
         exploration.editors = [self.user]
 

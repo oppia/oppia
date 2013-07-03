@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 class BaseModel(ndb.Model):
     """Base model for all object classes in Oppia."""
 
-    class ValidationError(Exception):
+    class ModelValidationError(Exception):
         """Error class for model validation errors."""
 
     def _pre_put_hook(self):
