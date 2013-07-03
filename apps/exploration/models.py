@@ -132,7 +132,7 @@ class Exploration(IdModel):
         return user and user == self.editors[0]
 
     def add_state(self, state_name, state_id=None):
-        """Adds a new state, and returns it."""
+        """Adds a new state, and returns it. Commits changes."""
         if self._has_state_named(state_name):
             raise Exception('Duplicate state name %s' % state_name)
 
@@ -146,5 +146,5 @@ class Exploration(IdModel):
         return new_state
 
     def add_editor(self, editor):
-        """Adds a new editor."""
+        """Adds a new editor. Does not commit changes."""
         self.editors.append(editor)
