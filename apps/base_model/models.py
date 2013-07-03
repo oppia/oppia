@@ -41,7 +41,7 @@ class IdModel(BaseModel):
         super(IdModel, self).put()
 
     def delete(self):
-        super(IdModel, self).delete()
+        super(IdModel, self).key.delete()
 
     @classmethod
     def get_new_id(cls, entity_name):

@@ -28,13 +28,22 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration services module."""
 
     def setUp(self):
-        """Loads the default widgets."""
+        """Loads the default widgets and creates dummy users."""
         super(ExplorationServicesUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
 
+        # TODO(sll): Pull user creation and deletion out into its own model.
         self.owner = User(email='owner@example.com')
         self.editor = User(email='editor@example.com')
         self.viewer = User(email='viewer@example.com')
+
+    def tearDown(self):
+        """Deletes the dummy users and any other widgets and explorations."""
+        # TODO(sll): Add deletion of all users.
+        InteractiveWidget.delete_all_widgets()
+        explorations = exp_services.get_all_explorations()
+        for exploration in explorations:
+            exploration.delete()
 
     def test_get_all_explorations(self):
         self.exploration = exp_services.create_new(
@@ -56,7 +65,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
     def test_get_viewable_explorations(self):
         self.exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A exploration_id')
-        self.exploration.editors.append(self.editor)
+        self.exploration.add_editor(self.editor)
         self.exploration.put()
 
         self.assertItemsEqual(
@@ -88,7 +97,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
     def test_get_editable_explorations(self):
         self.exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A exploration_id')
-        self.exploration.editors.append(self.editor)
+        self.exploration.add_editor(self.editor)
         self.exploration.put()
 
         self.assertItemsEqual(
@@ -119,7 +128,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         """Test the create_from_yaml() method."""
         exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A different exploration_id')
-        exp_services.add_state(exploration.id, 'New state')
+        exploration.add_state('New state')
         yaml_file = exp_services.export_to_yaml(exploration.id)
 
         exploration2 = exp_services.create_from_yaml(
@@ -156,7 +165,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
             'A exploration_id')
         self.assertEqual(exploration, retrieved_exploration)
 
-        exp_services.delete(exploration.id)
+        exploration.delete()
         with self.assertRaises(Exception):
             retrieved_exploration = exp_services.get_exploration_by_id(
                 'A exploration_id')
@@ -175,7 +184,7 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         """Test the export_to_yaml() method."""
         exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A different exploration_id')
-        exp_services.add_state(exploration.id, 'New state')
+        exploration.add_state('New state')
         yaml_file = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(yaml_file, """parameters: []
 states:
@@ -228,7 +237,7 @@ states:
         self.assertEqual(default_state.name, 'Renamed state')
 
         # Add a new state.
-        second_state = exp_services.add_state(exploration.id, 'State 2')
+        second_state = exploration.add_state('State 2')
         self.assertEqual(len(exploration.states), 2)
 
         # It is OK to rename a state to itself.
@@ -239,7 +248,7 @@ states:
         # But it is not OK to add or rename a state using a name that already
         # exists.
         with self.assertRaises(Exception):
-            exp_services.add_state(exploration.id, 'State 2')
+            exploration.add_state('State 2')
         with self.assertRaises(Exception):
             exp_services.rename_state(
                 exploration.id, second_state, 'Renamed state')

@@ -229,7 +229,7 @@ class ExplorationHandler(BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state = exp_services.add_state(exploration.id, state_name)
+        state = exploration.add_state(state_name)
         self.render_json(
             exp_services.export_state_to_dict(exploration.id, state.id))
 
@@ -259,7 +259,7 @@ class ExplorationHandler(BaseHandler):
                 exploration.editors = []
                 for email in editors:
                     editor = users.User(email=email)
-                    exploration.editors.append(editor)
+                    exploration.add_editor(editor)
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
@@ -276,7 +276,7 @@ class ExplorationHandler(BaseHandler):
     @require_editor
     def delete(self, exploration):
         """Deletes the given exploration."""
-        exp_services.delete(exploration.id)
+        exploration.delete()
 
 
 class ExplorationDownloadHandler(BaseHandler):

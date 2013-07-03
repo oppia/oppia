@@ -38,7 +38,7 @@ from apps.state.models import Content
 from apps.state.models import Rule
 from apps.state.models import State
 from apps.state.models import WidgetInstance
-from apps.widget.models import Widget
+from apps.widget.models import InteractiveWidget
 
 import feconf
 import utils
@@ -108,23 +108,6 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
 
 
 # Operations on states belonging to an exploration.
-def add_state(exploration_id, state_name, state_id=None):
-    """Adds a new state, and returns it."""
-    exploration = get_exploration_by_id(exploration_id)
-
-    if exploration._has_state_named(state_name):
-        raise Exception('Duplicate state name %s' % state_name)
-
-    state_id = state_id or State.get_new_id(state_name)
-    new_state = State(id=state_id, name=state_name)
-    new_state.put()
-
-    exploration.states.append(new_state.key)
-    exploration.put()
-
-    return new_state
-
-
 def rename_state(exploration_id, state, new_state_name):
     """Renames a state of this exploration."""
     exploration = get_exploration_by_id(exploration_id)
@@ -175,7 +158,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
-    for wp in Widget.get(wdict['widget_id']).params:
+    for wp in InteractiveWidget.get(wdict['widget_id']).params:
         if wp.name not in wdict['params']:
             state.widget.params[wp.name] = wp.value
 
@@ -216,14 +199,6 @@ def create_new(
     return exploration
 
 
-def delete(exploration_id):
-    """Deletes the exploration corresponding to the given exploration_id."""
-    exploration = get_exploration_by_id(exploration_id)
-    for state_key in exploration.states:
-        state_key.delete()
-    exploration.key.delete()
-
-
 def create_from_yaml(
     yaml_file, user, title, category, exploration_id=None,
         image_id=None):
@@ -249,13 +224,13 @@ def create_from_yaml(
         for state_description in exploration_states:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
-                     else add_state(exploration.id, state_name))
+                     else exploration.add_state(state_name))
             state_list.append({'state': state, 'desc': state_description})
 
         for index, state in enumerate(state_list):
             modify_using_dict(exploration.id, state['state'].id, state['desc'])
     except Exception:
-        delete(exploration.id)
+        exploration.delete()
         raise
 
     return exploration
@@ -301,7 +276,7 @@ def delete_demos():
             exploration_list.append(exploration)
 
     for exploration in exploration_list:
-        delete(exploration.id)
+        exploration.delete()
 
 
 # Methods for exporting states and explorations to other formats.

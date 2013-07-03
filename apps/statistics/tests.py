@@ -160,7 +160,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         InteractiveWidget.load_default_widgets()
         exp = exp_services.create_new(
             User(email='fake@user.com'), 'exploration', 'category', 'eid')
-        second_state = exp_services.add_state(exp.id, SECOND_STATE)
+        second_state = exp.add_state(SECOND_STATE)
 
         state_1_id = exp.init_state.id
         state_2_id = second_state.id

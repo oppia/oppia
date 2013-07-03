@@ -33,11 +33,20 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
 
     def setUp(self):
-        """Loads the default widgets."""
+        """Loads the default widgets and dummy users."""
         super(ExplorationModelUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
+        # TODO(sll): Pull user creation out into a separate model.
         self.user = User(email='test@example.com')
         self.another_user = User(email='another@user.com')
+
+    def tearDown(self):
+        """Deletes all widgets, explorations and dummy users."""
+        # TODO(sll): Add deletion of dummy users.
+        InteractiveWidget.delete_all_widgets()
+        explorations = exp_services.get_all_explorations()
+        for exploration in explorations:
+            exploration.delete()
 
     def test_exploration_class(self):
         """Test the Exploration class."""
@@ -112,7 +121,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.init_state, state)
         self.assertEqual(retrieved_exploration.title, 'New exploration')
-        self.assertEqual(retrieved_exploration.states, [state.key])
+        self.assertEqual(len(retrieved_exploration.states), 1)
+        self.assertEqual(retrieved_exploration.states[0], state.key)
         self.assertEqual(retrieved_exploration.parameters, [parameter])
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
@@ -145,7 +155,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A exploration_id')
-        exploration.editors.append(self.editor)
+        exploration.add_editor(self.editor)
         exploration.put()
 
         self.assertTrue(exploration.is_owned_by(self.owner))
@@ -161,7 +171,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
         exploration = exp_services.create_new(
             self.owner, 'A title', 'A category', 'A exploration_id')
-        exploration.editors.append(self.editor)
+        exploration.add_editor(self.editor)
         exploration.put()
 
         self.assertTrue(exploration.is_editable_by(self.owner))
