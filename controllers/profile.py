@@ -17,9 +17,11 @@
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 import apps.exploration.services as exp_services
-from apps.statistics.models import Statistics
+import apps.statistics.services as stats_services
 from controllers.base import BaseHandler
 from controllers.base import require_user
+
+from google.appengine.api import users
 
 
 class ProfilePage(BaseHandler):
@@ -40,7 +42,10 @@ class ProfileHandler(BaseHandler):
     @require_user
     def get(self):
         """Handles GET requests."""
-        exps = exp_services.get_editable_explorations(self.user)
+        if users.is_current_user_admin():
+            exps = exp_services.get_all_explorations()
+        else:
+            exps = exp_services.get_editable_explorations(self.user)
 
         self.values.update({
             'explorations': [{
@@ -48,6 +53,6 @@ class ProfileHandler(BaseHandler):
                 'image_id': exp.image_id,
                 'name': exp.title,
             } for exp in exps],
-            'improvable': Statistics.get_top_ten_improvable_states(exps),
+            'improvable': stats_services.get_top_ten_improvable_states(exps),
         })
         self.render_json(self.values)

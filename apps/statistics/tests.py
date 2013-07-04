@@ -18,11 +18,11 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
+import apps.exploration.services as exp_services
 from apps.statistics.models import Counter
 from apps.statistics.models import Journal
-from apps.statistics.models import Statistics
-from apps.statistics.models import EventHandler
-import apps.exploration.services as exp_services
+import apps.statistics.services as stats_services
+from apps.statistics.services import EventHandler
 from apps.widget.models import InteractiveWidget
 from apps.state.models import Rule
 
@@ -30,7 +30,7 @@ from google.appengine.api.users import User
 
 
 class StatisticsUnitTests(test_utils.AppEngineTestBase):
-    """Test the exploration model."""
+    """Test the statistics models and services."""
 
     def test_counter_class(self):
         """Test Counter Class."""
@@ -71,7 +71,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         EventHandler.record_state_hit('eid', state_id)
         EventHandler.record_state_hit('eid', state_id)
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
@@ -90,7 +90,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             extra_info='1')
         EventHandler.record_state_hit('eid', state_id)
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
@@ -115,7 +115,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             extra_info='1')
         EventHandler.record_state_hit('eid', state_id)
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
@@ -135,7 +135,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             'eid', state_id, Rule(name='Default', dest=state_id),
             extra_info='1')
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'incomplete')
@@ -149,7 +149,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
                 'eid', state_id, Rule(name='Default', dest=state_id),
                 extra_info='1')
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')
@@ -178,7 +178,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
                 'eid', state_2_id, Rule(name='Default', dest=state_2_id),
                 extra_info='1')
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'default')
@@ -195,7 +195,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
                 'eid', state_1_id, Rule(name='Default', dest=state_1_id),
                 extra_info='1')
 
-        states = Statistics.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')

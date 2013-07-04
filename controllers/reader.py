@@ -21,7 +21,7 @@ import json
 
 import apps.exploration.services as exp_services
 from apps.state.models import Content
-from apps.statistics.models import EventHandler
+from apps.statistics.services import EventHandler
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
 from controllers.base import BaseHandler

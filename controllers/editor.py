@@ -23,8 +23,8 @@ from apps.parameter.models import Parameter
 from apps.state.models import AnswerHandlerInstance
 from apps.state.models import Content
 from apps.state.models import Rule
-from apps.statistics.models import Statistics
-from apps.statistics.models import STATS_ENUMS
+import apps.statistics.services as stats_services
+from apps.statistics.services import STATS_ENUMS
 from apps.widget.models import InteractiveWidget
 from controllers.base import BaseHandler
 from controllers.base import require_editor
@@ -67,16 +67,16 @@ def get_state_for_frontend(state, exploration):
 def get_exploration_stats(exploration):
     """Returns a dict with stats for the given exploration."""
 
-    num_visits = Statistics.get_exploration_stats(
+    num_visits = stats_services.get_exploration_stats(
         STATS_ENUMS.exploration_visited, exploration.id)
 
-    num_completions = Statistics.get_exploration_stats(
+    num_completions = stats_services.get_exploration_stats(
         STATS_ENUMS.exploration_completed, exploration.id)
 
-    answers = Statistics.get_exploration_stats(
+    answers = stats_services.get_exploration_stats(
         STATS_ENUMS.rule_hit, exploration.id)
 
-    state_counts = Statistics.get_exploration_stats(
+    state_counts = stats_services.get_exploration_stats(
         STATS_ENUMS.state_hit, exploration.id)
 
     state_stats = {}
@@ -213,7 +213,8 @@ class ExplorationHandler(BaseHandler):
             'num_completions': statistics['num_completions'],
             'state_stats': statistics['state_stats'],
         })
-        improvements = Statistics.get_top_ten_improvable_states([exploration])
+        improvements = stats_services.get_top_ten_improvable_states(
+            [exploration])
         self.values.update({
             'imp': improvements,
         })
