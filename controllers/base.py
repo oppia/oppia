@@ -32,7 +32,7 @@ def require_user(handler):
     """Decorator that checks if a user is associated to the current session."""
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in."""
-        if not self.user:
+        if not self.user_id:
             self.redirect(users.create_login_url(self.request.uri))
             return
         return handler(self, **kwargs)
@@ -60,7 +60,7 @@ def require_editor(handler):
             self.UnauthorizedUserException: if the user exists but does not have
                 the right credentials.
         """
-        if not self.user:
+        if not self.user_id:
             self.redirect(users.create_login_url(self.request.uri))
             return
 
@@ -70,10 +70,10 @@ def require_editor(handler):
             raise self.PageNotFoundException
 
         if (not users.is_current_user_admin() and
-                not exploration.is_editable_by(self.user)):
+                not exploration.is_editable_by(self.user_id)):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
-                self.user)
+                self.user_id)
 
         if not state_id:
             return handler(self, exploration, **kwargs)
@@ -90,12 +90,12 @@ def require_admin(handler):
     """Decorator that checks if the current user is an admin."""
     def test_admin(self, **kwargs):
         """Checks if the user is logged in and is an admin."""
-        if not self.user:
+        if not self.user_id:
             self.redirect(users.create_login_url(self.request.uri))
             return
         if not users.is_current_user_admin():
             raise self.UnauthorizedUserException(
-                '%s is not an admin of this application', self.user)
+                '%s is not an admin of this application', self.user_id)
         return handler(self, **kwargs)
 
     return test_admin
@@ -120,7 +120,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.user = users.get_current_user()
         self.user_id = self.user.email() if self.user else None
-        if self.user:
+        if self.user_id:
             self.values['logout_url'] = (
                 users.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
@@ -141,7 +141,7 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def delete(self, *args):
-        """Base method to handle PUT requests."""
+        """Base method to handle DELETE requests."""
         raise self.PageNotFoundException
 
     def render_json(self, values):
