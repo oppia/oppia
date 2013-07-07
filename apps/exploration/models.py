@@ -74,26 +74,21 @@ class Exploration(IdModel):
     editor_ids = ndb.StringProperty(repeated=True)
 
     @classmethod
-    def get_all_explorations(cls):
-        """Returns an filterable iterable containing all explorations."""
-        return cls.query()
-
-    @classmethod
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
-        return cls.get_all_explorations().filter(cls.is_public == True)
+        return cls.get_all().filter(cls.is_public == True)
 
     @classmethod
     def get_viewable_explorations(cls, user_id):
         """Returns a list of explorations viewable by the given user_id."""
-        return cls.get_all_explorations().filter(
+        return cls.get_all().filter(
             ndb.OR(cls.is_public == True, cls.editor_ids == user_id)
         )
 
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
-        return cls.get_all_explorations().count()
+        return cls.get_all().count()
 
     def delete(self):
         """Deletes the exploration."""
@@ -104,7 +99,7 @@ class Exploration(IdModel):
     # TODO(sll): Consider splitting this file into a domain file and a model
     # file. The former would contain all properties and methods that need not
     # be re-implemented for multiple storage models (i.e., the ones located
-    # above this comment). The latter would contain only the attributes and
+    # below this comment). The latter would contain only the attributes and
     # methods that need to be re-implemented for the different storage models.
 
     @property

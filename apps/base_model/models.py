@@ -50,6 +50,11 @@ class IdModel(BaseModel):
         super(IdModel, self).key.delete()
 
     @classmethod
+    def get_all(cls):
+        """Returns a filterable iterable of all entities of this class."""
+        return cls.query()
+
+    @classmethod
     def get_new_id(cls, entity_name):
         """Gets a new 12-character id for an entity, based on its name.
 
