@@ -53,6 +53,8 @@ class IdModel(BaseModel):
     def get_new_id(cls, entity_name):
         """Gets a new 12-character id for an entity, based on its name.
 
+        This id is unique among all instances of this entity.
+
         Raises:
             Exception: if an id cannot be generated within a reasonable number
               of attempts.

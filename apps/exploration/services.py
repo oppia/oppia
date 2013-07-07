@@ -124,13 +124,11 @@ def rename_state(exploration_id, state, new_state_name):
 def get_state_by_id(exploration_id, state_id):
     """Returns a state of this exploration, given its id."""
     exploration = get_exploration_by_id(exploration_id)
+    if state_id not in exploration.state_ids:
+        raise Exception('Invalid state id %s for exploration %s' %
+                        (state_id, exploration_id))
 
-    for candidate_state_id in exploration.state_ids:
-        if candidate_state_id == state_id:
-            return State.get(state_id)
-
-    raise Exception('State with id %s not found in exploration %s.' %
-                    (state_id, exploration_id))
+    return State.get(state_id)
 
 
 def modify_using_dict(exploration_id, state_id, sdict):
@@ -238,16 +236,14 @@ def create_from_yaml(
 def load_demos():
     """Initializes the demo explorations."""
     for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
-        assert len(exploration) in [3, 4], (
-            'Invalid format for demo exploration: %s' % exploration)
-
-        yaml_filename = '%s.yaml' % exploration[0]
-        yaml_file = utils.get_file_contents(
-            os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, yaml_filename))
-
-        title = exploration[1]
-        category = exploration[2]
-        image_filename = exploration[3] if len(exploration) == 4 else None
+        if len(exploration) == 3:
+            (exp_filename, title, category) = exploration
+            image_filename = None
+        elif len(exploration) == 4:
+            (exp_filename, title, category, image_filename) = exploration
+        else:
+            raise Exception(
+                'Invalid format for demo exploration: %s' % exploration)
 
         image_id = None
         if image_filename:
@@ -256,6 +252,7 @@ def load_demos():
                 raw_image = f.read()
             image_id = Image.create(raw_image)
 
+        yaml_file = utils.get_sample_exploration_yaml(exp_filename)
         exploration = create_from_yaml(
             yaml_file=yaml_file, user=None, title=title, category=category,
             exploration_id=str(index), image_id=image_id)
@@ -265,16 +262,16 @@ def load_demos():
 
 def delete_demos():
     """Deletes the demo explorations."""
-    exploration_list = []
+    explorations_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
         exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
         else:
-            exploration_list.append(exploration)
+            explorations_to_delete.append(exploration)
 
-    for exploration in exploration_list:
+    for exploration in explorations_to_delete:
         exploration.delete()
 
 
