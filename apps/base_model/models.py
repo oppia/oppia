@@ -30,6 +30,9 @@ class BaseModel(ndb.Model):
     class ModelValidationError(Exception):
         """Error class for model validation errors."""
 
+    class EntityNotFoundError(Exception):
+        """Raised when no entity for a given id exists in the datastore."""
+
     def _pre_put_hook(self):
         pass
 
@@ -72,6 +75,7 @@ class IdModel(BaseModel):
         """Gets an entity by id. Fails noisily if strict == True."""
         entity = cls.get_by_id(entity_id)
         if strict and not entity:
-            raise Exception('Entity for class %s with id %s not found' %
-                            (cls.__name__, entity_id))
+            raise cls.EntityNotFoundError(
+                'Entity for class %s with id %s not found' %
+                (cls.__name__, entity_id))
         return entity

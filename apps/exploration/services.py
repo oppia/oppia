@@ -110,11 +110,10 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
 # Operations on states belonging to an exploration.
 def rename_state(exploration_id, state, new_state_name):
     """Renames a state of this exploration."""
-    exploration = get_exploration_by_id(exploration_id)
-
     if state.name == new_state_name:
         return
 
+    exploration = get_exploration_by_id(exploration_id)
     if exploration._has_state_named(new_state_name):
         raise Exception('Duplicate state name: %s' % new_state_name)
 
@@ -181,7 +180,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
 def create_new(
     user, title, category, exploration_id=None,
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
-    """Creates and returns a new exploration."""
+    """Creates, saves and returns a new exploration."""
     # Generate a new exploration id, if one wasn't passed in.
     exploration_id = exploration_id or Exploration.get_new_id(title)
 
