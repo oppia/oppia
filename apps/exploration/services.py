@@ -60,15 +60,15 @@ def get_public_explorations():
     return Exploration.get_public_explorations()
 
 
-def get_viewable_explorations(user):
+def get_viewable_explorations(user_id):
     """Returns a list of explorations viewable by the given user."""
-    return Exploration.get_viewable_explorations(user)
+    return Exploration.get_viewable_explorations(user_id)
 
 
-def get_editable_explorations(user):
+def get_editable_explorations(user_id):
     """Returns a list of explorations editable by the given user."""
-    return [exploration for exploration in get_viewable_explorations(user)
-            if exploration.is_editable_by(user)]
+    return [exploration for exploration in get_viewable_explorations(user_id)
+            if exploration.is_editable_by(user_id)]
 
 
 def count_explorations():
@@ -176,7 +176,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
 # Creation and deletion methods.
 def create_new(
-    user, title, category, exploration_id=None,
+    user_id, title, category, exploration_id=None,
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
     """Creates, saves and returns a new exploration."""
     # Generate a new exploration id, if one wasn't passed in.
@@ -186,25 +186,25 @@ def create_new(
     new_state = State(id=state_id, name=init_state_name)
     new_state.put()
 
-    # Note that demo explorations do not have owners, so user may be None.
+    # Note that demo explorations do not have owners, so user_id may be None.
     exploration = Exploration(
         id=exploration_id, title=title, category=category,
         image_id=image_id, state_ids=[state_id],
-        editors=[user] if user else [])
+        editor_ids=[user_id] if user_id else [])
 
     exploration.put()
     return exploration
 
 
 def create_from_yaml(
-    yaml_file, user, title, category, exploration_id=None,
+    yaml_file, user_id, title, category, exploration_id=None,
         image_id=None):
     """Creates an exploration from a YAML file."""
     exploration_dict = utils.dict_from_yaml(yaml_file)
     init_state_name = exploration_dict['states'][0]['name']
 
     exploration = create_new(
-        user, title, category, exploration_id=exploration_id,
+        user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id)
 
     init_state = State.get_by_name(init_state_name, exploration)
@@ -254,7 +254,7 @@ def load_demos():
 
         yaml_file = utils.get_sample_exploration_yaml(exp_filename)
         exploration = create_from_yaml(
-            yaml_file=yaml_file, user=None, title=title, category=category,
+            yaml_file=yaml_file, user_id=None, title=title, category=category,
             exploration_id=str(index), image_id=image_id)
         exploration.is_public = True
         exploration.put()

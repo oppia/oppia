@@ -43,21 +43,26 @@ class GalleryHandler(BaseHandler):
         if users.is_current_user_admin():
             explorations = exp_services.get_all_explorations()
             editable_exploration_ids = [e.id for e in explorations]
-        else:
-            explorations = exp_services.get_viewable_explorations(self.user)
+        elif self.user_id:
+            explorations = exp_services.get_viewable_explorations(self.user_id)
             editable_exploration_ids = [
-                e.id for e in exp_services.get_editable_explorations(self.user)]
+                e.id for e in exp_services.get_editable_explorations(
+                    self.user_id)
+            ]
+        else:
+            explorations = exp_services.get_public_explorations()
+            editable_exploration_ids = []
 
         categories = collections.defaultdict(list)
 
         for exploration in explorations:
             categories[exploration.category].append({
                 'can_edit': exploration.id in editable_exploration_ids,
-                'can_fork': self.user and exploration.is_demo,
+                'can_fork': self.user_id and exploration.is_demo,
                 'id': exploration.id,
                 'image_id': exploration.image_id,
                 'is_owner': (users.is_current_user_admin() or
-                             exploration.is_owned_by(self.user)),
+                             exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,
             })
 

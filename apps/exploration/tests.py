@@ -27,27 +27,23 @@ from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
 from google.appengine.ext.db import BadValueError
-from google.appengine.api.users import User
 
 
 class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
 
     def setUp(self):
-        """Loads the default widgets and dummy users."""
+        """Loads the default widgets."""
         super(ExplorationModelUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
-        # TODO(sll): Pull user creation out into a separate model.
-        self.user = User(email='test@example.com')
-        self.another_user = User(email='another@user.com')
 
     def tearDown(self):
-        """Deletes all widgets, explorations and dummy users."""
-        # TODO(sll): Add deletion of dummy users.
+        """Deletes all widgets and explorations."""
         InteractiveWidget.delete_all_widgets()
         explorations = exp_services.get_all_explorations()
         for exploration in explorations:
             exploration.delete()
+        super(ExplorationModelUnitTests, self).tearDown()
 
     def test_exploration_class(self):
         """Test the Exploration class."""
@@ -107,16 +103,11 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             exploration.image_id = image.key
         exploration.image_id = 'A string'
 
-        # The 'editors' property must be a list of User objects.
-        with self.assertRaises(BadValueError):
-            exploration.editors = 'A string'
-        with self.assertRaises(BadValueError):
-            exploration.editors = ['A string']
-        exploration.editors = []
-        # There must be at least one editor.
+        exploration.editor_ids = []
+        # There must be at least one editor id.
         with self.assertRaises(BaseModel.ModelValidationError):
             exploration.put()
-        exploration.editors = [self.user]
+        exploration.editor_ids = ['A user id']
 
         # Put and Retrieve the exploration.
         exploration.put()
@@ -129,7 +120,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(retrieved_exploration.parameters, [parameter])
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
-        self.assertEqual(retrieved_exploration.editors, [self.user])
+        self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])
 
     def test_get_exploration_error_cases(self):
         """Test the error cases for the get() method."""
@@ -152,32 +143,32 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
 
     def test_is_owned_by(self):
         """Test the is_owned_by() method."""
-        self.owner = User(email='owner@example.com')
-        self.editor = User(email='editor@example.com')
-        self.viewer = User(email='viewer@example.com')
+        self.owner_id = 'owner@example.com'
+        self.editor_id = 'editor@example.com'
+        self.viewer_id = 'viewer@example.com'
 
         exploration = exp_services.create_new(
-            self.owner, 'A title', 'A category', 'A exploration_id')
-        exploration.add_editor(self.editor)
+            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration.add_editor(self.editor_id)
         exploration.put()
 
-        self.assertTrue(exploration.is_owned_by(self.owner))
-        self.assertFalse(exploration.is_owned_by(self.editor))
-        self.assertFalse(exploration.is_owned_by(self.viewer))
+        self.assertTrue(exploration.is_owned_by(self.owner_id))
+        self.assertFalse(exploration.is_owned_by(self.editor_id))
+        self.assertFalse(exploration.is_owned_by(self.viewer_id))
         self.assertFalse(exploration.is_owned_by(None))
 
     def test_is_editable_by(self):
         """Test the is_editable_by() method."""
-        self.owner = User(email='owner@example.com')
-        self.editor = User(email='editor@example.com')
-        self.viewer = User(email='viewer@example.com')
+        self.owner_id = 'owner@example.com'
+        self.editor_id = 'editor@example.com'
+        self.viewer_id = 'viewer@example.com'
 
         exploration = exp_services.create_new(
-            self.owner, 'A title', 'A category', 'A exploration_id')
-        exploration.add_editor(self.editor)
+            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration.add_editor(self.editor_id)
         exploration.put()
 
-        self.assertTrue(exploration.is_editable_by(self.owner))
-        self.assertTrue(exploration.is_editable_by(self.editor))
-        self.assertFalse(exploration.is_editable_by(self.viewer))
+        self.assertTrue(exploration.is_editable_by(self.owner_id))
+        self.assertTrue(exploration.is_editable_by(self.editor_id))
+        self.assertFalse(exploration.is_editable_by(self.viewer_id))
         self.assertFalse(exploration.is_editable_by(None))

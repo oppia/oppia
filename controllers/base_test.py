@@ -37,9 +37,6 @@ class BaseHandlerTest(test_utils.AppEngineTestBase):
             self.assertNotEqual(response.status_int, 500)
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
-        # TODO(sll): Unify Model.get() methods and make them
-        #     behave consistently (either all raise Exceptions or
-        #     return None).
         # TODO(sll): Set a self.payload attr in the BaseHandler for
         #     POST, PUT and DELETE. Something needs to regulate what
         #     the fields in the payload should be.

@@ -119,6 +119,7 @@ class BaseHandler(webapp2.RequestHandler):
         }
 
         self.user = users.get_current_user()
+        self.user_id = self.user.email() if self.user else None
         if self.user:
             self.values['logout_url'] = (
                 users.create_logout_url(self.request.uri))

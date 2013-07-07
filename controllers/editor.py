@@ -32,8 +32,6 @@ from controllers.base import require_user
 import feconf
 import utils
 
-from google.appengine.api import users
-
 EDITOR_MODE = 'editor'
 
 
@@ -129,10 +127,11 @@ class NewExploration(BaseHandler):
 
         if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
             exploration = exp_services.create_from_yaml(
-                yaml_file=yaml, user=self.user, title=title, category=category)
+                yaml_file=yaml, user_id=self.user_id, title=title,
+                category=category)
         else:
             exploration = exp_services.create_new(
-                self.user, title=title, category=category)
+                self.user_id, title=title, category=category)
 
         self.render_json({'explorationId': exploration.id})
 
@@ -159,7 +158,8 @@ class ForkExploration(BaseHandler):
         category = forked_exploration.category
 
         exploration = exp_services.create_from_yaml(
-            yaml_file=yaml, user=self.user, title=title, category=category)
+            yaml_file=yaml, user_id=self.user_id, title=title,
+            category=category)
 
         self.render_json({'explorationId': exploration.id})
 
@@ -202,7 +202,7 @@ class ExplorationHandler(BaseHandler):
             'image_id': exploration.image_id,
             'category': exploration.category,
             'title': exploration.title,
-            'editors': [editor.nickname() for editor in exploration.editors],
+            'editors': [editor.email for editor in exploration.editor_ids],
             'states': state_list,
             'parameters': parameters,
         })
@@ -256,11 +256,11 @@ class ExplorationHandler(BaseHandler):
         if 'image_id' in payload:
             exploration.image_id = None if image_id == 'null' else image_id
         if editors:
-            if exploration.editors and self.user == exploration.editors[0]:
-                exploration.editors = []
+            if (exploration.editor_ids and
+                    self.user_id == exploration.editor_ids[0]):
+                exploration.editor_ids = []
                 for email in editors:
-                    editor = users.User(email=email)
-                    exploration.add_editor(editor)
+                    exploration.add_editor(email)
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')

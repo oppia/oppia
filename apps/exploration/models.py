@@ -52,7 +52,7 @@ class Exploration(IdModel):
             if not State.get(state_id, strict=False):
                 raise self.ModelValidationError('Invalid state_id %s.')
 
-        if not self.is_demo and not self.editors:
+        if not self.is_demo and not self.editor_ids:
             raise self.ModelValidationError('This exploration has no editors.')
 
     # The category this exploration belongs to.
@@ -68,10 +68,10 @@ class Exploration(IdModel):
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
     image_id = ndb.StringProperty()
-    # List of users who can edit this exploration. If the exploration is a demo
-    # exploration, the list is empty. Otherwise, the first element is the
-    # original creator of the exploration.
-    editors = ndb.UserProperty(repeated=True)
+    # List of ids of users who can edit this exploration. If the exploration is
+    # a demo exploration, the list is empty. Otherwise, the first element is
+    # the original creator of the exploration.
+    editor_ids = ndb.StringProperty(repeated=True)
 
     @classmethod
     def get_all_explorations(cls):
@@ -84,10 +84,10 @@ class Exploration(IdModel):
         return cls.get_all_explorations().filter(cls.is_public == True)
 
     @classmethod
-    def get_viewable_explorations(cls, user):
-        """Returns a list of explorations viewable by the given user."""
+    def get_viewable_explorations(cls, user_id):
+        """Returns a list of explorations viewable by the given user_id."""
         return cls.get_all_explorations().filter(
-            ndb.OR(cls.is_public == True, cls.editors == user)
+            ndb.OR(cls.is_public == True, cls.editor_ids == user_id)
         )
 
     @classmethod
@@ -123,13 +123,13 @@ class Exploration(IdModel):
         return any([State.get(state_id).name == state_name
                     for state_id in self.state_ids])
 
-    def is_editable_by(self, user):
+    def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
-        return user and (user in self.editors)
+        return user_id in self.editor_ids
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user_id):
         """Whether the given user owns the exploration."""
-        return user and user == self.editors[0]
+        return (not self.is_demo) and (user_id == self.editor_ids[0])
 
     def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it. Commits changes."""
@@ -145,6 +145,6 @@ class Exploration(IdModel):
 
         return new_state
 
-    def add_editor(self, editor):
+    def add_editor(self, editor_id):
         """Adds a new editor. Does not commit changes."""
-        self.editors.append(editor)
+        self.editor_ids.append(editor_id)

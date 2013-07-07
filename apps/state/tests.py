@@ -23,23 +23,28 @@ import apps.exploration.services as exp_services
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
-from google.appengine.api.users import User
-
 
 class StateModelUnitTests(test_utils.AppEngineTestBase):
     """Test the state model."""
 
     def setUp(self):
-        """Loads the default widgets and create sample users and explorations."""
+        """Loads the default widgets and creates a sample exploration."""
         super(StateModelUnitTests, self).setUp()
         InteractiveWidget.load_default_widgets()
 
-        self.user = User(email='test@example.com')
-        self.another_user = User(email='another@user.com')
+        self.user_id = 'test@example.com'
 
         self.exploration = exp_services.create_new(
-            self.user, 'A title', 'A category', 'A exploration_id')
+            self.user_id, 'A title', 'A category', 'A exploration_id')
         self.exploration.put()
+
+    def tearDown(self):
+        """Deletes all widgets and explorations."""
+        InteractiveWidget.delete_all_widgets()
+        explorations = exp_services.get_all_explorations()
+        for exploration in explorations:
+            exploration.delete()
+        super(StateModelUnitTests, self).tearDown()
 
     def test_state_class(self):
         """Test State Class."""
