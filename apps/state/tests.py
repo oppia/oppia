@@ -19,6 +19,7 @@ __author__ = 'Jeremy Emerson'
 import feconf
 import test_utils
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.state.models import State
 from apps.widget.models import InteractiveWidget
@@ -34,9 +35,8 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
 
         self.user_id = 'test@example.com'
 
-        self.exploration = exp_services.create_new(
-            self.user_id, 'A title', 'A category', 'A exploration_id')
-        self.exploration.put()
+        self.exploration = Exploration.get(exp_services.create_new(
+            self.user_id, 'A title', 'A category', 'A exploration_id'))
 
     def tearDown(self):
         """Deletes all widgets and explorations."""

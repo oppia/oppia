@@ -18,6 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import json
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.parameter.models import Parameter
 from apps.state.models import AnswerHandlerInstance
@@ -126,14 +127,14 @@ class NewExploration(BaseHandler):
         yaml = self.request.get('yaml')
 
         if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exploration = exp_services.create_from_yaml(
+            exploration_id = exp_services.create_from_yaml(
                 yaml_file=yaml, user_id=self.user_id, title=title,
                 category=category)
         else:
-            exploration = exp_services.create_new(
+            exploration_id = exp_services.create_new(
                 self.user_id, title=title, category=category)
 
-        self.render_json({'explorationId': exploration.id})
+        self.render_json({'explorationId': exploration_id})
 
 
 class ForkExploration(BaseHandler):
@@ -147,7 +148,7 @@ class ForkExploration(BaseHandler):
 
         exploration_id = payload.get('exploration_id')
 
-        forked_exploration = exp_services.get_exploration_by_id(exploration_id)
+        forked_exploration = Exploration.get(exploration_id)
         if not forked_exploration.is_demo:
             raise self.InvalidInputException('Exploration cannot be forked.')
 
@@ -157,11 +158,11 @@ class ForkExploration(BaseHandler):
         title = 'Copy of %s' % forked_exploration.title
         category = forked_exploration.category
 
-        exploration = exp_services.create_from_yaml(
+        new_exploration_id = exp_services.create_from_yaml(
             yaml_file=yaml, user_id=self.user_id, title=title,
             category=category)
 
-        self.render_json({'explorationId': exploration.id})
+        self.render_json({'explorationId': new_exploration_id})
 
 
 class ExplorationPage(BaseHandler):
@@ -327,7 +328,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            exp_services.rename_state(exploration.id, state, state_name)
+            exploration.rename_state(state, state_name)
 
         if 'param_changes' in payload:
             state.param_changes = []

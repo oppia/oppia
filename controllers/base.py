@@ -21,6 +21,7 @@ import logging
 import sys
 import traceback
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 import feconf
 import webapp2
@@ -65,7 +66,7 @@ def require_editor(handler):
             return
 
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = Exploration.get(exploration_id)
         except:
             raise self.PageNotFoundException
 

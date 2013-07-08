@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import cgi
 import json
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.state.models import Content
 from apps.statistics.services import EventHandler
@@ -145,7 +146,7 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = Exploration.get(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -328,7 +329,7 @@ class RandomExplorationPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        explorations = exp_services.get_public_explorations().fetch(100)
+        explorations = exp_services.get_public_explorations()
 
         # Don't use the first exploration; users will have seen that already
         # on the main page.

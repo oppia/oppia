@@ -16,11 +16,10 @@
 
 """Commands that can be used to operate on Oppia explorations.
 
-All functions here should be agnostic of how Exploration objects are stored in
-the database. In particular, the get_exploration_by_id(), query(), put() and
-delete() methods should delegate to the Exploration model class. This will
-enable the exploration storage model to be changed without affecting this
-class and others above it.
+All functions here should be agnostic of how ExplorationModel objects are
+stored in the database. In particular, the various query methods should
+delegate to the Exploration model class. This will enable the exploration
+storage model to be changed without affecting this module and others above it.
 """
 
 __author__ = 'Sean Lip'
@@ -29,7 +28,8 @@ import copy
 import logging
 import os
 
-from apps.exploration.models import Exploration
+from apps.exploration.domain import Exploration
+from apps.exploration.models import ExplorationModel
 from apps.image.models import Image
 from apps.parameter.models import ParamChange
 from apps.parameter.models import Parameter
@@ -45,35 +45,31 @@ import utils
 
 
 # Query methods.
-def get_exploration_by_id(exploration_id, strict=True):
-    """Gets an exploration by id. Fails noisily if strict == True."""
-    return Exploration.get(exploration_id, strict=strict)
-
-
 def get_all_explorations():
-    """Returns a list of all explorations."""
-    return Exploration.get_all()
+    """Returns a list of domain objects representing all explorations."""
+    return [Exploration(e) for e in ExplorationModel.get_all()]
 
 
 def get_public_explorations():
-    """Returns a list of publicly-available explorations."""
-    return Exploration.get_public_explorations()
+    """Returns a list of domain objects representing public explorations."""
+    return [Exploration(e) for e in ExplorationModel.get_public_explorations()]
 
 
 def get_viewable_explorations(user_id):
-    """Returns a list of explorations viewable by the given user."""
-    return Exploration.get_viewable_explorations(user_id)
+    """Returns domain objects for explorations viewable by the given user."""
+    return [Exploration(e) for e in
+            ExplorationModel.get_viewable_explorations(user_id)]
 
 
 def get_editable_explorations(user_id):
-    """Returns a list of explorations editable by the given user."""
-    return [exploration for exploration in get_viewable_explorations(user_id)
-            if exploration.is_editable_by(user_id)]
+    """Returns domain objects for explorations editable by the given user."""
+    return [e for e in get_viewable_explorations(user_id)
+            if e.is_editable_by(user_id)]
 
 
 def count_explorations():
     """Returns the total number of explorations."""
-    return Exploration.get_exploration_count()
+    return ExplorationModel.get_exploration_count()
 
 
 # Operations involving exploration parameters.
@@ -88,7 +84,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
     If the obj_type does not match the obj_type for the parameter in the
     exploration, an Exception is raised.
     """
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = Exploration.get(exploration_id)
 
     for param in exploration.parameters:
         if param.name == param_name:
@@ -108,22 +104,9 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
 
 
 # Operations on states belonging to an exploration.
-def rename_state(exploration_id, state, new_state_name):
-    """Renames a state of this exploration."""
-    if state.name == new_state_name:
-        return
-
-    exploration = get_exploration_by_id(exploration_id)
-    if exploration._has_state_named(new_state_name):
-        raise Exception('Duplicate state name: %s' % new_state_name)
-
-    state.name = new_state_name
-    state.put()
-
-
 def get_state_by_id(exploration_id, state_id):
     """Returns a state of this exploration, given its id."""
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = Exploration.get(exploration_id)
     if state_id not in exploration.state_ids:
         raise Exception('Invalid state id %s for exploration %s' %
                         (state_id, exploration_id))
@@ -133,7 +116,7 @@ def get_state_by_id(exploration_id, state_id):
 
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = Exploration.get(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
 
     state.content = [
@@ -178,22 +161,23 @@ def modify_using_dict(exploration_id, state_id, sdict):
 def create_new(
     user_id, title, category, exploration_id=None,
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
-    """Creates, saves and returns a new exploration."""
+    """Creates, saves and returns a new exploration id."""
     # Generate a new exploration id, if one wasn't passed in.
-    exploration_id = exploration_id or Exploration.get_new_id(title)
+    exploration_id = exploration_id or ExplorationModel.get_new_id(title)
 
     state_id = State.get_new_id(init_state_name)
     new_state = State(id=state_id, name=init_state_name)
     new_state.put()
 
     # Note that demo explorations do not have owners, so user_id may be None.
-    exploration = Exploration(
+    exploration = ExplorationModel(
         id=exploration_id, title=title, category=category,
         image_id=image_id, state_ids=[state_id],
         editor_ids=[user_id] if user_id else [])
 
     exploration.put()
-    return exploration
+
+    return exploration.id
 
 
 def create_from_yaml(
@@ -203,9 +187,9 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_file)
     init_state_name = exploration_dict['states'][0]['name']
 
-    exploration = create_new(
+    exploration = Exploration.get(create_new(
         user_id, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name, image_id=image_id)
+        init_state_name=init_state_name, image_id=image_id))
 
     init_state = State.get_by_name(init_state_name, exploration)
 
@@ -230,7 +214,7 @@ def create_from_yaml(
         exploration.delete()
         raise
 
-    return exploration
+    return exploration.id
 
 
 def load_demos():
@@ -253,9 +237,9 @@ def load_demos():
             image_id = Image.create(raw_image)
 
         yaml_file = utils.get_sample_exploration_yaml(exp_filename)
-        exploration = create_from_yaml(
+        exploration = Exploration.get(create_from_yaml(
             yaml_file=yaml_file, user_id=None, title=title, category=category,
-            exploration_id=str(index), image_id=image_id)
+            exploration_id=str(index), image_id=image_id))
         exploration.is_public = True
         exploration.put()
 
@@ -264,7 +248,7 @@ def delete_demos():
     """Deletes the demo explorations."""
     explorations_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = get_exploration_by_id(str(int_id), strict=False)
+        exploration = Exploration.get(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
@@ -311,7 +295,7 @@ def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     # TODO(sll): Cache the return value?
 
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = Exploration.get(exploration_id)
 
     params = []
     for param in exploration.parameters:

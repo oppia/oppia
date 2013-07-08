@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import test_utils
 
 from apps.base_model.models import BaseModel
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.widget.models import InteractiveWidget
 
@@ -48,96 +49,81 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_exploration_by_id(self):
-        """Test get_exploration_by_id()."""
-
-        EXP_ID = 'A exploration_id'
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', EXP_ID)
-
-        self.assertEqual(
-            exp_services.get_exploration_by_id(EXP_ID), exploration)
-        self.assertIsNone(
-            exp_services.get_exploration_by_id('FAKE_ID', strict=False))
-        with self.assertRaises(BaseModel.EntityNotFoundError):
-            exp_services.get_exploration_by_id('FAKE_ID')
-
     def test_get_all_explorations(self):
         """Test get_all_explorations()."""
 
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', 'A exploration_id'))
         self.assertItemsEqual(
-            exp_services.get_all_explorations(), [exploration])
+            [e.id for e in exp_services.get_all_explorations()],
+            [exploration.id]
+        )
 
-        exploration2 = exp_services.create_new(
-            self.owner_id, 'A new title', 'A category', 'A new exploration_id')
+        exploration2 = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A new title', 'A category', 'A new exploration_id'))
         self.assertItemsEqual(
-            exp_services.get_all_explorations(), [exploration, exploration2])
+            [e.id for e in exp_services.get_all_explorations()],
+            [exploration.id, exploration2.id]
+        )
 
     def test_get_public_explorations(self):
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id')
-        self.assertItemsEqual(
-            exp_services.get_public_explorations(), [])
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        self.assertEqual(exp_services.get_public_explorations(), [])
 
         exploration.is_public = True
         exploration.put()
-        self.assertItemsEqual(
-            exp_services.get_public_explorations(), [exploration])
+        self.assertEqual(
+            [e.id for e in exp_services.get_public_explorations()],
+            [exploration.id]
+        )
 
     def test_get_viewable_explorations(self):
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
         exploration.put()
 
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(self.owner_id),
-            [exploration])
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(self.viewer_id), [])
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(None), [])
+        def get_viewable_ids(user_id):
+            return [
+                e.id for e in exp_services.get_viewable_explorations(user_id)
+            ]
+
+        self.assertEqual(get_viewable_ids(self.owner_id), [exploration.id])
+        self.assertEqual(get_viewable_ids(self.viewer_id), [])
+        self.assertEqual(get_viewable_ids(None), [])
 
         # Set the exploration's status to published.
         exploration.is_public = True
         exploration.put()
 
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(self.owner_id),
-            [exploration])
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(self.viewer_id),
-            [exploration])
-        self.assertItemsEqual(
-            exp_services.get_viewable_explorations(None), [exploration])
+        self.assertEqual(get_viewable_ids(self.owner_id), [exploration.id])
+        self.assertEqual(
+            get_viewable_ids(self.viewer_id), [exploration.id])
+        self.assertEqual(get_viewable_ids(None), [exploration.id])
 
     def test_get_editable_explorations(self):
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
         exploration.put()
 
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(self.owner_id),
-            [exploration])
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(self.viewer_id), [])
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(None), [])
+        def get_editable_ids(user_id):
+            return [
+                e.id for e in exp_services.get_editable_explorations(user_id)
+            ]
+
+        self.assertEqual(get_editable_ids(self.owner_id), [exploration.id])
+        self.assertEqual(get_editable_ids(self.viewer_id), [])
+        self.assertEqual(get_editable_ids(None), [])
 
         # Set the exploration's status to published.
         exploration.is_public = True
         exploration.put()
 
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(self.owner_id),
-            [exploration])
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(self.viewer_id), [])
-        self.assertItemsEqual(
-            exp_services.get_editable_explorations(None), [])
+        self.assertEqual(get_editable_ids(self.owner_id), [exploration.id])
+        self.assertEqual(get_editable_ids(self.viewer_id), [])
+        self.assertEqual(get_editable_ids(None), [])
 
     def test_count_explorations(self):
         """Test count_explorations()."""
@@ -158,14 +144,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_create_from_yaml(self):
         """Test the create_from_yaml() method."""
-        exploration = exp_services.create_new(
+        exploration = Exploration.get(exp_services.create_new(
             self.owner_id, 'A title', 'A category',
-            'A different exploration_id')
+            'A different exploration_id'))
         exploration.add_state('New state')
         yaml_file = exp_services.export_to_yaml(exploration.id)
 
-        exploration2 = exp_services.create_from_yaml(
-            yaml_file, self.owner_id, 'Title', 'Category')
+        exploration2 = Exploration.get(exp_services.create_from_yaml(
+            yaml_file, self.owner_id, 'Title', 'Category'))
         self.assertEqual(len(exploration2.state_ids), 2)
         yaml_file_2 = exp_services.export_to_yaml(exploration2.id)
         self.assertEqual(yaml_file_2, yaml_file)
@@ -190,18 +176,17 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_creation_and_deletion_of_individual_explorations(self):
         """Test the create_new() and delete() methods."""
-        exploration = exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id')
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.put()
 
-        retrieved_exploration = exp_services.get_exploration_by_id(
-            'A exploration_id')
-        self.assertEqual(exploration, retrieved_exploration)
+        retrieved_exploration = Exploration.get('A exploration_id')
+        self.assertEqual(exploration.id, retrieved_exploration.id)
+        self.assertEqual(exploration.title, retrieved_exploration.title)
 
         exploration.delete()
         with self.assertRaises(Exception):
-            retrieved_exploration = exp_services.get_exploration_by_id(
-                'A exploration_id')
+            retrieved_exploration = Exploration.get('A exploration_id')
 
     def test_loading_and_deletion_of_demo_explorations(self):
         """Test loading and deletion of the demo explorations."""
@@ -215,9 +200,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_export_to_yaml(self):
         """Test the export_to_yaml() method."""
-        exploration = exp_services.create_new(
+        exploration = Exploration.get(exp_services.create_new(
             self.owner_id, 'A title', 'A category',
-            'A different exploration_id')
+            'A different exploration_id'))
         exploration.add_state('New state')
         yaml_file = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(yaml_file, """parameters: []
@@ -260,17 +245,15 @@ class ExplorationStateUnitTests(ExplorationServicesUnitTests):
 
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
-        exploration = exp_services.create_new(
-            self.owner_id, 'Title', 'Category', 'eid')
-        exploration.put()
+        exploration = Exploration.get(exp_services.create_new(
+            self.owner_id, 'Title', 'Category', 'eid'))
 
         self.assertEqual(len(exploration.state_ids), 1)
 
         default_state = exp_services.get_state_by_id(
             exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
-        exp_services.rename_state(
-            exploration.id, default_state, 'Renamed state')
+        exploration.rename_state(default_state, 'Renamed state')
 
         self.assertEqual(len(exploration.state_ids), 1)
         self.assertEqual(default_state.name, 'Renamed state')
@@ -280,8 +263,7 @@ class ExplorationStateUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exp_services.rename_state(
-            exploration.id, second_state, second_state.name)
+        exploration.rename_state(second_state, second_state.name)
         self.assertEqual(second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
@@ -289,8 +271,7 @@ class ExplorationStateUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exploration.add_state('State 2')
         with self.assertRaises(Exception):
-            exp_services.rename_state(
-                exploration.id, second_state, 'Renamed state')
+            exploration.rename_state(second_state, 'Renamed state')
 
         # The exploration now has exactly two states.
         self.assertFalse(exploration._has_state_named(default_state_name))

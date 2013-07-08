@@ -20,40 +20,21 @@ __author__ = 'Sean Lip'
 
 from apps.base_model.models import IdModel
 from apps.parameter.models import Parameter
-from apps.state.models import State
-import feconf
 
 from google.appengine.ext import ndb
 
 
-# TODO(sll): Add an anyone-can-edit mode.
-class Exploration(IdModel):
+QUERY_LIMIT = 100
+
+
+class ExplorationModel(IdModel):
     """Storage model for an Oppia exploration.
 
-    This class should only be imported by the exploration services file and the
-    Exploration model test file.
+    This class should only be imported by the exploration domain file, the
+    exploration services file, and the Exploration model test file.
     """
-    # TODO(sll): Write a test that ensures that the only two files that are
-    # allowed to import this class are the exploration services file and the
-    # Exploration tests file.
-    # TODO(sll): Should the id for explorations and states be a function of
-    # their names? This makes operations like get_by_name() or has_state_named()
-    # faster. But names can be changed...
-
-    def _pre_put_hook(self):
-        """Validates the exploration before it is put into the datastore."""
-        if not self.state_ids:
-            raise self.ModelValidationError('This exploration has no states.')
-
-        # TODO(sll): We may not need this once appropriate tests are in
-        # place and all state deletion operations are guarded against. Then
-        # we can remove it if speed becomes an issue.
-        for state_id in self.state_ids:
-            if not State.get(state_id, strict=False):
-                raise self.ModelValidationError('Invalid state_id %s.')
-
-        if not self.is_demo and not self.editor_ids:
-            raise self.ModelValidationError('This exploration has no editors.')
+    # TODO(sll): Write a test that ensures that the only files that are
+    # allowed to import this class are the ones described above.
 
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)
@@ -76,70 +57,28 @@ class Exploration(IdModel):
     @classmethod
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
-        return cls.get_all().filter(cls.is_public == True)
+        return cls.get_all().filter(cls.is_public == True).fetch(QUERY_LIMIT)
 
     @classmethod
     def get_viewable_explorations(cls, user_id):
         """Returns a list of explorations viewable by the given user_id."""
         return cls.get_all().filter(
             ndb.OR(cls.is_public == True, cls.editor_ids == user_id)
-        )
+        ).fetch(QUERY_LIMIT)
 
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def delete(self):
-        """Deletes the exploration."""
-        for state_id in self.state_ids:
-            State.get(state_id).delete()
-        super(Exploration, self).delete()
+    def put(self, properties=None):
+        """Updates the exploration using the properties dict, then saves it."""
+        if properties is None:
+            properties = {}
 
-    # TODO(sll): Consider splitting this file into a domain file and a model
-    # file. The former would contain all properties and methods that need not
-    # be re-implemented for multiple storage models (i.e., the ones located
-    # below this comment). The latter would contain only the attributes and
-    # methods that need to be re-implemented for the different storage models.
-
-    @property
-    def init_state(self):
-        """The state which forms the start of this exploration."""
-        return State.get(self.state_ids[0])
-
-    @property
-    def is_demo(self):
-        """Whether the exploration is one of the demo explorations."""
-        return self.id.isdigit() and (
-            0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
-
-    def _has_state_named(self, state_name):
-        """Whether the exploration contains a state with the given name."""
-        return any([State.get(state_id).name == state_name
-                    for state_id in self.state_ids])
-
-    def is_editable_by(self, user_id):
-        """Whether the given user has rights to edit this exploration."""
-        return user_id in self.editor_ids
-
-    def is_owned_by(self, user_id):
-        """Whether the given user owns the exploration."""
-        return (not self.is_demo) and (user_id == self.editor_ids[0])
-
-    def add_state(self, state_name, state_id=None):
-        """Adds a new state, and returns it. Commits changes."""
-        if self._has_state_named(state_name):
-            raise Exception('Duplicate state name %s' % state_name)
-
-        state_id = state_id or State.get_new_id(state_name)
-        new_state = State(id=state_id, name=state_name)
-        new_state.put()
-
-        self.state_ids.append(new_state.id)
-        self.put()
-
-        return new_state
-
-    def add_editor(self, editor_id):
-        """Adds a new editor. Does not commit changes."""
-        self.editor_ids.append(editor_id)
+        # In NDB, self._properties() returns the list of ndb properties of a
+        # model.
+        for key in self._properties:
+            if key in properties:
+                setattr(self, key, properties[key])
+        super(ExplorationModel, self).put()

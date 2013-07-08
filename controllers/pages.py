@@ -16,7 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import apps.exploration.services as exp_services
+from apps.exploration.domain import Exploration
 from controllers import admin
 from controllers.base import BaseHandler
 import feconf
@@ -30,7 +30,7 @@ class MainPage(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not exp_services.get_exploration_by_id('0', strict=False):
+        if not Exploration.get('0', strict=False):
             admin.reload_demos()
 
         self.values.update({

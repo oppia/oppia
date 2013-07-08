@@ -18,6 +18,7 @@ __author__ = 'Jeremy Emerson'
 
 import test_utils
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.state.models import Rule
 from apps.statistics.models import Counter
@@ -48,8 +49,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_get_top_ten_improvable_states(self):
         InteractiveWidget.load_default_widgets()
-        exp = exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid')
+        exp = Exploration.get(exp_services.create_new(
+            'fake@user.com', 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state.id
 
@@ -78,8 +79,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_single_default_rule_hit(self):
         InteractiveWidget.load_default_widgets()
-        exp = exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid')
+        exp = Exploration.get(exp_services.create_new(
+            'fake@user.com', 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state.id
 
@@ -97,8 +98,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_no_improvement_flag_hit(self):
         InteractiveWidget.load_default_widgets()
-        exp = exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid')
+        exp = Exploration.get(exp_services.create_new(
+            'fake@user.com', 'exploration', 'category', 'eid'))
 
         init_state = exp.init_state
         state_id = init_state.id
@@ -118,8 +119,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
     def test_incomplete_and_default_flags(self):
         InteractiveWidget.load_default_widgets()
-        exp = exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid')
+        exp = Exploration.get(exp_services.create_new(
+            'fake@user.com', 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state.id
 
@@ -156,8 +157,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         SECOND_STATE = 'State 2'
 
         InteractiveWidget.load_default_widgets()
-        exp = exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid')
+        exp = Exploration.get(exp_services.create_new(
+            'fake@user.com', 'exploration', 'category', 'eid'))
         second_state = exp.add_state(SECOND_STATE)
 
         state_1_id = exp.init_state.id

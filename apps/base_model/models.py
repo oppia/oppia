@@ -27,9 +27,6 @@ from google.appengine.ext import ndb
 class BaseModel(ndb.Model):
     """Base model for all object classes in Oppia."""
 
-    class ModelValidationError(Exception):
-        """Error class for model validation errors."""
-
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
 

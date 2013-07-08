@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import collections
 import utils
 
+from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.statistics.models import Counter
 from apps.statistics.models import Journal
@@ -146,7 +147,7 @@ def get_exploration_stats(event_name, exploration_id):
     if event_name == STATS_ENUMS.rule_hit:
         result = {}
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exp_services.get_state_by_id(exploration_id, state_id)
             result[state.id] = {
@@ -177,7 +178,7 @@ def get_exploration_stats(event_name, exploration_id):
     if event_name == STATS_ENUMS.state_hit:
         result = {}
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exp_services.get_state_by_id(exploration_id, state_id)
             event_key = get_event_key(
