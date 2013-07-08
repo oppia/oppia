@@ -16,8 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-
 from apps.widget.models import InteractiveWidget
 from apps.widget.models import NonInteractiveWidget
 from controllers.base import BaseHandler
@@ -95,9 +93,7 @@ class NonInteractiveWidgetHandler(BaseHandler):
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
-        payload = json.loads(self.request.get('payload'))
-
-        params = payload.get('params', {})
+        params = self.payload.get('params', {})
         if isinstance(params, list):
             new_params = {}
             for item in params:
@@ -105,7 +101,7 @@ class NonInteractiveWidgetHandler(BaseHandler):
             params = new_params
 
         state_params_dict = {}
-        state_params_given = payload.get('state_params')
+        state_params_given = self.payload.get('state_params')
         if state_params_given:
             for param in state_params_given:
                 # Pick a random parameter for each key.
@@ -137,9 +133,7 @@ class InteractiveWidgetHandler(BaseHandler):
 
     def post(self, widget_id):
         """Handles POST requests, for parameterized widgets."""
-        payload = json.loads(self.request.get('payload'))
-
-        params = payload.get('params', {})
+        params = self.payload.get('params', {})
         if isinstance(params, list):
             new_params = {}
             for item in params:
@@ -147,7 +141,7 @@ class InteractiveWidgetHandler(BaseHandler):
             params = new_params
 
         state_params_dict = {}
-        state_params_given = payload.get('state_params')
+        state_params_given = self.payload.get('state_params')
         if state_params_given:
             for param in state_params_given:
                 # Pick a random parameter for each key.

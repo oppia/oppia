@@ -79,7 +79,7 @@ def require_editor(handler):
         if not state_id:
             return handler(self, exploration, **kwargs)
         try:
-            state = exp_services.get_state_by_id(exploration_id, state_id)
+            state = exploration.get_state_by_id(state_id)
         except:
             raise self.PageNotFoundException
         return handler(self, exploration, state, **kwargs)
@@ -129,6 +129,11 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values['login_url'] = users.create_login_url(self.request.uri)
 
+        if self.request.get('payload'):
+            self.payload = json.loads(self.request.get('payload'))
+        else:
+            self.payload = {}
+
     def get(self, *args):
         """Base method to handle GET requests."""
         raise self.PageNotFoundException
@@ -165,7 +170,7 @@ class BaseHandler(webapp2.RequestHandler):
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
-        if self.request.get('payload'):
+        if self.payload:
             self.response.content_type = 'application/json'
             self.response.write(json.dumps(values))
         else:

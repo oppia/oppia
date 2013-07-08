@@ -104,20 +104,10 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
 
 
 # Operations on states belonging to an exploration.
-def get_state_by_id(exploration_id, state_id):
-    """Returns a state of this exploration, given its id."""
-    exploration = Exploration.get(exploration_id)
-    if state_id not in exploration.state_ids:
-        raise Exception('Invalid state id %s for exploration %s' %
-                        (state_id, exploration_id))
-
-    return State.get(state_id)
-
-
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
     exploration = Exploration.get(exploration_id)
-    state = get_state_by_id(exploration_id, state_id)
+    state = exploration.get_state_by_id(state_id)
 
     state.content = [
         Content(type=item['type'], value=item['value'])
@@ -264,7 +254,8 @@ def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):
     """Gets a Python dict of the internals of the state."""
 
-    state = get_state_by_id(exploration_id, state_id)
+    exploration = Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
     # Remove the computed 'classifier' property.
@@ -276,14 +267,15 @@ def export_state_internals_to_dict(
         for handler in state_dict['widget']['handlers']:
             for rule in handler['rules']:
                 if rule['dest'] != feconf.END_DEST:
-                    dest_state = get_state_by_id(exploration_id, rule['dest'])
+                    dest_state = exploration.get_state_by_id(rule['dest'])
                     rule['dest'] = dest_state.name
     return state_dict
 
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    state = get_state_by_id(exploration_id, state_id)
+    exploration = Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
     state_dict.update({'id': state.id, 'name': state.name,

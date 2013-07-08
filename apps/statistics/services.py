@@ -149,7 +149,7 @@ def get_exploration_stats(event_name, exploration_id):
 
         exploration = Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
-            state = exp_services.get_state_by_id(exploration_id, state_id)
+            state = exploration.get_state_by_id(state_id)
             result[state.id] = {
                 'name': state.name,
                 'rules': {}
@@ -180,7 +180,7 @@ def get_exploration_stats(event_name, exploration_id):
 
         exploration = Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
-            state = exp_services.get_state_by_id(exploration_id, state_id)
+            state = exploration.get_state_by_id(state_id)
             event_key = get_event_key(
                 event_name, '.'.join([exploration_id, state.id]))
 
@@ -201,7 +201,7 @@ def get_top_ten_improvable_states(explorations):
     ranked_states = []
     for exploration in explorations:
         for state_id in exploration.state_ids:
-            state = exp_services.get_state_by_id(exploration.id, state_id)
+            state = exploration.get_state_by_id(state_id)
             state_key = '%s.%s' % (exploration.id, state.id)
 
             # Get count of how many times the state was hit

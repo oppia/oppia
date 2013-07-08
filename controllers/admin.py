@@ -16,8 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-
 from apps.classifier.models import Classifier
 import apps.exploration.services as exp_services
 from apps.widget.models import InteractiveWidget
@@ -60,9 +58,8 @@ class AdminPage(BaseHandler):
     @require_admin
     def post(self):
         """Reloads the default widgets and explorations."""
-        payload = json.loads(self.request.get('payload'))
-        if payload.get('action') == 'reload':
-            if payload.get('item') == 'explorations':
+        if self.payload.get('action') == 'reload':
+            if self.payload.get('item') == 'explorations':
                 reload_explorations()
-            elif payload.get('item') == 'widgets':
+            elif self.payload.get('item') == 'widgets':
                 reload_widgets()

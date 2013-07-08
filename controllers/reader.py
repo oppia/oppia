@@ -199,19 +199,18 @@ class FeedbackHandler(BaseHandler):
         """Handles feedback interactions with readers."""
         values = {'error': []}
 
-        state = exp_services.get_state_by_id(exploration_id, state_id)
+        exploration = Exploration.get(exploration_id)
+        state = exploration.get_state_by_id(state_id)
         old_state = state
 
-        payload = json.loads(self.request.get('payload'))
-
         # The 0-based index of the last content block already on the page.
-        block_number = payload.get('block_number') + 1
+        block_number = self.payload.get('block_number') + 1
         # The reader's answer.
-        answer = payload.get('answer')
+        answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
-        handler = payload.get('handler')
+        handler = self.payload.get('handler')
 
-        params = payload.get('params', {})
+        params = self.payload.get('params', {})
         # Add the reader's answer to the parameter list.
         params['answer'] = answer
 
@@ -241,7 +240,7 @@ class FeedbackHandler(BaseHandler):
                     old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = exp_services.get_state_by_id(exploration_id, dest_id)
+            state = exploration.get_state_by_id(dest_id)
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:

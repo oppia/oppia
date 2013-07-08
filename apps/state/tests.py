@@ -61,8 +61,7 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         name_1 = 'State 1'
         state_1 = self.exploration.add_state(name_1, state_id=id_1)
 
-        fetched_state_1 = exp_services.get_state_by_id(
-            self.exploration.id, id_1)
+        fetched_state_1 = self.exploration.get_state_by_id(id_1)
         self.assertEqual(fetched_state_1, state_1)
 
         fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)

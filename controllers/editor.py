@@ -16,8 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
-
 from apps.exploration.domain import Exploration
 import apps.exploration.services as exp_services
 from apps.parameter.models import Parameter
@@ -113,11 +111,8 @@ class NewExploration(BaseHandler):
     @require_user
     def post(self):
         """Handles POST requests."""
-
-        payload = json.loads(self.request.get('payload'))
-
-        title = payload.get('title')
-        category = payload.get('category')
+        title = self.payload.get('title')
+        category = self.payload.get('category')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
@@ -144,9 +139,7 @@ class ForkExploration(BaseHandler):
     def post(self):
         """Handles POST requests."""
 
-        payload = json.loads(self.request.get('payload'))
-
-        exploration_id = payload.get('exploration_id')
+        exploration_id = self.payload.get('exploration_id')
 
         forked_exploration = Exploration.get(exploration_id)
         if not forked_exploration.is_demo:
@@ -186,7 +179,7 @@ class ExplorationHandler(BaseHandler):
 
         state_list = {}
         for state_id in exploration.state_ids:
-            state = exp_services.get_state_by_id(exploration.id, state_id)
+            state = exploration.get_state_by_id(state_id)
             state_list[state.id] = get_state_for_frontend(state, exploration)
 
         parameters = []
@@ -225,9 +218,7 @@ class ExplorationHandler(BaseHandler):
     def post(self, exploration):
         """Adds a new state to the given exploration."""
 
-        payload = json.loads(self.request.get('payload'))
-
-        state_name = payload.get('state_name')
+        state_name = self.payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
@@ -239,14 +230,12 @@ class ExplorationHandler(BaseHandler):
     def put(self, exploration):
         """Updates properties of the given exploration."""
 
-        payload = json.loads(self.request.get('payload'))
-
-        is_public = payload.get('is_public')
-        category = payload.get('category')
-        title = payload.get('title')
-        image_id = payload.get('image_id')
-        editors = payload.get('editors')
-        parameters = payload.get('parameters')
+        is_public = self.payload.get('is_public')
+        category = self.payload.get('category')
+        title = self.payload.get('title')
+        image_id = self.payload.get('image_id')
+        editors = self.payload.get('editors')
+        parameters = self.payload.get('parameters')
 
         if is_public:
             exploration.is_public = True
@@ -254,7 +243,7 @@ class ExplorationHandler(BaseHandler):
             exploration.category = category
         if title:
             exploration.title = title
-        if 'image_id' in payload:
+        if 'image_id' in self.payload:
             exploration.image_id = None if image_id == 'null' else image_id
         if editors:
             if (exploration.editor_ids and
@@ -305,9 +294,7 @@ class StateHandler(BaseHandler):
     def put(self, exploration, state):
         """Saves updates to a state."""
 
-        payload = json.loads(self.request.get('payload'))
-
-        yaml_file = payload.get('yaml_file')
+        yaml_file = self.payload.get('yaml_file')
         if yaml_file and feconf.ALLOW_YAML_FILE_UPLOAD:
             # The user has uploaded a YAML file. Process only this action.
             state = exp_services.modify_using_dict(
@@ -315,22 +302,23 @@ class StateHandler(BaseHandler):
             self.render_json(get_state_for_frontend(state, exploration))
             return
 
-        state_name = payload.get('state_name')
-        param_changes = payload.get('param_changes')
-        interactive_widget = payload.get('interactive_widget')
-        interactive_params = payload.get('interactive_params')
-        interactive_rulesets = payload.get('interactive_rulesets')
-        sticky_interactive_widget = payload.get('sticky_interactive_widget')
-        content = payload.get('content')
-        unresolved_answers = payload.get('unresolved_answers')
+        state_name = self.payload.get('state_name')
+        param_changes = self.payload.get('param_changes')
+        interactive_widget = self.payload.get('interactive_widget')
+        interactive_params = self.payload.get('interactive_params')
+        interactive_rulesets = self.payload.get('interactive_rulesets')
+        sticky_interactive_widget = self.payload.get(
+            'sticky_interactive_widget')
+        content = self.payload.get('content')
+        unresolved_answers = self.payload.get('unresolved_answers')
 
-        if 'state_name' in payload:
+        if 'state_name' in self.payload:
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
             exploration.rename_state(state.id, state_name)
 
-        if 'param_changes' in payload:
+        if 'param_changes' in self.payload:
             state.param_changes = []
             for param_change in param_changes:
                 instance = exp_services.get_or_create_param(
@@ -411,7 +399,7 @@ class StateHandler(BaseHandler):
             state.content = [Content(type=item['type'], value=item['value'])
                              for item in content]
 
-        if 'unresolved_answers' in payload:
+        if 'unresolved_answers' in self.payload:
             state.unresolved_answers = {}
             for answer, count in unresolved_answers.iteritems():
                 if count > 0:

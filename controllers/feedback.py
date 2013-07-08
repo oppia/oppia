@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import json
 import urllib
 
 from apps.statistics.services import EventHandler
@@ -35,10 +34,8 @@ class FeedbackPage(BaseHandler):
 
     def post(self):
         """Handles POST requests."""
-        payload = json.loads(self.request.get('payload'))
-
-        feedback = payload.get('feedback')
-        url = payload.get('url_params').get('url')
+        feedback = self.payload.get('feedback')
+        url = self.payload.get('url_params').get('url')
         url = urllib.unquote_plus(url)
 
         EventHandler.record_feedback_submitted(url, feedback)
