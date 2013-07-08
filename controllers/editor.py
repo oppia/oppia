@@ -423,27 +423,4 @@ class StateHandler(BaseHandler):
     @require_editor
     def delete(self, exploration, state):
         """Deletes the state with id state_id."""
-
-        # Do not allow deletion of initial states.
-        if exploration.init_state.id == state.id:
-            raise self.InvalidInputException(
-                'Cannot delete initial state of an exploration.')
-
-        # Find all dests in this exploration which equal the state to be
-        # deleted, and change them to loop back to their containing state.
-        for state_id in exploration.state_ids:
-            origin_state = exp_services.get_state_by_id(
-                exploration.id, state_id)
-            changed = False
-            for handler in origin_state.widget.handlers:
-                for rule in handler.rules:
-                    if rule.dest == state.id:
-                        rule.dest = origin_state.id
-                        changed = True
-            if changed:
-                origin_state.put()
-
-        # Delete the state with id state_id.
-        state.key.delete()
-        exploration.state_ids.remove(state.id)
-        exploration.put()
+        exploration.delete_state(state.id)

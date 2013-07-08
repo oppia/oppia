@@ -150,6 +150,34 @@ class Exploration(BaseDomainObject):
         state.name = new_state_name
         state.put()
 
+    def delete_state(self, state_id):
+        """Deletes the given state. Commits changes."""
+        if state_id not in self.state_ids:
+            raise Exception('State %s not in exploration %s' %
+                            (state_id, self.id))
+
+        # Do not allow deletion of initial states.
+        if self.state_ids[0] == state_id:
+            raise Exception('Cannot delete initial state of an exploration.')
+
+        # Find all destinations in the exploration which equal the deleted
+        # state, and change them to loop back to their containing state.
+        for other_state_id in self.state_ids:
+            other_state = State.get(other_state_id)
+            changed = False
+            for handler in other_state.widget.handlers:
+                for rule in handler.rules:
+                    if rule.dest == state_id:
+                        rule.dest = other_state_id
+                        changed = True
+            if changed:
+                other_state.put()
+
+        # Delete the state with id state_id.
+        State.get(state_id).delete()
+        self.state_ids.remove(state_id)
+        self.put()
+
     def add_editor(self, editor_id):
         """Adds a new editor. Does not commit changes."""
         self.editor_ids.append(editor_id)
