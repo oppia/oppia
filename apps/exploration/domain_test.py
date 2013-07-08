@@ -138,7 +138,7 @@ class ExplorationDomainUnitTests(test_utils.TestBase):
 
         default_state = State.get(exploration.state_ids[0])
         default_state_name = default_state.name
-        exploration.rename_state(default_state, 'Renamed state')
+        exploration.rename_state(default_state.id, 'Renamed state')
 
         self.assertEqual(len(exploration.state_ids), 1)
         self.assertEqual(default_state.name, 'Renamed state')
@@ -148,7 +148,7 @@ class ExplorationDomainUnitTests(test_utils.TestBase):
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exploration.rename_state(second_state, second_state.name)
+        exploration.rename_state(second_state.id, second_state.name)
         self.assertEqual(second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
@@ -156,7 +156,7 @@ class ExplorationDomainUnitTests(test_utils.TestBase):
         with self.assertRaises(Exception):
             exploration.add_state('State 2')
         with self.assertRaises(Exception):
-            exploration.rename_state(second_state, 'Renamed state')
+            exploration.rename_state(second_state.id, 'Renamed state')
 
         # The exploration now has exactly two states.
         self.assertFalse(exploration._has_state_named(default_state_name))

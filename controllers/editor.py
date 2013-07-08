@@ -328,7 +328,7 @@ class StateHandler(BaseHandler):
             # Replace the state name with this one, after checking validity.
             if state_name == feconf.END_DEST:
                 raise self.InvalidInputException('Invalid state name: END')
-            exploration.rename_state(state, state_name)
+            exploration.rename_state(state.id, state_name)
 
         if 'param_changes' in payload:
             state.param_changes = []

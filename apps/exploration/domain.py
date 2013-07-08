@@ -139,8 +139,13 @@ class Exploration(BaseDomainObject):
 
         return new_state
 
-    def rename_state(self, state, new_state_name):
+    def rename_state(self, state_id, new_state_name):
         """Renames a state of this exploration."""
+        if state_id not in self.state_ids:
+            raise Exception('State %s not in exploration %s' %
+                            (state_id, self.id))
+
+        state = State.get(state_id)
         if state.name == new_state_name:
             return
 
