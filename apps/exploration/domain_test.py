@@ -14,17 +14,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
+__author__ = 'Sean Lip'
 
 import test_utils
 
 from apps.exploration.domain import Exploration
-from apps.exploration.models import ExplorationModel
 import apps.exploration.services as exp_services
+from apps.state.models import State
 from apps.widget.models import InteractiveWidget
 
 
-class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
+class FakeExploration(Exploration):
+    """Allows dummy explorations to be created and commited."""
+
+    def __init__(self, exp_id='fake_exploration_id', owner_id=None):
+        """Creates a dummy exploration."""
+        self.id = exp_id
+        self.title = 'title'
+        self.category = 'category'
+        self.state_ids = []
+        self.parameters = []
+        self.is_public = False
+        self.image_id = 'image_id'
+        self.editor_ids = [owner_id] if owner_id else []
+
+    def put(self):
+        """The put() method is patched to make no commits to the datastore."""
+        self._pre_put_hook()
+
+
+class ExplorationDomainUnitTests(test_utils.TestBase):
     """Test the exploration domain object."""
 
     def setUp(self):
@@ -42,14 +61,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
     def test_validation(self):
         """Test validation of explorations."""
-        # TODO(sll): This should mock the __init__ method and not depend on
-        # ExplorationModel.
-        exploration = Exploration(
-            ExplorationModel(
-                id='i', title='t', category='c', state_ids=[], parameters=[],
-                is_public=False, image_id='i', editor_ids=[]
-            )
-        )
+        exploration = FakeExploration()
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
@@ -63,59 +75,56 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
     def test_init_state_property(self):
         """Test the init_state property."""
-        # TODO(sll): This should mock the __init__ method and not depend on
-        # ExplorationModel.
-        exploration = Exploration.get(exp_services.create_new(
-            'uid', 'title', 'category', init_state_name='a'
-        ))
-        self.assertEqual(exploration.init_state.name, 'a')
+        INIT_STATE_ID = 'init_state_id'
+        INIT_STATE_NAME = 'init_state_name'
+
+        init_state = State(id=INIT_STATE_ID, name=INIT_STATE_NAME)
+        init_state.put()
+
+        exploration = FakeExploration(owner_id='owner@example.com')
+        exploration.state_ids = ['init_state_id']
+        self.assertEqual(exploration.init_state.id, INIT_STATE_ID)
+        self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
         exploration.add_state('b')
-        exploration.put()
-        self.assertEqual(exploration.init_state.name, 'a')
+        self.assertEqual(exploration.init_state.id, INIT_STATE_ID)
+        self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
-        def get_exploration_object(id):
-            exploration_model = ExplorationModel(id=id, title='T', category='C')
-            exploration_model.put()
-            return Exploration(exploration_model)
-
-        demo = get_exploration_object('0')
+        demo = FakeExploration(exp_id='0')
         self.assertEqual(demo.is_demo, True)
-        notdemo1 = get_exploration_object('a')
+
+        notdemo1 = FakeExploration(exp_id='a')
         self.assertEqual(notdemo1.is_demo, False)
-        notdemo2 = get_exploration_object('abcd')
+
+        notdemo2 = FakeExploration(exp_id='abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
     def test_is_owned_by(self):
         """Test the is_owned_by() method."""
-        self.owner_id = 'owner@example.com'
-        self.editor_id = 'editor@example.com'
-        self.viewer_id = 'viewer@example.com'
+        owner_id = 'owner@example.com'
+        editor_id = 'editor@example.com'
+        viewer_id = 'viewer@example.com'
 
-        exploration = Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        exploration.add_editor(self.editor_id)
-        exploration.put()
+        exploration = FakeExploration(owner_id=owner_id)
+        exploration.add_editor(editor_id)
 
-        self.assertTrue(exploration.is_owned_by(self.owner_id))
-        self.assertFalse(exploration.is_owned_by(self.editor_id))
-        self.assertFalse(exploration.is_owned_by(self.viewer_id))
+        self.assertTrue(exploration.is_owned_by(owner_id))
+        self.assertFalse(exploration.is_owned_by(editor_id))
+        self.assertFalse(exploration.is_owned_by(viewer_id))
         self.assertFalse(exploration.is_owned_by(None))
 
     def test_is_editable_by(self):
         """Test the is_editable_by() method."""
-        self.owner_id = 'owner@example.com'
-        self.editor_id = 'editor@example.com'
-        self.viewer_id = 'viewer@example.com'
+        owner_id = 'owner@example.com'
+        editor_id = 'editor@example.com'
+        viewer_id = 'viewer@example.com'
 
-        exploration = Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        exploration.add_editor(self.editor_id)
-        exploration.put()
+        exploration = FakeExploration(owner_id=owner_id)
+        exploration.add_editor(editor_id)
 
-        self.assertTrue(exploration.is_editable_by(self.owner_id))
-        self.assertTrue(exploration.is_editable_by(self.editor_id))
-        self.assertFalse(exploration.is_editable_by(self.viewer_id))
+        self.assertTrue(exploration.is_editable_by(owner_id))
+        self.assertTrue(exploration.is_editable_by(editor_id))
+        self.assertFalse(exploration.is_editable_by(viewer_id))
         self.assertFalse(exploration.is_editable_by(None))

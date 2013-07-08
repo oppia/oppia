@@ -112,11 +112,6 @@ class Exploration(BaseDomainObject):
         return self.id.isdigit() and (
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
-    def _has_state_named(self, state_name):
-        """Whether the exploration contains a state with the given name."""
-        return any([State.get(state_id).name == state_name
-                    for state_id in self.state_ids])
-
     def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
         return user_id in self.editor_ids
@@ -124,6 +119,11 @@ class Exploration(BaseDomainObject):
     def is_owned_by(self, user_id):
         """Whether the given user owns the exploration."""
         return (not self.is_demo) and (user_id == self.editor_ids[0])
+
+    def _has_state_named(self, state_name):
+        """Whether the exploration contains a state with the given name."""
+        return any([State.get(state_id).name == state_name
+                    for state_id in self.state_ids])
 
     def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it. Commits changes."""
@@ -139,10 +139,6 @@ class Exploration(BaseDomainObject):
 
         return new_state
 
-    def add_editor(self, editor_id):
-        """Adds a new editor. Does not commit changes."""
-        self.editor_ids.append(editor_id)
-
     def rename_state(self, state, new_state_name):
         """Renames a state of this exploration."""
         if state.name == new_state_name:
@@ -153,3 +149,7 @@ class Exploration(BaseDomainObject):
 
         state.name = new_state_name
         state.put()
+
+    def add_editor(self, editor_id):
+        """Adds a new editor. Does not commit changes."""
+        self.editor_ids.append(editor_id)
