@@ -83,11 +83,11 @@ class ExplorationDomainUnitTests(test_utils.TestBase):
 
         exploration = FakeExploration(owner_id='owner@example.com')
         exploration.state_ids = ['init_state_id']
-        self.assertEqual(exploration.init_state.id, INIT_STATE_ID)
+        self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
         exploration.add_state('b')
-        self.assertEqual(exploration.init_state.id, INIT_STATE_ID)
+        self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
     def test_is_demo_property(self):

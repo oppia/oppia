@@ -119,12 +119,11 @@ class NewExploration(BaseHandler):
         if not category:
             raise self.InvalidInputException('No category chosen.')
 
-        yaml = self.request.get('yaml')
+        yaml_content = self.request.get('yaml')
 
-        if yaml and feconf.ALLOW_YAML_FILE_UPLOAD:
+        if yaml_content and feconf.ALLOW_YAML_FILE_UPLOAD:
             exploration_id = exp_services.create_from_yaml(
-                yaml_file=yaml, user_id=self.user_id, title=title,
-                category=category)
+                yaml_content, self.user_id, title, category)
         else:
             exploration_id = exp_services.create_new(
                 self.user_id, title=title, category=category)
@@ -147,13 +146,12 @@ class ForkExploration(BaseHandler):
 
         # Get the demo exploration as a YAML file, so that new states can be
         # created.
-        yaml = exp_services.export_to_yaml(forked_exploration.id)
+        yaml_content = exp_services.export_to_yaml(forked_exploration.id)
         title = 'Copy of %s' % forked_exploration.title
         category = forked_exploration.category
 
         new_exploration_id = exp_services.create_from_yaml(
-            yaml_file=yaml, user_id=self.user_id, title=title,
-            category=category)
+            yaml_content, self.user_id, title, category)
 
         self.render_json({'explorationId': new_exploration_id})
 
@@ -191,7 +189,7 @@ class ExplorationHandler(BaseHandler):
 
         self.values.update({
             'exploration_id': exploration.id,
-            'init_state_id': exploration.init_state.id,
+            'init_state_id': exploration.init_state_id,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
             'category': exploration.category,

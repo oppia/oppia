@@ -148,13 +148,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, 'A title', 'A category',
             'A different exploration_id'))
         exploration.add_state('New state')
-        yaml_file = exp_services.export_to_yaml(exploration.id)
+        yaml_content = exp_services.export_to_yaml(exploration.id)
 
         exploration2 = Exploration.get(exp_services.create_from_yaml(
-            yaml_file, self.owner_id, 'Title', 'Category'))
+            yaml_content, self.owner_id, 'Title', 'Category'))
         self.assertEqual(len(exploration2.state_ids), 2)
-        yaml_file_2 = exp_services.export_to_yaml(exploration2.id)
-        self.assertEqual(yaml_file_2, yaml_file)
+        yaml_content_2 = exp_services.export_to_yaml(exploration2.id)
+        self.assertEqual(yaml_content_2, yaml_content)
 
         self.assertEqual(exp_services.count_explorations(), 2)
 
@@ -204,8 +204,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, 'A title', 'A category',
             'A different exploration_id'))
         exploration.add_state('New state')
-        yaml_file = exp_services.export_to_yaml(exploration.id)
-        self.assertEqual(yaml_file, """parameters: []
+        yaml_content = exp_services.export_to_yaml(exploration.id)
+        self.assertEqual(yaml_content, """parameters: []
 states:
 - content: []
   name: '[untitled state]'

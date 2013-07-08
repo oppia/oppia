@@ -56,7 +56,7 @@ class Exploration(BaseDomainObject):
         self.editor_ids = exploration_model.editor_ids
 
     def _pre_put_hook(self):
-        """Validates the exploration before it is put into the datastore."""
+        """Validates the exploration before it is committed to storage."""
         if not self.state_ids:
             raise self.ObjectValidationError('This exploration has no states.')
 
@@ -103,9 +103,14 @@ class Exploration(BaseDomainObject):
 
     # Derived attributes of an exploration.
     @property
+    def init_state_id(self):
+        """The id of the starting state of this exploration."""
+        return self.state_ids[0]
+
+    @property
     def init_state(self):
         """The state which forms the start of this exploration."""
-        return self.get_state_by_id(self.state_ids[0])
+        return self.get_state_by_id(self.init_state_id)
 
     @property
     def is_demo(self):

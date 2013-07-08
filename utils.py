@@ -54,10 +54,10 @@ def create_enum(*sequential, **names):
     return type('Enum', (), enums)
 
 
-def get_file_contents(filepath):
+def get_file_contents(filepath, raw_bytes=False):
     """Gets the contents of a file, given a relative filepath from oppia/."""
     with open(filepath) as f:
-        return f.read().decode('utf-8')
+        return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
 def get_sample_exploration_yaml(filename):

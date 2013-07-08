@@ -171,10 +171,10 @@ def create_new(
 
 
 def create_from_yaml(
-    yaml_file, user_id, title, category, exploration_id=None,
+    yaml_content, user_id, title, category, exploration_id=None,
         image_id=None):
-    """Creates an exploration from a YAML file."""
-    exploration_dict = utils.dict_from_yaml(yaml_file)
+    """Creates an exploration from a YAML text string."""
+    exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
     exploration = Exploration.get(create_new(
@@ -184,15 +184,13 @@ def create_from_yaml(
     init_state = State.get_by_name(init_state_name, exploration)
 
     try:
-        for param in exploration_dict['parameters']:
-            exploration.parameters.append(Parameter(
-                name=param['name'], obj_type=param['obj_type'],
-                values=param['values'])
-            )
+        exploration.parameters = [Parameter(
+            name=param['name'], obj_type=param['obj_type'],
+            values=param['values']
+        ) for param in exploration_dict['parameters']]
 
         state_list = []
-        exploration_states = exploration_dict['states']
-        for state_description in exploration_states:
+        for state_description in exploration_dict['states']:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
                      else exploration.add_state(state_name))
@@ -216,20 +214,21 @@ def load_demos():
         elif len(exploration) == 4:
             (exp_filename, title, category, image_filename) = exploration
         else:
-            raise Exception(
-                'Invalid format for demo exploration: %s' % exploration)
+            raise Exception('Invalid demo exploration: %s' % exploration)
 
         image_id = None
         if image_filename:
-            with open(os.path.join(
-                    feconf.SAMPLE_IMAGES_DIR, image_filename)) as f:
-                raw_image = f.read()
-            image_id = Image.create(raw_image)
+            image_filepath = os.path.join(
+                feconf.SAMPLE_IMAGES_DIR, image_filename)
+            image_id = Image.create(utils.get_file_contents(
+                image_filepath, raw_bytes=True))
 
-        yaml_file = utils.get_sample_exploration_yaml(exp_filename)
-        exploration = Exploration.get(create_from_yaml(
-            yaml_file=yaml_file, user_id=None, title=title, category=category,
-            exploration_id=str(index), image_id=image_id))
+        yaml_content = utils.get_sample_exploration_yaml(exp_filename)
+        exploration_id = create_from_yaml(
+            yaml_content, None, title, category, exploration_id=str(index),
+            image_id=image_id)
+
+        exploration = Exploration.get(exploration_id)
         exploration.is_public = True
         exploration.put()
 
@@ -301,7 +300,7 @@ def export_to_yaml(exploration_id):
         state_internals = export_state_internals_to_dict(
             exploration.id, state_id, human_readable_dests=True)
 
-        if exploration.init_state.id == state_id:
+        if exploration.init_state_id == state_id:
             init_states_list.append(state_internals)
         else:
             others_states_list.append(state_internals)

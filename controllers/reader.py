@@ -168,7 +168,7 @@ class ExplorationHandler(BaseHandler):
             'interactive_params': init_state.widget.params,
             'oppia_html': init_html,
             'params': params,
-            'state_id': init_state.id,
+            'state_id': exploration.init_state_id,
             'title': exploration.title,
             'widgets': init_widgets,
         })
@@ -178,7 +178,7 @@ class ExplorationHandler(BaseHandler):
         self.render_json(self.values)
 
         EventHandler.record_exploration_visited(exploration_id)
-        EventHandler.record_state_hit(exploration_id, init_state.id)
+        EventHandler.record_state_hit(exploration_id, exploration.init_state_id)
 
 
 class FeedbackHandler(BaseHandler):
