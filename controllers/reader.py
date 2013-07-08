@@ -262,7 +262,7 @@ class FeedbackHandler(BaseHandler):
                 html_output += state_html
                 widget_output += state_widgets
 
-        # Render the response in the response in the customized html if
+        # Render the response in the customized html if
         # - the response is not rendered in the sticky interactive widget, and
         # - there is a static rendering html provided for that widget.
         sticky = (

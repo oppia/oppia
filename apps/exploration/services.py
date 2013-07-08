@@ -284,27 +284,16 @@ def export_state_to_dict(exploration_id, state_id):
 
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
-    # TODO(sll): Cache the return value?
-
     exploration = Exploration.get(exploration_id)
 
-    params = []
-    for param in exploration.parameters:
-        params.append({'name': param.name, 'obj_type': param.obj_type,
-                       'values': param.values})
+    params = [{
+        'name': param.name, 'obj_type': param.obj_type, 'values': param.values
+    } for param in exploration.parameters]
 
-    init_states_list = []
-    others_states_list = []
+    states_list = [export_state_internals_to_dict(
+        exploration_id, state_id, human_readable_dests=True)
+        for state_id in exploration.state_ids]
 
-    for state_id in exploration.state_ids:
-        state_internals = export_state_internals_to_dict(
-            exploration.id, state_id, human_readable_dests=True)
-
-        if exploration.init_state_id == state_id:
-            init_states_list.append(state_internals)
-        else:
-            others_states_list.append(state_internals)
-
-    full_state_list = init_states_list + others_states_list
-    result_dict = {'parameters': params, 'states': full_state_list}
-    return utils.yaml_from_dict(result_dict)
+    return utils.yaml_from_dict({
+        'parameters': params, 'states': states_list
+    })
