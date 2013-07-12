@@ -73,8 +73,7 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 
   /**
    * Adds content to an iframe.
-   * @param {string|Element} iframe The iframe element or its id to add
-   *     content to.
+   * @param {Element} iframe The iframe element to add content to.
    * @param {string} content The code for the iframe.
    */
   $scope.addContentToIframe = function(iframe, content) {
@@ -95,6 +94,15 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     doc.close();
 
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  };
+
+  /**
+   * Adds content to an iframe where iframe is specified by its ID.
+   * @param {string} iframeId The id of the iframe to add content to.
+   * @param {string} content The code for the iframe.
+   */
+  $scope.addContentToIframeWithId = function(iframeId, content) {
+    $scope.addContentToIframe(document.getElementById(iframeId), content);
   };
 
   /**

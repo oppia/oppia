@@ -26,7 +26,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.showPreview = input;
     $scope.$apply();
     if (input) {
-      $scope.addContentToIframe('interactiveWidgetPreview', $scope.interactiveWidget.raw);
+      $scope.addContentToIframeWithId(
+          'interactiveWidgetPreview', $scope.interactiveWidget.raw);
     }
   };
 
@@ -44,7 +45,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         $scope.interactiveWidget = widgetData.widget;
         $scope.interactiveParams = widgetParams;
         if ($scope.showPreview) {
-          $scope.addContentToIframe('interactiveWidgetPreview', $scope.interactiveWidget.raw);
+          $scope.addContentToIframeWithId(
+              'interactiveWidgetPreview', $scope.interactiveWidget.raw);
         }
       }
     );
@@ -341,7 +343,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       return;
     }
 
-    $scope.addContentToIframe('interactiveWidgetPreview', arg.data.raw);
+    $scope.addContentToIframeWithId('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;

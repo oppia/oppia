@@ -56,7 +56,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       $scope.createRequest({params: widget.params, state_params: $scope.paramChanges}),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
-      $scope.addContentToIframe(
+      $scope.addContentToIframeWithId(
           'widgetPreview' + widgetData.parent_index, widgetData.widget.raw);
     });
   };

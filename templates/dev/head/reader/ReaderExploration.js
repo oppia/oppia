@@ -38,9 +38,9 @@
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
         });
-    var prev_log = document.getElementsByClassName('previous-log')[0];
-    if (prev_log) {
-      prev_log.innerHTML = '';
+    var prevLog = document.getElementsByClassName('previous-log')[0];
+    if (prevLog) {
+      prevLog.innerHTML = '';
     }
   };
 
@@ -61,7 +61,7 @@
     $scope.title = data.title;
     $scope.widgets = data.widgets;
     // We need to generate the HTML (with the iframe) before populating it.
-    $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+    $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
     // The call to $apply() is needed before updateMath() is called.
@@ -69,7 +69,7 @@
     $scope.updateMath();
 
     for (var i = 0; i < data.widgets.length; i++) {
-      $scope.addContentToIframe(
+      $scope.addContentToIframeWithId(
         'widgetCompiled' + data.widgets[i].blockIndex + '-' + data.widgets[i].index,
         data.widgets[i].raw);
     }
@@ -122,23 +122,23 @@
     $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
     if (!data.sticky_interactive_widget) {
-      $scope.addContentToIframe('inputTemplate', $scope.inputTemplate);
+      $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
     }
 
     // Move the last round of user response and oppia response to the previous
     // log element so we can render new ones.
-    var prev_log = document.getElementsByClassName('previous-log')[0];
+    var prevLog = document.getElementsByClassName('previous-log')[0];
 
     // Angular seems to skip re-rendering if the bound text did not change since
     // the last rednering, which means we can not move the elements out into
     // another element. Cloning them here to avoid the problem.
     var last_log = document.getElementsByClassName('last-log')[0];
     for (var i = 0; i < last_log.childNodes.length; i++) {
-      prev_log.appendChild(last_log.childNodes[i].cloneNode(true));
+      prevLog.appendChild(last_log.childNodes[i].cloneNode(true));
     }
     var oppia_response = document.getElementsByClassName('oppia-response')[0];
     for (var i = 0; i < oppia_response.childNodes.length; i++) {
-      prev_log.appendChild(oppia_response.childNodes[i].cloneNode(true));
+      prevLog.appendChild(oppia_response.childNodes[i].cloneNode(true));
     }
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -148,7 +148,7 @@
 
     // TODO(sll): Can this be done without forcing a reload of all the existing widgets?
     for (var i = 0; i < $scope.widgets.length; i++) {
-      $scope.addContentToIframe(
+      $scope.addContentToIframeWithId(
         'widgetCompiled' + $scope.widgets[i].blockIndex + '-' + $scope.widgets[i].index,
         $scope.widgets[i].raw);
     }

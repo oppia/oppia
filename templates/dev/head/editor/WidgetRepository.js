@@ -49,7 +49,7 @@ function WidgetRepository($scope, $http, activeInputData) {
     for (var category in data.widgets) {
       for (var i = 0; i < $scope.widgets[category].length; ++i) {
         var rawCode = $scope.widgets[category][i].raw;
-        $scope.addContentToIframe(
+        $scope.addContentToIframeWithId(
             'widget-' + category + '-' + i,
             $scope.createCustomizedCode(
                 $scope.widgets[category][i].params, null, rawCode));
@@ -124,7 +124,7 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   // Inserts content into the preview tab just before it is shown.
   $('#modalTabs a[href="#preview"]').on('show', function (e) {
-    $scope.addContentToIframe(
+    $scope.addContentToIframeWithId(
       'modalPreview',
       $scope.createCustomizedCode($scope.modalWidget.params, null, $scope.modalWidget.raw));
   });
@@ -145,7 +145,7 @@ function WidgetRepository($scope, $http, activeInputData) {
         for (var i = 0; i < $scope.widgets[category].length; ++i) {
           if ($scope.widgets[category][i].name == widgetData.widget.name) {
             var rawCode = $scope.widgets[category][i].raw;
-            $scope.addContentToIframe(
+            $scope.addContentToIframeWithId(
                 'widget-' + category + '-' + i,
                 $scope.createCustomizedCode($scope.widgets[category][i].params, null, rawCode));
           }
@@ -201,7 +201,8 @@ function WidgetRepository($scope, $http, activeInputData) {
         $scope.widgets[category][index].params, $scope.customizedParams,
         $scope.widgets[category][index].raw);
     $scope.$apply();
-    $scope.addContentToIframe('widget-' + category + '-' + index, customizedCode);
+    $scope.addContentToIframeWithId(
+        'widget-' + category + '-' + index, customizedCode);
     $scope.closeCustomizeModal();
   };
 
@@ -235,7 +236,7 @@ function WidgetRepository($scope, $http, activeInputData) {
     $scope.previewIndex = index;
 
     var rawCode = $scope.widgets[category][index].raw;
-    $scope.addContentToIframe(
+    $scope.addContentToIframeWithId(
         'widgetPreview',
         $scope.createCustomizedCode(
              $scope.widgets[category][index].params, null, rawCode));

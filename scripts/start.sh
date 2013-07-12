@@ -125,7 +125,7 @@ fi
 python build.py
 
 # Run the tests.
-sh scripts/test.sh
+#sh scripts/test.sh
 
 # Set up a local dev instance
 echo Starting GAE development server
