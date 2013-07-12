@@ -197,11 +197,10 @@ class FeedbackHandler(BaseHandler):
 
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
-        values = {'error': []}
+        values = {}
 
         exploration = Exploration.get(exploration_id)
-        state = exploration.get_state_by_id(state_id)
-        old_state = state
+        old_state = exploration.get_state_by_id(state_id)
 
         # The 0-based index of the last content block already on the page.
         block_number = self.payload.get('block_number') + 1
@@ -214,7 +213,7 @@ class FeedbackHandler(BaseHandler):
         # Add the reader's answer to the parameter list.
         params['answer'] = answer
 
-        dest_id, feedback, rule, recorded_answer = state.transition(
+        dest_id, feedback, rule, recorded_answer = old_state.transition(
             answer, params, handler)
         assert dest_id
 
@@ -234,13 +233,14 @@ class FeedbackHandler(BaseHandler):
 
         if dest_id == feconf.END_DEST:
             # This leads to a FINISHED state.
+            new_state = None
             if feedback:
                 html_output, widget_output = self._append_feedback(
                     feedback, html_output, widget_output, block_number,
                     old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            state = exploration.get_state_by_id(dest_id)
+            new_state = exploration.get_state_by_id(dest_id)
             EventHandler.record_state_hit(exploration_id, dest_id)
 
             if feedback:
@@ -249,12 +249,12 @@ class FeedbackHandler(BaseHandler):
                     old_params)
 
             # Populate new parameters.
-            params = get_params(state, existing_params=old_params)
+            params = get_params(new_state, existing_params=old_params)
             # Append text for the new state only if the new and old states
             # differ.
-            if old_state.id != state.id:
+            if old_state.id != new_state.id:
                 state_html, state_widgets = parse_content_into_html(
-                    state.content, block_number, params)
+                    new_state.content, block_number, params)
                 # Separate text for the new state and feedback for the old state
                 # by an additional line.
                 if state_html and feedback:
@@ -267,8 +267,8 @@ class FeedbackHandler(BaseHandler):
         # - there is a static rendering html provided for that widget.
         sticky = (
             dest_id != feconf.END_DEST and
-            state.widget.sticky and
-            state.widget.widget_id == old_state.widget.widget_id
+            new_state.widget.sticky and
+            new_state.widget.widget_id == old_state.widget.widget_id
         )
         custom_response = ''
         if not sticky:
@@ -296,10 +296,11 @@ class FeedbackHandler(BaseHandler):
                 'custom_response': bool(custom_response),
             })
 
-        if state.widget.widget_id in DEFAULT_ANSWERS:
-            values['default_answer'] = DEFAULT_ANSWERS[state.widget.widget_id]
+        if dest_id != feconf.END_DEST and new_state.widget.widget_id in DEFAULT_ANSWERS:
+            values['default_answer'] = DEFAULT_ANSWERS[new_state.widget.widget_id]
+        values['state_id'] = feconf.END_DEST if dest_id == feconf.END_DEST else new_state.id
         values.update({
-            'exploration_id': exploration_id, 'state_id': state.id,
+            'exploration_id': exploration_id,
             'oppia_html': html_output, 'widgets': widget_output,
             'block_number': block_number, 'params': params,
             'finished': (dest_id == feconf.END_DEST),
@@ -312,9 +313,9 @@ class FeedbackHandler(BaseHandler):
             else:
                 values['interactive_widget_html'] = (
                     InteractiveWidget.get_raw_code(
-                        state.widget.widget_id,
+                        new_state.widget.widget_id,
                         params=utils.parse_dict_with_params(
-                            state.widget.params, params)
+                            new_state.widget.params, params)
                     )
                 )
         else:
