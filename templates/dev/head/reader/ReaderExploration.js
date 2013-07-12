@@ -38,10 +38,7 @@
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
         });
-    var prevLog = document.getElementsByClassName('previous-log')[0];
-    if (prevLog) {
-      prevLog.innerHTML = '';
-    }
+    $scope.responseLog = [];
   };
 
   $scope.initializePage();
@@ -54,8 +51,7 @@
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_widget_html;
-    $scope.oppiaHtml = data.oppia_html;
-    $scope.html = '';
+    $scope.responseLog = [data.oppia_html];
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
@@ -112,8 +108,8 @@
 
     $scope.params = data.params;
 
-    $scope.html = data.reader_html;
-    $scope.oppiaHtml = data.oppia_html;
+    $scope.responseLog = $scope.responseLog || [];
+    $scope.responseLog.push(data.reader_html, data.oppia_html);
 
     for (var i = 0; i < data.widgets.length; i++) {
       $scope.widgets.push(data.widgets[i]);
@@ -123,22 +119,6 @@
     // We need to generate the HTML (with the iframe) before populating it.
     if (!data.sticky_interactive_widget) {
       $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
-    }
-
-    // Move the last round of user response and oppia response to the previous
-    // log element so we can render new ones.
-    var prevLog = document.getElementsByClassName('previous-log')[0];
-
-    // Angular seems to skip re-rendering if the bound text did not change since
-    // the last rednering, which means we can not move the elements out into
-    // another element. Cloning them here to avoid the problem.
-    var last_log = document.getElementsByClassName('last-log')[0];
-    for (var i = 0; i < last_log.childNodes.length; i++) {
-      prevLog.appendChild(last_log.childNodes[i].cloneNode(true));
-    }
-    var oppia_response = document.getElementsByClassName('oppia-response')[0];
-    for (var i = 0; i < oppia_response.childNodes.length; i++) {
-      prevLog.appendChild(oppia_response.childNodes[i].cloneNode(true));
     }
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -164,7 +144,8 @@
     }
 
     var currentScrollTop = $('body').scrollTop();
-    // TODO(sll): This should actually scroll to the location of #oppiaHtml.
+    // TODO(sll): This should actually scroll to the location of last element in
+    // response log.
     $('html,body').animate({scrollTop: Math.max(
         $(document).height() - 1000, currentScrollTop + 50)});
   };
