@@ -98,6 +98,12 @@ class State(IdModel):
         elif not self.widget.handlers:
             self.widget.handlers = [self.get_default_handler()]
 
+        # No two handlers should have the same name.
+        handler_names = [h.name for h in self.widget.handlers]
+        if len(handler_names) != len(set(handler_names)):
+            raise self.ValidationError(
+                'Names of handlers are not unique: %s' % handler_names)
+
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
@@ -144,14 +150,8 @@ class State(IdModel):
             return feconf.END_DEST
         return State.get_by_name(name, exploration).id
 
-    def transition(self, answer, params, handler_name):
-        """Handle feedback interactions with readers."""
-
-        recorded_answer = answer
-        # TODO(sll): This is a special case for multiple-choice input
-        # which should really be handled generically.
-        if self.widget.widget_id == 'interactive-MultipleChoiceInput':
-            recorded_answer = self.widget.params['choices'][int(answer)]
+    def classify(self, answer, params, handler_name):
+        """Classify a reader's answer and return the rule it satisfies."""
 
         handlers = [h for h in self.widget.handlers if h.name == handler_name]
         if not handlers:
@@ -174,9 +174,7 @@ class State(IdModel):
             selected_rule = self.find_first_match(
                 handler, Classifier, norm_answer, params)
 
-        feedback = (utils.get_random_choice(selected_rule.feedback)
-                    if selected_rule.feedback else '')
-        return selected_rule.dest, feedback, selected_rule, recorded_answer
+        return selected_rule
 
     def find_first_match(self, handler, Classifier, norm_answer, params):
         for ind, rule in enumerate(handler.rules):

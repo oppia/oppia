@@ -213,9 +213,18 @@ class FeedbackHandler(BaseHandler):
         # Add the reader's answer to the parameter list.
         params['answer'] = answer
 
-        dest_id, feedback, rule, recorded_answer = old_state.transition(
-            answer, params, handler)
+        rule = old_state.classify(answer, params, handler)
+        dest_id = rule.dest
         assert dest_id
+
+        feedback = (utils.get_random_choice(rule.feedback)
+                    if rule.feedback else '')
+
+        recorded_answer = answer
+        # TODO(sll): This is a special case for multiple-choice input
+        # which should really be handled generically.
+        if old_state.widget.widget_id == 'interactive-MultipleChoiceInput':
+            recorded_answer = old_state.widget.params['choices'][int(answer)]
 
         if recorded_answer is not None:
             recorded_answer = json.dumps(recorded_answer)
