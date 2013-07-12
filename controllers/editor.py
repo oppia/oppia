@@ -194,7 +194,7 @@ class ExplorationHandler(BaseHandler):
             'image_id': exploration.image_id,
             'category': exploration.category,
             'title': exploration.title,
-            'editors': [editor for editor in exploration.editor_ids],
+            'editors': exploration.editor_ids,
             'states': state_list,
             'parameters': parameters,
         })
