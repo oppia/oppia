@@ -43,8 +43,12 @@ class FakeExploration(Exploration):
         self._pre_put_hook()
 
 
-class ExplorationDomainUnitTests(test_utils.TestBase):
+class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration domain object."""
+
+    # TODO(sll): The App Engine test base is needed here because Widgets are
+    # being put into the datastore on setup. We should perhaps try to mock
+    # these calls so that it is not needed.
 
     def setUp(self):
         """Loads the default widgets."""
