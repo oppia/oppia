@@ -202,23 +202,19 @@ class FeedbackHandler(BaseHandler):
         exploration = Exploration.get(exploration_id)
         old_state = exploration.get_state_by_id(state_id)
 
-        # The 0-based index of the last content block already on the page.
-        block_number = self.payload.get('block_number') + 1
         # The reader's answer.
         answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
         handler = self.payload.get('handler')
+        # The 0-based index of the last content block already on the page.
+        block_number = self.payload.get('block_number') + 1
 
         params = self.payload.get('params', {})
-        # Add the reader's answer to the parameter list.
         params['answer'] = answer
 
-        rule = old_state.classify(answer, params, handler)
-        dest_id = rule.dest
-        assert dest_id
-
-        feedback = (utils.get_random_choice(rule.feedback)
-                    if rule.feedback else '')
+        rule = old_state.classify(handler, answer, params)
+        new_state_id = rule.dest
+        feedback = rule.get_feedback_string()
 
         recorded_answer = answer
         # TODO(sll): This is a special case for multiple-choice input
@@ -240,7 +236,7 @@ class FeedbackHandler(BaseHandler):
         html_output, widget_output = '', []
         old_params = params
 
-        if dest_id == feconf.END_DEST:
+        if new_state_id == feconf.END_DEST:
             # This leads to a FINISHED state.
             new_state = None
             if feedback:
@@ -249,8 +245,8 @@ class FeedbackHandler(BaseHandler):
                     old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            new_state = exploration.get_state_by_id(dest_id)
-            EventHandler.record_state_hit(exploration_id, dest_id)
+            new_state = exploration.get_state_by_id(new_state_id)
+            EventHandler.record_state_hit(exploration_id, new_state_id)
 
             if feedback:
                 html_output, widget_output = self._append_feedback(
@@ -275,7 +271,7 @@ class FeedbackHandler(BaseHandler):
         # - the response is not rendered in the sticky interactive widget, and
         # - there is a static rendering html provided for that widget.
         sticky = (
-            dest_id != feconf.END_DEST and
+            new_state_id != feconf.END_DEST and
             new_state.widget.sticky and
             new_state.widget.widget_id == old_state.widget.widget_id
         )
@@ -305,17 +301,17 @@ class FeedbackHandler(BaseHandler):
                 'custom_response': bool(custom_response),
             })
 
-        if dest_id != feconf.END_DEST and new_state.widget.widget_id in DEFAULT_ANSWERS:
+        if new_state_id != feconf.END_DEST and new_state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[new_state.widget.widget_id]
-        values['state_id'] = feconf.END_DEST if dest_id == feconf.END_DEST else new_state.id
+        values['state_id'] = new_state_id
         values.update({
             'exploration_id': exploration_id,
             'oppia_html': html_output, 'widgets': widget_output,
             'block_number': block_number, 'params': params,
-            'finished': (dest_id == feconf.END_DEST),
+            'finished': (new_state_id == feconf.END_DEST),
         })
 
-        if dest_id != feconf.END_DEST:
+        if new_state_id != feconf.END_DEST:
             if sticky:
                 values['interactive_widget_html'] = ''
                 values['sticky_interactive_widget'] = True

@@ -47,11 +47,15 @@ class Rule(BaseModel):
     # Parameters for the classification rule. TODO(sll): Make these the actual params.
     inputs = ndb.JsonProperty(default={})
     # The id of the destination state.
-    dest = ndb.StringProperty()
+    dest = ndb.StringProperty(required=True)
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
     # State-level parameter changes to make if this rule is triggered.
     param_changes = ParamChangeProperty(repeated=True)
+
+    def get_feedback_string(self):
+        """Returns a (possibly empty) string with feedback for this rule."""
+        return utils.get_random_choice(self.feedback) if self.feedback else ''
 
 
 class AnswerHandlerInstance(BaseModel):
@@ -150,7 +154,7 @@ class State(IdModel):
             return feconf.END_DEST
         return State.get_by_name(name, exploration).id
 
-    def classify(self, answer, params, handler_name):
+    def classify(self, handler_name, answer, params):
         """Classify a reader's answer and return the rule it satisfies."""
 
         handlers = [h for h in self.widget.handlers if h.name == handler_name]
