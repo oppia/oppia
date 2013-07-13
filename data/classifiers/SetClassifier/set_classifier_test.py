@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 
-import SetClassifier
 import test_utils
 
 

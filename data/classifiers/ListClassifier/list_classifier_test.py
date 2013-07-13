@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 
-import ListClassifier
+import data.classifiers.ListClassifier.ListClassifier as ListClassifier
 import test_utils
 
 

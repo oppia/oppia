@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 
-import MultipleChoiceClassifier
+import data.classifiers.MultipleChoiceClassifier.MultipleChoiceClassifier as MultipleChoiceClassifier
 import test_utils
 
 

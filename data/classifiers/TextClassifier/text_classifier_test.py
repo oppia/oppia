@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 
-import TextClassifier
+import data.classifiers.TextClassifier.TextClassifier as TextClassifier
 import test_utils
 
 

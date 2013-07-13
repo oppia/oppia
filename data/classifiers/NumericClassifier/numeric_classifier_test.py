@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 
-import NumericClassifier
+import data.classifiers.NumericClassifier.NumericClassifier as NumericClassifier
 import test_utils
 
 

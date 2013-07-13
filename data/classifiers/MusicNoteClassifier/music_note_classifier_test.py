@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 
-import MusicNoteClassifier
+import data.classifiers.MusicNoteClassifier.MusicNoteClassifier as MusicNoteClassifier
 import test_utils
 
 

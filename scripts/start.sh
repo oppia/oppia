@@ -27,18 +27,23 @@ set -e
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
+if [ ! -d "oppia" ]; then
+  echo This script should be run from a folder named oppia with a subfolder named oppia.
+  exit 1
+fi
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from a folder named oppia.
+  echo This script should be run from a folder named oppia with a subfolder named oppia.
   exit 1
 fi
 
 echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
-RUNTIME_HOME=../oppia_runtime
+RUNTIME_HOME=gae_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
+THIRD_PARTY_DIR=third_party
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:./third_party/webtest-1.4.2
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
@@ -51,74 +56,74 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
 fi
 
 echo Checking whether the Closure Compiler is installed in third_party
-if [ ! -d "third_party/closure-compiler" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/closure-compiler" ]; then
   echo Installing Closure Compiler
-  mkdir -p third_party/closure-compiler
+  mkdir -p $THIRD_PARTY_DIR/closure-compiler
   wget http://closure-compiler.googlecode.com/files/compiler-latest.zip -O closure-compiler-download.zip
-  unzip closure-compiler-download.zip -d third_party/closure-compiler
+  unzip closure-compiler-download.zip -d $THIRD_PARTY_DIR/closure-compiler
   rm closure-compiler-download.zip
 fi
 
 # Static resources.
 echo Checking whether angular-ui is installed in third_party
-if [ ! -d "third_party/static/angular-ui-0.4.0" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
   echo Installing Angular UI
-  mkdir -p third_party/static/
+  mkdir -p $THIRD_PARTY_DIR/static/
   wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
-  unzip angular-ui-download.zip -d third_party/static/
+  unzip angular-ui-download.zip -d $THIRD_PARTY_DIR/static/
   rm angular-ui-download.zip
 fi
 
 echo Checking whether select2 is installed in third_party
-if [ ! -d "third_party/static/select2" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/select2" ]; then
   echo Installing select2
-  mkdir -p third_party/static/
+  mkdir -p $THIRD_PARTY_DIR/static/
   wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
-  unzip select2-download.zip -d third_party/static/
+  unzip select2-download.zip -d $THIRD_PARTY_DIR/static/
   rm select2-download.zip
-  mv third_party/static/select2-master third_party/static/select2
+  mv $THIRD_PARTY_DIR/static/select2-master $THIRD_PARTY_DIR/static/select2
 fi
 
 echo Checking whether jquery is installed in third_party
-if [ ! -d "third_party/static/jquery-1.7.1" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/jquery-1.7.1" ]; then
   echo Installing JQuery
-  mkdir -p third_party/static/jquery-1.7.1/
-  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O third_party/static/jquery-1.7.1/jquery.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/jquery-1.7.1/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O $THIRD_PARTY_DIR/static/jquery-1.7.1/jquery.min.js
 fi
 
 echo Checking whether jqueryui is installed in third_party
-if [ ! -d "third_party/static/jqueryui-1.8.17" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.8.17" ]; then
   echo Installing JQueryUI
-  mkdir -p third_party/static/jqueryui-1.8.17/
-  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O third_party/static/jqueryui-1.8.17/jquery-ui.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.8.17/
+  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.8.17/jquery-ui.min.js
 fi
 
 echo Checking whether angularjs is installed in third_party
-if [ ! -d "third_party/static/angularjs-1.0.3" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.3" ]; then
   echo Installing AngularJS and angular-sanitize
-  mkdir -p third_party/static/angularjs-1.0.3/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O third_party/static/angularjs-1.0.3/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O third_party/static/angularjs-1.0.3/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O third_party/static/angularjs-1.0.3/angular-sanitize.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.3/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-sanitize.min.js
 
   # Files for tests.
-  wget http://code.angularjs.org/1.0.3/angular-mocks.js -O third_party/static/angularjs-1.0.3/angular-mocks.js
-  wget http://code.angularjs.org/1.0.3/angular-scenario.js -O third_party/static/angularjs-1.0.3/angular-scenario.js
+  wget http://code.angularjs.org/1.0.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-mocks.js
+  wget http://code.angularjs.org/1.0.3/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-scenario.js
 fi
 
 echo Checking whether d3.js is installed in third_party
-if [ ! -d "third_party/static/d3js-3" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3" ]; then
   echo Installing d3.js
-  mkdir -p third_party/static/d3js-3/
-  wget http://d3js.org/d3.v3.min.js -O third_party/static/d3js-3/d3.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/d3js-3/
+  wget http://d3js.org/d3.v3.min.js -O $THIRD_PARTY_DIR/static/d3js-3/d3.min.js
 fi
 
 echo Checking whether YUI2 is installed in third_party
-if [ ! -d "third_party/static/yui2-2.9.0" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/yui2-2.9.0" ]; then
   echo Downloading YUI2 JavaScript and CSS files
-  mkdir -p third_party/static/yui2-2.9.0
-  wget "http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/container/container_core-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/element/element-min.js&2.9.0/build/button/button-min.js&2.9.0/build/editor/editor-min.js" -O third_party/static/yui2-2.9.0/yui2-2.9.0.js
-  wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O third_party/static/yui2-2.9.0/yui2-2.9.0.css
+  mkdir -p $THIRD_PARTY_DIR/static/yui2-2.9.0
+  wget "http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/container/container_core-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/element/element-min.js&2.9.0/build/button/button-min.js&2.9.0/build/editor/editor-min.js" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.js
+  wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.css
 fi
 
 # Do a build.

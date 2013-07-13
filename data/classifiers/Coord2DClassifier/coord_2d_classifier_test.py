@@ -19,7 +19,7 @@
 __author__ = 'Koji Ashida'
 
 
-import Coord2DClassifier
+import data.classifiers.Coord2DClassifier.Coord2DClassifier as Coord2DClassifier
 import test_utils
 
 

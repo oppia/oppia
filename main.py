@@ -18,16 +18,17 @@ __author__ = 'Sean Lip'
 
 import webapp2
 
-from controllers import admin
-from controllers import base
-from controllers import editor
-from controllers import feedback
-from controllers import gallery
-from controllers import pages
-from controllers import profile
-from controllers import reader
-from controllers import resources
-from controllers import widgets
+import oppia.controllers.admin as admin
+import oppia.controllers.base as base
+import oppia.controllers.editor as editor
+import oppia.controllers.feedback as feedback
+import oppia.controllers.gallery as gallery
+import oppia.controllers.pages as pages
+import oppia.controllers.profile as profile
+import oppia.controllers.reader as reader
+import oppia.controllers.resources as resources
+import oppia.controllers.widgets as widgets
+
 import feconf
 
 

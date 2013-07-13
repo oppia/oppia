@@ -73,7 +73,7 @@ def process_js(filename, target):
 ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
 
-for root in os.listdir(os.getcwd()):
+for root in os.listdir(os.path.join(os.getcwd(), 'oppia')):
     if '.git' in root or 'third_party' in root or 'lib' in root or 'data' in root:
         continue
 

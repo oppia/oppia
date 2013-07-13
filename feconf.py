@@ -70,11 +70,14 @@ DEV = (os.environ.get('SERVER_SOFTWARE')
 # The directory containing the HTML/JS/CSS templates.
 TEMPLATE_DIR = os.path.join(
     os.path.dirname(__file__),
-    'templates/dev/head' if DEV else 'templates/prod/head'
+    'oppia/templates/dev/head' if DEV else 'oppia/templates/prod/head'
 )
 
 # The directory containing third-party files.
-THIRD_PARTY_DIR = 'third_party'
+THIRD_PARTY_DIR = 'oppia/third_party'
+
+# The directory containing data files for tests.
+TESTS_DATA_DIR = 'oppia/tests/data'
 
 # The directories containing sample classifiers, explorations and widgets.
 SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
