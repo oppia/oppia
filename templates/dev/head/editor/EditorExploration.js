@@ -62,7 +62,7 @@ function ExplorationTab($scope, explorationData) {
 }
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
-    explorationData, warningsData, activeInputData) {
+    $filter, explorationData, warningsData, activeInputData) {
 
   /********************************************
   * Methods affecting the URL location hash.
@@ -150,6 +150,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
     $scope.chartColors = ['green', 'firebrick'];
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
+    $scope.graphData = $scope.reformatResponse(
+          data.states, data.init_state_id);
 
     explorationFullyLoaded = true;
   });
@@ -161,6 +163,91 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
           'explorationCategory', 'category', newValue, oldValue);
     }
   });
+
+  $scope.reformatResponse = function(states, initStateId) {
+    var SENTINEL_DEPTH = 3000;
+    var VERT_OFFSET = 20;
+    var HORIZ_SPACING = 150;
+    var VERT_SPACING = 100;
+    var HORIZ_OFFSET = 100;
+    var nodes = {};
+    nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
+    for (var state in states) {
+      nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
+    }
+    nodes[initStateId].depth = 0;
+
+    var maxDepth = 0;
+    var seenNodes = [initStateId];
+    var queue = [initStateId];
+    var maxXDistPerLevel = {0: HORIZ_OFFSET};
+    nodes[initStateId].y0 = VERT_OFFSET;
+    nodes[initStateId].x0 = HORIZ_OFFSET;
+
+    while (queue.length > 0) {
+      var currNode = queue[0];
+      queue.shift();
+      nodes[currNode].reachable = true;
+      if (currNode in states) {
+        for (var i = 0; i < states[currNode].widget.rules.submit.length; i++) {
+          // Assign levels to nodes only when they are first encountered.
+          if (seenNodes.indexOf(states[currNode].widget.rules.submit[i].dest) == -1) {
+            seenNodes.push(states[currNode].widget.rules.submit[i].dest);
+            nodes[states[currNode].widget.rules.submit[i].dest].depth = nodes[currNode].depth + 1;
+            nodes[states[currNode].widget.rules.submit[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
+            if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
+              nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
+              maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
+            } else {
+              nodes[states[currNode].widget.rules.submit[i].dest].x0 = HORIZ_OFFSET;
+              maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
+            }
+            maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
+            queue.push(states[currNode].widget.rules.submit[i].dest);
+          }
+        }
+      }
+    }
+
+    var horizPositionForLastRow = HORIZ_OFFSET;
+    for (var node in nodes) {
+      if (nodes[node].depth == SENTINEL_DEPTH) {
+        nodes[node].depth = maxDepth + 1;
+        nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
+        nodes[node].x0 = horizPositionForLastRow;
+        horizPositionForLastRow += HORIZ_SPACING;
+      }
+    }
+
+    // Assign unique IDs to each node.
+    var idCount = 0;
+    var nodeList = [];
+    for (var node in nodes) {
+      var nodeMap = nodes[node];
+      nodeMap['hashId'] = node;
+      nodeMap['id'] = idCount;
+      nodes[node]['id'] = idCount;
+      idCount++;
+      nodeList.push(nodeMap);
+    }
+
+    var links = [];
+    for (var state in states) {
+      for (var i = 0; i < states[state].widget.rules.submit.length; i++) {
+        links.push({
+            source: nodeList[nodes[state].id],
+            target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
+            name: $filter('parameterizeRule')({
+                rule: states[state].widget.rules.submit[i].rule,
+                inputs: states[state].widget.rules.submit[i].inputs
+            })
+        });
+      }
+    }
+
+    return {nodes: nodeList, links: links, initStateId: initStateId};
+  };
+
 
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
     // Do not save on the initial data load.
@@ -546,5 +633,5 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
-    '$routeParams', 'explorationData', 'warningsData', 'activeInputData'];
+    '$routeParams', '$filter', 'explorationData', 'warningsData', 'activeInputData'];
 ExplorationTab.$inject = ['$scope', 'explorationData'];

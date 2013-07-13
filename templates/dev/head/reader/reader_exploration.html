@@ -11,10 +11,11 @@
         <a ng-click="initializePage()" class="pull-right">Start again?</a>
         <br><br>
 
-        <div class="oppia-conversation-log previous-log"></div>
-        <div angular-html-bind="html" class="oppia-conversation-log last-log">
-        </div>
-        <div angular-html-bind="oppiaHtml" class="oppia-response" ng-show="oppiaHtml">
+        <div ng-repeat="response in responseLog">
+          <div ng-show="response"
+            class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
+            ng-bind-html-unsafe="response">
+          </div>
         </div>
         <br>
         <div ng-show="finished" class="oppia-response">

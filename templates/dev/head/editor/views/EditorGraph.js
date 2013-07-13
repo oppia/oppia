@@ -21,8 +21,6 @@
 function EditorGraph($scope, $filter, explorationData) {
   $scope.updateViz = function() {
     explorationData.getData().then(function(data) {
-      $scope.graphData = $scope.reformatResponse(
-          data.states, data.init_state_id);
     });
   };
 
@@ -31,91 +29,6 @@ function EditorGraph($scope, $filter, explorationData) {
 
   // Also update the graph when an update event is broadcast.
   $scope.$on('updateViz', $scope.updateViz);
-
-  // Reformat the model into a response that is processable by d3.js.
-  $scope.reformatResponse = function(states, initStateId) {
-    var SENTINEL_DEPTH = 3000;
-    var VERT_OFFSET = 20;
-    var HORIZ_SPACING = 150;
-    var VERT_SPACING = 100;
-    var HORIZ_OFFSET = 100;
-    var nodes = {};
-    nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
-    for (var state in states) {
-      nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
-    }
-    nodes[initStateId].depth = 0;
-
-    var maxDepth = 0;
-    var seenNodes = [initStateId];
-    var queue = [initStateId];
-    var maxXDistPerLevel = {0: HORIZ_OFFSET};
-    nodes[initStateId].y0 = VERT_OFFSET;
-    nodes[initStateId].x0 = HORIZ_OFFSET;
-
-    while (queue.length > 0) {
-      var currNode = queue[0];
-      queue.shift();
-      nodes[currNode].reachable = true;
-      if (currNode in states) {
-        for (var i = 0; i < states[currNode].widget.rules.submit.length; i++) {
-          // Assign levels to nodes only when they are first encountered.
-          if (seenNodes.indexOf(states[currNode].widget.rules.submit[i].dest) == -1) {
-            seenNodes.push(states[currNode].widget.rules.submit[i].dest);
-            nodes[states[currNode].widget.rules.submit[i].dest].depth = nodes[currNode].depth + 1;
-            nodes[states[currNode].widget.rules.submit[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
-            if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
-              maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
-            } else {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = HORIZ_OFFSET;
-              maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
-            }
-            maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
-            queue.push(states[currNode].widget.rules.submit[i].dest);
-          }
-        }
-      }
-    }
-
-    var horizPositionForLastRow = HORIZ_OFFSET;
-    for (var node in nodes) {
-      if (nodes[node].depth == SENTINEL_DEPTH) {
-        nodes[node].depth = maxDepth + 1;
-        nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
-        nodes[node].x0 = horizPositionForLastRow;
-        horizPositionForLastRow += HORIZ_SPACING;
-      }
-    }
-
-    // Assign unique IDs to each node.
-    var idCount = 0;
-    var nodeList = [];
-    for (var node in nodes) {
-      var nodeMap = nodes[node];
-      nodeMap['hashId'] = node;
-      nodeMap['id'] = idCount;
-      nodes[node]['id'] = idCount;
-      idCount++;
-      nodeList.push(nodeMap);
-    }
-
-    var links = [];
-    for (var state in states) {
-      for (var i = 0; i < states[state].widget.rules.submit.length; i++) {
-        links.push({
-            source: nodeList[nodes[state].id],
-            target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
-            name: $filter('parameterizeRule')({
-                rule: states[state].widget.rules.submit[i].rule,
-                inputs: states[state].widget.rules.submit[i].inputs
-            })
-        });
-      }
-    }
-
-    return {nodes: nodeList, links: links, initStateId: initStateId};
-  };
 }
 
 
@@ -136,7 +49,8 @@ oppia.directive('stateGraphViz', function(explorationData) {
     restrict: 'E',
     scope: {
       val: '=',
-      grouped: '='
+      grouped: '=',
+      stats: '='
     },
     link: function(scope, element, attrs) {
       scope.truncate = function(text) {
@@ -148,16 +62,13 @@ oppia.directive('stateGraphViz', function(explorationData) {
       };
 
       var vis = d3.select(element[0]).append('svg:svg')
-          .attr('width', w)
           .attr('height', h)
           .attr('class', 'oppia-graph-viz')
         .append('svg:g')
           .attr('transform', 'translate(20,30)');
 
-      scope.$watch('val', function (newVal, oldVal) {
-        // clear the elements inside of the directive
-        vis.selectAll('*').remove();
 
+      scope.$watch('val', function (newVal, oldVal) {
         // if 'val' is undefined, exit
         if (!newVal) {
           return;
@@ -167,6 +78,17 @@ oppia.directive('stateGraphViz', function(explorationData) {
         var nodes = source.nodes;
         var links = source.links;
         var initStateId = source.initStateId;
+        create(nodes, links, initStateId, scope.stats);
+      });
+
+      scope.$watch('stats', function(newVal, oldVal) {
+        create(scope.val.nodes, scope.val.links, scope.val.initStateId, newVal);
+      });
+
+      function create(nodes, links, initStateId, stats) {
+        // clear the elements inside of the directive
+        vis.selectAll('*').remove();
+
 
         // Update the links
         var link = vis.selectAll('path.link')
@@ -176,14 +98,14 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .data(['arrowhead'])
           .enter().append('svg:marker')
             .attr('id', String)
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 25)
-            .attr('refY', -1.5)
-            .attr('markerWidth', 3)
-            .attr('markerHeight', 3)
+            .attr('viewBox', '0 0 10 10')
+            .attr('refX', 10)
+            .attr('refY', 5)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 4.5)
             .attr('orient', 'auto')
           .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('d', 'M 0 0 L 10 5 L 0 10 z')
             .attr('fill', 'black');
 
         var linkEnter = link.enter().append('svg:g')
@@ -276,6 +198,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
               return '2';
             })
             .style('fill', function(d) {
+              if (stats) {
+                return 'green';
+              }
               if (d.hashId == initStateId) {
                 return 'olive';
               } else if (d.hashId == END_DEST) {
@@ -284,6 +209,22 @@ oppia.directive('stateGraphViz', function(explorationData) {
                 return 'pink';
               } else {
                 return 'beige';
+              }
+            })
+            .style('opacity', function(d) {
+              if (!stats) {
+                return 1;
+              } else {
+                 var percent;
+                 if (d.hashId == END_DEST) {
+                   percent = stats.numCompletions / stats.numVisits;
+                 } else {
+                   percent = stats.stateStats[d.hashId].count / stats.numVisits;
+                 }
+                 if (percent < .05) {
+                   return .05;
+                 }
+                 return percent;
               }
             })
             .on('click', function (d) {
@@ -303,37 +244,38 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('y', function(d) { return d.y0 + 25; })
             .text(function(d) { return scope.truncate(d.name); });
 
+        if (!stats) {
+          // Add a 'delete node' handler.
+          nodeEnter.append('svg:rect')
+              .attr('y', function(d) { return d.y0; })
+              .attr('x', function(d) { return d.x0; })
+              .attr('height', 20)
+              .attr('width', 20)
+              .attr('opacity', 0) // comment out this line to see the delete target
+              .attr('transform', function(d) {
+                return 'translate(' + (getTextWidth(d.name) - 15) + ',' + (+0) + ')'; }
+              )
+              .attr('stroke-width', '0')
+              .style('fill', 'pink')
+              .on('click', function (d) {
+                if (d.hashId == initStateId || d.hashId == END_DEST) {
+                  return;
+                }
+                scope.$parent.$parent.openDeleteStateModal(d.hashId);
+              });
 
-        // Add a 'delete node' handler.
-        nodeEnter.append('svg:rect')
-            .attr('y', function(d) { return d.y0; })
-            .attr('x', function(d) { return d.x0; })
-            .attr('height', 20)
-            .attr('width', 20)
-            .attr('opacity', 0) // comment out this line to see the delete target
-            .attr('transform', function(d) {
-              return 'translate(' + (getTextWidth(d.name) - 15) + ',' + (+0) + ')'; }
-            )
-            .attr('stroke-width', '0')
-            .style('fill', 'pink')
-            .on('click', function (d) {
-              if (d.hashId == initStateId || d.hashId == END_DEST) {
-                return;
-              }
-              scope.$parent.$parent.openDeleteStateModal(d.hashId);
-            });
-
-        nodeEnter.append('svg:text')
-            .attr('text-anchor', 'right')
-            .attr('dx', function(d) { return d.x0 + getTextWidth(d.name) -10; })
-            .attr('dy', function(d) { return d.y0 + 10; })
-            .text(function(d) {
-              if (d.hashId == initStateId || d.hashId == END_DEST) {
-                return;
-              }
-              return 'x';
-            });
-      });
+          nodeEnter.append('svg:text')
+              .attr('text-anchor', 'right')
+              .attr('dx', function(d) { return d.x0 + getTextWidth(d.name) -10; })
+              .attr('dy', function(d) { return d.y0 + 10; })
+              .text(function(d) {
+                if (d.hashId == initStateId || d.hashId == END_DEST) {
+                  return;
+                }
+                return 'x';
+              });
+        }
+      }
     }
   };
 });
