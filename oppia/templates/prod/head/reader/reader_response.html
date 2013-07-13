@@ -1,2 +1,0 @@
-{% if response %} <div class="oppia-reader-response-container"> {% if custom_response %} {{ response | safe }} {% else %} <span class="oppia-reader-response"> {% if response | is_list %} <!-- This allows unicode items in lists to be displayed properly. --> {% if (response | length) == 0 %} None {% else %} <ul> {% for item in response %} <li> {{item}} </li> {% endfor %} </ul> {% endif %} {% else %} {{response}} {% endif %} </span> {% endif %} </div>
-{% endif %}

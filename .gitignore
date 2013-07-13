@@ -1,8 +1,8 @@
 .gitignore
 *~
 *.pyc
+gae_runtime/*
 third_party/*
-templates/prod/*
+oppia/templates/prod/*
 .coverage
 .viminfo
-gae_runtime/*
