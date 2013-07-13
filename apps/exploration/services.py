@@ -248,6 +248,13 @@ def delete_demos():
         exploration.delete()
 
 
+def delete_all_explorations():
+    """Deletes all explorations."""
+    explorations = get_all_explorations()
+    for exploration in explorations:
+        exploration.delete()
+
+
 # Methods for exporting states and explorations to other formats.
 def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):

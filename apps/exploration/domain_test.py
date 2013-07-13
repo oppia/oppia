@@ -58,9 +58,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     def tearDown(self):
         """Deletes all widgets and explorations."""
         InteractiveWidget.delete_all_widgets()
-        explorations = exp_services.get_all_explorations()
-        for exploration in explorations:
-            exploration.delete()
+        exp_services.delete_all_explorations()
         super(ExplorationDomainUnitTests, self).tearDown()
 
     def test_validation(self):

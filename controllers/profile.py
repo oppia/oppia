@@ -45,7 +45,7 @@ class ProfileHandler(BaseHandler):
         if users.is_current_user_admin():
             exps = exp_services.get_all_explorations()
         else:
-            exps = exp_services.get_editable_explorations(self.user)
+            exps = exp_services.get_editable_explorations(self.user_id)
 
         self.values.update({
             'explorations': [{

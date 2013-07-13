@@ -41,9 +41,8 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         """Deletes the dummy users and any other widgets and explorations."""
         # TODO(sll): Add deletion of all users.
         InteractiveWidget.delete_all_widgets()
-        explorations = exp_services.get_all_explorations()
-        for exploration in explorations:
-            exploration.delete()
+        exp_services.delete_all_explorations()
+        super(ExplorationServicesUnitTests, self).tearDown()
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):

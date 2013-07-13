@@ -31,6 +31,16 @@ from apps.widget.models import InteractiveWidget
 class StatisticsUnitTests(test_utils.AppEngineTestBase):
     """Test the statistics models and services."""
 
+    def setUp(self):
+        super(StatisticsUnitTests, self).setUp()
+        self.user_id = 'fake@user.com'
+        InteractiveWidget.load_default_widgets()
+
+    def tearDown(self):
+        InteractiveWidget.delete_all_widgets()
+        exp_services.delete_all_explorations() 
+        super(StatisticsUnitTests, self).tearDown()
+
     def test_counter_class(self):
         """Test Counter Class."""
         o = Counter()
@@ -48,9 +58,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(o.values, ['The values'])
 
     def test_get_top_ten_improvable_states(self):
-        InteractiveWidget.load_default_widgets()
         exp = Exploration.get(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+            self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
 
@@ -78,9 +87,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['state_id'], exp.init_state_id)
 
     def test_single_default_rule_hit(self):
-        InteractiveWidget.load_default_widgets()
         exp = Exploration.get(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+            self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
 
@@ -97,9 +105,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['state_id'], exp.init_state_id)
 
     def test_no_improvement_flag_hit(self):
-        InteractiveWidget.load_default_widgets()
         exp = Exploration.get(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+            self.user_id, 'exploration', 'category', 'eid'))
 
         init_state = exp.init_state
         init_state.widget.handlers[0].rules = [
@@ -117,9 +124,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
-        InteractiveWidget.load_default_widgets()
         exp = Exploration.get(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+            self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
 
@@ -155,9 +161,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
     def test_two_state_default_hit(self):
         SECOND_STATE = 'State 2'
 
-        InteractiveWidget.load_default_widgets()
         exp = Exploration.get(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+            self.user_id, 'exploration', 'category', 'eid'))
         second_state = exp.add_state(SECOND_STATE)
 
         state_1_id = exp.init_state_id
