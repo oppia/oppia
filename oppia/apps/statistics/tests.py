@@ -41,22 +41,6 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         exp_services.delete_all_explorations() 
         super(StatisticsUnitTests, self).tearDown()
 
-    def test_counter_class(self):
-        """Test Counter Class."""
-        o = Counter()
-        o.name = 'The name'
-        o.value = 2
-        self.assertEqual(o.name, 'The name')
-        self.assertEqual(o.value, 2)
-
-    def test_journal_class(self):
-        """Test Journal Class."""
-        o = Journal()
-        o.name = 'The name'
-        o.values = ['The values']
-        self.assertEqual(o.name, 'The name')
-        self.assertEqual(o.values, ['The values'])
-
     def test_get_top_ten_improvable_states(self):
         exp = Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))

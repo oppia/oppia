@@ -44,38 +44,38 @@ def create_rule_name(rule):
     return name
 
 
-def get_event_key(event_name, key):
+def get_event_id(event_name, eid):
     if event_name == STATS_ENUMS.exploration_visited:
-        return 'e.%s' % key
+        return 'e.%s' % eid
     if event_name == STATS_ENUMS.rule_hit:
-        return 'default.%s' % str(key)
+        return 'default.%s' % eid
     if event_name == STATS_ENUMS.exploration_completed:
-        return 'c.%s' % key
+        return 'c.%s' % eid
     if event_name == STATS_ENUMS.feedback_submitted:
-        return 'f.%s' % key
+        return 'f.%s' % eid
     if event_name == STATS_ENUMS.state_hit:
-        return 's.%s' % str(key)
+        return 's.%s' % eid
 
 
 class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def _record_event(cls, event_name, key, extra_info=''):
+    def _record_event(cls, event_name, eid, extra_info=''):
         """Updates statistics based on recorded events."""
 
-        event_key = get_event_key(event_name, key)
+        event_id = get_event_id(event_name, eid)
 
         if event_name == STATS_ENUMS.exploration_visited:
-            cls._inc(event_key)
+            cls._inc(event_id)
         if event_name == STATS_ENUMS.rule_hit:
-            cls._add(event_key, unicode(extra_info))
+            cls._add(event_id, unicode(extra_info))
         if event_name == STATS_ENUMS.exploration_completed:
-            cls._inc(event_key)
+            cls._inc(event_id)
         if event_name == STATS_ENUMS.feedback_submitted:
-            cls._add(event_key, unicode(extra_info))
+            cls._add(event_id, unicode(extra_info))
         if event_name == STATS_ENUMS.state_hit:
-            cls._inc(event_key)
+            cls._inc(event_id)
 
     @classmethod
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
@@ -109,20 +109,20 @@ class EventHandler(object):
                           (exploration_id, state_id))
 
     @classmethod
-    def _inc(cls, event_key):
-        """Increments the counter corresponding to an event key."""
-        counter = Counter.get_or_insert(event_key, name=event_key)
+    def _inc(cls, event_id):
+        """Increments the counter corresponding to an event id."""
+        counter = Counter.get(event_id, strict=False)
         if not counter:
-            counter = Counter(id=event_key, name=event_key)
+            counter = Counter(id=event_id)
         counter.value += 1
         counter.put()
 
     @classmethod
-    def _add(cls, event_key, value):
-        """Adds to the list corresponding to an event key."""
-        journal = Journal.get_or_insert(event_key, name=event_key)
+    def _add(cls, event_id, value):
+        """Adds to the list corresponding to an event id."""
+        journal = Journal.get(event_id, strict=False)
         if not journal:
-            journal = Journal(id=event_key, name=event_key)
+            journal = Journal(id=event_id)
         journal.values.append(value)
         journal.put()
 
@@ -131,18 +131,12 @@ def get_exploration_stats(event_name, exploration_id):
     """Retrieves statistics for the given event name and exploration id."""
 
     if event_name == STATS_ENUMS.exploration_visited:
-        event_key = get_event_key(event_name, exploration_id)
-        counter = Counter.get_by_id(event_key)
-        if not counter:
-            return 0
-        return counter.value
+        event_id = get_event_id(event_name, exploration_id)
+        return Counter.get_value_by_id(event_id)
 
     if event_name == STATS_ENUMS.exploration_completed:
-        event_key = get_event_key(event_name, exploration_id)
-        counter = Counter.get_by_id(event_key)
-        if not counter:
-            return 0
-        return counter.value
+        event_id = get_event_id(event_name, exploration_id)
+        return Counter.get_value_by_id(event_id)
 
     if event_name == STATS_ENUMS.rule_hit:
         result = {}
@@ -157,20 +151,14 @@ def get_exploration_stats(event_name, exploration_id):
             for handler in state.widget.handlers:
                 for rule in handler.rules:
                     rule_name = create_rule_name(rule)
-                    event_key = get_event_key(
+                    event_id = get_event_id(
                         event_name, '.'.join(
                             [exploration_id, state.id, rule_name]))
 
-                    journal = Journal.get_by_id(event_key)
-
-                    if journal:
-                        top_ten = collections.Counter(
-                            journal.values).most_common(10)
-                    else:
-                        top_ten = []
-
+                    journal = Journal.get(event_id, strict=False)
                     result[state.id]['rules'][rule_name] = {
-                        'answers': top_ten,
+                        'answers': collections.Counter(
+                            journal.values).most_common(10) if journal else [],
                     }
 
         return result
@@ -181,18 +169,12 @@ def get_exploration_stats(event_name, exploration_id):
         exploration = Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
-            event_key = get_event_key(
+            event_id = get_event_id(
                 event_name, '.'.join([exploration_id, state.id]))
-
-            counter = Counter.get_by_id(event_key)
-            if not counter:
-                count = 0
-            else:
-                count = counter.value
 
             result[state.id] = {
                 'name': state.name,
-                'count': count,
+                'count': Counter.get_value_by_id(event_id),
             }
         return result
 
@@ -205,21 +187,18 @@ def get_top_ten_improvable_states(explorations):
             state_key = '%s.%s' % (exploration.id, state.id)
 
             # Get count of how many times the state was hit
-            event_key = get_event_key(STATS_ENUMS.state_hit, state_key)
-            all_count = Counter.get_value_by_id(event_key)
+            event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
+            all_count = Counter.get_value_by_id(event_id)
             if all_count == 0:
                 continue
 
             # Count the number of times the default rule was hit.
-            event_key = get_event_key(
+            event_id = get_event_id(
                 STATS_ENUMS.rule_hit, '%s.Default' % state_key)
-            default_count = Journal.get_value_count_by_id(event_key)
-            journal = Journal.get_by_id(event_key)
-            if journal:
-                top_default_answers = collections.Counter(
-                    journal.values).most_common(5)
-            else:
-                top_default_answers = []
+            default_count = Journal.get_value_count_by_id(event_id)
+            journal = Journal.get(event_id, strict=False)
+            top_default_answers = collections.Counter(
+                journal.values).most_common(5) if journal else []
 
             # Count the number of times an answer was submitted, regardless
             # of which rule it hits.
@@ -227,11 +206,11 @@ def get_top_ten_improvable_states(explorations):
             for handler in state.widget.handlers:
                 for rule in handler.rules:
                     rule_name = create_rule_name(rule)
-                    event_key = get_event_key(
+                    event_id = get_event_id(
                         STATS_ENUMS.rule_hit, '%s.%s' %
                         (state_key, rule_name))
                     completed_count += Journal.get_value_count_by_id(
-                        event_key)
+                        event_id)
 
             incomplete_count = all_count - completed_count
 

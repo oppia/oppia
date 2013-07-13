@@ -16,16 +16,16 @@
 
 Invoke this test script from the command line by running
 
-    python tests/suite.py
+    python oppia/tests/suite.py
 
-from the innermost oppia folder.
+from the root folder.
 
 Optionally, you can append a path to run tests in a particular
 subdirectory, e.g.:
 
-    python tests/suite.py --test_path='controllers'
+    python oppia/tests/suite.py --test_path='oppia/controllers'
 
-runs all tests in the controllers/ directory.
+runs all tests in the oppia/controllers/ directory.
 """
 
 __author__ = 'Sean Lip'
@@ -35,7 +35,7 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 79
+EXPECTED_TEST_COUNT = 77
 
 
 _PARSER = argparse.ArgumentParser()
@@ -60,19 +60,16 @@ def create_test_suites(parsed_args):
 
 def main():
     """Runs the tests."""
-    # TODO(sll): Check if the next dir is valid.
-    sdk_path = os.path.join(
-        os.getcwd(), '..', 'gae_runtime', 'google_appengine_1.7.7',
-        'google_appengine')
-    sys.path.insert(0, sdk_path)
-    sys.path.insert(0, os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..', '..')))
+    # TODO(sll): Check whether the following dirs exist.
+    sys.path.insert(0, os.path.join(
+        os.getcwd(), 'gae_runtime', 'google_appengine_1.7.7',
+        'google_appengine'))
+    sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '../third_party/webtest-1.4.2')))
-    sys.path.append(os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            '../../gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')))
+        os.path.join(os.getcwd(), 'third_party/webtest-1.4.2')))
+    sys.path.append(os.path.abspath(os.path.join(
+        os.getcwd(),
+        'gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')))
 
     import dev_appserver
     dev_appserver.fix_sys_path()

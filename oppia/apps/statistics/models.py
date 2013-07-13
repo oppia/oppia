@@ -18,15 +18,13 @@
 
 __author__ = 'Sean Lip'
 
-from oppia.apps.base_model.models import BaseModel
+from oppia.apps.base_model.models import IdModel
 
 from google.appengine.ext import ndb
 
 
-class Counter(BaseModel):
+class Counter(IdModel):
     """An integer-valued counter."""
-    # The name of the property.
-    name = ndb.StringProperty()
     # The value of the property.
     value = ndb.IntegerProperty(default=0)
     # When this counter was first created.
@@ -35,15 +33,13 @@ class Counter(BaseModel):
     last_updated = ndb.DateTimeProperty(auto_now=True)
 
     @classmethod
-    def get_value_by_id(cls, key):
-        counter = Counter.get_by_id(key)
+    def get_value_by_id(cls, cid):
+        counter = Counter.get(cid, strict=False)
         return counter.value if counter else 0
 
 
-class Journal(BaseModel):
+class Journal(IdModel):
     """A list of values."""
-    # The name of the list
-    name = ndb.StringProperty()
     # The list of values
     values = ndb.StringProperty(repeated=True)
     # When this counter was first created.
@@ -52,6 +48,6 @@ class Journal(BaseModel):
     last_updated = ndb.DateTimeProperty(auto_now=True)
 
     @classmethod
-    def get_value_count_by_id(cls, key):
-        journal = Journal.get_by_id(key)
+    def get_value_count_by_id(cls, jid):
+        journal = Journal.get(jid, strict=False)
         return len(journal.values) if journal else 0
