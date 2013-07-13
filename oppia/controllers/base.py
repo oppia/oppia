@@ -107,7 +107,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
-        return feconf.JINJA_ENV
+        return feconf.OPPIA_JINJA_ENV
 
     def __init__(self, request, response):
         # Set self.request, self.response and self.app.

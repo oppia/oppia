@@ -27,7 +27,7 @@ class EditorViewHandler(BaseHandler):
     def get(self, view_type):
         """Handles GET requests."""
         try:
-            self.response.write(feconf.JINJA_ENV.get_template(
+            self.response.write(self.jinja2_env.get_template(
                 'editor/views/%s.html' % view_type).render({}))
         except:
             raise self.PageNotFoundException
@@ -39,7 +39,7 @@ class TemplateHandler(BaseHandler):
     def get(self, template_type):
         """Handles GET requests."""
         try:
-            self.response.write(feconf.JINJA_ENV.get_template(
+            self.response.write(self.jinja2_env.get_template(
                 'components/%s.html' % template_type).render({}))
         except:
             raise self.PageNotFoundException

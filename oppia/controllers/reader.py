@@ -83,7 +83,7 @@ def parse_content_into_html(content_array, block_number, params=None):
             else:
                 value = content.value
 
-            html += feconf.JINJA_ENV.get_template(
+            html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
                     'type': content.type, 'value': value})
         elif content.type == 'widget':
@@ -94,7 +94,7 @@ def parse_content_into_html(content_array, block_number, params=None):
             widget_dict = json.loads(content.value)
             widget = NonInteractiveWidget.get_with_params(
                 widget_dict['id'], widget_dict['params'])
-            html += feconf.JINJA_ENV.get_template(
+            html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
                     'blockIndex': block_number,
                     'index': widget_counter,
@@ -295,7 +295,7 @@ class FeedbackHandler(BaseHandler):
         response = custom_response if custom_response else answer
         if sticky:
             response = ''
-        values['reader_html'] = feconf.JINJA_ENV.get_template(
+        values['reader_html'] = self.jinja2_env.get_template(
             'reader/reader_response.html').render({
                 'response': response,
                 'custom_response': bool(custom_response),

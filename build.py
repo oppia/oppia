@@ -18,8 +18,8 @@ import os
 import re
 import shutil
 
-HEAD_DIR = 'templates/dev/head/'
-OUT_DIR = 'templates/prod/head/'
+HEAD_DIR = 'oppia/templates/dev/head/'
+OUT_DIR = 'oppia/templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
 CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
     --compilation_level WHITESPACE_ONLY """
@@ -73,8 +73,8 @@ def process_js(filename, target):
 ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
 
-for root in os.listdir(os.path.join(os.getcwd(), 'oppia')):
-    if '.git' in root or 'third_party' in root or 'lib' in root or 'data' in root:
+for root in os.listdir(os.path.join(os.getcwd())):
+    if '.git' in root or 'third_party' in root or 'lib' in root or 'data' in root or 'gae_runtime' in root:
         continue
 
     print 'Processing', os.path.join(os.getcwd(), root)

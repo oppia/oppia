@@ -67,12 +67,6 @@ DEBUG = False
 DEV = (os.environ.get('SERVER_SOFTWARE')
        and os.environ['SERVER_SOFTWARE'].startswith('Development'))
 
-# The directory containing the HTML/JS/CSS templates.
-TEMPLATE_DIR = os.path.join(
-    os.path.dirname(__file__),
-    'oppia/templates/dev/head' if DEV else 'oppia/templates/prod/head'
-)
-
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'oppia/third_party'
 
@@ -96,17 +90,20 @@ OBJECT_JINJA_ENV = jinja2.Environment(
 )
 
 # The jinja environment used for loading frontend templates.
-loader = jinja2.FileSystemLoader(TEMPLATE_DIR)
-JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
+loader = jinja2.FileSystemLoader(os.path.join(
+    os.path.dirname(__file__),
+    'oppia/templates/dev/head' if DEV else 'oppia/templates/prod/head'
+))
+OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
 
 
 def include_js_file(name):
     """Include a raw JS file in the template without evaluating it."""
     assert name.endswith('.js')
-    return jinja2.Markup(loader.get_source(JINJA_ENV, name)[0])
+    return jinja2.Markup(loader.get_source(OPPIA_JINJA_ENV, name)[0])
 
-JINJA_ENV.globals['include_js_file'] = include_js_file
-JINJA_ENV.filters.update({
+OPPIA_JINJA_ENV.globals['include_js_file'] = include_js_file
+OPPIA_JINJA_ENV.filters.update({
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),
 })
