@@ -64,9 +64,6 @@ class Widget(polymodel.PolyModel):
     category = ndb.StringProperty(required=True)
     # The description of the widget.
     description = ndb.TextProperty()
-    # The widget static html template used for the response logging of
-    # interactive widgets.
-    static_template = ndb.TextProperty()
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used within a State.
     params = ParameterProperty(repeated=True)
@@ -78,10 +75,18 @@ class Widget(polymodel.PolyModel):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
 
+    @property
+    def response_template(self):
+        """The template that generates the html to display reader responses."""
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+        return utils.get_file_contents(os.path.join(
+            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
+
     @classmethod
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
-        # TODO(sll): Modify this to handle non-interactive widgets.
         return cls.get_by_id(widget_id)
 
     def put(self):
@@ -156,9 +161,6 @@ class NonInteractiveWidget(Widget):
 
             conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
-            # TODO(sll): Add a check that the template files exist.
-            conf['static_template'] = ''
-
             widget = cls(**conf)
             widget.put()
 
@@ -210,12 +212,6 @@ class InteractiveWidget(Widget):
             conf['id'] = '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
-            # TODO(sll): Add a check that the template files exist.
-            conf['static_template'] = ''
-            static_path = os.path.join(widget_dir, '%s.static.html' % widget_id)
-            if os.path.exists(static_path):
-                conf['static_template'] = utils.get_file_contents(static_path)
-
             widget = cls(**conf)
             widget.put()
 
@@ -244,11 +240,11 @@ class InteractiveWidget(Widget):
         return result
 
     @classmethod
-    def get_raw_static_code(cls, widget_id, params=None):
-        """Gets the static rendering raw code for a parameterized widget."""
+    def get_response_html(cls, widget_id, params=None):
+        """Gets the parameterized HTML for a reader response."""
         # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
         widget = cls.get(widget_id)
-        return utils.parse_with_jinja(widget.static_template, params)
+        return utils.parse_with_jinja(widget.response_template, params)

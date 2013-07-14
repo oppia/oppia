@@ -90,8 +90,13 @@ def parse_with_jinja(string, params, default=''):
     Returns:
       the parsed string, or None if the string could not be parsed.
     """
-    variables = meta.find_undeclared_variables(
-        Environment().parse(string))
+    env = Environment()
+    env.filters.update({
+        'is_list': lambda x: isinstance(x, list),
+        'is_dict': lambda x: isinstance(x, dict),
+    })
+
+    variables = meta.find_undeclared_variables(env.parse(string))
 
     new_params = copy.deepcopy(params)
     for var in variables:
@@ -99,7 +104,7 @@ def parse_with_jinja(string, params, default=''):
             new_params[var] = default
             logging.info('Cannot parse %s fully using %s', string, params)
 
-    return Environment().from_string(string).render(new_params)
+    return env.from_string(string).render(new_params)
 
 
 def parse_dict_with_params(d, params, default=''):

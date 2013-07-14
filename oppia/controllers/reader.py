@@ -275,31 +275,23 @@ class FeedbackHandler(BaseHandler):
             new_state.widget.sticky and
             new_state.widget.widget_id == old_state.widget.widget_id
         )
-        custom_response = ''
+        response = ''
         if not sticky:
             response_params = utils.parse_dict_with_params(
                 old_state.widget.params, old_params)
             response_params['answer'] = old_params['answer']
-            response_params['iframe_content'] = False
-            custom_response = InteractiveWidget.get_raw_static_code(
-                old_state.widget.widget_id, response_params)
 
-            if custom_response:
-                response_params['iframe_content'] = True
-                values['response_iframe'] = (
-                    InteractiveWidget.get_raw_static_code(
-                        old_state.widget.widget_id, response_params)
-                )
+            response_params['iframe_content'] = False
+            response = InteractiveWidget.get_response_html(
+                old_state.widget.widget_id, response_params)
+            response_params['iframe_content'] = True
+            values['response_iframe'] = (
+                InteractiveWidget.get_response_html(
+                    old_state.widget.widget_id, response_params)
+            )
 
         # Append reader's answer.
-        response = custom_response if custom_response else answer
-        if sticky:
-            response = ''
-        values['reader_html'] = self.jinja2_env.get_template(
-            'reader/reader_response.html').render({
-                'response': response,
-                'custom_response': bool(custom_response),
-            })
+        values['reader_html'] = response
 
         if new_state_id != feconf.END_DEST and new_state.widget.widget_id in DEFAULT_ANSWERS:
             values['default_answer'] = DEFAULT_ANSWERS[new_state.widget.widget_id]

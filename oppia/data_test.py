@@ -306,12 +306,12 @@ class WidgetDataUnitTests(DataUnitTest):
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config.yaml file, an html
-            # entry-point file, and (optionally) a static.html and a directory
+            # entry-point file, a response.html file and (optionally) a directory
             # named 'static'.
             dir_contents = os.listdir(widget_dir)
             self.assertLessEqual(len(dir_contents), 4)
 
-            if len(dir_contents) == 3:
+            if len(dir_contents) == 4:
                 self.assertIn('static', dir_contents)
                 static_dir = os.path.join(widget_dir, 'static')
                 self.assertTrue(os.path.isdir(static_dir))
@@ -319,9 +319,11 @@ class WidgetDataUnitTests(DataUnitTest):
             config_filepath = os.path.join(
                 widget_dir, '%s.config.yaml' % widget_id)
             html_entry_point = os.path.join(widget_dir, '%s.html' % widget_id)
+            response_template = os.path.join(widget_dir, 'response.html')
 
             self.assertTrue(os.path.isfile(config_filepath))
             self.assertTrue(os.path.isfile(html_entry_point))
+            self.assertTrue(os.path.isfile(response_template))
 
             # Read the widget configuration from config.yaml.
             with open(config_filepath) as f:

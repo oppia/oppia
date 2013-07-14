@@ -1,0 +1,16 @@
+<div class="oppia-reader-response-container">
+  <span class="oppia-reader-response">
+    <!-- This allows unicode items in lists to be displayed properly. -->
+    {% if (answer | length) == 0 %}
+      None
+    {% else %}
+      <ul style="padding-left: 40px">
+        {% for item in answer %}
+          <li>
+            {{item}}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </span>
+</div>
