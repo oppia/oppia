@@ -39,7 +39,7 @@ fi
 echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
-RUNTIME_HOME=gae_runtime
+RUNTIME_HOME=../gae_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
 THIRD_PARTY_DIR=third_party
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
