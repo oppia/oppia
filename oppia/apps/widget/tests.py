@@ -78,14 +78,14 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
             widget.put()
 
         widget = InteractiveWidget(
-            name='Widget Name', category='Category',
+            id='interactive-widget', name='Widget Name', category='Category',
             handlers=[AnswerHandler()])
         widget.put()
 
     def test_pre_put_validation(self):
         """Test pre-put checks for widget handlers."""
         widget = InteractiveWidget(
-            name='Widget Name', category='Category')
+            id='interactive-widget', name='Widget Name', category='Category')
         widget.handlers = []
         with self.assertRaises(BadValueError):
             widget.put()
@@ -105,7 +105,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
     def test_required_properties(self):
         """Test validation of required widget properties."""
-        widget = InteractiveWidget(name='Widget Name')
+        widget = InteractiveWidget(id='interactive-widget', name='Widget Name')
         with self.assertRaises(BadValueError):
             widget.put()
 

@@ -147,6 +147,15 @@ class Widget(polymodel.PolyModel):
 class NonInteractiveWidget(Widget):
     """A generic non-interactive widget."""
 
+    def _pre_put_hook(self):
+        if not self.id:
+            raise BadValueError('No id specified for widget.')
+
+        # Checks that the id is valid.
+        if not self.id.startswith('%s-' % feconf.NONINTERACTIVE_PREFIX):
+            raise BadValueError(
+                'Invalid id for non-interactive widget: %s' % self.id)
+
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets."""
@@ -178,6 +187,9 @@ class InteractiveWidget(Widget):
     handlers = ndb.StructuredProperty(AnswerHandler, repeated=True)
 
     def _pre_put_hook(self):
+        if not self.id:
+            raise BadValueError('No id specified for widget.')
+
         # Checks that at least one handler exists.
         if not self.handlers:
             raise BadValueError(
@@ -189,6 +201,11 @@ class InteractiveWidget(Widget):
             raise BadValueError(
                 'There are duplicate names in the handler for widget %s'
                 % self.id)
+
+        # Checks that the id is valid.
+        if not self.id.startswith('%s-' % feconf.INTERACTIVE_PREFIX):
+            raise BadValueError(
+                'Invalid id for interactive widget: %s' % self.id)
 
     def _get_handler(self, handler_name):
         """Get the handler object corresponding to a given handler name."""
