@@ -73,19 +73,19 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
     def test_put_method(self):
         """Test that put() only works when called on a Widget subclass."""
         widget = Widget(
-            name='Widget Name', category='Category', template='Template')
+            name='Widget Name', category='Category')
         with self.assertRaises(NotImplementedError):
             widget.put()
 
         widget = InteractiveWidget(
-            name='Widget Name', category='Category', template='Template',
+            name='Widget Name', category='Category',
             handlers=[AnswerHandler()])
         widget.put()
 
     def test_pre_put_validation(self):
         """Test pre-put checks for widget handlers."""
         widget = InteractiveWidget(
-            name='Widget Name', category='Category', template='Template')
+            name='Widget Name', category='Category')
         widget.handlers = []
         with self.assertRaises(BadValueError):
             widget.put()
@@ -110,10 +110,6 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
             widget.put()
 
         widget.category = 'Category'
-        with self.assertRaises(BadValueError):
-            widget.put()
-
-        widget.template = 'Template'
         with self.assertRaises(BadValueError):
             widget.put()
 
@@ -151,7 +147,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         parameterized_widget_dict = InteractiveWidget.get_with_params(
             MUSIC_STAFF_ID, {'noteToGuess': 'abc'})
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
-            'id', 'name', 'category', 'description', 'template',
+            'id', 'name', 'category', 'description',
             'static_template', 'params', 'handlers', 'raw'])
         self.assertEqual(parameterized_widget_dict['id'], MUSIC_STAFF_ID)
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');',

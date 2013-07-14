@@ -64,14 +64,19 @@ class Widget(polymodel.PolyModel):
     category = ndb.StringProperty(required=True)
     # The description of the widget.
     description = ndb.TextProperty()
-    # The widget html template (this is the entry point).
-    template = ndb.TextProperty(required=True)
     # The widget static html template used for the response logging of
     # interactive widgets.
     static_template = ndb.TextProperty()
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used within a State.
     params = ParameterProperty(repeated=True)
+
+    @property
+    def template(self):
+        """The template used to generate the widget html."""
+        widget_type, widget_id = self.id.split('-')
+        return utils.get_file_contents(os.path.join(
+            feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
 
     @classmethod
     def get(cls, widget_id):
@@ -151,9 +156,7 @@ class NonInteractiveWidget(Widget):
 
             conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
-            # TODO(sll): Should this be a template *location* instead?
-            conf['template'] = utils.get_file_contents(
-                os.path.join(widget_dir, '%s.html' % widget_id))
+            # TODO(sll): Add a check that the template files exist.
             conf['static_template'] = ''
 
             widget = cls(**conf)
@@ -207,8 +210,7 @@ class InteractiveWidget(Widget):
             conf['id'] = '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id)
             conf['params'] = [Parameter(**param) for param in conf['params']]
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
-            conf['template'] = utils.get_file_contents(
-                os.path.join(widget_dir, '%s.html' % widget_id))
+            # TODO(sll): Add a check that the template files exist.
             conf['static_template'] = ''
             static_path = os.path.join(widget_dir, '%s.static.html' % widget_id)
             if os.path.exists(static_path):
@@ -250,4 +252,3 @@ class InteractiveWidget(Widget):
 
         widget = cls.get(widget_id)
         return utils.parse_with_jinja(widget.static_template, params)
-

@@ -77,6 +77,7 @@ TESTS_DATA_DIR = 'oppia/tests/data'
 SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_IMAGES_DIR = 'data/images'
+WIDGETS_DIR = 'data/widgets'
 INTERACTIVE_WIDGETS_DIR = 'data/widgets/interactive'
 NONINTERACTIVE_WIDGETS_DIR = 'data/widgets/noninteractive'
 
@@ -89,13 +90,13 @@ OBJECT_JINJA_ENV = jinja2.Environment(
         os.path.dirname(__file__), OBJECT_TEMPLATES_DIR))
 )
 
+
 # The jinja environment used for loading frontend templates.
 loader = jinja2.FileSystemLoader(os.path.join(
     os.path.dirname(__file__),
     'oppia/templates/dev/head' if DEV else 'oppia/templates/prod/head'
 ))
 OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
-
 
 def include_js_file(name):
     """Include a raw JS file in the template without evaluating it."""
@@ -107,6 +108,7 @@ OPPIA_JINJA_ENV.filters.update({
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),
 })
+
 
 END_DEST = 'END'
 
