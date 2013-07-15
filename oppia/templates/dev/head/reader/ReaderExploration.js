@@ -46,7 +46,6 @@
   $scope.answerIsBeingProcessed = false;
 
   $scope.loadPage = function(data) {
-    $scope.answer = data.default_answer;
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
@@ -55,7 +54,7 @@
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
-    $scope.widgets = data.widgets;
+    $scope.iframeOutput = data.iframe_output;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
 
@@ -64,10 +63,11 @@
     $scope.$apply();
     $scope.updateMath();
 
-    for (var i = 0; i < data.widgets.length; i++) {
+    for (var i = 0; i < $scope.iframeOutput.length; i++) {
       $scope.addContentToIframeWithId(
-        'widgetCompiled' + data.widgets[i].blockIndex + '-' + data.widgets[i].index,
-        data.widgets[i].raw);
+        'widgetCompiled' + $scope.iframeOutput[i].blockIndex +
+            '-' + $scope.iframeOutput[i].index,
+        $scope.iframeOutput[i].raw);
     }
   };
 
@@ -109,16 +109,19 @@
     $scope.params = data.params;
 
     $scope.responseLog = $scope.responseLog || [];
-    $scope.responseLog.push(data.reader_html, data.oppia_html);
+    $scope.responseLog.push(data.reader_response_html, data.oppia_html);
 
-    for (var i = 0; i < data.widgets.length; i++) {
-      $scope.widgets.push(data.widgets[i]);
+    for (var i = 0; i < data.iframe_output.length; i++) {
+      $scope.iframeOutput.push(data.iframe_output[i]);
     }
 
-    $scope.answer = data.default_answer;
     // We need to generate the HTML (with the iframe) before populating it.
-    if (!data.sticky_interactive_widget) {
+    if ($scope.inputTemplate) {
+      // A non-empty interactive_widget_html means that the previous widget
+      // is not sticky and should be replaced.
       $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
+    } else if ($scope.finished) {
+      $scope.addContentToIframeWithId('inputTemplate', '');
     }
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -126,11 +129,12 @@
     $scope.$apply();
     $scope.updateMath();
 
-    // TODO(sll): Can this be done without forcing a reload of all the existing widgets?
-    for (var i = 0; i < $scope.widgets.length; i++) {
+    // TODO(sll): Can this be done without forcing a reload of all the existing iframes?
+    for (var i = 0; i < $scope.iframeOutput.length; i++) {
       $scope.addContentToIframeWithId(
-        'widgetCompiled' + $scope.widgets[i].blockIndex + '-' + $scope.widgets[i].index,
-        $scope.widgets[i].raw);
+        'widgetCompiled' + $scope.iframeOutput[i].blockIndex +
+            '-' + $scope.iframeOutput[i].index,
+        $scope.iframeOutput[i].raw);
     }
 
     if (data.response_iframe) {

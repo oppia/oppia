@@ -30,7 +30,6 @@ import feconf
 import utils
 
 READER_MODE = 'reader'
-DEFAULT_ANSWERS = {'NumericInput': 0, 'SetInput': {}, 'TextInput': ''}
 
 
 def get_params(state, existing_params=None):
@@ -170,11 +169,8 @@ class ExplorationHandler(BaseHandler):
             'params': params,
             'state_id': exploration.init_state_id,
             'title': exploration.title,
-            'widgets': init_widgets,
+            'iframe_output': init_widgets,
         })
-        if init_state.widget.widget_id in DEFAULT_ANSWERS:
-            self.values['default_answer'] = (
-                DEFAULT_ANSWERS[init_state.widget.widget_id])
         self.render_json(self.values)
 
         EventHandler.record_exploration_visited(exploration_id)
@@ -184,7 +180,7 @@ class ExplorationHandler(BaseHandler):
 class FeedbackHandler(BaseHandler):
     """Handles feedback to readers."""
 
-    def _append_feedback(self, feedback, html_output, widget_output,
+    def _append_feedback(self, feedback, html_output, iframe_output,
                          block_number, params):
         """Appends Oppia's feedback to the output variables."""
         feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
@@ -192,8 +188,8 @@ class FeedbackHandler(BaseHandler):
             [Content(type='text', value='<br>'.join(feedback_bits))],
             block_number, params)
         html_output += action_html
-        widget_output += action_widgets
-        return html_output, widget_output
+        iframe_output += action_widgets
+        return html_output, iframe_output
 
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
@@ -208,115 +204,121 @@ class FeedbackHandler(BaseHandler):
         handler = self.payload.get('handler')
         # The 0-based index of the last content block already on the page.
         block_number = self.payload.get('block_number') + 1
+        # Parameters associated with the reader.
+        old_params = self.payload.get('params', {})
+        old_params['answer'] = answer
 
-        params = self.payload.get('params', {})
-        params['answer'] = answer
-
-        rule = old_state.classify(handler, answer, params)
-        new_state_id = rule.dest
+        rule = old_state.classify(handler, answer, old_params)
         feedback = rule.get_feedback_string()
+        new_state_id = rule.dest
+        if new_state_id == feconf.END_DEST:
+            new_state = None
+        else:
+            new_state = exploration.get_state_by_id(new_state_id)
 
-        recorded_answer = answer
-        # TODO(sll): This is a special case for multiple-choice input
-        # which should really be handled generically.
-        if old_state.widget.widget_id == 'interactive-MultipleChoiceInput':
-            recorded_answer = old_state.widget.params['choices'][int(answer)]
+        # If the new state widget is the same as the old state widget, and the
+        # new state widget is sticky, do not render the reader response. The
+        # interactive widget in the frontend should take care of this.
+        # TODO(sll): This special-casing is not great; we should
+        # make the interface for updating the frontend more generic so that
+        # all the updates happen in the same place. Perhaps in the non-sticky
+        # case we should call a frontend method named appendFeedback() or
+        # similar.
+        sticky = (
+            new_state_id != feconf.END_DEST and
+            new_state.widget.sticky and
+            new_state.widget.widget_id == old_state.widget.widget_id
+        )
 
-        if recorded_answer is not None:
-            recorded_answer = json.dumps(recorded_answer)
+        # Append the reader's answer to the statistics log.
+        # TODO(sll): Parse this using old_params, but do not convert into
+        # a JSON string.
+        recorded_answer_params = old_state.widget.params
+        recorded_answer_params.update({
+            'answer': answer,
+        })
+        recorded_answer = InteractiveWidget.get_stats_log_html(
+            old_state.widget.widget_id, params=recorded_answer_params)
+
+        if recorded_answer:
             EventHandler.record_rule_hit(
                 exploration_id, state_id, rule, recorded_answer)
             # Add this answer to the state's 'unresolved answers' list.
             if recorded_answer not in old_state.unresolved_answers:
                 old_state.unresolved_answers[recorded_answer] = 0
             old_state.unresolved_answers[recorded_answer] += 1
-            # TODO(sll): Make this async?
             old_state.put()
 
-        html_output, widget_output = '', []
-        old_params = params
+        # Append the reader's answer to the response HTML.
+        reader_response_html = ''
+        if not sticky:
+            reader_response_html_params = utils.parse_dict_with_params(
+                old_state.widget.params, old_params)
+            reader_response_html_params.update({
+                'answer': answer,
+                'iframe_content': False
+            })
+            reader_response_html = InteractiveWidget.get_reader_response_html(
+                old_state.widget.widget_id, reader_response_html_params)
 
+            # TODO(sll): Find a better way of getting iframed content to the
+            # frontend without adding a separate attribute to the values dict.
+            # Try and use iframe_output.
+            reader_response_html_params['iframe_content'] = True
+            values['response_iframe'] = (
+                InteractiveWidget.get_reader_response_html(
+                    old_state.widget.widget_id, reader_response_html_params)
+            )
+        values['reader_response_html'] = reader_response_html
+
+        html_output, iframe_output = '', []
+        values['interactive_widget_html'] = ''
+
+        # Add Oppia's feedback to the response HTML.
+        if feedback:
+            html_output, iframe_output = self._append_feedback(
+                feedback, html_output, iframe_output, block_number,
+                old_params)
+
+        # Add the content for the new state to the response HTML.
         if new_state_id == feconf.END_DEST:
-            # This leads to a FINISHED state.
-            new_state = None
-            if feedback:
-                html_output, widget_output = self._append_feedback(
-                    feedback, html_output, widget_output, block_number,
-                    old_params)
             EventHandler.record_exploration_completed(exploration_id)
         else:
-            new_state = exploration.get_state_by_id(new_state_id)
             EventHandler.record_state_hit(exploration_id, new_state_id)
 
-            if feedback:
-                html_output, widget_output = self._append_feedback(
-                    feedback, html_output, widget_output, block_number,
-                    old_params)
-
             # Populate new parameters.
-            params = get_params(new_state, existing_params=old_params)
+            new_params = get_params(new_state, existing_params=old_params)
+
             # Append text for the new state only if the new and old states
             # differ.
             if old_state.id != new_state.id:
                 state_html, state_widgets = parse_content_into_html(
-                    new_state.content, block_number, params)
-                # Separate text for the new state and feedback for the old state
-                # by an additional line.
-                if state_html and feedback:
+                    new_state.content, block_number, new_params)
+
+                if html_output and state_html:
                     html_output += '<br>'
                 html_output += state_html
-                widget_output += state_widgets
 
-        # Render the response in the customized html if
-        # - the response is not rendered in the sticky interactive widget, and
-        # - there is a static rendering html provided for that widget.
-        sticky = (
-            new_state_id != feconf.END_DEST and
-            new_state.widget.sticky and
-            new_state.widget.widget_id == old_state.widget.widget_id
-        )
-        response = ''
-        if not sticky:
-            response_params = utils.parse_dict_with_params(
-                old_state.widget.params, old_params)
-            response_params['answer'] = old_params['answer']
+                iframe_output += state_widgets
 
-            response_params['iframe_content'] = False
-            response = InteractiveWidget.get_response_html(
-                old_state.widget.widget_id, response_params)
-            response_params['iframe_content'] = True
-            values['response_iframe'] = (
-                InteractiveWidget.get_response_html(
-                    old_state.widget.widget_id, response_params)
-            )
-
-        # Append reader's answer.
-        values['reader_html'] = response
-
-        if new_state_id != feconf.END_DEST and new_state.widget.widget_id in DEFAULT_ANSWERS:
-            values['default_answer'] = DEFAULT_ANSWERS[new_state.widget.widget_id]
-        values['state_id'] = new_state_id
-        values.update({
-            'exploration_id': exploration_id,
-            'oppia_html': html_output, 'widgets': widget_output,
-            'block_number': block_number, 'params': params,
-            'finished': (new_state_id == feconf.END_DEST),
-        })
-
-        if new_state_id != feconf.END_DEST:
-            if sticky:
-                values['interactive_widget_html'] = ''
-                values['sticky_interactive_widget'] = True
-            else:
+            if not sticky:
                 values['interactive_widget_html'] = (
                     InteractiveWidget.get_raw_code(
                         new_state.widget.widget_id,
                         params=utils.parse_dict_with_params(
-                            new_state.widget.params, params)
+                            new_state.widget.params, new_params)
                     )
                 )
-        else:
-            values['interactive_widget_html'] = ''
+
+        values.update({
+            'exploration_id': exploration_id,
+            'state_id': new_state_id,
+            'oppia_html': html_output,
+            'iframe_output': iframe_output,
+            'block_number': block_number,
+            'params': {} if new_state_id == feconf.END_DEST else new_params,
+            'finished': (new_state_id == feconf.END_DEST),
+        })
 
         self.render_json(values)
 

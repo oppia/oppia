@@ -8,6 +8,7 @@ text.config(function($interpolateProvider) {
 
 function TextInput($scope) {
   $scope.placeholder = GLOBALS.placeholder;
+  $scope.answer = '';
 
   $scope.submitAnswer = function(answer) {
     if (!answer) {

@@ -84,6 +84,20 @@ class Widget(polymodel.PolyModel):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
 
+    @property
+    def stats_log_template(self):
+        """The template for reader responses in the stats log."""
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+
+        try:
+            return utils.get_file_contents(os.path.join(
+                feconf.WIDGETS_DIR, widget_type, widget_id,
+                'stats_response.html'))
+        except IOError:
+            return '{{answer}}'
+
     @classmethod
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
@@ -257,7 +271,7 @@ class InteractiveWidget(Widget):
         return result
 
     @classmethod
-    def get_response_html(cls, widget_id, params=None):
+    def get_reader_response_html(cls, widget_id, params=None):
         """Gets the parameterized HTML for a reader response."""
         # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
@@ -265,3 +279,13 @@ class InteractiveWidget(Widget):
 
         widget = cls.get(widget_id)
         return utils.parse_with_jinja(widget.response_template, params)
+
+    @classmethod
+    def get_stats_log_html(cls, widget_id, params=None):
+        """Gets the HTML for recording a reader response for the stats log."""
+        # TODO(kashida): Make this consistent with get_raw_code.
+        if params is None:
+            params = {}
+
+        widget = cls.get(widget_id)
+        return utils.parse_with_jinja(widget.stats_log_template, params)
