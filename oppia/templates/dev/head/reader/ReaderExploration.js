@@ -49,7 +49,7 @@
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
-    $scope.inputTemplate = data.interactive_widget_html;
+    $scope.inputTemplate = data.interactive_html;
     $scope.responseLog = [data.oppia_html];
     $scope.params = data.params;
     $scope.stateId = data.state_id;
@@ -102,7 +102,7 @@
 
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
-    $scope.inputTemplate = data.interactive_widget_html;
+    $scope.inputTemplate = data.interactive_html;
     $scope.stateId = data.state_id;
     $scope.finished = data.finished;
 
@@ -117,7 +117,7 @@
 
     // We need to generate the HTML (with the iframe) before populating it.
     if ($scope.inputTemplate) {
-      // A non-empty interactive_widget_html means that the previous widget
+      // A non-empty interactive_html means that the previous widget
       // is not sticky and should be replaced.
       $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
     } else if ($scope.finished) {
