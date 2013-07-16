@@ -75,29 +75,6 @@ class Widget(polymodel.PolyModel):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
 
-    @property
-    def response_template(self):
-        """The template that generates the html to display reader responses."""
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
-        return utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
-
-    @property
-    def stats_log_template(self):
-        """The template for reader responses in the stats log."""
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
-
-        try:
-            return utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, widget_type, widget_id,
-                'stats_response.html'))
-        except IOError:
-            return '{{answer}}'
-
     @classmethod
     def get(cls, widget_id):
         """Gets a widget by id. If it does not exist, returns None."""
@@ -225,6 +202,38 @@ class InteractiveWidget(Widget):
         """Get the handler object corresponding to a given handler name."""
         return next((h for h in self.handlers if h.name == handler_name), None)
 
+    @property
+    def response_template_and_iframe(self):
+        """The template that generates the html to display reader responses."""
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+        html = utils.get_file_contents(os.path.join(
+            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
+
+        try:
+            iframe = utils.get_file_contents(os.path.join(
+                feconf.WIDGETS_DIR, widget_type, widget_id,
+                'response_iframe.html'))
+        except IOError:
+            iframe = ''
+
+        return html, iframe
+
+    @property
+    def stats_log_template(self):
+        """The template for reader responses in the stats log."""
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+
+        try:
+            return utils.get_file_contents(os.path.join(
+                feconf.WIDGETS_DIR, widget_type, widget_id,
+                'stats_response.html'))
+        except IOError:
+            return '{{answer}}'
+
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets.
@@ -272,13 +281,16 @@ class InteractiveWidget(Widget):
 
     @classmethod
     def get_reader_response_html(cls, widget_id, params=None):
-        """Gets the parameterized HTML for a reader response."""
+        """Gets the parameterized HTML and iframes for a reader response."""
         # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
         widget = cls.get(widget_id)
-        return utils.parse_with_jinja(widget.response_template, params)
+        html, iframe = widget.response_template_and_iframe
+        html = utils.parse_with_jinja(html, params)
+        iframe = utils.parse_with_jinja(iframe, params)
+        return html, iframe
 
     @classmethod
     def get_stats_log_html(cls, widget_id, params=None):

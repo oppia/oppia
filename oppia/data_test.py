@@ -307,9 +307,10 @@ class WidgetDataUnitTests(DataUnitTest):
 
             # In this directory there should only be a config.yaml file, an html
             # entry-point file, a response.html file, (optionally) a directory
-            # named 'static' and (optionally) a stats_response.html file.
+            # named 'static', (optionally) a response_iframe.html file and
+            # (optionally) a stats_response.html file.
             dir_contents = os.listdir(widget_dir)
-            self.assertLessEqual(len(dir_contents), 5)
+            self.assertLessEqual(len(dir_contents), 6)
 
             has_static_dir = False
             try:
@@ -329,8 +330,18 @@ class WidgetDataUnitTests(DataUnitTest):
             except Exception:
                 pass
 
+            has_response_iframe_file = False
+            response_iframe_template = os.path.join(
+                widget_dir, 'response_iframe.html')
+            try:
+                self.assertTrue(os.path.isfile(response_iframe_template))
+                has_response_iframe_file = True
+            except Exception:
+                pass
+
             self.assertEqual(
-                int(has_static_dir) + int(has_stats_response_file) + 3,
+                int(has_static_dir) + int(has_stats_response_file) +
+                    int(has_response_iframe_file) + 3,
                 len(dir_contents)
             )
 

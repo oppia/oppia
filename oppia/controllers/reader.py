@@ -201,19 +201,15 @@ class FeedbackHandler(BaseHandler):
             old_state.unresolved_answers[recorded_answer] += 1
             old_state.put()
 
-    def _append_feedback(self, feedback, html_output, iframe_output,
-                         block_number, params):
-        """Appends Oppia's feedback to the output variables."""
+    def _get_feedback(self, feedback, block_number, params):
+        """Gets the HTML and iframes with Oppia's feedback."""
         if not feedback:
-            return html_output, iframe_output
-
-        feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-        action_html, action_widgets = parse_content_into_html(
-            [Content(type='text', value='<br>'.join(feedback_bits))],
-            block_number, params)
-        html_output += action_html
-        iframe_output += action_widgets
-        return html_output, iframe_output
+            return '', []
+        else:
+            feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
+            return parse_content_into_html(
+                [Content(type='text', value='<br>'.join(feedback_bits))],
+                block_number, params)
 
     def _append_content(self, sticky, finished, old_params, new_state,
                         block_number, state_has_changed, html_output,
@@ -271,6 +267,8 @@ class FeedbackHandler(BaseHandler):
         else:
             new_state = exploration.get_state_by_id(new_state_id)
 
+        EventHandler.record_state_hit(exploration_id, new_state_id)
+
         # If the new state widget is the same as the old state widget, and the
         # new state widget is sticky, do not render the reader response. The
         # interactive widget in the frontend should take care of this.
@@ -290,36 +288,20 @@ class FeedbackHandler(BaseHandler):
 
         # Append the reader's answer to the response HTML.
         reader_response_html = ''
+        reader_response_iframe = ''
         if not sticky:
-            reader_response_html_params = utils.parse_dict_with_params(
-                old_state.widget.params, old_params)
-            reader_response_html_params.update({
-                'answer': answer,
-                'iframe_content': False
-            })
-            reader_response_html = InteractiveWidget.get_reader_response_html(
-                old_state.widget.widget_id, reader_response_html_params)
-
-            # TODO(sll): Find a better way of getting iframed content to the
-            # frontend without adding a separate attribute to the values dict.
-            # Try and use iframe_output.
-            reader_response_html_params['iframe_content'] = True
-            values['response_iframe'] = (
+            reader_response_html, reader_response_iframe = (
                 InteractiveWidget.get_reader_response_html(
-                    old_state.widget.widget_id, reader_response_html_params)
+                    old_state.widget.widget_id,
+                    utils.parse_dict_with_params(
+                        old_state.widget.params, old_params))
             )
         values['reader_response_html'] = reader_response_html
-
-        html_output, iframe_output = '', []
+        values['reader_response_iframe'] = reader_response_iframe
 
         # Add Oppia's feedback to the response HTML.
-        html_output, iframe_output = self._append_feedback(
-            feedback, html_output, iframe_output, block_number, old_params)
-
-        if new_state_id == feconf.END_DEST:
-            EventHandler.record_exploration_completed(exploration_id)
-        else:
-            EventHandler.record_state_hit(exploration_id, new_state_id)
+        html_output, iframe_output = self._get_feedback(
+            feedback, block_number, old_params)
 
         # Add the content for the new state to the response HTML.
         finished = (new_state_id == feconf.END_DEST)

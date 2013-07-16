@@ -19,6 +19,8 @@
 __author__ = 'Sean Lip'
 
 import collections
+
+import feconf
 import utils
 
 from oppia.apps.exploration.domain import Exploration
@@ -91,7 +93,7 @@ class EventHandler(object):
         cls._record_event(STATS_ENUMS.exploration_visited, exploration_id)
 
     @classmethod
-    def record_exploration_completed(cls, exploration_id):
+    def _record_exploration_completed(cls, exploration_id):
         """Records an event when an exploration is completed."""
         cls._record_event(STATS_ENUMS.exploration_completed, exploration_id)
 
@@ -105,8 +107,11 @@ class EventHandler(object):
     @classmethod
     def record_state_hit(cls, exploration_id, state_id):
         """Record an event when a state is loaded."""
-        cls._record_event(STATS_ENUMS.state_hit, '%s.%s' %
-                          (exploration_id, state_id))
+        if state_id == feconf.END_DEST:
+            cls._record_exploration_completed(exploration_id)
+        else:
+            cls._record_event(STATS_ENUMS.state_hit, '%s.%s' %
+                              (exploration_id, state_id))
 
     @classmethod
     def _inc(cls, event_id):

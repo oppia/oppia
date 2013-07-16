@@ -137,13 +137,13 @@
         $scope.iframeOutput[i].raw);
     }
 
-    if (data.response_iframe) {
+    if (data.reader_response_iframe) {
       // The previous user response needs to be rendered in a custom html with
       // an iframe.
       var iframes = document.getElementsByClassName('logContent');
       if (iframes.length) {
         $scope.addContentToIframe(
-            iframes[iframes.length - 1], data.response_iframe);
+            iframes[iframes.length - 1], data.reader_response_iframe);
       }
     }
 
