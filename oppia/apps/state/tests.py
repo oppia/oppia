@@ -17,12 +17,11 @@
 __author__ = 'Jeremy Emerson'
 
 import feconf
+from oppia.apps.exploration import exp_domain
+from oppia.apps.exploration import exp_services
+import oppia.apps.state.models as state_models
+import oppia.apps.widget.models as widget_models
 import test_utils
-
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.state.models import State
-from oppia.apps.widget.models import InteractiveWidget
 
 
 class StateModelUnitTests(test_utils.AppEngineTestBase):
@@ -31,22 +30,22 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets and creates a sample exploration."""
         super(StateModelUnitTests, self).setUp()
-        InteractiveWidget.load_default_widgets()
+        widget_models.InteractiveWidget.load_default_widgets()
 
         self.user_id = 'test@example.com'
 
-        self.exploration = Exploration.get(exp_services.create_new(
+        self.exploration = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'A title', 'A category', 'A exploration_id'))
 
     def tearDown(self):
         """Deletes all widgets and explorations."""
-        InteractiveWidget.delete_all_widgets()
+        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(StateModelUnitTests, self).tearDown()
 
     def test_state_class(self):
         """Test State Class."""
-        state = State(id='The exploration hash id')
+        state = state_models.State(id='The exploration hash id')
 
         # A new state should have a default name property.
         self.assertEqual(state.name, feconf.DEFAULT_STATE_NAME)
@@ -62,7 +61,8 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         fetched_state_1 = self.exploration.get_state_by_id(id_1)
         self.assertEqual(fetched_state_1, state_1)
 
-        fetched_state_by_name_1 = State.get_by_name(name_1, self.exploration)
+        fetched_state_by_name_1 = state_models.State.get_by_name(
+            name_1, self.exploration)
         self.assertEqual(fetched_state_by_name_1, state_1)
 
         # Test the failure cases.
@@ -71,14 +71,15 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         with self.assertRaises(Exception):
             self.exploration.get(id_2)
 
-        fetched_state_by_name_2 = State.get_by_name(
+        fetched_state_by_name_2 = state_models.State.get_by_name(
             name_2, self.exploration, strict=False)
         self.assertIsNone(fetched_state_by_name_2)
         with self.assertRaises(Exception):
-            State.get_by_name(name_2, self.exploration, strict=True)
+            state_models.State.get_by_name(
+                name_2, self.exploration, strict=True)
         # The default behavior is to fail noisily.
         with self.assertRaises(Exception):
-            State.get_by_name(name_2, self.exploration)
+            state_models.State.get_by_name(name_2, self.exploration)
 
     def test_get_id_from_name(self):
         """Test converting state names to ids."""
@@ -87,11 +88,14 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         self.exploration.add_state(name_1, state_id=id_1)
 
         self.assertEqual(
-            State._get_id_from_name(name_1, self.exploration), id_1)
+            state_models.State._get_id_from_name(name_1, self.exploration),
+            id_1
+        )
 
         with self.assertRaises(Exception):
-            State._get_id_from_name('fake_name', self.exploration)
+            state_models.State._get_id_from_name('fake_name', self.exploration)
 
         self.assertEqual(
-            State._get_id_from_name(feconf.END_DEST, self.exploration),
+            state_models.State._get_id_from_name(
+                feconf.END_DEST, self.exploration),
             feconf.END_DEST)

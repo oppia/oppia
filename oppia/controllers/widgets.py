@@ -16,14 +16,13 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import oppia.apps.user.services as user_services
-from oppia.apps.widget.models import InteractiveWidget
-from oppia.apps.widget.models import NonInteractiveWidget
-from oppia.controllers.base import BaseHandler
+from oppia.apps.user import user_services
+import oppia.apps.widget.models as widget_models
+from oppia.controllers import base
 import utils
 
 
-class WidgetRepositoryPage(BaseHandler):
+class WidgetRepositoryPage(base.BaseHandler):
     """Displays the widget repository page."""
 
     def get(self):
@@ -39,12 +38,15 @@ class WidgetRepositoryPage(BaseHandler):
         self.render_template('editor/widget_repository.html')
 
 
-class WidgetRepositoryHandler(BaseHandler):
+class WidgetRepositoryHandler(base.BaseHandler):
     """Provides data to populate the widget repository page."""
 
     def get_widgets(self, widget_class):
         """Load widgets from the datastore."""
-        assert widget_class in [InteractiveWidget, NonInteractiveWidget]
+        assert widget_class in [
+            widget_models.InteractiveWidget,
+            widget_models.NonInteractiveWidget
+        ]
 
         response = {}
 
@@ -64,9 +66,11 @@ class WidgetRepositoryHandler(BaseHandler):
         """Handles GET requests."""
         response = {}
         if self.request.get('interactive') == 'true':
-            response['widgets'] = self.get_widgets(InteractiveWidget)
+            response['widgets'] = self.get_widgets(
+                widget_models.InteractiveWidget)
         else:
-            response['widgets'] = self.get_widgets(NonInteractiveWidget)
+            response['widgets'] = self.get_widgets(
+                widget_models.NonInteractiveWidget)
             parent_index = self.request.get('parent_index')
             if parent_index is None:
                 raise Exception(
@@ -77,7 +81,7 @@ class WidgetRepositoryHandler(BaseHandler):
         self.render_json(response)
 
 
-class NonInteractiveWidgetHandler(BaseHandler):
+class NonInteractiveWidgetHandler(base.BaseHandler):
     """Handles requests relating to interactive widgets."""
     # TODO(sll): Combine this with InteractiveWidgetHandler.
 
@@ -85,7 +89,8 @@ class NonInteractiveWidgetHandler(BaseHandler):
         """Handles GET requests."""
         try:
             self.render_json({
-                'widget': NonInteractiveWidget.get_with_params(widget_id, {}),
+                'widget': widget_models.NonInteractiveWidget.get_with_params(
+                    widget_id, {}),
             })
         except:
             raise self.PageNotFoundException
@@ -110,7 +115,8 @@ class NonInteractiveWidgetHandler(BaseHandler):
         # TODO(sll): In order to unify this with InteractiveWidgetHandler,
         # we need a convention for which params must be JSONified and which
         # should not. Fix this.
-        response = NonInteractiveWidget.get_with_params(widget_id, params)
+        response = widget_models.NonInteractiveWidget.get_with_params(
+            widget_id, params)
 
         self.render_json({
             'widget': response,
@@ -118,14 +124,15 @@ class NonInteractiveWidgetHandler(BaseHandler):
         })
 
 
-class InteractiveWidgetHandler(BaseHandler):
+class InteractiveWidgetHandler(base.BaseHandler):
     """Handles requests relating to interactive widgets."""
 
     def get(self, widget_id):
         """Handles GET requests."""
         try:
             self.render_json({
-                'widget': InteractiveWidget.get_with_params(widget_id, {}),
+                'widget': widget_models.InteractiveWidget.get_with_params(
+                    widget_id, {}),
             })
         except:
             raise self.PageNotFoundException
@@ -147,7 +154,7 @@ class InteractiveWidgetHandler(BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        response = InteractiveWidget.get_with_params(
+        response = widget_models.InteractiveWidget.get_with_params(
             widget_id, params=utils.parse_dict_with_params(
                 params, state_params_dict)
         )

@@ -18,14 +18,14 @@
 
 __author__ = 'Sean Lip'
 
-from oppia.apps.base_model.domain import BaseDomainObject
-from oppia.apps.exploration.models import ExplorationModel
-from oppia.apps.state.models import State
 import feconf
+import oppia.apps.base_model.domain as base_domain
+import oppia.apps.exploration.models as exp_models
+import oppia.apps.state.models as state_models
 
 
 # TODO(sll): Add an anyone-can-edit mode.
-class Exploration(BaseDomainObject):
+class Exploration(base_domain.BaseDomainObject):
     """Domain object for an Oppia exploration.
 
     All methods and properties in this file should be independent of the
@@ -73,7 +73,8 @@ class Exploration(BaseDomainObject):
     @classmethod
     def get(cls, exploration_id, strict=True):
         """Returns a domain object representing an exploration."""
-        exploration_model = ExplorationModel.get(exploration_id, strict=strict)
+        exploration_model = exp_models.ExplorationModel.get(
+            exploration_id, strict=strict)
         if exploration_model is None:
             return None
         return cls(exploration_model)
@@ -143,15 +144,15 @@ class Exploration(BaseDomainObject):
             raise Exception(
                 'Invalid state id %s for exploration %s' % (state_id, self.id))
 
-        return State.get(state_id, strict=strict)
+        return state_models.State.get(state_id, strict=strict)
 
     def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it. Commits changes."""
         if self._has_state_named(state_name):
             raise Exception('Duplicate state name %s' % state_name)
 
-        state_id = state_id or State.get_new_id(state_name)
-        new_state = State(id=state_id, name=state_name)
+        state_id = state_id or state_models.State.get_new_id(state_name)
+        new_state = state_models.State(id=state_id, name=state_name)
         new_state.put()
 
         self.state_ids.append(new_state.id)

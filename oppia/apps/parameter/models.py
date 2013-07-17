@@ -18,8 +18,8 @@ __author__ = 'Sean Lip'
 
 import re
 
-from oppia.apps.base_model.models import BaseModel
-from oppia.apps.types.models import get_object_class
+import oppia.apps.base_model.models as base_models
+import oppia.apps.types.models as types_models
 import utils
 
 from google.appengine.ext import ndb
@@ -34,7 +34,7 @@ class AlphanumericProperty(ndb.StringProperty):
             'Only parameter names with characters in [a-zA-Z0-9] are accepted.')
 
 
-class Parameter(BaseModel):
+class Parameter(base_models.BaseModel):
     """Represents a (multi-valued) parameter.
 
     The 'values' property represents the list of possible default values for
@@ -46,7 +46,7 @@ class Parameter(BaseModel):
     """
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore."""
-        object_class = get_object_class(self.obj_type)
+        object_class = types_models.get_object_class(self.obj_type)
         self.values = [object_class.normalize(value) for value in self.values]
 
     # The name of the parameter.
@@ -71,7 +71,7 @@ class ParameterProperty(ndb.LocalStructuredProperty):
         super(ParameterProperty, self).__init__(Parameter, **kwds)
 
     def _validate(self, val):
-        object_class = get_object_class(val.obj_type)
+        object_class = types_models.get_object_class(val.obj_type)
         return Parameter(
             obj_type=val.obj_type,
             values=[object_class.normalize(value) for value in val.values],
@@ -110,7 +110,7 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
     def _validate(self, val):
         # Parent classes must do validation to check that the object type here
         # matches the object type of the parameter with the corresponding name.
-        object_class = get_object_class(val.obj_type)
+        object_class = types_models.get_object_class(val.obj_type)
         return ParamChange(
             obj_type=val.obj_type, name=val.name,
             values=[object_class.normalize(value) for value in val.values])
@@ -124,7 +124,7 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
             obj_type=val.obj_type, name=val.name, values=val.values)
 
 
-class ParamSet(BaseModel):
+class ParamSet(base_models.BaseModel):
     """A list of parameters."""
     # An ordered list of parameters.
     params = ParameterProperty(repeated=True)

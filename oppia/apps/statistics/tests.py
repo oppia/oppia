@@ -16,16 +16,12 @@
 
 __author__ = 'Jeremy Emerson'
 
+from oppia.apps.exploration import exp_domain
+from oppia.apps.exploration import exp_services
+import oppia.apps.state.models as state_models
+from oppia.apps.statistics import stats_services
+import oppia.apps.widget.models as widget_models
 import test_utils
-
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.state.models import Rule
-from oppia.apps.statistics.models import Counter
-from oppia.apps.statistics.models import Journal
-import oppia.apps.statistics.services as stats_services
-from oppia.apps.statistics.services import EventHandler
-from oppia.apps.widget.models import InteractiveWidget
 
 
 class StatisticsUnitTests(test_utils.AppEngineTestBase):
@@ -34,34 +30,34 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         super(StatisticsUnitTests, self).setUp()
         self.user_id = 'fake@user.com'
-        InteractiveWidget.load_default_widgets()
+        widget_models.InteractiveWidget.load_default_widgets()
 
     def tearDown(self):
-        InteractiveWidget.delete_all_widgets()
-        exp_services.delete_all_explorations() 
+        widget_models.InteractiveWidget.delete_all_widgets()
+        exp_services.delete_all_explorations()
         super(StatisticsUnitTests, self).tearDown()
 
     def test_get_top_ten_improvable_states(self):
-        exp = Exploration.get(exp_services.create_new(
+        exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
 
-        EventHandler.record_rule_hit(
-            'eid', state_id, Rule(name='Default', dest=state_id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
             extra_info='1')
-        EventHandler.record_rule_hit(
-            'eid', state_id, Rule(name='Default', dest=state_id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
             extra_info='2')
-        EventHandler.record_rule_hit(
-            'eid', state_id, Rule(name='Default', dest=state_id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
             extra_info='1')
 
-        EventHandler.record_state_hit('eid', state_id)
-        EventHandler.record_state_hit('eid', state_id)
-        EventHandler.record_state_hit('eid', state_id)
-        EventHandler.record_state_hit('eid', state_id)
-        EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
 
         states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
@@ -71,15 +67,15 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['state_id'], exp.init_state_id)
 
     def test_single_default_rule_hit(self):
-        exp = Exploration.get(exp_services.create_new(
+        exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
 
-        EventHandler.record_rule_hit(
-            'eid', state_id, Rule(name='Default', dest=state_id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
             extra_info='1')
-        EventHandler.record_state_hit('eid', state_id)
+        stats_services.EventHandler.record_state_hit('eid', state_id)
 
         states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 1)
@@ -89,26 +85,27 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['state_id'], exp.init_state_id)
 
     def test_no_improvement_flag_hit(self):
-        exp = Exploration.get(exp_services.create_new(
+        exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
 
         init_state = exp.init_state
         init_state.widget.handlers[0].rules = [
-            Rule(name='NotDefault', dest=init_state.id),
-            Rule(name='Default', dest=init_state.id),
+            state_models.Rule(name='NotDefault', dest=init_state.id),
+            state_models.Rule(name='Default', dest=init_state.id),
         ]
         init_state.put()
 
-        EventHandler.record_rule_hit(
-            'eid', init_state.id, Rule(name='NotDefault', dest=init_state.id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', init_state.id,
+            state_models.Rule(name='NotDefault', dest=init_state.id),
             extra_info='1')
-        EventHandler.record_state_hit('eid', init_state.id)
+        stats_services.EventHandler.record_state_hit('eid', init_state.id)
 
         states = stats_services.get_top_ten_improvable_states([exp])
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
-        exp = Exploration.get(exp_services.create_new(
+        exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
@@ -117,10 +114,10 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         # be classified as incomplete.
 
         for i in range(3):
-            EventHandler.record_state_hit('eid', state_id)
+            stats_services.EventHandler.record_state_hit('eid', state_id)
 
-        EventHandler.record_rule_hit(
-            'eid', state_id, Rule(name='Default', dest=state_id),
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
             extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -132,9 +129,10 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         # as default.
 
         for i in range(2):
-            EventHandler.record_state_hit('eid', state_id)
-            EventHandler.record_rule_hit(
-                'eid', state_id, Rule(name='Default', dest=state_id),
+            stats_services.EventHandler.record_state_hit('eid', state_id)
+            stats_services.EventHandler.record_rule_hit(
+                'eid', state_id,
+                state_models.Rule(name='Default', dest=state_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -145,7 +143,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
     def test_two_state_default_hit(self):
         SECOND_STATE = 'State 2'
 
-        exp = Exploration.get(exp_services.create_new(
+        exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
         second_state = exp.add_state(SECOND_STATE)
 
@@ -154,15 +152,17 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
 
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.
-        EventHandler.record_state_hit('eid', state_1_id)
-        EventHandler.record_rule_hit(
-            'eid', state_1_id, Rule(name='Default', dest=state_1_id),
+        stats_services.EventHandler.record_state_hit('eid', state_1_id)
+        stats_services.EventHandler.record_rule_hit(
+            'eid', state_1_id,
+            state_models.Rule(name='Default', dest=state_1_id),
             extra_info='1')
 
         for i in range(2):
-            EventHandler.record_state_hit('eid', state_2_id)
-            EventHandler.record_rule_hit(
-                'eid', state_2_id, Rule(name='Default', dest=state_2_id),
+            stats_services.EventHandler.record_state_hit('eid', state_2_id)
+            stats_services.EventHandler.record_rule_hit(
+                'eid', state_2_id,
+                state_models.Rule(name='Default', dest=state_2_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -177,9 +177,10 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         # Hit the default rule of state 1 two more times.
 
         for i in range(2):
-            EventHandler.record_state_hit('eid', state_1_id)
-            EventHandler.record_rule_hit(
-                'eid', state_1_id, Rule(name='Default', dest=state_1_id),
+            stats_services.EventHandler.record_state_hit('eid', state_1_id)
+            stats_services.EventHandler.record_rule_hit(
+                'eid', state_1_id,
+                state_models.Rule(name='Default', dest=state_1_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])

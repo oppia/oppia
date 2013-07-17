@@ -16,17 +16,16 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
-import oppia.apps.exploration.services as exp_services
-import oppia.apps.statistics.services as stats_services
-import oppia.apps.user.services as user_services
-from oppia.controllers.base import BaseHandler
-from oppia.controllers.base import require_user
+from oppia.apps.exploration import exp_services
+from oppia.apps.statistics import stats_services
+from oppia.apps.user import user_services
+from oppia.controllers import base
 
 
-class ProfilePage(BaseHandler):
+class ProfilePage(base.BaseHandler):
     """The profile page."""
 
-    @require_user
+    @base.require_user
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -35,10 +34,10 @@ class ProfilePage(BaseHandler):
         self.render_template('profile/profile.html')
 
 
-class ProfileHandler(BaseHandler):
+class ProfileHandler(base.BaseHandler):
     """Provides data for the profile gallery."""
 
-    @require_user
+    @base.require_user
     def get(self):
         """Handles GET requests."""
         if user_services.is_current_user_admin():

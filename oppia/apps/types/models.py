@@ -16,8 +16,8 @@
 
 __author__ = 'Sean Lip'
 
-from oppia.apps.base_model.models import BaseModel
 from data.objects.models import objects
+import oppia.apps.base_model.models as base_models
 
 from google.appengine.ext import ndb
 
@@ -35,7 +35,7 @@ def get_object_class(cls_name):
     return object_class
 
 
-class TypedInstance(BaseModel):
+class TypedInstance(base_models.BaseModel):
     """Represents an instance of a typed object."""
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore.

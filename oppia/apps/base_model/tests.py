@@ -16,9 +16,8 @@
 
 __author__ = 'Sean Lip'
 
+import oppia.apps.base_model.models as base_models
 import test_utils
-
-from oppia.apps.base_model.models import IdModel
 
 
 class IdModelUnitTests(test_utils.AppEngineTestBase):
@@ -33,12 +32,12 @@ class IdModelUnitTests(test_utils.AppEngineTestBase):
     def test_get_error_cases(self):
         """Test the error cases for the get() method."""
 
-        class FakeIdModel(IdModel):
+        class FakeIdModel(base_models.IdModel):
             pass
 
-        with self.assertRaises(IdModel.EntityNotFoundError):
+        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
             FakeIdModel.get('Invalid id')
-        with self.assertRaises(IdModel.EntityNotFoundError):
+        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
             FakeIdModel.get('Invalid id', strict=True)
 
         # The get() method should fail silently when strict == False.

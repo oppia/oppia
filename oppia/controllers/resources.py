@@ -16,12 +16,11 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from oppia.apps.image.models import Image
-from oppia.controllers.base import BaseHandler
-import feconf
+import oppia.apps.image.models as image_models
+from oppia.controllers import base
 
 
-class EditorViewHandler(BaseHandler):
+class EditorViewHandler(base.BaseHandler):
     """Retrieves an editor view in the 'editor/views' directory."""
 
     def get(self, view_type):
@@ -33,7 +32,7 @@ class EditorViewHandler(BaseHandler):
             raise self.PageNotFoundException
 
 
-class TemplateHandler(BaseHandler):
+class TemplateHandler(base.BaseHandler):
     """Retrieves a template for a UI component."""
 
     def get(self, template_type):
@@ -45,7 +44,7 @@ class TemplateHandler(BaseHandler):
             raise self.PageNotFoundException
 
 
-class ImageHandler(BaseHandler):
+class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
     def get(self, image_id):
@@ -55,7 +54,7 @@ class ImageHandler(BaseHandler):
             image_id: string representing the image id.
         """
         try:
-            image = Image.get(image_id)
+            image = image_models.Image.get(image_id)
 
             # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = str('image/%s' % image.format)
@@ -64,14 +63,14 @@ class ImageHandler(BaseHandler):
             raise self.PageNotFoundException
 
 
-class ImageUploadHandler(BaseHandler):
+class ImageUploadHandler(base.BaseHandler):
     """Handles image uploads."""
 
     def post(self):
         """Saves an image uploaded by a content creator."""
         raw = self.request.get('image')
         if raw:
-            image_id = Image.create(raw)
+            image_id = image_models.Image.create(raw)
             self.render_json({'image_id': image_id})
         else:
             raise self.InvalidInputException('No image supplied')

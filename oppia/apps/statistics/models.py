@@ -18,12 +18,12 @@
 
 __author__ = 'Sean Lip'
 
-from oppia.apps.base_model.models import IdModel
+import oppia.apps.base_model.models as base_models
 
 from google.appengine.ext import ndb
 
 
-class Counter(IdModel):
+class Counter(base_models.IdModel):
     """An integer-valued counter."""
     # The value of the property.
     value = ndb.IntegerProperty(default=0)
@@ -38,7 +38,7 @@ class Counter(IdModel):
         return counter.value if counter else 0
 
 
-class Journal(IdModel):
+class Journal(base_models.IdModel):
     """A list of values."""
     # The list of values
     values = ndb.StringProperty(repeated=True)

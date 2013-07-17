@@ -16,20 +16,20 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from oppia.apps.exploration.domain import Exploration
-from oppia.controllers import admin
-from oppia.controllers.base import BaseHandler
 import feconf
-import oppia.apps.user.services as user_services
+from oppia.apps.exploration import exp_domain
+from oppia.apps.user import user_services
+from oppia.controllers import admin
+from oppia.controllers import base
 import utils
 
 
-class MainPage(BaseHandler):
+class MainPage(base.BaseHandler):
     """Main splash page for Oppia."""
 
     def get(self):
         """Handles GET requests."""
-        if not Exploration.get('0', strict=False):
+        if not exp_domain.Exploration.get('0', strict=False):
             admin.reload_demos()
 
         self.values.update({
@@ -38,7 +38,7 @@ class MainPage(BaseHandler):
         self.render_template('pages/index.html')
 
 
-class AboutPage(BaseHandler):
+class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
 
     def get(self):
@@ -51,7 +51,7 @@ class AboutPage(BaseHandler):
         self.render_template('pages/about.html')
 
 
-class TermsPage(BaseHandler):
+class TermsPage(base.BaseHandler):
     """Page with terms and conditions."""
 
     def get(self):

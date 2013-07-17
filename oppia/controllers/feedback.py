@@ -18,11 +18,11 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import urllib
 
-from oppia.apps.statistics.services import EventHandler
-from oppia.controllers.base import BaseHandler
+from oppia.apps.statistics import stats_services
+from oppia.controllers import base
 
 
-class FeedbackPage(BaseHandler):
+class FeedbackPage(base.BaseHandler):
     """Page with feedback."""
 
     def get(self):
@@ -38,4 +38,4 @@ class FeedbackPage(BaseHandler):
         url = self.payload.get('url_params').get('url')
         url = urllib.unquote_plus(url)
 
-        EventHandler.record_feedback_submitted(url, feedback)
+        stats_services.EventHandler.record_feedback_submitted(url, feedback)

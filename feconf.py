@@ -17,6 +17,7 @@
 """Stores various configuration options and constants for Oppia."""
 
 import os
+
 import jinja2
 
 # Code contributors, in alphabetical order.

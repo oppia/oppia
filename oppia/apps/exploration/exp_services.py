@@ -28,37 +28,33 @@ import copy
 import logging
 import os
 
-from oppia.apps.exploration.domain import Exploration
-from oppia.apps.exploration.models import ExplorationModel
-from oppia.apps.image.models import Image
-from oppia.apps.parameter.models import ParamChange
-from oppia.apps.parameter.models import Parameter
-from oppia.apps.state.models import AnswerHandlerInstance
-from oppia.apps.state.models import Content
-from oppia.apps.state.models import Rule
-from oppia.apps.state.models import State
-from oppia.apps.state.models import WidgetInstance
-from oppia.apps.widget.models import InteractiveWidget
-
 import feconf
+from oppia.apps.exploration import exp_domain
+import oppia.apps.exploration.models as exp_models
+import oppia.apps.image.models as image_models
+import oppia.apps.parameter.models as param_models
+import oppia.apps.state.models as state_models
+import oppia.apps.widget.models as widget_models
 import utils
 
 
 # Query methods.
 def get_all_explorations():
     """Returns a list of domain objects representing all explorations."""
-    return [Exploration(e) for e in ExplorationModel.get_all()]
+    return [exp_domain.Exploration(e) for e in
+            exp_models.ExplorationModel.get_all()]
 
 
 def get_public_explorations():
     """Returns a list of domain objects representing public explorations."""
-    return [Exploration(e) for e in ExplorationModel.get_public_explorations()]
+    return [exp_domain.Exploration(e) for e in
+            exp_models.ExplorationModel.get_public_explorations()]
 
 
 def get_viewable_explorations(user_id):
     """Returns domain objects for explorations viewable by the given user."""
-    return [Exploration(e) for e in
-            ExplorationModel.get_viewable_explorations(user_id)]
+    return [exp_domain.Exploration(e) for e in
+            exp_models.ExplorationModel.get_viewable_explorations(user_id)]
 
 
 def get_editable_explorations(user_id):
@@ -69,7 +65,7 @@ def get_editable_explorations(user_id):
 
 def count_explorations():
     """Returns the total number of explorations."""
-    return ExplorationModel.get_exploration_count()
+    return exp_models.ExplorationModel.get_exploration_count()
 
 
 # Operations involving exploration parameters.
@@ -84,7 +80,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
     If the obj_type does not match the obj_type for the parameter in the
     exploration, an Exception is raised.
     """
-    exploration = Exploration.get(exploration_id)
+    exploration = exp_domain.Exploration.get(exploration_id)
 
     for param in exploration.parameters:
         if param.name == param_name:
@@ -92,25 +88,26 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
                 raise Exception(
                     'Parameter %s has wrong obj_type: was %s, expected %s'
                     % (param_name, obj_type, param.obj_type))
-            return ParamChange(name=param.name, obj_type=param.obj_type)
+            return param_models.ParamChange(
+                name=param.name, obj_type=param.obj_type)
 
     # The parameter was not found, so add it.
     if not obj_type:
         obj_type = 'UnicodeString'
     exploration.parameters.append(
-        Parameter(name=param_name, obj_type=obj_type))
+        param_models.Parameter(name=param_name, obj_type=obj_type))
     exploration.put()
-    return ParamChange(name=param_name, obj_type=obj_type)
+    return param_models.ParamChange(name=param_name, obj_type=obj_type)
 
 
 # Operations on states belonging to an exploration.
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
-    exploration = Exploration.get(exploration_id)
+    exploration = exp_domain.Exploration.get(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state.content = [
-        Content(type=item['type'], value=item['value'])
+        state_models.Content(type=item['type'], value=item['value'])
         for item in sdict['content']
     ]
 
@@ -122,25 +119,26 @@ def modify_using_dict(exploration_id, state_id, sdict):
         state.param_changes.append(instance)
 
     wdict = sdict['widget']
-    state.widget = WidgetInstance(
+    state.widget = state_models.WidgetInstance(
         widget_id=wdict['widget_id'], sticky=wdict['sticky'],
         params=wdict['params'], handlers=[])
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
-    for wp in InteractiveWidget.get(wdict['widget_id']).params:
+    for wp in widget_models.InteractiveWidget.get(wdict['widget_id']).params:
         if wp.name not in wdict['params']:
             state.widget.params[wp.name] = wp.value
 
     for handler in wdict['handlers']:
-        handler_rules = [Rule(
+        handler_rules = [state_models.Rule(
             name=rule['name'],
             inputs=rule['inputs'],
-            dest=State._get_id_from_name(rule['dest'], exploration),
+            dest=state_models.State._get_id_from_name(
+                rule['dest'], exploration),
             feedback=rule['feedback']
         ) for rule in handler['rules']]
 
-        state.widget.handlers.append(AnswerHandlerInstance(
+        state.widget.handlers.append(state_models.AnswerHandlerInstance(
             name=handler['name'], rules=handler_rules))
 
     state.put()
@@ -153,14 +151,15 @@ def create_new(
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
     """Creates, saves and returns a new exploration id."""
     # Generate a new exploration id, if one wasn't passed in.
-    exploration_id = exploration_id or ExplorationModel.get_new_id(title)
+    exploration_id = (exploration_id or
+                      exp_models.ExplorationModel.get_new_id(title))
 
-    state_id = State.get_new_id(init_state_name)
-    new_state = State(id=state_id, name=init_state_name)
+    state_id = state_models.State.get_new_id(init_state_name)
+    new_state = state_models.State(id=state_id, name=init_state_name)
     new_state.put()
 
     # Note that demo explorations do not have owners, so user_id may be None.
-    exploration = ExplorationModel(
+    exploration = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
         image_id=image_id, state_ids=[state_id],
         editor_ids=[user_id] if user_id else [])
@@ -177,14 +176,14 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
-    exploration = Exploration.get(create_new(
+    exploration = exp_domain.Exploration.get(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
 
-    init_state = State.get_by_name(init_state_name, exploration)
+    init_state = state_models.State.get_by_name(init_state_name, exploration)
 
     try:
-        exploration.parameters = [Parameter(
+        exploration.parameters = [param_models.Parameter(
             name=param['name'], obj_type=param['obj_type'],
             values=param['values']
         ) for param in exploration_dict['parameters']]
@@ -220,7 +219,7 @@ def load_demos():
         if image_filename:
             image_filepath = os.path.join(
                 feconf.SAMPLE_IMAGES_DIR, image_filename)
-            image_id = Image.create(utils.get_file_contents(
+            image_id = image_models.Image.create(utils.get_file_contents(
                 image_filepath, raw_bytes=True))
 
         yaml_content = utils.get_sample_exploration_yaml(exp_filename)
@@ -228,7 +227,7 @@ def load_demos():
             yaml_content, None, title, category, exploration_id=str(index),
             image_id=image_id)
 
-        exploration = Exploration.get(exploration_id)
+        exploration = exp_domain.Exploration.get(exploration_id)
         exploration.is_public = True
         exploration.put()
 
@@ -237,7 +236,7 @@ def delete_demos():
     """Deletes the demo explorations."""
     explorations_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = Exploration.get(str(int_id), strict=False)
+        exploration = exp_domain.Exploration.get(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
@@ -260,7 +259,7 @@ def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):
     """Gets a Python dict of the internals of the state."""
 
-    exploration = Exploration.get(exploration_id)
+    exploration = exp_domain.Exploration.get(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
@@ -280,7 +279,7 @@ def export_state_internals_to_dict(
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    exploration = Exploration.get(exploration_id)
+    exploration = exp_domain.Exploration.get(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
@@ -291,7 +290,7 @@ def export_state_to_dict(exploration_id, state_id):
 
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
-    exploration = Exploration.get(exploration_id)
+    exploration = exp_domain.Exploration.get(exploration_id)
 
     params = [{
         'name': param.name, 'obj_type': param.obj_type, 'values': param.values

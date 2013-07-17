@@ -16,11 +16,9 @@
 
 __author__ = 'Sean Lip'
 
-import test_utils
-from oppia.apps.types.models import get_object_class
-from oppia.apps.types.models import TypedInstance
-from oppia.apps.types.models import TypedInstanceProperty
 from data.objects.models import objects
+import oppia.apps.types.models as types_models
+import test_utils
 
 from google.appengine.ext import ndb
 
@@ -30,19 +28,19 @@ class GetObjectClassUnitTests(test_utils.AppEngineTestBase):
 
     def test_get_object_class_method(self):
         """Tests the normal behavior of get_object_class()."""
-        IntClass = get_object_class('Int')
+        IntClass = types_models.get_object_class('Int')
         assert IntClass.__name__ == 'Int'
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""
         with self.assertRaises(TypeError):
-            get_object_class('FakeClass')
+            types_models.get_object_class('FakeClass')
 
     def test_base_object_is_not_gettable(self):
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
         with self.assertRaises(TypeError):
-            get_object_class('BaseObject')
+            types_models.get_object_class('BaseObject')
 
 
 class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
@@ -50,7 +48,7 @@ class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
 
     def test_typed_instance_class(self):
         """Tests the TypedInstance class."""
-        model = TypedInstance(obj_type='Int', value='Bad value')
+        model = types_models.TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             model.put()
         model.value = 1
@@ -58,9 +56,9 @@ class TypedInstanceUnitTests(test_utils.AppEngineTestBase):
 
     def test_typed_instance_property(self):
         class StructuredTestModel(ndb.Model):
-            typed_instance = TypedInstanceProperty(required=True)
+            typed_instance = types_models.TypedInstanceProperty(required=True)
 
-        model = TypedInstance(obj_type='Int', value='Bad value')
+        model = types_models.TypedInstance(obj_type='Int', value='Bad value')
         with self.assertRaises(TypeError):
             structured_model = StructuredTestModel(typed_instance=model)
 

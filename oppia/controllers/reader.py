@@ -19,14 +19,13 @@ __author__ = 'Sean Lip'
 import cgi
 import json
 
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.state.models import Content
-from oppia.apps.statistics.services import EventHandler
-from oppia.apps.widget.models import InteractiveWidget
-from oppia.apps.widget.models import NonInteractiveWidget
-from oppia.controllers.base import BaseHandler
 import feconf
+from oppia.apps.exploration import exp_domain
+from oppia.apps.exploration import exp_services
+import oppia.apps.state.models as state_models
+from oppia.apps.statistics import stats_services
+import oppia.apps.widget.models as widget_models
+from oppia.controllers import base
 import utils
 
 READER_MODE = 'reader'
@@ -91,7 +90,7 @@ def parse_content_into_html(content_array, block_number, params=None):
                 continue
 
             widget_dict = json.loads(content.value)
-            widget = NonInteractiveWidget.get_with_params(
+            widget = widget_models.NonInteractiveWidget.get_with_params(
                 widget_dict['id'], widget_dict['params'])
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
@@ -111,7 +110,7 @@ def parse_content_into_html(content_array, block_number, params=None):
     return html, widget_array
 
 
-class ExplorationPage(BaseHandler):
+class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
     def get(self, unused_exploration_id):
@@ -127,7 +126,7 @@ class ExplorationPage(BaseHandler):
         self.render_template('reader/reader_exploration.html')
 
 
-class ExplorationHandler(BaseHandler):
+class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
     def _get_exploration_params(self, exploration):
@@ -145,7 +144,7 @@ class ExplorationHandler(BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_domain.Exploration.get(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -155,7 +154,7 @@ class ExplorationHandler(BaseHandler):
         params = get_params(init_state, params)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
-        interactive_html = InteractiveWidget.get_raw_code(
+        interactive_html = widget_models.InteractiveWidget.get_raw_code(
             init_state.widget.widget_id,
             params=utils.parse_dict_with_params(
                 init_state.widget.params, params)
@@ -173,15 +172,16 @@ class ExplorationHandler(BaseHandler):
         })
         self.render_json(self.values)
 
-        EventHandler.record_exploration_visited(exploration_id)
-        EventHandler.record_state_hit(exploration_id, exploration.init_state_id)
+        stats_services.EventHandler.record_exploration_visited(exploration_id)
+        stats_services.EventHandler.record_state_hit(
+            exploration_id, exploration.init_state_id)
 
 
-class FeedbackHandler(BaseHandler):
+class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
     def _append_answer_to_stats_log(
-        self, old_state, answer, exploration_id, old_state_id, rule):
+            self, old_state, answer, exploration_id, old_state_id, rule):
         """Append the reader's answer to the statistics log."""
         # TODO(sll): Parse this using old_params, but do not convert into
         # a JSON string.
@@ -189,11 +189,11 @@ class FeedbackHandler(BaseHandler):
         recorded_answer_params.update({
             'answer': answer,
         })
-        recorded_answer = InteractiveWidget.get_stats_log_html(
+        recorded_answer = widget_models.InteractiveWidget.get_stats_log_html(
             old_state.widget.widget_id, params=recorded_answer_params)
 
         if recorded_answer:
-            EventHandler.record_rule_hit(
+            stats_services.EventHandler.record_rule_hit(
                 exploration_id, old_state_id, rule, recorded_answer)
             # Add this answer to the state's 'unresolved answers' list.
             if recorded_answer not in old_state.unresolved_answers:
@@ -208,7 +208,8 @@ class FeedbackHandler(BaseHandler):
         else:
             feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
             return parse_content_into_html(
-                [Content(type='text', value='<br>'.join(feedback_bits))],
+                [state_models.Content(
+                    type='text', value='<br>'.join(feedback_bits))],
                 block_number, params)
 
     def _append_content(self, sticky, finished, old_params, new_state,
@@ -233,7 +234,7 @@ class FeedbackHandler(BaseHandler):
                 iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
-                InteractiveWidget.get_raw_code(
+                widget_models.InteractiveWidget.get_raw_code(
                     new_state.widget.widget_id,
                     params=utils.parse_dict_with_params(
                         new_state.widget.params, new_params)
@@ -246,7 +247,7 @@ class FeedbackHandler(BaseHandler):
         """Handles feedback interactions with readers."""
         values = {}
 
-        exploration = Exploration.get(exploration_id)
+        exploration = exp_domain.Exploration.get(exploration_id)
         old_state = exploration.get_state_by_id(state_id)
 
         # The reader's answer.
@@ -267,7 +268,8 @@ class FeedbackHandler(BaseHandler):
         else:
             new_state = exploration.get_state_by_id(new_state_id)
 
-        EventHandler.record_state_hit(exploration_id, new_state_id)
+        stats_services.EventHandler.record_state_hit(
+            exploration_id, new_state_id)
 
         # If the new state widget is the same as the old state widget, and the
         # new state widget is sticky, do not render the reader response. The
@@ -291,7 +293,7 @@ class FeedbackHandler(BaseHandler):
         reader_response_iframe = ''
         if not sticky:
             reader_response_html, reader_response_iframe = (
-                InteractiveWidget.get_reader_response_html(
+                widget_models.InteractiveWidget.get_reader_response_html(
                     old_state.widget.widget_id,
                     utils.parse_dict_with_params(
                         old_state.widget.params, old_params))
@@ -325,7 +327,7 @@ class FeedbackHandler(BaseHandler):
         self.render_json(values)
 
 
-class RandomExplorationPage(BaseHandler):
+class RandomExplorationPage(base.BaseHandler):
     """Returns the page for a random exploration."""
 
     def get(self):

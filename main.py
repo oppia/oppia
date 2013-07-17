@@ -16,20 +16,19 @@
 
 __author__ = 'Sean Lip'
 
-import webapp2
-
-import oppia.controllers.admin as admin
-import oppia.controllers.base as base
-import oppia.controllers.editor as editor
-import oppia.controllers.feedback as feedback
-import oppia.controllers.gallery as gallery
-import oppia.controllers.pages as pages
-import oppia.controllers.profile as profile
-import oppia.controllers.reader as reader
-import oppia.controllers.resources as resources
-import oppia.controllers.widgets as widgets
-
 import feconf
+from oppia.controllers import admin
+from oppia.controllers import base
+from oppia.controllers import editor
+from oppia.controllers import feedback
+from oppia.controllers import gallery
+from oppia.controllers import pages
+from oppia.controllers import profile
+from oppia.controllers import reader
+from oppia.controllers import resources
+from oppia.controllers import widgets
+
+import webapp2
 
 
 class Error404Handler(base.BaseHandler):

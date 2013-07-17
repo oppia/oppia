@@ -18,11 +18,11 @@ __author__ = 'Jeremy Emerson'
 
 import os
 
-from oppia.apps.image.models import Image
 import feconf
+import oppia.apps.image.models as image_models
 import test_utils
 
-from google.appengine.ext.db import BadValueError
+from google.appengine.ext import db
 
 
 class ImageUnitTests(test_utils.AppEngineTestBase):
@@ -31,8 +31,8 @@ class ImageUnitTests(test_utils.AppEngineTestBase):
     def test_image_class(self):
         """Test the Image class."""
         # An Image must have the 'raw' property set.
-        image = Image(id='The hash id')
-        with self.assertRaises(BadValueError):
+        image = image_models.Image(id='The hash id')
+        with self.assertRaises(db.BadValueError):
             image.put()
 
         # The 'raw' property must be a valid image.
@@ -46,5 +46,5 @@ class ImageUnitTests(test_utils.AppEngineTestBase):
         image.put()
 
         # Retrieve the image.
-        retrieved_image = Image.get_by_id('The hash id')
+        retrieved_image = image_models.Image.get_by_id('The hash id')
         self.assertEqual(retrieved_image.raw, image_file)

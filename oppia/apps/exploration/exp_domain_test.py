@@ -18,13 +18,13 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.state.models import State
-from oppia.apps.widget.models import InteractiveWidget
+from oppia.apps.exploration import exp_domain
+from oppia.apps.exploration import exp_services
+import oppia.apps.state.models as state_models
+import oppia.apps.widget.models as widget_models
 
 
-class FakeExploration(Exploration):
+class FakeExploration(exp_domain.Exploration):
     """Allows dummy explorations to be created and commited."""
 
     def __init__(self, exp_id='fake_exploration_id', owner_id=None):
@@ -53,11 +53,11 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets."""
         super(ExplorationDomainUnitTests, self).setUp()
-        InteractiveWidget.load_default_widgets()
+        widget_models.InteractiveWidget.load_default_widgets()
 
     def tearDown(self):
         """Deletes all widgets and explorations."""
-        InteractiveWidget.delete_all_widgets()
+        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(ExplorationDomainUnitTests, self).tearDown()
 
@@ -67,12 +67,12 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        with self.assertRaises(Exploration.ObjectValidationError):
+        with self.assertRaises(exp_domain.Exploration.ObjectValidationError):
             exploration.state_ids = ['A string']
             exploration.put()
 
         # There must be at least one editor id.
-        with self.assertRaises(Exploration.ObjectValidationError):
+        with self.assertRaises(exp_domain.Exploration.ObjectValidationError):
             exploration.put()
 
     def test_init_state_property(self):
@@ -80,7 +80,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         INIT_STATE_ID = 'init_state_id'
         INIT_STATE_NAME = 'init_state_name'
 
-        init_state = State(id=INIT_STATE_ID, name=INIT_STATE_NAME)
+        init_state = state_models.State(id=INIT_STATE_ID, name=INIT_STATE_NAME)
         init_state.put()
 
         exploration = FakeExploration(owner_id='owner@example.com')
@@ -138,7 +138,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         self.assertEqual(len(exploration.state_ids), 1)
 
-        default_state = State.get(exploration.state_ids[0])
+        default_state = state_models.State.get(exploration.state_ids[0])
         default_state_name = default_state.name
         exploration.rename_state(default_state.id, 'Renamed state')
 

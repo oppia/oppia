@@ -21,12 +21,9 @@ __author__ = 'Sean Lip'
 import collections
 
 import feconf
+from oppia.apps.exploration import exp_domain
+import oppia.apps.statistics.models as stats_models
 import utils
-
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.statistics.models import Counter
-from oppia.apps.statistics.models import Journal
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -116,18 +113,18 @@ class EventHandler(object):
     @classmethod
     def _inc(cls, event_id):
         """Increments the counter corresponding to an event id."""
-        counter = Counter.get(event_id, strict=False)
+        counter = stats_models.Counter.get(event_id, strict=False)
         if not counter:
-            counter = Counter(id=event_id)
+            counter = stats_models.Counter(id=event_id)
         counter.value += 1
         counter.put()
 
     @classmethod
     def _add(cls, event_id, value):
         """Adds to the list corresponding to an event id."""
-        journal = Journal.get(event_id, strict=False)
+        journal = stats_models.Journal.get(event_id, strict=False)
         if not journal:
-            journal = Journal(id=event_id)
+            journal = stats_models.Journal(id=event_id)
         journal.values.append(value)
         journal.put()
 
@@ -137,16 +134,16 @@ def get_exploration_stats(event_name, exploration_id):
 
     if event_name == STATS_ENUMS.exploration_visited:
         event_id = get_event_id(event_name, exploration_id)
-        return Counter.get_value_by_id(event_id)
+        return stats_models.Counter.get_value_by_id(event_id)
 
     if event_name == STATS_ENUMS.exploration_completed:
         event_id = get_event_id(event_name, exploration_id)
-        return Counter.get_value_by_id(event_id)
+        return stats_models.Counter.get_value_by_id(event_id)
 
     if event_name == STATS_ENUMS.rule_hit:
         result = {}
 
-        exploration = Exploration.get(exploration_id)
+        exploration = exp_domain.Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
             result[state.id] = {
@@ -160,7 +157,7 @@ def get_exploration_stats(event_name, exploration_id):
                         event_name, '.'.join(
                             [exploration_id, state.id, rule_name]))
 
-                    journal = Journal.get(event_id, strict=False)
+                    journal = stats_models.Journal.get(event_id, strict=False)
                     result[state.id]['rules'][rule_name] = {
                         'answers': collections.Counter(
                             journal.values).most_common(10) if journal else [],
@@ -171,7 +168,7 @@ def get_exploration_stats(event_name, exploration_id):
     if event_name == STATS_ENUMS.state_hit:
         result = {}
 
-        exploration = Exploration.get(exploration_id)
+        exploration = exp_domain.Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
             event_id = get_event_id(
@@ -179,7 +176,7 @@ def get_exploration_stats(event_name, exploration_id):
 
             result[state.id] = {
                 'name': state.name,
-                'count': Counter.get_value_by_id(event_id),
+                'count': stats_models.Counter.get_value_by_id(event_id),
             }
         return result
 
@@ -193,15 +190,15 @@ def get_top_ten_improvable_states(explorations):
 
             # Get count of how many times the state was hit
             event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
-            all_count = Counter.get_value_by_id(event_id)
+            all_count = stats_models.Counter.get_value_by_id(event_id)
             if all_count == 0:
                 continue
 
             # Count the number of times the default rule was hit.
             event_id = get_event_id(
                 STATS_ENUMS.rule_hit, '%s.Default' % state_key)
-            default_count = Journal.get_value_count_by_id(event_id)
-            journal = Journal.get(event_id, strict=False)
+            default_count = stats_models.Journal.get_value_count_by_id(event_id)
+            journal = stats_models.Journal.get(event_id, strict=False)
             top_default_answers = collections.Counter(
                 journal.values).most_common(5) if journal else []
 
@@ -214,8 +211,8 @@ def get_top_ten_improvable_states(explorations):
                     event_id = get_event_id(
                         STATS_ENUMS.rule_hit, '%s.%s' %
                         (state_key, rule_name))
-                    completed_count += Journal.get_value_count_by_id(
-                        event_id)
+                    completed_count += (
+                        stats_models.Journal.get_value_count_by_id(event_id))
 
             incomplete_count = all_count - completed_count
 

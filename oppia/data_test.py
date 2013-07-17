@@ -22,10 +22,9 @@ import os
 import re
 import string
 
-from oppia.apps.types.models import get_object_class
-from oppia.apps.widget.models import InteractiveWidget
-from oppia.apps.widget.models import Widget
 import feconf
+import oppia.apps.types.models as types_models
+import oppia.apps.widget.models as widget_models
 import test_utils
 import utils
 
@@ -65,7 +64,7 @@ class ExplorationDataUnitTests(DataUnitTest):
     def setUp(self):
         """Loads the default widgets."""
         super(ExplorationDataUnitTests, self).setUp()
-        InteractiveWidget.load_default_widgets()
+        widget_models.InteractiveWidget.load_default_widgets()
 
     def verify_is_valid_widget(self, widget_id):
         """Checks that a widget id is valid (i.e., its directory exists)."""
@@ -139,7 +138,8 @@ class ExplorationDataUnitTests(DataUnitTest):
             self.assertTrue(isinstance(wp_name, basestring))
 
             # Check that the parameter name is valid.
-            widget_params = Widget.get(state_dict['widget']['widget_id']).params
+            widget_params = widget_models.Widget.get(
+                state_dict['widget']['widget_id']).params
             widget_param_names = [wp.name for wp in widget_params]
             self.assertIn(
                 wp_name, widget_param_names,
@@ -149,7 +149,7 @@ class ExplorationDataUnitTests(DataUnitTest):
             # Get the object class used to normalize the value for this param.
             for wp in widget_params:
                 if wp.name == wp_name:
-                    obj_class = get_object_class(wp.obj_type)
+                    obj_class = types_models.get_object_class(wp.obj_type)
                     self.assertIsNotNone(obj_class)
                     break
 
@@ -312,37 +312,34 @@ class WidgetDataUnitTests(DataUnitTest):
             dir_contents = os.listdir(widget_dir)
             self.assertLessEqual(len(dir_contents), 6)
 
-            has_static_dir = False
+            optional_dirs_and_files_count = 0
+
             try:
                 self.assertIn('static', dir_contents)
                 static_dir = os.path.join(widget_dir, 'static')
                 self.assertTrue(os.path.isdir(static_dir))
-                has_static_dir = True
+                optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
-            has_stats_response_file = False
             stats_response_template = os.path.join(
                 widget_dir, 'stats_response.html')
             try:
                 self.assertTrue(os.path.isfile(stats_response_template))
-                has_stats_response_file = True
+                optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
-            has_response_iframe_file = False
             response_iframe_template = os.path.join(
                 widget_dir, 'response_iframe.html')
             try:
                 self.assertTrue(os.path.isfile(response_iframe_template))
-                has_response_iframe_file = True
+                optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             self.assertEqual(
-                int(has_static_dir) + int(has_stats_response_file) +
-                    int(has_response_iframe_file) + 3,
-                len(dir_contents)
+                optional_dirs_and_files_count + 3, len(dir_contents)
             )
 
             config_filepath = os.path.join(
@@ -396,7 +393,7 @@ class WidgetDataUnitTests(DataUnitTest):
                 self.assertTrue(isinstance(param['description'], basestring))
 
                 # Check that the default values have the correct types.
-                obj_class = get_object_class(param['obj_type'])
+                obj_class = types_models.get_object_class(param['obj_type'])
                 self.assertIsNotNone(obj_class)
                 self.assertTrue(isinstance(param['values'], list))
                 for value in param['values']:

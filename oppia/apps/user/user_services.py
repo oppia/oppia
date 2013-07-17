@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 
 from google.appengine.api import users
 
+
 def create_login_url(slug):
     """Creates a login url."""
     return users.create_login_url(slug)

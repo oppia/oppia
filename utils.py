@@ -24,10 +24,10 @@ import random
 import unicodedata
 import yaml
 
-from jinja2 import Environment
-from jinja2 import meta
-
 import feconf
+
+import jinja2
+from jinja2 import meta
 
 
 class InvalidInputException(Exception):
@@ -90,7 +90,7 @@ def parse_with_jinja(string, params, default=''):
     Returns:
       the parsed string, or None if the string could not be parsed.
     """
-    env = Environment()
+    env = jinja2.Environment()
     env.filters.update({
         'is_list': lambda x: isinstance(x, list),
         'is_dict': lambda x: isinstance(x, dict),

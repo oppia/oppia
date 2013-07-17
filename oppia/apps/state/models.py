@@ -20,25 +20,24 @@ __author__ = 'Sean Lip'
 
 import importlib
 
-from oppia.apps.base_model.models import BaseModel
-from oppia.apps.base_model.models import IdModel
-from oppia.apps.parameter.models import ParamChangeProperty
-from oppia.apps.widget.models import InteractiveWidget
 from data.objects.models import objects
 import feconf
+import oppia.apps.base_model.models as base_models
+import oppia.apps.parameter.models as param_models
+import oppia.apps.widget.models as widget_models
 import utils
 
 from google.appengine.ext import ndb
 
 
-class Content(BaseModel):
+class Content(base_models.BaseModel):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
     # TODO(sll): Generalize this so that the value can be a dict (for a widget).
     value = ndb.TextProperty(default='')
 
 
-class Rule(BaseModel):
+class Rule(base_models.BaseModel):
     """A rule for an answer classifier."""
     # TODO(sll): Ensure the types for param_changes are consistent.
 
@@ -51,14 +50,14 @@ class Rule(BaseModel):
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
     # State-level parameter changes to make if this rule is triggered.
-    param_changes = ParamChangeProperty(repeated=True)
+    param_changes = param_models.ParamChangeProperty(repeated=True)
 
     def get_feedback_string(self):
         """Returns a (possibly empty) string with feedback for this rule."""
         return utils.get_random_choice(self.feedback) if self.feedback else ''
 
 
-class AnswerHandlerInstance(BaseModel):
+class AnswerHandlerInstance(base_models.BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     rules = ndb.LocalStructuredProperty(Rule, repeated=True)
@@ -67,7 +66,7 @@ class AnswerHandlerInstance(BaseModel):
     classifier = ndb.StringProperty()
 
 
-class WidgetInstance(BaseModel):
+class WidgetInstance(base_models.BaseModel):
     """An instance of a widget."""
     # The id of the interactive widget class for this state.
     widget_id = ndb.StringProperty(default='interactive-Continue')
@@ -82,7 +81,7 @@ class WidgetInstance(BaseModel):
     handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
 
 
-class State(IdModel):
+class State(base_models.IdModel):
     """A state which forms part of an exploration."""
 
     def get_default_rule(self):
@@ -111,7 +110,7 @@ class State(IdModel):
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
-        widget = InteractiveWidget.get(self.widget.widget_id)
+        widget = widget_models.InteractiveWidget.get(self.widget.widget_id)
         for curr_handler in self.widget.handlers:
             for w_handler in widget.handlers:
                 if w_handler.name == curr_handler.name:
@@ -122,7 +121,7 @@ class State(IdModel):
     # The content displayed to the reader in this state.
     content = ndb.StructuredProperty(Content, repeated=True)
     # Parameter changes associated with this state.
-    param_changes = ParamChangeProperty(repeated=True)
+    param_changes = param_models.ParamChangeProperty(repeated=True)
     # The interactive widget associated with this state. Set to be the default
     # widget if not explicitly specified by the caller.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
@@ -206,8 +205,8 @@ class State(IdModel):
     def get_classifier_info(self, widget_id, handler_name, rule, state_params):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
-        mutable_rule = InteractiveWidget.get(widget_id).get_readable_name(
-            handler_name, rule.name)
+        mutable_rule = widget_models.InteractiveWidget.get(
+            widget_id).get_readable_name(handler_name, rule.name)
 
         func_name = classifier_func[: first_bracket]
         str_params = classifier_func[first_bracket + 1: -1].split(',')

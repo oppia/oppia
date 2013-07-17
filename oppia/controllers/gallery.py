@@ -18,12 +18,12 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
 
-import oppia.apps.exploration.services as exp_services
-import oppia.apps.user.services as user_services
-from oppia.controllers.base import BaseHandler
+from oppia.apps.exploration import exp_services
+from oppia.apps.user import user_services
+from oppia.controllers import base
 
 
-class GalleryPage(BaseHandler):
+class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
     def get(self):
@@ -34,7 +34,7 @@ class GalleryPage(BaseHandler):
         self.render_template('gallery/gallery.html')
 
 
-class GalleryHandler(BaseHandler):
+class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery."""
 
     def get(self):

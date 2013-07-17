@@ -21,29 +21,29 @@ __author__ = 'Sean Lip'
 import copy
 import os
 
-from oppia.apps.base_model.models import BaseModel
-from oppia.apps.classifier.models import Classifier
-from oppia.apps.parameter.models import Parameter
-from oppia.apps.parameter.models import ParameterProperty
 import feconf
+import oppia.apps.base_model.models as base_models
+import oppia.apps.classifier.models as cl_models
+import oppia.apps.parameter.models as param_models
 import utils
 
+from google.appengine.ext import db
 from google.appengine.ext import ndb
-from google.appengine.ext.db import BadValueError
 from google.appengine.ext.ndb import polymodel
 
 
-class AnswerHandler(BaseModel):
+class AnswerHandler(base_models.BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     # TODO(sll): Store a reference instead?
-    classifier = ndb.StringProperty(choices=Classifier.get_classifier_ids())
+    classifier = ndb.StringProperty(
+        choices=cl_models.Classifier.get_classifier_ids())
 
     @property
     def rules(self):
         if not self.classifier:
             return []
-        return Classifier.get(self.classifier).rules
+        return cl_models.Classifier.get(self.classifier).rules
 
 
 class Widget(polymodel.PolyModel):
@@ -66,7 +66,7 @@ class Widget(polymodel.PolyModel):
     description = ndb.TextProperty()
     # Parameter specifications for this widget. The default parameters can be
     # overridden when the widget is used within a State.
-    params = ParameterProperty(repeated=True)
+    params = param_models.ParameterProperty(repeated=True)
 
     @property
     def template(self):
@@ -140,11 +140,11 @@ class NonInteractiveWidget(Widget):
 
     def _pre_put_hook(self):
         if not self.id:
-            raise BadValueError('No id specified for widget.')
+            raise db.BadValueError('No id specified for widget.')
 
         # Checks that the id is valid.
         if not self.id.startswith('%s-' % feconf.NONINTERACTIVE_PREFIX):
-            raise BadValueError(
+            raise db.BadValueError(
                 'Invalid id for non-interactive widget: %s' % self.id)
 
     @classmethod
@@ -160,7 +160,8 @@ class NonInteractiveWidget(Widget):
                 conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
             conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
-            conf['params'] = [Parameter(**param) for param in conf['params']]
+            conf['params'] = [
+                param_models.Parameter(**param) for param in conf['params']]
             widget = cls(**conf)
             widget.put()
 
@@ -179,23 +180,23 @@ class InteractiveWidget(Widget):
 
     def _pre_put_hook(self):
         if not self.id:
-            raise BadValueError('No id specified for widget.')
+            raise db.BadValueError('No id specified for widget.')
 
         # Checks that at least one handler exists.
         if not self.handlers:
-            raise BadValueError(
+            raise db.BadValueError(
                 'Widget %s has no handlers defined' % self.name)
 
         # Checks that all handler names are unique.
         names = [handler.name for handler in self.handlers]
         if len(set(names)) != len(names):
-            raise BadValueError(
+            raise db.BadValueError(
                 'There are duplicate names in the handler for widget %s'
                 % self.id)
 
         # Checks that the id is valid.
         if not self.id.startswith('%s-' % feconf.INTERACTIVE_PREFIX):
-            raise BadValueError(
+            raise db.BadValueError(
                 'Invalid id for interactive widget: %s' % self.id)
 
     def _get_handler(self, handler_name):
@@ -250,7 +251,8 @@ class InteractiveWidget(Widget):
                 conf = utils.dict_from_yaml(f.read().decode('utf-8'))
 
             conf['id'] = '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id)
-            conf['params'] = [Parameter(**param) for param in conf['params']]
+            conf['params'] = [
+                param_models.Parameter(**param) for param in conf['params']]
             conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
             widget = cls(**conf)
             widget.put()

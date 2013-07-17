@@ -20,8 +20,8 @@ __author__ = 'Sean Lip'
 
 import imghdr
 
-from oppia.apps.base_model.models import IdModel
 import feconf
+import oppia.apps.base_model.models as base_models
 
 from google.appengine.ext import ndb
 
@@ -38,7 +38,7 @@ class ImageProperty(ndb.BlobProperty):
         assert is_valid, error_message
 
 
-class Image(IdModel):
+class Image(base_models.IdModel):
     """An image."""
     # The raw image blob.
     raw = ImageProperty(required=True)

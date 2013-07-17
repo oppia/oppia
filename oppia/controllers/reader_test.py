@@ -14,11 +14,10 @@
 
 __author__ = 'Sean Lip'
 
-import test_utils
+import json
 
 from oppia.controllers import admin
-
-import json
+import test_utils
 
 
 class ReaderControllerUnitTests(test_utils.AppEngineTestBase):

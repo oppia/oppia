@@ -16,19 +16,14 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.parameter.models import Parameter
-from oppia.apps.state.models import AnswerHandlerInstance
-from oppia.apps.state.models import Content
-from oppia.apps.state.models import Rule
-import oppia.apps.statistics.services as stats_services
-from oppia.apps.statistics.services import STATS_ENUMS
-from oppia.apps.widget.models import InteractiveWidget
-from oppia.controllers.base import BaseHandler
-from oppia.controllers.base import require_editor
-from oppia.controllers.base import require_user
 import feconf
+from oppia.apps.exploration import exp_domain
+from oppia.apps.exploration import exp_services
+import oppia.apps.parameter.models as param_models
+import oppia.apps.state.models as state_models
+from oppia.apps.statistics import stats_services
+import oppia.apps.widget.models as widget_models
+from oppia.controllers import base
 import utils
 
 EDITOR_MODE = 'editor'
@@ -50,7 +45,7 @@ def get_state_for_frontend(state, exploration):
             if item['name'] == 'Default':
                 item['rule'] = 'Default'
             else:
-                item['rule'] = InteractiveWidget.get(
+                item['rule'] = widget_models.InteractiveWidget.get(
                     state.widget.widget_id).get_readable_name(
                         handler['name'], item['name']
                     )
@@ -65,16 +60,16 @@ def get_exploration_stats(exploration):
     """Returns a dict with stats for the given exploration."""
 
     num_visits = stats_services.get_exploration_stats(
-        STATS_ENUMS.exploration_visited, exploration.id)
+        stats_services.STATS_ENUMS.exploration_visited, exploration.id)
 
     num_completions = stats_services.get_exploration_stats(
-        STATS_ENUMS.exploration_completed, exploration.id)
+        stats_services.STATS_ENUMS.exploration_completed, exploration.id)
 
     answers = stats_services.get_exploration_stats(
-        STATS_ENUMS.rule_hit, exploration.id)
+        stats_services.STATS_ENUMS.rule_hit, exploration.id)
 
     state_counts = stats_services.get_exploration_stats(
-        STATS_ENUMS.state_hit, exploration.id)
+        stats_services.STATS_ENUMS.state_hit, exploration.id)
 
     state_stats = {}
     for state_id in answers.keys():
@@ -105,10 +100,10 @@ def get_exploration_stats(exploration):
     }
 
 
-class NewExploration(BaseHandler):
+class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    @require_user
+    @base.require_user
     def post(self):
         """Handles POST requests."""
         title = self.payload.get('title')
@@ -131,16 +126,16 @@ class NewExploration(BaseHandler):
         self.render_json({'explorationId': exploration_id})
 
 
-class ForkExploration(BaseHandler):
+class ForkExploration(base.BaseHandler):
     """Forks an existing exploration."""
 
-    @require_user
+    @base.require_user
     def post(self):
         """Handles POST requests."""
 
         exploration_id = self.payload.get('exploration_id')
 
-        forked_exploration = Exploration.get(exploration_id)
+        forked_exploration = exp_domain.Exploration.get(exploration_id)
         if not forked_exploration.is_demo:
             raise self.InvalidInputException('Exploration cannot be forked.')
 
@@ -156,10 +151,10 @@ class ForkExploration(BaseHandler):
         self.render_json({'explorationId': new_exploration_id})
 
 
-class ExplorationPage(BaseHandler):
+class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @require_editor
+    @base.require_editor
     def get(self, unused_exploration):
         """Handles GET requests."""
         self.values.update({
@@ -168,10 +163,10 @@ class ExplorationPage(BaseHandler):
         self.render_template('editor/editor_exploration.html')
 
 
-class ExplorationHandler(BaseHandler):
+class ExplorationHandler(base.BaseHandler):
     """Page with editor data for a single exploration."""
 
-    @require_editor
+    @base.require_editor
     def get(self, exploration):
         """Gets the question name and state list for a question page."""
 
@@ -212,7 +207,7 @@ class ExplorationHandler(BaseHandler):
         })
         self.render_json(self.values)
 
-    @require_editor
+    @base.require_editor
     def post(self, exploration):
         """Adds a new state to the given exploration."""
 
@@ -224,7 +219,7 @@ class ExplorationHandler(BaseHandler):
         self.render_json(
             exp_services.export_state_to_dict(exploration.id, state.id))
 
-    @require_editor
+    @base.require_editor
     def put(self, exploration):
         """Updates properties of the given exploration."""
 
@@ -254,7 +249,7 @@ class ExplorationHandler(BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                Parameter(
+                param_models.Parameter(
                     name=item['name'], obj_type=item['obj_type'],
                     description=item['description'], values=item['values']
                 ) for item in parameters
@@ -262,16 +257,16 @@ class ExplorationHandler(BaseHandler):
 
         exploration.put()
 
-    @require_editor
+    @base.require_editor
     def delete(self, exploration):
         """Deletes the given exploration."""
         exploration.delete()
 
 
-class ExplorationDownloadHandler(BaseHandler):
+class ExplorationDownloadHandler(base.BaseHandler):
     """Downloads an exploration as a YAML file."""
 
-    @require_editor
+    @base.require_editor
     def get(self, exploration):
         """Handles GET requests."""
         filename = 'oppia-%s' % utils.to_ascii(exploration.title)
@@ -285,10 +280,10 @@ class ExplorationDownloadHandler(BaseHandler):
         self.response.write(exp_services.export_to_yaml(exploration.id))
 
 
-class StateHandler(BaseHandler):
+class StateHandler(base.BaseHandler):
     """Handles state transactions."""
 
-    @require_editor
+    @base.require_editor
     def put(self, exploration, state):
         """Saves updates to a state."""
 
@@ -337,7 +332,7 @@ class StateHandler(BaseHandler):
             ruleset = interactive_rulesets['submit']
             utils.recursively_remove_key(ruleset, u'$$hashKey')
 
-            state.widget.handlers = [AnswerHandlerInstance(
+            state.widget.handlers = [state_models.AnswerHandlerInstance(
                 name='submit', rules=[])]
 
             # This is part of the state. The rules should be put into it.
@@ -348,7 +343,7 @@ class StateHandler(BaseHandler):
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
 
-                state_rule = Rule()
+                state_rule = state_models.Rule()
                 state_rule.name = rule.get('name')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')
@@ -394,8 +389,10 @@ class StateHandler(BaseHandler):
                 state_ruleset.append(state_rule)
 
         if content:
-            state.content = [Content(type=item['type'], value=item['value'])
-                             for item in content]
+            state.content = [
+                state_models.Content(type=item['type'], value=item['value'])
+                for item in content
+            ]
 
         if 'unresolved_answers' in self.payload:
             state.unresolved_answers = {}
@@ -406,7 +403,7 @@ class StateHandler(BaseHandler):
         state.put()
         self.render_json(get_state_for_frontend(state, exploration))
 
-    @require_editor
+    @base.require_editor
     def delete(self, exploration, state):
         """Deletes the state with id state_id."""
         exploration.delete_state(state.id)

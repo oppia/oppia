@@ -20,15 +20,14 @@ __author__ = 'Sean Lip'
 
 import os
 
-from oppia.apps.base_model.models import BaseModel
-from oppia.apps.base_model.models import IdModel
 import feconf
+import oppia.apps.base_model.models as base_models
 import utils
 
 from google.appengine.ext import ndb
 
 
-class RuleSpec(BaseModel):
+class RuleSpec(base_models.BaseModel):
     """A rule specification in a classifier."""
     # Python code for the rule, e.g. "equals(x)"
     rule = ndb.StringProperty()
@@ -39,7 +38,7 @@ class RuleSpec(BaseModel):
     checks = ndb.TextProperty(repeated=True)
 
 
-class Classifier(IdModel):
+class Classifier(base_models.IdModel):
     """An Oppia classifier. Its id is the same as its directory name."""
 
     # Rule specifications for the classifier.

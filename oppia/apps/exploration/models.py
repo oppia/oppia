@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
-from oppia.apps.base_model.models import IdModel
-from oppia.apps.parameter.models import Parameter
+import oppia.apps.base_model.models as base_models
+import oppia.apps.parameter.models as param_models
 
 from google.appengine.ext import ndb
 
@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 QUERY_LIMIT = 100
 
 
-class ExplorationModel(IdModel):
+class ExplorationModel(base_models.IdModel):
     """Storage model for an Oppia exploration.
 
     This class should only be imported by the exploration domain file, the
@@ -44,7 +44,8 @@ class ExplorationModel(IdModel):
     # be empty.
     state_ids = ndb.StringProperty(repeated=True)
     # The list of parameters associated with this exploration.
-    parameters = ndb.LocalStructuredProperty(Parameter, repeated=True)
+    parameters = ndb.LocalStructuredProperty(
+        param_models.Parameter, repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.

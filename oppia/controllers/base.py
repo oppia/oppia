@@ -21,10 +21,9 @@ import logging
 import sys
 import traceback
 
-from oppia.apps.exploration.domain import Exploration
-import oppia.apps.exploration.services as exp_services
-import oppia.apps.user.services as user_services
 import feconf
+from oppia.apps.exploration import exp_domain
+from oppia.apps.user import user_services
 import webapp2
 
 
@@ -65,7 +64,7 @@ def require_editor(handler):
             return
 
         try:
-            exploration = Exploration.get(exploration_id)
+            exploration = exp_domain.Exploration.get(exploration_id)
         except:
             raise self.PageNotFoundException
 

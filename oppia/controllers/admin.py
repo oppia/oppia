@@ -16,23 +16,20 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from oppia.apps.classifier.models import Classifier
-import oppia.apps.exploration.services as exp_services
-from oppia.apps.widget.models import InteractiveWidget
-from oppia.apps.widget.models import NonInteractiveWidget
-from oppia.apps.widget.models import Widget
-from oppia.controllers.base import BaseHandler
-from oppia.controllers.base import require_admin
+import oppia.apps.classifier.models as cl_models
+from oppia.apps.exploration import exp_services
+import oppia.apps.widget.models as widget_models
+from oppia.controllers import base
 
 
 def reload_widgets():
     """Reload the default classifiers and widgets."""
-    Classifier.delete_all_classifiers()
-    Classifier.load_default_classifiers()
+    cl_models.Classifier.delete_all_classifiers()
+    cl_models.Classifier.load_default_classifiers()
 
-    Widget.delete_all_widgets()
-    InteractiveWidget.load_default_widgets()
-    NonInteractiveWidget.load_default_widgets()
+    widget_models.Widget.delete_all_widgets()
+    widget_models.InteractiveWidget.load_default_widgets()
+    widget_models.NonInteractiveWidget.load_default_widgets()
 
 
 def reload_explorations():
@@ -47,15 +44,15 @@ def reload_demos():
     reload_explorations()
 
 
-class AdminPage(BaseHandler):
+class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
 
-    @require_admin
+    @base.require_admin
     def get(self):
         """Handles GET requests."""
         self.render_template('admin/admin.html')
 
-    @require_admin
+    @base.require_admin
     def post(self):
         """Reloads the default widgets and explorations."""
         if self.payload.get('action') == 'reload':
