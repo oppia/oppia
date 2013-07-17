@@ -20,9 +20,8 @@ from oppia.apps.exploration.domain import Exploration
 from oppia.controllers import admin
 from oppia.controllers.base import BaseHandler
 import feconf
+import oppia.apps.user.services as user_services
 import utils
-
-from google.appengine.api import users
 
 
 class MainPage(BaseHandler):
@@ -34,7 +33,7 @@ class MainPage(BaseHandler):
             admin.reload_demos()
 
         self.values.update({
-            'gallery_login_url': users.create_login_url('/gallery'),
+            'gallery_login_url': user_services.create_login_url('/gallery'),
         })
         self.render_template('pages/index.html')
 

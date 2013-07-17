@@ -23,10 +23,9 @@ import traceback
 
 from oppia.apps.exploration.domain import Exploration
 import oppia.apps.exploration.services as exp_services
+import oppia.apps.user.services as user_services
 import feconf
 import webapp2
-
-from google.appengine.api import users
 
 
 def require_user(handler):
@@ -34,7 +33,7 @@ def require_user(handler):
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in."""
         if not self.user_id:
-            self.redirect(users.create_login_url(self.request.uri))
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
         return handler(self, **kwargs)
 
@@ -62,7 +61,7 @@ def require_editor(handler):
                 the right credentials.
         """
         if not self.user_id:
-            self.redirect(users.create_login_url(self.request.uri))
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
 
         try:
@@ -70,7 +69,7 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if (not users.is_current_user_admin() and
+        if (not user_services.is_current_user_admin() and
                 not exploration.is_editable_by(self.user_id)):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
@@ -92,9 +91,9 @@ def require_admin(handler):
     def test_admin(self, **kwargs):
         """Checks if the user is logged in and is an admin."""
         if not self.user_id:
-            self.redirect(users.create_login_url(self.request.uri))
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
-        if not users.is_current_user_admin():
+        if not user_services.is_current_user_admin():
             raise self.UnauthorizedUserException(
                 '%s is not an admin of this application', self.user_id)
         return handler(self, **kwargs)
@@ -119,15 +118,16 @@ class BaseHandler(webapp2.RequestHandler):
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
         }
 
-        self.user = users.get_current_user()
+        self.user = user_services.get_current_user()
         self.user_id = self.user.email() if self.user else None
         if self.user_id:
             self.values['logout_url'] = (
-                users.create_logout_url(self.request.uri))
+                user_services.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
-            self.values['is_admin'] = users.is_current_user_admin()
+            self.values['is_admin'] = user_services.is_current_user_admin()
         else:
-            self.values['login_url'] = users.create_login_url(self.request.uri)
+            self.values['login_url'] = user_services.create_login_url(
+                self.request.uri)
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
@@ -189,7 +189,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if isinstance(exception, self.NotLoggedInException):
-            self.redirect(users.create_login_url(self.request.uri))
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

@@ -19,9 +19,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 import collections
 
 import oppia.apps.exploration.services as exp_services
+import oppia.apps.user.services as user_services
 from oppia.controllers.base import BaseHandler
-
-from google.appengine.api import users
 
 
 class GalleryPage(BaseHandler):
@@ -40,7 +39,7 @@ class GalleryHandler(BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if users.is_current_user_admin():
+        if user_services.is_current_user_admin():
             explorations = exp_services.get_all_explorations()
             editable_exploration_ids = [e.id for e in explorations]
         elif self.user_id:
@@ -61,7 +60,7 @@ class GalleryHandler(BaseHandler):
                 'can_fork': self.user_id and exploration.is_demo,
                 'id': exploration.id,
                 'image_id': exploration.image_id,
-                'is_owner': (users.is_current_user_admin() or
+                'is_owner': (user_services.is_current_user_admin() or
                              exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,
             })

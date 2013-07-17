@@ -18,10 +18,9 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 import oppia.apps.exploration.services as exp_services
 import oppia.apps.statistics.services as stats_services
+import oppia.apps.user.services as user_services
 from oppia.controllers.base import BaseHandler
 from oppia.controllers.base import require_user
-
-from google.appengine.api import users
 
 
 class ProfilePage(BaseHandler):
@@ -42,7 +41,7 @@ class ProfileHandler(BaseHandler):
     @require_user
     def get(self):
         """Handles GET requests."""
-        if users.is_current_user_admin():
+        if user_services.is_current_user_admin():
             exps = exp_services.get_all_explorations()
         else:
             exps = exp_services.get_editable_explorations(self.user_id)

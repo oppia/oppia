@@ -16,12 +16,11 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import oppia.apps.user.services as user_services
 from oppia.apps.widget.models import InteractiveWidget
 from oppia.apps.widget.models import NonInteractiveWidget
 from oppia.controllers.base import BaseHandler
 import utils
-
-from google.appengine.api import users
 
 
 class WidgetRepositoryPage(BaseHandler):
@@ -35,7 +34,7 @@ class WidgetRepositoryPage(BaseHandler):
             self.values['interactive'] = True
         if 'parent_index' in self.request.GET.keys():
             self.values['parent_index'] = self.request.get('parent_index')
-        if users.is_current_user_admin():
+        if user_services.is_current_user_admin():
             self.values['admin'] = True
         self.render_template('editor/widget_repository.html')
 
