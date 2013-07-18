@@ -20,7 +20,6 @@ import feconf
 from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
-import oppia.apps.widget.models as widget_models
 import test_utils
 
 
@@ -30,16 +29,12 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets and creates a sample exploration."""
         super(StateModelUnitTests, self).setUp()
-        widget_models.InteractiveWidget.load_default_widgets()
-
         self.user_id = 'test@example.com'
-
         self.exploration = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'A title', 'A category', 'A exploration_id'))
 
     def tearDown(self):
         """Deletes all widgets and explorations."""
-        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(StateModelUnitTests, self).tearDown()
 

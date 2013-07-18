@@ -65,8 +65,8 @@ def parse_content_into_html(content_array, block_number, params=None):
         the HTML string representing the array.
 
     Raises:
-        InvalidInputException: if content has no 'type' attribute, or an invalid
-            'type' attribute.
+        InvalidInputException: if content has no 'type' attribute, or an
+            invalid 'type' attribute.
     """
     if params is None:
         params = {}
@@ -90,7 +90,7 @@ def parse_content_into_html(content_array, block_number, params=None):
                 continue
 
             widget_dict = json.loads(content.value)
-            widget = widget_models.NonInteractiveWidget.get_with_params(
+            widget = widget_models.get_with_params(
                 widget_dict['id'], widget_dict['params'])
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
@@ -130,8 +130,8 @@ class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
     def _get_exploration_params(self, exploration):
-        # TODO(yanamal/sll): consider merging with get_params somehow, since the
-        # process is largely the same
+        # TODO(yanamal/sll): consider merging with get_params somehow, since
+        # the process is largely the same
         params = {}
         for item in exploration.parameters:
             value = item.value
@@ -154,7 +154,7 @@ class ExplorationHandler(base.BaseHandler):
         params = get_params(init_state, params)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
-        interactive_html = widget_models.InteractiveWidget.get_raw_code(
+        interactive_html = widget_models.get_raw_code(
             init_state.widget.widget_id,
             params=utils.parse_dict_with_params(
                 init_state.widget.params, params)
@@ -189,7 +189,7 @@ class FeedbackHandler(base.BaseHandler):
         recorded_answer_params.update({
             'answer': answer,
         })
-        recorded_answer = widget_models.InteractiveWidget.get_stats_log_html(
+        recorded_answer = widget_models.get_stats_log_html(
             old_state.widget.widget_id, params=recorded_answer_params)
 
         if recorded_answer:
@@ -234,7 +234,7 @@ class FeedbackHandler(base.BaseHandler):
                 iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
-                widget_models.InteractiveWidget.get_raw_code(
+                widget_models.get_raw_code(
                     new_state.widget.widget_id,
                     params=utils.parse_dict_with_params(
                         new_state.widget.params, new_params)
@@ -299,9 +299,8 @@ class FeedbackHandler(base.BaseHandler):
             # using a custom filter.
             reader_response_params['answer'] = answer
             reader_response_html, reader_response_iframe = (
-                widget_models.InteractiveWidget.get_reader_response_html(
-                    old_state.widget.widget_id,
-                    reader_response_params)
+                widget_models.get_reader_response_html(
+                    old_state.widget.widget_id, reader_response_params)
             )
         values['reader_response_html'] = reader_response_html
         values['reader_response_iframe'] = reader_response_iframe

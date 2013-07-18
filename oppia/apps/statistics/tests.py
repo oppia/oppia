@@ -20,7 +20,6 @@ from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
 from oppia.apps.statistics import stats_services
-import oppia.apps.widget.models as widget_models
 import test_utils
 
 
@@ -30,10 +29,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         super(StatisticsUnitTests, self).setUp()
         self.user_id = 'fake@user.com'
-        widget_models.InteractiveWidget.load_default_widgets()
 
     def tearDown(self):
-        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(StatisticsUnitTests, self).tearDown()
 

@@ -20,7 +20,6 @@ import test_utils
 
 from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
-import oppia.apps.widget.models as widget_models
 
 
 class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
@@ -29,7 +28,6 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets and creates dummy users."""
         super(ExplorationServicesUnitTests, self).setUp()
-        widget_models.InteractiveWidget.load_default_widgets()
 
         self.owner_id = 'owner@example.com'
         self.editor_id = 'editor@example.com'
@@ -37,7 +35,6 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
 
     def tearDown(self):
         """Deletes the dummy users and any other widgets and explorations."""
-        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(ExplorationServicesUnitTests, self).tearDown()
 
@@ -56,7 +53,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
 
         exploration2 = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A new title', 'A category', 'A new exploration_id'))
+            self.owner_id, 'New title', 'A category', 'New exploration_id'))
         self.assertItemsEqual(
             [e.id for e in exp_services.get_all_explorations()],
             [exploration.id, exploration2.id]

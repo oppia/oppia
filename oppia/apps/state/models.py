@@ -33,7 +33,7 @@ from google.appengine.ext import ndb
 class Content(base_models.BaseModel):
     """Non-interactive content in a state."""
     type = ndb.StringProperty(choices=['text', 'image', 'video', 'widget'])
-    # TODO(sll): Generalize this so that the value can be a dict (for a widget).
+    # TODO(sll): Generalize this so the value can be a dict (for a widget).
     value = ndb.TextProperty(default='')
 
 
@@ -43,7 +43,8 @@ class Rule(base_models.BaseModel):
 
     # The name of the rule.
     name = ndb.StringProperty(required=True)
-    # Parameters for the classification rule. TODO(sll): Make these the actual params.
+    # Parameters for the classification rule.
+    # TODO(sll): Make these the actual params.
     inputs = ndb.JsonProperty(default={})
     # The id of the destination state.
     dest = ndb.StringProperty(required=True)
@@ -110,9 +111,10 @@ class State(base_models.IdModel):
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
-        widget = widget_models.InteractiveWidget.get(self.widget.widget_id)
+        widget_handlers = widget_models.get_widget_handlers(
+            self.widget.widget_id)
         for curr_handler in self.widget.handlers:
-            for w_handler in widget.handlers:
+            for w_handler in widget_handlers:
                 if w_handler.name == curr_handler.name:
                     curr_handler.classifier = w_handler.classifier
 
@@ -194,7 +196,8 @@ class State(base_models.IdModel):
             if match:
                 return rule
 
-        raise Exception('No matching rule found for handler %s.' % handler.name)
+        raise Exception(
+            'No matching rule found for handler %s.' % handler.name)
 
     def get_typed_object(self, mutable_rule, param):
         param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
@@ -205,8 +208,8 @@ class State(base_models.IdModel):
     def get_classifier_info(self, widget_id, handler_name, rule, state_params):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
-        mutable_rule = widget_models.InteractiveWidget.get(
-            widget_id).get_readable_name(handler_name, rule.name)
+        mutable_rule = widget_models.get_readable_rule_name(
+            widget_id, handler_name, rule.name)
 
         func_name = classifier_func[: first_bracket]
         str_params = classifier_func[first_bracket + 1: -1].split(',')

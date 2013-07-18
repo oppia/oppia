@@ -35,13 +35,14 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 77
+EXPECTED_TEST_COUNT = 74
 
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--test_path',
-    help='optional file or subdirectory path containing the test(s) to run', type=str)
+    help='optional file or subdirectory path containing the test(s) to run',
+    type=str)
 
 
 def create_test_suites(parsed_args):
@@ -69,7 +70,8 @@ def main():
         os.path.join(os.getcwd(), 'third_party/webtest-1.4.2')))
     sys.path.append(os.path.abspath(os.path.join(
         os.getcwd(),
-        '../gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')))
+        '../gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')
+    ))
 
     import dev_appserver
     dev_appserver.fix_sys_path()

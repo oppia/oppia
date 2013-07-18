@@ -22,7 +22,6 @@ from oppia.apps.exploration import exp_services
 import oppia.apps.image.models as image_models
 import oppia.apps.parameter.models as param_models
 import oppia.apps.state.models as state_models
-import oppia.apps.widget.models as widget_models
 import test_utils
 
 from google.appengine.ext.db import BadValueError
@@ -34,11 +33,9 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets."""
         super(ExplorationModelUnitTests, self).setUp()
-        widget_models.InteractiveWidget.load_default_widgets()
 
     def tearDown(self):
         """Deletes all widgets and explorations."""
-        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(ExplorationModelUnitTests, self).tearDown()
 

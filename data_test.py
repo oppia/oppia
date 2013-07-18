@@ -37,8 +37,8 @@ class DataUnitTest(test_utils.AppEngineTestBase):
 
         Args:
           adict: the dictionary to test.
-          dict_schema: list of 2-element tuples. The first element of each tuple
-            is the key name and the second element is the value type.
+          dict_schema: list of 2-element tuples. The first element of each
+            tuple is the key name and the second element is the value type.
         """
         for item in dict_schema:
             self.assertEqual(
@@ -49,7 +49,7 @@ class DataUnitTest(test_utils.AppEngineTestBase):
         TOP_LEVEL_KEYS = [item[0] for item in dict_schema]
         self.assertItemsEqual(
             TOP_LEVEL_KEYS, adict.keys(),
-            msg='Dict %s does not conform to schema %s.' % (adict, dict_schema))
+            msg='Dict %s should conform to schema %s.' % (adict, dict_schema))
 
         for item in dict_schema:
             self.assertTrue(
@@ -60,11 +60,6 @@ class DataUnitTest(test_utils.AppEngineTestBase):
 
 class ExplorationDataUnitTests(DataUnitTest):
     """Tests that all the default explorations are valid."""
-
-    def setUp(self):
-        """Loads the default widgets."""
-        super(ExplorationDataUnitTests, self).setUp()
-        widget_models.InteractiveWidget.load_default_widgets()
 
     def verify_is_valid_widget(self, widget_id):
         """Checks that a widget id is valid (i.e., its directory exists)."""
@@ -139,8 +134,8 @@ class ExplorationDataUnitTests(DataUnitTest):
 
             # Check that the parameter name is valid.
             try:
-                widget_params = widget_models.Widget.get(
-                    state_dict['widget']['widget_id']).params
+                widget_params = widget_models.get_widget_params(
+                    state_dict['widget']['widget_id'])
             except Exception as e:
                 raise Exception(
                     '%s; widget id: %s' %
@@ -315,13 +310,14 @@ class WidgetDataUnitTests(DataUnitTest):
             self.assertTrue(self.is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
-            widget_dir = os.path.join(feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
+            widget_dir = os.path.join(
+                feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
-            # In this directory there should only be a config.yaml file, an html
-            # entry-point file, a response.html file, (optionally) a directory
-            # named 'static', (optionally) a response_iframe.html file and
-            # (optionally) a stats_response.html file.
+            # In this directory there should only be a config.yaml file, an
+            # html entry-point file, a response.html file, (optionally) a
+            # directory named 'static', (optionally) a response_iframe.html
+            # file and (optionally) a stats_response.html file.
             dir_contents = os.listdir(widget_dir)
             self.assertLessEqual(len(dir_contents), 6)
 
@@ -390,6 +386,12 @@ class WidgetDataUnitTests(DataUnitTest):
                 if item_type == basestring:
                     self.assertTrue(getattr(widget_cls, item))
 
+            # Check that at least one handler exists.
+            self.assertTrue(
+                len(widget_cls.handlers),
+                msg='Widget %s has no handlers defined' % widget_id
+            )
+
             for handler in widget_cls.handlers:
                 HANDLER_KEYS = ['name', 'classifier']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
@@ -405,6 +407,14 @@ class WidgetDataUnitTests(DataUnitTest):
                     self.assertTrue(
                         os.path.isdir(classifier_dir),
                         msg='Classifier %s does not exist' % classifier_dir)
+
+            # Check that all handler names are unique.
+            names = [handler['name'] for handler in widget_cls.handlers]
+            self.assertEqual(
+                len(set(names)),
+                len(names),
+                'Widget %s has duplicate handler names' % widget_id
+            )
 
             for param in widget_cls.params:
                 PARAM_KEYS = ['name', 'description', 'obj_type', 'values']

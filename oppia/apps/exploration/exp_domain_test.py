@@ -21,7 +21,6 @@ import test_utils
 from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
-import oppia.apps.widget.models as widget_models
 
 
 class FakeExploration(exp_domain.Exploration):
@@ -53,11 +52,9 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     def setUp(self):
         """Loads the default widgets."""
         super(ExplorationDomainUnitTests, self).setUp()
-        widget_models.InteractiveWidget.load_default_widgets()
 
     def tearDown(self):
         """Deletes all widgets and explorations."""
-        widget_models.InteractiveWidget.delete_all_widgets()
         exp_services.delete_all_explorations()
         super(ExplorationDomainUnitTests, self).tearDown()
 

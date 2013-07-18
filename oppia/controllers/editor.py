@@ -45,10 +45,8 @@ def get_state_for_frontend(state, exploration):
             if item['name'] == 'Default':
                 item['rule'] = 'Default'
             else:
-                item['rule'] = widget_models.InteractiveWidget.get(
-                    state.widget.widget_id).get_readable_name(
-                        handler['name'], item['name']
-                    )
+                item['rule'] = widget_models.get_readable_rule_name(
+                    state.widget.widget_id, handler['name'], item['name'])
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
@@ -81,7 +79,8 @@ def get_exploration_stats(exploration):
         all_rule_count = 0
         state_count = state_counts[state_id]['count']
         for rule in answers[state_id]['rules'].keys():
-            state_stats[state_id]['rule_stats'][rule] = answers[state_id]['rules'][rule]
+            state_stats[state_id]['rule_stats'][rule] = (
+                answers[state_id]['rules'][rule])
             rule_count = 0
             for _, count in answers[state_id]['rules'][rule]['answers']:
                 rule_count += count

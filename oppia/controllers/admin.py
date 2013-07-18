@@ -27,9 +27,7 @@ def reload_widgets():
     cl_models.Classifier.delete_all_classifiers()
     cl_models.Classifier.load_default_classifiers()
 
-    widget_models.Widget.delete_all_widgets()
-    widget_models.InteractiveWidget.load_default_widgets()
-    widget_models.NonInteractiveWidget.load_default_widgets()
+    widget_models.refresh_widgets()
 
 
 def reload_explorations():

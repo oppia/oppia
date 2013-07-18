@@ -41,21 +41,20 @@ class WidgetRepositoryPage(base.BaseHandler):
 class WidgetRepositoryHandler(base.BaseHandler):
     """Provides data to populate the widget repository page."""
 
-    def get_widgets(self, widget_class):
-        """Load widgets from the datastore."""
-        assert widget_class in [
-            widget_models.InteractiveWidget,
-            widget_models.NonInteractiveWidget
-        ]
+    def get_widgets(self, widget_prefix):
+        """Load widgets."""
+        assert widget_prefix in ['interactive-', 'noninteractive-']
+        widget_classes = widget_models.get_widget_bindings_with_prefix(
+            widget_prefix)
 
         response = {}
 
-        for widget in widget_class.query():
-            category = widget.category
+        for widget_cls in widget_classes:
+            category = widget_cls.category
             if category not in response:
                 response[category] = []
             response[category].append(
-                widget_class.get_with_params(widget.id, {})
+                widget_models.get_with_params(widget_cls().id, {})
             )
 
         for category in response:
@@ -66,15 +65,13 @@ class WidgetRepositoryHandler(base.BaseHandler):
         """Handles GET requests."""
         response = {}
         if self.request.get('interactive') == 'true':
-            response['widgets'] = self.get_widgets(
-                widget_models.InteractiveWidget)
+            response['widgets'] = self.get_widgets('interactive-')
         else:
-            response['widgets'] = self.get_widgets(
-                widget_models.NonInteractiveWidget)
+            response['widgets'] = self.get_widgets('noninteractive-')
             parent_index = self.request.get('parent_index')
             if parent_index is None:
                 raise Exception(
-                    'No parent index supplied for non-interactive widget.')
+                    'Non-interactive widgets require a parent_index.')
             else:
                 response['parent_index'] = parent_index
 
@@ -89,7 +86,7 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         """Handles GET requests."""
         try:
             self.render_json({
-                'widget': widget_models.NonInteractiveWidget.get_with_params(
+                'widget': widget_models.get_with_params(
                     widget_id, {}),
             })
         except:
@@ -115,8 +112,7 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         # TODO(sll): In order to unify this with InteractiveWidgetHandler,
         # we need a convention for which params must be JSONified and which
         # should not. Fix this.
-        response = widget_models.NonInteractiveWidget.get_with_params(
-            widget_id, params)
+        response = widget_models.get_with_params(widget_id, params)
 
         self.render_json({
             'widget': response,
@@ -131,7 +127,7 @@ class InteractiveWidgetHandler(base.BaseHandler):
         """Handles GET requests."""
         try:
             self.render_json({
-                'widget': widget_models.InteractiveWidget.get_with_params(
+                'widget': widget_models.get_with_params(
                     widget_id, {}),
             })
         except:
@@ -154,7 +150,7 @@ class InteractiveWidgetHandler(base.BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        response = widget_models.InteractiveWidget.get_with_params(
+        response = widget_models.get_with_params(
             widget_id, params=utils.parse_dict_with_params(
                 params, state_params_dict)
         )

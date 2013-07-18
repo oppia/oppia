@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import copy
 import inspect
 import os
 import pkgutil
@@ -29,9 +28,7 @@ import oppia.apps.classifier.models as cl_models
 import oppia.apps.parameter.models as param_models
 import utils
 
-from google.appengine.ext import db
 from google.appengine.ext import ndb
-from google.appengine.ext.ndb import polymodel
 
 
 class AnswerHandler(base_models.BaseModel):
@@ -52,23 +49,85 @@ class BaseWidget(object):
     """Base widget definition class."""
     @property
     def id(self):
-        return self.__cls__.__name__
+        prefix = 'interactive' if self.is_interactive else 'noninteractive'
+        return '%s-%s' % (prefix, self.__class__.__name__)
 
+    # The human-readable name of the widget.
     name = ''
+    # The category in the widget repository to which this widget belongs.
     category = ''
+    # The description of the widget.
     description = ''
+    # Parameter specifications for this widget. The default parameters can be
+    # overridden when the widget is used within a State.
     params = []
 
     handlers = []
 
+    @property
     def is_interactive(self):
         """A widget is interactive if its handlers array is non-empty."""
+        # TODO(sll): Also, if its id has the 'interactive-' prefix. Resolve
+        # this (using tests) so that there is a single source of truth.
         return bool(self.handlers)
+
+    @property
+    def response_template_and_iframe(self):
+        """The template that generates the html to display reader responses."""
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
+
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+        html = utils.get_file_contents(os.path.join(
+            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
+
+        try:
+            iframe = utils.get_file_contents(os.path.join(
+                feconf.WIDGETS_DIR, widget_type, widget_id,
+                'response_iframe.html'))
+        except IOError:
+            iframe = ''
+
+        return html, iframe
+
+    @property
+    def stats_log_template(self):
+        """The template for reader responses in the stats log."""
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
+
+        widget_type, widget_id = self.id.split('-')
+        if widget_type != feconf.INTERACTIVE_PREFIX:
+            return ''
+
+        try:
+            return utils.get_file_contents(os.path.join(
+                feconf.WIDGETS_DIR, widget_type, widget_id,
+                'stats_response.html'))
+        except IOError:
+            return '{{answer}}'
 
 
 # A dict containing all widgets. The keys are the widget ids (prefixed with
 # the widget type) and the values are the widget classes.
+# TODO(sll): Encapsulate this as a private member of a class?
 widget_bindings = {}
+
+
+def get_widget_bindings_with_prefix(widget_prefix):
+    """Get a list of widget classes whose id starts with widget_prefix."""
+    refresh_widgets()
+
+    widget_classes = []
+    for widget_id, widget_cls in widget_bindings.iteritems():
+        if widget_id.startswith(widget_prefix):
+            widget_classes.append(widget_cls)
+
+    return widget_classes
 
 
 def refresh_widgets():
@@ -109,9 +168,12 @@ def refresh_widgets():
         feconf.INTERACTIVE_WIDGET_COUNT + feconf.NONINTERACTIVE_WIDGET_COUNT)
 
 
+def get_widget_count():
+    return len(widget_bindings)
+
+
 def get_rules_for_handler(widget_id, handler_name):
-    widget_cls = Widget.get(widget_id)
-    for handler in widget_cls.handlers:
+    for handler in get_widget_handlers(widget_id):
         if handler['name'] == handler_name:
             if handler['classifier'] is None:
                 return []
@@ -119,275 +181,114 @@ def get_rules_for_handler(widget_id, handler_name):
                 return cl_models.Classifier.get(handler['classifier']).rules
 
 
-class Widget(polymodel.PolyModel):
-    """A superclass for NonInteractiveWidget and InteractiveWidget.
-
-    NB: The ids for this class are strings that are the concatenations of:
-      - the widget type (interactive|noninteractive)
-      - a hyphen
-      - the camel-cased version of the human-readable names.
-    """
-    @property
-    def id(self):
-        return self.key.id()
-
-    # The human-readable name of the widget.
-    name = ndb.StringProperty(required=True)
-    # The category in the widget repository to which this widget belongs.
-    category = ndb.StringProperty(required=True)
-    # The description of the widget.
-    description = ndb.TextProperty()
-    # Parameter specifications for this widget. The default parameters can be
-    # overridden when the widget is used within a State.
-    params = param_models.ParameterProperty(repeated=True)
-
-    @property
-    def template(self):
-        """The template used to generate the widget html."""
-        widget_type, widget_id = self.id.split('-')
-        return utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
-
-    @classmethod
-    def get(cls, widget_id):
-        """Gets a widget by id. If it does not exist, returns None."""
-        return cls.get_by_id(widget_id)
-
-    def put(self):
-        """The put() method should only be called on subclasses of Widget."""
-        if self.__class__.__name__ == 'Widget':
-            raise NotImplementedError
-        super(Widget, self).put()
-
-    @classmethod
-    def get_raw_code(cls, widget_id, params=None):
-        """Gets the raw code for a parameterized widget."""
-        if params is None:
-            params = {}
-
-        widget = cls.get(widget_id)
-
-        # Parameters used to generate the raw code for the widget.
-        # TODO(sll): Why do we convert only the default value to a JS string?
-        parameters = dict(
-            (param.name, params.get(
-                param.name, utils.convert_to_js_string(param.value))
-             ) for param in widget.params)
-
-        return utils.parse_with_jinja(widget.template, parameters)
-
-    @classmethod
-    def _get_with_params(cls, widget_id, params):
-        """Gets a dict representing a parameterized widget.
-
-        This method must be called on a subclass of Widget.
-        """
-        if cls.__name__ == 'Widget':
-            raise NotImplementedError
-
-        widget = cls.get(widget_id)
-        if widget is None:
-            raise Exception('No widget found with id %s' % widget_id)
-
-        result = copy.deepcopy(widget.to_dict(exclude=['class_']))
-        result.update({
-            'id': widget_id,
-            'raw': cls.get_raw_code(widget_id, params),
-            # TODO(sll): Restructure this so that it is
-            # {key: {value: ..., obj_type: ...}}
-            'params': dict((param.name, params.get(param.name, param.value))
-                           for param in widget.params),
-        })
-        return result
-
-    @classmethod
-    def delete_all_widgets(cls):
-        """Deletes all widgets."""
-        widget_list = Widget.query()
-        for widget in widget_list:
-            widget.key.delete()
-
-
-class NonInteractiveWidget(Widget):
-    """A generic non-interactive widget."""
-
-    def _pre_put_hook(self):
-        if not self.id:
-            raise db.BadValueError('No id specified for widget.')
-
-        # Checks that the id is valid.
-        if not self.id.startswith('%s-' % feconf.NONINTERACTIVE_PREFIX):
-            raise db.BadValueError(
-                'Invalid id for non-interactive widget: %s' % self.id)
-
-    @classmethod
-    def load_default_widgets(cls):
-        """Loads the default widgets."""
+def get_widget_cls_by_id(widget_id):
+    """Gets a widget class by id. Refreshes once if the widget is not found;
+    subsequently, throws an error."""
+    if widget_id not in widget_bindings:
         refresh_widgets()
-
-        for widget_id in widget_bindings:
-            widget_cls = widget_bindings[widget_id]
-
-            if widget_id.startswith('noninteractive-'):
-                widget_id = widget_id.split('-')[1]
-            else:
-                continue
-
-            conf = {
-                'id': '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id),
-                'params': [
-                    param_models.Parameter(**param)
-                    for param in widget_cls.params],
-                'name': widget_cls.name,
-                'category': widget_cls.category,
-                'description': widget_cls.description
-            }
-            widget = cls(**conf)
-            widget.put()
-
-    @classmethod
-    def get_with_params(cls, widget_id, params):
-        """Gets a dict representing a parameterized widget."""
-        result = super(NonInteractiveWidget, cls)._get_with_params(
-            widget_id, params)
-        return result
+    return widget_bindings[widget_id]
 
 
-class InteractiveWidget(Widget):
-    """A generic interactive widget."""
-
-    handlers = ndb.StructuredProperty(AnswerHandler, repeated=True)
-
-    def _pre_put_hook(self):
-        if not self.id:
-            raise db.BadValueError('No id specified for widget.')
-
-        # Checks that at least one handler exists.
-        if not self.handlers:
-            raise db.BadValueError(
-                'Widget %s has no handlers defined' % self.name)
-
-        # Checks that all handler names are unique.
-        names = [handler.name for handler in self.handlers]
-        if len(set(names)) != len(names):
-            raise db.BadValueError(
-                'There are duplicate names in the handler for widget %s'
-                % self.id)
-
-        # Checks that the id is valid.
-        if not self.id.startswith('%s-' % feconf.INTERACTIVE_PREFIX):
-            raise db.BadValueError(
-                'Invalid id for interactive widget: %s' % self.id)
-
-    def _get_handler(self, handler_name):
-        """Get the handler object corresponding to a given handler name."""
-        return next((h for h in self.handlers if h.name == handler_name), None)
-
-    @property
-    def response_template_and_iframe(self):
-        """The template that generates the html to display reader responses."""
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
-        html = utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
-
-        try:
-            iframe = utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, widget_type, widget_id,
-                'response_iframe.html'))
-        except IOError:
-            iframe = ''
-
-        return html, iframe
-
-    @property
-    def stats_log_template(self):
-        """The template for reader responses in the stats log."""
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
-
-        try:
-            return utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, widget_type, widget_id,
-                'stats_response.html'))
-        except IOError:
-            return '{{answer}}'
-
-    @classmethod
-    def load_default_widgets(cls):
-        """Loads the default widgets.
-
-        Assumes that everything is valid (directories exist, widget config files
-        are formatted correctly, etc.).
-        """
+def get_widget_template(widget_id):
+    """The template used to generate the widget html."""
+    if widget_id not in widget_bindings:
         refresh_widgets()
+    assert widget_id in widget_bindings
 
-        for widget_id in widget_bindings:
-            widget_cls = widget_bindings[widget_id]
+    widget_type, widget_id = widget_id.split('-')
+    return utils.get_file_contents(os.path.join(
+        feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
 
-            if widget_id.startswith('interactive-'):
-                widget_id = widget_id.split('-')[1]
-            else:
-                continue
 
-            conf = {
-                'id': '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id),
-                'params': [
-                    param_models.Parameter(**param)
-                    for param in widget_cls.params],
-                'name': widget_cls.name,
-                'category': widget_cls.category,
-                'description': widget_cls.description,
-                'handlers': [AnswerHandler(**ah) for ah in widget_cls.handlers]
-            }
-            widget = cls(**conf)
-            widget.put()
+def get_widget_params(widget_id):
+    widget_cls = get_widget_cls_by_id(widget_id)
+    return [param_models.Parameter(**param) for param in widget_cls.params]
 
-    def get_readable_name(self, handler_name, rule_rule):
-        """Get the human-readable text for a rule."""
-        handler = self._get_handler(handler_name)
-        rule = next(r.name for r in handler.rules if r.rule == rule_rule)
 
-        if rule:
-            return rule
-        raise Exception('No rule name found for %s' % rule_rule)
+def get_widget_handlers(widget_id):
+    widget_cls = get_widget_cls_by_id(widget_id)
+    return [AnswerHandler(**ah) for ah in widget_cls.handlers]
 
-    @classmethod
-    def get_with_params(cls, widget_id, params):
-        """Gets a dict representing a parameterized widget."""
-        result = super(InteractiveWidget, cls)._get_with_params(
-            widget_id, params)
 
-        widget = cls.get(widget_id)
+def get_raw_code(widget_id, params=None):
+    """Gets the raw code for a parameterized widget."""
+    if params is None:
+        params = {}
 
-        for idx, handler in enumerate(widget.handlers):
-            result['handlers'][idx]['rules'] = dict(
-                (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
-                for rule in handler.rules)
+    widget_params = get_widget_params(widget_id)
 
-        return result
+    # Parameters used to generate the raw code for the widget.
+    # TODO(sll): Why do we convert only the default value to a JS string?
+    parameters = dict(
+        (param.name, params.get(
+            param.name, utils.convert_to_js_string(param.value))
+         ) for param in widget_params)
 
-    @classmethod
-    def get_reader_response_html(cls, widget_id, params=None):
-        """Gets the parameterized HTML and iframes for a reader response."""
-        # TODO(kashida): Make this consistent with get_raw_code.
-        if params is None:
-            params = {}
+    return utils.parse_with_jinja(
+        get_widget_template(widget_id), parameters)
 
-        widget = cls.get(widget_id)
-        html, iframe = widget.response_template_and_iframe
-        html = utils.parse_with_jinja(html, params)
-        iframe = utils.parse_with_jinja(iframe, params)
-        return html, iframe
 
-    @classmethod
-    def get_stats_log_html(cls, widget_id, params=None):
-        """Gets the HTML for recording a reader response for the stats log."""
-        # TODO(kashida): Make this consistent with get_raw_code.
-        if params is None:
-            params = {}
+def get_with_params(widget_id, params):
+    """Gets a dict representing a parameterized widget."""
+    widget_cls = get_widget_cls_by_id(widget_id)
+    widget_params = get_widget_params(widget_id)
+    widget_handlers = get_widget_handlers(widget_id)
 
-        widget = cls.get(widget_id)
-        return utils.parse_with_jinja(widget.stats_log_template, params)
+    result = {
+        'name': widget_cls.name,
+        'category': widget_cls.category,
+        'description': widget_cls.description,
+        'handlers': [h.to_dict() for h in widget_handlers],
+        'id': widget_id,
+        'raw': get_raw_code(widget_id, params),
+        # TODO(sll): Restructure this so that it is
+        # {key: {value: ..., obj_type: ...}}
+        'params': dict((param.name, params.get(param.name, param.value))
+                       for param in widget_params),
+    }
+
+    for idx, handler in enumerate(widget_handlers):
+        result['handlers'][idx]['rules'] = dict(
+            (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
+            for rule in handler.rules)
+
+    return result
+
+
+def get_reader_response_html(widget_id, params=None):
+    """Gets the parameterized HTML and iframes for a reader response."""
+    # TODO(kashida): Make this consistent with get_raw_code.
+    if params is None:
+        params = {}
+
+    widget_cls = get_widget_cls_by_id(widget_id)
+    assert widget_cls().is_interactive
+
+    html, iframe = widget_cls().response_template_and_iframe
+    html = utils.parse_with_jinja(html, params)
+    iframe = utils.parse_with_jinja(iframe, params)
+    return html, iframe
+
+
+def get_stats_log_html(widget_id, params=None):
+    """Gets the HTML for recording a reader response for the stats log."""
+    # TODO(kashida): Make this consistent with get_raw_code.
+    if params is None:
+        params = {}
+
+    widget_cls = get_widget_cls_by_id(widget_id)
+    return utils.parse_with_jinja(widget_cls().stats_log_template, params)
+
+
+def get_readable_rule_name(widget_id, handler_name, rule_rule):
+    """Get the human-readable text for a rule."""
+    handlers = get_widget_handlers(widget_id)
+
+    # Get the handler object corresponding to a given handler name.
+    handler = next((h for h in handlers if h.name == handler_name), None)
+
+    rule = next(r.name for r in handler.rules if r.rule == rule_rule)
+
+    if rule:
+        return rule
+    raise Exception('No rule name found for %s' % rule_rule)
