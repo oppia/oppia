@@ -138,8 +138,14 @@ class ExplorationDataUnitTests(DataUnitTest):
             self.assertTrue(isinstance(wp_name, basestring))
 
             # Check that the parameter name is valid.
-            widget_params = widget_models.Widget.get(
-                state_dict['widget']['widget_id']).params
+            try:
+                widget_params = widget_models.Widget.get(
+                    state_dict['widget']['widget_id']).params
+            except Exception as e:
+                raise Exception(
+                    '%s; widget id: %s' %
+                    (e, state_dict['widget']['widget_id'])
+                )
             widget_param_names = [wp.name for wp in widget_params]
             self.assertIn(
                 wp_name, widget_param_names,
@@ -295,7 +301,14 @@ class WidgetDataUnitTests(DataUnitTest):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
+        # TODO(sll): Check that the correct number of interactive and
+        # noninteractive widgets exist.
+        widget_models.refresh_widgets()
+        bindings = widget_models.widget_bindings
+
         widget_ids = os.listdir(os.path.join(feconf.INTERACTIVE_WIDGETS_DIR))
+        # TODO(sll): These tests ought to include non-interactive widgets as
+        # well.
 
         for widget_id in widget_ids:
             # Check that the widget_id name is valid.
@@ -322,54 +335,62 @@ class WidgetDataUnitTests(DataUnitTest):
             except Exception:
                 pass
 
-            stats_response_template = os.path.join(
-                widget_dir, 'stats_response.html')
             try:
-                self.assertTrue(os.path.isfile(stats_response_template))
+                self.assertTrue(os.path.isfile(
+                    os.path.join(widget_dir, 'stats_response.html')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
-            response_iframe_template = os.path.join(
-                widget_dir, 'response_iframe.html')
             try:
-                self.assertTrue(os.path.isfile(response_iframe_template))
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, 'response_iframe.html')))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, '%s.pyc' % widget_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 3, len(dir_contents)
+                optional_dirs_and_files_count + 3, len(dir_contents),
+                dir_contents
             )
 
-            config_filepath = os.path.join(
-                widget_dir, '%s.config.yaml' % widget_id)
+            py_file = os.path.join(widget_dir, '%s.py' % widget_id)
             html_entry_point = os.path.join(widget_dir, '%s.html' % widget_id)
             response_template = os.path.join(widget_dir, 'response.html')
 
-            self.assertTrue(os.path.isfile(config_filepath))
+            self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_entry_point))
             self.assertTrue(os.path.isfile(response_template))
 
-            # Read the widget configuration from config.yaml.
-            with open(config_filepath) as f:
-                widget_config = utils.dict_from_yaml(f.read().decode('utf-8'))
-
             WIDGET_CONFIG_SCHEMA = [
-                ('id', basestring), ('name', basestring),
-                ('category', basestring), ('description', basestring),
-                ('handlers', list), ('params', list)
+                ('name', basestring), ('category', basestring),
+                ('description', basestring), ('handlers', list),
+                ('params', list)
             ]
 
-            # Check that the configuration file contains the correct top-level
-            # keys, and that these keys have the correct types.
-            self.verify_dict_keys_and_types(widget_config, WIDGET_CONFIG_SCHEMA)
+            widget_cls = bindings['interactive-%s' % widget_id]
 
-            # Check that the specified widget id is the same as the directory
-            # name.
-            self.assertTrue(widget_config['id'], widget_id)
+            # Check that the specified widget id is the same as the class name.
+            self.assertTrue(widget_id, widget_cls.__name__)
 
-            for handler in widget_config['handlers']:
+            # Check that the configuration file contains the correct
+            # top-level keys, and that these keys have the correct types.
+            for item, item_type in WIDGET_CONFIG_SCHEMA:
+                self.assertTrue(isinstance(
+                    getattr(widget_cls, item), item_type
+                ))
+                # The string attributes should be non-empty.
+                if item_type == basestring:
+                    self.assertTrue(getattr(widget_cls, item))
+
+            for handler in widget_cls.handlers:
                 HANDLER_KEYS = ['name', 'classifier']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
                 self.assertTrue(isinstance(handler['name'], basestring))
@@ -385,7 +406,7 @@ class WidgetDataUnitTests(DataUnitTest):
                         os.path.isdir(classifier_dir),
                         msg='Classifier %s does not exist' % classifier_dir)
 
-            for param in widget_config['params']:
+            for param in widget_cls.params:
                 PARAM_KEYS = ['name', 'description', 'obj_type', 'values']
                 self.assertItemsEqual(PARAM_KEYS, param.keys())
                 self.assertTrue(isinstance(param['name'], basestring))

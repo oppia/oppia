@@ -99,6 +99,7 @@ loader = jinja2.FileSystemLoader(os.path.join(
 ))
 OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
 
+
 def include_js_file(name):
     """Include a raw JS file in the template without evaluating it."""
     assert name.endswith('.js')
@@ -127,3 +128,8 @@ ALLOW_YAML_FILE_UPLOAD = False
 # Prefixes for widget ids in the datastore.
 INTERACTIVE_PREFIX = 'interactive'
 NONINTERACTIVE_PREFIX = 'noninteractive'
+
+# The total number of non-interactive widgets. Used as a sanity check.
+NONINTERACTIVE_WIDGET_COUNT = 1
+# The total number of interactive widgets. Used as a sanity check.
+INTERACTIVE_WIDGET_COUNT = 8

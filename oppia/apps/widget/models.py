@@ -19,7 +19,9 @@
 __author__ = 'Sean Lip'
 
 import copy
+import inspect
 import os
+import pkgutil
 
 import feconf
 import oppia.apps.base_model.models as base_models
@@ -44,6 +46,77 @@ class AnswerHandler(base_models.BaseModel):
         if not self.classifier:
             return []
         return cl_models.Classifier.get(self.classifier).rules
+
+
+class BaseWidget(object):
+    """Base widget definition class."""
+    @property
+    def id(self):
+        return self.__cls__.__name__
+
+    name = ''
+    category = ''
+    description = ''
+    params = []
+
+    handlers = []
+
+    def is_interactive(self):
+        """A widget is interactive if its handlers array is non-empty."""
+        return bool(self.handlers)
+
+
+# A dict containing all widgets. The keys are the widget ids (prefixed with
+# the widget type) and the values are the widget classes.
+widget_bindings = {}
+
+
+def refresh_widgets():
+    """Repopulate the dict of widget bindings."""
+
+    # Empty the current bindings dict.
+    global widget_bindings
+    widget_bindings = {}
+
+    SOURCE_DIRS = [
+        feconf.NONINTERACTIVE_WIDGETS_DIR,
+        feconf.INTERACTIVE_WIDGETS_DIR
+    ]
+
+    # Assemble all paths of the form data/widgets/[WIDGET_TYPE]/[WIDGET_ID].
+    ALL_WIDGET_PATHS = []
+    for widget_dir in SOURCE_DIRS:
+        full_dir = os.path.join(os.getcwd(), widget_dir)
+        ALL_WIDGET_PATHS += [
+            os.path.join(os.getcwd(), full_dir, widget_id)
+            for widget_id in os.listdir(full_dir)
+            if os.path.isdir(os.path.join(full_dir, widget_id))
+        ]
+
+    # Crawl the directories and add new widgets to the bindings dict.
+    for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
+        module = loader.find_module(name).load_module(name)
+        for name, cls in inspect.getmembers(module, inspect.isclass):
+            if issubclass(cls, BaseWidget):
+                if cls.__name__ in widget_bindings:
+                    raise Exception(
+                        'Duplicate widget name %s' % cls.__name__)
+
+                prefix = 'interactive' if cls.handlers else 'noninteractive'
+                widget_bindings['%s-%s' % (prefix, cls.__name__)] = cls
+
+    assert len(widget_bindings) == (
+        feconf.INTERACTIVE_WIDGET_COUNT + feconf.NONINTERACTIVE_WIDGET_COUNT)
+
+
+def get_rules_for_handler(widget_id, handler_name):
+    widget_cls = Widget.get(widget_id)
+    for handler in widget_cls.handlers:
+        if handler['name'] == handler_name:
+            if handler['classifier'] is None:
+                return []
+            else:
+                return cl_models.Classifier.get(handler['classifier']).rules
 
 
 class Widget(polymodel.PolyModel):
@@ -150,18 +223,25 @@ class NonInteractiveWidget(Widget):
     @classmethod
     def load_default_widgets(cls):
         """Loads the default widgets."""
-        widget_ids = os.listdir(feconf.NONINTERACTIVE_WIDGETS_DIR)
+        refresh_widgets()
 
-        for widget_id in widget_ids:
-            widget_dir = os.path.join(
-                feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
-            widget_conf_filename = '%s.config.yaml' % widget_id
-            with open(os.path.join(widget_dir, widget_conf_filename)) as f:
-                conf = utils.dict_from_yaml(f.read().decode('utf-8'))
+        for widget_id in widget_bindings:
+            widget_cls = widget_bindings[widget_id]
 
-            conf['id'] = '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id)
-            conf['params'] = [
-                param_models.Parameter(**param) for param in conf['params']]
+            if widget_id.startswith('noninteractive-'):
+                widget_id = widget_id.split('-')[1]
+            else:
+                continue
+
+            conf = {
+                'id': '%s-%s' % (feconf.NONINTERACTIVE_PREFIX, widget_id),
+                'params': [
+                    param_models.Parameter(**param)
+                    for param in widget_cls.params],
+                'name': widget_cls.name,
+                'category': widget_cls.category,
+                'description': widget_cls.description
+            }
             widget = cls(**conf)
             widget.put()
 
@@ -242,18 +322,26 @@ class InteractiveWidget(Widget):
         Assumes that everything is valid (directories exist, widget config files
         are formatted correctly, etc.).
         """
-        widget_ids = os.listdir(feconf.INTERACTIVE_WIDGETS_DIR)
+        refresh_widgets()
 
-        for widget_id in widget_ids:
-            widget_dir = os.path.join(feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
-            widget_conf_filename = '%s.config.yaml' % widget_id
-            with open(os.path.join(widget_dir, widget_conf_filename)) as f:
-                conf = utils.dict_from_yaml(f.read().decode('utf-8'))
+        for widget_id in widget_bindings:
+            widget_cls = widget_bindings[widget_id]
 
-            conf['id'] = '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id)
-            conf['params'] = [
-                param_models.Parameter(**param) for param in conf['params']]
-            conf['handlers'] = [AnswerHandler(**ah) for ah in conf['handlers']]
+            if widget_id.startswith('interactive-'):
+                widget_id = widget_id.split('-')[1]
+            else:
+                continue
+
+            conf = {
+                'id': '%s-%s' % (feconf.INTERACTIVE_PREFIX, widget_id),
+                'params': [
+                    param_models.Parameter(**param)
+                    for param in widget_cls.params],
+                'name': widget_cls.name,
+                'category': widget_cls.category,
+                'description': widget_cls.description,
+                'handlers': [AnswerHandler(**ah) for ah in widget_cls.handlers]
+            }
             widget = cls(**conf)
             widget.put()
 

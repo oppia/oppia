@@ -292,11 +292,16 @@ class FeedbackHandler(base.BaseHandler):
         reader_response_html = ''
         reader_response_iframe = ''
         if not sticky:
+            reader_response_params = utils.parse_dict_with_params(
+                old_state.widget.params, old_params)
+            # TODO(sll): This is a hack to solve an issue with unnecessary
+            # conversion of the answer to a JavaScript-safe string. Fix it by
+            # using a custom filter.
+            reader_response_params['answer'] = answer
             reader_response_html, reader_response_iframe = (
                 widget_models.InteractiveWidget.get_reader_response_html(
                     old_state.widget.widget_id,
-                    utils.parse_dict_with_params(
-                        old_state.widget.params, old_params))
+                    reader_response_params)
             )
         values['reader_response_html'] = reader_response_html
         values['reader_response_iframe'] = reader_response_iframe
