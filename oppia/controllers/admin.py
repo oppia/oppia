@@ -18,7 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import oppia.apps.classifier.models as cl_models
 from oppia.apps.exploration import exp_services
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 from oppia.controllers import base
 
 
@@ -27,7 +27,7 @@ def reload_widgets():
     cl_models.Classifier.delete_all_classifiers()
     cl_models.Classifier.load_default_classifiers()
 
-    widget_models.Registry.refresh()
+    widget_domain.Registry.refresh()
 
 
 def reload_explorations():

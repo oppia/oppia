@@ -18,7 +18,7 @@ __author__ = 'Jeremy Emerson'
 
 import feconf
 import oppia.apps.classifier.models as cl_models
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 import test_utils
 
 from google.appengine.ext import db
@@ -34,7 +34,7 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
 
     def test_rules_property(self):
         """Test that answer_handler.rules behaves as expected."""
-        answer_handler = widget_models.AnswerHandler()
+        answer_handler = widget_domain.AnswerHandler()
         answer_handler.put()
         self.assertEqual(answer_handler.name, 'submit')
         self.assertEqual(answer_handler.rules, [])
@@ -45,11 +45,11 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
 
     def test_fake_classifier_is_not_accepted(self):
         """Test validation of answer_handler.classifier."""
-        answer_handler = widget_models.AnswerHandler()
+        answer_handler = widget_domain.AnswerHandler()
         with self.assertRaises(db.BadValueError):
             answer_handler.classifier = 'FakeClassifier'
 
-        answer_handler = widget_models.AnswerHandler(
+        answer_handler = widget_domain.AnswerHandler(
             classifier='MultipleChoiceClassifier')
         answer_handler.put()
 
@@ -63,7 +63,7 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
         MUSIC_STAFF_ID = 'MusicStaff'
 
-        widget = widget_models.Registry.get_widget_by_id(
+        widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
         self.assertEqual(widget.id, MUSIC_STAFF_ID)
         self.assertEqual(widget.name, 'Music staff')

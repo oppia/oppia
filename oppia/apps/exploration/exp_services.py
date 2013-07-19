@@ -34,7 +34,7 @@ import oppia.apps.exploration.models as exp_models
 import oppia.apps.image.models as image_models
 import oppia.apps.parameter.models as param_models
 import oppia.apps.state.models as state_models
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 import utils
 
 
@@ -125,7 +125,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
-    widget_params = widget_models.Registry.get_widget_by_id(
+    widget_params = widget_domain.Registry.get_widget_by_id(
         feconf.INTERACTIVE_PREFIX, wdict['widget_id']).params
     for wp in widget_params:
         if wp.name not in wdict['params']:

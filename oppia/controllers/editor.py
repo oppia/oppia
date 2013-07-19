@@ -22,7 +22,7 @@ from oppia.apps.exploration import exp_services
 import oppia.apps.parameter.models as param_models
 import oppia.apps.state.models as state_models
 from oppia.apps.statistics import stats_services
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 from oppia.controllers import base
 import utils
 
@@ -46,7 +46,7 @@ def get_state_for_frontend(state, exploration):
                 item['rule'] = 'Default'
             else:
                 # Get the human-readable name for a rule.
-                item['rule'] = widget_models.Registry.get_widget_by_id(
+                item['rule'] = widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, state.widget.widget_id
                 ).get_rule_by_rule(
                     handler['name'], item['name']

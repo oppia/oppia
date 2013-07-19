@@ -24,7 +24,7 @@ from data.objects.models import objects
 import feconf
 import oppia.apps.base_model.models as base_models
 import oppia.apps.parameter.models as param_models
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 import utils
 
 from google.appengine.ext import ndb
@@ -105,7 +105,7 @@ class State(base_models.IdModel):
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
-        widget_instance = widget_models.Registry.get_widget_by_id(
+        widget_instance = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, self.widget.widget_id)
         for curr_handler in self.widget.handlers:
             for w_handler in widget_instance.handlers:
@@ -204,7 +204,7 @@ class State(base_models.IdModel):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
         # Get the readable rule name.
-        rule_name = widget_models.Registry.get_widget_by_id(
+        rule_name = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, widget_id
         ).get_rule_by_rule(
             handler_name, rule.name

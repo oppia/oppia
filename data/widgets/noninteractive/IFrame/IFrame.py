@@ -1,7 +1,7 @@
-from oppia.apps.widget import models
+from oppia.apps.widget import widget_domain
 
 
-class IFrame(models.BaseWidget):
+class IFrame(widget_domain.BaseWidget):
     """Definition of a widget.
 
     Do NOT make any changes to this widget definition while the Oppia app is

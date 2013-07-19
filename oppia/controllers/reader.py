@@ -24,7 +24,7 @@ from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
 from oppia.apps.statistics import stats_services
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 from oppia.controllers import base
 import utils
 
@@ -90,7 +90,7 @@ def parse_content_into_html(content_array, block_number, params=None):
                 continue
 
             widget_dict = json.loads(content.value)
-            widget = widget_models.Registry.get_widget_by_id(
+            widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_dict['id']
             )
             html += feconf.OPPIA_JINJA_ENV.get_template(
@@ -156,7 +156,7 @@ class ExplorationHandler(base.BaseHandler):
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
 
-        interactive_widget = widget_models.Registry.get_widget_by_id(
+        interactive_widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_raw_code(
             params=utils.parse_dict_with_params(
@@ -186,7 +186,7 @@ class FeedbackHandler(base.BaseHandler):
     def _append_answer_to_stats_log(
             self, old_state, answer, exploration_id, old_state_id, rule):
         """Append the reader's answer to the statistics log."""
-        widget = widget_models.Registry.get_widget_by_id(
+        widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
         )
 
@@ -241,7 +241,7 @@ class FeedbackHandler(base.BaseHandler):
                 iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
-                widget_models.Registry.get_widget_by_id(
+                widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
                 ).get_raw_code(
                     params=utils.parse_dict_with_params(
@@ -307,7 +307,7 @@ class FeedbackHandler(base.BaseHandler):
             # using a custom filter.
             reader_response_params['answer'] = answer
             reader_response_html, reader_response_iframe = (
-                widget_models.Registry.get_widget_by_id(
+                widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
                 ).get_reader_response_html(reader_response_params)
             )

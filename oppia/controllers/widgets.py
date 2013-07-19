@@ -20,7 +20,7 @@ import collections
 
 import feconf
 from oppia.apps.user import user_services
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 from oppia.controllers import base
 import utils
 
@@ -46,7 +46,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
     def get_widgets(self, widget_type):
         """Load widgets."""
-        widgets = widget_models.Registry.get_widgets_of_type(
+        widgets = widget_domain.Registry.get_widgets_of_type(
             widget_type)
 
         response = collections.defaultdict(list)
@@ -85,7 +85,7 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         try:
-            widget = widget_models.Registry.get_widget_by_id(
+            widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_id
             )
             self.render_json({
@@ -114,7 +114,7 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         # TODO(sll): In order to unify this with InteractiveWidgetHandler,
         # we need a convention for which params must be JSONified and which
         # should not. Fix this.
-        widget = widget_models.Registry.get_widget_by_id(
+        widget = widget_domain.Registry.get_widget_by_id(
             feconf.NONINTERACTIVE_PREFIX, widget_id
         )
         self.render_json({
@@ -129,7 +129,7 @@ class InteractiveWidgetHandler(base.BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         try:
-            widget = widget_models.Registry.get_widget_by_id(
+            widget = widget_domain.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX, widget_id
             )
             self.render_json({
@@ -155,7 +155,7 @@ class InteractiveWidgetHandler(base.BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        widget = widget_models.Registry.get_widget_by_id(
+        widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, widget_id
         )
         response = widget.get_with_params(

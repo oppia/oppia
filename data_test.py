@@ -24,7 +24,7 @@ import string
 
 import feconf
 import oppia.apps.types.models as types_models
-import oppia.apps.widget.models as widget_models
+from oppia.apps.widget import widget_domain
 import test_utils
 import utils
 
@@ -134,7 +134,7 @@ class ExplorationDataUnitTests(DataUnitTest):
 
             # Check that the parameter name is valid.
             try:
-                widget = widget_models.Registry.get_widget_by_id(
+                widget = widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX,
                     state_dict['widget']['widget_id']
                 )
@@ -298,18 +298,18 @@ class WidgetDataUnitTests(DataUnitTest):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
-        widget_models.Registry.refresh()
+        widget_domain.Registry.refresh()
 
         self.assertEqual(
-            len(widget_models.Registry.interactive_widgets),
+            len(widget_domain.Registry.interactive_widgets),
             feconf.INTERACTIVE_WIDGET_COUNT
         )
         self.assertEqual(
-            len(widget_models.Registry.noninteractive_widgets),
+            len(widget_domain.Registry.noninteractive_widgets),
             feconf.NONINTERACTIVE_WIDGET_COUNT
         )
 
-        bindings = widget_models.Registry.interactive_widgets
+        bindings = widget_domain.Registry.interactive_widgets
 
         widget_ids = os.listdir(os.path.join(feconf.INTERACTIVE_WIDGETS_DIR))
         # TODO(sll): These tests ought to include non-interactive widgets as
