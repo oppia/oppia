@@ -90,9 +90,9 @@ def parse_content_into_html(content_array, block_number, params=None):
                 continue
 
             widget_dict = json.loads(content.value)
-            widget = widget_models.get_with_params(
-                feconf.NONINTERACTIVE_PREFIX,
-                widget_dict['id'], widget_dict['params'])
+            widget = widget_models.Registry.get_widget_by_id(
+                feconf.NONINTERACTIVE_PREFIX, widget_dict['id']
+            )
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
                     'blockIndex': block_number,
@@ -102,7 +102,7 @@ def parse_content_into_html(content_array, block_number, params=None):
             widget_array.append({
                 'blockIndex': block_number,
                 'index': widget_counter,
-                'raw': widget['raw'],
+                'raw': widget.get_with_params(widget_dict['params'])['raw'],
             })
             widget_counter += 1
         else:
@@ -155,9 +155,10 @@ class ExplorationHandler(base.BaseHandler):
         params = get_params(init_state, params)
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
-        interactive_html = widget_models.get_raw_code(
-            feconf.INTERACTIVE_PREFIX,
-            init_state.widget.widget_id,
+
+        interactive_widget = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
+        interactive_html = interactive_widget.get_raw_code(
             params=utils.parse_dict_with_params(
                 init_state.widget.params, params)
         )
@@ -185,14 +186,18 @@ class FeedbackHandler(base.BaseHandler):
     def _append_answer_to_stats_log(
             self, old_state, answer, exploration_id, old_state_id, rule):
         """Append the reader's answer to the statistics log."""
+        widget = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
+        )
+
         # TODO(sll): Parse this using old_params, but do not convert into
         # a JSON string.
         recorded_answer_params = old_state.widget.params
         recorded_answer_params.update({
             'answer': answer,
         })
-        recorded_answer = widget_models.get_stats_log_html(
-            old_state.widget.widget_id, params=recorded_answer_params)
+        recorded_answer = widget.get_stats_log_html(
+            params=recorded_answer_params)
 
         if recorded_answer:
             stats_services.EventHandler.record_rule_hit(
@@ -236,9 +241,9 @@ class FeedbackHandler(base.BaseHandler):
                 iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
-                widget_models.get_raw_code(
-                    feconf.INTERACTIVE_PREFIX,
-                    new_state.widget.widget_id,
+                widget_models.Registry.get_widget_by_id(
+                    feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
+                ).get_raw_code(
                     params=utils.parse_dict_with_params(
                         new_state.widget.params, new_params)
                 )
@@ -302,8 +307,9 @@ class FeedbackHandler(base.BaseHandler):
             # using a custom filter.
             reader_response_params['answer'] = answer
             reader_response_html, reader_response_iframe = (
-                widget_models.get_reader_response_html(
-                    old_state.widget.widget_id, reader_response_params)
+                widget_models.Registry.get_widget_by_id(
+                    feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
+                ).get_reader_response_html(reader_response_params)
             )
         values['reader_response_html'] = reader_response_html
         values['reader_response_iframe'] = reader_response_iframe

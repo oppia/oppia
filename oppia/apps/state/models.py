@@ -204,8 +204,11 @@ class State(base_models.IdModel):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
         # Get the readable rule name.
-        mutable_rule = widget_models.get_rule_by_rule(
-            widget_id, handler_name, rule.name).name
+        rule_name = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, widget_id
+        ).get_rule_by_rule(
+            handler_name, rule.name
+        ).name
 
         func_name = classifier_func[: first_bracket]
         str_params = classifier_func[first_bracket + 1: -1].split(',')
@@ -217,7 +220,7 @@ class State(base_models.IdModel):
                 parsed_param = utils.parse_with_jinja(
                     parsed_param, state_params)
 
-            typed_object = self.get_typed_object(mutable_rule, param)
+            typed_object = self.get_typed_object(rule_name, param)
             normalized_param = typed_object.normalize(parsed_param)
             param_list.append(normalized_param)
 

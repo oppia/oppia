@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes and methods relating to Oppia widgets."""
+"""Classes relating to Oppia widgets."""
 
 __author__ = 'Sean Lip'
 
@@ -92,7 +92,7 @@ class BaseWidget(object):
         return bool(self._handlers)
 
     @property
-    def response_template_and_iframe(self):
+    def _response_template_and_iframe(self):
         """The template that generates the html to display reader responses."""
         if not self.is_interactive:
             raise Exception(
@@ -112,7 +112,7 @@ class BaseWidget(object):
         return html, iframe
 
     @property
-    def stats_log_template(self):
+    def _stats_log_template(self):
         """The template for reader responses in the stats log."""
         if not self.is_interactive:
             raise Exception(
@@ -130,6 +130,82 @@ class BaseWidget(object):
         """The template used to generate the widget html."""
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
+
+    def get_raw_code(self, params=None):
+        """Gets the raw code for a parameterized widget."""
+
+        if params is None:
+            params = {}
+
+        # Parameters used to generate the raw code for the widget.
+        # TODO(sll): Why do we convert only the default value to a JS string?
+        parameters = dict(
+            (param.name, params.get(
+                param.name, utils.convert_to_js_string(param.value))
+             ) for param in self.params)
+
+        return utils.parse_with_jinja(self.template, parameters)
+
+    def get_with_params(self, params):
+        """Gets a dict representing a parameterized widget."""
+
+        result = {
+            'name': self.name,
+            'category': self.category,
+            'description': self.description,
+            'id': self.id,
+            'raw': self.get_raw_code(params),
+            # TODO(sll): Restructure this so that it is
+            # {key: {value: ..., obj_type: ...}}
+            'params': dict((param.name, params.get(param.name, param.value))
+                           for param in self.params),
+        }
+
+        if self.type == feconf.INTERACTIVE_PREFIX:
+            result['handlers'] = [h.to_dict() for h in self.handlers]
+            for idx, handler in enumerate(self.handlers):
+                result['handlers'][idx]['rules'] = dict((
+                    rule.name,
+                    {'classifier': rule.rule, 'checks': rule.checks}
+                ) for rule in handler.rules)
+
+        return result
+
+    def get_reader_response_html(self, params=None):
+        """Gets the parameterized HTML and iframes for a reader response."""
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
+
+        # TODO(kashida): Make this consistent with get_raw_code.
+        if params is None:
+            params = {}
+
+        html, iframe = self._response_template_and_iframe
+        html = utils.parse_with_jinja(html, params)
+        iframe = utils.parse_with_jinja(iframe, params)
+        return html, iframe
+
+    def get_stats_log_html(self, params=None):
+        """Gets the HTML for recording a reader response for the stats log."""
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
+
+        # TODO(kashida): Make this consistent with get_raw_code.
+        if params is None:
+            params = {}
+
+        return utils.parse_with_jinja(self._stats_log_template, params)
+
+    def _get_handler_by_name(self, handler_name):
+        """Get the handler for a widget, given its name."""
+        return next(h for h in self.handlers if h.name == handler_name)
+
+    def get_rule_by_rule(self, handler_name, rule_rule):
+        """Gets a rule, given its .rule attribute and its ancestors."""
+        handler = self._get_handler_by_name(handler_name)
+        return next(r for r in handler.rules if r.rule == rule_rule)
 
 
 class Registry(object):
@@ -200,82 +276,3 @@ class Registry(object):
         if widget_id not in cls.WIDGET_TYPE_MAPPING[widget_type][0]:
             cls.refresh()
         return cls.WIDGET_TYPE_MAPPING[widget_type][0][widget_id]
-
-
-def get_raw_code(widget_type, widget_id, params=None):
-    """Gets the raw code for a parameterized widget."""
-
-    widget = Registry.get_widget_by_id(widget_type, widget_id)
-    if params is None:
-        params = {}
-
-    # Parameters used to generate the raw code for the widget.
-    # TODO(sll): Why do we convert only the default value to a JS string?
-    parameters = dict(
-        (param.name, params.get(
-            param.name, utils.convert_to_js_string(param.value))
-         ) for param in widget.params)
-
-    return utils.parse_with_jinja(widget.template, parameters)
-
-
-def get_with_params(widget_type, widget_id, params):
-    """Gets a dict representing a parameterized widget."""
-    widget = Registry.get_widget_by_id(widget_type, widget_id)
-
-    result = {
-        'name': widget.name,
-        'category': widget.category,
-        'description': widget.description,
-        'id': widget_id,
-        'raw': get_raw_code(widget_type, widget_id, params),
-        # TODO(sll): Restructure this so that it is
-        # {key: {value: ..., obj_type: ...}}
-        'params': dict((param.name, params.get(param.name, param.value))
-                       for param in widget.params),
-    }
-
-    if widget_type == feconf.INTERACTIVE_PREFIX:
-        result['handlers'] = [h.to_dict() for h in widget.handlers]
-        for idx, handler in enumerate(widget.handlers):
-            result['handlers'][idx]['rules'] = dict(
-                (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
-                for rule in handler.rules)
-
-    return result
-
-
-def get_reader_response_html(widget_id, params=None):
-    """Gets the parameterized HTML and iframes for a reader response."""
-    # TODO(kashida): Make this consistent with get_raw_code.
-    if params is None:
-        params = {}
-
-    widget = Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
-
-    html, iframe = widget.response_template_and_iframe
-    html = utils.parse_with_jinja(html, params)
-    iframe = utils.parse_with_jinja(iframe, params)
-    return html, iframe
-
-
-def get_stats_log_html(widget_id, params=None):
-    """Gets the HTML for recording a reader response for the stats log."""
-    # TODO(kashida): Make this consistent with get_raw_code.
-    if params is None:
-        params = {}
-
-    widget = Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
-    return utils.parse_with_jinja(widget.stats_log_template, params)
-
-
-def get_handler_by_name(widget_id, handler_name):
-    """Get the handler for a widget, given its name."""
-    widget = Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
-    return next(h for h in widget.handlers if h.name == handler_name)
-
-
-def get_rule_by_rule(widget_id, handler_name, rule_rule):
-    """Gets a rule, given its .rule attribute and its ancestors."""
-    handler = get_handler_by_name(widget_id, handler_name)
-    return next(r for r in handler.rules if r.rule == rule_rule)

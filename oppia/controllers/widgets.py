@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import collections
+
 import feconf
 from oppia.apps.user import user_services
 import oppia.apps.widget.models as widget_models
@@ -47,18 +49,13 @@ class WidgetRepositoryHandler(base.BaseHandler):
         widgets = widget_models.Registry.get_widgets_of_type(
             widget_type)
 
-        response = {}
-
+        response = collections.defaultdict(list)
         for widget in widgets:
-            category = widget.category
-            if category not in response:
-                response[category] = []
-            response[category].append(
-                widget_models.get_with_params(widget_type, widget.id, {})
-            )
+            response[widget.category].append(widget.get_with_params({}))
 
         for category in response:
             response[category].sort()
+
         return response
 
     def get(self):  # pylint: disable-msg=C6409
@@ -88,9 +85,11 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         try:
+            widget = widget_models.Registry.get_widget_by_id(
+                feconf.NONINTERACTIVE_PREFIX, widget_id
+            )
             self.render_json({
-                'widget': widget_models.get_with_params(
-                    feconf.NONINTERACTIVE_PREFIX, widget_id, {}),
+                'widget': widget.get_with_params({}),
             })
         except:
             raise self.PageNotFoundException
@@ -115,11 +114,11 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         # TODO(sll): In order to unify this with InteractiveWidgetHandler,
         # we need a convention for which params must be JSONified and which
         # should not. Fix this.
-        response = widget_models.get_with_params(
-            feconf.NONINTERACTIVE_PREFIX, widget_id, params)
-
+        widget = widget_models.Registry.get_widget_by_id(
+            feconf.NONINTERACTIVE_PREFIX, widget_id
+        )
         self.render_json({
-            'widget': response,
+            'widget': widget.get_with_params(params),
             'parent_index': self.request.get('parent_index'),
         })
 
@@ -130,9 +129,11 @@ class InteractiveWidgetHandler(base.BaseHandler):
     def get(self, widget_id):
         """Handles GET requests."""
         try:
+            widget = widget_models.Registry.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX, widget_id
+            )
             self.render_json({
-                'widget': widget_models.get_with_params(
-                    feconf.INTERACTIVE_PREFIX, widget_id, {}),
+                'widget': widget.get_with_params({}),
             })
         except:
             raise self.PageNotFoundException
@@ -154,10 +155,11 @@ class InteractiveWidgetHandler(base.BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        response = widget_models.get_with_params(
-            feconf.INTERACTIVE_PREFIX,
-            widget_id,
-            params=utils.parse_dict_with_params(params, state_params_dict)
+        widget = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, widget_id
+        )
+        response = widget.get_with_params(
+            utils.parse_dict_with_params(params, state_params_dict)
         )
 
         self.render_json({'widget': response})

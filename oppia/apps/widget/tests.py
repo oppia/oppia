@@ -68,17 +68,14 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(widget.id, MUSIC_STAFF_ID)
         self.assertEqual(widget.name, 'Music staff')
 
-        code = widget_models.get_raw_code(
-            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
+        code = widget.get_raw_code()
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
 
-        code = widget_models.get_raw_code(
-            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID, {'noteToGuess': 'abc'}
-        )
+        code = widget.get_raw_code({'noteToGuess': 'abc'})
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');', code)
 
-        parameterized_widget_dict = widget_models.get_with_params(
-            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID, {'noteToGuess': 'abc'}
+        parameterized_widget_dict = widget.get_with_params(
+            {'noteToGuess': 'abc'}
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'id', 'name', 'category', 'description',

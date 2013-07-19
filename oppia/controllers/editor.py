@@ -46,8 +46,11 @@ def get_state_for_frontend(state, exploration):
                 item['rule'] = 'Default'
             else:
                 # Get the human-readable name for a rule.
-                item['rule'] = widget_models.get_rule_by_rule(
-                    state.widget.widget_id, handler['name'], item['name']).name
+                item['rule'] = widget_models.Registry.get_widget_by_id(
+                    feconf.INTERACTIVE_PREFIX, state.widget.widget_id
+                ).get_rule_by_rule(
+                    handler['name'], item['name']
+                ).name
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
