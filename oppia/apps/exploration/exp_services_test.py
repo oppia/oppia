@@ -215,7 +215,7 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: interactive-Continue
+    widget_id: Continue
 - content: []
   name: New state
   param_changes: []
@@ -230,5 +230,5 @@ states:
         param_changes: []
     params: {}
     sticky: false
-    widget_id: interactive-Continue
+    widget_id: Continue
 """)

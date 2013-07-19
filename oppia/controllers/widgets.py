@@ -16,6 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import feconf
 from oppia.apps.user import user_services
 import oppia.apps.widget.models as widget_models
 from oppia.controllers import base
@@ -41,11 +42,10 @@ class WidgetRepositoryPage(base.BaseHandler):
 class WidgetRepositoryHandler(base.BaseHandler):
     """Provides data to populate the widget repository page."""
 
-    def get_widgets(self, widget_prefix):
+    def get_widgets(self, widget_type):
         """Load widgets."""
-        assert widget_prefix in ['interactive-', 'noninteractive-']
-        widget_classes = widget_models.get_widget_bindings_with_prefix(
-            widget_prefix)
+        widget_classes = widget_models.Registry.get_widgets_of_type(
+            widget_type)
 
         response = {}
 
@@ -54,7 +54,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
             if category not in response:
                 response[category] = []
             response[category].append(
-                widget_models.get_with_params(widget_cls().id, {})
+                widget_models.get_with_params(widget_type, widget_cls().id, {})
             )
 
         for category in response:
@@ -65,9 +65,12 @@ class WidgetRepositoryHandler(base.BaseHandler):
         """Handles GET requests."""
         response = {}
         if self.request.get('interactive') == 'true':
-            response['widgets'] = self.get_widgets('interactive-')
+            response['widgets'] = self.get_widgets(
+                feconf.INTERACTIVE_PREFIX)
         else:
-            response['widgets'] = self.get_widgets('noninteractive-')
+            response['widgets'] = self.get_widgets(
+                feconf.NONINTERACTIVE_PREFIX)
+
             parent_index = self.request.get('parent_index')
             if parent_index is None:
                 raise Exception(
@@ -87,7 +90,7 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         try:
             self.render_json({
                 'widget': widget_models.get_with_params(
-                    widget_id, {}),
+                    feconf.NONINTERACTIVE_PREFIX, widget_id, {}),
             })
         except:
             raise self.PageNotFoundException
@@ -112,7 +115,8 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
         # TODO(sll): In order to unify this with InteractiveWidgetHandler,
         # we need a convention for which params must be JSONified and which
         # should not. Fix this.
-        response = widget_models.get_with_params(widget_id, params)
+        response = widget_models.get_with_params(
+            feconf.NONINTERACTIVE_PREFIX, widget_id, params)
 
         self.render_json({
             'widget': response,
@@ -128,7 +132,7 @@ class InteractiveWidgetHandler(base.BaseHandler):
         try:
             self.render_json({
                 'widget': widget_models.get_with_params(
-                    widget_id, {}),
+                    feconf.INTERACTIVE_PREFIX, widget_id, {}),
             })
         except:
             raise self.PageNotFoundException
@@ -151,8 +155,9 @@ class InteractiveWidgetHandler(base.BaseHandler):
                     utils.get_random_choice(param['values']))
 
         response = widget_models.get_with_params(
-            widget_id, params=utils.parse_dict_with_params(
-                params, state_params_dict)
+            feconf.INTERACTIVE_PREFIX,
+            widget_id,
+            params=utils.parse_dict_with_params(params, state_params_dict)
         )
 
         self.render_json({'widget': response})

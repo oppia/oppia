@@ -91,6 +91,7 @@ def parse_content_into_html(content_array, block_number, params=None):
 
             widget_dict = json.loads(content.value)
             widget = widget_models.get_with_params(
+                feconf.NONINTERACTIVE_PREFIX,
                 widget_dict['id'], widget_dict['params'])
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
@@ -155,6 +156,7 @@ class ExplorationHandler(base.BaseHandler):
         init_html, init_widgets = parse_content_into_html(
             init_state.content, 0, params)
         interactive_html = widget_models.get_raw_code(
+            feconf.INTERACTIVE_PREFIX,
             init_state.widget.widget_id,
             params=utils.parse_dict_with_params(
                 init_state.widget.params, params)
@@ -235,6 +237,7 @@ class FeedbackHandler(base.BaseHandler):
 
             interactive_html = '' if sticky else (
                 widget_models.get_raw_code(
+                    feconf.INTERACTIVE_PREFIX,
                     new_state.widget.widget_id,
                     params=utils.parse_dict_with_params(
                         new_state.widget.params, new_params)

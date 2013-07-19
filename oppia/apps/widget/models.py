@@ -48,9 +48,12 @@ class AnswerHandler(base_models.BaseModel):
 class BaseWidget(object):
     """Base widget definition class."""
     @property
+    def type(self):
+        return 'interactive' if self.is_interactive else 'noninteractive'
+
+    @property
     def id(self):
-        prefix = 'interactive' if self.is_interactive else 'noninteractive'
-        return '%s-%s' % (prefix, self.__class__.__name__)
+        return self.__class__.__name__
 
     # The human-readable name of the widget.
     name = ''
@@ -66,9 +69,7 @@ class BaseWidget(object):
 
     @property
     def is_interactive(self):
-        """A widget is interactive if its handlers array is non-empty."""
-        # TODO(sll): Also, if its id has the 'interactive-' prefix. Resolve
-        # this (using tests) so that there is a single source of truth.
+        """A widget is interactive iff its handlers array is non-empty."""
         return bool(self.handlers)
 
     @property
@@ -78,16 +79,14 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
         html = utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, widget_type, widget_id, 'response.html'))
+            feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX,
+            self.id, 'response.html'))
 
         try:
             iframe = utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, widget_type, widget_id,
-                'response_iframe.html'))
+                feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX,
+                self.id, 'response_iframe.html'))
         except IOError:
             iframe = ''
 
@@ -100,51 +99,42 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        widget_type, widget_id = self.id.split('-')
-        if widget_type != feconf.INTERACTIVE_PREFIX:
-            return ''
-
         try:
             return utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, widget_type, widget_id,
+                feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX, self.id,
                 'stats_response.html'))
         except IOError:
             return '{{answer}}'
 
 
-# A dict containing all widgets. The keys are the widget ids (prefixed with
-# the widget type) and the values are the widget classes.
-# TODO(sll): Encapsulate this as a private member of a class?
-widget_bindings = {}
+class Registry(object):
+    """Registry of all widgets."""
 
+    # The keys of these dicts are the widget ids and the values are instances
+    # of the corresponding widgets.
+    # TODO(sll): Actually make them instances, not classes.
+    interactive_widgets = {}
+    noninteractive_widgets = {}
 
-def get_widget_bindings_with_prefix(widget_prefix):
-    """Get a list of widget classes whose id starts with widget_prefix."""
-    refresh_widgets()
+    # Maps a widget_type to a (registry_dict, source_dir) pair.
+    WIDGET_TYPE_MAPPING = {
+        feconf.INTERACTIVE_PREFIX: (
+            interactive_widgets, feconf.INTERACTIVE_WIDGETS_DIR
+        ),
+        feconf.NONINTERACTIVE_PREFIX: (
+            noninteractive_widgets, feconf.NONINTERACTIVE_WIDGETS_DIR
+        ),
+    }
 
-    widget_classes = []
-    for widget_id, widget_cls in widget_bindings.iteritems():
-        if widget_id.startswith(widget_prefix):
-            widget_classes.append(widget_cls)
+    @classmethod
+    def _refresh_widgets_of_type(cls, widget_type):
+        registry_dict = cls.WIDGET_TYPE_MAPPING[widget_type][0]
+        widget_dir = cls.WIDGET_TYPE_MAPPING[widget_type][1]
 
-    return widget_classes
+        registry_dict.clear()
 
-
-def refresh_widgets():
-    """Repopulate the dict of widget bindings."""
-
-    # Empty the current bindings dict.
-    global widget_bindings
-    widget_bindings = {}
-
-    SOURCE_DIRS = [
-        feconf.NONINTERACTIVE_WIDGETS_DIR,
-        feconf.INTERACTIVE_WIDGETS_DIR
-    ]
-
-    # Assemble all paths of the form data/widgets/[WIDGET_TYPE]/[WIDGET_ID].
-    ALL_WIDGET_PATHS = []
-    for widget_dir in SOURCE_DIRS:
+        # Assemble all paths of the form data/widgets/[WIDGET_TYPE]/[WIDGET_ID].
+        ALL_WIDGET_PATHS = []
         full_dir = os.path.join(os.getcwd(), widget_dir)
         ALL_WIDGET_PATHS += [
             os.path.join(os.getcwd(), full_dir, widget_id)
@@ -152,24 +142,40 @@ def refresh_widgets():
             if os.path.isdir(os.path.join(full_dir, widget_id))
         ]
 
-    # Crawl the directories and add new widgets to the bindings dict.
-    for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
-        module = loader.find_module(name).load_module(name)
-        for name, cls in inspect.getmembers(module, inspect.isclass):
-            if issubclass(cls, BaseWidget):
-                if cls.__name__ in widget_bindings:
-                    raise Exception(
-                        'Duplicate widget name %s' % cls.__name__)
+        # Crawl the directories and add new widgets to the bindings dict.
+        for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                if issubclass(clazz, BaseWidget):
+                    if clazz.__name__ in registry_dict:
+                        raise Exception(
+                            'Duplicate widget name %s' % clazz.__name__)
 
-                prefix = 'interactive' if cls.handlers else 'noninteractive'
-                widget_bindings['%s-%s' % (prefix, cls.__name__)] = cls
+                    registry_dict[clazz.__name__] = clazz
 
-    assert len(widget_bindings) == (
-        feconf.INTERACTIVE_WIDGET_COUNT + feconf.NONINTERACTIVE_WIDGET_COUNT)
+    @classmethod
+    def refresh(cls):
+        """Repopulate the dict of widget bindings."""
+        cls._refresh_widgets_of_type(feconf.INTERACTIVE_PREFIX)
+        cls._refresh_widgets_of_type(feconf.NONINTERACTIVE_PREFIX)
 
+    @classmethod
+    def get_widgets_of_type(cls, widget_type):
+        """Get a list of widget classes whose id starts with widget_prefix."""
+        assert widget_type in cls.WIDGET_TYPE_MAPPING
 
-def get_widget_count():
-    return len(widget_bindings)
+        Registry.refresh()
+        return cls.WIDGET_TYPE_MAPPING[widget_type][0].values()
+
+    @classmethod
+    def get_widget_by_id(cls, widget_type, widget_id):
+        """Gets a widget instance by its type and id.
+
+        Refreshes once if the widget is not found; subsequently, throws an
+        error."""
+        if widget_id not in cls.WIDGET_TYPE_MAPPING[widget_type][0]:
+            cls.refresh()
+        return cls.WIDGET_TYPE_MAPPING[widget_type][0][widget_id]
 
 
 def get_rules_for_handler(widget_id, handler_name):
@@ -181,41 +187,33 @@ def get_rules_for_handler(widget_id, handler_name):
                 return cl_models.Classifier.get(handler['classifier']).rules
 
 
-def get_widget_cls_by_id(widget_id):
-    """Gets a widget class by id. Refreshes once if the widget is not found;
-    subsequently, throws an error."""
-    if widget_id not in widget_bindings:
-        refresh_widgets()
-    return widget_bindings[widget_id]
-
-
-def get_widget_template(widget_id):
+def get_widget_template(widget_type, widget_id):
     """The template used to generate the widget html."""
-    if widget_id not in widget_bindings:
-        refresh_widgets()
-    assert widget_id in widget_bindings
+    if widget_id not in Registry.WIDGET_TYPE_MAPPING[widget_type][0]:
+        Registry.refresh()
+    assert widget_id in Registry.WIDGET_TYPE_MAPPING[widget_type][0]
 
-    widget_type, widget_id = widget_id.split('-')
     return utils.get_file_contents(os.path.join(
         feconf.WIDGETS_DIR, widget_type, widget_id, '%s.html' % widget_id))
 
 
-def get_widget_params(widget_id):
-    widget_cls = get_widget_cls_by_id(widget_id)
+def get_widget_params(widget_type, widget_id):
+    widget_cls = Registry.get_widget_by_id(widget_type, widget_id)
     return [param_models.Parameter(**param) for param in widget_cls.params]
 
 
 def get_widget_handlers(widget_id):
-    widget_cls = get_widget_cls_by_id(widget_id)
+    widget_cls = Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, widget_id)
     return [AnswerHandler(**ah) for ah in widget_cls.handlers]
 
 
-def get_raw_code(widget_id, params=None):
+def get_raw_code(widget_type, widget_id, params=None):
     """Gets the raw code for a parameterized widget."""
     if params is None:
         params = {}
 
-    widget_params = get_widget_params(widget_id)
+    widget_params = get_widget_params(widget_type, widget_id)
 
     # Parameters used to generate the raw code for the widget.
     # TODO(sll): Why do we convert only the default value to a JS string?
@@ -225,32 +223,33 @@ def get_raw_code(widget_id, params=None):
          ) for param in widget_params)
 
     return utils.parse_with_jinja(
-        get_widget_template(widget_id), parameters)
+        get_widget_template(widget_type, widget_id), parameters)
 
 
-def get_with_params(widget_id, params):
+def get_with_params(widget_type, widget_id, params):
     """Gets a dict representing a parameterized widget."""
-    widget_cls = get_widget_cls_by_id(widget_id)
-    widget_params = get_widget_params(widget_id)
-    widget_handlers = get_widget_handlers(widget_id)
+    widget_cls = Registry.get_widget_by_id(widget_type, widget_id)
+    widget_params = get_widget_params(widget_type, widget_id)
 
     result = {
         'name': widget_cls.name,
         'category': widget_cls.category,
         'description': widget_cls.description,
-        'handlers': [h.to_dict() for h in widget_handlers],
         'id': widget_id,
-        'raw': get_raw_code(widget_id, params),
+        'raw': get_raw_code(widget_type, widget_id, params),
         # TODO(sll): Restructure this so that it is
         # {key: {value: ..., obj_type: ...}}
         'params': dict((param.name, params.get(param.name, param.value))
                        for param in widget_params),
     }
 
-    for idx, handler in enumerate(widget_handlers):
-        result['handlers'][idx]['rules'] = dict(
-            (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
-            for rule in handler.rules)
+    if widget_type == feconf.INTERACTIVE_PREFIX:
+        widget_handlers = get_widget_handlers(widget_id)
+        result['handlers'] = [h.to_dict() for h in widget_handlers]
+        for idx, handler in enumerate(widget_handlers):
+            result['handlers'][idx]['rules'] = dict(
+                (rule.name, {'classifier': rule.rule, 'checks': rule.checks})
+                for rule in handler.rules)
 
     return result
 
@@ -261,7 +260,8 @@ def get_reader_response_html(widget_id, params=None):
     if params is None:
         params = {}
 
-    widget_cls = get_widget_cls_by_id(widget_id)
+    widget_cls = Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, widget_id)
     assert widget_cls().is_interactive
 
     html, iframe = widget_cls().response_template_and_iframe
@@ -276,7 +276,8 @@ def get_stats_log_html(widget_id, params=None):
     if params is None:
         params = {}
 
-    widget_cls = get_widget_cls_by_id(widget_id)
+    widget_cls = Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, widget_id)
     return utils.parse_with_jinja(widget_cls().stats_log_template, params)
 
 
@@ -284,11 +285,11 @@ def get_readable_rule_name(widget_id, handler_name, rule_rule):
     """Get the human-readable text for a rule."""
     handlers = get_widget_handlers(widget_id)
 
-    # Get the handler object corresponding to a given handler name.
     handler = next((h for h in handlers if h.name == handler_name), None)
 
-    rule = next(r.name for r in handler.rules if r.rule == rule_rule)
+    try:
+        rule = next(r.name for r in handler.rules if r.rule == rule_rule)
+    except StopIteration:
+        raise Exception('No rule name found for %s' % rule_rule)
 
-    if rule:
-        return rule
-    raise Exception('No rule name found for %s' % rule_rule)
+    return rule

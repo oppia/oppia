@@ -16,6 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
+import feconf
 import oppia.apps.classifier.models as cl_models
 import oppia.apps.widget.models as widget_models
 import test_utils
@@ -56,35 +57,30 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
 class WidgetUnitTests(test_utils.AppEngineTestBase):
     """Test widget models."""
 
-    def test_loading_of_widgets(self):
-        """Test loading of the default widgets."""
-        self.assertEqual(widget_models.get_widget_count(), 9)
-        # TODO(sll): Check that the correct number of interactive and
-        # noninteractive widgets exist. Check the prefixes of the names in
-        # the bindings dict.
-
     def test_parameterized_widget(self):
         """Test that parameterized widgets are correctly handled."""
         cl_models.Classifier.load_default_classifiers()
 
-        MUSIC_STAFF_ID = 'interactive-MusicStaff'
+        MUSIC_STAFF_ID = 'MusicStaff'
 
-        widget_cls = widget_models.get_widget_cls_by_id(MUSIC_STAFF_ID)
+        widget_cls = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
         # You can't have a @property that is also a @classmethod, so just
         # widget_cls.id does not work here.
         self.assertEqual(widget_cls().id, MUSIC_STAFF_ID)
         self.assertEqual(widget_cls.name, 'Music staff')
 
-        code = widget_models.get_raw_code(MUSIC_STAFF_ID)
+        code = widget_models.get_raw_code(
+            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
 
         code = widget_models.get_raw_code(
-            MUSIC_STAFF_ID, {'noteToGuess': 'abc'})
+            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID, {'noteToGuess': 'abc'}
+        )
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');', code)
 
-        parameterized_widget_dict = (
-            widget_models.get_with_params(
-                MUSIC_STAFF_ID, {'noteToGuess': 'abc'})
+        parameterized_widget_dict = widget_models.get_with_params(
+            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID, {'noteToGuess': 'abc'}
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'id', 'name', 'category', 'description',

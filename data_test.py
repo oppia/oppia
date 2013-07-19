@@ -135,6 +135,7 @@ class ExplorationDataUnitTests(DataUnitTest):
             # Check that the parameter name is valid.
             try:
                 widget_params = widget_models.get_widget_params(
+                    feconf.INTERACTIVE_PREFIX,
                     state_dict['widget']['widget_id'])
             except Exception as e:
                 raise Exception(
@@ -296,10 +297,18 @@ class WidgetDataUnitTests(DataUnitTest):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
-        # TODO(sll): Check that the correct number of interactive and
-        # noninteractive widgets exist.
-        widget_models.refresh_widgets()
-        bindings = widget_models.widget_bindings
+        widget_models.Registry.refresh()
+
+        self.assertEqual(
+            len(widget_models.Registry.interactive_widgets),
+            feconf.INTERACTIVE_WIDGET_COUNT
+        )
+        self.assertEqual(
+            len(widget_models.Registry.noninteractive_widgets),
+            feconf.NONINTERACTIVE_WIDGET_COUNT
+        )
+
+        bindings = widget_models.Registry.interactive_widgets
 
         widget_ids = os.listdir(os.path.join(feconf.INTERACTIVE_WIDGETS_DIR))
         # TODO(sll): These tests ought to include non-interactive widgets as
@@ -371,7 +380,7 @@ class WidgetDataUnitTests(DataUnitTest):
                 ('params', list)
             ]
 
-            widget_cls = bindings['interactive-%s' % widget_id]
+            widget_cls = bindings[widget_id]
 
             # Check that the specified widget id is the same as the class name.
             self.assertTrue(widget_id, widget_cls.__name__)

@@ -70,7 +70,7 @@ class AnswerHandlerInstance(base_models.BaseModel):
 class WidgetInstance(base_models.BaseModel):
     """An instance of a widget."""
     # The id of the interactive widget class for this state.
-    widget_id = ndb.StringProperty(default='interactive-Continue')
+    widget_id = ndb.StringProperty(default='Continue')
     # Parameters for the interactive widget view, stored as key-value pairs.
     # Each parameter is single-valued. The values may be Jinja templates that
     # refer to state parameters.
