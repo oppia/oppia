@@ -125,8 +125,9 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
-    for wp in widget_models.get_widget_params(
-            feconf.INTERACTIVE_PREFIX, wdict['widget_id']):
+    widget_params = widget_models.Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, wdict['widget_id']).params
+    for wp in widget_params:
         if wp.name not in wdict['params']:
             state.widget.params[wp.name] = wp.value
 

@@ -63,12 +63,10 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
         MUSIC_STAFF_ID = 'MusicStaff'
 
-        widget_cls = widget_models.Registry.get_widget_by_id(
+        widget = widget_models.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
-        # You can't have a @property that is also a @classmethod, so just
-        # widget_cls.id does not work here.
-        self.assertEqual(widget_cls().id, MUSIC_STAFF_ID)
-        self.assertEqual(widget_cls.name, 'Music staff')
+        self.assertEqual(widget.id, MUSIC_STAFF_ID)
+        self.assertEqual(widget.name, 'Music staff')
 
         code = widget_models.get_raw_code(
             feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)

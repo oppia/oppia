@@ -44,17 +44,17 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
     def get_widgets(self, widget_type):
         """Load widgets."""
-        widget_classes = widget_models.Registry.get_widgets_of_type(
+        widgets = widget_models.Registry.get_widgets_of_type(
             widget_type)
 
         response = {}
 
-        for widget_cls in widget_classes:
-            category = widget_cls.category
+        for widget in widgets:
+            category = widget.category
             if category not in response:
                 response[category] = []
             response[category].append(
-                widget_models.get_with_params(widget_type, widget_cls().id, {})
+                widget_models.get_with_params(widget_type, widget.id, {})
             )
 
         for category in response:

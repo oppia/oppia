@@ -23,8 +23,8 @@ class InteractiveMap(models.BaseWidget):
         'A map input widget for users to specify a position.')
 
     # Customization parameters and their descriptions, types and default
-    # values.
-    params = [{
+    # values. This attribute name MUST be prefixed by '_'.
+    _params = [{
         'name': 'latitude',
         'description': 'Starting map center latitude (-90 to 90).',
         'obj_type': 'Real',
@@ -43,7 +43,8 @@ class InteractiveMap(models.BaseWidget):
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated classifiers. Interactive widgets
-    # must have at least one of these.
-    handlers = [{
+    # must have at least one of these. This attribute name MUST be prefixed by
+    # '_'.
+    _handlers = [{
         'name': 'submit', 'classifier': 'Coord2DClassifier'
     }]

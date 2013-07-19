@@ -24,8 +24,8 @@ class InteractiveIFrame(models.BaseWidget):
         'events occur.')
 
     # Customization parameters and their descriptions, types and default
-    # values.
-    params = [{
+    # values. This attribute name MUST be prefixed by '_'.
+    _params = [{
         'name': 'childPageUrl',
         'description': 'The URL of the page to iframe.',
         'obj_type': 'UnicodeString',
@@ -34,7 +34,8 @@ class InteractiveIFrame(models.BaseWidget):
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated classifiers. Interactive widgets
-    # must have at least one of these.
-    handlers = [{
+    # must have at least one of these. This attribute name MUST be prefixed by
+    # '_'.
+    _handlers = [{
         'name': 'submit', 'classifier': 'TextClassifier'
     }]

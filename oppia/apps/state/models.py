@@ -102,19 +102,13 @@ class State(base_models.IdModel):
         elif not self.widget.handlers:
             self.widget.handlers = [self.get_default_handler()]
 
-        # No two handlers should have the same name.
-        handler_names = [h.name for h in self.widget.handlers]
-        if len(handler_names) != len(set(handler_names)):
-            raise self.ValidationError(
-                'Names of handlers are not unique: %s' % handler_names)
-
         # TODO(sll): Do other validation.
 
         # Add the corresponding AnswerHandler classifiers for easy reference.
-        widget_handlers = widget_models.get_widget_handlers(
-            self.widget.widget_id)
+        widget_instance = widget_models.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget.widget_id)
         for curr_handler in self.widget.handlers:
-            for w_handler in widget_handlers:
+            for w_handler in widget_instance.handlers:
                 if w_handler.name == curr_handler.name:
                     curr_handler.classifier = w_handler.classifier
 
@@ -129,6 +123,7 @@ class State(base_models.IdModel):
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
     # A dict whose keys are unresolved answers associated with this state, and
     # whose values are their counts.
+    # TODO(sll): Move this out of this class and into Statistics.
     unresolved_answers = ndb.JsonProperty(default={})
 
     @classmethod
@@ -208,8 +203,9 @@ class State(base_models.IdModel):
     def get_classifier_info(self, widget_id, handler_name, rule, state_params):
         classifier_func = rule.name.replace(' ', '')
         first_bracket = classifier_func.find('(')
-        mutable_rule = widget_models.get_readable_rule_name(
-            widget_id, handler_name, rule.name)
+        # Get the readable rule name.
+        mutable_rule = widget_models.get_rule_by_rule(
+            widget_id, handler_name, rule.name).name
 
         func_name = classifier_func[: first_bracket]
         str_params = classifier_func[first_bracket + 1: -1].split(',')

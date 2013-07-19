@@ -45,8 +45,9 @@ def get_state_for_frontend(state, exploration):
             if item['name'] == 'Default':
                 item['rule'] = 'Default'
             else:
-                item['rule'] = widget_models.get_readable_rule_name(
-                    state.widget.widget_id, handler['name'], item['name'])
+                # Get the human-readable name for a rule.
+                item['rule'] = widget_models.get_rule_by_rule(
+                    state.widget.widget_id, handler['name'], item['name']).name
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 

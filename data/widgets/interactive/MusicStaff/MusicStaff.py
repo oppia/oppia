@@ -25,8 +25,8 @@ class MusicStaff(models.BaseWidget):
     )
 
     # Customization parameters and their descriptions, types and default
-    # values.
-    params = [{
+    # values. This attribute name MUST be prefixed by '_'.
+    _params = [{
         'name': 'noteToGuess',
         'description': 'The note that the reader should guess.',
         'obj_type': 'UnicodeString',
@@ -37,7 +37,8 @@ class MusicStaff(models.BaseWidget):
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated classifiers. Interactive widgets
-    # must have at least one of these.
-    handlers = [{
+    # must have at least one of these. This attribute name MUST be prefixed by
+    # '_'.
+    _handlers = [{
         'name': 'submit', 'classifier': 'MusicNoteClassifier'
     }]

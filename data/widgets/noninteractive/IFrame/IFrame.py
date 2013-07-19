@@ -24,8 +24,8 @@ class IFrame(models.BaseWidget):
     )
 
     # Customization parameters and their descriptions, types and default
-    # values.
-    params = [{
+    # values. This attribute name MUST be prefixed by '_'.
+    _params = [{
         'name': 'childPageUrl',
         'description': 'The URL of the page to iframe.',
         'obj_type': 'UnicodeString',

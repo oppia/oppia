@@ -134,22 +134,23 @@ class ExplorationDataUnitTests(DataUnitTest):
 
             # Check that the parameter name is valid.
             try:
-                widget_params = widget_models.get_widget_params(
+                widget = widget_models.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX,
-                    state_dict['widget']['widget_id'])
+                    state_dict['widget']['widget_id']
+                )
             except Exception as e:
                 raise Exception(
                     '%s; widget id: %s' %
                     (e, state_dict['widget']['widget_id'])
                 )
-            widget_param_names = [wp.name for wp in widget_params]
+            widget_param_names = [wp.name for wp in widget.params]
             self.assertIn(
                 wp_name, widget_param_names,
                 msg='Parameter %s is not a valid parameter for widget %s' % (
                     wp_name, state_dict['widget']['widget_id']))
 
             # Get the object class used to normalize the value for this param.
-            for wp in widget_params:
+            for wp in widget.params:
                 if wp.name == wp_name:
                     obj_class = types_models.get_object_class(wp.obj_type)
                     self.assertIsNotNone(obj_class)
@@ -376,32 +377,32 @@ class WidgetDataUnitTests(DataUnitTest):
 
             WIDGET_CONFIG_SCHEMA = [
                 ('name', basestring), ('category', basestring),
-                ('description', basestring), ('handlers', list),
-                ('params', list)
+                ('description', basestring), ('_handlers', list),
+                ('_params', list)
             ]
 
-            widget_cls = bindings[widget_id]
+            widget = bindings[widget_id]
 
             # Check that the specified widget id is the same as the class name.
-            self.assertTrue(widget_id, widget_cls.__name__)
+            self.assertTrue(widget_id, widget.__class__.__name__)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in WIDGET_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
-                    getattr(widget_cls, item), item_type
+                    getattr(widget, item), item_type
                 ))
                 # The string attributes should be non-empty.
                 if item_type == basestring:
-                    self.assertTrue(getattr(widget_cls, item))
+                    self.assertTrue(getattr(widget, item))
 
             # Check that at least one handler exists.
             self.assertTrue(
-                len(widget_cls.handlers),
+                len(widget.handlers),
                 msg='Widget %s has no handlers defined' % widget_id
             )
 
-            for handler in widget_cls.handlers:
+            for handler in widget._handlers:
                 HANDLER_KEYS = ['name', 'classifier']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
                 self.assertTrue(isinstance(handler['name'], basestring))
@@ -418,14 +419,14 @@ class WidgetDataUnitTests(DataUnitTest):
                         msg='Classifier %s does not exist' % classifier_dir)
 
             # Check that all handler names are unique.
-            names = [handler['name'] for handler in widget_cls.handlers]
+            names = [handler.name for handler in widget.handlers]
             self.assertEqual(
                 len(set(names)),
                 len(names),
                 'Widget %s has duplicate handler names' % widget_id
             )
 
-            for param in widget_cls.params:
+            for param in widget._params:
                 PARAM_KEYS = ['name', 'description', 'obj_type', 'values']
                 self.assertItemsEqual(PARAM_KEYS, param.keys())
                 self.assertTrue(isinstance(param['name'], basestring))
