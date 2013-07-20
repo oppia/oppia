@@ -23,7 +23,6 @@ import os
 import pkgutil
 
 import feconf
-import oppia.apps.base_model.models as base_models
 import oppia.apps.classifier.models as cl_models
 import oppia.apps.parameter.models as param_models
 import utils
