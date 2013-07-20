@@ -52,7 +52,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.initWidget = function(index) {
     var widget = JSON.parse($scope.content[index].value);
     $http.post(
-      '/noninteractive_widgets/' + widget.id + '?parent_index=' + index,
+      '/widgets/noninteractive/' + widget.id + '?parent_index=' + index,
       $scope.createRequest({params: widget.params, state_params: $scope.paramChanges}),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {

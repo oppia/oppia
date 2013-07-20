@@ -84,8 +84,8 @@ urls = [
 
     (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
     (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
-    (r'/noninteractive_widgets/(%s)/?' % r, widgets.NonInteractiveWidgetHandler),
-    (r'/interactive_widgets/(%s)/?' % r, widgets.InteractiveWidgetHandler),
+    (r'/widgets/(noninteractive)/(%s)/?' % r, widgets.WidgetHandler),
+    (r'/widgets/(interactive)/(%s)/?' % r, widgets.WidgetHandler),
 
     # 404 error handler.
     (r'/.*', Error404Handler),

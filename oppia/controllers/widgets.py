@@ -46,8 +46,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
     def get_widgets(self, widget_type):
         """Load widgets."""
-        widgets = widget_domain.Registry.get_widgets_of_type(
-            widget_type)
+        widgets = widget_domain.Registry.get_widgets_of_type(widget_type)
 
         response = collections.defaultdict(list)
         for widget in widgets:
@@ -78,23 +77,21 @@ class WidgetRepositoryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class NonInteractiveWidgetHandler(base.BaseHandler):
-    """Handles requests relating to interactive widgets."""
-    # TODO(sll): Combine this with InteractiveWidgetHandler.
+class WidgetHandler(base.BaseHandler):
+    """Handles requests for individual widgets."""
 
-    def get(self, widget_id):
+    def get(self, widget_type, widget_id):
         """Handles GET requests."""
         try:
             widget = widget_domain.Registry.get_widget_by_id(
-                feconf.NONINTERACTIVE_PREFIX, widget_id
-            )
+                widget_type, widget_id)
             self.render_json({
                 'widget': widget.get_with_params({}),
             })
         except:
             raise self.PageNotFoundException
 
-    def post(self, widget_id):
+    def post(self, widget_type, widget_id):
         """Handles POST requests, for parameterized widgets."""
         params = self.payload.get('params', {})
         if isinstance(params, list):
@@ -111,55 +108,18 @@ class NonInteractiveWidgetHandler(base.BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        # TODO(sll): In order to unify this with InteractiveWidgetHandler,
-        # we need a convention for which params must be JSONified and which
-        # should not. Fix this.
+        # TODO(sll): We need a better convention for which params must be
+        # JSONified and which should not. Fix this.
         widget = widget_domain.Registry.get_widget_by_id(
-            feconf.NONINTERACTIVE_PREFIX, widget_id
-        )
-        self.render_json({
-            'widget': widget.get_with_params(params),
-            'parent_index': self.request.get('parent_index'),
-        })
+            widget_type, widget_id)
 
-
-class InteractiveWidgetHandler(base.BaseHandler):
-    """Handles requests relating to interactive widgets."""
-
-    def get(self, widget_id):
-        """Handles GET requests."""
-        try:
-            widget = widget_domain.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX, widget_id
-            )
+        if widget_type == feconf.NONINTERACTIVE_PREFIX:
             self.render_json({
-                'widget': widget.get_with_params({}),
+                'widget': widget.get_with_params(params),
+                'parent_index': self.request.get('parent_index'),
             })
-        except:
-            raise self.PageNotFoundException
-
-    def post(self, widget_id):
-        """Handles POST requests, for parameterized widgets."""
-        params = self.payload.get('params', {})
-        if isinstance(params, list):
-            new_params = {}
-            for item in params:
-                new_params[item['name']] = item['default_value']
-            params = new_params
-
-        state_params_dict = {}
-        state_params_given = self.payload.get('state_params')
-        if state_params_given:
-            for param in state_params_given:
-                # Pick a random parameter for each key.
-                state_params_dict[param['name']] = (
-                    utils.get_random_choice(param['values']))
-
-        widget = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, widget_id
-        )
-        response = widget.get_with_params(
-            utils.parse_dict_with_params(params, state_params_dict)
-        )
-
-        self.render_json({'widget': response})
+        else:
+            response = widget.get_with_params(
+                utils.parse_dict_with_params(params, state_params_dict)
+            )
+            self.render_json({'widget': response})
