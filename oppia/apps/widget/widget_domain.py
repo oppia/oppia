@@ -28,21 +28,26 @@ import oppia.apps.classifier.models as cl_models
 import oppia.apps.parameter.models as param_models
 import utils
 
-from google.appengine.ext import ndb
 
+class AnswerHandler(object):
+    """Value object for an answer event stream (e.g. submit, click, drag)."""
 
-class AnswerHandler(base_models.BaseModel):
-    """An answer event stream (submit, click, drag, etc.)."""
-    name = ndb.StringProperty(default='submit')
-    # TODO(sll): Store a reference instead?
-    classifier = ndb.StringProperty(
-        choices=cl_models.Classifier.get_classifier_ids())
+    name = ''
+    classifier = ''
+
+    def __init__(self, name='submit', classifier=None):
+        self.name = name
+        self.classifier = classifier
+        assert (classifier is None or
+                classifier in cl_models.Classifier.get_classifier_ids())
 
     @property
     def rules(self):
-        if not self.classifier:
-            return []
-        return cl_models.Classifier.get(self.classifier).rules
+        return cl_models.Classifier.get(
+            self.classifier).rules if self.classifier else []
+
+    def to_dict(self):
+        return {'name': self.name, 'classifier': self.classifier}
 
 
 class BaseWidget(object):

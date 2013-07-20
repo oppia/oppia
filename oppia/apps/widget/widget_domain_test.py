@@ -21,11 +21,9 @@ import oppia.apps.classifier.models as cl_models
 from oppia.apps.widget import widget_domain
 import test_utils
 
-from google.appengine.ext import db
-
 
 class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
-    """Test AnswerHandler models."""
+    """Test the AnswerHandler domain object."""
 
     def setUp(self):
         """Loads the default classifiers."""
@@ -35,27 +33,22 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
     def test_rules_property(self):
         """Test that answer_handler.rules behaves as expected."""
         answer_handler = widget_domain.AnswerHandler()
-        answer_handler.put()
         self.assertEqual(answer_handler.name, 'submit')
         self.assertEqual(answer_handler.rules, [])
 
-        answer_handler.classifier = 'MultipleChoiceClassifier'
-        answer_handler.put()
+        answer_handler = widget_domain.AnswerHandler(
+            classifier='MultipleChoiceClassifier')
         self.assertEqual(len(answer_handler.rules), 1)
 
     def test_fake_classifier_is_not_accepted(self):
         """Test validation of answer_handler.classifier."""
-        answer_handler = widget_domain.AnswerHandler()
-        with self.assertRaises(db.BadValueError):
-            answer_handler.classifier = 'FakeClassifier'
-
-        answer_handler = widget_domain.AnswerHandler(
-            classifier='MultipleChoiceClassifier')
-        answer_handler.put()
+        with self.assertRaises(AssertionError):
+            answer_handler = widget_domain.AnswerHandler(
+                classifier='FakeClassifier')
 
 
 class WidgetUnitTests(test_utils.AppEngineTestBase):
-    """Test widget models."""
+    """Test the widget domain object and registry."""
 
     def test_parameterized_widget(self):
         """Test that parameterized widgets are correctly handled."""
