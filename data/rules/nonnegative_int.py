@@ -14,19 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base rules."""
+"""Rules for NonnegativeInts."""
 
-from oppia.apps.rule import rule_domain
+__author__ = 'Sean Lip'
+
 from data.objects.models import objects
+from data.rules import base
 
 
-class NonnegativeIntRule(rule_domain.Rule):
-    subject_type = objects.NonnegativeInt
+class Equals(base.NonnegativeIntRule):
+    description = 'is equal to {{x|NonnegativeInt}}'
+    _PARAMS = [('x', objects.NonnegativeInt)]
 
-
-class NumberRule(rule_domain.Rule):
-    subject_type = objects.Number
-
-
-class RealRule(rule_domain.Rule):
-    subject_type = objects.Real
+    def _evaluate(self, subject):
+        return subject == self.x

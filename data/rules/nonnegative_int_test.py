@@ -14,19 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base rules."""
+"""Tests for classification of NonnegativeInts."""
 
-from oppia.apps.rule import rule_domain
-from data.objects.models import objects
+__author__ = 'Sean Lip'
 
+import unittest
 
-class NonnegativeIntRule(rule_domain.Rule):
-    subject_type = objects.NonnegativeInt
-
-
-class NumberRule(rule_domain.Rule):
-    subject_type = objects.Number
+from data.rules import number
 
 
-class RealRule(rule_domain.Rule):
-    subject_type = objects.Real
+class NonnegativeIntUnitTests(unittest.TestCase):
+    """Tests for rules operating on NonnegativeInt objects."""
+
+    def test_equals_rule(self):
+        self.assertTrue(number.Equals(3).eval(3))
+        self.assertFalse(number.Equals(4).eval(3))

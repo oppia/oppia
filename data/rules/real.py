@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for Numbers and Reals."""
+"""Rules for Reals."""
 
 __author__ = 'Sean Lip'
 
