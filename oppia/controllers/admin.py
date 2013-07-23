@@ -16,17 +16,13 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import oppia.apps.classifier.models as cl_models
 from oppia.apps.exploration import exp_services
 from oppia.apps.widget import widget_domain
 from oppia.controllers import base
 
 
 def reload_widgets():
-    """Reload the default classifiers and widgets."""
-    cl_models.Classifier.delete_all_classifiers()
-    cl_models.Classifier.load_default_classifiers()
-
+    """Refresh the default widgets."""
     widget_domain.Registry.refresh()
 
 
@@ -37,7 +33,7 @@ def reload_explorations():
 
 
 def reload_demos():
-    """Reload default classifiers, widgets, and explorations (in that order)."""
+    """Reload default widgets and explorations (in that order)."""
     reload_widgets()
     reload_explorations()
 

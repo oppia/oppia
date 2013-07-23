@@ -20,8 +20,24 @@ from oppia.apps.rule import rule_domain
 from data.objects.models import objects
 
 
+class Coord2DRule(rule_domain.Rule):
+    subject_type = objects.Coord2D
+
+
+class ListRule(rule_domain.Rule):
+    subject_type = objects.List
+
+
+class MusicNoteRule(rule_domain.Rule):
+    subject_type = objects.MusicNote
+
+
 class NonnegativeIntRule(rule_domain.Rule):
     subject_type = objects.NonnegativeInt
+
+
+class NormalizedStringRule(rule_domain.Rule):
+    subject_type = objects.NormalizedString
 
 
 class NumberRule(rule_domain.Rule):
@@ -30,3 +46,7 @@ class NumberRule(rule_domain.Rule):
 
 class RealRule(rule_domain.Rule):
     subject_type = objects.Real
+
+
+class SetRule(rule_domain.Rule):
+    subject_type = objects.Set

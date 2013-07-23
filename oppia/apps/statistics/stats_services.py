@@ -36,10 +36,13 @@ STATS_ENUMS = utils.create_enum(
 
 def create_rule_name(rule):
     name = rule.name
+    if not rule.inputs:
+        return name
+    name += '('
     for key in rule.inputs:
-        left_paren = name.index('(')
-        name = name[0:left_paren] + name[left_paren:].replace(
-            key, utils.to_ascii(rule.inputs[key]))
+        name += utils.to_ascii(rule.inputs[key])
+        name += ','
+    name += ')'
     return name
 
 
@@ -195,6 +198,9 @@ def get_top_ten_improvable_states(explorations):
                 continue
 
             # Count the number of times the default rule was hit.
+            # TODO(sll): The use of '%s.Default' assumes a particular encoding
+            # of the rule. This should be moved away to a separate method that
+            # is used for both PUTs and GETs.
             event_id = get_event_id(
                 STATS_ENUMS.rule_hit, '%s.Default' % state_key)
             default_count = stats_models.Journal.get_value_count_by_id(event_id)
@@ -230,6 +236,16 @@ def get_top_ten_improvable_states(explorations):
                 eligible_flags.append({
                     'rank': incomplete_count,
                     'improve_type': IMPROVE_TYPE_INCOMPLETE})
+
+            # TODO(sll): Break this method out into smaller, more testable
+            # parts; then remove the following commented code.
+            """
+            j_arr = [j.id for j in stats_models.Journal.get_all()]
+            raise Exception('%s %s %s %s %s %s' % (
+                default_count, incomplete_count, all_count, completed_count,
+                eligible_flags, j_arr
+            ))
+            """
 
             eligible_flags = sorted(
                 eligible_flags, key=lambda flag: flag['rank'], reverse=True)

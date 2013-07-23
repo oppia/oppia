@@ -1,5 +1,0 @@
-within(p, d):
-  name: Answer is within a distance of {{d|Real}} from {{p|Coord2D}}
-
-not_within(p, d):
-  name: Answer is not within a distance of {{d|Real}} from {{p|Coord2D}}

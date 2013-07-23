@@ -13,7 +13,7 @@ states:
         feedback: []
         inputs:
           x: '6'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: List the ways
         feedback: []
@@ -45,7 +45,7 @@ states:
           you''re happy with your answer, click Submit.'
         inputs:
           x: []
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: List the ways
         feedback:
@@ -53,7 +53,7 @@ states:
         inputs:
           x:
           - RBY
-        name: has_elements_in(x)
+        name: HasElementsIn
         param_changes: []
       - dest: List the ways
         feedback:
@@ -65,7 +65,7 @@ states:
           - BYR
           - YRB
           - YBR
-        name: has_elements_not_in(x)
+        name: HasElementsNotIn
         param_changes: []
       - dest: Prompt for explanation with all ways listed
         feedback: []
@@ -76,7 +76,7 @@ states:
           - BYR
           - YRB
           - YBR
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: List the ways
         feedback:
@@ -90,7 +90,7 @@ states:
           - byr
           - yrb
           - ybr
-        name: has_elements_in(x)
+        name: HasElementsIn
         param_changes: []
       - dest: List the ways
         feedback:
@@ -99,7 +99,7 @@ states:
           x:
           - YBR
           - YRB
-        name: is_disjoint_from(x)
+        name: IsDisjointFrom
         param_changes: []
       - dest: List the ways
         feedback:
@@ -108,7 +108,7 @@ states:
           x:
           - BRY
           - BYR
-        name: is_disjoint_from(x)
+        name: IsDisjointFrom
         param_changes: []
       - dest: List the ways
         feedback:
@@ -120,7 +120,7 @@ states:
           - YRB
           - BRY
           - BYR
-        name: is_subset_of(x)
+        name: IsSubsetOf
         param_changes: []
       - dest: List the ways
         feedback:

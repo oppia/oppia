@@ -27,9 +27,9 @@ class Continue(widget_domain.BaseWidget):
     _params = []
 
     # Actions that the reader can perform on this widget which trigger a
-    # feedback interaction, and the associated classifiers. Interactive widgets
+    # feedback interaction, and the associated input types. Interactive widgets
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'classifier': None
+        'name': 'submit', 'input_type': None
     }]

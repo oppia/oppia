@@ -52,28 +52,28 @@ states:
         - You go northeast
         inputs:
           x: northeast
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Clearing
         feedback:
         - You go northwest
         inputs:
           x: northwest
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Troll
         feedback:
         - You go northeast
         inputs:
           x: ne
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Clearing
         feedback:
         - You go northwest
         inputs:
           x: nw
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Fork
         feedback:
@@ -82,7 +82,7 @@ states:
         - There is no way back. You must carry on!
         inputs:
           x: back
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Fork
         feedback:
@@ -113,35 +113,35 @@ states:
         - You go southwest
         inputs:
           x: southwest
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Fork
         feedback:
         - You go southwest
         inputs:
           x: sw
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Troll
         feedback:
         - You use nothing. Nothing happens.
         inputs:
           x: use nothing
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Troll
         feedback:
         - You do nothing. nothing happens.
         inputs:
           x: nothing
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Troll
         feedback:
         - You flail at the troll with your {{Weapon}}. He is not amused.
         inputs:
           x: '{{Weapon}}'
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: pre-rainbow
         feedback:
@@ -149,7 +149,7 @@ states:
           he sneezes really loudly and you are carried away by the gust...
         inputs:
           x: '{{sneezeitem}}'
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: END
         feedback:
@@ -158,21 +158,21 @@ states:
           \ and toward victory!"
         inputs:
           x: '{{payitem}}'
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Troll
         feedback:
         - You don't have that!
         inputs:
           x: use
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Troll
         feedback:
         - You flail at the troll with your bare hands. He is not amused.
         inputs:
           x: troll
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Troll
         feedback:
@@ -202,27 +202,27 @@ states:
         feedback: []
         inputs:
           x: pick
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: picking
         feedback: []
         inputs:
           x: flower
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Fork
         feedback:
         - You go southeast
         inputs:
           x: southeast
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Fork
         feedback:
         - You go southeast
         inputs:
           x: se
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Clearing
         feedback:
@@ -268,7 +268,7 @@ states:
         feedback: []
         inputs:
           x: 0
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Fork
         feedback: []
@@ -315,35 +315,35 @@ states:
         - Correct!
         inputs:
           x: '{{numcoins}}'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Rainbow
         feedback:
         - Actually, I can't hold any more than 10 coins. My hands are too small.
         inputs:
           x: 10.0
-        name: is_greater_than(x)
+        name: IsGreaterThan
         param_changes: []
       - dest: Rainbow
         feedback:
         - I do have some coins!
         inputs:
           x: 1.0
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Rainbow
         feedback:
         - No, fewer than that!
         inputs:
           x: '{{numcoins}}'
-        name: is_greater_than(x)
+        name: IsGreaterThan
         param_changes: []
       - dest: Rainbow
         feedback:
         - More than that!
         inputs:
           x: '{{numcoins}}'
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Rainbow
         feedback:

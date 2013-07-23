@@ -19,7 +19,7 @@ states:
           p:
           - 27.171781
           - 78.04217
-        name: within(p, d)
+        name: Within
         param_changes: []
       - dest: Taj Mahal on map
         feedback:

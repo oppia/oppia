@@ -403,20 +403,11 @@ class WidgetDataUnitTests(DataUnitTest):
             )
 
             for handler in widget._handlers:
-                HANDLER_KEYS = ['name', 'classifier']
+                HANDLER_KEYS = ['name', 'input_type']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
                 self.assertTrue(isinstance(handler['name'], basestring))
-                # The default classifier may be None (e.g. in the case of the
-                # 'Continue' widget).
-                if handler['classifier'] is not None:
-                    self.assertTrue(isinstance(
-                        handler['classifier'], basestring))
-                    # Check that the classifier directory exists.
-                    classifier_dir = os.path.join(
-                        feconf.SAMPLE_CLASSIFIERS_DIR, handler['classifier'])
-                    self.assertTrue(
-                        os.path.isdir(classifier_dir),
-                        msg='Classifier %s does not exist' % classifier_dir)
+                # TODO(sll): Check that the input_type is either None or a
+                # typed object.
 
             # Check that all handler names are unique.
             names = [handler.name for handler in widget.handlers]

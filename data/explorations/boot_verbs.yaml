@@ -15,7 +15,7 @@ states:
         - That is correct! Great job!
         inputs:
           x: juego
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: boot verb
         feedback:
@@ -23,7 +23,7 @@ states:
           because jugar is a boot verb.
         inputs:
           x: jugo
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: subject
         feedback: []
@@ -46,7 +46,7 @@ states:
         feedback: []
         inputs:
           x: juego
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: So...
         feedback:
@@ -77,7 +77,7 @@ states:
         feedback: []
         inputs:
           x: jueg
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: So...
         feedback:
@@ -101,7 +101,7 @@ states:
         feedback: []
         inputs:
           x: yo
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: subject
         feedback:
@@ -128,7 +128,7 @@ states:
           so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: -o
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: boot verb
         feedback:
@@ -136,7 +136,7 @@ states:
           so that's not quite right. That's because jugar is a boot verb!
         inputs:
           x: o
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: verb endings
         feedback:

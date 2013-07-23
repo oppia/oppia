@@ -265,9 +265,6 @@ def export_state_internals_to_dict(
     state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
-    # Remove the computed 'classifier' property.
-    for handler in state_dict['widget']['handlers']:
-        del handler['classifier']
 
     if human_readable_dests:
         # Change the dest ids to human-readable names.

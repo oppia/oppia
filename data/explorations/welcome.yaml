@@ -19,7 +19,7 @@ states:
         - Yes!
         inputs:
           x: 0
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Welcome!
         feedback:
@@ -27,7 +27,7 @@ states:
           that choice up. Have another go?
         inputs:
           x: 2
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:
@@ -57,7 +57,7 @@ states:
         - Yes! So 11 times 11 must be bigger. Let's try again.
         inputs:
           x: 100.0
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Estimate 100
         feedback:
@@ -90,14 +90,14 @@ states:
         - That's right!
         inputs:
           x: B4
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Music widget
         feedback:
         - I think the original note is lower.
         inputs:
           x: B4
-        name: is_greater_than(x)
+        name: IsGreaterThan
         param_changes: []
       - dest: Music widget
         feedback:
@@ -105,7 +105,7 @@ states:
           listening carefully to the difference.
         inputs:
           x: B4
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Music widget
         feedback: []
@@ -130,14 +130,14 @@ states:
         - 'Yes, that''s correct: 11 times 11 is 121.'
         inputs:
           x: 121.0
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Estimate 100
         feedback:
         - Nope. Let's make a quick estimate.
         inputs:
           x: 121.0
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Numeric input
         feedback:
@@ -146,21 +146,21 @@ states:
         inputs:
           tol: 9.0
           x: 121.0
-        name: is_within_tolerance(x, tol)
+        name: IsWithinTolerance
         param_changes: []
       - dest: Numeric input
         feedback:
         - That's too high! Try guessing lower.
         inputs:
           x: 121.0
-        name: is_greater_than(x)
+        name: IsGreaterThan
         param_changes: []
       - dest: Numeric input
         feedback:
         - That's not large enough. Try guessing higher?
         inputs:
           x: 121.0
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Numeric input
         feedback:
@@ -214,7 +214,7 @@ states:
           that's not too far away. Try again?
         inputs:
           x: greek
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:
@@ -226,7 +226,7 @@ states:
           answer to.)
         inputs:
           x: roman
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: What language
         feedback:
@@ -238,7 +238,7 @@ states:
           answer to.)
         inputs:
           x: latin
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: What language
         feedback:
@@ -246,7 +246,7 @@ states:
           but it's not from Sweden.
         inputs:
           x: Swedish
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:
@@ -254,14 +254,14 @@ states:
           engine, such as Google.'
         inputs:
           x: translate oppia
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: What language
         feedback:
         - Not quite; that's actually the opposite of 'start'. Check your spelling!
         inputs:
           x: finish
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Numeric input
         feedback:
@@ -271,21 +271,21 @@ states:
           own types of questions. Here is a question that takes numeric input:'
         inputs:
           x: finnish
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:
         - I think your spelling isn't quite right; you might want to check it.
         inputs:
           x: finnish
-        name: fuzzy_equals(x)
+        name: FuzzyEquals
         param_changes: []
       - dest: What language
         feedback:
         - Great, glad to hear that. Which language is it?
         inputs:
           x: 'yes'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:
@@ -293,7 +293,7 @@ states:
           place that's colder than Germany. Have another go?
         inputs:
           x: German
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: What language
         feedback:
@@ -302,7 +302,7 @@ states:
           Can you guess which one?'
         inputs:
           x: French
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Numeric input
         feedback:
@@ -313,7 +313,7 @@ states:
           that takes numeric input:'
         inputs:
           x: suomi
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: What language
         feedback:

@@ -8,30 +8,26 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, softwar
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Coord2D classifier rule definitions."""
+"""Tests for classification of Sets."""
 
-__author__ = 'Koji Ashida'
+__author__ = 'Sean Lip'
 
+import unittest
 
-from data.objects.models import objects
-
-# Normalizer to use for reader answers.
-DEFAULT_NORMALIZER = objects.Coord2D
+import data.rules.set as set_rules
 
 
-def within(val, p, d):
-    """The given value should be within {{d}} of {{p}}."""
-    dx = val[0] - p[0]
-    dy = val[1] - p[1]
-    return dx * dx + dy * dy < d * d
+class SetRuleUnitTests(unittest.TestCase):
+    """Tests for rules operating on Set objects."""
 
+    def test_equals_rule(self):
+        self.assertTrue(set_rules.Equals([1, 3]).eval([3, 1]))
+        self.assertFalse(set_rules.Equals([1]).eval([3, 1]))
 
-def not_within(val, p, d):
-    """The given value should not be within {{d}} of {{p}}."""
-    return not within(val, p, d)
+    # TODO(sll): Add more tests.

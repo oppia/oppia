@@ -1,2 +1,0 @@
-equals(x):
-  name: Answer is equal to {{x|NonnegativeInt}}

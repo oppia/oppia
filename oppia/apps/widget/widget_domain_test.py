@@ -16,19 +16,14 @@
 
 __author__ = 'Jeremy Emerson'
 
+from data.objects.models import objects
 import feconf
-import oppia.apps.classifier.models as cl_models
 from oppia.apps.widget import widget_domain
 import test_utils
 
 
 class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
     """Test the AnswerHandler domain object."""
-
-    def setUp(self):
-        """Loads the default classifiers."""
-        super(AnswerHandlerUnitTests, self).setUp()
-        cl_models.Classifier.load_default_classifiers()
 
     def test_rules_property(self):
         """Test that answer_handler.rules behaves as expected."""
@@ -37,14 +32,8 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(answer_handler.rules, [])
 
         answer_handler = widget_domain.AnswerHandler(
-            classifier='MultipleChoiceClassifier')
+            input_type=objects.NonnegativeInt)
         self.assertEqual(len(answer_handler.rules), 1)
-
-    def test_fake_classifier_is_not_accepted(self):
-        """Test validation of answer_handler.classifier."""
-        with self.assertRaises(AssertionError):
-            answer_handler = widget_domain.AnswerHandler(
-                classifier='FakeClassifier')
 
 
 class WidgetUnitTests(test_utils.AppEngineTestBase):
@@ -52,7 +41,6 @@ class WidgetUnitTests(test_utils.AppEngineTestBase):
 
     def test_parameterized_widget(self):
         """Test that parameterized widgets are correctly handled."""
-        cl_models.Classifier.load_default_classifiers()
 
         MUSIC_STAFF_ID = 'MusicStaff'
 

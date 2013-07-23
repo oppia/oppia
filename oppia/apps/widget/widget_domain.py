@@ -23,8 +23,8 @@ import os
 import pkgutil
 
 import feconf
-import oppia.apps.classifier.models as cl_models
 import oppia.apps.parameter.models as param_models
+from oppia.apps.rule import rule_domain
 import utils
 
 
@@ -32,21 +32,25 @@ class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
 
     name = ''
-    classifier = ''
+    input_type = ''
 
-    def __init__(self, name='submit', classifier=None):
+    def __init__(self, name='submit', input_type=None):
         self.name = name
-        self.classifier = classifier
-        assert (classifier is None or
-                classifier in cl_models.Classifier.get_classifier_ids())
+        self.input_type = input_type
+        # TODO(sll): Add an assert for input_type: it should be None or a
+        # class in data.objects.models.objects.
 
     @property
     def rules(self):
-        return cl_models.Classifier.get(
-            self.classifier).rules if self.classifier else []
+        return rule_domain.get_rules_for_input_type(self.input_type)
 
     def to_dict(self):
-        return {'name': self.name, 'classifier': self.classifier}
+        return {
+            'name': self.name,
+            'input_type': (
+                None if self.input_type is None else self.input_type.__name__
+            )
+        }
 
 
 class BaseWidget(object):
@@ -169,9 +173,9 @@ class BaseWidget(object):
             result['handlers'] = [h.to_dict() for h in self.handlers]
             for idx, handler in enumerate(self.handlers):
                 result['handlers'][idx]['rules'] = dict((
-                    rule.name,
-                    {'classifier': rule.rule, 'checks': rule.checks}
-                ) for rule in handler.rules)
+                    rule_cls.description,
+                    {'classifier': rule_cls.__name__}
+                ) for rule_cls in handler.rules)
 
         return result
 
@@ -202,14 +206,15 @@ class BaseWidget(object):
 
         return utils.parse_with_jinja(self._stats_log_template, params)
 
-    def _get_handler_by_name(self, handler_name):
+    def get_handler_by_name(self, handler_name):
         """Get the handler for a widget, given the name of the handler."""
         return next(h for h in self.handlers if h.name == handler_name)
 
-    def get_rule_by_rule(self, handler_name, rule_rule):
+    def get_rule_description(self, handler_name, rule_name):
         """Gets a rule, given its .rule attribute and its ancestors."""
-        handler = self._get_handler_by_name(handler_name)
-        return next(r for r in handler.rules if r.rule == rule_rule)
+        handler = self.get_handler_by_name(handler_name)
+        return next(
+            r for r in handler.rules if r.__name__ == rule_name).description
 
 
 class Registry(object):

@@ -18,6 +18,42 @@
 
 __author__ = 'Sean Lip'
 
+import inspect
+import os
+import pkgutil
+
+import feconf
+
+
+def get_obj_type_for_param_name(rule_class, param_name):
+    """Gets the obj type for a given param name."""
+    param_list = rule_class._PARAMS
+    for item in param_list:
+        if item[0] == param_name:
+            return item[1]
+    raise Exception(
+        'Rule %s has no param called %s' % (rule_class.__name__, param_name))
+
+
+def get_rules_for_input_type(input_type):
+    """Gets all rules for a given input type (of type objects.[...])."""
+    if input_type is None:
+        return []
+
+    rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
+    rule_class_name = '%sRule' % input_type.__name__
+    results = []
+
+    for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+        module = loader.find_module(name).load_module(name)
+        for name, clazz in inspect.getmembers(module, inspect.isclass):
+            ancestors = clazz.__bases__
+            ancestor_class_names = [c.__name__ for c in ancestors]
+            if rule_class_name in ancestor_class_names:
+                results.append(clazz)
+
+    return results
+
 
 class Rule(object):
     """Abstract base class for a rule value object."""

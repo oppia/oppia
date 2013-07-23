@@ -101,8 +101,12 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
 
     def test_set_validation(self):
         """Tests objects of type Set."""
-        mappings = [([3, 'a'], [3, 'a']), ([], []), ]
-        invalid_values = ['123', {'a': 1}, 3.0, None, [1, 2, 1]]
+        mappings = [
+            ([3, 'a'], ['a', 3]),
+            ([], []),
+            ([1, 2, 1], [1, 2]),
+        ]
+        invalid_values = ['123', {'a': 1}, 3.0, None]
 
         self.check_normalization(objects.Set, mappings, invalid_values)
 

@@ -33,6 +33,18 @@ class FakeRule(rule_domain.Rule):
         return subject == self.x
 
 
+class RuleServicesUnitTests(unittest.TestCase):
+    """Tests for rule services."""
+
+    def test_get_rules_for_input_type(self):
+        self.assertEqual(
+            len(rule_domain.get_rules_for_input_type(objects.NonnegativeInt)),
+            1
+        )
+        self.assertEqual(
+            len(rule_domain.get_rules_for_input_type(objects.Real)), 7)
+
+
 class RuleDomainUnitTests(unittest.TestCase):
     """Tests for rules."""
 

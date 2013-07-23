@@ -76,8 +76,8 @@ class RealRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(3.001))
 
     def test_is_within_tolerance_rule(self):
-        rule = real.IsWithinTolerance(3, 0.5)
+        rule = real.IsWithinTolerance(0.5, 0)
 
-        self.assertTrue(rule.eval(3))
-        self.assertTrue(rule.eval(3.5))
-        self.assertFalse(rule.eval(3.51))
+        self.assertTrue(rule.eval(0))
+        self.assertTrue(rule.eval(0.5))
+        self.assertFalse(rule.eval(0.51))

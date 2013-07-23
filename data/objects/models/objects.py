@@ -230,9 +230,8 @@ class Set(List):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
-            result = super(Set, cls).normalize(raw)
-            assert len(set(result)) == len(result)
-            return result
+            assert isinstance(raw, set) or isinstance(raw, list)
+            return list(set(raw))
         except Exception:
             raise TypeError('Cannot convert to set: %s' % raw)
 

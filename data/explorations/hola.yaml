@@ -16,20 +16,20 @@ states:
           of sentences as well as the ending exclamation point.'
         inputs:
           x: hola!
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Me llamo
         feedback: []
         inputs:
           x: hola
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Hola
         feedback:
         - Check your spelling!
         inputs:
           x: hola
-        name: fuzzy_equals(x)
+        name: FuzzyEquals
         param_changes: []
       - dest: Hola
         feedback:
@@ -56,13 +56,13 @@ states:
         - Don't forget your accent marks next time!
         inputs:
           x: adios
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: END
         feedback: []
         inputs:
           x: adiós
-        name: contains(x)
+        name: Contains
         param_changes: []
       - dest: Adios
         feedback:
@@ -87,28 +87,28 @@ states:
         - Apples aren't black unless they are rotten...and they aren't blue
         inputs:
           x: '0'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Colores
         feedback:
         - Orange and white...not quite
         inputs:
           x: '1'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Adios
         feedback:
         - "\xA1S\xED! That's right -- apples are red and green."
         inputs:
           x: '2'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Colores
         feedback:
         - Yellow and gray? Apples?
         inputs:
           x: '3'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Colores
         feedback:
@@ -146,7 +146,7 @@ states:
           So, let''s try this again...Introduce yourself.'
         inputs:
           x: what is your name?
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Me llamo
         feedback:
@@ -155,7 +155,7 @@ states:
           So, let''s try this again...Introduce yourself.'
         inputs:
           x: what do you call yourself?
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Me llamo
         feedback:
@@ -182,19 +182,19 @@ states:
         - You've got one too many verbs.
         inputs:
           x: me llamo es
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Supermercado
         feedback: []
         inputs:
           x: me llamo
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Supermercado
         feedback: []
         inputs:
           x: mi nombre es
-        name: starts_with(x)
+        name: StartsWith
         param_changes: []
       - dest: Me llamo meaning
         feedback: []
@@ -218,21 +218,21 @@ states:
         - That's right!
         inputs:
           x: my name is
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Como meaning
         feedback:
         - Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i am called
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Como meaning
         feedback:
         - Literally, yes, but it can also be translated as "My name is."
         inputs:
           x: i call myself
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Como meaning
         feedback:
@@ -263,7 +263,7 @@ states:
           \ don't know\""
         inputs:
           x: '0'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Supermercado
         feedback:
@@ -273,14 +273,14 @@ states:
           \ buy cars in a supermarket. If you need more help, select \"I don't know\""
         inputs:
           x: '1'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Colores
         feedback:
         - Yes! You can buy apples in a supermarket.
         inputs:
           x: '2'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Supermercado
         feedback:

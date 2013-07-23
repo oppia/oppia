@@ -18,7 +18,7 @@ states:
         - Yay, that's correct!
         inputs:
           x: '{{noteStart}}'
-        name: equals(x)
+        name: Equals
         param_changes: []
       - dest: Main window
         feedback:
@@ -26,21 +26,21 @@ states:
         inputs:
           tol: '1'
           x: '{{noteStart}}'
-        name: is_within_tolerance(x, tol)
+        name: IsWithinTolerance
         param_changes: []
       - dest: Main window
         feedback:
         - I think the original note is higher.
         inputs:
           x: '{{noteStart}}'
-        name: is_less_than(x)
+        name: IsLessThan
         param_changes: []
       - dest: Main window
         feedback:
         - I think the original pitch is lower.
         inputs:
           x: '{{noteStart}}'
-        name: is_greater_than(x)
+        name: IsGreaterThan
         param_changes: []
       - dest: Main window
         feedback:

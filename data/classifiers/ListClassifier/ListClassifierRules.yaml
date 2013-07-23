@@ -1,8 +1,0 @@
-equals(x):
-  name: Answer is equal to {{x|List}}
-
-does_not_equal(x):
-  name: Answer does not equal {{x|List}}
-
-has_nonempty_common_prefix(x):
-  name: Answer shares a common prefix with {{x|List}}

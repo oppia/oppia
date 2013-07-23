@@ -74,11 +74,11 @@ THIRD_PARTY_DIR = 'oppia/third_party'
 # The directory containing data files for tests.
 TESTS_DATA_DIR = 'oppia/tests/data'
 
-# The directories containing sample classifiers, explorations and widgets.
-SAMPLE_CLASSIFIERS_DIR = 'data/classifiers'
+# The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_IMAGES_DIR = 'data/images'
 WIDGETS_DIR = 'data/widgets'
+RULES_DIR = 'data/rules'
 INTERACTIVE_WIDGETS_DIR = 'data/widgets/interactive'
 NONINTERACTIVE_WIDGETS_DIR = 'data/widgets/noninteractive'
 

@@ -20,6 +20,7 @@ import feconf
 from oppia.apps.exploration import exp_domain
 from oppia.apps.exploration import exp_services
 import oppia.apps.parameter.models as param_models
+from oppia.apps.rule import rule_domain
 import oppia.apps.state.models as state_models
 from oppia.apps.statistics import stats_services
 from oppia.apps.widget import widget_domain
@@ -48,9 +49,8 @@ def get_state_for_frontend(state, exploration):
                 # Get the human-readable name for a rule.
                 item['rule'] = widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-                ).get_rule_by_rule(
-                    handler['name'], item['name']
-                ).name
+                ).get_rule_description(handler['name'], item['name'])
+
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
@@ -338,6 +338,10 @@ class StateHandler(base.BaseHandler):
             state.widget.handlers = [state_models.AnswerHandlerInstance(
                 name='submit', rules=[])]
 
+            generic_handler = widget_domain.Registry.get_widget_by_id(
+                'interactive', state.widget.widget_id).get_handler_by_name(
+                    'submit')
+
             # This is part of the state. The rules should be put into it.
             state_ruleset = state.widget.handlers[0].rules
 
@@ -360,34 +364,30 @@ class StateHandler(base.BaseHandler):
                     state_ruleset.append(state_rule)
                     continue
 
+                matched_generic_rule = next(
+                    r for r in generic_handler.rules
+                    if r.__name__ == state_rule.name
+                )
+
                 # Normalize the params here, then store them.
-                classifier_func = state_rule.name.replace(' ', '')
-                first_bracket = classifier_func.find('(')
-                mutable_rule = rule['rule']
+                param_name_list = state_rule.inputs.keys()
 
-                params = classifier_func[first_bracket + 1: -1].split(',')
-                for index, param in enumerate(params):
-                    if param not in rule['inputs']:
-                        raise self.InvalidInputException(
-                            'Parameter %s could not be replaced.' % param)
-
-                    typed_object = state.get_typed_object(mutable_rule, param)
-                    # TODO(sll): Make the following check more robust.
-                    if (not isinstance(rule['inputs'][param], basestring) or
-                            '{{' not in rule['inputs'][param] or
-                            '}}' not in rule['inputs'][param]):
-                        normalized_param = typed_object.normalize(
-                            rule['inputs'][param])
+                for index, param_name in enumerate(param_name_list):
+                    param_type = rule_domain.get_obj_type_for_param_name(
+                        matched_generic_rule, param_name)
+                    value = state_rule.inputs[param_name]
+                    if (not isinstance(value, basestring) or
+                            '{{' not in value or '}}' not in value):
+                        normalized_param = param_type.normalize(value)
                     else:
-                        normalized_param = rule['inputs'][param]
+                        normalized_param = value
 
                     if normalized_param is None:
                         raise self.InvalidInputException(
                             '%s has the wrong type. Please replace it with a '
-                            '%s.' % (rule['inputs'][param],
-                                     typed_object.__name__))
+                            '%s.' % (value, param_type.__name__))
 
-                    state_rule.inputs[param] = normalized_param
+                    state_rule.inputs[param_name] = normalized_param
 
                 state_ruleset.append(state_rule)
 

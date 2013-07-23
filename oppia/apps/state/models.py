@@ -18,8 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import importlib
-
 from data.objects.models import objects
 import feconf
 import oppia.apps.base_model.models as base_models
@@ -38,10 +36,10 @@ class Content(base_models.BaseModel):
 
 
 class Rule(base_models.BaseModel):
-    """A rule for an answer classifier."""
+    """A rule."""
     # TODO(sll): Ensure the types for param_changes are consistent.
 
-    # The name of the rule.
+    # The name of the rule class.
     name = ndb.StringProperty(required=True)
     # Parameters for the classification rule.
     # TODO(sll): Make these the actual params.
@@ -62,9 +60,6 @@ class AnswerHandlerInstance(base_models.BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     rules = ndb.LocalStructuredProperty(Rule, repeated=True)
-    # This is a derived property from the corresponding AnswerHandler in
-    # widget.py. It is added automatically on State.put().
-    classifier = ndb.StringProperty()
 
 
 class WidgetInstance(base_models.BaseModel):
@@ -103,14 +98,6 @@ class State(base_models.IdModel):
             self.widget.handlers = [self.get_default_handler()]
 
         # TODO(sll): Do other validation.
-
-        # Add the corresponding AnswerHandler classifiers for easy reference.
-        widget_instance = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, self.widget.widget_id)
-        for curr_handler in self.widget.handlers:
-            for w_handler in widget_instance.handlers:
-                if w_handler.name == curr_handler.name:
-                    curr_handler.classifier = w_handler.classifier
 
     # Human-readable name for the state.
     name = ndb.StringProperty(default=feconf.DEFAULT_STATE_NAME)
@@ -152,44 +139,39 @@ class State(base_models.IdModel):
 
     def classify(self, handler_name, answer, params):
         """Classify a reader's answer and return the rule it satisfies."""
+        # Get the widget to determine the input type.
+        generic_handler = widget_domain.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget.widget_id
+        ).get_handler_by_name(handler_name)
+        all_rule_classes = generic_handler.rules
 
         handlers = [h for h in self.widget.handlers if h.name == handler_name]
         if not handlers:
             raise Exception('No handlers found for %s' % handler_name)
         handler = handlers[0]
 
-        if handler.classifier is None:
+        if generic_handler.input_type is None:
             selected_rule = handler.rules[0]
         else:
-            # Import the relevant classifier module.
-            classifier_module = '.'.join([
-                feconf.SAMPLE_CLASSIFIERS_DIR.replace('/', '.'),
-                handler.classifier, handler.classifier])
-            Classifier = importlib.import_module(classifier_module)
-
-            norm_answer = Classifier.DEFAULT_NORMALIZER().normalize(answer)
-            if norm_answer is None:
-                raise Exception('Could not normalize %s.' % answer)
-
             selected_rule = self.find_first_match(
-                handler, Classifier, norm_answer, params)
+                handler, all_rule_classes, answer, params)
 
         return selected_rule
 
-    def find_first_match(self, handler, Classifier, norm_answer, params):
+    def find_first_match(self, handler, all_rule_classes, answer, params):
         for ind, rule in enumerate(handler.rules):
             if rule.name == 'Default':
                 return rule
 
-            func_name, param_list = self.get_classifier_info(
-                self.widget.widget_id, handler.name, rule, params)
-            param_list = [norm_answer] + param_list
-            classifier_output = getattr(Classifier, func_name)(*param_list)
-
-            match, _ = utils.normalize_classifier_return(classifier_output)
-
-            if match:
-                return rule
+            # Find the relevant rule in all_rule_classes, instantiate it,
+            # and evaluate it.
+            for r in all_rule_classes:
+                if r.__name__ == rule.name:
+                    param_list = self.get_param_list(
+                        self.widget.widget_id, handler.name, rule, params)
+                    match = r(*param_list).eval(answer)
+                    if match:
+                        return rule
 
         raise Exception(
             'No matching rule found for handler %s.' % handler.name)
@@ -200,28 +182,36 @@ class State(base_models.IdModel):
         normalizer_string = param_spec[: param_spec.find('}}')]
         return getattr(objects, normalizer_string)
 
-    def get_classifier_info(self, widget_id, handler_name, rule, state_params):
-        classifier_func = rule.name.replace(' ', '')
-        first_bracket = classifier_func.find('(')
-        # Get the readable rule name.
-        rule_name = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, widget_id
-        ).get_rule_by_rule(
-            handler_name, rule.name
-        ).name
+    def get_param_list(self, widget_id, handler_name, rule, state_params):
+        # TODO(sll): In the frontend, use the rule descriptions as the single
+        # source of truth for the params.
 
-        func_name = classifier_func[: first_bracket]
-        str_params = classifier_func[first_bracket + 1: -1].split(',')
+        # Get the readable rule description.
+        rule_description = widget_domain.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, widget_id
+        ).get_rule_description(handler_name, rule.name)
 
         param_list = []
-        for index, param in enumerate(str_params):
-            parsed_param = rule.inputs[param]
+        # Get the params from the rule description.
+        while rule_description.find('{{') != -1:
+            opening_index = rule_description.find('{{')
+            rule_description = rule_description[opening_index + 2:]
+
+            bar_index = rule_description.find('|')
+            param_name = rule_description[: bar_index]
+            rule_description = rule_description[bar_index + 1:]
+
+            closing_index = rule_description.find('}}')
+            normalizer_string = rule_description[: closing_index]
+            rule_description = rule_description[closing_index + 2:]
+
+            parsed_param = rule.inputs[param_name]
             if isinstance(parsed_param, basestring) and '{{' in parsed_param:
                 parsed_param = utils.parse_with_jinja(
                     parsed_param, state_params)
 
-            typed_object = self.get_typed_object(rule_name, param)
-            normalized_param = typed_object.normalize(parsed_param)
+            normalized_param = getattr(
+                objects, normalizer_string).normalize(parsed_param)
             param_list.append(normalized_param)
 
-        return func_name, param_list
+        return param_list
