@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 NOTE_MAP = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5']
@@ -33,7 +32,6 @@ def get_note_index(note):
 
 class Equals(base.MusicNoteRule):
     description = 'is equal to {{x|MusicNote}}'
-    _PARAMS = [('x', objects.MusicNote)]
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -41,7 +39,6 @@ class Equals(base.MusicNoteRule):
 
 class IsLessThan(base.MusicNoteRule):
     description = 'is lower in pitch than {{x|MusicNote}}'
-    _PARAMS = [('x', objects.MusicNote)]
 
     def _evaluate(self, subject):
         return get_note_index(subject) < get_note_index(self.x)
@@ -49,7 +46,6 @@ class IsLessThan(base.MusicNoteRule):
 
 class IsGreaterThan(base.MusicNoteRule):
     description = 'is higher in pitch than {{x|MusicNote}}'
-    _PARAMS = [('x', objects.MusicNote)]
 
     def _evaluate(self, subject):
         return get_note_index(subject) > get_note_index(self.x)
@@ -57,7 +53,6 @@ class IsGreaterThan(base.MusicNoteRule):
 
 class IsLessThanOrEqualTo(base.MusicNoteRule):
     description = 'has pitch lower than or equal to {{x|MusicNote}}'
-    _PARAMS = [('x', objects.MusicNote)]
 
     def _evaluate(self, subject):
         return get_note_index(subject) <= get_note_index(self.x)
@@ -65,7 +60,6 @@ class IsLessThanOrEqualTo(base.MusicNoteRule):
 
 class IsGreaterThanOrEqualTo(base.MusicNoteRule):
     description = 'has pitch higher than or equal to {{x|MusicNote}}'
-    _PARAMS = [('x', objects.MusicNote)]
 
     def _evaluate(self, subject):
         return get_note_index(subject) >= get_note_index(self.x)
@@ -74,10 +68,6 @@ class IsGreaterThanOrEqualTo(base.MusicNoteRule):
 class IsInclusivelyBetween(base.MusicNoteRule):
     description = ('has a pitch between {{a|MusicNote}} and '
                    '{{b|MusicNote}}, inclusive')
-    _PARAMS = [
-        ('a', objects.MusicNote),
-        ('b', objects.MusicNote),
-    ]
 
     def _validate_params(self):
         assert get_note_index(self.a) <= get_note_index(self.b)
@@ -88,11 +78,7 @@ class IsInclusivelyBetween(base.MusicNoteRule):
 
 
 class IsWithinTolerance(base.MusicNoteRule):
-    description = 'is within {{tol|Real}} of {{x|MusicNote}}'
-    _PARAMS = [
-        ('tol', objects.Int),
-        ('x', objects.MusicNote),
-    ]
+    description = 'is within {{tol|Int}} of {{x|MusicNote}}'
 
     def _evaluate(self, subject):
         lower_note = NOTE_MAP[max(get_note_index(self.x) - self.tol, 0)]

@@ -18,16 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Within(base.Coord2DRule):
     description = 'is within {{d|Real}} of {{p|Coord2D}}'
-    _PARAMS = [
-        ('d', objects.Real),
-        ('p', objects.Coord2D),
-    ]
 
     def _evaluate(self, subject):
         dx = subject[0] - self.p[0]
@@ -37,10 +32,6 @@ class Within(base.Coord2DRule):
 
 class NotWithin(base.Coord2DRule):
     description = 'is not within {{d|Real}} of {{p|Coord2D}}'
-    _PARAMS = [
-        ('d', objects.Real),
-        ('p', objects.Coord2D),
-    ]
 
     def _evaluate(self, subject):
         return not Within(self.d, self.p)._evaluate(subject)

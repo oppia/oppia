@@ -26,8 +26,7 @@ from oppia.apps.rule import rule_domain
 
 class FakeRule(rule_domain.Rule):
     subject_type = objects.Number
-    description = 'is equal to {{x|Number}}'
-    _PARAMS = [('x', objects.Number), ('y', objects.UnicodeString)]
+    description = 'is between {{x|Number}} and {{y|UnicodeString}}'
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -61,6 +60,10 @@ class RuleDomainUnitTests(unittest.TestCase):
         fake_rule = FakeRule(2, 'a')
         self.assertTrue(fake_rule.x, 2)
         self.assertTrue(fake_rule.y, 'a')
+        self.assertEqual(
+            fake_rule._PARAMS,
+            [('x', objects.Number), ('y', objects.UnicodeString)]
+        )
 
     def test_rule_composition(self):
         fake_rule_1 = FakeRule(2, 'unused')
@@ -70,7 +73,8 @@ class RuleDomainUnitTests(unittest.TestCase):
         self.assertFalse(and_rule.eval(3))
         self.assertEqual(
             and_rule.description,
-            'is equal to {{x|Number}} and is equal to {{x|Number}}'
+            'is between {{x|Number}} and {{y|UnicodeString}} and '
+            'is between {{x|Number}} and {{y|UnicodeString}}'
         )
 
         fake_rule_2 = FakeRule(3, 'unused')
@@ -81,11 +85,15 @@ class RuleDomainUnitTests(unittest.TestCase):
         self.assertFalse(or_rule.eval(4))
         self.assertEqual(
             or_rule.description,
-            'is equal to {{x|Number}} or is equal to {{x|Number}}'
+            'is between {{x|Number}} and {{y|UnicodeString}} or '
+            'is between {{x|Number}} and {{y|UnicodeString}}'
         )
 
         not_rule = rule_domain.NotRule(fake_rule_1)
 
         self.assertTrue(not_rule.eval(3))
         self.assertFalse(not_rule.eval(2))
-        self.assertEqual(not_rule.description, 'is not equal to {{x|Number}}')
+        self.assertEqual(
+            not_rule.description,
+            'is not between {{x|Number}} and {{y|UnicodeString}}'
+        )

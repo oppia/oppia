@@ -18,13 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Equals(base.NormalizedStringRule):
     description = 'is equal to {{x|NormalizedString}}'
-    _PARAMS = [('x', objects.NormalizedString)]
 
     def _evaluate(self, subject):
         return subject.lower() == self.x.lower()
@@ -32,7 +30,6 @@ class Equals(base.NormalizedStringRule):
 
 class CaseSensitiveEquals(base.NormalizedStringRule):
     description = 'is equal to {{x|NormalizedString}}, taking case into account'
-    _PARAMS = [('x', objects.NormalizedString)]
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -40,7 +37,6 @@ class CaseSensitiveEquals(base.NormalizedStringRule):
 
 class StartsWith(base.NormalizedStringRule):
     description = 'starts with {{x|NormalizedString}}'
-    _PARAMS = [('x', objects.NormalizedString)]
 
     def _evaluate(self, subject):
         return subject.lower().startswith(self.x.lower())
@@ -48,7 +44,6 @@ class StartsWith(base.NormalizedStringRule):
 
 class Contains(base.NormalizedStringRule):
     description = 'contains {{x|NormalizedString}}'
-    _PARAMS = [('x', objects.NormalizedString)]
 
     def _evaluate(self, subject):
         return subject.lower().find(self.x.lower()) != -1
@@ -56,7 +51,6 @@ class Contains(base.NormalizedStringRule):
 
 class FuzzyEquals(base.NormalizedStringRule):
     description = 'is equal to {{x|NormalizedString}}, but misspelled by one character'
-    _PARAMS = [('x', objects.NormalizedString)]
 
     def _evaluate(self, subject):
         oneago = None

@@ -18,10 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
+
 import feconf
 import oppia.apps.base_model.models as base_models
 import oppia.apps.parameter.models as param_models
+from oppia.apps.rule import rule_domain
 from oppia.apps.widget import widget_domain
 import utils
 
@@ -185,12 +186,6 @@ class State(base_models.IdModel):
         raise Exception(
             'No matching rule found for handler %s.' % handler.name)
 
-    def get_typed_object(self, mutable_rule, param):
-        param_spec = mutable_rule[mutable_rule.find('{{' + param) + 2:]
-        param_spec = param_spec[param_spec.find('|') + 1:]
-        normalizer_string = param_spec[: param_spec.find('}}')]
-        return getattr(objects, normalizer_string)
-
     def get_param_list(self, widget_id, handler_name, rule, state_params):
         # TODO(sll): In the frontend, use the rule descriptions as the single
         # source of truth for the params.
@@ -200,27 +195,16 @@ class State(base_models.IdModel):
             feconf.INTERACTIVE_PREFIX, widget_id
         ).get_rule_description(handler_name, rule.name)
 
+        param_defns = rule_domain.get_param_list(rule_description)
+
         param_list = []
-        # Get the params from the rule description.
-        while rule_description.find('{{') != -1:
-            opening_index = rule_description.find('{{')
-            rule_description = rule_description[opening_index + 2:]
-
-            bar_index = rule_description.find('|')
-            param_name = rule_description[: bar_index]
-            rule_description = rule_description[bar_index + 1:]
-
-            closing_index = rule_description.find('}}')
-            normalizer_string = rule_description[: closing_index]
-            rule_description = rule_description[closing_index + 2:]
-
+        for (param_name, obj_cls) in param_defns:
             parsed_param = rule.inputs[param_name]
             if isinstance(parsed_param, basestring) and '{{' in parsed_param:
                 parsed_param = utils.parse_with_jinja(
                     parsed_param, state_params)
 
-            normalized_param = getattr(
-                objects, normalizer_string).normalize(parsed_param)
+            normalized_param = obj_cls.normalize(parsed_param)
             param_list.append(normalized_param)
 
         return param_list

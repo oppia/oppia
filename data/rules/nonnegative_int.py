@@ -18,13 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Equals(base.NonnegativeIntRule):
     description = 'is equal to {{x|NonnegativeInt}}'
-    _PARAMS = [('x', objects.NonnegativeInt)]
 
     def _evaluate(self, subject):
         return subject == self.x

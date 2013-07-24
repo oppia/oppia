@@ -18,13 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Equals(base.NumberRule):
     description = 'is equal to {{x|Number}}'
-    _PARAMS = [('x', objects.Number)]
 
     def _evaluate(self, subject):
         return subject == self.x

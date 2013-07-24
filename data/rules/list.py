@@ -18,21 +18,18 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Equals(base.ListRule):
     description = 'is equal to {{x|List}}'
-    _PARAMS = [('x', objects.List)]
 
     def _evaluate(self, subject):
         return subject == self.x
 
 
 class DoesNotEqual(base.ListRule):
-    description = 'is not equal to {{x|Set}}'
-    _PARAMS = [('x', objects.List)]
+    description = 'is not equal to {{x|List}}'
 
     def _evaluate(self, subject):
         return subject != self.x
@@ -40,7 +37,6 @@ class DoesNotEqual(base.ListRule):
 
 class HasNonemptyCommonPrefix(base.ListRule):
     description = 'has a non-empty common prefix with {{x|List}}'
-    _PARAMS = [('x', objects.List)]
 
     def _evaluate(self, subject):
         return len(self.x) > 0 and len(subject) > 0 and self.x[0] == subject[0]

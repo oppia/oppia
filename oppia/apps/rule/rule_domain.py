@@ -22,12 +22,13 @@ import inspect
 import os
 import pkgutil
 
+from data.objects.models import objects
 import feconf
 
 
 def get_obj_type_for_param_name(rule_class, param_name):
     """Gets the obj type for a given param name."""
-    param_list = rule_class._PARAMS
+    param_list = get_param_list(rule_class.description)
     for item in param_list:
         if item[0] == param_name:
             return item[1]
@@ -55,6 +56,28 @@ def get_rules_for_input_type(input_type):
     return results
 
 
+def get_param_list(description):
+    """Get a parameter list from the rule description."""
+    param_list = []
+    while description.find('{{') != -1:
+        opening_index = description.find('{{')
+        description = description[opening_index + 2:]
+
+        bar_index = description.find('|')
+        param_name = description[: bar_index]
+        description = description[bar_index + 1:]
+
+        closing_index = description.find('}}')
+        normalizer_string = description[: closing_index]
+        description = description[closing_index + 2:]
+
+        param_list.append(
+            (param_name, getattr(objects, normalizer_string))
+        )
+
+    return param_list
+
+
 class Rule(object):
     """Abstract base class for a rule value object."""
     subject_type = None
@@ -62,13 +85,22 @@ class Rule(object):
     # Description of the rule, e.g. "is equal to {{x|Int}}"
     description = ''
 
-    def __init__(self, *args):
-        param_tuples = self._PARAMS
-        if len(args) != len(param_tuples):
-            raise ValueError(
-                'Expected parameters %s, received %s' % (param_tuples, args))
+    _PARAMS = None
 
-        for ind, param_tuple in enumerate(param_tuples):
+    @property
+    def params(self):
+        if self._PARAMS is None:
+            # Derive the rule params from its description.
+            self._PARAMS = get_param_list(self.description)
+
+        return self._PARAMS
+
+    def __init__(self, *args):
+        if len(args) != len(self.params):
+            raise ValueError(
+                'Expected parameters %s, received %s' % (self.params, args))
+
+        for ind, param_tuple in enumerate(self.params):
             setattr(self, param_tuple[0], param_tuple[1].normalize(args[ind]))
 
         self._validate_params()

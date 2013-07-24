@@ -18,13 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from data.rules import base
 
 
 class Equals(base.SetRule):
     description = 'is equal to {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -32,7 +30,6 @@ class Equals(base.SetRule):
 
 class IsSubsetOf(base.SetRule):
     description = 'is a proper subset of {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return subject < self.x
@@ -40,7 +37,6 @@ class IsSubsetOf(base.SetRule):
 
 class IsSupersetOf(base.SetRule):
     description = 'is a proper superset of {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return subject > self.x
@@ -48,7 +44,6 @@ class IsSupersetOf(base.SetRule):
 
 class HasElementsIn(base.SetRule):
     description = 'has elements in common with {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return bool(subject.intersection(self.x))
@@ -56,7 +51,6 @@ class HasElementsIn(base.SetRule):
 
 class HasElementsNotIn(base.SetRule):
     description = 'has elements not in {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return bool(subject - self.x)
@@ -64,7 +58,6 @@ class HasElementsNotIn(base.SetRule):
 
 class OmitsElementsIn(base.SetRule):
     description = 'omits some elements of {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return bool(self.x - subject)
@@ -72,7 +65,6 @@ class OmitsElementsIn(base.SetRule):
 
 class IsDisjointFrom(base.SetRule):
     description = 'has no elements in common with {{x|Set}}'
-    _PARAMS = [('x', objects.Set)]
 
     def _evaluate(self, subject):
         return not bool(subject.intersection(self.x))
