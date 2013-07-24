@@ -35,7 +35,7 @@ class Content(base_models.BaseModel):
     value = ndb.TextProperty(default='')
 
 
-class Rule(base_models.BaseModel):
+class RuleSpec(base_models.BaseModel):
     """A rule."""
     # TODO(sll): Ensure the types for param_changes are consistent.
 
@@ -48,18 +48,27 @@ class Rule(base_models.BaseModel):
     dest = ndb.StringProperty(required=True)
     # Feedback to give the reader if this rule is triggered.
     feedback = ndb.TextProperty(repeated=True)
-    # State-level parameter changes to make if this rule is triggered.
+    # Exploration-level parameter changes to make if this rule is triggered.
     param_changes = param_models.ParamChangeProperty(repeated=True)
 
     def get_feedback_string(self):
         """Returns a (possibly empty) string with feedback for this rule."""
         return utils.get_random_choice(self.feedback) if self.feedback else ''
 
+    def __str__(self):
+        """Returns a string representation of a rule (for the stats log)."""
+        param_list = [
+            utils.to_ascii(self.inputs[key]) for key in self.inputs]
+        return '%s(%s)' % (self.name, ','.join(param_list))
+
+
+DEFAULT_RULE_SPEC_REPR = str(RuleSpec(name='Default'))
+
 
 class AnswerHandlerInstance(base_models.BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
-    rules = ndb.LocalStructuredProperty(Rule, repeated=True)
+    rule_specs = ndb.LocalStructuredProperty(RuleSpec, repeated=True)
 
 
 class WidgetInstance(base_models.BaseModel):
@@ -73,18 +82,18 @@ class WidgetInstance(base_models.BaseModel):
     # If true, keep the widget instance from the previous state if both are of
     # the same type.
     sticky = ndb.BooleanProperty(default=False)
-    # Answer handlers and rulesets.
+    # Answer handlers and rule specs.
     handlers = ndb.LocalStructuredProperty(AnswerHandlerInstance, repeated=True)
 
 
 class State(base_models.IdModel):
     """A state which forms part of an exploration."""
 
-    def get_default_rule(self):
-        return Rule(name='Default', dest=self.id)
+    def get_default_rule_spec(self):
+        return RuleSpec(name='Default', dest=self.id)
 
     def get_default_handler(self):
-        return AnswerHandlerInstance(rules=[self.get_default_rule()])
+        return AnswerHandlerInstance(rule_specs=[self.get_default_rule_spec()])
 
     def get_default_widget(self):
         return WidgetInstance(handlers=[self.get_default_handler()])
@@ -151,7 +160,7 @@ class State(base_models.IdModel):
         handler = handlers[0]
 
         if generic_handler.input_type is None:
-            selected_rule = handler.rules[0]
+            selected_rule = handler.rule_specs[0]
         else:
             selected_rule = self.find_first_match(
                 handler, all_rule_classes, answer, params)
@@ -159,7 +168,7 @@ class State(base_models.IdModel):
         return selected_rule
 
     def find_first_match(self, handler, all_rule_classes, answer, params):
-        for ind, rule in enumerate(handler.rules):
+        for ind, rule in enumerate(handler.rule_specs):
             if rule.name == 'Default':
                 return rule
 

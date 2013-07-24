@@ -132,7 +132,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
             state.widget.params[wp.name] = wp.value
 
     for handler in wdict['handlers']:
-        handler_rules = [state_models.Rule(
+        handler_rule_specs = [state_models.RuleSpec(
             name=rule['name'],
             inputs=rule['inputs'],
             dest=state_models.State._get_id_from_name(
@@ -141,7 +141,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         ) for rule in handler['rules']]
 
         state.widget.handlers.append(state_models.AnswerHandlerInstance(
-            name=handler['name'], rules=handler_rules))
+            name=handler['name'], rule_specs=handler_rule_specs))
 
     state.put()
     return state
@@ -265,6 +265,11 @@ def export_state_internals_to_dict(
     state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
+
+    # TODO(sll): Remove this temporary fix to maintain backward-compatibility.
+    for handler in state_dict['widget']['handlers']:
+        handler['rules'] = handler['rule_specs']
+        del handler['rule_specs']
 
     if human_readable_dests:
         # Change the dest ids to human-readable names.

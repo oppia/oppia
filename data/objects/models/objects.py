@@ -230,7 +230,7 @@ class Set(List):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
-            assert isinstance(raw, set) or isinstance(raw, list)
+            assert isinstance(raw, (list, set, tuple))
             return list(set(raw))
         except Exception:
             raise TypeError('Cannot convert to set: %s' % raw)

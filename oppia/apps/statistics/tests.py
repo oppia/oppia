@@ -39,16 +39,15 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
+        default_rule_spec = state_models.RuleSpec(
+            name='Default', dest=state_id)
 
         stats_services.EventHandler.record_rule_hit(
-            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
-            extra_info='1')
+            'eid', state_id, default_rule_spec, extra_info='1')
         stats_services.EventHandler.record_rule_hit(
-            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
-            extra_info='2')
+            'eid', state_id, default_rule_spec, extra_info='2')
         stats_services.EventHandler.record_rule_hit(
-            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
-            extra_info='1')
+            'eid', state_id, default_rule_spec, extra_info='1')
 
         stats_services.EventHandler.record_state_hit('eid', state_id)
         stats_services.EventHandler.record_state_hit('eid', state_id)
@@ -68,10 +67,11 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
+        default_rule_spec = state_models.RuleSpec(
+            name='Default', dest=state_id)
 
         stats_services.EventHandler.record_rule_hit(
-            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
-            extra_info='1')
+            'eid', state_id, default_rule_spec, extra_info='1')
         stats_services.EventHandler.record_state_hit('eid', state_id)
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -86,15 +86,15 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             self.user_id, 'exploration', 'category', 'eid'))
 
         init_state = exp.init_state
-        init_state.widget.handlers[0].rules = [
-            state_models.Rule(name='NotDefault', dest=init_state.id),
-            state_models.Rule(name='Default', dest=init_state.id),
+        init_state.widget.handlers[0].rule_specs = [
+            state_models.RuleSpec(name='NotDefault', dest=init_state.id),
+            state_models.RuleSpec(name='Default', dest=init_state.id),
         ]
         init_state.put()
 
         stats_services.EventHandler.record_rule_hit(
             'eid', init_state.id,
-            state_models.Rule(name='NotDefault', dest=init_state.id),
+            state_models.RuleSpec(name='NotDefault', dest=init_state.id),
             extra_info='1')
         stats_services.EventHandler.record_state_hit('eid', init_state.id)
 
@@ -106,6 +106,8 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             self.user_id, 'exploration', 'category', 'eid'))
 
         state_id = exp.init_state_id
+        default_rule_spec = state_models.RuleSpec(
+            name='Default', dest=state_id)
 
         # Hit the default once, and do an incomplete twice. The result should
         # be classified as incomplete.
@@ -114,7 +116,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             stats_services.EventHandler.record_state_hit('eid', state_id)
 
         stats_services.EventHandler.record_rule_hit(
-            'eid', state_id, state_models.Rule(name='Default', dest=state_id),
+            'eid', state_id, default_rule_spec,
             extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -129,7 +131,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             stats_services.EventHandler.record_state_hit('eid', state_id)
             stats_services.EventHandler.record_rule_hit(
                 'eid', state_id,
-                state_models.Rule(name='Default', dest=state_id),
+                state_models.RuleSpec(name='Default', dest=state_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -152,14 +154,14 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         stats_services.EventHandler.record_state_hit('eid', state_1_id)
         stats_services.EventHandler.record_rule_hit(
             'eid', state_1_id,
-            state_models.Rule(name='Default', dest=state_1_id),
+            state_models.RuleSpec(name='Default', dest=state_1_id),
             extra_info='1')
 
         for i in range(2):
             stats_services.EventHandler.record_state_hit('eid', state_2_id)
             stats_services.EventHandler.record_rule_hit(
                 'eid', state_2_id,
-                state_models.Rule(name='Default', dest=state_2_id),
+                state_models.RuleSpec(name='Default', dest=state_2_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])
@@ -177,7 +179,7 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             stats_services.EventHandler.record_state_hit('eid', state_1_id)
             stats_services.EventHandler.record_rule_hit(
                 'eid', state_1_id,
-                state_models.Rule(name='Default', dest=state_1_id),
+                state_models.RuleSpec(name='Default', dest=state_1_id),
                 extra_info='1')
 
         states = stats_services.get_top_ten_improvable_states([exp])

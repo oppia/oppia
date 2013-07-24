@@ -22,6 +22,7 @@ import collections
 
 import feconf
 from oppia.apps.exploration import exp_domain
+import oppia.apps.state.models as state_models
 import oppia.apps.statistics.models as stats_models
 import utils
 
@@ -32,18 +33,6 @@ IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 STATS_ENUMS = utils.create_enum(
     'exploration_visited', 'rule_hit', 'exploration_completed',
     'feedback_submitted', 'state_hit')
-
-
-def create_rule_name(rule):
-    name = rule.name
-    if not rule.inputs:
-        return name
-    name += '('
-    for key in rule.inputs:
-        name += utils.to_ascii(rule.inputs[key])
-        name += ','
-    name += ')'
-    return name
 
 
 def get_event_id(event_name, eid):
@@ -83,8 +72,7 @@ class EventHandler(object):
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""
         cls._record_event(
-            STATS_ENUMS.rule_hit, '%s.%s.%s' % (
-                exploration_id, state_id, create_rule_name(rule)),
+            STATS_ENUMS.rule_hit, '%s.%s.%s' % (exploration_id, state_id, rule),
             extra_info)
 
     @classmethod
@@ -132,14 +120,21 @@ class EventHandler(object):
         journal.put()
 
 
+def _count_state_hits(exploration_id, state_id):
+    """Returns the number of times a particular state was entered."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
+
+    state_key = '.'.join([exploration_id, state.id])
+    event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
+    return stats_models.Counter.get_value_by_id(event_id)
+
+
 def get_exploration_stats(event_name, exploration_id):
     """Retrieves statistics for the given event name and exploration id."""
 
-    if event_name == STATS_ENUMS.exploration_visited:
-        event_id = get_event_id(event_name, exploration_id)
-        return stats_models.Counter.get_value_by_id(event_id)
-
-    if event_name == STATS_ENUMS.exploration_completed:
+    if (event_name in [STATS_ENUMS.exploration_visited,
+                       STATS_ENUMS.exploration_completed]):
         event_id = get_event_id(event_name, exploration_id)
         return stats_models.Counter.get_value_by_id(event_id)
 
@@ -154,8 +149,8 @@ def get_exploration_stats(event_name, exploration_id):
                 'rules': {}
             }
             for handler in state.widget.handlers:
-                for rule in handler.rules:
-                    rule_name = create_rule_name(rule)
+                for rule in handler.rule_specs:
+                    rule_name = str(rule)
                     event_id = get_event_id(
                         event_name, '.'.join(
                             [exploration_id, state.id, rule_name]))
@@ -174,12 +169,9 @@ def get_exploration_stats(event_name, exploration_id):
         exploration = exp_domain.Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
-            event_id = get_event_id(
-                event_name, '.'.join([exploration_id, state.id]))
-
             result[state.id] = {
                 'name': state.name,
-                'count': stats_models.Counter.get_value_by_id(event_id),
+                'count': _count_state_hits(exploration_id, state_id)
             }
         return result
 
@@ -189,20 +181,18 @@ def get_top_ten_improvable_states(explorations):
     for exploration in explorations:
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
-            state_key = '%s.%s' % (exploration.id, state.id)
 
-            # Get count of how many times the state was hit
-            event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
-            all_count = stats_models.Counter.get_value_by_id(event_id)
+            # Count how many times the state was hit.
+            all_count = _count_state_hits(exploration.id, state.id)
             if all_count == 0:
                 continue
 
             # Count the number of times the default rule was hit.
-            # TODO(sll): The use of '%s.Default' assumes a particular encoding
-            # of the rule. This should be moved away to a separate method that
-            # is used for both PUTs and GETs.
             event_id = get_event_id(
-                STATS_ENUMS.rule_hit, '%s.Default' % state_key)
+                STATS_ENUMS.rule_hit,
+                '.'.join([exploration.id, state.id,
+                          state_models.DEFAULT_RULE_SPEC_REPR])
+            )
             default_count = stats_models.Journal.get_value_count_by_id(event_id)
             journal = stats_models.Journal.get(event_id, strict=False)
             top_default_answers = collections.Counter(
@@ -212,11 +202,11 @@ def get_top_ten_improvable_states(explorations):
             # of which rule it hits.
             completed_count = 0
             for handler in state.widget.handlers:
-                for rule in handler.rules:
-                    rule_name = create_rule_name(rule)
+                for rule in handler.rule_specs:
+                    rule_name = str(rule)
                     event_id = get_event_id(
-                        STATS_ENUMS.rule_hit, '%s.%s' %
-                        (state_key, rule_name))
+                        STATS_ENUMS.rule_hit, '%s.%s.%s' %
+                        (exploration.id, state.id, rule_name))
                     completed_count += (
                         stats_models.Journal.get_value_count_by_id(event_id))
 
@@ -225,8 +215,10 @@ def get_top_ten_improvable_states(explorations):
             state_rank, improve_type = 0, ''
 
             eligible_flags = []
-            default_rule = filter(lambda rule: rule.name == 'Default',
-                                  state.widget.handlers[0].rules)[0]
+            default_rule = filter(
+                lambda rule: str(rule) == state_models.DEFAULT_RULE_SPEC_REPR,
+                state.widget.handlers[0].rule_specs
+            )[0]
             default_self_loop = default_rule.dest == state.id
             if float(default_count) / all_count > .2 and default_self_loop:
                 eligible_flags.append({

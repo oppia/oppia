@@ -336,21 +336,21 @@ class StateHandler(base.BaseHandler):
             utils.recursively_remove_key(ruleset, u'$$hashKey')
 
             state.widget.handlers = [state_models.AnswerHandlerInstance(
-                name='submit', rules=[])]
+                name='submit', rule_specs=[])]
 
             generic_handler = widget_domain.Registry.get_widget_by_id(
                 'interactive', state.widget.widget_id).get_handler_by_name(
                     'submit')
 
             # This is part of the state. The rules should be put into it.
-            state_ruleset = state.widget.handlers[0].rules
+            state_ruleset = state.widget.handlers[0].rule_specs
 
             # TODO(yanamal): Do additional calculations here to get the
             # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
 
-                state_rule = state_models.Rule()
+                state_rule = state_models.RuleSpec()
                 state_rule.name = rule.get('name')
                 state_rule.inputs = rule.get('inputs')
                 state_rule.dest = rule.get('dest')

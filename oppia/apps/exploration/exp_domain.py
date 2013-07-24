@@ -188,7 +188,7 @@ class Exploration(base_domain.BaseDomainObject):
             other_state = self.get_state_by_id(other_state_id)
             changed = False
             for handler in other_state.widget.handlers:
-                for rule in handler.rules:
+                for rule in handler.rule_specs:
                     if rule.dest == state_id:
                         rule.dest = other_state_id
                         changed = True
