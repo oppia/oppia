@@ -34,6 +34,34 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         exp_services.delete_all_explorations()
         super(StatisticsUnitTests, self).tearDown()
 
+    def test_count_state_hits(self):
+        exp = exp_domain.Exploration.get(exp_services.create_new(
+            self.user_id, 'exploration', 'category', 'eid'))
+        second_state = exp.add_state('State 2')
+
+        state_1_id = exp.init_state_id
+        state_2_id = second_state.id
+
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_1_id), 0)
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_2_id), 0)
+
+        stats_services.EventHandler.record_state_hit('eid', state_1_id)
+
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_1_id), 1)
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_2_id), 0)
+
+        stats_services.EventHandler.record_state_hit('eid', state_2_id)
+        stats_services.EventHandler.record_state_hit('eid', state_2_id)
+
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_1_id), 1)
+        self.assertEquals(
+            stats_services._count_state_hits('eid', state_2_id), 2)
+
     def test_get_top_ten_improvable_states(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
