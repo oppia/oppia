@@ -120,27 +120,3 @@ class State(base_models.IdModel):
     # The interactive widget associated with this state. Set to be the default
     # widget if not explicitly specified by the caller.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
-
-    @classmethod
-    def get_by_name(cls, name, exploration, strict=True):
-        """Gets a state by name. Fails noisily if strict == True."""
-        assert name and exploration
-
-        # TODO(sll): This is too slow; improve it.
-        state = None
-        for state_id in exploration.state_ids:
-            candidate_state = State.get(state_id)
-            if candidate_state.name == name:
-                state = candidate_state
-                break
-
-        if strict and not state:
-            raise Exception('State %s not found.' % name)
-        return state
-
-    @classmethod
-    def _get_id_from_name(cls, name, exploration):
-        """Converts a state name to an id. Handles the END state case."""
-        if name == feconf.END_DEST:
-            return feconf.END_DEST
-        return State.get_by_name(name, exploration).id

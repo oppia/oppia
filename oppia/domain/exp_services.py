@@ -102,6 +102,31 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
 
 
 # Operations on states belonging to an exploration.
+def get_state_by_name(exploration_id, state_name, strict=True):
+    """Gets a state by name. Fails noisily if strict == True."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+    assert state_name
+
+    # TODO(sll): This is too slow; improve it.
+    state = None
+    for state_id in exploration.state_ids:
+        candidate_state = state_models.State.get(state_id)
+        if candidate_state.name == state_name:
+            state = candidate_state
+            break
+
+    if strict and not state:
+        raise Exception('State %s not found' % state_name)
+    return state
+
+
+def convert_state_name_to_id(exploration_id, state_name):
+    """Converts a state name to an id. Handles the END state case."""
+    if state_name == feconf.END_DEST:
+        return feconf.END_DEST
+    return get_state_by_name(exploration_id, state_name).id
+
+
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
     exploration = exp_domain.Exploration.get(exploration_id)
@@ -136,8 +161,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         handler_rule_specs = [state_models.RuleSpec(
             name=rule['name'],
             inputs=rule['inputs'],
-            dest=state_models.State._get_id_from_name(
-                rule['dest'], exploration),
+            dest=convert_state_name_to_id(exploration_id, rule['dest']),
             feedback=rule['feedback']
         ) for rule in handler['rules']]
 
@@ -229,7 +253,7 @@ def create_from_yaml(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
 
-    init_state = state_models.State.get_by_name(init_state_name, exploration)
+    init_state = get_state_by_name(exploration.id, init_state_name)
 
     try:
         exploration.parameters = [param_models.Parameter(

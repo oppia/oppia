@@ -30,8 +30,6 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         """Loads the default widgets and creates a sample exploration."""
         super(StateModelUnitTests, self).setUp()
         self.user_id = 'test@example.com'
-        self.exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'A title', 'A category', 'A exploration_id'))
 
     def test_state_class(self):
         """Test State Class."""
@@ -44,48 +42,25 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
 
     def test_create_and_get_state(self):
         """Test creation and retrieval of states."""
+        eid = 'A exploration_id'
+        exploration = exp_domain.Exploration.get(exp_services.create_new(
+            self.user_id, 'A title', 'A category', eid))
+
         id_1 = '123'
         name_1 = 'State 1'
-        state_1 = self.exploration.add_state(name_1, state_id=id_1)
+        state_1 = exploration.add_state(name_1, state_id=id_1)
 
-        fetched_state_1 = self.exploration.get_state_by_id(id_1)
+        fetched_state_1 = exploration.get_state_by_id(id_1)
         self.assertEqual(fetched_state_1, state_1)
 
-        fetched_state_by_name_1 = state_models.State.get_by_name(
-            name_1, self.exploration)
-        self.assertEqual(fetched_state_by_name_1, state_1)
+        self.assertEqual(
+            exp_services.get_state_by_name(eid, name_1), state_1)
 
-        # Test the failure cases.
-        id_2 = 'fake_id'
         name_2 = 'fake_name'
-        with self.assertRaises(Exception):
-            self.exploration.get(id_2)
-
-        fetched_state_by_name_2 = state_models.State.get_by_name(
-            name_2, self.exploration, strict=False)
-        self.assertIsNone(fetched_state_by_name_2)
-        with self.assertRaises(Exception):
-            state_models.State.get_by_name(
-                name_2, self.exploration, strict=True)
+        self.assertIsNone(exp_services.get_state_by_name(
+            eid, name_2, strict=False))
+        with self.assertRaisesRegexp(Exception, 'not found'):
+            exp_services.get_state_by_name(eid, name_2, strict=True)
         # The default behavior is to fail noisily.
-        with self.assertRaises(Exception):
-            state_models.State.get_by_name(name_2, self.exploration)
-
-    def test_get_id_from_name(self):
-        """Test converting state names to ids."""
-        id_1 = '123'
-        name_1 = 'State 1'
-        self.exploration.add_state(name_1, state_id=id_1)
-
-        self.assertEqual(
-            state_models.State._get_id_from_name(name_1, self.exploration),
-            id_1
-        )
-
-        with self.assertRaises(Exception):
-            state_models.State._get_id_from_name('fake_name', self.exploration)
-
-        self.assertEqual(
-            state_models.State._get_id_from_name(
-                feconf.END_DEST, self.exploration),
-            feconf.END_DEST)
+        with self.assertRaisesRegexp(Exception, 'not found'):
+            exp_services.get_state_by_name(eid, name_2)
