@@ -9,8 +9,7 @@ class SetInput(widget_domain.BaseWidget):
     running, otherwise things will break.
 
     This class represents a widget, whose id is the name of the class. It is
-    auto-discovered from apps/widget/models.py when the default widgets are
-    refreshed.
+    auto-discovered when the default widgets are refreshed.
     """
 
     # The human-readable name of the widget.

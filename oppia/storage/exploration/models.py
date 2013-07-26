@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
-import oppia.apps.base_model.models as base_models
-import oppia.apps.parameter.models as param_models
+import oppia.storage.base_model.models as base_models
+import oppia.storage.parameter.models as param_models
 
 from google.appengine.ext import ndb
 

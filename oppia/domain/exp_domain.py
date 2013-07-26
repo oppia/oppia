@@ -19,9 +19,9 @@
 __author__ = 'Sean Lip'
 
 import feconf
-import oppia.apps.exploration.models as exp_models
-import oppia.apps.state.models as state_models
 from oppia.domain import base_domain
+import oppia.storage.exploration.models as exp_models
+import oppia.storage.state.models as state_models
 
 
 class Exploration(base_domain.BaseDomainObject):

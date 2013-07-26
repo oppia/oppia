@@ -19,7 +19,7 @@ __author__ = 'Jeremy Emerson'
 import os
 
 import feconf
-import oppia.apps.image.models as image_models
+import oppia.storage.image.models as image_models
 import test_utils
 
 from google.appengine.ext import db

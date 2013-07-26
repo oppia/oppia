@@ -21,9 +21,9 @@ __author__ = 'Sean Lip'
 import collections
 
 import feconf
-import oppia.apps.state.models as state_models
-import oppia.apps.statistics.models as stats_models
 from oppia.domain import exp_domain
+import oppia.storage.state.models as state_models
+import oppia.storage.statistics.models as stats_models
 import utils
 
 

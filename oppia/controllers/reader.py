@@ -20,12 +20,12 @@ import cgi
 import json
 
 import feconf
-import oppia.apps.state.models as state_models
 from oppia.controllers import base
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
+import oppia.storage.state.models as state_models
 import utils
 
 READER_MODE = 'reader'
