@@ -184,7 +184,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         for (var rule in wHandlers[i].rules) {
           ruleDict[rule] = wHandlers[i].rules[rule].classifier;
         }
-        console.trace();
         console.log(ruleDict);
         return ruleDict;
       }
