@@ -213,6 +213,7 @@ function WidgetRepository($scope, $http, activeInputData) {
   };
 
   $scope.selectWidget = function(category, index) {
+    console.debug();
     var customizedCode = $scope.createCustomizedCode(
         $scope.widgets[category][index].params, $scope.customizedParams,
         $scope.widgets[category][index].raw);

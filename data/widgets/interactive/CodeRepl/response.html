@@ -1,0 +1,14 @@
+<div class="oppia-reader-response-container">
+  <span class="oppia-reader-response">
+    <b>{{answer.code}}</b><br>
+    {% if answer.output %}
+      {{answer.output}}<br>
+    {% endif %}
+    {% if answer.error %}
+      <font color=red>Error: {{answer.error}}</font><br>
+    {% endif %}
+    {% if answer.evaluation %}
+      &gt;&gt; {{answer.evaluation}}
+    {% endif %}
+  </span>
+</div>

@@ -173,6 +173,28 @@ class NonnegativeInt(Int):
             raise TypeError('Cannot convert to nonnegative int: %s' % raw)
 
 
+class CodeEvaluation(BaseObject):
+    """Evaluation result of programming code."""
+
+    description = 'Code and its evaluation results.'
+    icon_filename = ''
+    view_html_filename = 'code_evaluation_view'
+    edit_html_filename = None
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, dict)
+            assert 'code' in raw
+            assert 'output' in raw
+            assert 'evaluation' in raw
+            assert 'error' in raw
+            return raw
+        except Exception:
+            raise TypeError('Cannot convert to code evaluation: %s' % raw)
+
+
 class Coord2D(BaseObject):
     """2D coordinate class."""
 
