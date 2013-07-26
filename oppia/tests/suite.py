@@ -35,7 +35,7 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 96
+EXPECTED_TEST_COUNT = 94
 
 
 _PARSER = argparse.ArgumentParser()

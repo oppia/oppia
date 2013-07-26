@@ -27,7 +27,7 @@ def get_note_index(note):
     for idx, map_note in enumerate(NOTE_MAP):
         if note == map_note:
             return idx
-    return None
+    raise Exception('Invalid music note %s.' % note)
 
 
 class Equals(base.MusicNoteRule):

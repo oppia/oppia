@@ -23,7 +23,7 @@ import re
 import string
 
 import feconf
-import oppia.apps.types.models as types_models
+from oppia.apps.typed_objects import obj_services
 from oppia.apps.widget import widget_domain
 import test_utils
 import utils
@@ -152,7 +152,7 @@ class ExplorationDataUnitTests(DataUnitTest):
             # Get the object class used to normalize the value for this param.
             for wp in widget.params:
                 if wp.name == wp_name:
-                    obj_class = types_models.get_object_class(wp.obj_type)
+                    obj_class = obj_services.get_object_class(wp.obj_type)
                     self.assertIsNotNone(obj_class)
                     break
 
@@ -425,7 +425,7 @@ class WidgetDataUnitTests(DataUnitTest):
                 self.assertTrue(isinstance(param['description'], basestring))
 
                 # Check that the default values have the correct types.
-                obj_class = types_models.get_object_class(param['obj_type'])
+                obj_class = obj_services.get_object_class(param['obj_type'])
                 self.assertIsNotNone(obj_class)
                 self.assertTrue(isinstance(param['values'], list))
                 for value in param['values']:

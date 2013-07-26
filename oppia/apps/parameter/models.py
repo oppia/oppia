@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 import re
 
 import oppia.apps.base_model.models as base_models
-import oppia.apps.types.models as types_models
+from oppia.apps.typed_objects import obj_services
 import utils
 
 from google.appengine.ext import ndb
@@ -41,12 +41,12 @@ class Parameter(base_models.BaseModel):
     the parameter. The 'value' property returns one value from these, chosen
     randomly; the 'values' property returns the entire list.
 
-    The difference between a Parameter and a TypedInstance is that a Parameter
+    The difference between a Parameter and a typed object is that a Parameter
     can be overridden (by specifying its name and a new set of values).
     """
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore."""
-        object_class = types_models.get_object_class(self.obj_type)
+        object_class = obj_services.get_object_class(self.obj_type)
         self.values = [object_class.normalize(value) for value in self.values]
 
     # The name of the parameter.
@@ -71,7 +71,7 @@ class ParameterProperty(ndb.LocalStructuredProperty):
         super(ParameterProperty, self).__init__(Parameter, **kwds)
 
     def _validate(self, val):
-        object_class = types_models.get_object_class(val.obj_type)
+        object_class = obj_services.get_object_class(val.obj_type)
         return Parameter(
             obj_type=val.obj_type,
             values=[object_class.normalize(value) for value in val.values],
@@ -110,7 +110,7 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
     def _validate(self, val):
         # Parent classes must do validation to check that the object type here
         # matches the object type of the parameter with the corresponding name.
-        object_class = types_models.get_object_class(val.obj_type)
+        object_class = obj_services.get_object_class(val.obj_type)
         return ParamChange(
             obj_type=val.obj_type, name=val.name,
             values=[object_class.normalize(value) for value in val.values])
@@ -122,9 +122,3 @@ class ParamChangeProperty(ndb.LocalStructuredProperty):
     def _from_base_type(self, val):
         return ParamChange(
             obj_type=val.obj_type, name=val.name, values=val.values)
-
-
-class ParamSet(base_models.BaseModel):
-    """A list of parameters."""
-    # An ordered list of parameters.
-    params = ParameterProperty(repeated=True)
