@@ -33,11 +33,6 @@ class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
         self.editor_id = 'editor@example.com'
         self.viewer_id = 'viewer@example.com'
 
-    def tearDown(self):
-        """Deletes the dummy users and any other widgets and explorations."""
-        exp_services.delete_all_explorations()
-        super(ExplorationServicesUnitTests, self).tearDown()
-
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""

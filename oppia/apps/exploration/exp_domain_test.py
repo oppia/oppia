@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import test_utils
 
 from oppia.apps.exploration import exp_domain
-from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
 
 
@@ -44,19 +43,6 @@ class FakeExploration(exp_domain.Exploration):
 
 class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration domain object."""
-
-    # TODO(sll): The App Engine test base is needed here because Widgets are
-    # being put into the datastore on setup. We should perhaps try to mock
-    # these calls so that it is not needed.
-
-    def setUp(self):
-        """Loads the default widgets."""
-        super(ExplorationDomainUnitTests, self).setUp()
-
-    def tearDown(self):
-        """Deletes all widgets and explorations."""
-        exp_services.delete_all_explorations()
-        super(ExplorationDomainUnitTests, self).tearDown()
 
     def test_validation(self):
         """Test validation of explorations."""

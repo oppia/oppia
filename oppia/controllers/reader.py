@@ -202,11 +202,8 @@ class FeedbackHandler(base.BaseHandler):
         if recorded_answer:
             stats_services.EventHandler.record_rule_hit(
                 exploration_id, old_state_id, rule, recorded_answer)
-            # Add this answer to the state's 'unresolved answers' list.
-            if recorded_answer not in old_state.unresolved_answers:
-                old_state.unresolved_answers[recorded_answer] = 0
-            old_state.unresolved_answers[recorded_answer] += 1
-            old_state.put()
+            stats_services.EventHandler.record_unresolved_answer(
+                exploration_id, old_state_id, recorded_answer)
 
     def _get_feedback(self, feedback, block_number, params):
         """Gets the HTML and iframes with Oppia's feedback."""

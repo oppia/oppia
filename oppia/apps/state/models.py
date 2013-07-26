@@ -118,10 +118,6 @@ class State(base_models.IdModel):
     # The interactive widget associated with this state. Set to be the default
     # widget if not explicitly specified by the caller.
     widget = ndb.StructuredProperty(WidgetInstance, required=True)
-    # A dict whose keys are unresolved answers associated with this state, and
-    # whose values are their counts.
-    # TODO(sll): Move this out of this class and into Statistics.
-    unresolved_answers = ndb.JsonProperty(default={})
 
     @classmethod
     def get_by_name(cls, name, exploration, strict=True):

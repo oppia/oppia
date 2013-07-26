@@ -33,11 +33,6 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
         self.exploration = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'A title', 'A category', 'A exploration_id'))
 
-    def tearDown(self):
-        """Deletes all widgets and explorations."""
-        exp_services.delete_all_explorations()
-        super(StateModelUnitTests, self).tearDown()
-
     def test_state_class(self):
         """Test State Class."""
         state = state_models.State(id='The exploration hash id')

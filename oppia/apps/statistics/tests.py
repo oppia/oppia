@@ -30,10 +30,6 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
         super(StatisticsUnitTests, self).setUp()
         self.user_id = 'fake@user.com'
 
-    def tearDown(self):
-        exp_services.delete_all_explorations()
-        super(StatisticsUnitTests, self).tearDown()
-
     def test_count_state_hits(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
             self.user_id, 'exploration', 'category', 'eid'))
@@ -61,6 +57,28 @@ class StatisticsUnitTests(test_utils.AppEngineTestBase):
             stats_services._count_state_hits('eid', state_1_id), 1)
         self.assertEquals(
             stats_services._count_state_hits('eid', state_2_id), 2)
+
+    def test_unresolved_answers_tally(self):
+        self.assertEquals(
+            stats_services.get_unresolved_answers('eid', 'sid'), {})
+
+        stats_services.EventHandler.record_unresolved_answer(
+            'eid', 'sid', 'answer1')
+        self.assertEquals(
+            stats_services.get_unresolved_answers('eid', 'sid'), {'answer1': 1}
+        )
+
+        stats_services.EventHandler.record_unresolved_answer(
+            'eid', 'sid', 'answer1')
+        self.assertEquals(
+            stats_services.get_unresolved_answers('eid', 'sid'), {'answer1': 2}
+        )
+
+        stats_services.EventHandler.replace_unresolved_answers(
+            'eid', 'sid', {})
+        self.assertEquals(
+            stats_services.get_unresolved_answers('eid', 'sid'), {}
+        )
 
     def test_get_top_ten_improvable_states(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(

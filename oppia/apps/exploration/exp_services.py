@@ -264,9 +264,10 @@ def export_state_internals_to_dict(
     exploration = exp_domain.Exploration.get(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
-    state_dict = copy.deepcopy(state.to_dict(exclude=['unresolved_answers']))
+    state_dict = copy.deepcopy(state.to_dict())
 
     # TODO(sll): Remove this temporary fix to maintain backward-compatibility.
+    # Propagate the name change rules --> rule_specs to the frontend.
     for handler in state_dict['widget']['handlers']:
         handler['rules'] = handler['rule_specs']
         del handler['rule_specs']
@@ -287,8 +288,7 @@ def export_state_to_dict(exploration_id, state_id):
     state = exploration.get_state_by_id(state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
-    state_dict.update({'id': state.id, 'name': state.name,
-                       'unresolved_answers': state.unresolved_answers})
+    state_dict.update({'id': state.id, 'name': state.name})
     return state_dict
 
 

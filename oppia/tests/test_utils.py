@@ -17,6 +17,9 @@ import os
 import unittest
 import webtest
 
+from oppia.apps.exploration import exp_services
+from oppia.apps.statistics import stats_services
+
 
 def empty_environ():
     os.environ['AUTH_DOMAIN'] = 'example.com'
@@ -76,4 +79,6 @@ class AppEngineTestBase(TestBase):
         self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
+        exp_services.delete_all_explorations()
+        stats_services.delete_all_stats()
         self.testbed.deactivate()

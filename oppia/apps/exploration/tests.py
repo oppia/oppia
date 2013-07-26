@@ -18,7 +18,6 @@ __author__ = 'Jeremy Emerson'
 
 from oppia.apps.exploration import exp_domain
 import oppia.apps.exploration.models as exp_models
-from oppia.apps.exploration import exp_services
 import oppia.apps.image.models as image_models
 import oppia.apps.parameter.models as param_models
 import oppia.apps.state.models as state_models
@@ -29,15 +28,6 @@ from google.appengine.ext.db import BadValueError
 
 class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
     """Test the exploration model."""
-
-    def setUp(self):
-        """Loads the default widgets."""
-        super(ExplorationModelUnitTests, self).setUp()
-
-    def tearDown(self):
-        """Deletes all widgets and explorations."""
-        exp_services.delete_all_explorations()
-        super(ExplorationModelUnitTests, self).tearDown()
 
     def test_exploration_class(self):
         """Test the Exploration model class."""

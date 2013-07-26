@@ -32,7 +32,7 @@ IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 
 STATS_ENUMS = utils.create_enum(
     'exploration_visited', 'rule_hit', 'exploration_completed',
-    'feedback_submitted', 'state_hit')
+    'feedback_submitted', 'state_hit', 'unresolved_answers')
 
 
 def get_event_id(event_name, eid):
@@ -46,6 +46,8 @@ def get_event_id(event_name, eid):
         return 'f.%s' % eid
     if event_name == STATS_ENUMS.state_hit:
         return 's.%s' % eid
+    if event_name == STATS_ENUMS.unresolved_answers:
+        return 'u.%s' % eid
 
 
 class EventHandler(object):
@@ -67,13 +69,15 @@ class EventHandler(object):
             cls._add(event_id, unicode(extra_info))
         if event_name == STATS_ENUMS.state_hit:
             cls._inc(event_id)
+        if event_name == STATS_ENUMS.unresolved_answers:
+            cls._add_data_point_to_tally(event_id, unicode(extra_info))
 
     @classmethod
     def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
         """Records an event when an answer triggers the default rule."""
         cls._record_event(
             STATS_ENUMS.rule_hit, '%s.%s.%s' % (exploration_id, state_id, rule),
-            extra_info)
+            extra_info=extra_info)
 
     @classmethod
     def record_exploration_visited(cls, exploration_id):
@@ -102,6 +106,22 @@ class EventHandler(object):
                               (exploration_id, state_id))
 
     @classmethod
+    def record_unresolved_answer(cls, exploration_id, state_id, answer):
+        """Records a new unresolved answer."""
+        cls._record_event(
+            STATS_ENUMS.unresolved_answers,
+            '%s.%s' % (exploration_id, state_id),
+            extra_info=answer
+        )
+
+    @classmethod
+    def replace_unresolved_answers(cls, exploration_id, state_id, new_value):
+        cls._set_tally(get_event_id(
+            STATS_ENUMS.unresolved_answers,
+            '%s.%s' % (exploration_id, state_id)
+        ), new_value)
+
+    @classmethod
     def _inc(cls, event_id):
         """Increments the counter corresponding to an event id."""
         counter = stats_models.Counter.get(event_id, strict=False)
@@ -119,15 +139,50 @@ class EventHandler(object):
         journal.values.append(value)
         journal.put()
 
+    @classmethod
+    def _add_data_point_to_tally(cls, event_id, data):
+        """Adds a data point to a tally."""
+        tally = stats_models.Tally.get(event_id, strict=False)
+        if tally is None:
+            tally = stats_models.Tally(id=event_id, value={})
+
+        if data in tally.value:
+            tally.value[data] += 1
+        else:
+            tally.value[data] = 1
+
+        tally.put()
+
+    @classmethod
+    def _set_tally(cls, event_id, new_value):
+        """Sets the value of a tally."""
+        tally = stats_models.Tally.get(event_id, strict=False)
+        if tally:
+            tally.value = new_value
+            tally.put()
+
+    @classmethod
+    def _append_to_log(cls, event_id, value):
+        """Adds to the list corresponding to an event id."""
+        journal = stats_models.Journal.get(event_id, strict=False)
+        if not journal:
+            journal = stats_models.Journal(id=event_id)
+        journal.values.append(value)
+        journal.put()
+
 
 def _count_state_hits(exploration_id, state_id):
     """Returns the number of times a particular state was entered."""
-    exploration = exp_domain.Exploration.get(exploration_id)
-    state = exploration.get_state_by_id(state_id)
-
-    state_key = '.'.join([exploration_id, state.id])
+    state_key = '.'.join([exploration_id, state_id])
     event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
     return stats_models.Counter.get_value_by_id(event_id)
+
+
+def get_unresolved_answers(exploration_id, state_id):
+    """Gets the tally of unresolved answers for a given state."""
+    state_key = '.'.join([exploration_id, state_id])
+    event_id = get_event_id(STATS_ENUMS.unresolved_answers, state_key)
+    return stats_models.Tally.get_value_by_id(event_id)
 
 
 def get_exploration_stats(event_name, exploration_id):
@@ -260,3 +315,10 @@ def get_top_ten_improvable_states(explorations):
         key=lambda state: state['rank'],
         reverse=True)
     return problem_states[:10]
+
+
+def delete_all_stats():
+    """Deletes all statistics."""
+    stats_models.Counter.delete_all()
+    stats_models.Journal.delete_all()
+    stats_models.Tally.delete_all()

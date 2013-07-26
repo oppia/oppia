@@ -55,6 +55,9 @@ def get_state_for_frontend(state, exploration):
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
     state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
+
+    state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
+        exploration.id, state.id)
     return state_repr
 
 
@@ -398,10 +401,10 @@ class StateHandler(base.BaseHandler):
             ]
 
         if 'unresolved_answers' in self.payload:
-            state.unresolved_answers = {}
-            for answer, count in unresolved_answers.iteritems():
-                if count > 0:
-                    state.unresolved_answers[answer] = count
+            stats_services.EventHandler.replace_unresolved_answers(
+                exploration.id, state.id,
+                {k: v for k, v in unresolved_answers.iteritems() if v > 0}
+            )
 
         state.put()
         self.render_json(get_state_for_frontend(state, exploration))
