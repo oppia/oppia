@@ -42,7 +42,8 @@ class Parameter(base_models.BaseModel):
     randomly; the 'values' property returns the entire list.
 
     The difference between a Parameter and a typed object is that a Parameter
-    can be overridden (by specifying its name and a new set of values).
+    can be overridden (by specifying its name and a new set of values). A
+    typed object is meant to be immutable (once it is created).
     """
     def _pre_put_hook(self):
         """Does validation before the model is put into the datastore."""
@@ -63,29 +64,6 @@ class Parameter(base_models.BaseModel):
         if not self.values:
             return None
         return utils.get_random_choice(self.values)
-
-
-class ParameterProperty(ndb.LocalStructuredProperty):
-    """Represents a multi-valued parameter."""
-    def __init__(self, **kwds):
-        super(ParameterProperty, self).__init__(Parameter, **kwds)
-
-    def _validate(self, val):
-        object_class = obj_services.get_object_class(val.obj_type)
-        return Parameter(
-            obj_type=val.obj_type,
-            values=[object_class.normalize(value) for value in val.values],
-            name=val.name, description=val.description)
-
-    def _to_base_type(self, val):
-        return Parameter(
-            obj_type=val.obj_type, values=val.values, name=val.name,
-            description=val.description)
-
-    def _from_base_type(self, val):
-        return Parameter(
-            obj_type=val.obj_type, values=val.values, name=val.name,
-            description=val.description)
 
 
 class ParamChange(Parameter):

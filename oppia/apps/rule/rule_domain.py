@@ -79,7 +79,14 @@ def get_param_list(description):
 
 
 class Rule(object):
-    """Abstract base class for a rule value object."""
+    """Abstract base class for a value object that represents a rule.
+
+    All rules assume that the subject and rule initialization parameters
+    are JSONifiable objects (such as primitives, lists, dicts, and
+    compositions of these, but NOT sets, tuples, etc.). This is enforced
+    by normalizing the subject and rule initialization parameters to
+    JSONifiable objects before any evaluations are performed.
+    """
     subject_type = None
 
     # Description of the rule, e.g. "is equal to {{x|Int}}"
