@@ -2,6 +2,7 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+
 v1.0.5 (30 Jun 2013)
 --------------------
 * Add support for initializing parameters at the exploration level.
