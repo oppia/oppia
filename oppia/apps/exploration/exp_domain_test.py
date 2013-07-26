@@ -50,12 +50,26 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        with self.assertRaises(exp_domain.Exploration.ObjectValidationError):
-            exploration.state_ids = ['A string']
+        exploration.state_ids = []
+        with self.assertRaisesRegexp(
+                exp_domain.Exploration.ObjectValidationError,
+                'exploration has no states'):
+            exploration.put()
+        exploration.state_ids = ['A string']
+        with self.assertRaisesRegexp(
+                exp_domain.Exploration.ObjectValidationError,
+                'Invalid state_id'):
             exploration.put()
 
+        new_state = state_models.State(id='Initial state id')
+        new_state.put()
+        exploration.state_ids = ['Initial state id']
+
         # There must be at least one editor id.
-        with self.assertRaises(exp_domain.Exploration.ObjectValidationError):
+        exploration.editor_ids = []
+        with self.assertRaisesRegexp(
+                exp_domain.Exploration.ObjectValidationError,
+                'exploration has no editors'):
             exploration.put()
 
     def test_init_state_property(self):
@@ -117,6 +131,9 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
         exploration = FakeExploration(owner_id='owner@example.com')
+        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
+            exploration.get_state_by_id('invalid_state_id')
+
         exploration.add_state('Initial state')
 
         self.assertEqual(len(exploration.state_ids), 1)
@@ -139,9 +156,9 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         # But it is not OK to add or rename a state using a name that already
         # exists.
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.add_state('State 2')
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.rename_state(second_state.id, 'Renamed state')
 
         # The exploration now has exactly two states.
@@ -154,11 +171,12 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         exploration = FakeExploration(owner_id='owner@example.com')
         exploration.add_state('first_state')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+                ValueError, 'Cannot delete initial state'):
             exploration.delete_state(exploration.state_ids[0])
 
         exploration.add_state('second_state')
         exploration.delete_state(exploration.state_ids[1])
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
             exploration.delete_state('fake_state')

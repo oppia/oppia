@@ -141,7 +141,7 @@ class Exploration(base_domain.BaseDomainObject):
     def get_state_by_id(self, state_id, strict=True):
         """Returns a state of the exploration, given its id."""
         if state_id not in self.state_ids:
-            raise Exception(
+            raise ValueError(
                 'Invalid state id %s for exploration %s' % (state_id, self.id))
 
         return state_models.State.get(state_id, strict=strict)
@@ -149,7 +149,7 @@ class Exploration(base_domain.BaseDomainObject):
     def add_state(self, state_name, state_id=None):
         """Adds a new state, and returns it. Commits changes."""
         if self._has_state_named(state_name):
-            raise Exception('Duplicate state name %s' % state_name)
+            raise ValueError('Duplicate state name %s' % state_name)
 
         state_id = state_id or state_models.State.get_new_id(state_name)
         new_state = state_models.State(id=state_id, name=state_name)
@@ -161,13 +161,13 @@ class Exploration(base_domain.BaseDomainObject):
         return new_state
 
     def rename_state(self, state_id, new_state_name):
-        """Renames a state of this exploration."""
+        """Renames a state of this exploration. Commits changes."""
         state = self.get_state_by_id(state_id)
         if state.name == new_state_name:
             return
 
         if self._has_state_named(new_state_name):
-            raise Exception('Duplicate state name: %s' % new_state_name)
+            raise ValueError('Duplicate state name: %s' % new_state_name)
 
         state.name = new_state_name
         state.put()
@@ -175,12 +175,12 @@ class Exploration(base_domain.BaseDomainObject):
     def delete_state(self, state_id):
         """Deletes the given state. Commits changes."""
         if state_id not in self.state_ids:
-            raise Exception('State %s not in exploration %s' %
+            raise ValueError('Invalid state id %s for exploration %s' %
                             (state_id, self.id))
 
         # Do not allow deletion of initial states.
         if self.state_ids[0] == state_id:
-            raise Exception('Cannot delete initial state of an exploration.')
+            raise ValueError('Cannot delete initial state of an exploration.')
 
         # Find all destinations in the exploration which equal the deleted
         # state, and change them to loop back to their containing state.

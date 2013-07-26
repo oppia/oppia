@@ -227,3 +227,36 @@ states:
     sticky: false
     widget_id: Continue
 """)
+
+    def test_export_state_to_dict(self):
+        """Test the export_state_to_dict() method."""
+        exploration = exp_domain.Exploration.get(exp_services.create_new(
+            self.owner_id, 'A title', 'A category',
+            'A different exploration_id'))
+        new_state = exploration.add_state('New state')
+        state_dict = exp_services.export_state_to_dict(
+            exploration.id, new_state.id)
+
+        expected_dict = {
+            'id': new_state.id,
+            'name': u'New state',
+            'content': [],
+            'param_changes': [],
+            'widget': {
+                'widget_id': u'Continue',
+                'params': {},
+                'sticky': False,
+                'handlers': [{
+                    'name': u'submit',
+                    'rules': [{
+                        'name': u'Default',
+                        'inputs': {},
+                        'dest': new_state.id,
+                        'feedback': [],
+                        'param_changes': [],
+
+                    }]
+                }]
+            },
+        }
+        self.assertEqual(expected_dict, state_dict)
