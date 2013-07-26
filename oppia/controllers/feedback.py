@@ -18,8 +18,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import urllib
 
-from oppia.apps.statistics import stats_services
 from oppia.controllers import base
+from oppia.domain import stats_services
 
 
 class FeedbackPage(base.BaseHandler):

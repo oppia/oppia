@@ -29,12 +29,12 @@ import logging
 import os
 
 import feconf
-from oppia.apps.exploration import exp_domain
 import oppia.apps.exploration.models as exp_models
 import oppia.apps.image.models as image_models
 import oppia.apps.parameter.models as param_models
 import oppia.apps.state.models as state_models
-from oppia.apps.widget import widget_domain
+from oppia.domain import exp_domain
+from oppia.domain import widget_domain
 import utils
 
 

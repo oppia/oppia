@@ -16,9 +16,9 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-from oppia.apps.exploration import exp_services
-from oppia.apps.widget import widget_domain
 from oppia.controllers import base
+from oppia.domain import exp_services
+from oppia.domain import widget_domain
 
 
 def reload_widgets():

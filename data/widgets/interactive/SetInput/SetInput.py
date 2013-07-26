@@ -1,5 +1,5 @@
 from data.objects.models import objects
-from oppia.apps.widget import widget_domain
+from oppia.domain import widget_domain
 
 
 class SetInput(widget_domain.BaseWidget):

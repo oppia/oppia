@@ -18,9 +18,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
 
-from oppia.apps.exploration import exp_services
-from oppia.apps.user import user_services
 from oppia.controllers import base
+from oppia.domain import exp_services
+from oppia.domain import user_services
 
 
 class GalleryPage(base.BaseHandler):

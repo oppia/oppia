@@ -17,9 +17,9 @@
 __author__ = 'Jeremy Emerson'
 
 import feconf
-from oppia.apps.exploration import exp_domain
-from oppia.apps.exploration import exp_services
 import oppia.apps.state.models as state_models
+from oppia.domain import exp_domain
+from oppia.domain import exp_services
 import test_utils
 
 

@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 from data.objects.models import objects
-from oppia.apps.typed_objects import obj_services
+from oppia.domain import obj_services
 import test_utils
 
 

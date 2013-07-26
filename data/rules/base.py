@@ -16,8 +16,8 @@
 
 """Base rules."""
 
-from oppia.apps.rule import rule_domain
 from data.objects.models import objects
+from oppia.domain import rule_domain
 
 
 class Coord2DRule(rule_domain.Rule):

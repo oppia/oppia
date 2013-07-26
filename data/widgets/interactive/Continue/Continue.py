@@ -1,4 +1,4 @@
-from oppia.apps.widget import widget_domain
+from oppia.domain import widget_domain
 
 
 class Continue(widget_domain.BaseWidget):

@@ -19,12 +19,11 @@
 __author__ = 'Sean Lip'
 
 import feconf
-import oppia.apps.base_model.domain as base_domain
 import oppia.apps.exploration.models as exp_models
 import oppia.apps.state.models as state_models
+from oppia.domain import base_domain
 
 
-# TODO(sll): Add an anyone-can-edit mode.
 class Exploration(base_domain.BaseDomainObject):
     """Domain object for an Oppia exploration.
 

@@ -23,8 +23,8 @@ import re
 import string
 
 import feconf
-from oppia.apps.typed_objects import obj_services
-from oppia.apps.widget import widget_domain
+from oppia.domain import obj_services
+from oppia.domain import widget_domain
 import test_utils
 import utils
 

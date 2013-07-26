@@ -21,7 +21,7 @@ __author__ = 'Sean Lip'
 import unittest
 
 from data.objects.models import objects
-from oppia.apps.rule import rule_domain
+from oppia.domain import rule_domain
 
 
 class FakeRule(rule_domain.Rule):

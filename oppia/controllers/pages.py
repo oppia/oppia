@@ -17,10 +17,10 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
-from oppia.apps.exploration import exp_domain
-from oppia.apps.user import user_services
 from oppia.controllers import admin
 from oppia.controllers import base
+from oppia.domain import exp_domain
+from oppia.domain import user_services
 import utils
 
 

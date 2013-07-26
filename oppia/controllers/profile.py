@@ -16,10 +16,10 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
-from oppia.apps.exploration import exp_services
-from oppia.apps.statistics import stats_services
-from oppia.apps.user import user_services
 from oppia.controllers import base
+from oppia.domain import exp_services
+from oppia.domain import stats_services
+from oppia.domain import user_services
 
 
 class ProfilePage(base.BaseHandler):

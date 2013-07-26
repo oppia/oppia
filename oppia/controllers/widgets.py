@@ -19,9 +19,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 import collections
 
 import feconf
-from oppia.apps.user import user_services
-from oppia.apps.widget import widget_domain
 from oppia.controllers import base
+from oppia.domain import user_services
+from oppia.domain import widget_domain
 import utils
 
 

@@ -22,8 +22,8 @@ __author__ = 'Sean Lip'
 import feconf
 import oppia.apps.base_model.models as base_models
 import oppia.apps.parameter.models as param_models
-from oppia.apps.rule import rule_domain
-from oppia.apps.widget import widget_domain
+from oppia.domain import rule_domain
+from oppia.domain import widget_domain
 import utils
 
 from google.appengine.ext import ndb

@@ -16,10 +16,9 @@
 
 __author__ = 'Sean Lip'
 
+from oppia.domain import exp_domain
+from oppia.domain import exp_services
 import test_utils
-
-from oppia.apps.exploration import exp_domain
-from oppia.apps.exploration import exp_services
 
 
 class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):

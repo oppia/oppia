@@ -17,8 +17,8 @@ import os
 import unittest
 import webtest
 
-from oppia.apps.exploration import exp_services
-from oppia.apps.statistics import stats_services
+from oppia.domain import exp_services
+from oppia.domain import stats_services
 
 
 def empty_environ():

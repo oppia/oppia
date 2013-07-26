@@ -18,7 +18,7 @@ __author__ = 'Jeremy Emerson'
 
 from data.objects.models import objects
 import feconf
-from oppia.apps.widget import widget_domain
+from oppia.domain import widget_domain
 import test_utils
 
 
