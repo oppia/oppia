@@ -174,7 +174,7 @@ class ExplorationHandler(base.BaseHandler):
 
     @base.require_editor
     def get(self, exploration):
-        """Gets the question name and state list for a question page."""
+        """Gets the data for the exploration overview page."""
 
         state_list = {}
         for state_id in exploration.state_ids:

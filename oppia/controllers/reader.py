@@ -265,7 +265,8 @@ class FeedbackHandler(base.BaseHandler):
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
 
-        rule = old_state.classify(handler, answer, old_params)
+        rule = exp_services.classify(
+            exploration_id, state_id, handler, answer, old_params)
         feedback = rule.get_feedback_string()
         new_state_id = rule.dest
         if new_state_id == feconf.END_DEST:

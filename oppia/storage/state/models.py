@@ -19,8 +19,6 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.domain import rule_domain
-from oppia.domain import widget_domain
 import oppia.storage.base_model.models as base_models
 import oppia.storage.parameter.models as param_models
 import utils
@@ -50,6 +48,11 @@ class RuleSpec(base_models.BaseModel):
     feedback = ndb.TextProperty(repeated=True)
     # Exploration-level parameter changes to make if this rule is triggered.
     param_changes = param_models.ParamChangeProperty(repeated=True)
+
+    @property
+    def is_default(self):
+        """Returns True if this spec corresponds to the default rule."""
+        return self.name == 'Default'
 
     def get_feedback_string(self):
         """Returns a (possibly empty) string with feedback for this rule."""
@@ -141,65 +144,3 @@ class State(base_models.IdModel):
         if name == feconf.END_DEST:
             return feconf.END_DEST
         return State.get_by_name(name, exploration).id
-
-    def classify(self, handler_name, answer, params):
-        """Classify a reader's answer and return the rule it satisfies."""
-        # Get the widget to determine the input type.
-        generic_handler = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, self.widget.widget_id
-        ).get_handler_by_name(handler_name)
-        all_rule_classes = generic_handler.rules
-
-        handlers = [h for h in self.widget.handlers if h.name == handler_name]
-        if not handlers:
-            raise Exception('No handlers found for %s' % handler_name)
-        handler = handlers[0]
-
-        if generic_handler.input_type is None:
-            selected_rule = handler.rule_specs[0]
-        else:
-            selected_rule = self.find_first_match(
-                handler, all_rule_classes, answer, params)
-
-        return selected_rule
-
-    def find_first_match(self, handler, all_rule_classes, answer, params):
-        for ind, rule in enumerate(handler.rule_specs):
-            if rule.name == 'Default':
-                return rule
-
-            # Find the relevant rule in all_rule_classes, instantiate it,
-            # and evaluate it.
-            for r in all_rule_classes:
-                if r.__name__ == rule.name:
-                    param_list = self.get_param_list(
-                        self.widget.widget_id, handler.name, rule, params)
-                    match = r(*param_list).eval(answer)
-                    if match:
-                        return rule
-
-        raise Exception(
-            'No matching rule found for handler %s.' % handler.name)
-
-    def get_param_list(self, widget_id, handler_name, rule, state_params):
-        # TODO(sll): In the frontend, use the rule descriptions as the single
-        # source of truth for the params.
-
-        # Get the readable rule description.
-        rule_description = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, widget_id
-        ).get_rule_description(handler_name, rule.name)
-
-        param_defns = rule_domain.get_param_list(rule_description)
-
-        param_list = []
-        for (param_name, obj_cls) in param_defns:
-            parsed_param = rule.inputs[param_name]
-            if isinstance(parsed_param, basestring) and '{{' in parsed_param:
-                parsed_param = utils.parse_with_jinja(
-                    parsed_param, state_params)
-
-            normalized_param = obj_cls.normalize(parsed_param)
-            param_list.append(normalized_param)
-
-        return param_list

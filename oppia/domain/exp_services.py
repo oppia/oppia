@@ -30,6 +30,7 @@ import os
 
 import feconf
 from oppia.domain import exp_domain
+from oppia.domain import rule_domain
 from oppia.domain import widget_domain
 import oppia.storage.exploration.models as exp_models
 import oppia.storage.image.models as image_models
@@ -145,6 +146,52 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
     state.put()
     return state
+
+
+def _find_first_match(handler, all_rule_classes, answer, state_params):
+    for rule_spec in handler.rule_specs:
+        if rule_spec.is_default:
+            return rule_spec
+
+        r = next(r for r in all_rule_classes if r.__name__ == rule_spec.name)
+
+        param_list = []
+        param_defns = rule_domain.get_param_list(r.description)
+        for (param_name, obj_cls) in param_defns:
+            parsed_param = rule_spec.inputs[param_name]
+            if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
+                parsed_param = utils.parse_with_jinja(
+                    parsed_param, state_params)
+            normalized_param = obj_cls.normalize(parsed_param)
+            param_list.append(normalized_param)
+
+        match = r(*param_list).eval(answer)
+        if match:
+            return rule_spec
+
+    raise Exception(
+        'No matching rule found for handler %s.' % handler.name)
+
+
+def classify(exploration_id, state_id, handler_name, answer, params):
+    """Return the first rule that is satisfied by a reader's answer."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
+
+    # Get the widget to determine the input type.
+    generic_handler = widget_domain.Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
+    ).get_handler_by_name(handler_name)
+
+    handler = next(h for h in state.widget.handlers if h.name == handler_name)
+
+    if generic_handler.input_type is None:
+        selected_rule = handler.rule_specs[0]
+    else:
+        selected_rule = _find_first_match(
+            handler, generic_handler.rules, answer, params)
+
+    return selected_rule
 
 
 # Creation and deletion methods.

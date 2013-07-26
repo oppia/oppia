@@ -77,7 +77,7 @@ class ExplorationModel(base_models.IdModel):
         if properties is None:
             properties = {}
 
-        # In NDB, self._properties() returns the list of ndb properties of a
+        # In NDB, self._properties returns the list of ndb properties of a
         # model.
         for key in self._properties:
             if key in properties:
