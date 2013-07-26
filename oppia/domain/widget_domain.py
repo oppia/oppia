@@ -23,8 +23,8 @@ import os
 import pkgutil
 
 import feconf
-import oppia.apps.parameter.models as param_models
 from oppia.domain import rule_domain
+import oppia.storage.parameter.models as param_models
 import utils
 
 

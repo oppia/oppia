@@ -16,8 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import oppia.apps.image.models as image_models
 from oppia.controllers import base
+import oppia.storage.image.models as image_models
 
 
 class EditorViewHandler(base.BaseHandler):

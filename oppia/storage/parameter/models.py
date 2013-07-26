@@ -18,8 +18,8 @@ __author__ = 'Sean Lip'
 
 import re
 
-import oppia.apps.base_model.models as base_models
 from oppia.domain import obj_services
+import oppia.storage.base_model.models as base_models
 import utils
 
 from google.appengine.ext import ndb

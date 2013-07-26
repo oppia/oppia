@@ -16,10 +16,10 @@
 
 __author__ = 'Jeremy Emerson'
 
-import oppia.apps.state.models as state_models
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_services
+import oppia.storage.state.models as state_models
 import test_utils
 
 

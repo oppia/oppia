@@ -18,8 +18,8 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
-import oppia.apps.state.models as state_models
 from oppia.domain import exp_domain
+import oppia.storage.state.models as state_models
 
 
 class FakeExploration(exp_domain.Exploration):

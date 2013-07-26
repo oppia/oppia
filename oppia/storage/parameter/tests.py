@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import oppia.apps.parameter.models as param_models
+import oppia.storage.parameter.models as param_models
 import test_utils
 
 
