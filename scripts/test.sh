@@ -45,6 +45,8 @@ THIRD_PARTY_DIR=third_party
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2:$THIRD_PARTY_DIR/mock-1.0.1
 export PYTHONPATH=$PYTHONPATH
+# Adjust the path to include a reference to node.
+PATH=$PATH:$THIRD_PARTY_DIR/node-0.10.1/bin
 
 # webtest is used for tests.
 echo Checking if webtest is installed in third_party
@@ -77,6 +79,22 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.3" ]; then
   # Files for tests.
   wget http://code.angularjs.org/1.0.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-mocks.js
   wget http://code.angularjs.org/1.0.3/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-scenario.js
+fi
+
+# Node is needed to install karma.
+echo Checking if node.js is installed in third_party
+if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
+  echo Installing Node.js
+  wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
+  tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
+  mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
+  rm node-download.tgz
+fi
+
+echo Checking whether Karma has been installed via node.js
+if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/karma" ]; then
+  echo Installing Karma
+  $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g karma
 fi
 
 # Note: you can safely delete all of the following code (up to the end of the

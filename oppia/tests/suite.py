@@ -35,7 +35,7 @@ import os
 import sys
 import unittest
 
-EXPECTED_TEST_COUNT = 94
+EXPECTED_TEST_COUNT = 95
 
 
 _PARSER = argparse.ArgumentParser()
@@ -55,7 +55,7 @@ def create_test_suites(parsed_args):
     suite1 = loader.discover(
         root_dir, pattern='*_test.py', top_level_dir=root_dir)
     suite2 = loader.discover(
-        root_dir, pattern='tests.py', top_level_dir=root_dir)
+        root_dir, pattern='*tests.py', top_level_dir=root_dir)
     return [suite1, suite2]
 
 

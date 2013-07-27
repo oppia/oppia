@@ -45,6 +45,8 @@ THIRD_PARTY_DIR=third_party
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
+# Adjust the path to include a reference to node.
+PATH=$PATH:$THIRD_PARTY_DIR/node-0.10.1/bin
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
@@ -63,6 +65,16 @@ if [ ! -d "$THIRD_PARTY_DIR/closure-compiler" ]; then
   unzip closure-compiler-download.zip -d $THIRD_PARTY_DIR/closure-compiler
   rm closure-compiler-download.zip
 fi
+
+echo Checking if node.js is installed in third_party
+if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
+  echo Installing Node.js
+  wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
+  tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
+  mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
+  rm node-download.tgz
+fi
+
 
 # Static resources.
 echo Checking whether angular-ui is installed in third_party
