@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+from oppia.domain import obj_services
 import utils
 
 
@@ -27,18 +28,33 @@ class Parameter(object):
     A parameter consists of a name, an obj_type, a list of values
     and an optional description. Each element in the list of values
     must be of the given obj_type.
+
+    Note that the obj_type must be set before the values.
     """
     name = None
-    values = None
     obj_type = None
+    values = None
     description = ''
 
-    def __init__(self, name, values, obj_type, description=''):
+    def __setattr__(self, name, value):
+        if name == 'name':
+            assert value
+        elif name == 'obj_type':
+            # Later, accept actual obj_types (not the string for the name).
+            # Or maybe accept both?
+            assert value and isinstance(value, basestring)
+        elif name == 'values':
+            assert value and isinstance(value, list)
+            value = [obj_services.get_object_class(
+                self.obj_type).normalize(item) for item in value]
+
+        super(Parameter, self).__setattr__(name, value)
+
+    def __init__(self, name, obj_type, values, description=''):
         self.name = name
-        self.values = values
         self.obj_type = obj_type
+        self.values = values
         self.description = description
-        assert self.values and self.obj_type and self.name
 
     @property
     def value(self):
