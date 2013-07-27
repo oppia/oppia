@@ -65,7 +65,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding action and the value has several keys:
-    // - 'rule' (the raw rule string)
+    // - 'description' (the rule description string)
     // - 'inputs' (a list of parameters)
     // - 'name' (stuff needed to build the Python classifier code)
     // - 'dest' (the destination for this rule)
@@ -143,16 +143,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return result;
   };
 
-  $scope.selectRule = function(rule, name) {
+  $scope.selectRule = function(description, name) {
     $scope.deselectAllRules();
-    $scope.addRuleActionRule = rule;
+    $scope.addRuleActionDescription = description;
     $scope.addRuleActionName = name;
     $scope.addRuleActionDest = explorationData.stateId;
     $scope.addRuleActionDestNew = '';
 
     // Finds the parameters and sets them in addRuleActionInputs.
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var copyOfRule = rule;
+    var copyOfRule = description;
     while (true) {
       if (!copyOfRule.match(pattern)) {
         break;
@@ -181,8 +181,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     for (var i = 0; i < wHandlers.length; i++) {
       if (wHandlers[i].name == action) {
         ruleDict = {};
-        for (var rule in wHandlers[i].rules) {
-          ruleDict[rule] = wHandlers[i].rules[rule].classifier;
+        for (var description in wHandlers[i].rules) {
+          ruleDict[description] = wHandlers[i].rules[description].classifier;
         }
         console.log(ruleDict);
         return ruleDict;
@@ -192,7 +192,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
   $scope.deselectAllRules = function() {
     $scope.addRuleActionIndex = null;
-    $scope.addRuleActionRule = null;
+    $scope.addRuleActionDescription = null;
     $scope.addRuleActionName = null;
     $scope.addRuleActionInputs = {};
     $scope.addRuleActionDest = null;
@@ -213,7 +213,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
     $scope.addRuleActionIndex = index;
     var rule = $scope.interactiveRulesets[action][index];
-    $scope.addRuleActionRule = rule.rule;
+    $scope.addRuleActionDescription = rule.description;
     $scope.addRuleActionName = rule.name;
     $scope.addRuleActionInputs = rule.inputs;
     $scope.addRuleActionDest = rule.dest;
@@ -244,10 +244,10 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.saveExtendedRule(action, extendedRule);
   };
 
-  $scope.saveRule = function(rule, name, inputs, dest, newDest, feedback) {
-    if (rule) {
+  $scope.saveRule = function(description, name, inputs, dest, newDest, feedback) {
+    if (description) {
       var extendedRule = {
-        rule: rule,
+        description: description,
         name: name,
         inputs: inputs,
         dest: dest,
@@ -349,7 +349,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveWidget = arg.data.widget;
       $scope.interactiveParams = $scope.interactiveWidget.params;
       $scope.interactiveRulesets = {'submit': [{
-        'rule': 'Default',
+        'description': 'Default',
         'name': '',
         'inputs': {},
         'dest': $scope.stateId,
@@ -372,7 +372,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
     explorationData.saveStateData($scope.stateId, {
-      'unresolved_answers': $scope.unresolvedAnswers,
+      'unresolved_answers': $scope.unresolvedAnswers
     });
     $scope.generateUnresolvedAnswersMap();
   };

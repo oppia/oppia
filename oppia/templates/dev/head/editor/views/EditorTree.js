@@ -47,9 +47,9 @@ function EditorTree($scope, $filter, explorationData) {
     }
     for (var i = 0; i < states[currStateId].widget.rules.submit.length; ++i) {
       var destStateId = states[currStateId].widget.rules.submit[i].dest;
-      var rule = states[currStateId].widget.rules.submit[i].rule;
+      var description = states[currStateId].widget.rules.submit[i].description;
       var inputs = states[currStateId].widget.rules.submit[i].inputs;
-      var category = $filter('parameterizeRule')({rule: rule, inputs: inputs});
+      var category = $filter('parameterizeRuleDescription')({description: description, inputs: inputs});
       if (destStateId == END_DEST) {
         thisState['children'].push(
             {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});

@@ -144,7 +144,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       'numVisits': data.num_visits,
       'numCompletions': data.num_completions,
       'stateStats': data.state_stats,
-      'imp': data.imp,
+      'imp': data.imp
     };
 
     $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
@@ -237,8 +237,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         links.push({
             source: nodeList[nodes[state].id],
             target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
-            name: $filter('parameterizeRule')({
-                rule: states[state].widget.rules.submit[i].rule,
+            name: $filter('parameterizeRuleDescription')({
+                description: states[state].widget.rules.submit[i].description,
                 inputs: states[state].widget.rules.submit[i].inputs
             })
         });

@@ -189,7 +189,10 @@ class Coord2D(BaseObject):
                 assert len(raw) == 2
                 r0, r1 = raw
             else:
-                reals = raw.lstrip('[').rstrip(']').split(',')
+                if '(' in raw:
+                    reals = raw.lstrip('(').rstrip(')').split(',')
+                else:
+                    reals = raw.lstrip('[').rstrip(']').split(',')
                 r0 = float(reals[0])
                 r1 = float(reals[1])
 

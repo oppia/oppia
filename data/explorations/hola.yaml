@@ -9,7 +9,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Me llamo
         feedback:
         - 'Don''t forget: Spanish uses inverted exclamation points at the beginning
@@ -50,7 +50,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Adios
         feedback:
         - Don't forget your accent marks next time!
@@ -81,7 +81,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Colores
         feedback:
         - Apples aren't black unless they are rotten...and they aren't blue
@@ -138,7 +138,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Me llamo
         feedback:
         - 'Yes!
@@ -176,7 +176,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Me llamo
         feedback:
         - You've got one too many verbs.
@@ -212,7 +212,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Como meaning
         feedback:
         - That's right!
@@ -254,7 +254,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Supermercado
         feedback:
         - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!

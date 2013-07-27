@@ -34,30 +34,31 @@ def get_state_for_frontend(state, exploration):
     """Returns a representation of the given state for the frontend."""
 
     state_repr = exp_services.export_state_to_dict(exploration.id, state.id)
-    modified_state_dict = exp_services.export_state_internals_to_dict(
-        exploration.id, state.id, human_readable_dests=True)
 
     # TODO(sll): The following is for backwards-compatibility and should be
     # deleted later.
     rules = {}
     for handler in state_repr['widget']['handlers']:
-        rules[handler['name']] = handler['rules']
+        rules[handler['name']] = handler['rule_specs']
         for item in rules[handler['name']]:
             if item['name'] == 'Default':
-                item['rule'] = 'Default'
+                item['description'] = 'Default'
             else:
                 # Get the human-readable name for a rule.
-                item['rule'] = widget_domain.Registry.get_widget_by_id(
+                item['description'] = widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, state.widget.widget_id
                 ).get_rule_description(handler['name'], item['name'])
 
     state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
-    state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
-
     state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
         exploration.id, state.id)
+
+    modified_state_dict = exp_services.export_state_internals_to_dict(
+        exploration.id, state.id, human_readable_dests=True)
+    state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
+
     return state_repr
 
 
@@ -360,7 +361,7 @@ class StateHandler(base.BaseHandler):
                 state_rule.feedback = rule.get('feedback')
 
                 # Generate the code to be executed.
-                if rule['rule'] == 'Default':
+                if rule['description'] == 'Default':
                     # This is the default rule.
                     assert rule_ind == len(ruleset) - 1
                     state_rule.name = 'Default'

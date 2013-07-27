@@ -13,7 +13,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: What language
         feedback:
         - Yes!
@@ -51,7 +51,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Numeric input
         feedback:
         - Yes! So 11 times 11 must be bigger. Let's try again.
@@ -84,7 +84,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Things you can do
         feedback:
         - That's right!
@@ -124,7 +124,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Music widget
         feedback:
         - 'Yes, that''s correct: 11 times 11 is 121.'
@@ -188,7 +188,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback: []
         inputs: {}
@@ -206,7 +206,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: What language
         feedback:
         - That's a pretty good guess. Several Greek words end with 'ia', such as 'thexia'

@@ -114,12 +114,12 @@ oppia.filter('bracesToInput', function() {
 });
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
-oppia.filter('parameterizeRule', function() {
+oppia.filter('parameterizeRuleDescription', function() {
   return function(input, choices) {
     if (!input) {
       return '';
     }
-    var rule = input.rule;
+    var description = input.description;
     var inputs = input.inputs;
 
     var isMultipleChoice = false;
@@ -127,22 +127,22 @@ oppia.filter('parameterizeRule', function() {
       isMultipleChoice = true;
     }
 
-    var finalRule = rule;
+    var finalRule = description;
 
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var iter = 0;
     while (true) {
-      if (!rule.match(pattern) || iter == 100) {
+      if (!description.match(pattern) || iter == 100) {
         break;
       }
       iter++;
 
-      var varName = rule.match(pattern)[1];
+      var varName = description.match(pattern)[1];
       var replacementText = inputs[varName];
       if (isMultipleChoice) {
         replacementText = "'" + choices[inputs[varName]] + "'";
       }
-      rule = rule.replace(pattern, ' ');
+      description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }
     return finalRule;

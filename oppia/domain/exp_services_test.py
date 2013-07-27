@@ -206,7 +206,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: '[untitled state]'
         feedback: []
         inputs: {}
@@ -221,7 +221,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: New state
         feedback: []
         inputs: {}
@@ -252,7 +252,7 @@ states:
                 'sticky': False,
                 'handlers': [{
                     'name': u'submit',
-                    'rules': [{
+                    'rule_specs': [{
                         'name': u'Default',
                         'inputs': {},
                         'dest': new_state.id,

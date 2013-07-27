@@ -9,7 +9,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback:
         - That is correct! Great job!
@@ -41,7 +41,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback: []
         inputs:
@@ -72,7 +72,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: So...
         feedback: []
         inputs:
@@ -96,7 +96,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: verb endings
         feedback: []
         inputs:
@@ -121,7 +121,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: boot verb
         feedback:
         - But if you just drop the -ar and at -o, you get jugo which means juice,

@@ -159,11 +159,11 @@ def modify_using_dict(exploration_id, state_id, sdict):
 
     for handler in wdict['handlers']:
         handler_rule_specs = [state_models.RuleSpec(
-            name=rule['name'],
-            inputs=rule['inputs'],
-            dest=convert_state_name_to_id(exploration_id, rule['dest']),
-            feedback=rule['feedback']
-        ) for rule in handler['rules']]
+            name=rule_spec['name'],
+            inputs=rule_spec['inputs'],
+            dest=convert_state_name_to_id(exploration_id, rule_spec['dest']),
+            feedback=rule_spec['feedback']
+        ) for rule_spec in handler['rule_specs']]
 
         state.widget.handlers.append(state_models.AnswerHandlerInstance(
             name=handler['name'], rule_specs=handler_rule_specs))
@@ -337,16 +337,10 @@ def export_state_internals_to_dict(
 
     state_dict = copy.deepcopy(state.to_dict())
 
-    # TODO(sll): Remove this temporary fix to maintain backward-compatibility.
-    # Propagate the name change rules --> rule_specs to the frontend.
-    for handler in state_dict['widget']['handlers']:
-        handler['rules'] = handler['rule_specs']
-        del handler['rule_specs']
-
     if human_readable_dests:
         # Change the dest ids to human-readable names.
         for handler in state_dict['widget']['handlers']:
-            for rule in handler['rules']:
+            for rule in handler['rule_specs']:
                 if rule['dest'] != feconf.END_DEST:
                     dest_state = exploration.get_state_by_id(rule['dest'])
                     rule['dest'] = dest_state.name
