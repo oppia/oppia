@@ -52,10 +52,6 @@ def get_state_for_frontend(state, exploration):
     state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
         exploration.id, state.id)
 
-    modified_state_dict = exp_services.export_state_internals_to_dict(
-        exploration.id, state.id, human_readable_dests=True)
-    state_repr['yaml'] = utils.yaml_from_dict(modified_state_dict)
-
     return state_repr
 
 
@@ -290,14 +286,6 @@ class StateHandler(base.BaseHandler):
     @base.require_editor
     def put(self, exploration, state):
         """Saves updates to a state."""
-
-        yaml_file = self.payload.get('yaml_file')
-        if yaml_file and feconf.ALLOW_YAML_FILE_UPLOAD:
-            # The user has uploaded a YAML file. Process only this action.
-            state = exp_services.modify_using_dict(
-                exploration.id, state.id, utils.dict_from_yaml(yaml_file))
-            self.render_json(get_state_for_frontend(state, exploration))
-            return
 
         state_name = self.payload.get('state_name')
         param_changes = self.payload.get('param_changes')

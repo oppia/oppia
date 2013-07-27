@@ -21,7 +21,6 @@
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
 var GUI_EDITOR_URL = '/gui';
-var YAML_EDITOR_URL = '/text';
 var STATS_VIEWER_URL = '/stats';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
@@ -29,8 +28,6 @@ var STATS_VIEWER_URL = '/stats';
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-      when(YAML_EDITOR_URL + '/:stateId',
-           {templateUrl: '/editor_views/yaml_editor', controller: YamlEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
       when(STATS_VIEWER_URL,
@@ -67,38 +64,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
-  /**
-   * Gets the current mode from the URL location hash, with the GUI mode being
-   * the default.
-   */
-  $scope.getMode = function() {
-    if ($location.$$url.substring(0, YAML_EDITOR_URL.length) == YAML_EDITOR_URL) {
-      return YAML_EDITOR_URL.substring(1);
-    } else {
-      return GUI_EDITOR_URL.substring(1);
-    }
-  };
-
-  /**
-   * Changes the state editor mode.
-   * @param {string} mode The state editor mode to switch to (currently, gui or text).
-   */
-  $scope.changeMode = function(mode) {
-    if (mode == GUI_EDITOR_URL.substring(1)) {
-      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
-    } else if (mode == YAML_EDITOR_URL.substring(1)) {
-      $location.path(YAML_EDITOR_URL + '/' + explorationData.stateId);
-    } else {
-      warningsData.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
-    }
-    $scope.$apply();
-  };
-
   // Changes the location hash when the editorView tab is changed.
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
-      $scope.changeMode($scope.getMode());
+      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
+      $scope.$apply();
       $scope.stateName = explorationData.data.states[explorationData.stateId].name;
     } else if (e.target.hash == '#statsViewer') {
       $location.path('stats');
