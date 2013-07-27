@@ -35,7 +35,7 @@
                  <bar-chart ng-show="ruleData.chartData[1][1] > 0" chart-colors="ruleChartColors" chart-data="ruleData.chartData" width=100 height=30 show-legend="false"></bar-chart></td>
                <td>
                  <ul>
-                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="<[answer[1]]> > 1">s</div>)</i></li>
+                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="answer[1] > 1">s</div>)</i></li>
                  </ul>
                </td>
             </tr>

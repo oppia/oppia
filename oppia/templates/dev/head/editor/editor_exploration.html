@@ -14,6 +14,7 @@
 
 {% block header_js %}
   {{ super() }}
+  <script src="/third_party/static/select2/select2.js"></script>
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
@@ -154,7 +155,6 @@
   {{ super() }}
   <script src="/third_party/static/d3js-3/d3.min.js"></script>
   <script async src="/third_party/static/yui2-2.9.0/yui2-2.9.0.js"></script>
-  <script async src="/third_party/static/select2/select2.js"></script>
   <script>
     {{ include_js_file('assets/js/services/explorationData.js') }}
     {{ include_js_file('editor/EditorExploration.js') }}

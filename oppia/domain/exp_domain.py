@@ -119,6 +119,15 @@ class Exploration(base_domain.BaseDomainObject):
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
     # Methods relating to owners and editors.
+    def is_forkable_by(self, user_id):
+        """Whether the given user has rights to fork this exploration.
+
+        This is a policy decision, and the criterion here can be changed.
+        For example, it may depend on whether the user has completed the
+        exploration or earned admin credentials.
+        """
+        return self.is_demo or self.is_editable_by(user_id)
+
     def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
         return user_id in self.editor_ids
@@ -161,6 +170,9 @@ class Exploration(base_domain.BaseDomainObject):
 
     def rename_state(self, state_id, new_state_name):
         """Renames a state of this exploration. Commits changes."""
+        if new_state_name == feconf.END_DEST:
+            raise ValueError('Invalid state name: %s' % feconf.END_DEST)
+
         state = self.get_state_by_id(state_id)
         if state.name == new_state_name:
             return

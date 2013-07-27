@@ -185,7 +185,7 @@ def get_unresolved_answers(exploration_id, state_id):
     return stats_models.Tally.get_value_by_id(event_id)
 
 
-def get_exploration_stats(event_name, exploration_id):
+def _get_exploration_stats(event_name, exploration_id):
     """Retrieves statistics for the given event name and exploration id."""
 
     if (event_name in [STATS_ENUMS.exploration_visited,
@@ -231,7 +231,55 @@ def get_exploration_stats(event_name, exploration_id):
         return result
 
 
+def export_exploration_stats_to_dict(exploration_id):
+    """Returns a dict with stats for the given exploration id."""
+
+    num_visits = _get_exploration_stats(
+        STATS_ENUMS.exploration_visited, exploration_id)
+    num_completions = _get_exploration_stats(
+        STATS_ENUMS.exploration_completed, exploration_id)
+
+    answers = _get_exploration_stats(STATS_ENUMS.rule_hit, exploration_id)
+    state_counts = _get_exploration_stats(
+        STATS_ENUMS.state_hit, exploration_id)
+
+    state_stats = {}
+    for state_id in answers:
+        all_rule_count = 0
+        state_count = state_counts[state_id]['count']
+
+        rule_stats = {}
+        for rule in answers[state_id]['rules']:
+            # TODO(sll): Can this computation be done in the frontend instead?
+            rule_count = 0
+            for _, count in answers[state_id]['rules'][rule]['answers']:
+                rule_count += count
+                all_rule_count += count
+
+            rule_stats[rule] = answers[state_id]['rules'][rule]
+            rule_stats[rule]['chartData'] = [
+                ['', 'This rule', 'Other answers'],
+                ['', rule_count, state_count - rule_count]]
+
+        state_stats[state_id] = {
+            'name': answers[state_id]['name'],
+            'count': state_count,
+            'rule_stats': rule_stats,
+            'no_answer_chartdata': [
+                ['', 'No answer', 'Answer given'],
+                ['',  state_count - all_rule_count, all_rule_count]
+            ]
+        }
+
+    return {
+        'num_visits': num_visits,
+        'num_completions': num_completions,
+        'state_stats': state_stats,
+    }
+
+
 def get_top_ten_improvable_states(explorations):
+    """Returns the top improvable states across all the given explorations."""
     ranked_states = []
     for exploration in explorations:
         for state_id in exploration.state_ids:

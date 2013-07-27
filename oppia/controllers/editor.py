@@ -38,8 +38,8 @@ def get_state_for_frontend(state, exploration):
     # Add descriptions to each rule.
     for handler in state_repr['widget']['handlers']:
         for rule_spec in handler['rule_specs']:
-            if rule_spec['name'] == 'Default':
-                rule_spec['description'] = 'Default'
+            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
+                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
             else:
                 rule_spec['description'] = (
                     widget_domain.Registry.get_widget_by_id(
@@ -53,51 +53,6 @@ def get_state_for_frontend(state, exploration):
         exploration.id, state.id)
 
     return state_repr
-
-
-def get_exploration_stats(exploration):
-    """Returns a dict with stats for the given exploration."""
-
-    num_visits = stats_services.get_exploration_stats(
-        stats_services.STATS_ENUMS.exploration_visited, exploration.id)
-
-    num_completions = stats_services.get_exploration_stats(
-        stats_services.STATS_ENUMS.exploration_completed, exploration.id)
-
-    answers = stats_services.get_exploration_stats(
-        stats_services.STATS_ENUMS.rule_hit, exploration.id)
-
-    state_counts = stats_services.get_exploration_stats(
-        stats_services.STATS_ENUMS.state_hit, exploration.id)
-
-    state_stats = {}
-    for state_id in answers.keys():
-        state_stats[state_id] = {
-            'name': answers[state_id]['name'],
-            'count': state_counts[state_id]['count'],
-            'rule_stats': {},
-        }
-        all_rule_count = 0
-        state_count = state_counts[state_id]['count']
-        for rule in answers[state_id]['rules'].keys():
-            state_stats[state_id]['rule_stats'][rule] = (
-                answers[state_id]['rules'][rule])
-            rule_count = 0
-            for _, count in answers[state_id]['rules'][rule]['answers']:
-                rule_count += count
-                all_rule_count += count
-            state_stats[state_id]['rule_stats'][rule]['chartData'] = [
-                ['', 'This rule', 'Other answers'],
-                ['', rule_count, state_count - rule_count]]
-        state_stats[state_id]['no_answer_chartdata'] = [
-            ['', 'No answer', 'Answer given'],
-            ['',  state_count - all_rule_count, all_rule_count]]
-
-    return {
-        'num_visits': num_visits,
-        'num_completions': num_completions,
-        'state_stats': state_stats,
-    }
 
 
 class NewExploration(base.BaseHandler):
@@ -132,23 +87,12 @@ class ForkExploration(base.BaseHandler):
     @base.require_user
     def post(self):
         """Handles POST requests."""
-
         exploration_id = self.payload.get('exploration_id')
 
-        forked_exploration = exp_domain.Exploration.get(exploration_id)
-        if not forked_exploration.is_demo:
-            raise self.InvalidInputException('Exploration cannot be forked.')
-
-        # Get the demo exploration as a YAML file, so that new states can be
-        # created.
-        yaml_content = exp_services.export_to_yaml(forked_exploration.id)
-        title = 'Copy of %s' % forked_exploration.title
-        category = forked_exploration.category
-
-        new_exploration_id = exp_services.create_from_yaml(
-            yaml_content, self.user_id, title, category)
-
-        self.render_json({'explorationId': new_exploration_id})
+        self.render_json({
+            'explorationId': exp_services.fork_exploration(
+                exploration_id, self.user_id)
+        })
 
 
 class ExplorationPage(base.BaseHandler):
@@ -194,7 +138,8 @@ class ExplorationHandler(base.BaseHandler):
             'parameters': parameters,
         })
 
-        statistics = get_exploration_stats(exploration)
+        statistics = stats_services.export_exploration_stats_to_dict(
+            exploration.id)
         self.values.update({
             'num_visits': statistics['num_visits'],
             'num_completions': statistics['num_completions'],
@@ -298,9 +243,6 @@ class StateHandler(base.BaseHandler):
         unresolved_answers = self.payload.get('unresolved_answers')
 
         if 'state_name' in self.payload:
-            # Replace the state name with this one, after checking validity.
-            if state_name == feconf.END_DEST:
-                raise self.InvalidInputException('Invalid state name: END')
             exploration.rename_state(state.id, state_name)
 
         if 'param_changes' in self.payload:
@@ -314,7 +256,7 @@ class StateHandler(base.BaseHandler):
         if interactive_widget:
             state.widget.widget_id = interactive_widget
 
-        if interactive_params:
+        if interactive_params is not None:
             state.widget.params = interactive_params
 
         if sticky_interactive_widget is not None:
@@ -327,58 +269,47 @@ class StateHandler(base.BaseHandler):
             state.widget.handlers = [state_models.AnswerHandlerInstance(
                 name='submit', rule_specs=[])]
 
-            generic_handler = widget_domain.Registry.get_widget_by_id(
-                'interactive', state.widget.widget_id).get_handler_by_name(
-                    'submit')
-
-            # This is part of the state. The rules should be put into it.
-            state_ruleset = state.widget.handlers[0].rule_specs
+            generic_widget = widget_domain.Registry.get_widget_by_id(
+                'interactive', state.widget.widget_id)
 
             # TODO(yanamal): Do additional calculations here to get the
             # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
-
-                state_rule = state_models.RuleSpec()
-                state_rule.name = rule.get('name')
-                state_rule.inputs = rule.get('inputs')
-                state_rule.dest = rule.get('dest')
-                state_rule.feedback = rule.get('feedback')
-
-                # Generate the code to be executed.
-                if rule['description'] == 'Default':
-                    # This is the default rule.
-                    assert rule_ind == len(ruleset) - 1
-                    state_rule.name = 'Default'
-                    state_ruleset.append(state_rule)
-                    continue
-
-                matched_generic_rule = next(
-                    r for r in generic_handler.rules
-                    if r.__name__ == state_rule.name
+                state_rule = state_models.RuleSpec(
+                    name=rule.get('name'), inputs=rule.get('inputs'),
+                    dest=rule.get('dest'), feedback=rule.get('feedback')
                 )
 
-                # Normalize the params here, then store them.
-                param_name_list = state_rule.inputs.keys()
+                if rule['description'] == feconf.DEFAULT_RULE_NAME:
+                    if (rule_ind != len(ruleset) - 1 or
+                            rule['name'] != feconf.DEFAULT_RULE_NAME):
+                        raise ValueError('Invalid ruleset: the last rule '
+                                         'should be a default rule.')
+                else:
+                    matched_rule = generic_widget.get_rule_by_name(
+                        'submit', state_rule.name)
 
-                for index, param_name in enumerate(param_name_list):
-                    param_type = rule_domain.get_obj_type_for_param_name(
-                        matched_generic_rule, param_name)
-                    value = state_rule.inputs[param_name]
-                    if (not isinstance(value, basestring) or
-                            '{{' not in value or '}}' not in value):
-                        normalized_param = param_type.normalize(value)
-                    else:
-                        normalized_param = value
+                    # Normalize and store the rule params.
+                    for param_name in state_rule.inputs:
+                        value = state_rule.inputs[param_name]
+                        param_type = rule_domain.get_obj_type_for_param_name(
+                            matched_rule, param_name)
 
-                    if normalized_param is None:
-                        raise self.InvalidInputException(
-                            '%s has the wrong type. Please replace it with a '
-                            '%s.' % (value, param_type.__name__))
+                        if (not isinstance(value, basestring) or
+                                '{{' not in value or '}}' not in value):
+                            normalized_param = param_type.normalize(value)
+                        else:
+                            normalized_param = value
 
-                    state_rule.inputs[param_name] = normalized_param
+                        if normalized_param is None:
+                            raise self.InvalidInputException(
+                                '%s has the wrong type. Please replace it '
+                                'with a %s.' % (value, param_type.__name__))
 
-                state_ruleset.append(state_rule)
+                        state_rule.inputs[param_name] = normalized_param
+
+                state.widget.handlers[0].rule_specs.append(state_rule)
 
         if content:
             state.content = [

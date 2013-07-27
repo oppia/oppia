@@ -120,6 +120,9 @@ DEFAULT_STATE_NAME = '[untitled state]'
 # Default file name for newly-created files for download.
 DEFAULT_FILE_NAME = 'New file'
 
+# Name (and description) of the default rule.
+DEFAULT_RULE_NAME = 'Default'
+
 ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
 
 # Set this to True to allow file uploads via YAML in the gallery and editor pages.

@@ -277,6 +277,18 @@ def create_from_yaml(
     return exploration.id
 
 
+def fork_exploration(exploration_id, user_id):
+    """Forks an exploration and returns the new exploration's id."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+    if not exploration.is_forkable_by(user_id):
+        raise Exception('You cannot copy this exploration.')
+
+    return create_from_yaml(
+        export_to_yaml(exploration_id), user_id,
+        'Copy of %s' % exploration.title, exploration.category
+    )
+
+
 def load_demos():
     """Initializes the demo explorations."""
     for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):

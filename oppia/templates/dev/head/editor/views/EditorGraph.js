@@ -82,6 +82,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
       });
 
       scope.$watch('stats', function(newVal, oldVal) {
+        if (!scope.val) {
+          return;
+        }
         create(scope.val.nodes, scope.val.links, scope.val.initStateId, newVal);
       });
 
