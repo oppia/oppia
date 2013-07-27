@@ -19,5 +19,7 @@ import unittest
 class JavaScriptTests(unittest.TestCase):
 
     def test_with_karma(self):
-        subprocess.call([
-            'third_party/node-0.10.1/bin/karma', 'start', 'oppia/tests/karma.conf.js'])
+    	return_code = subprocess.call([
+            'third_party/node-0.10.1/bin/karma', 'start',
+            'oppia/tests/karma.conf.js'])
+    	self.assertEqual(return_code, 0)
