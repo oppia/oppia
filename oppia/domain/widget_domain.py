@@ -23,8 +23,8 @@ import os
 import pkgutil
 
 import feconf
+from oppia.domain import param_domain
 from oppia.domain import rule_domain
-import oppia.storage.parameter.models as param_models
 import utils
 
 
@@ -84,7 +84,7 @@ class BaseWidget(object):
 
     @property
     def params(self):
-        return [param_models.Parameter(**param) for param in self._params]
+        return [param_domain.Parameter(**param) for param in self._params]
 
     @property
     def handlers(self):

@@ -155,7 +155,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         feconf.INTERACTIVE_PREFIX, wdict['widget_id']).params
     for wp in widget_params:
         if wp.name not in wdict['params']:
-            state.widget.params[wp.name] = wp.value
+            state.widget.params[wp.name] = wp.values
 
     for handler in wdict['handlers']:
         handler_rule_specs = [state_models.RuleSpec(
