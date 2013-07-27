@@ -30,31 +30,6 @@ import utils
 EDITOR_MODE = 'editor'
 
 
-def get_state_for_frontend(state, exploration):
-    """Returns a representation of the given state for the frontend."""
-
-    state_repr = exp_services.export_state_to_dict(exploration.id, state.id)
-
-    # Add descriptions to each rule.
-    for handler in state_repr['widget']['handlers']:
-        for rule_spec in handler['rule_specs']:
-            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
-                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
-            else:
-                rule_spec['description'] = (
-                    widget_domain.Registry.get_widget_by_id(
-                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-                    ).get_rule_description(handler['name'], rule_spec['name'])
-                )
-
-    state_repr['widget']['id'] = state_repr['widget']['widget_id']
-
-    state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
-        exploration.id, state.id)
-
-    return state_repr
-
-
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
@@ -116,15 +91,13 @@ class ExplorationHandler(base.BaseHandler):
 
         state_list = {}
         for state_id in exploration.state_ids:
-            state = exploration.get_state_by_id(state_id)
-            state_list[state.id] = get_state_for_frontend(state, exploration)
+            state_list[state_id] = exp_services.export_state_to_verbose_dict(
+                exploration.id, state_id)
 
-        parameters = []
-        for param in exploration.parameters:
-            parameters.append({
-                'name': param.name, 'obj_type': param.obj_type,
-                'description': param.description, 'values': param.values
-            })
+        parameters = [{
+            'name': param.name, 'obj_type': param.obj_type,
+            'description': param.description, 'values': param.values
+        } for param in exploration.parameters]
 
         self.values.update({
             'exploration_id': exploration.id,
@@ -324,7 +297,8 @@ class StateHandler(base.BaseHandler):
             )
 
         state.put()
-        self.render_json(get_state_for_frontend(state, exploration))
+        self.render_json(exp_services.export_state_to_verbose_dict(
+            exploration.id, state.id))
 
     @base.require_editor
     def delete(self, exploration, state):

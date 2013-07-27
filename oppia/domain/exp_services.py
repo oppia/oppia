@@ -31,6 +31,7 @@ import os
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import rule_domain
+from oppia.domain import stats_services
 from oppia.domain import widget_domain
 import oppia.storage.exploration.models as exp_models
 import oppia.storage.image.models as image_models
@@ -366,6 +367,33 @@ def export_state_to_dict(exploration_id, state_id):
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
     state_dict.update({'id': state.id, 'name': state.name})
+    return state_dict
+
+
+def export_state_to_verbose_dict(exploration_id, state_id):
+    """Gets a state dict with rule descriptions and unresolved answers."""
+
+    state_dict = export_state_to_dict(exploration_id, state_id)
+
+    state_dict['unresolved_answers'] = stats_services.get_unresolved_answers(
+        exploration_id, state_id)
+    # TODO(sll): Fix the frontend and remove this line.
+    state_dict['widget']['id'] = state_dict['widget']['widget_id']
+
+    exploration = exp_domain.Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
+
+    for handler in state_dict['widget']['handlers']:
+        for rule_spec in handler['rule_specs']:
+            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
+                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
+            else:
+                rule_spec['description'] = (
+                    widget_domain.Registry.get_widget_by_id(
+                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
+                    ).get_rule_description(handler['name'], rule_spec['name'])
+                )
+
     return state_dict
 
 
