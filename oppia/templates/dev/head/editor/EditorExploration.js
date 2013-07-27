@@ -171,8 +171,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     var VERT_SPACING = 100;
     var HORIZ_OFFSET = 100;
     var nodes = {};
+    var state;
     nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
-    for (var state in states) {
+    for (state in states) {
       nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
     }
     nodes[initStateId].depth = 0;
@@ -184,33 +185,40 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     nodes[initStateId].y0 = VERT_OFFSET;
     nodes[initStateId].x0 = HORIZ_OFFSET;
 
+    var handlers, ruleSpecs, h, i;
+
     while (queue.length > 0) {
       var currNode = queue[0];
       queue.shift();
       nodes[currNode].reachable = true;
       if (currNode in states) {
-        for (var i = 0; i < states[currNode].widget.rules.submit.length; i++) {
-          // Assign levels to nodes only when they are first encountered.
-          if (seenNodes.indexOf(states[currNode].widget.rules.submit[i].dest) == -1) {
-            seenNodes.push(states[currNode].widget.rules.submit[i].dest);
-            nodes[states[currNode].widget.rules.submit[i].dest].depth = nodes[currNode].depth + 1;
-            nodes[states[currNode].widget.rules.submit[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
-            if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
-              maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
-            } else {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = HORIZ_OFFSET;
-              maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
+        handlers = states[currNode].widget.handlers;
+        for (h = 0; h < handlers.length; h++) {
+          ruleSpecs = handlers[h].rule_specs;
+          for (i = 0; i < ruleSpecs.length; i++) {
+            // Assign levels to nodes only when they are first encountered.
+            if (seenNodes.indexOf(ruleSpecs[i].dest) == -1) {
+              seenNodes.push(ruleSpecs[i].dest);
+              nodes[ruleSpecs[i].dest].depth = nodes[currNode].depth + 1;
+              nodes[ruleSpecs[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
+              if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
+                nodes[ruleSpecs[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
+                maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
+              } else {
+                nodes[ruleSpecs[i].dest].x0 = HORIZ_OFFSET;
+                maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
+              }
+              maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
+              queue.push(ruleSpecs[i].dest);
             }
-            maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
-            queue.push(states[currNode].widget.rules.submit[i].dest);
           }
         }
       }
     }
 
     var horizPositionForLastRow = HORIZ_OFFSET;
-    for (var node in nodes) {
+    var node;
+    for (node in nodes) {
       if (nodes[node].depth == SENTINEL_DEPTH) {
         nodes[node].depth = maxDepth + 1;
         nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
@@ -222,7 +230,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     // Assign unique IDs to each node.
     var idCount = 0;
     var nodeList = [];
-    for (var node in nodes) {
+    for (node in nodes) {
       var nodeMap = nodes[node];
       nodeMap['hashId'] = node;
       nodeMap['id'] = idCount;
@@ -232,16 +240,20 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
 
     var links = [];
-    for (var state in states) {
-      for (var i = 0; i < states[state].widget.rules.submit.length; i++) {
-        links.push({
+    for (state in states) {
+      handlers = states[state].widget.handlers;
+      for (h = 0; h < handlers.length; h++) {
+        ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
             source: nodeList[nodes[state].id],
-            target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
+            target: nodeList[nodes[ruleSpecs[i].dest].id],
             name: $filter('parameterizeRuleDescription')({
-                description: states[state].widget.rules.submit[i].description,
-                inputs: states[state].widget.rules.submit[i].inputs
+                description: ruleSpecs[i].description,
+                inputs: ruleSpecs[i].inputs
             })
-        });
+          });
+        }
       }
     }
 

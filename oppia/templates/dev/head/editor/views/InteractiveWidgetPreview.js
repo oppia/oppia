@@ -71,7 +71,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     // - 'dest' (the destination for this rule)
     // - 'feedback' (any feedback given for this rule)
     // - 'paramChanges' (parameter changes associated with this rule)
-    $scope.interactiveRulesets = data.widget.rules;
+    $scope.interactiveRulesets = {};
+    for (var i = 0; i < data.widget.handlers.length; i++) {
+      $scope.interactiveRulesets[data.widget.handlers[i].name] = (
+          data.widget.handlers[i].rule_specs);
+    }
     $scope.interactiveParams = data.widget.params;
     $scope.stickyInteractiveWidget = data.widget.sticky;
     $scope.generateWidgetPreview(data.widget.id, data.widget.params);

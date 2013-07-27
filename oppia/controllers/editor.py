@@ -35,21 +35,18 @@ def get_state_for_frontend(state, exploration):
 
     state_repr = exp_services.export_state_to_dict(exploration.id, state.id)
 
-    # TODO(sll): The following is for backwards-compatibility and should be
-    # deleted later.
-    rules = {}
+    # Add descriptions to each rule.
     for handler in state_repr['widget']['handlers']:
-        rules[handler['name']] = handler['rule_specs']
-        for item in rules[handler['name']]:
-            if item['name'] == 'Default':
-                item['description'] = 'Default'
+        for rule_spec in handler['rule_specs']:
+            if rule_spec['name'] == 'Default':
+                rule_spec['description'] = 'Default'
             else:
-                # Get the human-readable name for a rule.
-                item['description'] = widget_domain.Registry.get_widget_by_id(
-                    feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-                ).get_rule_description(handler['name'], item['name'])
+                rule_spec['description'] = (
+                    widget_domain.Registry.get_widget_by_id(
+                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
+                    ).get_rule_description(handler['name'], rule_spec['name'])
+                )
 
-    state_repr['widget']['rules'] = rules
     state_repr['widget']['id'] = state_repr['widget']['widget_id']
 
     state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
