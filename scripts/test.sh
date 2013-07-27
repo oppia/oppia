@@ -83,6 +83,7 @@ fi
 
 # Node is needed to install karma.
 echo Checking if node.js is installed in third_party
+echo NOTE: If this fails, you may need to change the -x64 suffix to -x86 in a couple of lines below this message in the start.sh and test.sh scripts.
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
   echo Installing Node.js
   wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz

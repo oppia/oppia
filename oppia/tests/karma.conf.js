@@ -19,7 +19,7 @@ autoWatch = true;
 browsers = ['Chrome'];
 
 // Kill the browser if it does not capture in the given timeout [ms].
-captureTimeout = 10000;
+captureTimeout = 60000;
 
 junitReporter = {
   outputFile: '../test_out/unit.xml',
