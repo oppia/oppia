@@ -17,9 +17,9 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
-from oppia.controllers import admin
 from oppia.controllers import base
 from oppia.domain import exp_domain
+from oppia.domain import exp_services
 from oppia.domain import user_services
 import utils
 
@@ -30,7 +30,7 @@ class MainPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         if not exp_domain.Exploration.get('0', strict=False):
-            admin.reload_demos()
+            exp_services.reload_demos()
 
         self.values.update({
             'gallery_login_url': user_services.create_login_url('/gallery'),

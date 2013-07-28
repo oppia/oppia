@@ -359,6 +359,12 @@ def delete_demos():
         exploration.delete()
 
 
+def reload_demos():
+    """Reloads the demo explorations."""
+    delete_demos()
+    load_demos()
+
+
 def delete_all_explorations():
     """Deletes all explorations."""
     explorations = get_all_explorations()

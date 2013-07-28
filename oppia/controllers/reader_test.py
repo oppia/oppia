@@ -16,7 +16,7 @@ __author__ = 'Sean Lip'
 
 import json
 
-from oppia.controllers import admin
+from oppia.domain import exp_services
 import test_utils
 
 
@@ -25,7 +25,7 @@ class ReaderControllerUnitTests(test_utils.AppEngineTestBase):
 
     def test_exploration_end_to_end(self):
         """Test a reader's progression through the default exploration."""
-        admin.reload_demos()
+        exp_services.reload_demos()
 
         response = self.testapp.get('/learn/0/data')
         self.assertEqual(response.status_int, 200)
