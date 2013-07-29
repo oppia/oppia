@@ -22,6 +22,7 @@ from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
+import oppia.storage.state.models as state_models
 
 
 class StateCounterUnitTests(test_utils.AppEngineTestBase):
@@ -39,9 +40,9 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
 
         self.assertEquals(state1_counter.first_entry_count, 0)
         self.assertEquals(state1_counter.subsequent_entries_count, 0)
+        self.assertEquals(state1_counter.total_entry_count, 0)
         self.assertEquals(state1_counter.resolved_answer_count, 0)
         self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 0)
         self.assertEquals(state1_counter.no_answer_count, 0)
 
         stats_services.EventHandler.record_state_hit('eid', state1_id, True)
@@ -50,9 +51,9 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
 
         self.assertEquals(state1_counter.first_entry_count, 1)
         self.assertEquals(state1_counter.subsequent_entries_count, 0)
+        self.assertEquals(state1_counter.total_entry_count, 1)
         self.assertEquals(state1_counter.resolved_answer_count, 0)
         self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 1)
         self.assertEquals(state1_counter.no_answer_count, 1)
 
         stats_services.EventHandler.record_state_hit('eid', state2_id, True)
@@ -63,14 +64,121 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
 
         self.assertEquals(state1_counter.first_entry_count, 1)
         self.assertEquals(state1_counter.subsequent_entries_count, 0)
+        self.assertEquals(state1_counter.total_entry_count, 1)
         self.assertEquals(state1_counter.resolved_answer_count, 0)
         self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 1)
         self.assertEquals(state1_counter.no_answer_count, 1)
 
         self.assertEquals(state2_counter.first_entry_count, 1)
         self.assertEquals(state2_counter.subsequent_entries_count, 1)
+        self.assertEquals(state2_counter.total_entry_count, 2)
         self.assertEquals(state2_counter.resolved_answer_count, 0)
         self.assertEquals(state2_counter.active_answer_count, 0)
-        self.assertEquals(state2_counter.total_entry_count, 2)
         self.assertEquals(state2_counter.no_answer_count, 2)
+
+
+class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
+    """Test the state rule answer log domain object."""
+
+    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+
+    def test_state_rule_answer_logs(self):
+        exp = exp_domain.Exploration.get(exp_services.create_new(
+            'user_id', 'exploration', 'category', 'eid'))
+        state_id = exp.init_state_id
+
+        stats_services.EventHandler.record_state_hit(
+            'eid', state_id, True)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {})
+        self.assertEquals(answer_log.total_answer_count, 0)
+        self.assertEquals(answer_log.get_top_answers(2), [])
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer1': 1})
+        self.assertEquals(answer_log.total_answer_count, 1)
+        self.assertEquals(answer_log.get_top_answers(1), [('answer1', 1)])
+        self.assertEquals(answer_log.get_top_answers(2), [('answer1', 1)])
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
+        self.assertEquals(answer_log.total_answer_count, 3)
+        self.assertEquals(
+            answer_log.get_top_answers(1), [('answer1', 2)])
+        self.assertEquals(
+            answer_log.get_top_answers(2), [('answer1', 2), ('answer2', 1)])
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 3})
+        self.assertEquals(answer_log.total_answer_count, 5)
+        self.assertEquals(
+            answer_log.get_top_answers(1), [('answer2', 3)])
+        self.assertEquals(
+            answer_log.get_top_answers(2), [('answer2', 3), ('answer1', 2)])
+
+    def test_recording_answer_for_different_rules(self):
+        exp = exp_domain.Exploration.get(exp_services.create_new(
+            'user_id', 'exploration', 'category', 'eid'))
+        state_id = exp.init_state_id
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, 'a_different_rule_repr', 'answer2')
+
+        default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(default_rule_answer_log.answers, {'answer1': 1})
+        self.assertEquals(default_rule_answer_log.total_answer_count, 1)
+
+        other_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, 'a_different_rule_repr')
+        self.assertEquals(other_rule_answer_log.answers, {'answer2': 1})
+        self.assertEquals(other_rule_answer_log.total_answer_count, 1)
+
+    def test_resolving_answers(self):
+        exp = exp_domain.Exploration.get(exp_services.create_new(
+            'user_id', 'exploration', 'category', 'eid'))
+        state_id = exp.init_state_id
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {})
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
+        self.assertEquals(answer_log.total_answer_count, 3)
+
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', state_id, ['answer1'])
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer2': 1})
+        self.assertEquals(answer_log.total_answer_count, 1)

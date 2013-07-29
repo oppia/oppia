@@ -31,13 +31,14 @@ class StateCounter(object):
     """
     first_entry_count = None
     subsequent_entries_count = None
-    resolved_answer_count = None
-    active_answer_count = None
 
     @property
     def total_entry_count(self):
         """Total number of entries to the state."""
         return self.first_entry_count + self.subsequent_entries_count
+
+    resolved_answer_count = None
+    active_answer_count = None
 
     @property
     def no_answer_count(self):

@@ -18,126 +18,275 @@ __author__ = 'Jeremy Emerson'
 
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
+from oppia.domain import stats_domain
 from oppia.domain import stats_services
 import oppia.storage.state.models as state_models
 import test_utils
 
 
+class EventHandlerUnitTests(test_utils.AppEngineTestBase):
+    """Test the event handler methods."""
+
+    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+
+    def test_record_state_hit(self):
+        stats_services.EventHandler.record_state_hit('eid', 'sid', True)
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.first_entry_count, 1)
+        self.assertEquals(counter.subsequent_entries_count, 0)
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 0)
+        self.assertEquals(counter.total_entry_count, 1)
+        self.assertEquals(counter.no_answer_count, 1)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', state_models.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {})
+
+        stats_services.EventHandler.record_state_hit('eid', 'sid', False)
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.first_entry_count, 1)
+        self.assertEquals(counter.subsequent_entries_count, 1)
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 0)
+        self.assertEquals(counter.total_entry_count, 2)
+        self.assertEquals(counter.no_answer_count, 2)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', state_models.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {})
+
+    def test_record_answer_submitted(self):
+        stats_services.EventHandler.record_state_hit('eid', 'sid', True)
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', 'Rule', 'answer')
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.first_entry_count, 1)
+        self.assertEquals(counter.subsequent_entries_count, 0)
+        self.assertEquals(counter.total_entry_count, 1)
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 1)
+        self.assertEquals(counter.no_answer_count, 0)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get('eid', 'sid', 'Rule')
+        self.assertEquals(answer_log.answers, {'answer': 1})
+
+        stats_services.EventHandler.record_state_hit('eid', 'sid', False)
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', 'Rule', 'answer')
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.first_entry_count, 1)
+        self.assertEquals(counter.subsequent_entries_count, 1)
+        self.assertEquals(counter.total_entry_count, 2)
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 2)
+        self.assertEquals(counter.no_answer_count, 0)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get('eid', 'sid', 'Rule')
+        self.assertEquals(answer_log.answers, {'answer': 2})
+
+        stats_services.EventHandler.record_state_hit('eid', 'sid', False)
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.first_entry_count, 1)
+        self.assertEquals(counter.subsequent_entries_count, 2)
+        self.assertEquals(counter.total_entry_count, 3)
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 2)
+        self.assertEquals(counter.no_answer_count, 1)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get('eid', 'sid', 'Rule')
+        self.assertEquals(answer_log.answers, {'answer': 2})
+
+    def test_resolve_answers_for_default_rule(self):
+        stats_services.EventHandler.record_state_hit('eid', 'sid', True)
+
+        # Submit three answers.
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, 'answer1')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, 'answer2')
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, 'answer3')
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.resolved_answer_count, 0)
+        self.assertEquals(counter.active_answer_count, 3)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(
+            answer_log.answers, {'answer1': 1, 'answer2': 1, 'answer3': 1})
+
+        # Nothing changes if you try to resolve an invalid answer.
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', ['fake_answer'])
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(
+            answer_log.answers, {'answer1': 1, 'answer2': 1, 'answer3': 1})
+
+        # Resolve two answers.
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', ['answer1', 'answer2'])
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.resolved_answer_count, 2)
+        self.assertEquals(counter.active_answer_count, 1)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer3': 1})
+
+        # Nothing changes if you try to resolve an answer that has already
+        # been resolved.
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', ['answer1'])
+        answer_log = stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR)
+        self.assertEquals(answer_log.answers, {'answer3': 1})
+
+        # Resolve the last answer.
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', ['answer3'])
+
+        counter = stats_domain.StateCounter.get('eid', 'sid')
+        self.assertEquals(counter.resolved_answer_count, 3)
+        self.assertEquals(counter.active_answer_count, 0)
+
+        answer_log = stats_domain.StateRuleAnswerLog.get('eid', 'sid', 'Rule')
+        self.assertEquals(answer_log.answers, {})
+
+
 class StatsServicesUnitTests(test_utils.AppEngineTestBase):
     """Test the statistics services."""
 
-    def setUp(self):
-        super(StatsServicesUnitTests, self).setUp()
-        self.user_id = 'fake@user.com'
+    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
 
-    def test_unresolved_answers_tally(self):
+    def test_delete_all_stats(self):
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, '1')
+
+        self.assertEqual(stats_domain.StateCounter.get(
+            'eid', 'sid').active_answer_count, 1)
+        self.assertEqual(stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR).total_answer_count, 1)
+
+        stats_services.delete_all_stats()
+        self.assertEqual(stats_domain.StateCounter.get(
+            'eid', 'sid').active_answer_count, 0)
+        self.assertEqual(stats_domain.StateRuleAnswerLog.get(
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR).total_answer_count, 0)
+
+    def test_unresolved_answers(self):
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', 'sid', state_models.DEFAULT_RULE_SPEC_REPR, 'answer1')
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, 'answer1')
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {'answer1': 1}
-        )
+                'eid', 'sid'), {'answer1': 1})
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', 'sid', state_models.DEFAULT_RULE_SPEC_REPR, 'answer1')
+            'eid', 'sid', self.DEFAULT_RULESPEC_STR, 'answer1')
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {'answer1': 2}
-        )
+                'eid', 'sid'), {'answer1': 2})
 
         stats_services.EventHandler.resolve_answers_for_default_rule(
             'eid', 'sid', ['answer1'])
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {}
-        )
+                'eid', 'sid'), {})
 
-    def test_get_top_ten_improvable_states(self):
+
+class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
+    """Test the get_top_improvable_states() function."""
+
+    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+
+    def test_get_top_improvable_states(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'exploration', 'category', 'eid'))
-
+            'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
-        default_rule_spec = state_models.DEFAULT_RULE_SPEC_REPR
+
+        for _ in range(5):
+            stats_services.EventHandler.record_state_hit('eid', state_id, True)
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, default_rule_spec, '1')
-        stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, default_rule_spec, '2')
-        stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, default_rule_spec, '1')
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, '1')
+        for _ in range(2):
+            stats_services.EventHandler.record_answer_submitted(
+                'eid', state_id, self.DEFAULT_RULESPEC_STR, '2')
 
-        stats_services.EventHandler.record_state_hit('eid', state_id, True)
-        stats_services.EventHandler.record_state_hit('eid', state_id, True)
-        stats_services.EventHandler.record_state_hit('eid', state_id, True)
-        stats_services.EventHandler.record_state_hit('eid', state_id, True)
-        stats_services.EventHandler.record_state_hit('eid', state_id, True)
+        expected_top_state = {
+            'exp_id': 'eid', 'type': 'default', 'rank': 3,
+            'state_id': exp.init_state_id
+        }
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 10)
         self.assertEquals(len(states), 1)
-        self.assertEquals(states[0]['exp_id'], 'eid')
-        self.assertEquals(states[0]['type'], 'default')
-        self.assertEquals(states[0]['rank'], 3)
-        self.assertEquals(states[0]['state_id'], exp.init_state_id)
+        self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_single_default_rule_hit(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'exploration', 'category', 'eid'))
-
+            'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
-        default_rule_spec = state_models.DEFAULT_RULE_SPEC_REPR
 
-        stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, default_rule_spec, '1')
         stats_services.EventHandler.record_state_hit('eid', state_id, True)
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        expected_top_state = {
+            'exp_id': 'eid', 'type': 'default', 'rank': 1,
+            'state_id': exp.init_state_id
+        }
+
+        states = stats_services.get_top_improvable_states(['eid'], 2)
         self.assertEquals(len(states), 1)
-        self.assertEquals(states[0]['exp_id'], 'eid')
-        self.assertEquals(states[0]['type'], 'default')
-        self.assertEquals(states[0]['rank'], 1)
-        self.assertEquals(states[0]['state_id'], exp.init_state_id)
+        self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_no_improvement_flag_hit(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'exploration', 'category', 'eid'))
+            'fake@user.com', 'exploration', 'category', 'eid'))
 
-        init_state = exp.init_state
-        init_state.widget.handlers[0].rule_specs = [
-            state_models.RuleSpec(name='NotDefault', dest=init_state.id),
-            state_models.RuleSpec(name='Default', dest=init_state.id),
+        not_default_rule_spec = state_models.RuleSpec(
+            name='NotDefault', dest=exp.init_state.id)
+        exp.init_state.widget.handlers[0].rule_specs = [
+            not_default_rule_spec,
+            state_models.RuleSpec(name='Default', dest=exp.init_state.id),
         ]
-        init_state.put()
+        exp.init_state.put()
 
+        stats_services.EventHandler.record_state_hit(
+            'eid', exp.init_state.id, True)
         stats_services.EventHandler.record_answer_submitted(
-            'eid', init_state.id,
-            str(state_models.RuleSpec(name='NotDefault', dest=init_state.id)),
-            '1')
-        stats_services.EventHandler.record_state_hit('eid', init_state.id, True)
+            'eid', exp.init_state.id, str(not_default_rule_spec), '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 1)
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'exploration', 'category', 'eid'))
-
+            'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
-        default_rule_spec = state_models.DEFAULT_RULE_SPEC_REPR
 
-        # Hit the default once, and do an incomplete twice. The result should
-        # be classified as incomplete.
+        # Hit the default rule once, and fail to answer twice. The result
+        # should be classified as incomplete.
 
-        for i in range(3):
+        for _ in range(3):
             stats_services.EventHandler.record_state_hit('eid', state_id, True)
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, default_rule_spec, '1')
+            'eid', state_id, self.DEFAULT_RULESPEC_STR, '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 2)
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'incomplete')
@@ -148,63 +297,64 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
         for i in range(2):
             stats_services.EventHandler.record_state_hit('eid', state_id, True)
             stats_services.EventHandler.record_answer_submitted(
-                'eid', state_id,
-                str(state_models.RuleSpec(name='Default', dest=state_id)), '1')
+                'eid', state_id, self.DEFAULT_RULESPEC_STR, '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 2)
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')
 
     def test_two_state_default_hit(self):
-        SECOND_STATE = 'State 2'
-
         exp = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'exploration', 'category', 'eid'))
+            'fake@user.com', 'exploration', 'category', 'eid'))
+
+        SECOND_STATE = 'State 2'
         second_state = exp.add_state(SECOND_STATE)
 
-        state_1_id = exp.init_state_id
-        state_2_id = second_state.id
+        state1_id = exp.init_state_id
+        state2_id = second_state.id
 
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.
-        stats_services.EventHandler.record_state_hit('eid', state_1_id, True)
+        stats_services.EventHandler.record_state_hit('eid', state1_id, True)
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_1_id,
-            str(state_models.RuleSpec(name='Default', dest=state_1_id)), '1')
+            'eid', state1_id, self.DEFAULT_RULESPEC_STR, '1')
 
         for i in range(2):
             stats_services.EventHandler.record_state_hit(
-                'eid', state_2_id, True)
+                'eid', state2_id, True)
             stats_services.EventHandler.record_answer_submitted(
-                'eid', state_2_id,
-                str(state_models.RuleSpec(name='Default', dest=state_2_id)),
-                '1')
+                'eid', state2_id, self.DEFAULT_RULESPEC_STR, '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 5)
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'default')
-        self.assertEquals(states[0]['state_id'], state_2_id)
+        self.assertEquals(states[0]['state_id'], state2_id)
         self.assertEquals(states[1]['rank'], 1)
         self.assertEquals(states[1]['type'], 'default')
-        self.assertEquals(states[1]['state_id'], state_1_id)
+        self.assertEquals(states[1]['state_id'], state1_id)
 
         # Hit the default rule of state 1 two more times.
 
         for i in range(2):
             stats_services.EventHandler.record_state_hit(
-                'eid', state_1_id, True)
+                'eid', state1_id, True)
             stats_services.EventHandler.record_answer_submitted(
-                'eid', state_1_id,
-                str(state_models.RuleSpec(name='Default', dest=state_1_id)),
-                '1')
+                'eid', state1_id, self.DEFAULT_RULESPEC_STR, '1')
 
-        states = stats_services.get_top_ten_improvable_states(['eid'])
+        states = stats_services.get_top_improvable_states(['eid'], 5)
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')
-        self.assertEquals(states[0]['state_id'], state_1_id)
+        self.assertEquals(states[0]['state_id'], state1_id)
         self.assertEquals(states[1]['rank'], 2)
         self.assertEquals(states[1]['type'], 'default')
-        self.assertEquals(states[1]['state_id'], state_2_id)
+        self.assertEquals(states[1]['state_id'], state2_id)
+
+        # Try getting just the top improvable state.
+        states = stats_services.get_top_improvable_states(['eid'], 1)
+        self.assertEquals(len(states), 1)
+        self.assertEquals(states[0]['rank'], 3)
+        self.assertEquals(states[0]['type'], 'default')
+        self.assertEquals(states[0]['state_id'], state1_id)

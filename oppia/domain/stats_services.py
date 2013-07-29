@@ -33,23 +33,23 @@ class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def record_answer_submitted(cls, exploration_id, state_id, rule, answer):
-        """Records an event when an answer triggers a rule."""
-        stats_models.process_submitted_answer(
-            exploration_id, state_id, rule, answer)
-
-    @classmethod
     def record_state_hit(cls, exploration_id, state_id, first_time):
         """Record an event when a state is encountered by the reader."""
         stats_models.StateCounterModel.inc(
             exploration_id, state_id, first_time)
 
     @classmethod
+    def record_answer_submitted(cls, exploration_id, state_id, rule, answer):
+        """Records an event when an answer triggers a rule."""
+        stats_models.process_submitted_answer(
+            exploration_id, state_id, rule, answer)
+
+    @classmethod
     def resolve_answers_for_default_rule(
             cls, exploration_id, state_id, answers):
         stats_models.resolve_answers(
             exploration_id, state_id,
-            state_models.DEFAULT_RULE_SPEC_REPR, answers)
+            state_models.DEFAULT_RULESPEC_STR, answers)
 
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_id):
@@ -57,7 +57,7 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_id):
     # TODO(sll): Add similar functionality for other rules.
     # TODO(sll): Should this return just the top N answers instead?
     return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_id, state_models.DEFAULT_RULE_SPEC_REPR).answers
+        exploration_id, state_id, state_models.DEFAULT_RULESPEC_STR).answers
 
 
 def export_exploration_stats_to_dict(exploration_id):
@@ -132,18 +132,17 @@ def export_exploration_stats_to_dict(exploration_id):
     }
 
 
-def get_top_ten_improvable_states(exploration_ids):
-    """Returns the top improvable states across all the given explorations."""
+def get_top_improvable_states(exploration_ids, N):
+    """Returns the top N improvable states across all the given explorations."""
 
     ranked_states = []
     for exploration_id in exploration_ids:
         exploration = exp_domain.Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
-            state = exploration.get_state_by_id(state_id)
             state_counts = stats_domain.StateCounter.get(
-                exploration_id, state.id)
+                exploration_id, state_id)
             default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-                exploration.id, state.id, state_models.DEFAULT_RULE_SPEC_REPR)
+                exploration.id, state_id, state_models.DEFAULT_RULESPEC_STR)
 
             total_entry_count = state_counts.total_entry_count
             if total_entry_count == 0:
@@ -154,6 +153,7 @@ def get_top_ten_improvable_states(exploration_ids):
 
             eligible_flags = []
 
+            state = exploration.get_state_by_id(state_id)
             if (default_count > 0.2 * total_entry_count and
                     state.widget.handlers[0].default_rule_spec.dest ==
                     state.id):
@@ -175,9 +175,9 @@ def get_top_ten_improvable_states(exploration_ids):
                 improve_type = eligible_flags[0]['improve_type']
 
             ranked_states.append({
-                'exp_id': exploration.id,
+                'exp_id': exploration_id,
                 'exp_name': exploration.title,
-                'state_id': state.id,
+                'state_id': state_id,
                 'state_name': state.name,
                 'rank': state_rank,
                 'type': improve_type,
@@ -189,7 +189,7 @@ def get_top_ten_improvable_states(exploration_ids):
         [state for state in ranked_states if state['rank'] != 0],
         key=lambda state: state['rank'],
         reverse=True)
-    return problem_states[:10]
+    return problem_states[:N]
 
 
 def delete_all_stats():

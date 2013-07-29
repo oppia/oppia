@@ -65,7 +65,7 @@ class RuleSpec(base_models.BaseModel):
         return '%s(%s)' % (self.name, ','.join(param_list))
 
 
-DEFAULT_RULE_SPEC_REPR = str(RuleSpec(name='Default'))
+DEFAULT_RULESPEC_STR = str(RuleSpec(name='Default'))
 
 
 class AnswerHandlerInstance(base_models.BaseModel):

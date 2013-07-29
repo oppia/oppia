@@ -130,7 +130,7 @@ def process_submitted_answer(exploration_id, state_id, rule, answer):
 
 
 def resolve_answers(exploration_id, state_id, rule, answers):
-    """Resolves answers for the given rule.
+    """Resolves selected answers for the given rule.
 
     Args:
         exploration_id: the exploration id
@@ -140,6 +140,7 @@ def resolve_answers(exploration_id, state_id, rule, answers):
     """
     # TODO(sll): Run this in a transaction (together with any updates to the
     # state).
+    assert isinstance(answers, list)
     answer_log = StateRuleAnswerLogModel.get_or_create(
         exploration_id, state_id, rule)
 
@@ -149,9 +150,9 @@ def resolve_answers(exploration_id, state_id, rule, answers):
             logging.error(
                 'Answer %s not found in answer log for rule %s of exploration '
                 '%s, state %s' % (answer, rule, exploration_id, state_id))
-
-        resolved_count += answer_log.answers[answer]
-        del answer_log.answers[answer]
+        else:
+            resolved_count += answer_log.answers[answer]
+            del answer_log.answers[answer]
     answer_log.put()
 
     counter = StateCounterModel.get_or_create(exploration_id, state_id)

@@ -116,11 +116,8 @@ class ExplorationHandler(base.BaseHandler):
             'num_visits': statistics['num_visits'],
             'num_completions': statistics['num_completions'],
             'state_stats': statistics['state_stats'],
-        })
-        improvements = stats_services.get_top_ten_improvable_states(
-            [exploration.id])
-        self.values.update({
-            'imp': improvements,
+            'imp': stats_services.get_top_improvable_states(
+                [exploration.id], 10),
         })
         self.render_json(self.values)
 
