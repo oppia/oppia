@@ -407,8 +407,10 @@ def export_state_to_verbose_dict(exploration_id, state_id):
 
     state_dict = export_state_to_dict(exploration_id, state_id)
 
-    state_dict['unresolved_answers'] = stats_services.get_unresolved_answers(
-        exploration_id, state_id)
+    state_dict['unresolved_answers'] = (
+        stats_services.get_unresolved_answers_for_default_rule(
+            exploration_id, state_id))
+
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
 

@@ -18,230 +18,82 @@
 
 __author__ = 'Sean Lip'
 
-import collections
-
 import feconf
 from oppia.domain import exp_domain
+from oppia.domain import stats_domain
 import oppia.storage.state.models as state_models
 import oppia.storage.statistics.models as stats_models
-import utils
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
-
-STATS_ENUMS = utils.create_enum(
-    'exploration_visited', 'rule_hit', 'exploration_completed',
-    'feedback_submitted', 'state_hit', 'unresolved_answers')
-
-
-def get_event_id(event_name, eid):
-    if event_name == STATS_ENUMS.exploration_visited:
-        return 'e.%s' % eid
-    if event_name == STATS_ENUMS.rule_hit:
-        return 'default.%s' % eid
-    if event_name == STATS_ENUMS.exploration_completed:
-        return 'c.%s' % eid
-    if event_name == STATS_ENUMS.feedback_submitted:
-        return 'f.%s' % eid
-    if event_name == STATS_ENUMS.state_hit:
-        return 's.%s' % eid
-    if event_name == STATS_ENUMS.unresolved_answers:
-        return 'u.%s' % eid
 
 
 class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def _record_event(cls, event_name, eid, extra_info=''):
-        """Updates statistics based on recorded events."""
-
-        event_id = get_event_id(event_name, eid)
-
-        if event_name == STATS_ENUMS.exploration_visited:
-            cls._inc(event_id)
-        if event_name == STATS_ENUMS.rule_hit:
-            cls._add(event_id, unicode(extra_info))
-        if event_name == STATS_ENUMS.exploration_completed:
-            cls._inc(event_id)
-        if event_name == STATS_ENUMS.feedback_submitted:
-            cls._add(event_id, unicode(extra_info))
-        if event_name == STATS_ENUMS.state_hit:
-            cls._inc(event_id)
-        if event_name == STATS_ENUMS.unresolved_answers:
-            cls._add_data_point_to_tally(event_id, unicode(extra_info))
+    def record_answer_submitted(cls, exploration_id, state_id, rule, answer):
+        """Records an event when an answer triggers a rule."""
+        stats_models.process_submitted_answer(
+            exploration_id, state_id, rule, answer)
 
     @classmethod
-    def record_rule_hit(cls, exploration_id, state_id, rule, extra_info=''):
-        """Records an event when an answer triggers the default rule."""
-        cls._record_event(
-            STATS_ENUMS.rule_hit, '%s.%s.%s' % (exploration_id, state_id, rule),
-            extra_info=extra_info)
+    def record_state_hit(cls, exploration_id, state_id, first_time):
+        """Record an event when a state is encountered by the reader."""
+        stats_models.StateCounterModel.inc(
+            exploration_id, state_id, first_time)
 
     @classmethod
-    def record_exploration_visited(cls, exploration_id):
-        """Records an event when an exploration is first loaded."""
-        cls._record_event(STATS_ENUMS.exploration_visited, exploration_id)
-
-    @classmethod
-    def _record_exploration_completed(cls, exploration_id):
-        """Records an event when an exploration is completed."""
-        cls._record_event(STATS_ENUMS.exploration_completed, exploration_id)
-
-    @classmethod
-    def record_feedback_submitted(cls, url, feedback):
-        """Records an event where feedback was submitted via the web UI."""
-        cls._record_event(
-            STATS_ENUMS.feedback_submitted, url, extra_info=feedback
-        )
-
-    @classmethod
-    def record_state_hit(cls, exploration_id, state_id):
-        """Record an event when a state is loaded."""
-        if state_id == feconf.END_DEST:
-            cls._record_exploration_completed(exploration_id)
-        else:
-            cls._record_event(STATS_ENUMS.state_hit, '%s.%s' %
-                              (exploration_id, state_id))
-
-    @classmethod
-    def record_unresolved_answer(cls, exploration_id, state_id, answer):
-        """Records a new unresolved answer."""
-        cls._record_event(
-            STATS_ENUMS.unresolved_answers,
-            '%s.%s' % (exploration_id, state_id),
-            extra_info=answer
-        )
-
-    @classmethod
-    def replace_unresolved_answers(cls, exploration_id, state_id, new_value):
-        cls._set_tally(get_event_id(
-            STATS_ENUMS.unresolved_answers,
-            '%s.%s' % (exploration_id, state_id)
-        ), new_value)
-
-    @classmethod
-    def _inc(cls, event_id):
-        """Increments the counter corresponding to an event id."""
-        counter = stats_models.Counter.get(event_id, strict=False)
-        if not counter:
-            counter = stats_models.Counter(id=event_id)
-        counter.value += 1
-        counter.put()
-
-    @classmethod
-    def _add(cls, event_id, value):
-        """Adds to the list corresponding to an event id."""
-        journal = stats_models.Journal.get(event_id, strict=False)
-        if not journal:
-            journal = stats_models.Journal(id=event_id)
-        journal.values.append(value)
-        journal.put()
-
-    @classmethod
-    def _add_data_point_to_tally(cls, event_id, data):
-        """Adds a data point to a tally."""
-        tally = stats_models.Tally.get(event_id, strict=False)
-        if tally is None:
-            tally = stats_models.Tally(id=event_id, value={})
-
-        if data in tally.value:
-            tally.value[data] += 1
-        else:
-            tally.value[data] = 1
-
-        tally.put()
-
-    @classmethod
-    def _set_tally(cls, event_id, new_value):
-        """Sets the value of a tally."""
-        tally = stats_models.Tally.get(event_id, strict=False)
-        if tally:
-            tally.value = new_value
-            tally.put()
-
-    @classmethod
-    def _append_to_log(cls, event_id, value):
-        """Adds to the list corresponding to an event id."""
-        journal = stats_models.Journal.get(event_id, strict=False)
-        if not journal:
-            journal = stats_models.Journal(id=event_id)
-        journal.values.append(value)
-        journal.put()
+    def resolve_answers_for_default_rule(
+            cls, exploration_id, state_id, answers):
+        stats_models.resolve_answers(
+            exploration_id, state_id,
+            state_models.DEFAULT_RULE_SPEC_REPR, answers)
 
 
-def _count_state_hits(exploration_id, state_id):
-    """Returns the number of times a particular state was entered."""
-    state_key = '.'.join([exploration_id, state_id])
-    event_id = get_event_id(STATS_ENUMS.state_hit, state_key)
-    return stats_models.Counter.get_value_by_id(event_id)
-
-
-def get_unresolved_answers(exploration_id, state_id):
-    """Gets the tally of unresolved answers for a given state."""
-    state_key = '.'.join([exploration_id, state_id])
-    event_id = get_event_id(STATS_ENUMS.unresolved_answers, state_key)
-    return stats_models.Tally.get_value_by_id(event_id)
-
-
-def _get_exploration_stats(event_name, exploration_id):
-    """Retrieves statistics for the given event name and exploration id."""
-
-    if (event_name in [STATS_ENUMS.exploration_visited,
-                       STATS_ENUMS.exploration_completed]):
-        event_id = get_event_id(event_name, exploration_id)
-        return stats_models.Counter.get_value_by_id(event_id)
-
-    if event_name == STATS_ENUMS.rule_hit:
-        result = {}
-
-        exploration = exp_domain.Exploration.get(exploration_id)
-        for state_id in exploration.state_ids:
-            state = exploration.get_state_by_id(state_id)
-            result[state.id] = {
-                'name': state.name,
-                'rules': {}
-            }
-            for handler in state.widget.handlers:
-                for rule in handler.rule_specs:
-                    rule_name = str(rule)
-                    event_id = get_event_id(
-                        event_name, '.'.join(
-                            [exploration_id, state.id, rule_name]))
-
-                    journal = stats_models.Journal.get(event_id, strict=False)
-                    result[state.id]['rules'][rule_name] = {
-                        'answers': collections.Counter(
-                            journal.values).most_common(10) if journal else [],
-                    }
-
-        return result
-
-    if event_name == STATS_ENUMS.state_hit:
-        result = {}
-
-        exploration = exp_domain.Exploration.get(exploration_id)
-        for state_id in exploration.state_ids:
-            state = exploration.get_state_by_id(state_id)
-            result[state.id] = {
-                'name': state.name,
-                'count': _count_state_hits(exploration_id, state_id)
-            }
-        return result
+def get_unresolved_answers_for_default_rule(exploration_id, state_id):
+    """Gets the tally of unresolved answers that hit the default rule."""
+    # TODO(sll): Add similar functionality for other rules.
+    # TODO(sll): Should this return just the top N answers instead?
+    return stats_domain.StateRuleAnswerLog.get(
+        exploration_id, state_id, state_models.DEFAULT_RULE_SPEC_REPR).answers
 
 
 def export_exploration_stats_to_dict(exploration_id):
     """Returns a dict with stats for the given exploration id."""
+    exploration = exp_domain.Exploration.get(exploration_id)
 
-    num_visits = _get_exploration_stats(
-        STATS_ENUMS.exploration_visited, exploration_id)
-    num_completions = _get_exploration_stats(
-        STATS_ENUMS.exploration_completed, exploration_id)
+    num_visits = stats_domain.StateCounter.get(
+        exploration_id, exploration.init_state_id).first_entry_count
+    # Note that the subsequent_entries_count for END_DEST should be 0.
+    num_completions = stats_domain.StateCounter.get(
+        exploration_id, feconf.END_DEST).first_entry_count
 
-    answers = _get_exploration_stats(STATS_ENUMS.rule_hit, exploration_id)
-    state_counts = _get_exploration_stats(
-        STATS_ENUMS.state_hit, exploration_id)
+    answers = {}
+    for state_id in exploration.state_ids:
+        state = exploration.get_state_by_id(state_id)
+        answers[state.id] = {
+            'name': state.name,
+            'rules': {}
+        }
+        for handler in state.widget.handlers:
+            for rule in handler.rule_specs:
+                answer_log = stats_domain.StateRuleAnswerLog.get(
+                    exploration_id, state.id, str(rule))
+
+                answers[state.id]['rules'][str(rule)] = {
+                    'answers': answer_log.get_top_answers(10)
+                }
+
+    state_counts = {}
+    for state_id in exploration.state_ids:
+        state = exploration.get_state_by_id(state_id)
+        state_counts[state_id] = {
+            'name': state.name,
+            'count': stats_domain.StateCounter.get(
+                exploration_id, state_id).total_entry_count,
+        }
 
     state_stats = {}
     for state_id in answers:
@@ -285,35 +137,23 @@ def get_top_ten_improvable_states(explorations):
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
 
+            state_counts = stats_domain.StateCounter.get(
+                exploration.id, state.id)
+
             # Count how many times the state was hit.
-            all_count = _count_state_hits(exploration.id, state.id)
+            all_count = state_counts.total_entry_count
             if all_count == 0:
                 continue
 
-            # Count the number of times the default rule was hit.
-            event_id = get_event_id(
-                STATS_ENUMS.rule_hit,
-                '.'.join([exploration.id, state.id,
-                          state_models.DEFAULT_RULE_SPEC_REPR])
-            )
-            default_count = stats_models.Journal.get_value_count_by_id(event_id)
-            journal = stats_models.Journal.get(event_id, strict=False)
-            top_default_answers = collections.Counter(
-                journal.values).most_common(5) if journal else []
+            # Count the total number of unresolved answers that match the
+            # default rule.
+            state_answer_log = stats_domain.StateRuleAnswerLog.get(
+                exploration.id, state.id, state_models.DEFAULT_RULE_SPEC_REPR)
+            default_count = state_answer_log.total_answer_count
+            top_default_answers = state_answer_log.get_top_answers(5)
 
-            # Count the number of times an answer was submitted, regardless
-            # of which rule it hits.
-            completed_count = 0
-            for handler in state.widget.handlers:
-                for rule in handler.rule_specs:
-                    rule_name = str(rule)
-                    event_id = get_event_id(
-                        STATS_ENUMS.rule_hit, '%s.%s.%s' %
-                        (exploration.id, state.id, rule_name))
-                    completed_count += (
-                        stats_models.Journal.get_value_count_by_id(event_id))
-
-            incomplete_count = all_count - completed_count
+            # Count the number of times no answer was submitted.
+            incomplete_count = state_counts.no_answer_count
 
             state_rank, improve_type = 0, ''
 
@@ -367,6 +207,4 @@ def get_top_ten_improvable_states(explorations):
 
 def delete_all_stats():
     """Deletes all statistics."""
-    stats_models.Counter.delete_all()
-    stats_models.Journal.delete_all()
-    stats_models.Tally.delete_all()
+    stats_models.delete_all_stats()

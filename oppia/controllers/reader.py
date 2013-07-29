@@ -80,15 +80,15 @@ class ExplorationHandler(base.BaseHandler):
             'interactive_params': init_state.widget.params,
             'oppia_html': init_html,
             'params': params,
+            'state_history': [exploration.init_state_id],
             'state_id': exploration.init_state_id,
             'title': exploration.title,
             'iframe_output': init_widgets,
         })
         self.render_json(self.values)
 
-        stats_services.EventHandler.record_exploration_visited(exploration_id)
         stats_services.EventHandler.record_state_hit(
-            exploration_id, exploration.init_state_id)
+            exploration_id, exploration.init_state_id, True)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -110,11 +110,8 @@ class FeedbackHandler(base.BaseHandler):
         recorded_answer = widget.get_stats_log_html(
             params=recorded_answer_params)
 
-        if recorded_answer:
-            stats_services.EventHandler.record_rule_hit(
-                exploration_id, old_state_id, rule, recorded_answer)
-            stats_services.EventHandler.record_unresolved_answer(
-                exploration_id, old_state_id, recorded_answer)
+        stats_services.EventHandler.record_answer_submitted(
+            exploration_id, old_state_id, str(rule), recorded_answer)
 
     def _get_feedback(self, feedback, block_number, params):
         """Gets the HTML and iframes with Oppia's feedback."""
@@ -176,6 +173,8 @@ class FeedbackHandler(base.BaseHandler):
         # Parameters associated with the reader.
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
+        # The reader's state history.
+        state_history = self.payload['state_history']
 
         rule = exp_services.classify(
             exploration_id, state_id, handler, answer, old_params)
@@ -185,7 +184,8 @@ class FeedbackHandler(base.BaseHandler):
                      else exploration.get_state_by_id(new_state_id))
 
         stats_services.EventHandler.record_state_hit(
-            exploration_id, new_state_id)
+            exploration_id, new_state_id, (new_state_id not in state_history))
+        state_history.append(new_state_id)
 
         # If the new state widget is the same as the old state widget, and the
         # new state widget is sticky, do not render the reader response. The
@@ -243,6 +243,7 @@ class FeedbackHandler(base.BaseHandler):
             'block_number': block_number,
             'params': new_params,
             'finished': finished,
+            'state_history': state_history,
         })
 
         self.render_json(values)

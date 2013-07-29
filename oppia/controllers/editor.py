@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import rule_domain
 from oppia.domain import stats_services
@@ -213,7 +212,7 @@ class StateHandler(base.BaseHandler):
         sticky_interactive_widget = self.payload.get(
             'sticky_interactive_widget')
         content = self.payload.get('content')
-        unresolved_answers = self.payload.get('unresolved_answers')
+        resolved_answers = self.payload.get('resolved_answers')
 
         if 'state_name' in self.payload:
             exploration.rename_state(state.id, state_name)
@@ -290,11 +289,9 @@ class StateHandler(base.BaseHandler):
                 for item in content
             ]
 
-        if 'unresolved_answers' in self.payload:
-            stats_services.EventHandler.replace_unresolved_answers(
-                exploration.id, state.id,
-                {k: v for k, v in unresolved_answers.iteritems() if v > 0}
-            )
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration.id, state.id, resolved_answers)
 
         state.put()
         self.render_json(exp_services.export_state_to_verbose_dict(

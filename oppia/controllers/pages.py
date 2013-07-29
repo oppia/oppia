@@ -57,3 +57,14 @@ class TermsPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/terms.html')
+
+
+class FeedbackPage(base.BaseHandler):
+    """Page with feedback."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': 'feedback',
+        })
+        self.render_template('pages/feedback.html')

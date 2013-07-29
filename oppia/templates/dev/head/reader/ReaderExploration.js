@@ -55,6 +55,7 @@
     $scope.stateId = data.state_id;
     $scope.title = data.title;
     $scope.iframeOutput = data.iframe_output;
+    $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.addContentToIframeWithId('inputTemplate', $scope.inputTemplate);
 
@@ -80,7 +81,8 @@
       answer: answer,
       block_number: $scope.blockNumber,
       handler: handler,
-      params: $scope.params
+      params: $scope.params,
+      state_history: $scope.stateHistory
     };
 
     $scope.answerIsBeingProcessed = true;
@@ -107,6 +109,7 @@
     $scope.finished = data.finished;
 
     $scope.params = data.params;
+    $scope.stateHistory = data.state_history;
 
     $scope.responseLog = $scope.responseLog || [];
     $scope.responseLog.push(data.reader_response_html, data.oppia_html);

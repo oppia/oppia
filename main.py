@@ -20,7 +20,6 @@ import feconf
 from oppia.controllers import admin
 from oppia.controllers import base
 from oppia.controllers import editor
-from oppia.controllers import feedback
 from oppia.controllers import gallery
 from oppia.controllers import pages
 from oppia.controllers import profile
@@ -52,10 +51,9 @@ urls = [
     (r'/?', pages.MainPage),
     (r'/about/?', pages.AboutPage),
     (r'/terms/?', pages.TermsPage),
+    (r'/feedback/?', pages.FeedbackPage),
 
     (r'/admin/?', admin.AdminPage),
-
-    (r'/feedback/?', feedback.FeedbackPage),
 
     (r'/editor_views/(%s)/?' % r, resources.EditorViewHandler),
     (r'/templates/(%s)/?' % r, resources.TemplateHandler),

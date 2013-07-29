@@ -376,7 +376,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
     explorationData.saveStateData($scope.stateId, {
-      'unresolved_answers': $scope.unresolvedAnswers
+      'resolved_answers': [answer]
     });
     $scope.generateUnresolvedAnswersMap();
   };
