@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import operator
 
 import oppia.storage.statistics.models as stats_models
@@ -86,7 +87,7 @@ class StateRuleAnswerLog(object):
         return total_count
 
     def __init__(self, answers):
-        self.answers = answers
+        self.answers = copy.deepcopy(answers)
 
     @classmethod
     def get(cls, exploration_id, state_id, rule_str):

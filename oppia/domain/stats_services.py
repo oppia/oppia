@@ -60,76 +60,62 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_id):
         exploration_id, state_id, state_models.DEFAULT_RULESPEC_STR).answers
 
 
-def export_exploration_stats_to_dict(exploration_id):
-    """Returns a dict with stats for the given exploration id."""
+def get_exploration_visit_count(exploration_id):
+    """Returns the number of times this exploration has been accessed."""
     exploration = exp_domain.Exploration.get(exploration_id)
-
-    num_visits = stats_domain.StateCounter.get(
+    return stats_domain.StateCounter.get(
         exploration_id, exploration.init_state_id).first_entry_count
+
+
+def get_exploration_completed_count(exploration_id):
+    """Returns the number of times this exploration has been completed."""
     # Note that the subsequent_entries_count for END_DEST should be 0.
-    num_completions = stats_domain.StateCounter.get(
+    return stats_domain.StateCounter.get(
         exploration_id, feconf.END_DEST).first_entry_count
 
-    answers = {}
+
+def get_state_stats_for_exploration(exploration_id):
+    """Returns a dict with state statistics for the given exploration id."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+
+    state_stats = {}
     for state_id in exploration.state_ids:
-        # TODO(sll): Remove this call.
+        state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
+        total_entry_count = state_counts.total_entry_count
+
         state = exploration.get_state_by_id(state_id)
-        answers[state.id] = {
-            'name': state.name,
-            'rules': {}
-        }
+
+        rule_stats = {}
         for handler in state.widget.handlers:
             for rule in handler.rule_specs:
+                # TODO(sll): Add handler information to the rule string.
                 answer_log = stats_domain.StateRuleAnswerLog.get(
                     exploration_id, state.id, str(rule))
 
-                answers[state.id]['rules'][str(rule)] = {
-                    'answers': answer_log.get_top_answers(10)
+                total_answer_count = answer_log.total_answer_count
+
+                rule_stats[str(rule)] = {
+                    'answers': answer_log.get_top_answers(10),
+                    'chartData': [
+                        ['', 'This rule', 'Other answers'],
+                        ['', total_answer_count,
+                         total_entry_count - total_answer_count]
+                    ]
                 }
 
-    state_counts = {}
-    for state_id in exploration.state_ids:
-        # TODO(sll): Remove this call.
-        state = exploration.get_state_by_id(state_id)
-        state_counts[state_id] = {
-            'name': state.name,
-            'count': stats_domain.StateCounter.get(
-                exploration_id, state_id).total_entry_count,
-        }
-
-    state_stats = {}
-    for state_id in answers:
-        all_rule_count = 0
-        state_count = state_counts[state_id]['count']
-
-        rule_stats = {}
-        for rule in answers[state_id]['rules']:
-            # TODO(sll): Can this computation be done in the frontend instead?
-            rule_count = 0
-            for _, count in answers[state_id]['rules'][rule]['answers']:
-                rule_count += count
-                all_rule_count += count
-
-            rule_stats[rule] = answers[state_id]['rules'][rule]
-            rule_stats[rule]['chartData'] = [
-                ['', 'This rule', 'Other answers'],
-                ['', rule_count, state_count - rule_count]]
-
         state_stats[state_id] = {
-            'name': answers[state_id]['name'],
-            'count': state_count,
+            'name': state.name,
+            'count': total_entry_count,
             'rule_stats': rule_stats,
+            # Add information about resolved answers to the chart data.
             'no_answer_chartdata': [
                 ['', 'No answer', 'Answer given'],
-                ['',  state_count - all_rule_count, all_rule_count]
+                ['',  state_counts.no_answer_count,
+                 state_counts.active_answer_count]
             ]
         }
 
-    return {
-        'num_visits': num_visits,
-        'num_completions': num_completions,
-        'state_stats': state_stats,
-    }
+    return state_stats
 
 
 def get_top_improvable_states(exploration_ids, N):

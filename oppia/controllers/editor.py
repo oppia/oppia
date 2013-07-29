@@ -108,14 +108,13 @@ class ExplorationHandler(base.BaseHandler):
             'editors': exploration.editor_ids,
             'states': state_list,
             'parameters': parameters,
-        })
-
-        statistics = stats_services.export_exploration_stats_to_dict(
-            exploration.id)
-        self.values.update({
-            'num_visits': statistics['num_visits'],
-            'num_completions': statistics['num_completions'],
-            'state_stats': statistics['state_stats'],
+            # Add information for the exploration statistics page.
+            'num_visits': stats_services.get_exploration_visit_count(
+                exploration.id),
+            'num_completions': stats_services.get_exploration_completed_count(
+                exploration.id),
+            'state_stats': stats_services.get_state_stats_for_exploration(
+                exploration.id),
             'imp': stats_services.get_top_improvable_states(
                 [exploration.id], 10),
         })
