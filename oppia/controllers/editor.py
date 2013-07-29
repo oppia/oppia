@@ -118,7 +118,7 @@ class ExplorationHandler(base.BaseHandler):
             'state_stats': statistics['state_stats'],
         })
         improvements = stats_services.get_top_ten_improvable_states(
-            [exploration])
+            [exploration.id])
         self.values.update({
             'imp': improvements,
         })

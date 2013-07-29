@@ -73,6 +73,12 @@ class AnswerHandlerInstance(base_models.BaseModel):
     name = ndb.StringProperty(default='submit')
     rule_specs = ndb.LocalStructuredProperty(RuleSpec, repeated=True)
 
+    @property
+    def default_rule_spec(self):
+        """The default rule spec."""
+        assert self.rule_specs[-1].is_default
+        return self.rule_specs[-1]
+
 
 class WidgetInstance(base_models.BaseModel):
     """An instance of a widget."""

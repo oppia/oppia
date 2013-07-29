@@ -51,6 +51,7 @@ class ProfileHandler(base.BaseHandler):
                 'image_id': exp.image_id,
                 'name': exp.title,
             } for exp in exps],
-            'improvable': stats_services.get_top_ten_improvable_states(exps),
+            'improvable': stats_services.get_top_ten_improvable_states(
+                [exp.id for exp in exps]),
         })
         self.render_json(self.values)

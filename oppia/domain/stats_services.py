@@ -72,6 +72,7 @@ def export_exploration_stats_to_dict(exploration_id):
 
     answers = {}
     for state_id in exploration.state_ids:
+        # TODO(sll): Remove this call.
         state = exploration.get_state_by_id(state_id)
         answers[state.id] = {
             'name': state.name,
@@ -88,6 +89,7 @@ def export_exploration_stats_to_dict(exploration_id):
 
     state_counts = {}
     for state_id in exploration.state_ids:
+        # TODO(sll): Remove this call.
         state = exploration.get_state_by_id(state_id)
         state_counts[state_id] = {
             'name': state.name,
@@ -130,61 +132,45 @@ def export_exploration_stats_to_dict(exploration_id):
     }
 
 
-def get_top_ten_improvable_states(explorations):
+def get_top_ten_improvable_states(exploration_ids):
     """Returns the top improvable states across all the given explorations."""
+
     ranked_states = []
-    for exploration in explorations:
+    for exploration_id in exploration_ids:
+        exploration = exp_domain.Exploration.get(exploration_id)
         for state_id in exploration.state_ids:
             state = exploration.get_state_by_id(state_id)
-
             state_counts = stats_domain.StateCounter.get(
-                exploration.id, state.id)
+                exploration_id, state.id)
+            default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
+                exploration.id, state.id, state_models.DEFAULT_RULE_SPEC_REPR)
 
-            # Count how many times the state was hit.
-            all_count = state_counts.total_entry_count
-            if all_count == 0:
+            total_entry_count = state_counts.total_entry_count
+            if total_entry_count == 0:
                 continue
 
-            # Count the total number of unresolved answers that match the
-            # default rule.
-            state_answer_log = stats_domain.StateRuleAnswerLog.get(
-                exploration.id, state.id, state_models.DEFAULT_RULE_SPEC_REPR)
-            default_count = state_answer_log.total_answer_count
-            top_default_answers = state_answer_log.get_top_answers(5)
-
-            # Count the number of times no answer was submitted.
-            incomplete_count = state_counts.no_answer_count
-
-            state_rank, improve_type = 0, ''
+            default_count = default_rule_answer_log.total_answer_count
+            no_answer_submitted_count = state_counts.no_answer_count
 
             eligible_flags = []
-            default_rule = filter(
-                lambda rule: str(rule) == state_models.DEFAULT_RULE_SPEC_REPR,
-                state.widget.handlers[0].rule_specs
-            )[0]
-            default_self_loop = default_rule.dest == state.id
-            if float(default_count) / all_count > .2 and default_self_loop:
+
+            if (default_count > 0.2 * total_entry_count and
+                    state.widget.handlers[0].default_rule_spec.dest ==
+                    state.id):
                 eligible_flags.append({
                     'rank': default_count,
                     'improve_type': IMPROVE_TYPE_DEFAULT})
-            if float(incomplete_count) / all_count > .2:
+
+            if no_answer_submitted_count > 0.2 * total_entry_count:
                 eligible_flags.append({
-                    'rank': incomplete_count,
+                    'rank': no_answer_submitted_count,
                     'improve_type': IMPROVE_TYPE_INCOMPLETE})
 
-            # TODO(sll): Break this method out into smaller, more testable
-            # parts; then remove the following commented code.
-            """
-            j_arr = [j.id for j in stats_models.Journal.get_all()]
-            raise Exception('%s %s %s %s %s %s' % (
-                default_count, incomplete_count, all_count, completed_count,
-                eligible_flags, j_arr
-            ))
-            """
-
-            eligible_flags = sorted(
-                eligible_flags, key=lambda flag: flag['rank'], reverse=True)
+            state_rank, improve_type = 0, ''
             if eligible_flags:
+                eligible_flags = sorted(
+                    eligible_flags, key=lambda flag: flag['rank'],
+                    reverse=True)
                 state_rank = eligible_flags[0]['rank']
                 improve_type = eligible_flags[0]['improve_type']
 
@@ -195,7 +181,8 @@ def get_top_ten_improvable_states(explorations):
                 'state_name': state.name,
                 'rank': state_rank,
                 'type': improve_type,
-                'top_default_answers': top_default_answers
+                'top_default_answers': default_rule_answer_log.get_top_answers(
+                    5)
             })
 
     problem_states = sorted(

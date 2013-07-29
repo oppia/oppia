@@ -76,7 +76,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
         stats_services.EventHandler.record_state_hit('eid', state_id, True)
         stats_services.EventHandler.record_state_hit('eid', state_id, True)
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
@@ -94,7 +94,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
             'eid', state_id, default_rule_spec, '1')
         stats_services.EventHandler.record_state_hit('eid', state_id, True)
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['exp_id'], 'eid')
         self.assertEquals(states[0]['type'], 'default')
@@ -118,7 +118,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
             '1')
         stats_services.EventHandler.record_state_hit('eid', init_state.id, True)
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
@@ -137,7 +137,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
         stats_services.EventHandler.record_answer_submitted(
             'eid', state_id, default_rule_spec, '1')
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'incomplete')
@@ -151,7 +151,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
                 'eid', state_id,
                 str(state_models.RuleSpec(name='Default', dest=state_id)), '1')
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 1)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')
@@ -181,7 +181,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
                 str(state_models.RuleSpec(name='Default', dest=state_2_id)),
                 '1')
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 2)
         self.assertEquals(states[0]['type'], 'default')
@@ -200,7 +200,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
                 str(state_models.RuleSpec(name='Default', dest=state_1_id)),
                 '1')
 
-        states = stats_services.get_top_ten_improvable_states([exp])
+        states = stats_services.get_top_ten_improvable_states(['eid'])
         self.assertEquals(len(states), 2)
         self.assertEquals(states[0]['rank'], 3)
         self.assertEquals(states[0]['type'], 'default')
