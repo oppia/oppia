@@ -287,7 +287,7 @@ class StateHandler(base.BaseHandler):
 
         if 'resolved_answers' in self.payload:
             stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration.id, state.id, resolved_answers)
+                exploration.id, state.id, 'submit', resolved_answers)
 
         state.put()
         self.render_json(exp_services.export_state_to_verbose_dict(

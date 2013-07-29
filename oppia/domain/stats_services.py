@@ -27,6 +27,7 @@ import oppia.storage.statistics.models as stats_models
 
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
+SUBMIT_HANDLER_NAME = 'submit'
 
 
 class EventHandler(object):
@@ -39,16 +40,17 @@ class EventHandler(object):
             exploration_id, state_id, first_time)
 
     @classmethod
-    def record_answer_submitted(cls, exploration_id, state_id, rule, answer):
+    def record_answer_submitted(
+            cls, exploration_id, state_id, handler_name, rule_str, answer):
         """Records an event when an answer triggers a rule."""
         stats_models.process_submitted_answer(
-            exploration_id, state_id, rule, answer)
+            exploration_id, state_id, handler_name, rule_str, answer)
 
     @classmethod
     def resolve_answers_for_default_rule(
-            cls, exploration_id, state_id, answers):
+            cls, exploration_id, state_id, handler_name, answers):
         stats_models.resolve_answers(
-            exploration_id, state_id,
+            exploration_id, state_id, handler_name,
             state_models.DEFAULT_RULESPEC_STR, answers)
 
 
@@ -57,7 +59,9 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_id):
     # TODO(sll): Add similar functionality for other rules.
     # TODO(sll): Should this return just the top N answers instead?
     return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_id, state_models.DEFAULT_RULESPEC_STR).answers
+        exploration_id, state_id, SUBMIT_HANDLER_NAME,
+        state_models.DEFAULT_RULESPEC_STR
+    ).answers
 
 
 def get_exploration_visit_count(exploration_id):
@@ -88,13 +92,12 @@ def get_state_stats_for_exploration(exploration_id):
         rule_stats = {}
         for handler in state.widget.handlers:
             for rule in handler.rule_specs:
-                # TODO(sll): Add handler information to the rule string.
                 answer_log = stats_domain.StateRuleAnswerLog.get(
-                    exploration_id, state.id, str(rule))
+                    exploration_id, state.id, SUBMIT_HANDLER_NAME, str(rule))
 
                 total_answer_count = answer_log.total_answer_count
 
-                rule_stats[str(rule)] = {
+                rule_stats['.'.join([SUBMIT_HANDLER_NAME, str(rule)])] = {
                     'answers': answer_log.get_top_answers(10),
                     'chartData': [
                         ['', 'This rule', 'Other answers'],
@@ -128,7 +131,8 @@ def get_top_improvable_states(exploration_ids, N):
             state_counts = stats_domain.StateCounter.get(
                 exploration_id, state_id)
             default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-                exploration.id, state_id, state_models.DEFAULT_RULESPEC_STR)
+                exploration.id, state_id, SUBMIT_HANDLER_NAME,
+                state_models.DEFAULT_RULESPEC_STR)
 
             total_entry_count = state_counts.total_entry_count
             if total_entry_count == 0:

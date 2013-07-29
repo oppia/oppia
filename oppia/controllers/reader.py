@@ -95,7 +95,8 @@ class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_id, rule):
+            self, old_state, answer, exploration_id, old_state_id, handler,
+            rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
@@ -111,7 +112,7 @@ class FeedbackHandler(base.BaseHandler):
             params=recorded_answer_params)
 
         stats_services.EventHandler.record_answer_submitted(
-            exploration_id, old_state_id, str(rule), recorded_answer)
+            exploration_id, old_state_id, handler, str(rule), recorded_answer)
 
     def _get_feedback(self, feedback, block_number, params):
         """Gets the HTML and iframes with Oppia's feedback."""
@@ -202,7 +203,7 @@ class FeedbackHandler(base.BaseHandler):
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, state_id, rule)
+            old_state, answer, exploration_id, state_id, handler, rule)
 
         # Append the reader's answer to the response HTML.
         reader_response_html = ''

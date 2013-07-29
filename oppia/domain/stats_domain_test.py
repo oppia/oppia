@@ -81,6 +81,7 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
     """Test the state rule answer log domain object."""
 
     DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
         exp = exp_domain.Exploration.get(exp_services.create_new(
@@ -91,28 +92,31 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
             'eid', state_id, True)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {})
         self.assertEquals(answer_log.total_answer_count, 0)
         self.assertEquals(answer_log.get_top_answers(2), [])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', state_id, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC_STR, 'answer1')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 1})
         self.assertEquals(answer_log.total_answer_count, 1)
         self.assertEquals(answer_log.get_top_answers(1), [('answer1', 1)])
         self.assertEquals(answer_log.get_top_answers(2), [('answer1', 1)])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', state_id, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC_STR, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 3)
         self.assertEquals(
@@ -121,12 +125,14 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
             answer_log.get_top_answers(2), [('answer1', 2), ('answer2', 1)])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'answer2')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 3})
         self.assertEquals(answer_log.total_answer_count, 5)
         self.assertEquals(
@@ -140,17 +146,19 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
         state_id = exp.init_state_id
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, 'a_different_rule_repr', 'answer2')
+            'eid', state_id, self.SUBMIT_HANDLER, 'a_different_rule_repr',
+            'answer2')
 
         default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(default_rule_answer_log.answers, {'answer1': 1})
         self.assertEquals(default_rule_answer_log.total_answer_count, 1)
 
         other_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, 'a_different_rule_repr')
+            'eid', state_id, self.SUBMIT_HANDLER, 'a_different_rule_repr')
         self.assertEquals(other_rule_answer_log.answers, {'answer2': 1})
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
@@ -160,25 +168,28 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
         state_id = exp.init_state_id
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {})
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', state_id, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC_STR, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', state_id, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC_STR, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR, 'answer2')
+            'eid', state_id, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC_STR, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer1': 2, 'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 3)
 
         stats_services.EventHandler.resolve_answers_for_default_rule(
-            'eid', state_id, ['answer1'])
+            'eid', state_id, self.SUBMIT_HANDLER, ['answer1'])
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_id, self.DEFAULT_RULESPEC_STR)
+            'eid', state_id, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 1)

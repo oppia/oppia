@@ -90,10 +90,10 @@ class StateRuleAnswerLog(object):
         self.answers = copy.deepcopy(answers)
 
     @classmethod
-    def get(cls, exploration_id, state_id, rule_str):
+    def get(cls, exploration_id, state_id, handler_name, rule_str):
         # TODO(sll): Should rule_str be unicode instead?
         answer_log_model = stats_models.StateRuleAnswerLogModel.get_or_create(
-            exploration_id, state_id, rule_str)
+            exploration_id, state_id, handler_name, rule_str)
         return cls(answer_log_model.answers)
 
     def get_top_answers(self, N):
