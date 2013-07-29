@@ -36,8 +36,7 @@ class ReaderControllerUnitTests(test_utils.AppEngineTestBase):
                       exploration_json['oppia_html'])
         self.assertEqual(exploration_json['title'], 'Welcome to Oppia!')
         state_id = exploration_json['state_id']
-
-        self.assertTrue(len(exploration_json['state_history']), 1)
+        self.assertEqual(exploration_json['state_history'], [state_id])
 
         payload = {
             'answer': '0', 'block_number': 0, 'handler': 'submit',
@@ -50,4 +49,6 @@ class ReaderControllerUnitTests(test_utils.AppEngineTestBase):
         exploration_json = json.loads(response.body)
         self.assertIn('In fact, the word Oppia means \'learn\'.',
                       exploration_json['oppia_html'])
-        self.assertTrue(len(exploration_json['state_history']), 2)
+        new_state_id = exploration_json['state_id']
+        self.assertEqual(
+            exploration_json['state_history'], [state_id, new_state_id])

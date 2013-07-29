@@ -16,6 +16,8 @@
 
 __author__ = 'Jeremy Emerson'
 
+import json
+
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
