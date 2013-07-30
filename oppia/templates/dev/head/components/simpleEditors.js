@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for reusable components.
+ * @fileoverview Directives for reusable simple editor components.
  *
  * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('list', function (warningsData) {
+  // Editable list directive.
   return {
     restrict: 'E',
     scope: {items: '=', largeInput: '@'},
@@ -81,40 +82,8 @@ oppia.directive('list', function (warningsData) {
   };
 });
 
-oppia.directive('barChart', function() {
-  return {
-    restrict: 'E',
-    scope: {chartData: '=', chartColors: '='},
-    controller: function($scope, $element, $attrs) {
-      var chart = new google.visualization.BarChart($element[0]);
-      $scope.$watch($attrs.chartData, function(value) {
-        value = $scope.chartData;
-        if (!$.isArray(value)) {
-          return;
-        }
-        var data = google.visualization.arrayToDataTable(value);
-        var legendPosition = 'right';
-        if ($attrs.showLegend == 'false') {
-          legendPosition = 'none';
-        }
-        var options =  {
-          title: $attrs.chartTitle,
-          colors: $scope.chartColors,
-          isStacked: true,
-          width: $attrs.width,
-          height: $attrs.height,
-          legend: {position: legendPosition},
-          hAxis: {gridlines: {color: 'transparent'}},
-          chartArea: {width: $attrs.chartAreaWidth, left:0}
-        };
-        chart.draw(data, options);
-      });
-    }
-  };
-});
-
-// An editable string directive.
 oppia.directive('string', function (warningsData) {
+  // Editable string directive.
   return {
     restrict: 'E',
     scope: {item: '='},

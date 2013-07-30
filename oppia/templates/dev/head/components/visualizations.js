@@ -13,10 +13,42 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state graph visualization.
+ * @fileoverview Directives for reusable data visualization components.
  *
  * @author sll@google.com (Sean Lip)
  */
+
+oppia.directive('barChart', function() {
+  return {
+    restrict: 'E',
+    scope: {chartData: '=', chartColors: '='},
+    controller: function($scope, $element, $attrs) {
+      var chart = new google.visualization.BarChart($element[0]);
+      $scope.$watch($attrs.chartData, function(value) {
+        value = $scope.chartData;
+        if (!$.isArray(value)) {
+          return;
+        }
+        var data = google.visualization.arrayToDataTable(value);
+        var legendPosition = 'right';
+        if ($attrs.showLegend == 'false') {
+          legendPosition = 'none';
+        }
+        var options =  {
+          title: $attrs.chartTitle,
+          colors: $scope.chartColors,
+          isStacked: true,
+          width: $attrs.width,
+          height: $attrs.height,
+          legend: {position: legendPosition},
+          hAxis: {gridlines: {color: 'transparent'}},
+          chartArea: {width: $attrs.chartAreaWidth, left:0}
+        };
+        chart.draw(data, options);
+      });
+    }
+  };
+});
 
 oppia.directive('stateGraphViz', function(explorationData, $filter) {
   // constants
