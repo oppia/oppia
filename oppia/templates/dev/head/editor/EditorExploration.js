@@ -127,11 +127,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $scope.statsGraphOpacities = {};
     for (var stateId in $scope.states) {
-      var visits = (stateId == END_DEST ? $scope.stats.numCompletions :
-                    $scope.stats.stateStats[stateId].count);
+      var visits = $scope.stats.stateStats[stateId].firstEntryCount;
       $scope.statsGraphOpacities[stateId] = Math.max(
           visits / $scope.stats.numVisits, 0.05);
     }
+    $scope.statsGraphOpacities[END_DEST] = Math.max(
+        $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
     $scope.graphData = $scope.reformatResponse(
           data.states, data.init_state_id);

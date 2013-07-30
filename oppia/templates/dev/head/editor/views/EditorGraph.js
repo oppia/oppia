@@ -21,7 +21,7 @@
 oppia.directive('stateGraphViz', function(explorationData, $filter) {
   // constants
   var w = 960,
-      h = 4000,
+      h = 1500,
       i = 0;
   var NODE_PADDING_X = 8;
   // The following variable must be at least 3.
@@ -35,7 +35,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
     restrict: 'E',
     scope: {
       val: '=',
-      fill: '@',
+      nodeFill: '@',
       opacityMap: '=',
       forbidNodeDeletion: '@'
     },
@@ -48,7 +48,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         // TODO(sll): This does not update if a state name is changed.
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
-                    scope.fill, scope.opacityMap, scope.forbidNodeDeletion);
+                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion);
         }
       });
 

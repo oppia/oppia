@@ -87,6 +87,7 @@ def get_state_stats_for_exploration(exploration_id):
     state_stats = {}
     for state_id in exploration.state_ids:
         state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
+        first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
         state = exploration.get_state_by_id(state_id)
@@ -98,6 +99,8 @@ def get_state_stats_for_exploration(exploration_id):
                     exploration_id, state.id, SUBMIT_HANDLER_NAME, str(rule))
                 rule_stats['.'.join([SUBMIT_HANDLER_NAME, str(rule)])] = {
                     'answers': answer_log.get_top_answers(10),
+                    # TODO(sll): This should be made more generic and the chart
+                    # logic moved to the frontend.
                     'chartData': [
                         ['', 'This rule', 'Other answers'],
                         ['', answer_log.total_answer_count,
@@ -107,9 +110,12 @@ def get_state_stats_for_exploration(exploration_id):
 
         state_stats[state_id] = {
             'name': state.name,
-            'count': total_entry_count,
+            'firstEntryCount': first_entry_count,
+            'totalEntryCount': total_entry_count,
             'rule_stats': rule_stats,
             # Add information about resolved answers to the chart data.
+            # TODO(sll): This should be made more generic and the chart logic
+            # moved to the frontend.
             'no_answer_chartdata': [
                 ['', 'No answer', 'Answer given'],
                 ['',  state_counts.no_answer_count,
