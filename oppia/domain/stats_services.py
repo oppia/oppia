@@ -49,6 +49,7 @@ class EventHandler(object):
     @classmethod
     def resolve_answers_for_default_rule(
             cls, exploration_id, state_id, handler_name, answers):
+        """Resolves a list of answers for the default rule of this state."""
         stats_models.resolve_answers(
             exploration_id, state_id, handler_name,
             state_models.DEFAULT_RULESPEC_STR, answers)
@@ -56,7 +57,8 @@ class EventHandler(object):
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_id):
     """Gets the tally of unresolved answers that hit the default rule."""
-    # TODO(sll): Add similar functionality for other rules.
+    # TODO(sll): Add similar functionality for other rules? But then we have
+    # to figure out what happens when those rules are edited/deleted.
     # TODO(sll): Should this return just the top N answers instead?
     return stats_domain.StateRuleAnswerLog.get(
         exploration_id, state_id, SUBMIT_HANDLER_NAME,
@@ -94,15 +96,12 @@ def get_state_stats_for_exploration(exploration_id):
             for rule in handler.rule_specs:
                 answer_log = stats_domain.StateRuleAnswerLog.get(
                     exploration_id, state.id, SUBMIT_HANDLER_NAME, str(rule))
-
-                total_answer_count = answer_log.total_answer_count
-
                 rule_stats['.'.join([SUBMIT_HANDLER_NAME, str(rule)])] = {
                     'answers': answer_log.get_top_answers(10),
                     'chartData': [
                         ['', 'This rule', 'Other answers'],
-                        ['', total_answer_count,
-                         total_entry_count - total_answer_count]
+                        ['', answer_log.total_answer_count,
+                         total_entry_count - answer_log.total_answer_count]
                     ]
                 }
 
