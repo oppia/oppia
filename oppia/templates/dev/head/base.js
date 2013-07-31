@@ -47,7 +47,7 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 
   // Opens the feedback page in a new window.
   $scope.openFeedbackPage = function() {
-    window.open('/feedback/?url=' + encodeURIComponent(window.location.pathname));
+    window.open('/feedback/');
   };
 
   /**

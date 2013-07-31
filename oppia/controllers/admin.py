@@ -18,24 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 from oppia.controllers import base
 from oppia.domain import exp_services
-from oppia.domain import widget_domain
-
-
-def reload_widgets():
-    """Refresh the default widgets."""
-    widget_domain.Registry.refresh()
-
-
-def reload_explorations():
-    """Reload the default explorations."""
-    exp_services.delete_demos()
-    exp_services.load_demos()
-
-
-def reload_demos():
-    """Reload default widgets and explorations (in that order)."""
-    reload_widgets()
-    reload_explorations()
 
 
 class AdminPage(base.BaseHandler):
@@ -48,9 +30,7 @@ class AdminPage(base.BaseHandler):
 
     @base.require_admin
     def post(self):
-        """Reloads the default widgets and explorations."""
+        """Reloads the default explorations."""
         if self.payload.get('action') == 'reload':
             if self.payload.get('item') == 'explorations':
-                reload_explorations()
-            elif self.payload.get('item') == 'widgets':
-                reload_widgets()
+                exp_services.reload_demos()

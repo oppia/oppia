@@ -13,53 +13,76 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the editor's state graph.
+ * @fileoverview Directives for reusable data visualization components.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-function EditorGraph($scope, $filter, explorationData) {
-  $scope.updateViz = function() {
-    explorationData.getData().then(function(data) {
-    });
+oppia.directive('barChart', function() {
+  return {
+    restrict: 'E',
+    scope: {chartData: '=', chartColors: '='},
+    controller: function($scope, $element, $attrs) {
+      var chart = new google.visualization.BarChart($element[0]);
+      $scope.$watch($attrs.chartData, function(value) {
+        value = $scope.chartData;
+        if (!$.isArray(value)) {
+          return;
+        }
+        var data = google.visualization.arrayToDataTable(value);
+        var legendPosition = 'right';
+        if ($attrs.showLegend == 'false') {
+          legendPosition = 'none';
+        }
+        var options =  {
+          title: $attrs.chartTitle,
+          colors: $scope.chartColors,
+          isStacked: true,
+          width: $attrs.width,
+          height: $attrs.height,
+          legend: {position: legendPosition},
+          hAxis: {gridlines: {color: 'transparent'}},
+          chartArea: {width: $attrs.chartAreaWidth, left:0}
+        };
+        chart.draw(data, options);
+      });
+    }
   };
+});
 
-  // At the start, update the graph.
-  $scope.updateViz();
-
-  // Also update the graph when an update event is broadcast.
-  $scope.$on('updateViz', $scope.updateViz);
-}
-
-
-oppia.directive('stateGraphViz', function(explorationData) {
+oppia.directive('stateGraphViz', function(explorationData, $filter) {
   // constants
   var w = 960,
-      h = 4000,
+      h = 1500,
       i = 0;
   var NODE_PADDING_X = 8;
   // The following variable must be at least 3.
-  var MAX_CATEGORY_LENGTH = 20;
+  var MAX_NODE_LABEL_LENGTH = 20;
 
   var getTextWidth = function(text) {
-    return 40 + Math.min(MAX_CATEGORY_LENGTH, text.length) * 5;
+    return 40 + Math.min(MAX_NODE_LABEL_LENGTH, text.length) * 5;
   };
 
   return {
     restrict: 'E',
     scope: {
       val: '=',
-      grouped: '=',
-      stats: '='
+      nodeFill: '@',
+      opacityMap: '=',
+      forbidNodeDeletion: '@'
     },
     link: function(scope, element, attrs) {
       scope.truncate = function(text) {
-        if (text.length > MAX_CATEGORY_LENGTH) {
-          return text.substring(0, MAX_CATEGORY_LENGTH - 3) + '...';
-        } else {
-          return text;
-        }
+        return $filter('truncate')(text, MAX_NODE_LABEL_LENGTH);
       };
+
+      scope.$watch('val', function (newVal, oldVal) {
+        // TODO(sll): This does not update if a state name is changed.
+        if (newVal) {
+          drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
+                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion);
+        }
+      });
 
       var vis = d3.select(element[0]).append('svg:svg')
           .attr('height', h)
@@ -67,31 +90,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
         .append('svg:g')
           .attr('transform', 'translate(20,30)');
 
-
-      scope.$watch('val', function (newVal, oldVal) {
-        // if 'val' is undefined, exit
-        if (!newVal) {
-          return;
-        }
-
-        var source = newVal;
-        var nodes = source.nodes;
-        var links = source.links;
-        var initStateId = source.initStateId;
-        create(nodes, links, initStateId, scope.stats);
-      });
-
-      scope.$watch('stats', function(newVal, oldVal) {
-        if (!scope.val) {
-          return;
-        }
-        create(scope.val.nodes, scope.val.links, scope.val.initStateId, newVal);
-      });
-
-      function create(nodes, links, initStateId, stats) {
+      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion) {
         // clear the elements inside of the directive
         vis.selectAll('*').remove();
-
 
         // Update the links
         var link = vis.selectAll('path.link')
@@ -132,8 +133,8 @@ oppia.directive('stateGraphViz', function(explorationData) {
                 return 'M' + sourcex + ' ' + sourcey;
               }
 
-              var dx = targetx - sourcex;
-              var dy = targety - sourcey;
+              var dx = targetx - sourcex,
+                  dy = targety - sourcey;
 
               /* Fractional amount of truncation to be applied to the end of
                  each link. */
@@ -146,30 +147,27 @@ oppia.directive('stateGraphViz', function(explorationData) {
                     endCutoff, 20.0/Math.abs(dy));
               }
 
-              var dxperp = targety - sourcey;
-              var dyperp = sourcex - targetx;
-              var norm = Math.sqrt(dxperp*dxperp + dyperp*dyperp);
+              var dxperp = targety - sourcey,
+                  dyperp = sourcex - targetx,
+                  norm = Math.sqrt(dxperp*dxperp + dyperp*dyperp);
               dxperp /= norm;
               dyperp /= norm;
 
-              var midx = sourcex + dx/2 + dxperp*20;
-              var midy = sourcey + dy/2 + dyperp*20;
-
-              var startx = sourcex + startCutoff*dx;
-              var starty = sourcey + startCutoff*dy;
-              var endx = targetx - endCutoff*dx;
-              var endy = targety - endCutoff*dy;
+              var midx = sourcex + dx/2 + dxperp*20,
+                  midy = sourcey + dy/2 + dyperp*20,
+                  startx = sourcex + startCutoff*dx,
+                  starty = sourcey + startCutoff*dy,
+                  endx = targetx - endCutoff*dx,
+                  endy = targety - endCutoff*dy;
 
               // Draw a quadratic bezier curve.
               return 'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
                   ' ' + endx + ' ' + endy;
             })
             .attr('marker-end', function(d) {
-              if (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) {
-                return '';
-              } else {
-                return 'url(#arrowhead)';
-              }
+              return (
+                (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) ?
+                '' : 'url(#arrowhead)');
             });
 
         // Update the nodes
@@ -186,57 +184,36 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('y', function(d) { return d.y0; })
             .attr('ry', function(d) { return 4; })
             .attr('rx', function(d) { return 4; })
-            .attr('width', function(d) { return getTextWidth(d.name) + 2*NODE_PADDING_X; })
+            .attr('width', function(d) {
+               return getTextWidth(d.name) + 2*NODE_PADDING_X; })
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
-              if (d.hashId != END_DEST) {
-                return 'clickable';
-              }
-            })
+              return d.hashId != END_DEST ? 'clickable' : null; })
             .style('stroke', 'black')
             .style('stroke-width', function(d) {
-              if (d.hashId == initStateId || d.hashId == END_DEST) {
-                return '3';
-              }
-              return '2';
+              return (d.hashId == initStateId || d.hashId == END_DEST) ? '3' : '2';
             })
             .style('fill', function(d) {
-              if (stats) {
-                return 'green';
-              }
-              if (d.hashId == initStateId) {
-                return 'olive';
-              } else if (d.hashId == END_DEST) {
-                return 'green';
-              } else if (d.reachable === false) {
-                return 'pink';
+              if (nodeFill) {
+                return nodeFill;
               } else {
-                return 'beige';
+                return (
+                  d.hashId == initStateId ? 'olive' :
+                  d.hashId == END_DEST ? 'green' :
+                  d.reachable === false ? 'pink' :
+                  'beige'
+                );
               }
             })
             .style('opacity', function(d) {
-              if (!stats) {
-                return 1;
-              } else {
-                 var percent;
-                 if (d.hashId == END_DEST) {
-                   percent = stats.numCompletions / stats.numVisits;
-                 } else {
-                   percent = stats.stateStats[d.hashId].count / stats.numVisits;
-                 }
-                 if (percent < .05) {
-                   return .05;
-                 }
-                 return percent;
-              }
+              return opacityMap ? opacityMap[d.hashId] : 1.0;
             })
             .on('click', function (d) {
-              if (d.hashId == END_DEST) {
-                return;
+              if (d.hashId != END_DEST) {
+                explorationData.getStateData(d.hashId);
+                scope.$parent.$parent.stateId = d.hashId;
+                $('#editorViewTab a[href="#stateEditor"]').tab('show');
               }
-              explorationData.getStateData(d.hashId);
-              scope.$parent.$parent.stateId = d.hashId;
-              $('#editorViewTab a[href="#stateEditor"]').tab('show');
             })
             .append('svg:title')
             .text(function(d) { return d.name; });
@@ -247,7 +224,7 @@ oppia.directive('stateGraphViz', function(explorationData) {
             .attr('y', function(d) { return d.y0 + 25; })
             .text(function(d) { return scope.truncate(d.name); });
 
-        if (!stats) {
+        if (!forbidNodeDeletion) {
           // Add a 'delete node' handler.
           nodeEnter.append('svg:rect')
               .attr('y', function(d) { return d.y0; })
@@ -261,10 +238,9 @@ oppia.directive('stateGraphViz', function(explorationData) {
               .attr('stroke-width', '0')
               .style('fill', 'pink')
               .on('click', function (d) {
-                if (d.hashId == initStateId || d.hashId == END_DEST) {
-                  return;
+                if (d.hashId != initStateId && d.hashId != END_DEST) {
+                  scope.$parent.openDeleteStateModal(d.hashId);
                 }
-                scope.$parent.$parent.openDeleteStateModal(d.hashId);
               });
 
           nodeEnter.append('svg:text')
@@ -272,18 +248,10 @@ oppia.directive('stateGraphViz', function(explorationData) {
               .attr('dx', function(d) { return d.x0 + getTextWidth(d.name) -10; })
               .attr('dy', function(d) { return d.y0 + 10; })
               .text(function(d) {
-                if (d.hashId == initStateId || d.hashId == END_DEST) {
-                  return;
-                }
-                return 'x';
+                return (d.hashId != initStateId && d.hashId != END_DEST) ? 'x' : '';
               });
         }
       }
     }
   };
 });
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-EditorGraph.$inject = ['$scope', '$filter', 'explorationData'];

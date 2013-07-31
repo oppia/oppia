@@ -65,13 +65,19 @@ class RuleSpec(base_models.BaseModel):
         return '%s(%s)' % (self.name, ','.join(param_list))
 
 
-DEFAULT_RULE_SPEC_REPR = str(RuleSpec(name='Default'))
+DEFAULT_RULESPEC_STR = str(RuleSpec(name='Default'))
 
 
 class AnswerHandlerInstance(base_models.BaseModel):
     """An answer event stream (submit, click, drag, etc.)."""
     name = ndb.StringProperty(default='submit')
     rule_specs = ndb.LocalStructuredProperty(RuleSpec, repeated=True)
+
+    @property
+    def default_rule_spec(self):
+        """The default rule spec."""
+        assert self.rule_specs[-1].is_default
+        return self.rule_specs[-1]
 
 
 class WidgetInstance(base_models.BaseModel):

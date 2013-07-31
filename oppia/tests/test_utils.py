@@ -28,6 +28,7 @@ def empty_environ():
     os.environ['SERVER_PORT'] = '8080'
     os.environ['USER_EMAIL'] = ''
     os.environ['USER_ID'] = ''
+    os.environ['USER_IS_ADMIN'] = '0'
 
 
 class TestBase(unittest.TestCase):
@@ -56,6 +57,16 @@ class TestBase(unittest.TestCase):
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
+    def login(self, email, is_admin=False):
+        os.environ['USER_EMAIL'] = email
+        os.environ['USER_ID'] = email
+        os.environ['USER_IS_ADMIN'] = '1' if is_admin else '0'
+
+    def logout(self):
+        os.environ['USER_EMAIL'] = ''
+        os.environ['USER_ID'] = ''
+        del os.environ['USER_IS_ADMIN']
+
     def setUp(self):  # pylint: disable-msg=g-bad-name
         empty_environ()
 
@@ -83,4 +94,5 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         exp_services.delete_all_explorations()
         stats_services.delete_all_stats()
+        os.environ['USER_IS_ADMIN'] = '0'
         self.testbed.deactivate()

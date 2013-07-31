@@ -65,8 +65,8 @@ DEMO_EXPLORATIONS = [
 DEBUG = False
 
 # Whether we should serve the development or production experience.
-DEV = (os.environ.get('SERVER_SOFTWARE')
-       and os.environ['SERVER_SOFTWARE'].startswith('Development'))
+DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
+            and os.environ['SERVER_SOFTWARE'].startswith('Development'))
 
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'oppia/third_party'
@@ -95,7 +95,7 @@ OBJECT_JINJA_ENV = jinja2.Environment(
 # The jinja environment used for loading frontend templates.
 loader = jinja2.FileSystemLoader(os.path.join(
     os.path.dirname(__file__),
-    'oppia/templates/dev/head' if DEV else 'oppia/templates/prod/head'
+    'oppia/templates/dev/head' if DEV_MODE else 'oppia/templates/prod/head'
 ))
 OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
 

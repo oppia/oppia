@@ -118,9 +118,22 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       'imp': data.imp
     };
 
-    $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
+    $scope.chartData = [
+      ['', 'Completions', 'Non-completions'],
+      ['', data.num_completions, data.num_visits - data.num_completions]
+    ];
     $scope.chartColors = ['green', 'firebrick'];
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
+
+    $scope.statsGraphOpacities = {};
+    for (var stateId in $scope.states) {
+      var visits = $scope.stats.stateStats[stateId].firstEntryCount;
+      $scope.statsGraphOpacities[stateId] = Math.max(
+          visits / $scope.stats.numVisits, 0.05);
+    }
+    $scope.statsGraphOpacities[END_DEST] = Math.max(
+        $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
+
     $scope.graphData = $scope.reformatResponse(
           data.states, data.init_state_id);
 

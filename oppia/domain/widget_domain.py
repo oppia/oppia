@@ -195,7 +195,10 @@ class BaseWidget(object):
         return html, iframe
 
     def get_stats_log_html(self, params=None):
-        """Gets the HTML for recording a reader response for the stats log."""
+        """Gets the HTML for recording a reader response for the stats log.
+
+        Returns an HTML string.
+        """
         if not self.is_interactive:
             raise Exception(
                 'This method should only be called for interactive widgets.')

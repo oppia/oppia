@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import rule_domain
 from oppia.domain import stats_services
@@ -28,31 +27,6 @@ import oppia.storage.state.models as state_models
 import utils
 
 EDITOR_MODE = 'editor'
-
-
-def get_state_for_frontend(state, exploration):
-    """Returns a representation of the given state for the frontend."""
-
-    state_repr = exp_services.export_state_to_dict(exploration.id, state.id)
-
-    # Add descriptions to each rule.
-    for handler in state_repr['widget']['handlers']:
-        for rule_spec in handler['rule_specs']:
-            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
-                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
-            else:
-                rule_spec['description'] = (
-                    widget_domain.Registry.get_widget_by_id(
-                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-                    ).get_rule_description(handler['name'], rule_spec['name'])
-                )
-
-    state_repr['widget']['id'] = state_repr['widget']['widget_id']
-
-    state_repr['unresolved_answers'] = stats_services.get_unresolved_answers(
-        exploration.id, state.id)
-
-    return state_repr
 
 
 class NewExploration(base.BaseHandler):
@@ -116,15 +90,13 @@ class ExplorationHandler(base.BaseHandler):
 
         state_list = {}
         for state_id in exploration.state_ids:
-            state = exploration.get_state_by_id(state_id)
-            state_list[state.id] = get_state_for_frontend(state, exploration)
+            state_list[state_id] = exp_services.export_state_to_verbose_dict(
+                exploration.id, state_id)
 
-        parameters = []
-        for param in exploration.parameters:
-            parameters.append({
-                'name': param.name, 'obj_type': param.obj_type,
-                'description': param.description, 'values': param.values
-            })
+        parameters = [{
+            'name': param.name, 'obj_type': param.obj_type,
+            'description': param.description, 'values': param.values
+        } for param in exploration.parameters]
 
         self.values.update({
             'exploration_id': exploration.id,
@@ -136,19 +108,15 @@ class ExplorationHandler(base.BaseHandler):
             'editors': exploration.editor_ids,
             'states': state_list,
             'parameters': parameters,
-        })
-
-        statistics = stats_services.export_exploration_stats_to_dict(
-            exploration.id)
-        self.values.update({
-            'num_visits': statistics['num_visits'],
-            'num_completions': statistics['num_completions'],
-            'state_stats': statistics['state_stats'],
-        })
-        improvements = stats_services.get_top_ten_improvable_states(
-            [exploration])
-        self.values.update({
-            'imp': improvements,
+            # Add information for the exploration statistics page.
+            'num_visits': stats_services.get_exploration_visit_count(
+                exploration.id),
+            'num_completions': stats_services.get_exploration_completed_count(
+                exploration.id),
+            'state_stats': stats_services.get_state_stats_for_exploration(
+                exploration.id),
+            'imp': stats_services.get_top_improvable_states(
+                [exploration.id], 10),
         })
         self.render_json(self.values)
 
@@ -240,7 +208,7 @@ class StateHandler(base.BaseHandler):
         sticky_interactive_widget = self.payload.get(
             'sticky_interactive_widget')
         content = self.payload.get('content')
-        unresolved_answers = self.payload.get('unresolved_answers')
+        resolved_answers = self.payload.get('resolved_answers')
 
         if 'state_name' in self.payload:
             exploration.rename_state(state.id, state_name)
@@ -317,14 +285,13 @@ class StateHandler(base.BaseHandler):
                 for item in content
             ]
 
-        if 'unresolved_answers' in self.payload:
-            stats_services.EventHandler.replace_unresolved_answers(
-                exploration.id, state.id,
-                {k: v for k, v in unresolved_answers.iteritems() if v > 0}
-            )
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration.id, state.id, 'submit', resolved_answers)
 
         state.put()
-        self.render_json(get_state_for_frontend(state, exploration))
+        self.render_json(exp_services.export_state_to_verbose_dict(
+            exploration.id, state.id))
 
     @base.require_editor
     def delete(self, exploration, state):

@@ -91,8 +91,7 @@ oppia.directive('stateTreeViz', function (explorationData) {
   return {
     restrict: 'E',
     scope: {
-      val: '=',
-      grouped: '='
+      val: '='
     },
     link: function (scope, element, attrs) {
       var tree = d3.layout.tree().size([h, 100]);

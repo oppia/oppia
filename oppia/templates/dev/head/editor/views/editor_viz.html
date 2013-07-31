@@ -21,18 +21,15 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="graph">
-    <div ng-controller="EditorGraph">
-      {{ add_state_form() }}
-      <em>Click on a state node in the diagram below to edit it.</em>
+    {{ add_state_form() }}
+    <em>Click on a state node in the diagram below to edit it.</em>
 
-      <br><br>
+    <br><br>
 
-      <center ng-hide="graphData">
-        <img src="/images/loading.gif" alt="Loading..." width="50px">
-      </center>
-      <state-graph-viz val="graphData" grouped="grouped">
-      </state-graph-viz>
-    </div>
+    <center ng-hide="graphData">
+      <img src="/images/loading.gif" alt="Loading..." width="50px">
+    </center>
+    <state-graph-viz val="graphData"></state-graph-viz>
   </div>
   <div class="tab-pane" id="tree">
     <div ng-controller="EditorTree">
@@ -44,7 +41,7 @@
       <center ng-hide="treeData">
         <img src="/images/loading.gif" alt="Loading..." width="50px">
       </center>
-      <state-tree-viz val="treeData" grouped="grouped">
+      <state-tree-viz val="treeData">
       </state-tree-viz>
     </div>
   </div>

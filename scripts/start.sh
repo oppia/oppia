@@ -47,6 +47,7 @@ PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIR
 export PYTHONPATH=$PYTHONPATH
 # Adjust the path to include a reference to node.
 PATH=$PATH:$THIRD_PARTY_DIR/node-0.10.1/bin
+MACHINE_TYPE=`uname -m`
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
@@ -69,10 +70,17 @@ fi
 echo Checking if node.js is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
   echo Installing Node.js
-  wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
-  tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-  mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
-  rm node-download.tgz
+  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
+    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
+    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
+    rm node-download.tgz
+  else
+    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x86.tar.gz -O node-download.tgz
+    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
+    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x86 $THIRD_PARTY_DIR/node-0.10.1
+    rm node-download.tgz
+  fi
 fi
 
 
@@ -111,16 +119,17 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.8.17" ]; then
 fi
 
 echo Checking whether angularjs is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.3" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.7" ]; then
   echo Installing AngularJS and angular-sanitize
-  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.3/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-sanitize.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.7/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.min.js
 
   # Files for tests.
-  wget http://code.angularjs.org/1.0.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-mocks.js
-  wget http://code.angularjs.org/1.0.3/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.3/angular-scenario.js
+  wget http://code.angularjs.org/1.0.7/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-mocks.js
+  wget http://code.angularjs.org/1.0.7/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-scenario.js
 fi
 
 echo Checking whether d3.js is installed in third_party

@@ -25,12 +25,14 @@ storage model to be changed without affecting this module and others above it.
 __author__ = 'Sean Lip'
 
 import copy
+import json
 import logging
 import os
 
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import rule_domain
+from oppia.domain import stats_services
 from oppia.domain import widget_domain
 import oppia.storage.exploration.models as exp_models
 import oppia.storage.image.models as image_models
@@ -99,6 +101,31 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
         param_models.Parameter(name=param_name, obj_type=obj_type))
     exploration.put()
     return param_models.ParamChange(name=param_name, obj_type=obj_type)
+
+
+def update_with_state_params(exploration_id, state_id, reader_params=None):
+    """Updates a reader's params using the params for the given state."""
+    if reader_params is None:
+        reader_params = {}
+
+    exploration = exp_domain.Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
+
+    for item in state.param_changes:
+        reader_params[item.name] = (
+            None if item.value is None else utils.parse_with_jinja(
+                item.value, reader_params))
+    return reader_params
+
+
+def get_exploration_params(exploration_id):
+    """Gets exploration-scoped parameters when an exploration is started."""
+    exploration = exp_domain.Exploration.get(exploration_id)
+
+    params = {}
+    for param in exploration.parameters:
+        params[param.name] = param.value
+    return params
 
 
 # Operations on states belonging to an exploration.
@@ -332,6 +359,12 @@ def delete_demos():
         exploration.delete()
 
 
+def reload_demos():
+    """Reloads the demo explorations."""
+    delete_demos()
+    load_demos()
+
+
 def delete_all_explorations():
     """Deletes all explorations."""
     explorations = get_all_explorations()
@@ -367,6 +400,98 @@ def export_state_to_dict(exploration_id, state_id):
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
     state_dict.update({'id': state.id, 'name': state.name})
     return state_dict
+
+
+def export_state_to_verbose_dict(exploration_id, state_id):
+    """Gets a state dict with rule descriptions and unresolved answers."""
+
+    state_dict = export_state_to_dict(exploration_id, state_id)
+
+    state_dict['unresolved_answers'] = (
+        stats_services.get_unresolved_answers_for_default_rule(
+            exploration_id, state_id))
+
+    # TODO(sll): Fix the frontend and remove this line.
+    state_dict['widget']['id'] = state_dict['widget']['widget_id']
+
+    exploration = exp_domain.Exploration.get(exploration_id)
+    state = exploration.get_state_by_id(state_id)
+
+    for handler in state_dict['widget']['handlers']:
+        for rule_spec in handler['rule_specs']:
+            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
+                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
+            else:
+                rule_spec['description'] = (
+                    widget_domain.Registry.get_widget_by_id(
+                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
+                    ).get_rule_description(handler['name'], rule_spec['name'])
+                )
+
+    return state_dict
+
+
+def export_content_to_html(content_array, block_number, params=None):
+    """Takes a Content array and transforms it into HTML.
+
+    Args:
+        content_array: an array, each of whose members is of type Content. This
+            object has two keys: type and value. The 'type' is one of the
+            following:
+                - 'text'; then the value is a text string
+                - 'image'; then the value is an image ID
+                - 'video'; then the value is a video ID
+                - 'widget'; then the value is a JSON-encoded dict with keys
+                    'id' and 'params', from which the raw widget HTML can be
+                    constructed
+        block_number: the number of content blocks preceding this one.
+        params: any parameters used for templatizing text strings.
+
+    Returns:
+        the HTML string representing the array.
+
+    Raises:
+        InvalidInputException: if content has no 'type' attribute, or an
+            invalid 'type' attribute.
+    """
+    if params is None:
+        params = {}
+
+    html = ''
+    widget_array = []
+    widget_counter = 0
+    for content in content_array:
+        if content.type in ['text', 'image', 'video']:
+            value = (utils.parse_with_jinja(content.value, params)
+                     if content.type == 'text' else content.value)
+
+            html += feconf.OPPIA_JINJA_ENV.get_template(
+                'reader/content.html').render({
+                    'type': content.type, 'value': value})
+        elif content.type == 'widget':
+            # Ignore empty widget specifications.
+            if not content.value:
+                continue
+
+            widget_dict = json.loads(content.value)
+            widget = widget_domain.Registry.get_widget_by_id(
+                feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
+            html += feconf.OPPIA_JINJA_ENV.get_template(
+                'reader/content.html').render({
+                    'blockIndex': block_number,
+                    'index': widget_counter,
+                    'type': content.type,
+                })
+            widget_array.append({
+                'blockIndex': block_number,
+                'index': widget_counter,
+                'raw': widget.get_with_params(widget_dict['params'])['raw'],
+            })
+            widget_counter += 1
+        else:
+            raise utils.InvalidInputException(
+                'Invalid content type %s', content.type)
+    return html, widget_array
 
 
 def export_to_yaml(exploration_id):
