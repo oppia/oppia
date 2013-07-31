@@ -19,6 +19,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 from oppia.controllers import base
 import oppia.storage.image.models as image_models
 
+import mimetypes
+
 
 class EditorViewHandler(base.BaseHandler):
     """Retrieves an editor view in the 'editor/views' directory."""
@@ -74,3 +76,29 @@ class ImageUploadHandler(base.BaseHandler):
             self.render_json({'image_id': image_id})
         else:
             raise self.InvalidInputException('No image supplied')
+
+
+class StaticFileHandler(base.BaseHandler):
+    """Handles static file serving on non-GAE platforms."""
+
+    def get(self):
+        path_map = {
+            '/favicon.ico': 'static/images/favicon.ico',
+            '/images': 'static/images',
+            '/css': 'oppia/templates/dev/head/assets/css',
+            '/img': 'third_party/bootstrap/img',
+            '/third_party/static': 'third_party/static',
+            '/lib/static': 'lib/static',
+            '/data/widgets/': 'data/widgets/',
+        }
+        file_path = self.request.path
+        for path in path_map:
+            if file_path.startswith(path):
+                file_path = file_path.replace(path, path_map[path])
+        try:
+            f = open(file_path, 'r')
+            self.response.headers['Content-Type'] = mimetypes.guess_type(file_path)[0]
+            self.response.write(f.read())
+            f.close()
+        except Exception:
+            self.response.set_status(404)

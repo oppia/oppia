@@ -17,6 +17,10 @@
 __author__ = 'Sean Lip'
 
 import feconf
+if feconf.PLATFORM == 'Django':
+    import os
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oppia.settings")
+
 from oppia.controllers import admin
 from oppia.controllers import base
 from oppia.controllers import editor
@@ -85,8 +89,24 @@ urls = [
     (r'/widgets/(noninteractive)/(%s)/?' % r, widgets.WidgetHandler),
     (r'/widgets/(interactive)/(%s)/?' % r, widgets.WidgetHandler),
 
+    (r'/lib/static/.+', resources.StaticFileHandler),
+    (r'/third_party/static/.+', resources.StaticFileHandler),
+    (r'/css/.+', resources.StaticFileHandler),
+    (r'/favicon.ico', resources.StaticFileHandler),
+    (r'/data/widgets/.+', resources.StaticFileHandler),
+    (r'/images/.+', resources.StaticFileHandler),
+    (r'/img/.+', resources.StaticFileHandler),
+
     # 404 error handler.
     (r'/.*', Error404Handler),
 ]
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
+
+
+def main():
+    from paste import httpserver
+    httpserver.serve(app, host='127.0.0.1', port='8080')
+
+if __name__ == '__main__':
+    main()
