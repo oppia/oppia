@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,45 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models relating to images."""
-
-__author__ = 'Sean Lip'
-
-import imghdr
+__author__ = 'Tarashish Mishra'
 
 import feconf
-import oppia.storage.base_model.models as base_models
 
-from google.appengine.ext import ndb
-
-
-class ImageProperty(ndb.BlobProperty):
-    """An image property."""
-
-    def _validate(self, value):
-        """Check that the image is in one of the accepted formats."""
-        is_valid = imghdr.what(None, h=value) in feconf.ACCEPTED_IMAGE_FORMATS
-        allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
-        error_message = ('Image file not recognized: it should be in one of '
-                         'the following formats: %s.' % allowed_formats)
-        assert is_valid, error_message
-
-
-class Image(base_models.IdModel):
-    """An image."""
-    # The raw image blob.
-    raw = ImageProperty(required=True)
-    # Alt text.
-    alt_text = ndb.TextProperty()
-    # The image file format. TODO(sll): auto-assign on put().
-    format = ndb.StringProperty(
-        choices=feconf.ACCEPTED_IMAGE_FORMATS, default='png')
-
-    @classmethod
-    def create(cls, raw, alt_text=''):
-        """Creates a new Image object and returns its id."""
-        image_id = cls.get_new_id(alt_text)
-        format = imghdr.what(None, h=raw)
-        image_entity = cls(id=image_id, raw=raw, format=format)
-        image_entity.put()
-        return image_entity.id
+model = feconf.MODEL_FILE_MAPPING[feconf.PLATFORM]
+modelmodule = __import__(model, globals(), locals(), ['*'])
+for k in dir(modelmodule):
+    locals()[k] = getattr(modelmodule, k)

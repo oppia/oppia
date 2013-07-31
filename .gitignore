@@ -7,3 +7,4 @@ oppia/templates/prod/*
 .coverage
 .viminfo
 libpeerconnection.log
+uploads/*

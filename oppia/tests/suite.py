@@ -35,6 +35,8 @@ import os
 import sys
 import unittest
 
+import feconf
+
 EXPECTED_TEST_COUNT = 103
 
 
@@ -75,6 +77,8 @@ def main():
 
     import dev_appserver
     dev_appserver.fix_sys_path()
+
+    feconf.PLATFORM = 'GAE'
 
     parsed_args = _PARSER.parse_args()
     suites = create_test_suites(parsed_args)
