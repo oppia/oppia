@@ -20,7 +20,8 @@ import test_utils
 
 import feconf
 from oppia.domain import exp_domain
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 
 
 class FakeExploration(exp_domain.Exploration):

@@ -20,8 +20,10 @@ __author__ = 'Sean Lip'
 
 import feconf
 from oppia.domain import base_domain
-import oppia.storage.exploration.models as exp_models
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(exp_models, state_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.state
+])
 
 
 class Exploration(base_domain.BaseDomainObject):

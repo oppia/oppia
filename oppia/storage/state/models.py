@@ -19,8 +19,9 @@
 __author__ = 'Sean Lip'
 
 import feconf
-import oppia.storage.base_model.models as base_models
-import oppia.storage.parameter.models as param_models
+from oppia.platform import models
+base_models, param_models = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.parameter])
 import utils
 
 from google.appengine.ext import ndb

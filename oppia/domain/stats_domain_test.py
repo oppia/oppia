@@ -22,7 +22,8 @@ from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 
 
 class StateCounterUnitTests(test_utils.AppEngineTestBase):

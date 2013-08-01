@@ -21,7 +21,8 @@ __author__ = 'Sean Lip'
 import copy
 import operator
 
-import oppia.storage.statistics.models as stats_models
+from oppia.platform import models
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class StateCounter(object):

@@ -68,6 +68,10 @@ DEBUG = False
 DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
             and os.environ['SERVER_SOFTWARE'].startswith('Development'))
 
+# The platform for the storage backend. This is used in the model-switching
+# code in oppia/platform.
+PLATFORM = 'gae'
+
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'oppia/third_party'
 
