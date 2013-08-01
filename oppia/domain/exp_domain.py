@@ -30,18 +30,6 @@ class Exploration(base_domain.BaseDomainObject):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-
-    id = None
-    category = None
-    title = None
-    state_ids = None
-    parameters = None
-    is_public = None
-    image_id = None
-    editor_ids = None
-
-    _exploration_model = None
-
     def __init__(self, exploration_model):
         self._exploration_model = exploration_model
 

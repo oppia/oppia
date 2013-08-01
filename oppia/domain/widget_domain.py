@@ -31,9 +31,6 @@ import utils
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
 
-    name = ''
-    input_type = ''
-
     def __init__(self, name='submit', input_type=None):
         self.name = name
         self.input_type = input_type
@@ -70,16 +67,19 @@ class BaseWidget(object):
     def id(self):
         return self.__class__.__name__
 
-    # The human-readable name of the widget.
+    # The human-readable name of the widget. Overridden in subclasses.
     name = ''
     # The category in the widget repository to which this widget belongs.
+    # Overridden in subclasses.
     category = ''
-    # The description of the widget.
+    # The description of the widget. Overridden in subclasses.
     description = ''
     # Parameter specifications for this widget. The default parameters can be
-    # overridden when the widget is used within a State.
+    # overridden when the widget is used within a State. Overridden in
+    # subclasses.
     _params = []
 
+    # Answer handlers. Overridden in subclasses.
     _handlers = []
 
     @property

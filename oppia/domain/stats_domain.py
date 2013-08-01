@@ -30,28 +30,22 @@ class StateCounter(object):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-    first_entry_count = None
-    subsequent_entries_count = None
+    def __init__(self, fec, sec, rac, aac):
+        self.first_entry_count = fec
+        self.subsequent_entries_count = sec
+        self.resolved_answer_count = rac
+        self.active_answer_count = aac
 
     @property
     def total_entry_count(self):
         """Total number of entries to the state."""
         return self.first_entry_count + self.subsequent_entries_count
 
-    resolved_answer_count = None
-    active_answer_count = None
-
     @property
     def no_answer_count(self):
         """Number of times a reader left without entering an answer."""
         return (self.first_entry_count + self.subsequent_entries_count
                 - self.resolved_answer_count - self.active_answer_count)
-
-    def __init__(self, fec, sec, rac, aac):
-        self.first_entry_count = fec
-        self.subsequent_entries_count = sec
-        self.resolved_answer_count = rac
-        self.active_answer_count = aac
 
     @classmethod
     def get(cls, exploration_id, state_id):
@@ -71,11 +65,12 @@ class StateRuleAnswerLog(object):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-    # This dict represents a log of answers that hit this rule and that have
-    # not been resolved. The keys of this dict are the answers encoded as HTML
-    # strings, and the values are integer counts representing how many times
-    # the answer has been entered.
-    answers = None
+    def __init__(self, answers):
+        # This dict represents a log of answers that hit this rule and that
+        # have not been resolved. The keys of this dict are the answers encoded
+        # as HTML strings, and the values are integer counts representing how
+        # many times the answer has been entered.
+        self.answers = copy.deepcopy(answers)
 
     @property
     def total_answer_count(self):
@@ -85,9 +80,6 @@ class StateRuleAnswerLog(object):
         for answer, count in self.answers.iteritems():
             total_count += count
         return total_count
-
-    def __init__(self, answers):
-        self.answers = copy.deepcopy(answers)
 
     @classmethod
     def get(cls, exploration_id, state_id, handler_name, rule_str):
