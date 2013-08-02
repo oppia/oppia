@@ -135,7 +135,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
-                return 'M' + sourcex + ' ' + sourcey;
+		return 'M' + sourcex  + ',' + (sourcey + 20) + 
+                       'A' + (sourceWidth/2) + ',20 0 1,1' 
+                           + (sourcex-8-sourceWidth/2) + ' ' + sourcey;
               }
 
               var dx = targetx - sourcex,
@@ -170,9 +172,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                   ' ' + endx + ' ' + endy;
             })
             .attr('marker-end', function(d) {
-              return (
-                (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) ?
-                '' : 'url(#arrowhead)');
+              return 'url(#arrowhead)';
             });
 
         // Update the nodes
