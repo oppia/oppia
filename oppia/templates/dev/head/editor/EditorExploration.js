@@ -136,7 +136,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $scope.highlightStates = {};
     for (var i = 0; i < data.imp.length; i++) {
-      $scope.highlightStates[data.imp[i].state_id] = 'royalblue';
+      $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
     }
 
     $scope.graphData = $scope.reformatResponse(

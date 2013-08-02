@@ -198,7 +198,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               return d.hashId != END_DEST ? 'clickable' : null; })
             .style('stroke', function(d) { return (highlightStates? (d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC') : 'black')})
             .style('stroke-width', function(d) {
-              return ((d.hashId == initStateId || d.hashId == END_DEST) && !highlightStates) ? '3' : '2';
+              return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
             })
             .style('fill', function(d) {
               if (nodeFill) {
