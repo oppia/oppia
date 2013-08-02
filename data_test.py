@@ -95,13 +95,13 @@ class ExplorationDataUnitTests(DataUnitTest):
         self.verify_dict_keys_and_types(state_dict['widget'], WIDGET_SCHEMA)
 
         for handler in state_dict['widget']['handlers']:
-            HANDLER_SCHEMA = [('name', basestring), ('rules', list)]
+            HANDLER_SCHEMA = [('name', basestring), ('rule_specs', list)]
             self.verify_dict_keys_and_types(handler, HANDLER_SCHEMA)
 
-            # Check that the list of rules is non-empty.
-            self.assertTrue(handler['rules'])
+            # Check that the list of rule_specs is non-empty.
+            self.assertTrue(handler['rule_specs'])
 
-            for rule in handler['rules']:
+            for rule in handler['rule_specs']:
                 RULE_SCHEMA = [
                     ('dest', basestring), ('feedback', list), ('inputs', dict),
                     ('name', basestring), ('param_changes', list)
@@ -183,7 +183,7 @@ class ExplorationDataUnitTests(DataUnitTest):
                 states_list, curr_state)
 
             for handler in states_list[curr_state_ind]['widget']['handlers']:
-                for rule in handler['rules']:
+                for rule in handler['rule_specs']:
                     dest_state = rule['dest']
                     if (dest_state not in curr_queue and
                             dest_state not in processed_queue and
@@ -217,7 +217,7 @@ class ExplorationDataUnitTests(DataUnitTest):
                         and state_name not in processed_queue):
                     state_widget = states_list[ind]['widget']
                     for handler in state_widget['handlers']:
-                        for rule in handler['rules']:
+                        for rule in handler['rule_specs']:
                             if rule['dest'] == curr_state:
                                 curr_queue.append(state_name)
                                 break

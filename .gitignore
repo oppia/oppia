@@ -6,3 +6,4 @@ third_party/*
 oppia/templates/prod/*
 .coverage
 .viminfo
+libpeerconnection.log

@@ -8,7 +8,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Prompt for explanation
         feedback: []
         inputs:
@@ -36,7 +36,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: List the ways
         feedback:
         - 'What? No more ways? There''s at least one, surely -- for example, RYB.
@@ -139,7 +139,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback: []
         inputs: {}
@@ -157,7 +157,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback:
         - 'There are indeed six possibilities: RYB, RBY, BRY, BYR, YRB and YBR. Great!'

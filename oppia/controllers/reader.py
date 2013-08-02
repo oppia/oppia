@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 import cgi
-import json
 
 import feconf
 from oppia.controllers import base
@@ -25,90 +24,11 @@ from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 import utils
 
 READER_MODE = 'reader'
-
-
-def get_params(state, existing_params=None):
-    """Updates existing parameters based on changes in the given state."""
-    if existing_params is None:
-        existing_params = {}
-    # Modify params using param_changes.
-    for item in state.param_changes:
-        # Pick a random parameter for this key.
-        value = item.value
-        existing_params[item.name] = (
-            None if value is None else utils.parse_with_jinja(
-                value, existing_params, value))
-    return existing_params
-
-
-def parse_content_into_html(content_array, block_number, params=None):
-    """Takes a Content array and transforms it into HTML.
-
-    Args:
-        content_array: an array, each of whose members is of type Content. This
-            object has two keys: type and value. The 'type' is one of the
-            following:
-                - 'text'; then the value is a text string
-                - 'image'; then the value is an image ID
-                - 'video'; then the value is a video ID
-                - 'widget'; then the value is a JSON-encoded dict with keys
-                    'id' and 'params', from which the raw widget HTML can be
-                    constructed
-        block_number: the number of content blocks preceding this one.
-        params: any parameters used for templatizing text strings.
-
-    Returns:
-        the HTML string representing the array.
-
-    Raises:
-        InvalidInputException: if content has no 'type' attribute, or an
-            invalid 'type' attribute.
-    """
-    if params is None:
-        params = {}
-
-    html = ''
-    widget_array = []
-    widget_counter = 0
-    for content in content_array:
-        if content.type in ['text', 'image', 'video']:
-            if content.type == 'text':
-                value = utils.parse_with_jinja(content.value, params)
-            else:
-                value = content.value
-
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'type': content.type, 'value': value})
-        elif content.type == 'widget':
-            # Ignore empty widget specifications.
-            if not content.value:
-                continue
-
-            widget_dict = json.loads(content.value)
-            widget = widget_domain.Registry.get_widget_by_id(
-                feconf.NONINTERACTIVE_PREFIX, widget_dict['id']
-            )
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'blockIndex': block_number,
-                    'index': widget_counter,
-                    'type': content.type,
-                })
-            widget_array.append({
-                'blockIndex': block_number,
-                'index': widget_counter,
-                'raw': widget.get_with_params(widget_dict['params'])['raw'],
-            })
-            widget_counter += 1
-        else:
-            raise utils.InvalidInputException(
-                'Invalid content type %s', content.type)
-    return html, widget_array
 
 
 class ExplorationPage(base.BaseHandler):
@@ -116,11 +36,9 @@ class ExplorationPage(base.BaseHandler):
 
     def get(self, unused_exploration_id):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': READER_MODE,
-        })
+        self.values.update({'nav_mode': READER_MODE})
 
-        # The following allows embedding of Oppia explorations in other pages.
+        # Allow embedding of Oppia explorations in other pages.
         if self.request.get('iframed') == 'true':
             self.values['iframed'] = True
 
@@ -129,16 +47,6 @@ class ExplorationPage(base.BaseHandler):
 
 class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
-
-    def _get_exploration_params(self, exploration):
-        # TODO(yanamal/sll): consider merging with get_params somehow, since
-        # the process is largely the same
-        params = {}
-        for item in exploration.parameters:
-            value = item.value
-            params[item.name] = (None if value is None else
-                                 utils.parse_with_jinja(value, params, value))
-        return params
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
@@ -149,11 +57,15 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_state = exploration.init_state
         # TODO: get params from exploration specification instead
-        params = self._get_exploration_params(exploration)
-        params = get_params(init_state, params)
-        init_html, init_widgets = parse_content_into_html(
+        params = exp_services.update_with_state_params(
+            exploration_id,
+            exploration.init_state_id,
+            reader_params=exp_services.get_exploration_params(exploration_id)
+        )
+
+        init_state = exploration.init_state
+        init_html, init_widgets = exp_services.export_content_to_html(
             init_state.content, 0, params)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
@@ -169,22 +81,23 @@ class ExplorationHandler(base.BaseHandler):
             'interactive_params': init_state.widget.params,
             'oppia_html': init_html,
             'params': params,
+            'state_history': [exploration.init_state_id],
             'state_id': exploration.init_state_id,
             'title': exploration.title,
             'iframe_output': init_widgets,
         })
         self.render_json(self.values)
 
-        stats_services.EventHandler.record_exploration_visited(exploration_id)
         stats_services.EventHandler.record_state_hit(
-            exploration_id, exploration.init_state_id)
+            exploration_id, exploration.init_state_id, True)
 
 
 class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_id, rule):
+            self, old_state, answer, exploration_id, old_state_id, handler,
+            rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
@@ -199,11 +112,8 @@ class FeedbackHandler(base.BaseHandler):
         recorded_answer = widget.get_stats_log_html(
             params=recorded_answer_params)
 
-        if recorded_answer:
-            stats_services.EventHandler.record_rule_hit(
-                exploration_id, old_state_id, rule, recorded_answer)
-            stats_services.EventHandler.record_unresolved_answer(
-                exploration_id, old_state_id, recorded_answer)
+        stats_services.EventHandler.record_answer_submitted(
+            exploration_id, old_state_id, handler, str(rule), recorded_answer)
 
     def _get_feedback(self, feedback, block_number, params):
         """Gets the HTML and iframes with Oppia's feedback."""
@@ -211,30 +121,31 @@ class FeedbackHandler(base.BaseHandler):
             return '', []
         else:
             feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
-            return parse_content_into_html(
+            return exp_services.export_content_to_html(
                 [state_models.Content(
                     type='text', value='<br>'.join(feedback_bits))],
                 block_number, params)
 
-    def _append_content(self, sticky, finished, old_params, new_state,
-                        block_number, state_has_changed, html_output,
-                        iframe_output):
+    def _append_content(self, exploration_id, sticky, finished, old_params,
+                        new_state, block_number, state_has_changed,
+                        html_output, iframe_output):
         """Appends content for the new state to the output variables."""
         if finished:
             return {}, html_output, iframe_output, ''
         else:
             # Populate new parameters.
-            new_params = get_params(new_state, existing_params=old_params)
+            new_params = exp_services.update_with_state_params(
+                exploration_id, new_state.id, reader_params=old_params)
 
             if state_has_changed:
                 # Append the content for the new state.
-                state_html, state_widgets = parse_content_into_html(
+                state_html, state_widgets = exp_services.export_content_to_html(
                     new_state.content, block_number, new_params)
 
                 if html_output and state_html:
                     html_output += '<br>'
-                html_output += state_html
 
+                html_output += state_html
                 iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
@@ -264,17 +175,19 @@ class FeedbackHandler(base.BaseHandler):
         # Parameters associated with the reader.
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
+        # The reader's state history.
+        state_history = self.payload['state_history']
 
-        rule = old_state.classify(handler, answer, old_params)
+        rule = exp_services.classify(
+            exploration_id, state_id, handler, answer, old_params)
         feedback = rule.get_feedback_string()
         new_state_id = rule.dest
-        if new_state_id == feconf.END_DEST:
-            new_state = None
-        else:
-            new_state = exploration.get_state_by_id(new_state_id)
+        new_state = (None if new_state_id == feconf.END_DEST
+                     else exploration.get_state_by_id(new_state_id))
 
         stats_services.EventHandler.record_state_hit(
-            exploration_id, new_state_id)
+            exploration_id, new_state_id, (new_state_id not in state_history))
+        state_history.append(new_state_id)
 
         # If the new state widget is the same as the old state widget, and the
         # new state widget is sticky, do not render the reader response. The
@@ -291,7 +204,7 @@ class FeedbackHandler(base.BaseHandler):
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, state_id, rule)
+            old_state, answer, exploration_id, state_id, handler, rule)
 
         # Append the reader's answer to the response HTML.
         reader_response_html = ''
@@ -320,8 +233,8 @@ class FeedbackHandler(base.BaseHandler):
         state_has_changed = (old_state.id != new_state_id)
         new_params, html_output, iframe_output, interactive_html = (
             self._append_content(
-                sticky, finished, old_params, new_state, block_number,
-                state_has_changed, html_output, iframe_output))
+                exploration_id, sticky, finished, old_params, new_state,
+                block_number, state_has_changed, html_output, iframe_output))
 
         values.update({
             'interactive_html': interactive_html,
@@ -332,6 +245,7 @@ class FeedbackHandler(base.BaseHandler):
             'block_number': block_number,
             'params': new_params,
             'finished': finished,
+            'state_history': state_history,
         })
 
         self.render_json(values)
@@ -344,8 +258,7 @@ class RandomExplorationPage(base.BaseHandler):
         """Handles GET requests."""
         explorations = exp_services.get_public_explorations()
 
-        # Don't use the first exploration; users will have seen that already
-        # on the main page.
+        # Skip the first exploration; users have seen it on the main page.
         selected_exploration = utils.get_random_choice(explorations[1:])
 
         self.redirect('/learn/%s' % selected_exploration.id)

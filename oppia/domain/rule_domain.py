@@ -26,6 +26,10 @@ from data.objects.models import objects
 import feconf
 
 
+# TODO(sll): In the frontend, use the rule descriptions as the single source
+# of truth for the params.
+
+
 def get_obj_type_for_param_name(rule_class, param_name):
     """Gets the obj type for a given param name."""
     param_list = get_param_list(rule_class.description)

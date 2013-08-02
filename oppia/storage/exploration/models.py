@@ -18,8 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-import oppia.storage.base_model.models as base_models
-import oppia.storage.parameter.models as param_models
+from oppia.platform import models
+base_models, param_models = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.parameter])
 
 from google.appengine.ext import ndb
 
@@ -77,7 +78,7 @@ class ExplorationModel(base_models.IdModel):
         if properties is None:
             properties = {}
 
-        # In NDB, self._properties() returns the list of ndb properties of a
+        # In NDB, self._properties returns the list of ndb properties of a
         # model.
         for key in self._properties:
             if key in properties:

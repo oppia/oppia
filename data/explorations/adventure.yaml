@@ -26,7 +26,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Road
         feedback: []
         inputs: {}
@@ -46,7 +46,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Troll
         feedback:
         - You go northeast
@@ -107,7 +107,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Fork
         feedback:
         - You go southwest
@@ -197,7 +197,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: picking
         feedback: []
         inputs:
@@ -263,7 +263,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Fork
         feedback: []
         inputs:
@@ -292,7 +292,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Clearing
         feedback: []
         inputs: {}
@@ -309,7 +309,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: get coins
         feedback:
         - Correct!
@@ -366,7 +366,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Troll
         feedback: []
         inputs: {}
@@ -397,7 +397,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: Rainbow
         feedback: []
         inputs: {}

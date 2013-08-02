@@ -18,8 +18,10 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
+import feconf
 from oppia.domain import exp_domain
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 
 
 class FakeExploration(exp_domain.Exploration):
@@ -85,7 +87,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
-        exploration.add_state('b')
+        exploration.add_state('unused_second_state')
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
@@ -160,6 +162,10 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
             exploration.add_state('State 2')
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.rename_state(second_state.id, 'Renamed state')
+
+        # And it is not OK to rename a state to the END_DEST.
+        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
+            exploration.rename_state(second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
         self.assertFalse(exploration._has_state_named(default_state_name))

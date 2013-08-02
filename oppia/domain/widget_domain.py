@@ -23,16 +23,13 @@ import os
 import pkgutil
 
 import feconf
+from oppia.domain import param_domain
 from oppia.domain import rule_domain
-import oppia.storage.parameter.models as param_models
 import utils
 
 
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
-
-    name = ''
-    input_type = ''
 
     def __init__(self, name='submit', input_type=None):
         self.name = name
@@ -70,21 +67,24 @@ class BaseWidget(object):
     def id(self):
         return self.__class__.__name__
 
-    # The human-readable name of the widget.
+    # The human-readable name of the widget. Overridden in subclasses.
     name = ''
     # The category in the widget repository to which this widget belongs.
+    # Overridden in subclasses.
     category = ''
-    # The description of the widget.
+    # The description of the widget. Overridden in subclasses.
     description = ''
     # Parameter specifications for this widget. The default parameters can be
-    # overridden when the widget is used within a State.
+    # overridden when the widget is used within a State. Overridden in
+    # subclasses.
     _params = []
 
+    # Answer handlers. Overridden in subclasses.
     _handlers = []
 
     @property
     def params(self):
-        return [param_models.Parameter(**param) for param in self._params]
+        return [param_domain.Parameter(**param) for param in self._params]
 
     @property
     def handlers(self):
@@ -195,7 +195,10 @@ class BaseWidget(object):
         return html, iframe
 
     def get_stats_log_html(self, params=None):
-        """Gets the HTML for recording a reader response for the stats log."""
+        """Gets the HTML for recording a reader response for the stats log.
+
+        Returns an HTML string.
+        """
         if not self.is_interactive:
             raise Exception(
                 'This method should only be called for interactive widgets.')
@@ -210,11 +213,15 @@ class BaseWidget(object):
         """Get the handler for a widget, given the name of the handler."""
         return next(h for h in self.handlers if h.name == handler_name)
 
-    def get_rule_description(self, handler_name, rule_name):
-        """Gets a rule, given its .rule attribute and its ancestors."""
+    def get_rule_by_name(self, handler_name, rule_name):
+        """Gets a rule, given its name and ancestors."""
         handler = self.get_handler_by_name(handler_name)
         return next(
-            r for r in handler.rules if r.__name__ == rule_name).description
+            r for r in handler.rules if r.__name__ == rule_name)
+
+    def get_rule_description(self, handler_name, rule_name):
+        """Gets a rule description, given its name and ancestors."""
+        return self.get_rule_by_name(handler_name, rule_name).description
 
 
 class Registry(object):

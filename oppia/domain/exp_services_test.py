@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
 import test_utils
@@ -161,20 +162,20 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Check that no new exploration was created.
         self.assertEqual(exp_services.count_explorations(), 2)
 
-    def test_creation_and_deletion_of_individual_explorations(self):
-        """Test the create_new() and delete() methods."""
+    def test_creation_and_deletion_and_retrieval_of_explorations(self):
+        """Test the create_new(), delete() and get() methods."""
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_domain.Exploration.get('fake_eid')
+
         exploration = exp_domain.Exploration.get(exp_services.create_new(
             self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        exploration.put()
-
         retrieved_exploration = exp_domain.Exploration.get('A exploration_id')
         self.assertEqual(exploration.id, retrieved_exploration.id)
         self.assertEqual(exploration.title, retrieved_exploration.title)
 
         exploration.delete()
         with self.assertRaises(Exception):
-            retrieved_exploration = exp_domain.Exploration.get(
-                'A exploration_id')
+            exp_domain.Exploration.get('A exploration_id')
 
     def test_loading_and_deletion_of_demo_explorations(self):
         """Test loading and deletion of the demo explorations."""
@@ -185,6 +186,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_demos()
         self.assertEqual(exp_services.count_explorations(), 0)
+
+
+class ExportUnitTests(ExplorationServicesUnitTests):
+    """Test export methods for explorations and states."""
 
     def test_export_to_yaml(self):
         """Test the export_to_yaml() method."""
@@ -201,7 +206,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: '[untitled state]'
         feedback: []
         inputs: {}
@@ -216,7 +221,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: New state
         feedback: []
         inputs: {}
@@ -247,7 +252,7 @@ states:
                 'sticky': False,
                 'handlers': [{
                     'name': u'submit',
-                    'rules': [{
+                    'rule_specs': [{
                         'name': u'Default',
                         'inputs': {},
                         'dest': new_state.id,
@@ -259,3 +264,27 @@ states:
             },
         }
         self.assertEqual(expected_dict, state_dict)
+
+
+class StateServicesUnitTests(ExplorationServicesUnitTests):
+    """Test methods operating on states."""
+
+    def test_convert_state_name_to_id(self):
+        """Test converting state names to ids."""
+        eid = 'exp_id'
+        exploration = exp_domain.Exploration.get(exp_services.create_new(
+            'user_id', 'A title', 'A category', eid))
+
+        sid = 'state_id'
+        state_name = 'State 1'
+        exploration.add_state(state_name, state_id=sid)
+
+        self.assertEqual(
+            exp_services.convert_state_name_to_id(eid, state_name), sid)
+
+        with self.assertRaisesRegexp(Exception, 'not found'):
+            exp_services.convert_state_name_to_id(eid, 'fake_name')
+
+        self.assertEqual(
+            exp_services.convert_state_name_to_id(eid, feconf.END_DEST),
+            feconf.END_DEST)

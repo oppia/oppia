@@ -10,7 +10,7 @@ states:
   widget:
     handlers:
     - name: submit
-      rules:
+      rule_specs:
       - dest: END
         feedback:
         - Yes, you found it!

@@ -60,7 +60,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          Answer <[rule | parameterizeRule: interactiveParams.choices]>:
+          Answer <[rule | parameterizeRuleDescription: interactiveParams.choices]>:
           (<[getStateNameForRule(rule.dest)]>, <[rule.feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
@@ -109,7 +109,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <[interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1] | parameterizeRule: interactiveParams.choices]>:
+          <[interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1] | parameterizeRuleDescription: interactiveParams.choices]>:
           (<[getStateNameForRule(interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].dest)]>, <[interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
@@ -208,19 +208,19 @@
     <div class="modal-body">
       <h4><[addRuleAction.type]></h4>
 
-      <div ng-hide="addRuleActionRule">
-        <div ng-repeat="(rule, name) in getRules(addRuleAction)"
+      <div ng-hide="addRuleActionDescription">
+        <div ng-repeat="(description, name) in getRules(addRuleAction)"
              class="oppia-rule">
-          <span ng-bind-html="rule | bracesToText"></span>
+          <span ng-bind-html="description | bracesToText"></span>
           <button type="button" class="pull-right"
-                  ng-click="selectRule(rule, name)">
+                  ng-click="selectRule(description, name)">
             Select
           </button>
         </div>
       </div>
 
-      <div ng-show="addRuleActionRule">
-        <span angular-html-bind="addRuleActionRule | bracesToInput: interactiveParams.choices"></span>
+      <div ng-show="addRuleActionDescription">
+        <span angular-html-bind="addRuleActionDescription | bracesToInput: interactiveParams.choices"></span>
 
         <hr>
         <div>
@@ -242,9 +242,9 @@
     </div>
   
     <div class="modal-footer">
-      <span ng-show="addRuleActionRule">
+      <span ng-show="addRuleActionDescription">
         <button type="button"
-                ng-click="saveRule(addRuleActionRule, addRuleActionName,
+                ng-click="saveRule(addRuleActionDescription, addRuleActionName,
                           addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
           Save
         </button>
@@ -253,13 +253,13 @@
       <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
       returns to the 'previous' screen only when a new rule is being added. Otherwise, the modal
       should just be dismissed. -->
-      <span ng-show="addRuleActionRule && addRuleActionIndex == null">
+      <span ng-show="addRuleActionDescription && addRuleActionIndex == null">
         <button type="button" class="btn" ng-click="deselectAllRules()">
           Cancel
         </button>
       </span>
   
-      <span ng-show="!addRuleActionRule && addRuleActionIndex == null">
+      <span ng-show="!addRuleActionDescription && addRuleActionIndex == null">
         <button type="button" class="btn" data-dismiss="modal">
           Cancel
         </button>

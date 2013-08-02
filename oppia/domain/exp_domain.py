@@ -20,8 +20,10 @@ __author__ = 'Sean Lip'
 
 import feconf
 from oppia.domain import base_domain
-import oppia.storage.exploration.models as exp_models
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(exp_models, state_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.state
+])
 
 
 class Exploration(base_domain.BaseDomainObject):
@@ -30,18 +32,6 @@ class Exploration(base_domain.BaseDomainObject):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-
-    id = None
-    category = None
-    title = None
-    state_ids = None
-    parameters = None
-    is_public = None
-    image_id = None
-    editor_ids = None
-
-    _exploration_model = None
-
     def __init__(self, exploration_model):
         self._exploration_model = exploration_model
 
@@ -119,6 +109,15 @@ class Exploration(base_domain.BaseDomainObject):
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
     # Methods relating to owners and editors.
+    def is_forkable_by(self, user_id):
+        """Whether the given user has rights to fork this exploration.
+
+        This is a policy decision, and the criterion here can be changed.
+        For example, it may depend on whether the user has completed the
+        exploration or earned admin credentials.
+        """
+        return self.is_demo or self.is_editable_by(user_id)
+
     def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
         return user_id in self.editor_ids
@@ -161,6 +160,9 @@ class Exploration(base_domain.BaseDomainObject):
 
     def rename_state(self, state_id, new_state_name):
         """Renames a state of this exploration. Commits changes."""
+        if new_state_name == feconf.END_DEST:
+            raise ValueError('Invalid state name: %s' % feconf.END_DEST)
+
         state = self.get_state_by_id(state_id)
         if state.name == new_state_name:
             return

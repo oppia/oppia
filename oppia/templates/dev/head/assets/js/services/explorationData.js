@@ -20,7 +20,7 @@
  */
 
 oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData, $q) {
-  // Valid state properties
+  // Valid state properties that can be saved.
   var validStateProperties = [
     'content',
     'interactive_widget',
@@ -28,9 +28,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'interactive_rulesets',
     'sticky_interactive_widget',
     'param_changes',
-    'state_name',
-    'unresolved_answers',
-    'yaml_file'
+    'resolved_answers',
+    'state_name'
   ];
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
@@ -45,16 +44,17 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     getData: function() {
       if (explorationData.data) {
         console.log('Found exploration data in cache.');
-  
+
         var deferred = $q.defer();
         deferred.resolve(explorationData.data);
         return deferred.promise;
       } else {
         // Retrieve data from the server.
         return $http.get(explorationUrl + '/data').then(function(response) {
+          console.trace();
           console.log('Retrieved exploration data.');
           console.log(response.data);
-  
+
           explorationData.data = response.data;
           return response.data;
         });

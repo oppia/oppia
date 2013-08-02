@@ -21,7 +21,6 @@
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
 var GUI_EDITOR_URL = '/gui';
-var YAML_EDITOR_URL = '/text';
 var STATS_VIEWER_URL = '/stats';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
@@ -29,8 +28,6 @@ var STATS_VIEWER_URL = '/stats';
 
 oppia.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-      when(YAML_EDITOR_URL + '/:stateId',
-           {templateUrl: '/editor_views/yaml_editor', controller: YamlEditor}).
       when(GUI_EDITOR_URL + '/:stateId',
            {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
       when(STATS_VIEWER_URL,
@@ -67,38 +64,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
-  /**
-   * Gets the current mode from the URL location hash, with the GUI mode being
-   * the default.
-   */
-  $scope.getMode = function() {
-    if ($location.$$url.substring(0, YAML_EDITOR_URL.length) == YAML_EDITOR_URL) {
-      return YAML_EDITOR_URL.substring(1);
-    } else {
-      return GUI_EDITOR_URL.substring(1);
-    }
-  };
-
-  /**
-   * Changes the state editor mode.
-   * @param {string} mode The state editor mode to switch to (currently, gui or text).
-   */
-  $scope.changeMode = function(mode) {
-    if (mode == GUI_EDITOR_URL.substring(1)) {
-      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
-    } else if (mode == YAML_EDITOR_URL.substring(1)) {
-      $location.path(YAML_EDITOR_URL + '/' + explorationData.stateId);
-    } else {
-      warningsData.addWarning('Error: mode ' + mode + ' doesn\'t exist.');
-    }
-    $scope.$apply();
-  };
-
   // Changes the location hash when the editorView tab is changed.
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
-      $scope.changeMode($scope.getMode());
+      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
+      $scope.$apply();
       $scope.stateName = explorationData.data.states[explorationData.stateId].name;
     } else if (e.target.hash == '#statsViewer') {
       $location.path('stats');
@@ -144,12 +115,25 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       'numVisits': data.num_visits,
       'numCompletions': data.num_completions,
       'stateStats': data.state_stats,
-      'imp': data.imp,
+      'imp': data.imp
     };
 
-    $scope.chartData = [['', 'Completions', 'Non-completions'],['', data.num_completions, data.num_visits - data.num_completions]];
+    $scope.chartData = [
+      ['', 'Completions', 'Non-completions'],
+      ['', data.num_completions, data.num_visits - data.num_completions]
+    ];
     $scope.chartColors = ['green', 'firebrick'];
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
+
+    $scope.statsGraphOpacities = {};
+    for (var stateId in $scope.states) {
+      var visits = $scope.stats.stateStats[stateId].firstEntryCount;
+      $scope.statsGraphOpacities[stateId] = Math.max(
+          visits / $scope.stats.numVisits, 0.05);
+    }
+    $scope.statsGraphOpacities[END_DEST] = Math.max(
+        $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
+
     $scope.graphData = $scope.reformatResponse(
           data.states, data.init_state_id);
 
@@ -171,8 +155,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     var VERT_SPACING = 100;
     var HORIZ_OFFSET = 100;
     var nodes = {};
+    var state;
     nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
-    for (var state in states) {
+    for (state in states) {
       nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
     }
     nodes[initStateId].depth = 0;
@@ -184,33 +169,40 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     nodes[initStateId].y0 = VERT_OFFSET;
     nodes[initStateId].x0 = HORIZ_OFFSET;
 
+    var handlers, ruleSpecs, h, i;
+
     while (queue.length > 0) {
       var currNode = queue[0];
       queue.shift();
       nodes[currNode].reachable = true;
       if (currNode in states) {
-        for (var i = 0; i < states[currNode].widget.rules.submit.length; i++) {
-          // Assign levels to nodes only when they are first encountered.
-          if (seenNodes.indexOf(states[currNode].widget.rules.submit[i].dest) == -1) {
-            seenNodes.push(states[currNode].widget.rules.submit[i].dest);
-            nodes[states[currNode].widget.rules.submit[i].dest].depth = nodes[currNode].depth + 1;
-            nodes[states[currNode].widget.rules.submit[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
-            if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
-              maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
-            } else {
-              nodes[states[currNode].widget.rules.submit[i].dest].x0 = HORIZ_OFFSET;
-              maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
+        handlers = states[currNode].widget.handlers;
+        for (h = 0; h < handlers.length; h++) {
+          ruleSpecs = handlers[h].rule_specs;
+          for (i = 0; i < ruleSpecs.length; i++) {
+            // Assign levels to nodes only when they are first encountered.
+            if (seenNodes.indexOf(ruleSpecs[i].dest) == -1) {
+              seenNodes.push(ruleSpecs[i].dest);
+              nodes[ruleSpecs[i].dest].depth = nodes[currNode].depth + 1;
+              nodes[ruleSpecs[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
+              if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
+                nodes[ruleSpecs[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
+                maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
+              } else {
+                nodes[ruleSpecs[i].dest].x0 = HORIZ_OFFSET;
+                maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
+              }
+              maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
+              queue.push(ruleSpecs[i].dest);
             }
-            maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
-            queue.push(states[currNode].widget.rules.submit[i].dest);
           }
         }
       }
     }
 
     var horizPositionForLastRow = HORIZ_OFFSET;
-    for (var node in nodes) {
+    var node;
+    for (node in nodes) {
       if (nodes[node].depth == SENTINEL_DEPTH) {
         nodes[node].depth = maxDepth + 1;
         nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
@@ -222,7 +214,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     // Assign unique IDs to each node.
     var idCount = 0;
     var nodeList = [];
-    for (var node in nodes) {
+    for (node in nodes) {
       var nodeMap = nodes[node];
       nodeMap['hashId'] = node;
       nodeMap['id'] = idCount;
@@ -232,16 +224,20 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
 
     var links = [];
-    for (var state in states) {
-      for (var i = 0; i < states[state].widget.rules.submit.length; i++) {
-        links.push({
+    for (state in states) {
+      handlers = states[state].widget.handlers;
+      for (h = 0; h < handlers.length; h++) {
+        ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
             source: nodeList[nodes[state].id],
-            target: nodeList[nodes[states[state].widget.rules.submit[i].dest].id],
-            name: $filter('parameterizeRule')({
-                rule: states[state].widget.rules.submit[i].rule,
-                inputs: states[state].widget.rules.submit[i].inputs
+            target: nodeList[nodes[ruleSpecs[i].dest].id],
+            name: $filter('parameterizeRuleDescription')({
+                description: ruleSpecs[i].description,
+                inputs: ruleSpecs[i].inputs
             })
-        });
+          });
+        }
       }
     }
 

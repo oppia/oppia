@@ -7,10 +7,10 @@
         <span ng-show="foo.type == 'default'"> may need a bit more feedback. Students seem to keep hitting a no feedback state.</span>
     </li>
   </ol>
-  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width=500 height=100 chart-area-width=300></bar-chart>
+  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width="500" height="100" chart-area-width=300></bar-chart>
   <br><br>
-  <b>Common student paths</b>
-  <state-graph-viz stats="stats" val="graphData" grouped="grouped"></state-graph-viz>
+  <b>Common student paths (colors indicate the number of times the state was first entered)</b>
+  <state-graph-viz val="graphData" node-fill="green" opacity-map="statsGraphOpacities" forbid-node-deletion="true"></state-graph-viz>
   <table>
     <tr>
       <th class="oppia-stats-table">State name</th>
@@ -18,24 +18,24 @@
       <th class="oppia-stats-table">Rules hit</th>
     </tr>
 
-    <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'count':true">
+    <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'totalEntryCount':true">
       <td class="oppia-stats-table">
         <a href="/create/<[explorationId]>#/gui/<[state]>">
           <[stateData.name]>
         </a>
       </td>
       <td class="oppia-stats-table">
-        <[stateData.count]>
+        <[stateData.totalEntryCount]>
       </td>
       <td class="oppia-stats-table">
-          <table ng-show="stateData.count > 0">
-            <tr ng-show="ruleData.chartData[1][1] > 0" ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'count':true">
+          <table ng-show="stateData.totalEntryCount > 0">
+            <tr ng-show="ruleData.chartData[1][1] > 0" ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'totalEntryCount':true">
                <td valign="top" width="200"><[rule]></td>
                <td valign="top" width="100">
                  <bar-chart ng-show="ruleData.chartData[1][1] > 0" chart-colors="ruleChartColors" chart-data="ruleData.chartData" width=100 height=30 show-legend="false"></bar-chart></td>
                <td>
                  <ul>
-                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="<[answer[1]]> > 1">s</div>)</i></li>
+                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="answer[1] > 1">s</div>)</i></li>
                  </ul>
                </td>
             </tr>
@@ -55,7 +55,7 @@
   </table>
 </div>
 
-<div ng-hide="stats.numVisits > 0">
+<div ng-show="stats.numVisits == 0">
   <em>
     This exploration has not been viewed by readers yet, so there are no
     statistics to display.

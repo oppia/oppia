@@ -45,21 +45,25 @@ function EditorTree($scope, $filter, explorationData) {
     if (priorCategory) {
       thisState['name'] = '[' + $scope.truncate(priorCategory) + '] ' + states[currStateId].name;
     }
-    for (var i = 0; i < states[currStateId].widget.rules.submit.length; ++i) {
-      var destStateId = states[currStateId].widget.rules.submit[i].dest;
-      var rule = states[currStateId].widget.rules.submit[i].rule;
-      var inputs = states[currStateId].widget.rules.submit[i].inputs;
-      var category = $filter('parameterizeRule')({rule: rule, inputs: inputs});
-      if (destStateId == END_DEST) {
-        thisState['children'].push(
-            {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
-      } else if (seen[destStateId]) {
-        thisState['children'].push(
-            {'name': '[' + $scope.truncate(category) + '] ' + states[destStateId].name,
-             'size': 100, 'hashId': destStateId});
-      } else {
-        seen[destStateId] = true;
-        thisState['children'].push($scope.dfs(destStateId, seen, states, category));
+    var handlers = states[currStateId].widget.handlers;
+    for (var h = 0; h < handlers.length; h++) {
+      var ruleSpecs = handlers[h].rule_specs;
+      for (var i = 0; i < ruleSpecs.length; ++i) {
+        var destStateId = ruleSpecs[i].dest;
+        var description = ruleSpecs[i].description;
+        var inputs = ruleSpecs[i].inputs;
+        var category = $filter('parameterizeRuleDescription')({description: description, inputs: inputs});
+        if (destStateId == END_DEST) {
+          thisState['children'].push(
+              {'name': '[' + $scope.truncate(category) + '] END', 'size': 100});
+        } else if (seen[destStateId]) {
+          thisState['children'].push(
+              {'name': '[' + $scope.truncate(category) + '] ' + states[destStateId].name,
+               'size': 100, 'hashId': destStateId});
+        } else {
+          seen[destStateId] = true;
+          thisState['children'].push($scope.dfs(destStateId, seen, states, category));
+        }
       }
     }
     return thisState;
@@ -87,8 +91,7 @@ oppia.directive('stateTreeViz', function (explorationData) {
   return {
     restrict: 'E',
     scope: {
-      val: '=',
-      grouped: '='
+      val: '='
     },
     link: function (scope, element, attrs) {
       var tree = d3.layout.tree().size([h, 100]);

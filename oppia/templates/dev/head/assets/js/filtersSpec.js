@@ -5,7 +5,7 @@ describe('Testing filters', function() {
     'round1',
     'bracesToText',
     'bracesToInput',
-    'parameterizeRule'
+    'parameterizeRuleDescription'
   ];
 
   beforeEach(angular.mock.module('oppia'));
