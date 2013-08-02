@@ -67,6 +67,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
     restrict: 'E',
     scope: {
       val: '=',
+      highlightStates: '=',
       nodeFill: '@',
       opacityMap: '=',
       forbidNodeDeletion: '@'
@@ -80,7 +81,8 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         // TODO(sll): This does not update if a state name is changed.
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
-                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion);
+                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
+                    scope.highlightStates);
           for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
             document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
           }
@@ -89,7 +91,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
 
       var height = 0;
 
-      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion) {
+      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
         height = 0;
         var vis = d3.select(element[0]).append('svg:svg')
             .attr('class', 'oppia-graph-viz')
@@ -194,9 +196,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               return d.hashId != END_DEST ? 'clickable' : null; })
-            .style('stroke', 'black')
+            .style('stroke', function(d) { return (highlightStates? (highlightStates.indexOf(d.hashId) >=0 ? 'royalblue' : '#CCCCCC') : 'black')})
             .style('stroke-width', function(d) {
-              return (d.hashId == initStateId || d.hashId == END_DEST) ? '3' : '2';
+              return ((d.hashId == initStateId || d.hashId == END_DEST) && !highlightStates) ? '3' : '2';
             })
             .style('fill', function(d) {
               if (nodeFill) {
@@ -210,7 +212,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 );
               }
             })
-            .style('opacity', function(d) {
+            .style('fill-opacity', function(d) {
               return opacityMap ? opacityMap[d.hashId] : 1.0;
             })
             .on('click', function (d) {
