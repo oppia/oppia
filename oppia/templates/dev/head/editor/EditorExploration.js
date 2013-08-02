@@ -134,9 +134,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.statsGraphOpacities[END_DEST] = Math.max(
         $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
-    $scope.highlightStates = [];
+    $scope.highlightStates = {};
     for (var i = 0; i < data.imp.length; i++) {
-      $scope.highlightStates[i] = data.imp[i].state_id;
+      $scope.highlightStates[data.imp[i].state_id] = 'royalblue';
     }
 
     $scope.graphData = $scope.reformatResponse(
