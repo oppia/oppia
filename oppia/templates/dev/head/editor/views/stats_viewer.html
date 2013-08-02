@@ -1,4 +1,10 @@
 <div ng-show="stats.numVisits > 0">
+  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width="500" height="100" chart-area-width=300></bar-chart>
+  <br><br>
+  <b>Common student paths </b>
+  <br>
+  <i>(fill colors indicate the number of times the state was first entered, states that may need help are highlighted in blue)</i>
+  <state-graph-viz val="graphData" node-fill="rgba(0, 128, 0, 0.5)" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates"></state-graph-viz>
   <b ng-show="stats.imp.length > 0">States that need a little help</b>
   <ol>
     <li ng-repeat="foo in stats.imp">
@@ -7,12 +13,6 @@
         <span ng-show="foo.type == 'default'"> may need a bit more feedback. Students seem to keep hitting a no feedback state.</span>
     </li>
   </ol>
-  <bar-chart chart-data="chartData" chart-title="Completion Rate" chart-colors="chartColors" width="500" height="100" chart-area-width=300></bar-chart>
-  <br><br>
-  <b>Common student paths </b>
-  <br>
-  <i>(fill colors indicate the number of times the state was first entered, states that may need help are highlighted in blue)</i>
-  <state-graph-viz val="graphData" node-fill="rgba(0, 128, 0, 0.5)" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates"></state-graph-viz>
   <table>
     <tr>
       <th class="oppia-stats-table">State name</th>
