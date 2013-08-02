@@ -1,6 +1,7 @@
 {% macro add_state_form() -%}
   <form ng-submit="addState(newStateDesc)">
-    <input style="width: 80%" type="text" list="states" ng-model="newStateDesc" placeholder="Add New State Name" required>
+    Add a new state:
+    <input style="width: 30" type="text" list="states" ng-model="newStateDesc" placeholder="New State Name" required>
     <datalist id="states">
       <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
     </datalist>
@@ -9,40 +10,20 @@
 
 
 <h4>
-  Visualizations
+  Visualization
   <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
        title="These visualizations show how the exploration's states are linked. You can access each state's editor by clicking on its node.">
 </h4>
 
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#graph" data-toggle="tab">Graph</a></li>
-  <li><a href="#tree" data-toggle="tab">Tree</a></li>
-</ul>
+<div>
+  <em>Click on a state node in the diagram below to edit it.</em>
 
-<div class="tab-content">
-  <div class="tab-pane active" id="graph">
-    {{ add_state_form() }}
-    <em>Click on a state node in the diagram below to edit it.</em>
+  <br><br>
 
-    <br><br>
+  <center ng-hide="graphData">
+    <img src="/images/loading.gif" alt="Loading..." width="50px">
+  </center>
+  <state-graph-viz val="graphData"></state-graph-viz>
 
-    <center ng-hide="graphData">
-      <img src="/images/loading.gif" alt="Loading..." width="50px">
-    </center>
-    <state-graph-viz val="graphData"></state-graph-viz>
-  </div>
-  <div class="tab-pane" id="tree">
-    <div ng-controller="EditorTree">
-      {{ add_state_form() }}
-      <em>Click 'Edit' to edit the corresponding node.</em>
-
-      <br><br>
-
-      <center ng-hide="treeData">
-        <img src="/images/loading.gif" alt="Loading..." width="50px">
-      </center>
-      <state-tree-viz val="treeData">
-      </state-tree-viz>
-    </div>
-  </div>
+  {{ add_state_form() }}
 </div>

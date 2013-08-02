@@ -81,20 +81,8 @@
 
           <div class="tab-content">
             <div class="tab-pane active" id="explorationMap">
-
-              <button ng-click="activeInputData.name = 'explorationMetadata'" ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
-                Show exploration metadata
-              </button>
-
-              <button ng-click="activeInputData.clear()" ng-show="activeInputData.name.indexOf('explorationMetadata') == 0" class="pull-right">
-                Hide exploration metadata
-              </button>
-
-              <div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
-                {% include 'editor/views/editor_metadata.html' %}
-                <br>
-              </div>
-
+              {% include 'editor/views/editor_metadata.html' %}
+              <hr>
               {% include 'editor/views/editor_viz.html' %}
             </div>
 
@@ -158,7 +146,6 @@
   <script>
     {{ include_js_file('assets/js/services/explorationData.js') }}
     {{ include_js_file('editor/EditorExploration.js') }}
-    {{ include_js_file('editor/views/EditorTree.js') }}
     {{ include_js_file('editor/views/GuiEditor.js') }}
     {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}
   </script>
