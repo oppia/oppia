@@ -20,6 +20,10 @@ from data.objects.models import objects
 from oppia.domain import rule_domain
 
 
+class CodeEvaluationRule(rule_domain.Rule):
+    subject_type = objects.CodeEvaluation
+
+
 class Coord2DRule(rule_domain.Rule):
     subject_type = objects.Coord2D
 
