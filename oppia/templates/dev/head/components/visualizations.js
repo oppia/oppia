@@ -81,7 +81,10 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
                     scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion);
-          console.log(document.getElementsByClassName('oppia-graph-viz')[0].style.height = height);
+          for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
+            document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
+            console.log(document.getElementsByClassName('oppia-graph-viz')[i].style.height);
+          }
         }
       });
 
