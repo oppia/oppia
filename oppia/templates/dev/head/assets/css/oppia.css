@@ -199,7 +199,7 @@ textarea {
 .oppia-main-body {
   height: 100%;
   margin: 0 auto -4em;
-  min-height: 100%;  
+  min-height: 100%;
   padding-bottom: 3em;
 }
 
@@ -290,6 +290,10 @@ textarea {
 
 .oppia-conversation-log {
   opacity: 0.7;
+}
+
+.oppia-cursor-pointer {
+  cursor: pointer;
 }
 
 .oppia-editable-name {
