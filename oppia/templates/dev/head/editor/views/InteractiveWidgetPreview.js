@@ -354,7 +354,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveParams = $scope.interactiveWidget.params;
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
-        'name': '',
+        'name': 'Default',
         'inputs': {},
         'dest': $scope.stateId,
         'feedback': [],

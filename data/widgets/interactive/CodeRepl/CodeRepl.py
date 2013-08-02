@@ -11,16 +11,6 @@ class CodeRepl(widget_domain.BaseWidget):
     This class represents a widget, whose id is the name of the class. It is
     auto-discovered from apps/widget/models.py when the default widgets are
     refreshed.
-
-    TODO:
-      Make data/objects/templates/code_evaluation_view.html.
-      Add jsrepl to the repository.
-      Make selection of prog language a drop down in expl editor.
-      Add option to tell if the code is one line or multiple lines?
-      Add more rules and tests for them.
-        Rules for output, error, and evaluation.
-      Sample exploration.
-      Allow the widget to be sticky?
     """
 
     # The human-readable name of the widget.
