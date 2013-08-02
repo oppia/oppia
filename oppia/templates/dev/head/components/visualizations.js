@@ -107,14 +107,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .data(['arrowhead'])
           .enter().append('svg:marker')
             .attr('id', String)
-            .attr('viewBox', '0 0 10 10')
+            .attr('viewBox', '-5 -5 18 18')
             .attr('refX', 10)
             .attr('refY', 5)
             .attr('markerWidth', 6)
-            .attr('markerHeight', 4.5)
+            .attr('markerHeight', 9)
             .attr('orient', 'auto')
           .append('svg:path')
-            .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+            .attr('d', 'M -5 0 L 12 6 L -5 12 z')
             .attr('fill', 'black');
 
         var linkEnter = link.enter().append('svg:g')
@@ -135,8 +135,8 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
-		return 'M' + sourcex  + ',' + (sourcey + 20) + 
-                       'A' + (sourceWidth/2) + ',20 0 1,1' 
+		return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) + 
+                       'A' + (sourceWidth/4) + ',20 0 1,1' 
                            + (sourcex-8-sourceWidth/2) + ' ' + sourcey;
               }
 
