@@ -111,7 +111,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('id', String)
             .attr('viewBox', '-5 -5 18 18')
             .attr('refX', 10)
-            .attr('refY', 5)
+            .attr('refY', 6)
             .attr('markerWidth', 6)
             .attr('markerHeight', 9)
             .attr('orient', 'auto')
@@ -139,7 +139,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               if (d.source == d.target) {
 		return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) + 
                        'A' + (sourceWidth/4) + ',20 0 1,1' 
-                           + (sourcex-8-sourceWidth/2) + ' ' + sourcey;
+                           + (sourcex-10-sourceWidth/2) + ' ' + sourcey;
               }
 
               var dx = targetx - sourcex,
@@ -213,7 +213,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               }
             })
             .style('fill-opacity', function(d) {
-              return opacityMap ? opacityMap[d.hashId] : 1.0;
+              return opacityMap ? opacityMap[d.hashId] : 0.5;
             })
             .on('click', function (d) {
               if (d.hashId != END_DEST) {
