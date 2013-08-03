@@ -19,16 +19,17 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.domain import base_domain
 from oppia.platform import models
 (state_models,) = models.Registry.import_models([models.NAMES.state])
+import utils
 
 
-class Exploration(base_domain.BaseDomainObject):
+class Exploration(object):
     """Domain object for an Oppia exploration.
 
-    All methods and properties in this file should be independent of the
-    specific storage model used.
+    Domain objects capture domain-specific logic and are agnostic of how the
+    objects they represent are stored. All methods and properties in domain
+    files should therefore be independent of the specific storage models used.
     """
     def __init__(self, exploration_model):
         self.id = exploration_model.id
@@ -44,7 +45,7 @@ class Exploration(base_domain.BaseDomainObject):
     def validate(self):
         """Validates the exploration before it is committed to storage."""
         if not self.state_ids:
-            raise self.ObjectValidationError('This exploration has no states.')
+            raise utils.ValidationError('This exploration has no states.')
 
         # TODO(sll): Check that the template path pointed to by default_skin
         # exists.
@@ -54,10 +55,10 @@ class Exploration(base_domain.BaseDomainObject):
         # we can remove it if speed becomes an issue.
         for state_id in self.state_ids:
             if not self.get_state_by_id(state_id, strict=False):
-                raise self.ObjectValidationError('Invalid state_id %s.')
+                raise utils.ValidationError('Invalid state_id %s.')
 
         if not self.is_demo and not self.editor_ids:
-            raise self.ObjectValidationError('This exploration has no editors.')
+            raise utils.ValidationError('This exploration has no editors.')
 
     # Derived attributes of an exploration.
     @property

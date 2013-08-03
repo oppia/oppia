@@ -18,11 +18,11 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
-import feconf
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.platform import models
 (state_models,) = models.Registry.import_models([models.NAMES.state])
+import utils
 
 
 class FakeExploration(exp_domain.Exploration):
@@ -55,13 +55,11 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         # representing State ids.
         exploration.state_ids = []
         with self.assertRaisesRegexp(
-                exp_domain.Exploration.ObjectValidationError,
-                'exploration has no states'):
+                utils.ValidationError, 'exploration has no states'):
             exp_services.save_exploration(exploration)
         exploration.state_ids = ['A string']
         with self.assertRaisesRegexp(
-                exp_domain.Exploration.ObjectValidationError,
-                'Invalid state_id'):
+                utils.ValidationError, 'Invalid state_id'):
             exp_services.save_exploration(exploration)
 
         new_state = state_models.State(id='Initial state id')
@@ -71,8 +69,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         # There must be at least one editor id.
         exploration.editor_ids = []
         with self.assertRaisesRegexp(
-                exp_domain.Exploration.ObjectValidationError,
-                'exploration has no editors'):
+                utils.ValidationError, 'exploration has no editors'):
             exp_services.save_exploration(exploration)
 
     def test_init_state_property(self):
