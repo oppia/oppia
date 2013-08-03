@@ -66,27 +66,20 @@ DEMO_EXPLORATIONS = [
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform on which oppia is running. Currently, there are 2 possible values.
-# 'GAE' or 'Django'
-PLATFORM = 'GAE' if (os.environ.get('SERVER_SOFTWARE')
-                     and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-                     or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'Django'
-
-# The model file to use depending on the platform.
-MODEL_FILE_MAPPING = {
-    'GAE': 'gae_models',
-    'Django': 'django_models'}
-
-# Whether we should serve the development or production experience.
-if PLATFORM == 'GAE':
-    DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
-                and os.environ['SERVER_SOFTWARE'].startswith('Development'))
-elif PLATFORM == 'Django':
-    DEV_MODE = settings.DEV
-
 # The platform for the storage backend. This is used in the model-switching
 # code in oppia/platform.
-PLATFORM = 'gae'
+PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
+                     and (os.environ['SERVER_SOFTWARE'].startswith('Development')
+                     or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+
+# Whether we should serve the development or production experience.
+if PLATFORM == 'gae':
+    DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
+                and os.environ['SERVER_SOFTWARE'].startswith('Development'))
+elif PLATFORM == 'django':
+    DEV_MODE = settings.DEV
+
+
 
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'oppia/third_party'
