@@ -66,7 +66,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.get_public_explorations(), [])
 
         exploration.is_public = True
-        exploration.put()
+        exp_services.save_exploration(exploration)
         self.assertEqual(
             [e.id for e in exp_services.get_public_explorations()],
             [exploration.id]
@@ -77,7 +77,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
-        exploration.put()
+        exp_services.save_exploration(exploration)
 
         def get_viewable_ids(user_id):
             return [
@@ -90,7 +90,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Set the exploration's status to published.
         exploration.is_public = True
-        exploration.put()
+        exp_services.save_exploration(exploration)
 
         self.assertEqual(get_viewable_ids(self.owner_id), [exploration.id])
         self.assertEqual(
@@ -102,7 +102,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
-        exploration.put()
+        exp_services.save_exploration(exploration)
 
         def get_editable_ids(user_id):
             return [
@@ -115,7 +115,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Set the exploration's status to published.
         exploration.is_public = True
-        exploration.put()
+        exp_services.save_exploration(exploration)
 
         self.assertEqual(get_editable_ids(self.owner_id), [exploration.id])
         self.assertEqual(get_editable_ids(self.viewer_id), [])
@@ -144,7 +144,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exploration.add_state('New state')
+        exp_services.add_state(exploration.id, 'New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
 
         exploration2 = exp_services.get_exploration_by_id(
@@ -185,7 +185,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exploration.id, retrieved_exploration.id)
         self.assertEqual(exploration.title, retrieved_exploration.title)
 
-        exploration.delete()
+        with self.assertRaises(Exception):
+            exp_services.get_exploration_by_id('fake_exploration')
+
+        exp_services.delete_exploration('A exploration_id')
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('A exploration_id')
 
@@ -209,7 +212,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exploration.add_state('New state')
+        exp_services.add_state(exploration.id, 'New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(yaml_content, """parameters: []
 states:
@@ -251,7 +254,7 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        new_state = exploration.add_state('New state')
+        new_state = exp_services.add_state(exploration.id, 'New state')
         state_dict = exp_services.export_state_to_dict(
             exploration.id, new_state.id)
 
@@ -295,7 +298,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         sid = 'state_id'
         state_name = 'State 1'
-        exploration.add_state(state_name, state_id=sid)
+        exp_services.add_state(exploration.id, state_name, state_id=sid)
 
         self.assertEqual(
             exp_services.convert_state_name_to_id(eid, state_name), sid)
@@ -329,3 +332,95 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEquals(
             exp_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
+
+    def test_create_and_get_state(self):
+        """Test creation and retrieval of states."""
+        eid = 'A exploration_id'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                'fake@user.com', 'A title', 'A category', eid))
+
+        id_1 = '123'
+        name_1 = 'State 1'
+        state_1 = exp_services.add_state(eid, name_1, state_id=id_1)
+
+        exploration = exp_services.get_exploration_by_id(eid)
+        fetched_state_1 = exploration.get_state_by_id(id_1)
+        self.assertEqual(fetched_state_1, state_1)
+
+        self.assertEqual(
+            exp_services.get_state_by_name(eid, name_1), state_1)
+
+        name_2 = 'fake_name'
+        self.assertIsNone(exp_services.get_state_by_name(
+            eid, name_2, strict=False))
+        with self.assertRaisesRegexp(Exception, 'not found'):
+            exp_services.get_state_by_name(eid, name_2, strict=True)
+        # The default behavior is to fail noisily.
+        with self.assertRaisesRegexp(Exception, 'not found'):
+            exp_services.get_state_by_name(eid, name_2)
+
+    def test_delete_state(self):
+        """Test deletion of states."""
+        exploration_id = 'A exploration_id'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                'fake@user.com', 'A title', 'A category', exploration_id))
+        exp_services.add_state(exploration_id, 'first_state')
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Cannot delete initial state'):
+            exp_services.delete_state(exploration.id, exploration.state_ids[0])
+
+        exp_services.add_state(exploration_id, 'second_state')
+        exp_services.delete_state(exploration.id, exploration.state_ids[1])
+
+        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
+            exp_services.delete_state(exploration.id, 'fake_state')
+
+    def test_state_operations(self):
+        """Test adding, renaming and checking existence of states."""
+        exploration_id = 'A exploration_id'
+
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                'fake@user.com', 'A title', 'A category', exploration_id))
+        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
+            exploration.get_state_by_id('invalid_state_id')
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.assertEqual(len(exploration.state_ids), 1)
+
+        default_state = state_models.State.get(exploration.state_ids[0])
+        default_state_name = default_state.name
+        exploration.rename_state(default_state.id, 'Renamed state')
+
+        self.assertEqual(len(exploration.state_ids), 1)
+        self.assertEqual(default_state.name, 'Renamed state')
+
+        # Add a new state.
+        second_state = exp_services.add_state(exploration_id, 'State 2')
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.assertEqual(len(exploration.state_ids), 2)
+
+        # It is OK to rename a state to itself.
+        exploration.rename_state(second_state.id, second_state.name)
+        renamed_second_state = exploration.get_state_by_id(second_state.id)
+        self.assertEqual(renamed_second_state.name, 'State 2')
+
+        # But it is not OK to add or rename a state using a name that already
+        # exists.
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exp_services.add_state(exploration_id, 'State 2')
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exploration.rename_state(second_state.id, 'Renamed state')
+
+        # And it is not OK to rename a state to the END_DEST.
+        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
+            exploration.rename_state(second_state.id, feconf.END_DEST)
+
+        # The exploration now has exactly two states.
+        self.assertFalse(exploration.has_state_named(default_state_name))
+        self.assertTrue(exploration.has_state_named('Renamed state'))
+        self.assertTrue(exploration.has_state_named('State 2'))

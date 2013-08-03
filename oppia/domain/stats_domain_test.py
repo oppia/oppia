@@ -31,7 +31,7 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
     def test_state_entry_counts(self):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
-        second_state = exp.add_state('State 2')
+        second_state = exp_services.add_state(exp.id, 'State 2')
 
         state1_id = exp.init_state_id
         state2_id = second_state.id

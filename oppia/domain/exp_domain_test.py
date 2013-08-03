@@ -20,6 +20,7 @@ import test_utils
 
 import feconf
 from oppia.domain import exp_domain
+from oppia.domain import exp_services
 from oppia.platform import models
 (state_models,) = models.Registry.import_models([models.NAMES.state])
 
@@ -56,12 +57,12 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         with self.assertRaisesRegexp(
                 exp_domain.Exploration.ObjectValidationError,
                 'exploration has no states'):
-            exploration.put()
+            exp_services.save_exploration(exploration)
         exploration.state_ids = ['A string']
         with self.assertRaisesRegexp(
                 exp_domain.Exploration.ObjectValidationError,
                 'Invalid state_id'):
-            exploration.put()
+            exp_services.save_exploration(exploration)
 
         new_state = state_models.State(id='Initial state id')
         new_state.put()
@@ -72,7 +73,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         with self.assertRaisesRegexp(
                 exp_domain.Exploration.ObjectValidationError,
                 'exploration has no editors'):
-            exploration.put()
+            exp_services.save_exploration(exploration)
 
     def test_init_state_property(self):
         """Test the init_state property."""
@@ -87,7 +88,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
-        exploration.add_state('unused_second_state')
+        exploration.state_ids.append('unused_second_state')
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
@@ -129,60 +130,3 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         self.assertTrue(exploration.is_editable_by(editor_id))
         self.assertFalse(exploration.is_editable_by(viewer_id))
         self.assertFalse(exploration.is_editable_by(None))
-
-    def test_state_operations(self):
-        """Test adding, renaming and checking existence of states."""
-        exploration = FakeExploration(owner_id='owner@example.com')
-        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exploration.get_state_by_id('invalid_state_id')
-
-        exploration.add_state('Initial state')
-
-        self.assertEqual(len(exploration.state_ids), 1)
-
-        default_state = state_models.State.get(exploration.state_ids[0])
-        default_state_name = default_state.name
-        exploration.rename_state(default_state.id, 'Renamed state')
-
-        self.assertEqual(len(exploration.state_ids), 1)
-        self.assertEqual(default_state.name, 'Renamed state')
-
-        # Add a new state.
-        second_state = exploration.add_state('State 2')
-        self.assertEqual(len(exploration.state_ids), 2)
-
-        # It is OK to rename a state to itself.
-        exploration.rename_state(second_state.id, second_state.name)
-        renamed_second_state = exploration.get_state_by_id(second_state.id)
-        self.assertEqual(renamed_second_state.name, 'State 2')
-
-        # But it is not OK to add or rename a state using a name that already
-        # exists.
-        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exploration.add_state('State 2')
-        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exploration.rename_state(second_state.id, 'Renamed state')
-
-        # And it is not OK to rename a state to the END_DEST.
-        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exploration.rename_state(second_state.id, feconf.END_DEST)
-
-        # The exploration now has exactly two states.
-        self.assertFalse(exploration._has_state_named(default_state_name))
-        self.assertTrue(exploration._has_state_named('Renamed state'))
-        self.assertTrue(exploration._has_state_named('State 2'))
-
-    def test_delete_state(self):
-        """Test deletion of states."""
-        exploration = FakeExploration(owner_id='owner@example.com')
-        exploration.add_state('first_state')
-
-        with self.assertRaisesRegexp(
-                ValueError, 'Cannot delete initial state'):
-            exploration.delete_state(exploration.state_ids[0])
-
-        exploration.add_state('second_state')
-        exploration.delete_state(exploration.state_ids[1])
-
-        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exploration.delete_state('fake_state')

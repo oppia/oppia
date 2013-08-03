@@ -57,6 +57,33 @@ def get_exploration_by_id(exploration_id, strict=True):
         exploration_model) if exploration_model else None
 
 
+def save_exploration(exploration):
+    """Commits an exploration domain object to persistent storage."""
+    exploration.validate()
+
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
+    exploration_model.put({
+        'category': exploration.category,
+        'title': exploration.title,
+        'state_ids': exploration.state_ids,
+        'parameters': exploration.parameters,
+        'is_public': exploration.is_public,
+        'image_id': exploration.image_id,
+        'editor_ids': exploration.editor_ids,
+        'default_skin': exploration.default_skin,
+    })
+
+
+def delete_exploration(exploration_id):
+    """Deletes the exploration with the given exploration_id."""
+    exploration_model = exp_models.ExplorationModel.get(exploration_id)
+    exploration = exp_domain.Exploration(exploration_model)
+
+    for state_id in exploration.state_ids:
+        exploration.get_state_by_id(state_id).delete()
+    exploration_model.delete()
+
+
 # Query methods.
 def get_all_explorations():
     """Returns a list of domain objects representing all explorations."""
@@ -115,7 +142,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
         obj_type = 'UnicodeString'
     exploration.parameters.append(
         param_models.Parameter(name=param_name, obj_type=obj_type))
-    exploration.put()
+    save_exploration(exploration)
     return param_models.ParamChange(name=param_name, obj_type=obj_type)
 
 
@@ -168,6 +195,52 @@ def convert_state_name_to_id(exploration_id, state_name):
     if state_name == feconf.END_DEST:
         return feconf.END_DEST
     return get_state_by_name(exploration_id, state_name).id
+
+
+def add_state(exploration_id, state_name, state_id=None):
+    """Adds a new state, and returns it. Commits changes."""
+    exploration = get_exploration_by_id(exploration_id)
+    if exploration.has_state_named(state_name):
+        raise ValueError('Duplicate state name %s' % state_name)
+
+    state_id = state_id or state_models.State.get_new_id(state_name)
+    new_state = state_models.State(id=state_id, name=state_name)
+    new_state.put()
+
+    exploration.state_ids.append(new_state.id)
+    save_exploration(exploration)
+
+    return new_state
+
+
+def delete_state(exploration_id, state_id):
+    """Deletes the given state. Commits changes."""
+    exploration = get_exploration_by_id(exploration_id)
+    if state_id not in exploration.state_ids:
+        raise ValueError('Invalid state id %s for exploration %s' %
+                        (state_id, exploration.id))
+
+    # Do not allow deletion of initial states.
+    if exploration.state_ids[0] == state_id:
+        raise ValueError('Cannot delete initial state of an exploration.')
+
+    # Find all destinations in the exploration which equal the deleted
+    # state, and change them to loop back to their containing state.
+    for other_state_id in exploration.state_ids:
+        other_state = exploration.get_state_by_id(other_state_id)
+        changed = False
+        for handler in other_state.widget.handlers:
+            for rule in handler.rule_specs:
+                if rule.dest == state_id:
+                    rule.dest = other_state_id
+                    changed = True
+        if changed:
+            other_state.put()
+
+    # Delete the state with id state_id.
+    exploration.get_state_by_id(state_id).delete()
+    exploration.state_ids.remove(state_id)
+    save_exploration(exploration)
 
 
 def modify_using_dict(exploration_id, state_id, sdict):
@@ -275,14 +348,14 @@ def create_new(
     new_state.put()
 
     # Note that demo explorations do not have owners, so user_id may be None.
-    exploration = exp_models.ExplorationModel(
+    exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
         image_id=image_id, state_ids=[state_id],
         editor_ids=[user_id] if user_id else [])
 
-    exploration.put()
+    exploration_model.put()
 
-    return exploration.id
+    return exploration_model.id
 
 
 def create_from_yaml(
@@ -308,13 +381,13 @@ def create_from_yaml(
         for state_description in exploration_dict['states']:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
-                     else exploration.add_state(state_name))
+                     else add_state(exploration.id, state_name))
             state_list.append({'state': state, 'desc': state_description})
 
         for index, state in enumerate(state_list):
             modify_using_dict(exploration.id, state['state'].id, state['desc'])
     except Exception:
-        exploration.delete()
+        delete_exploration(exploration.id)
         raise
 
     return exploration.id
@@ -357,22 +430,22 @@ def load_demos():
 
         exploration = get_exploration_by_id(exploration_id)
         exploration.is_public = True
-        exploration.put()
+        save_exploration(exploration)
 
 
 def delete_demos():
     """Deletes the demo explorations."""
-    explorations_to_delete = []
+    exploration_ids_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
         exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
         else:
-            explorations_to_delete.append(exploration)
+            exploration_ids_to_delete.append(exploration.id)
 
-    for exploration in explorations_to_delete:
-        exploration.delete()
+    for exploration_id in exploration_ids_to_delete:
+        delete_exploration(exploration_id)
 
 
 def reload_demos():
@@ -385,7 +458,7 @@ def delete_all_explorations():
     """Deletes all explorations."""
     explorations = get_all_explorations()
     for exploration in explorations:
-        exploration.delete()
+        delete_exploration(exploration.id)
 
 
 # Methods for exporting states and explorations to other formats.

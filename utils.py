@@ -40,6 +40,11 @@ class EntityIdNotFoundError(Exception):
     pass
 
 
+class ValidationError(Exception):
+    """Error class for when a domain object fails validation."""
+    pass
+
+
 def log(message):
     """Logs info messages in development/debug mode."""
     # TODO(sll): This method is unused; remove it.

@@ -129,7 +129,7 @@ class ExplorationHandler(base.BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state = exploration.add_state(state_name)
+        state = exp_services.add_state(exploration.id, state_name)
         self.render_json(
             exp_services.export_state_to_dict(exploration.id, state.id))
 
@@ -169,12 +169,12 @@ class ExplorationHandler(base.BaseHandler):
                 ) for item in parameters
             ]
 
-        exploration.put()
+        exp_services.save_exploration(exploration)
 
     @base.require_editor
     def delete(self, exploration):
         """Deletes the given exploration."""
-        exploration.delete()
+        exp_services.delete_exploration(exploration.id)
 
 
 class ExplorationDownloadHandler(base.BaseHandler):
@@ -297,4 +297,4 @@ class StateHandler(base.BaseHandler):
     @base.require_editor
     def delete(self, exploration, state):
         """Deletes the state with id state_id."""
-        exploration.delete_state(state.id)
+        exp_services.delete_state(exploration.id, state.id)

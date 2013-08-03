@@ -302,7 +302,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
             'fake@user.com', 'exploration', 'category', 'eid'))
 
         SECOND_STATE = 'State 2'
-        second_state = exp.add_state(SECOND_STATE)
+        second_state = exp_services.add_state(exp.id, SECOND_STATE)
 
         state1_id = exp.init_state_id
         state2_id = second_state.id
