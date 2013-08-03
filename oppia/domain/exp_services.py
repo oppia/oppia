@@ -174,7 +174,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
     wdict = sdict['widget']
     state.widget = state_models.WidgetInstance(
         widget_id=wdict['widget_id'], sticky=wdict['sticky'],
-        params=wdict['params'], handlers=[])
+        params=wdict['params'], handlers=[]).put()
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
@@ -195,6 +195,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         state.widget.handlers.append(state_models.AnswerHandlerInstance(
             name=handler['name'], rule_specs=handler_rule_specs))
 
+    state.widget.put()
     state.put()
     return state
 
