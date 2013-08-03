@@ -35,9 +35,32 @@ class _Platform(object):
 class _Django(_Platform):
 
     @classmethod
-    def import_models(cls):
-        # TODO(sunu/sll): Implement this method.
-        raise NotImplementedError
+    def import_models(cls, model_names):
+
+        returned_models = []
+        for name in model_names:
+            if name == NAMES.base_model:
+                from oppia.storage.base_model import django_models as base_model
+                returned_models.append(base_model)
+            elif name == NAMES.exploration:
+                from oppia.storage.exploration import django_models as exp_model
+                returned_models.append(exp_model)
+            elif name == NAMES.image:
+                from oppia.storage.image import django_models as image_model
+                returned_models.append(image_model)
+            elif name == NAMES.parameter:
+                from oppia.storage.parameter import django_models as parameter_model
+                returned_models.append(parameter_model)
+            elif name == NAMES.state:
+                from oppia.storage.state import django_models as state_model
+                returned_models.append(state_model)
+            elif name == NAMES.statistics:
+                from oppia.storage.statistics import django_models as statistics_model
+                returned_models.append(statistics_model)
+            else:
+                raise Exception('Invalid model name: %s' % name)
+
+        return tuple(returned_models)
 
     NAME = 'django'
 
@@ -49,22 +72,22 @@ class _Gae(_Platform):
         returned_models = []
         for name in model_names:
             if name == NAMES.base_model:
-                from oppia.storage.base_model import models as base_model
+                from oppia.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
             elif name == NAMES.exploration:
-                from oppia.storage.exploration import models as exp_model
+                from oppia.storage.exploration import gae_models as exp_model
                 returned_models.append(exp_model)
             elif name == NAMES.image:
-                from oppia.storage.image import models as image_model
+                from oppia.storage.image import gae_models as image_model
                 returned_models.append(image_model)
             elif name == NAMES.parameter:
-                from oppia.storage.parameter import models as parameter_model
+                from oppia.storage.parameter import gae_models as parameter_model
                 returned_models.append(parameter_model)
             elif name == NAMES.state:
-                from oppia.storage.state import models as state_model
+                from oppia.storage.state import gae_models as state_model
                 returned_models.append(state_model)
             elif name == NAMES.statistics:
-                from oppia.storage.statistics import models as statistics_model
+                from oppia.storage.statistics import gae_models as statistics_model
                 returned_models.append(statistics_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
