@@ -12,11 +12,74 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Tarashish Mishra'
+"""Base model class."""
 
-import feconf
+__author__ = 'Sean Lip'
 
-model = feconf.MODEL_FILE_MAPPING[feconf.PLATFORM]
-modelmodule = __import__(model, globals(), locals(), ['*'])
-for k in dir(modelmodule):
-    locals()[k] = getattr(modelmodule, k)
+import base64
+import hashlib
+
+import utils
+
+from google.appengine.ext import ndb
+
+
+class BaseModel(ndb.Model):
+    """Base model for all object classes in Oppia."""
+
+    class EntityNotFoundError(Exception):
+        """Raised when no entity for a given id exists in the datastore."""
+
+    def _pre_put_hook(self):
+        pass
+
+
+class IdModel(BaseModel):
+    """An abstract model class with an explicit id property."""
+    @property
+    def id(self):
+        return self.key.id()
+
+    def put(self):
+        super(IdModel, self).put()
+
+    def delete(self):
+        super(IdModel, self).key.delete()
+
+    @classmethod
+    def get_all(cls):
+        """Returns a filterable iterable of all entities of this class."""
+        return cls.query()
+
+    @classmethod
+    def get_new_id(cls, entity_name):
+        """Gets a new 12-character id for an entity, based on its name.
+
+        This id is unique among all instances of this entity.
+
+        Raises:
+            Exception: if an id cannot be generated within a reasonable number
+              of attempts.
+        """
+        MAX_RETRIES = 10
+        RAND_RANGE = 127*127
+        for i in range(MAX_RETRIES):
+            new_id = base64.urlsafe_b64encode(
+                hashlib.sha1(
+                    '%s%s' % (entity_name.encode('utf-8'),
+                              utils.get_random_int(RAND_RANGE))
+                ).digest())[:12]
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
+
+    @classmethod
+    def get(cls, entity_id, strict=True):
+        """Gets an entity by id. Fails noisily if strict == True."""
+        entity = cls.get_by_id(entity_id)
+        if strict and not entity:
+            raise cls.EntityNotFoundError(
+                'Entity for class %s with id %s not found' %
+                (cls.__name__, entity_id))
+        return entity
