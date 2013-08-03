@@ -175,9 +175,12 @@ def modify_using_dict(exploration_id, state_id, sdict):
         state.param_changes.append(instance)
 
     wdict = sdict['widget']
-    state.widget = state_models.WidgetInstance(
+    widget = state_models.WidgetInstance(
         widget_id=wdict['widget_id'], sticky=wdict['sticky'],
-        params=wdict['params'], handlers=[]).put()
+        params=wdict['params'], handlers=[])
+
+    widget.put()
+    state.widget = widget
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
