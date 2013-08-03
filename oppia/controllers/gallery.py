@@ -20,7 +20,8 @@ import collections
 
 from oppia.controllers import base
 from oppia.domain import exp_services
-from oppia.domain import user_services
+from oppia.platform import models
+user_services = models.Registry.import_user_services()
 
 
 class GalleryPage(base.BaseHandler):
@@ -39,7 +40,7 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if user_services.is_current_user_admin():
+        if user_services.is_current_user_admin(self.request):
             explorations = exp_services.get_all_explorations()
             editable_exploration_ids = [e.id for e in explorations]
         elif self.user_id:
@@ -60,7 +61,7 @@ class GalleryHandler(base.BaseHandler):
                 'can_fork': self.user_id and exploration.is_demo,
                 'id': exploration.id,
                 'image_id': exploration.image_id,
-                'is_owner': (user_services.is_current_user_admin() or
+                'is_owner': (user_services.is_current_user_admin(self.request) or
                              exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,
             })

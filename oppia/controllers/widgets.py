@@ -20,7 +20,8 @@ import collections
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import user_services
+from oppia.platform import models
+user_services = models.Registry.import_user_services()
 from oppia.domain import widget_domain
 import utils
 
@@ -36,7 +37,7 @@ class WidgetRepositoryPage(base.BaseHandler):
             self.values['interactive'] = True
         if 'parent_index' in self.request.GET.keys():
             self.values['parent_index'] = self.request.get('parent_index')
-        if user_services.is_current_user_admin():
+        if user_services.is_current_user_admin(self.request):
             self.values['admin'] = True
         self.render_template('editor/widget_repository.html')
 

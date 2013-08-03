@@ -19,7 +19,8 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 from oppia.controllers import base
 from oppia.domain import exp_services
 from oppia.domain import stats_services
-from oppia.domain import user_services
+from oppia.platform import models
+user_services = models.Registry.import_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -40,7 +41,7 @@ class ProfileHandler(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        if user_services.is_current_user_admin():
+        if user_services.is_current_user_admin(self.request):
             exps = exp_services.get_all_explorations()
         else:
             exps = exp_services.get_editable_explorations(self.user_id)

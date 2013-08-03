@@ -23,7 +23,8 @@ import traceback
 
 import feconf
 from oppia.domain import exp_domain
-from oppia.domain import user_services
+from oppia.platform import models
+user_services = models.Registry.import_user_services()
 import webapp2
 
 
@@ -68,7 +69,7 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if (not user_services.is_current_user_admin() and
+        if (not user_services.is_current_user_admin(self.request) and
                 not exploration.is_editable_by(self.user_id)):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
@@ -92,7 +93,7 @@ def require_admin(handler):
         if not self.user_id:
             self.redirect(user_services.create_login_url(self.request.uri))
             return
-        if not user_services.is_current_user_admin():
+        if not user_services.is_current_user_admin(self.request):
             raise self.UnauthorizedUserException(
                 '%s is not an admin of this application', self.user_id)
         return handler(self, **kwargs)
@@ -117,13 +118,13 @@ class BaseHandler(webapp2.RequestHandler):
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
         }
 
-        self.user = user_services.get_current_user()
+        self.user = user_services.get_current_user(self.request)
         self.user_id = self.user.email() if self.user else None
         if self.user_id:
             self.values['logout_url'] = (
                 user_services.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
-            self.values['is_admin'] = user_services.is_current_user_admin()
+            self.values['is_admin'] = user_services.is_current_user_admin(self.request)
         else:
             self.values['login_url'] = user_services.create_login_url(
                 self.request.uri)

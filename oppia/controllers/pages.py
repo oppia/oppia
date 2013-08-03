@@ -20,7 +20,8 @@ import feconf
 from oppia.controllers import base
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
-from oppia.domain import user_services
+from oppia.platform import models
+user_services = models.Registry.import_user_services()
 import utils
 
 
