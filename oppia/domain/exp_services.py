@@ -74,6 +74,29 @@ def save_exploration(exploration):
     })
 
 
+def create_new(
+    user_id, title, category, exploration_id=None,
+        init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
+    """Creates and saves a new exploration; returns its id."""
+    # Generate a new exploration id, if one wasn't passed in.
+    exploration_id = (exploration_id or
+                      exp_models.ExplorationModel.get_new_id(title))
+
+    state_id = state_models.State.get_new_id(init_state_name)
+    new_state = state_models.State(id=state_id, name=init_state_name)
+    new_state.put()
+
+    # Note that demo explorations do not have owners, so user_id may be None.
+    exploration_model = exp_models.ExplorationModel(
+        id=exploration_id, title=title, category=category,
+        image_id=image_id, state_ids=[state_id],
+        editor_ids=[user_id] if user_id else [])
+
+    exploration_model.put()
+
+    return exploration_model.id
+
+
 def delete_exploration(exploration_id):
     """Deletes the exploration with the given exploration_id."""
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
@@ -335,29 +358,6 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 
 # Creation and deletion methods.
-def create_new(
-    user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
-    """Creates, saves and returns a new exploration id."""
-    # Generate a new exploration id, if one wasn't passed in.
-    exploration_id = (exploration_id or
-                      exp_models.ExplorationModel.get_new_id(title))
-
-    state_id = state_models.State.get_new_id(init_state_name)
-    new_state = state_models.State(id=state_id, name=init_state_name)
-    new_state.put()
-
-    # Note that demo explorations do not have owners, so user_id may be None.
-    exploration_model = exp_models.ExplorationModel(
-        id=exploration_id, title=title, category=category,
-        image_id=image_id, state_ids=[state_id],
-        editor_ids=[user_id] if user_id else [])
-
-    exploration_model.put()
-
-    return exploration_model.id
-
-
 def create_from_yaml(
     yaml_content, user_id, title, category, exploration_id=None,
         image_id=None):
@@ -555,9 +555,7 @@ def export_content_to_html(content_array, block_number, params=None):
     if params is None:
         params = {}
 
-    html = ''
-    widget_array = []
-    widget_counter = 0
+    html, widget_array = '', []
     for content in content_array:
         if content.type in ['text', 'image', 'video']:
             value = (utils.parse_with_jinja(content.value, params)
@@ -574,18 +572,18 @@ def export_content_to_html(content_array, block_number, params=None):
             widget_dict = json.loads(content.value)
             widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
+            widget_array_len = len(widget_array)
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
                     'blockIndex': block_number,
-                    'index': widget_counter,
+                    'index': widget_array_len,
                     'type': content.type,
                 })
             widget_array.append({
                 'blockIndex': block_number,
-                'index': widget_counter,
+                'index': widget_array_len,
                 'raw': widget.get_with_params(widget_dict['params'])['raw'],
             })
-            widget_counter += 1
         else:
             raise utils.InvalidInputException(
                 'Invalid content type %s', content.type)
