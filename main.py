@@ -17,7 +17,7 @@
 __author__ = 'Sean Lip'
 
 import feconf
-if feconf.PLATFORM == 'Django':
+if feconf.PLATFORM == 'django':
     import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oppia.settings")
 

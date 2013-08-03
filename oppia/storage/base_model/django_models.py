@@ -154,3 +154,6 @@ django_internal_attrs = dir(dummymodel)
 internal_attrs = ['_json_field_cache']
 
 all_internal_attrs = django_internal_attrs + internal_attrs
+
+class FakeIdModel(IdModel):
+    pass

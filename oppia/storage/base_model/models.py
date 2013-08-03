@@ -22,3 +22,4 @@ from oppia.storage.base_model import django_models
 
 BaseModel = django_models.BaseModel
 IdModel = django_models.IdModel
+FakeIdModel = django_models.FakeIdModel

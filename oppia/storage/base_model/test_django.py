@@ -35,10 +35,7 @@ def inheritors(klass):
                 work.append(child)
     return subclasses
 
-
-class FakeIdModel(base_models.IdModel):
-    pass
-
+FakeIdModel = base_models.FakeIdModel
 
 class ConverterUnitTests(unittest.TestCase):
     """Test the Converter class."""
