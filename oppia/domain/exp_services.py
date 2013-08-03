@@ -32,7 +32,7 @@ import os
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import rule_domain
-from oppia.domain import stats_services
+from oppia.domain import stats_domain
 from oppia.domain import widget_domain
 from oppia.platform import models
 (exp_models, image_models, param_models, state_models) = (
@@ -42,6 +42,19 @@ from oppia.platform import models
     ])
 )
 import utils
+
+
+# TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
+SUBMIT_HANDLER_NAME = 'submit'
+
+
+# Repository methods.
+def get_exploration_by_id(exploration_id, strict=True):
+    """Returns a domain object representing an exploration."""
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration_id, strict=strict)
+    return exp_domain.Exploration(
+        exploration_model) if exploration_model else None
 
 
 # Query methods.
@@ -86,7 +99,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
     If the obj_type does not match the obj_type for the parameter in the
     exploration, an Exception is raised.
     """
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     for param in exploration.parameters:
         if param.name == param_name:
@@ -111,7 +124,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
     if reader_params is None:
         reader_params = {}
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     for item in state.param_changes:
@@ -123,7 +136,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
 
 def get_exploration_params(exploration_id):
     """Gets exploration-scoped parameters when an exploration is started."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     params = {}
     for param in exploration.parameters:
@@ -134,7 +147,7 @@ def get_exploration_params(exploration_id):
 # Operations on states belonging to an exploration.
 def get_state_by_name(exploration_id, state_name, strict=True):
     """Gets a state by name. Fails noisily if strict == True."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     assert state_name
 
     # TODO(sll): This is too slow; improve it.
@@ -159,7 +172,7 @@ def convert_state_name_to_id(exploration_id, state_name):
 
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state.content = [
@@ -229,7 +242,7 @@ def _find_first_match(handler, all_rule_classes, answer, state_params):
 
 def classify(exploration_id, state_id, handler_name, answer, params):
     """Return the first rule that is satisfied by a reader's answer."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     # Get the widget to determine the input type.
@@ -279,7 +292,7 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
-    exploration = exp_domain.Exploration.get(create_new(
+    exploration = get_exploration_by_id(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
 
@@ -309,7 +322,7 @@ def create_from_yaml(
 
 def fork_exploration(exploration_id, user_id):
     """Forks an exploration and returns the new exploration's id."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     if not exploration.is_forkable_by(user_id):
         raise Exception('You cannot copy this exploration.')
 
@@ -342,7 +355,7 @@ def load_demos():
             yaml_content, None, title, category, exploration_id=str(index),
             image_id=image_id)
 
-        exploration = exp_domain.Exploration.get(exploration_id)
+        exploration = get_exploration_by_id(exploration_id)
         exploration.is_public = True
         exploration.put()
 
@@ -351,7 +364,7 @@ def delete_demos():
     """Deletes the demo explorations."""
     explorations_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = exp_domain.Exploration.get(str(int_id), strict=False)
+        exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
@@ -380,7 +393,7 @@ def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):
     """Gets a Python dict of the internals of the state."""
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict())
@@ -397,7 +410,7 @@ def export_state_internals_to_dict(
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
@@ -405,19 +418,28 @@ def export_state_to_dict(exploration_id, state_id):
     return state_dict
 
 
+def get_unresolved_answers_for_default_rule(exploration_id, state_id):
+    """Gets the tally of unresolved answers that hit the default rule."""
+    # TODO(sll): Add similar functionality for other rules? But then we have
+    # to figure out what happens when those rules are edited/deleted.
+    # TODO(sll): Should this return just the top N answers instead?
+    return stats_domain.StateRuleAnswerLog.get(
+        exploration_id, state_id, SUBMIT_HANDLER_NAME,
+        state_models.DEFAULT_RULESPEC_STR).answers
+
+
 def export_state_to_verbose_dict(exploration_id, state_id):
     """Gets a state dict with rule descriptions and unresolved answers."""
 
     state_dict = export_state_to_dict(exploration_id, state_id)
 
-    state_dict['unresolved_answers'] = (
-        stats_services.get_unresolved_answers_for_default_rule(
-            exploration_id, state_id))
+    state_dict['unresolved_answers'] = get_unresolved_answers_for_default_rule(
+        exploration_id, state_id)
 
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     for handler in state_dict['widget']['handlers']:
@@ -499,7 +521,7 @@ def export_content_to_html(content_array, block_number, params=None):
 
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     params = [{
         'name': param.name, 'obj_type': param.obj_type, 'values': param.values

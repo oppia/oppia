@@ -17,7 +17,6 @@
 __author__ = 'Jeremy Emerson'
 
 import feconf
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.platform import models
 (state_models,) = models.Registry.import_models([models.NAMES.state])
@@ -44,8 +43,9 @@ class StateModelUnitTests(test_utils.AppEngineTestBase):
     def test_create_and_get_state(self):
         """Test creation and retrieval of states."""
         eid = 'A exploration_id'
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.user_id, 'A title', 'A category', eid))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.user_id, 'A title', 'A category', eid))
 
         id_1 = '123'
         name_1 = 'State 1'

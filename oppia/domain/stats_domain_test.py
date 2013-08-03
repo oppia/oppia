@@ -18,7 +18,6 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
@@ -30,7 +29,7 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
     """Test the state counter domain object."""
 
     def test_state_entry_counts(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
         second_state = exp.add_state('State 2')
 
@@ -85,7 +84,7 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 
@@ -142,7 +141,7 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
             answer_log.get_top_answers(2), [('answer2', 3), ('answer1', 2)])
 
     def test_recording_answer_for_different_rules(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 
@@ -164,7 +163,7 @@ class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
     def test_resolving_answers(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 

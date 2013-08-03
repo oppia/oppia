@@ -20,7 +20,6 @@ import cgi
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import skins_services
 from oppia.domain import stats_services
@@ -38,7 +37,7 @@ class ExplorationPage(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
-            exploration = exp_domain.Exploration.get(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -61,7 +60,7 @@ class ExplorationHandler(base.BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = exp_domain.Exploration.get(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -171,7 +170,7 @@ class FeedbackHandler(base.BaseHandler):
         """Handles feedback interactions with readers."""
         values = {}
 
-        exploration = exp_domain.Exploration.get(exploration_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         old_state = exploration.get_state_by_id(state_id)
 
         # The reader's answer.

@@ -63,15 +63,6 @@ class Exploration(base_domain.BaseDomainObject):
         if not self.is_demo and not self.editor_ids:
             raise self.ObjectValidationError('This exploration has no editors.')
 
-    @classmethod
-    def get(cls, exploration_id, strict=True):
-        """Returns a domain object representing an exploration."""
-        exploration_model = exp_models.ExplorationModel.get(
-            exploration_id, strict=strict)
-        if exploration_model is None:
-            return None
-        return cls(exploration_model)
-
     def put(self):
         """Saves the exploration."""
         self._pre_put_hook()

@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import user_services
 import utils
@@ -29,7 +28,7 @@ class MainPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not exp_domain.Exploration.get('0', strict=False):
+        if not exp_services.get_exploration_by_id('0', strict=False):
             exp_services.reload_demos()
 
         self.values.update({

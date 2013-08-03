@@ -17,8 +17,10 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
+from oppia.domain import stats_services
+from oppia.platform import models
+(state_models,) = (models.Registry.import_models([models.NAMES.state]))
 import test_utils
 
 
@@ -40,23 +42,27 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     def test_get_all_explorations(self):
         """Test get_all_explorations()."""
 
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'A exploration_id'))
         self.assertItemsEqual(
             [e.id for e in exp_services.get_all_explorations()],
             [exploration.id]
         )
 
-        exploration2 = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'New title', 'A category', 'New exploration_id'))
+        exploration2 = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'New title', 'A category',
+                'New exploration_id'))
         self.assertItemsEqual(
             [e.id for e in exp_services.get_all_explorations()],
             [exploration.id, exploration2.id]
         )
 
     def test_get_public_explorations(self):
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'A exploration_id'))
         self.assertEqual(exp_services.get_public_explorations(), [])
 
         exploration.is_public = True
@@ -67,8 +73,9 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
 
     def test_get_viewable_explorations(self):
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
         exploration.put()
 
@@ -91,8 +98,9 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(get_viewable_ids(None), [exploration.id])
 
     def test_get_editable_explorations(self):
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
         exploration.put()
 
@@ -132,14 +140,16 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_create_from_yaml(self):
         """Test the create_from_yaml() method."""
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category',
-            'A different exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
         exploration.add_state('New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
 
-        exploration2 = exp_domain.Exploration.get(exp_services.create_from_yaml(
-            yaml_content, self.owner_id, 'Title', 'Category'))
+        exploration2 = exp_services.get_exploration_by_id(
+            exp_services.create_from_yaml(
+                yaml_content, self.owner_id, 'Title', 'Category'))
         self.assertEqual(len(exploration2.state_ids), 2)
         yaml_content_2 = exp_services.export_to_yaml(exploration2.id)
         self.assertEqual(yaml_content_2, yaml_content)
@@ -165,17 +175,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_creation_and_deletion_and_retrieval_of_explorations(self):
         """Test the create_new(), delete() and get() methods."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_domain.Exploration.get('fake_eid')
+            exp_services.get_exploration_by_id('fake_eid')
 
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        retrieved_exploration = exp_domain.Exploration.get('A exploration_id')
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'A exploration_id'))
+        retrieved_exploration = exp_services.get_exploration_by_id(
+            'A exploration_id')
         self.assertEqual(exploration.id, retrieved_exploration.id)
         self.assertEqual(exploration.title, retrieved_exploration.title)
 
         exploration.delete()
         with self.assertRaises(Exception):
-            exp_domain.Exploration.get('A exploration_id')
+            exp_services.get_exploration_by_id('A exploration_id')
 
     def test_loading_and_deletion_of_demo_explorations(self):
         """Test loading and deletion of the demo explorations."""
@@ -193,9 +205,10 @@ class ExportUnitTests(ExplorationServicesUnitTests):
 
     def test_export_to_yaml(self):
         """Test the export_to_yaml() method."""
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category',
-            'A different exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
         exploration.add_state('New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(yaml_content, """parameters: []
@@ -234,9 +247,10 @@ states:
 
     def test_export_state_to_dict(self):
         """Test the export_state_to_dict() method."""
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            self.owner_id, 'A title', 'A category',
-            'A different exploration_id'))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
         new_state = exploration.add_state('New state')
         state_dict = exp_services.export_state_to_dict(
             exploration.id, new_state.id)
@@ -269,11 +283,15 @@ states:
 class StateServicesUnitTests(ExplorationServicesUnitTests):
     """Test methods operating on states."""
 
+    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    SUBMIT_HANDLER = 'submit'
+
     def test_convert_state_name_to_id(self):
         """Test converting state names to ids."""
         eid = 'exp_id'
-        exploration = exp_domain.Exploration.get(exp_services.create_new(
-            'user_id', 'A title', 'A category', eid))
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                'user_id', 'A title', 'A category', eid))
 
         sid = 'state_id'
         state_name = 'State 1'
@@ -288,3 +306,26 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.convert_state_name_to_id(eid, feconf.END_DEST),
             feconf.END_DEST)
+
+    def test_get_unresolved_answers(self):
+        self.assertEquals(
+            exp_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {})
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            exp_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {'a1': 1})
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            exp_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {'a1': 2})
+
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
+        self.assertEquals(
+            exp_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {})
