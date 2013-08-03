@@ -16,9 +16,8 @@
 
 __author__ = 'Jeremy Emerson'
 
-from oppia.domain import exp_domain
+from oppia.domain import exp_services
 import oppia.storage.exploration.models as exp_models
-import oppia.storage.image.models as image_models
 import oppia.storage.parameter.models as param_models
 import oppia.storage.state.models as state_models
 
@@ -78,7 +77,7 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # Put and retrieve the exploration.
         exploration.put()
 
-        retrieved_exploration = exp_domain.Exploration.get(
+        retrieved_exploration = exp_services.get_exploration_by_id(
             'The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')
