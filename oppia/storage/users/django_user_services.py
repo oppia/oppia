@@ -16,27 +16,42 @@
 
 """Provides a seam for user-related services."""
 
-__author__ = 'Sean Lip'
+__author__ = 'Tarashish Mishra'
 
-
-from google.appengine.api import users
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 
 
 def create_login_url(slug):
     """Creates a login url."""
-    return users.create_login_url(slug)
+    # Currently we have no way to implement this on non-GAE platforms 
+	# as a stand alone app.
+    return ''
 
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    return users.create_logout_url(slug)
+    # Currently we have no way to implement this on non-GAE platforms 
+	# as a stand alone app.
+    return ''
 
 
-def is_current_user_admin():
+def is_current_user_admin(request):
     """Checks whether the current user is an admin."""
-    return users.is_current_user_admin()
+    user = get_current_user(request)
+    if user:
+        return user.is_superuser
+    else:
+        return False
 
 
-def get_current_user():
+def get_current_user(request):
     """Returns the current user."""
-    return users.get_current_user()
+    session_key = request.cookies['sessionid']
+    try:
+        session = Session.objects.get(session_key=session_key)
+        uid = session.get_decoded().get('_auth_user_id')
+        user = User.objects.get(pk=uid)
+        return user
+    except Session.DoesNotExist:
+        return None

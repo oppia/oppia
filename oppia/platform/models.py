@@ -62,6 +62,11 @@ class _Django(_Platform):
 
         return tuple(returned_models)
 
+    @classmethod
+    def import_user_services(cls):
+        from oppia.storage.users import django_user_services
+        return django_user_services
+
     NAME = 'django'
 
 
@@ -94,6 +99,11 @@ class _Gae(_Platform):
 
         return tuple(returned_models)
 
+    @classmethod
+    def import_user_services(cls):
+        from oppia.storage.users import gae_user_services
+        return gae_user_services
+
     NAME = 'gae'
 
 
@@ -110,3 +120,7 @@ class Registry(object):
     @classmethod
     def import_models(cls, model_names):
         return cls._get().import_models(model_names)
+
+    @classmethod
+    def import_user_services(cls):
+        return cls._get().import_user_services()
