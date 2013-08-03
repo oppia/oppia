@@ -147,27 +147,33 @@ if [ ! -d "$THIRD_PARTY_DIR/static/yui2-2.9.0" ]; then
   wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.css
 fi
 
-echo Checking whether jsrepl is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-  echo Checking whether coffeescript has been installed via node.js
-  if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
-    echo Installing CoffeeScript
-    $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
-  fi
-
-  echo Downloading jsrepl
-  pushd $THIRD_PARTY_DIR
-  git clone git://github.com/replit/jsrepl.git
-  cd jsrepl
-  git submodule update --init --recursive
-
-  echo Compiling jsrepl
-  # Reducing jvm memory requirement from 4G to 1G.
-  sed -i s/Xmx4g/Xmx1g/ Cakefile
-  NODE_PATH=../node-0.10.1/lib/node_modules cake bake
-  popd
-  mv $THIRD_PARTY_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
-fi
+# For this to work, you must first run
+#
+#     sudo apt-get install cakephp-scripts
+#
+# Commenting the rest of the code out for now because it is not working on some systems.
+#
+# echo Checking whether jsrepl is installed in third_party
+# if [ ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
+#   echo Checking whether coffeescript has been installed via node.js
+#   if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
+#     echo Installing CoffeeScript
+#     $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
+#   fi
+#
+#   echo Downloading jsrepl
+#   cd $THIRD_PARTY_DIR
+#   git clone git://github.com/replit/jsrepl.git
+#   cd jsrepl
+#   git submodule update --init --recursive
+#
+#   echo Compiling jsrepl
+#   # Reducing jvm memory requirement from 4G to 1G.
+#   sed -i s/Xmx4g/Xmx1g/ Cakefile
+#   NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+#   cd ../../
+#   mv $THIRD_PARTY_DIR/jsrepl/myapp $THIRD_PARTY_DIR/static/jsrepl
+# fi
 
 # Do a build.
 python build.py
