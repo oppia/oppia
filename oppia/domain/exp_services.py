@@ -32,7 +32,7 @@ import os
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import rule_domain
-from oppia.domain import stats_services
+from oppia.domain import stats_domain
 from oppia.domain import widget_domain
 from oppia.platform import models
 (exp_models, image_models, param_models, state_models) = (
@@ -42,6 +42,69 @@ from oppia.platform import models
     ])
 )
 import utils
+
+
+# TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
+SUBMIT_HANDLER_NAME = 'submit'
+
+
+# Repository methods.
+def get_exploration_by_id(exploration_id, strict=True):
+    """Returns a domain object representing an exploration."""
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration_id, strict=strict)
+    return exp_domain.Exploration(
+        exploration_model) if exploration_model else None
+
+
+def save_exploration(exploration):
+    """Commits an exploration domain object to persistent storage."""
+    exploration.validate()
+
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
+    exploration_model.put({
+        'category': exploration.category,
+        'title': exploration.title,
+        'state_ids': exploration.state_ids,
+        'parameters': exploration.parameters,
+        'is_public': exploration.is_public,
+        'image_id': exploration.image_id,
+        'editor_ids': exploration.editor_ids,
+        'default_skin': exploration.default_skin,
+    })
+
+
+def create_new(
+    user_id, title, category, exploration_id=None,
+        init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
+    """Creates and saves a new exploration; returns its id."""
+    # Generate a new exploration id, if one wasn't passed in.
+    exploration_id = (exploration_id or
+                      exp_models.ExplorationModel.get_new_id(title))
+
+    state_id = state_models.State.get_new_id(init_state_name)
+    new_state = state_models.State(id=state_id, name=init_state_name)
+    new_state.put()
+
+    # Note that demo explorations do not have owners, so user_id may be None.
+    exploration_model = exp_models.ExplorationModel(
+        id=exploration_id, title=title, category=category,
+        image_id=image_id, state_ids=[state_id],
+        editor_ids=[user_id] if user_id else [])
+
+    exploration_model.put()
+
+    return exploration_model.id
+
+
+def delete_exploration(exploration_id):
+    """Deletes the exploration with the given exploration_id."""
+    exploration_model = exp_models.ExplorationModel.get(exploration_id)
+    exploration = exp_domain.Exploration(exploration_model)
+
+    for state_id in exploration.state_ids:
+        exploration.get_state_by_id(state_id).delete()
+    exploration_model.delete()
 
 
 # Query methods.
@@ -86,7 +149,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
     If the obj_type does not match the obj_type for the parameter in the
     exploration, an Exception is raised.
     """
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     for param in exploration.parameters:
         if param.name == param_name:
@@ -102,7 +165,7 @@ def get_or_create_param(exploration_id, param_name, obj_type=None):
         obj_type = 'UnicodeString'
     exploration.parameters.append(
         param_models.Parameter(name=param_name, obj_type=obj_type))
-    exploration.put()
+    save_exploration(exploration)
     return param_models.ParamChange(name=param_name, obj_type=obj_type)
 
 
@@ -111,7 +174,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
     if reader_params is None:
         reader_params = {}
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     for item in state.param_changes:
@@ -123,7 +186,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
 
 def get_exploration_params(exploration_id):
     """Gets exploration-scoped parameters when an exploration is started."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     params = {}
     for param in exploration.parameters:
@@ -134,7 +197,7 @@ def get_exploration_params(exploration_id):
 # Operations on states belonging to an exploration.
 def get_state_by_name(exploration_id, state_name, strict=True):
     """Gets a state by name. Fails noisily if strict == True."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     assert state_name
 
     # TODO(sll): This is too slow; improve it.
@@ -157,9 +220,55 @@ def convert_state_name_to_id(exploration_id, state_name):
     return get_state_by_name(exploration_id, state_name).id
 
 
+def add_state(exploration_id, state_name, state_id=None):
+    """Adds a new state, and returns it. Commits changes."""
+    exploration = get_exploration_by_id(exploration_id)
+    if exploration.has_state_named(state_name):
+        raise ValueError('Duplicate state name %s' % state_name)
+
+    state_id = state_id or state_models.State.get_new_id(state_name)
+    new_state = state_models.State(id=state_id, name=state_name)
+    new_state.put()
+
+    exploration.state_ids.append(new_state.id)
+    save_exploration(exploration)
+
+    return new_state
+
+
+def delete_state(exploration_id, state_id):
+    """Deletes the given state. Commits changes."""
+    exploration = get_exploration_by_id(exploration_id)
+    if state_id not in exploration.state_ids:
+        raise ValueError('Invalid state id %s for exploration %s' %
+                        (state_id, exploration.id))
+
+    # Do not allow deletion of initial states.
+    if exploration.state_ids[0] == state_id:
+        raise ValueError('Cannot delete initial state of an exploration.')
+
+    # Find all destinations in the exploration which equal the deleted
+    # state, and change them to loop back to their containing state.
+    for other_state_id in exploration.state_ids:
+        other_state = exploration.get_state_by_id(other_state_id)
+        changed = False
+        for handler in other_state.widget.handlers:
+            for rule in handler.rule_specs:
+                if rule.dest == state_id:
+                    rule.dest = other_state_id
+                    changed = True
+        if changed:
+            other_state.put()
+
+    # Delete the state with id state_id.
+    exploration.get_state_by_id(state_id).delete()
+    exploration.state_ids.remove(state_id)
+    save_exploration(exploration)
+
+
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state.content = [
@@ -233,7 +342,7 @@ def _find_first_match(handler, all_rule_classes, answer, state_params):
 
 def classify(exploration_id, state_id, handler_name, answer, params):
     """Return the first rule that is satisfied by a reader's answer."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     # Get the widget to determine the input type.
@@ -253,29 +362,6 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 
 # Creation and deletion methods.
-def create_new(
-    user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
-    """Creates, saves and returns a new exploration id."""
-    # Generate a new exploration id, if one wasn't passed in.
-    exploration_id = (exploration_id or
-                      exp_models.ExplorationModel.get_new_id(title))
-
-    state_id = state_models.State.get_new_id(init_state_name)
-    new_state = state_models.State(id=state_id, name=init_state_name)
-    new_state.put()
-
-    # Note that demo explorations do not have owners, so user_id may be None.
-    exploration = exp_models.ExplorationModel(
-        id=exploration_id, title=title, category=category,
-        image_id=image_id, state_ids=[state_id],
-        editor_ids=[user_id] if user_id else [])
-
-    exploration.put()
-
-    return exploration.id
-
-
 def create_from_yaml(
     yaml_content, user_id, title, category, exploration_id=None,
         image_id=None):
@@ -283,7 +369,7 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
-    exploration = exp_domain.Exploration.get(create_new(
+    exploration = get_exploration_by_id(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
 
@@ -299,13 +385,13 @@ def create_from_yaml(
         for state_description in exploration_dict['states']:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
-                     else exploration.add_state(state_name))
+                     else add_state(exploration.id, state_name))
             state_list.append({'state': state, 'desc': state_description})
 
         for index, state in enumerate(state_list):
             modify_using_dict(exploration.id, state['state'].id, state['desc'])
     except Exception:
-        exploration.delete()
+        delete_exploration(exploration.id)
         raise
 
     return exploration.id
@@ -313,7 +399,7 @@ def create_from_yaml(
 
 def fork_exploration(exploration_id, user_id):
     """Forks an exploration and returns the new exploration's id."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     if not exploration.is_forkable_by(user_id):
         raise Exception('You cannot copy this exploration.')
 
@@ -346,24 +432,24 @@ def load_demos():
             yaml_content, None, title, category, exploration_id=str(index),
             image_id=image_id)
 
-        exploration = exp_domain.Exploration.get(exploration_id)
+        exploration = get_exploration_by_id(exploration_id)
         exploration.is_public = True
-        exploration.put()
+        save_exploration(exploration)
 
 
 def delete_demos():
     """Deletes the demo explorations."""
-    explorations_to_delete = []
+    exploration_ids_to_delete = []
     for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = exp_domain.Exploration.get(str(int_id), strict=False)
+        exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
             logging.info('No exploration with id %s found.' % int_id)
         else:
-            explorations_to_delete.append(exploration)
+            exploration_ids_to_delete.append(exploration.id)
 
-    for exploration in explorations_to_delete:
-        exploration.delete()
+    for exploration_id in exploration_ids_to_delete:
+        delete_exploration(exploration_id)
 
 
 def reload_demos():
@@ -376,7 +462,7 @@ def delete_all_explorations():
     """Deletes all explorations."""
     explorations = get_all_explorations()
     for exploration in explorations:
-        exploration.delete()
+        delete_exploration(exploration.id)
 
 
 # Methods for exporting states and explorations to other formats.
@@ -384,7 +470,7 @@ def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):
     """Gets a Python dict of the internals of the state."""
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = copy.deepcopy(state.to_dict())
@@ -401,7 +487,7 @@ def export_state_internals_to_dict(
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
@@ -409,19 +495,28 @@ def export_state_to_dict(exploration_id, state_id):
     return state_dict
 
 
+def get_unresolved_answers_for_default_rule(exploration_id, state_id):
+    """Gets the tally of unresolved answers that hit the default rule."""
+    # TODO(sll): Add similar functionality for other rules? But then we have
+    # to figure out what happens when those rules are edited/deleted.
+    # TODO(sll): Should this return just the top N answers instead?
+    return stats_domain.StateRuleAnswerLog.get(
+        exploration_id, state_id, SUBMIT_HANDLER_NAME,
+        state_models.DEFAULT_RULESPEC_STR).answers
+
+
 def export_state_to_verbose_dict(exploration_id, state_id):
     """Gets a state dict with rule descriptions and unresolved answers."""
 
     state_dict = export_state_to_dict(exploration_id, state_id)
 
-    state_dict['unresolved_answers'] = (
-        stats_services.get_unresolved_answers_for_default_rule(
-            exploration_id, state_id))
+    state_dict['unresolved_answers'] = get_unresolved_answers_for_default_rule(
+        exploration_id, state_id)
 
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
 
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
     state = exploration.get_state_by_id(state_id)
 
     for handler in state_dict['widget']['handlers']:
@@ -464,9 +559,7 @@ def export_content_to_html(content_array, block_number, params=None):
     if params is None:
         params = {}
 
-    html = ''
-    widget_array = []
-    widget_counter = 0
+    html, widget_array = '', []
     for content in content_array:
         if content.type in ['text', 'image', 'video']:
             value = (utils.parse_with_jinja(content.value, params)
@@ -483,18 +576,18 @@ def export_content_to_html(content_array, block_number, params=None):
             widget_dict = json.loads(content.value)
             widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
+            widget_array_len = len(widget_array)
             html += feconf.OPPIA_JINJA_ENV.get_template(
                 'reader/content.html').render({
                     'blockIndex': block_number,
-                    'index': widget_counter,
+                    'index': widget_array_len,
                     'type': content.type,
                 })
             widget_array.append({
                 'blockIndex': block_number,
-                'index': widget_counter,
+                'index': widget_array_len,
                 'raw': widget.get_with_params(widget_dict['params'])['raw'],
             })
-            widget_counter += 1
         else:
             raise utils.InvalidInputException(
                 'Invalid content type %s', content.type)
@@ -503,7 +596,7 @@ def export_content_to_html(content_array, block_number, params=None):
 
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
 
     params = [{
         'name': param.name, 'obj_type': param.obj_type, 'values': param.values
@@ -513,6 +606,7 @@ def export_to_yaml(exploration_id):
         exploration_id, state_id, human_readable_dests=True)
         for state_id in exploration.state_ids]
 
+    # TODO(sll): Add import/export for default_skin.
     return utils.yaml_from_dict({
         'parameters': params, 'states': states_list
     })

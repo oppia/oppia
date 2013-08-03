@@ -20,8 +20,8 @@ import cgi
 
 import feconf
 from oppia.controllers import base
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
+from oppia.domain import skins_services
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
 from oppia.platform import models
@@ -34,14 +34,21 @@ READER_MODE = 'reader'
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    def get(self, unused_exploration_id):
+    def get(self, exploration_id):
         """Handles GET requests."""
-        self.values.update({'nav_mode': READER_MODE})
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
-        # Allow embedding of Oppia explorations in other pages.
-        if self.request.get('iframed') == 'true':
-            self.values['iframed'] = True
+        iframed = (self.request.get('iframed') == 'true')
 
+        self.values.update({
+            'content': skins_services.get_skin_html(
+                exploration.default_skin),
+            'iframed': iframed,
+            'nav_mode': READER_MODE,
+        })
         self.render_template('reader/reader_exploration.html')
 
 
@@ -53,7 +60,7 @@ class ExplorationHandler(base.BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         try:
-            exploration = exp_domain.Exploration.get(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -163,7 +170,7 @@ class FeedbackHandler(base.BaseHandler):
         """Handles feedback interactions with readers."""
         values = {}
 
-        exploration = exp_domain.Exploration.get(exploration_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         old_state = exploration.get_state_by_id(state_id)
 
         # The reader's answer.

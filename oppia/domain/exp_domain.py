@@ -19,22 +19,19 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.domain import base_domain
 from oppia.platform import models
-(exp_models, state_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.state
-])
+(state_models,) = models.Registry.import_models([models.NAMES.state])
+import utils
 
 
-class Exploration(base_domain.BaseDomainObject):
+class Exploration(object):
     """Domain object for an Oppia exploration.
 
-    All methods and properties in this file should be independent of the
-    specific storage model used.
+    Domain objects capture domain-specific logic and are agnostic of how the
+    objects they represent are stored. All methods and properties in domain
+    files should therefore be independent of the specific storage models used.
     """
     def __init__(self, exploration_model):
-        self._exploration_model = exploration_model
-
         self.id = exploration_model.id
         self.category = exploration_model.category
         self.title = exploration_model.title
@@ -43,53 +40,25 @@ class Exploration(base_domain.BaseDomainObject):
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
+        self.default_skin = exploration_model.default_skin
 
-    def _pre_put_hook(self):
+    def validate(self):
         """Validates the exploration before it is committed to storage."""
         if not self.state_ids:
-            raise self.ObjectValidationError('This exploration has no states.')
+            raise utils.ValidationError('This exploration has no states.')
+
+        # TODO(sll): Check that the template path pointed to by default_skin
+        # exists.
 
         # TODO(sll): We may not need this once appropriate tests are in
         # place and all state deletion operations are guarded against. Then
         # we can remove it if speed becomes an issue.
         for state_id in self.state_ids:
             if not self.get_state_by_id(state_id, strict=False):
-                raise self.ObjectValidationError('Invalid state_id %s.')
+                raise utils.ValidationError('Invalid state_id %s.')
 
         if not self.is_demo and not self.editor_ids:
-            raise self.ObjectValidationError('This exploration has no editors.')
-
-    @classmethod
-    def get(cls, exploration_id, strict=True):
-        """Returns a domain object representing an exploration."""
-        exploration_model = exp_models.ExplorationModel.get(
-            exploration_id, strict=strict)
-        if exploration_model is None:
-            return None
-        return cls(exploration_model)
-
-    def put(self):
-        """Saves the exploration."""
-        self._pre_put_hook()
-
-        # TODO(sll): Make this discover the properties automatically, then move
-        # it to the base domain class.
-        properties = {
-            'category': self.category,
-            'title': self.title,
-            'state_ids': self.state_ids,
-            'parameters': self.parameters,
-            'is_public': self.is_public,
-            'image_id': self.image_id,
-            'editor_ids': self.editor_ids,
-        }
-        self._exploration_model.put(properties)
-
-    def delete(self):
-        """Deletes the exploration."""
-        for state_id in self.state_ids:
-            self.get_state_by_id(state_id).delete()
-        self._exploration_model.delete()
+            raise utils.ValidationError('This exploration has no editors.')
 
     # Derived attributes of an exploration.
     @property
@@ -131,7 +100,7 @@ class Exploration(base_domain.BaseDomainObject):
         self.editor_ids.append(editor_id)
 
     # Methods relating to states comprising this exploration.
-    def _has_state_named(self, state_name):
+    def has_state_named(self, state_name):
         """Whether the exploration contains a state with the given name."""
         return any([self.get_state_by_id(state_id).name == state_name
                     for state_id in self.state_ids])
@@ -144,20 +113,6 @@ class Exploration(base_domain.BaseDomainObject):
 
         return state_models.State.get(state_id, strict=strict)
 
-    def add_state(self, state_name, state_id=None):
-        """Adds a new state, and returns it. Commits changes."""
-        if self._has_state_named(state_name):
-            raise ValueError('Duplicate state name %s' % state_name)
-
-        state_id = state_id or state_models.State.get_new_id(state_name)
-        new_state = state_models.State(id=state_id, name=state_name)
-        new_state.put()
-
-        self.state_ids.append(new_state.id)
-        self.put()
-
-        return new_state
-
     def rename_state(self, state_id, new_state_name):
         """Renames a state of this exploration. Commits changes."""
         if new_state_name == feconf.END_DEST:
@@ -167,36 +122,8 @@ class Exploration(base_domain.BaseDomainObject):
         if state.name == new_state_name:
             return
 
-        if self._has_state_named(new_state_name):
+        if self.has_state_named(new_state_name):
             raise ValueError('Duplicate state name: %s' % new_state_name)
 
         state.name = new_state_name
         state.put()
-
-    def delete_state(self, state_id):
-        """Deletes the given state. Commits changes."""
-        if state_id not in self.state_ids:
-            raise ValueError('Invalid state id %s for exploration %s' %
-                            (state_id, self.id))
-
-        # Do not allow deletion of initial states.
-        if self.state_ids[0] == state_id:
-            raise ValueError('Cannot delete initial state of an exploration.')
-
-        # Find all destinations in the exploration which equal the deleted
-        # state, and change them to loop back to their containing state.
-        for other_state_id in self.state_ids:
-            other_state = self.get_state_by_id(other_state_id)
-            changed = False
-            for handler in other_state.widget.handlers:
-                for rule in handler.rule_specs:
-                    if rule.dest == state_id:
-                        rule.dest = other_state_id
-                        changed = True
-            if changed:
-                other_state.put()
-
-        # Delete the state with id state_id.
-        self.get_state_by_id(state_id).delete()
-        self.state_ids.remove(state_id)
-        self.put()

@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.domain import exp_domain
+from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.platform import models
 (state_models, stats_models) = models.Registry.import_models([
@@ -57,20 +57,9 @@ class EventHandler(object):
             state_models.DEFAULT_RULESPEC_STR, answers)
 
 
-def get_unresolved_answers_for_default_rule(exploration_id, state_id):
-    """Gets the tally of unresolved answers that hit the default rule."""
-    # TODO(sll): Add similar functionality for other rules? But then we have
-    # to figure out what happens when those rules are edited/deleted.
-    # TODO(sll): Should this return just the top N answers instead?
-    return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_id, SUBMIT_HANDLER_NAME,
-        state_models.DEFAULT_RULESPEC_STR
-    ).answers
-
-
 def get_exploration_visit_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = exp_services.get_exploration_by_id(exploration_id)
     return stats_domain.StateCounter.get(
         exploration_id, exploration.init_state_id).first_entry_count
 
@@ -84,7 +73,7 @@ def get_exploration_completed_count(exploration_id):
 
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""
-    exploration = exp_domain.Exploration.get(exploration_id)
+    exploration = exp_services.get_exploration_by_id(exploration_id)
 
     state_stats = {}
     for state_id in exploration.state_ids:
@@ -133,7 +122,7 @@ def get_top_improvable_states(exploration_ids, N):
 
     ranked_states = []
     for exploration_id in exploration_ids:
-        exploration = exp_domain.Exploration.get(exploration_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         for state_id in exploration.state_ids:
             state_counts = stats_domain.StateCounter.get(
                 exploration_id, state_id)

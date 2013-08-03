@@ -14,18 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base domain object."""
+"""Provides services for HTML skins."""
 
 __author__ = 'Sean Lip'
 
+import feconf
+import jinja2
 
-class BaseDomainObject(object):
-    """Base domain object class for Oppia.
 
-    Domain objects capture domain-specific logic and are agnostic of how the
-    objects they represent are stored. All methods and properties in domain
-    files should therefore be independent of the specific storage models used.
-    """
-
-    class ObjectValidationError(Exception):
-        """Error class for domain object validation errors."""
+def get_skin_html(skin_name):
+    """Returns the HTML for a given skin."""
+    return jinja2.Markup(feconf.SKINS_JINJA_ENV.get_template(
+        '%s.html' % skin_name).render())

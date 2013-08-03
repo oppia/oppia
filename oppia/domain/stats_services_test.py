@@ -16,7 +16,6 @@
 
 __author__ = 'Jeremy Emerson'
 
-from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
@@ -192,29 +191,6 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
             'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR
         ).total_answer_count, 0)
 
-    def test_unresolved_answers(self):
-        self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {})
-
-        stats_services.EventHandler.record_answer_submitted(
-            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
-        self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {'a1': 1})
-
-        stats_services.EventHandler.record_answer_submitted(
-            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
-        self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {'a1': 2})
-
-        stats_services.EventHandler.resolve_answers_for_default_rule(
-            'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
-        self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
-                'eid', 'sid'), {})
-
 
 class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
     """Test the get_top_improvable_states() function."""
@@ -223,7 +199,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_get_top_improvable_states(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 
@@ -248,7 +224,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_single_default_rule_hit(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 
@@ -267,7 +243,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_no_improvement_flag_hit(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
 
         not_default_rule_spec = state_models.RuleSpec(
@@ -288,7 +264,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         state_id = exp.init_state_id
 
@@ -322,11 +298,11 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(states[0]['type'], 'default')
 
     def test_two_state_default_hit(self):
-        exp = exp_domain.Exploration.get(exp_services.create_new(
+        exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
 
         SECOND_STATE = 'State 2'
-        second_state = exp.add_state(SECOND_STATE)
+        second_state = exp_services.add_state(exp.id, SECOND_STATE)
 
         state1_id = exp.init_state_id
         state2_id = second_state.id

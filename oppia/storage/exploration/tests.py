@@ -16,7 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
-from oppia.domain import exp_domain
+from oppia.domain import exp_services
 from oppia.platform import models
 (exp_models, image_models, param_models, state_models) = (
     models.Registry.import_models([
@@ -85,7 +85,7 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # Put and retrieve the exploration.
         exploration.put()
 
-        retrieved_exploration = exp_domain.Exploration.get(
+        retrieved_exploration = exp_services.get_exploration_by_id(
             'The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')

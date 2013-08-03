@@ -104,6 +104,12 @@ OBJECT_JINJA_ENV = jinja2.Environment(
         os.path.dirname(__file__), OBJECT_TEMPLATES_DIR))
 )
 
+SKINS_DIR = 'data/skins'
+SKINS_JINJA_ENV = jinja2.Environment(
+    autoescape=True,
+    loader=jinja2.FileSystemLoader(os.path.join(
+        os.path.dirname(__file__), SKINS_DIR))
+)
 
 # The jinja environment used for loading frontend templates.
 loader = jinja2.FileSystemLoader(os.path.join(

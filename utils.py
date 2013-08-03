@@ -40,14 +40,9 @@ class EntityIdNotFoundError(Exception):
     pass
 
 
-def log(message):
-    """Logs info messages in development/debug mode."""
-    # TODO(sll): This method is unused; remove it.
-    if feconf.DEV_MODE or feconf.DEBUG:
-        if isinstance(message, dict):
-            logging.info(json.dumps(message, sort_keys=True, indent=4))
-        else:
-            logging.info(str(message))
+class ValidationError(Exception):
+    """Error class for when a domain object fails validation."""
+    pass
 
 
 def create_enum(*sequential, **names):
