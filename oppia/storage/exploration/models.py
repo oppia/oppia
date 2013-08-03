@@ -55,6 +55,9 @@ class ExplorationModel(base_models.IdModel):
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.
     editor_ids = ndb.StringProperty(repeated=True)
+    # The default HTML template to use for displaying the exploration to the
+    # reader. This is a filename in data/skins (without the .html suffix).
+    default_skin = ndb.StringProperty(default='conversation')
 
     @classmethod
     def get_public_explorations(cls):

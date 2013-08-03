@@ -43,11 +43,15 @@ class Exploration(base_domain.BaseDomainObject):
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
+        self.default_skin = exploration_model.default_skin
 
     def _pre_put_hook(self):
         """Validates the exploration before it is committed to storage."""
         if not self.state_ids:
             raise self.ObjectValidationError('This exploration has no states.')
+
+        # TODO(sll): Check that the template path pointed to by default_skin
+        # exists.
 
         # TODO(sll): We may not need this once appropriate tests are in
         # place and all state deletion operations are guarded against. Then
@@ -82,6 +86,7 @@ class Exploration(base_domain.BaseDomainObject):
             'is_public': self.is_public,
             'image_id': self.image_id,
             'editor_ids': self.editor_ids,
+            'default_skin': self.default_skin,
         }
         self._exploration_model.put(properties)
 

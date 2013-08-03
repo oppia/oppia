@@ -509,6 +509,7 @@ def export_to_yaml(exploration_id):
         exploration_id, state_id, human_readable_dests=True)
         for state_id in exploration.state_ids]
 
+    # TODO(sll): Add import/export for default_skin.
     return utils.yaml_from_dict({
         'parameters': params, 'states': states_list
     })
