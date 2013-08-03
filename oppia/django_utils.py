@@ -1,8 +1,27 @@
+# coding: utf-8
+#
+# Copyright 2013 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Utility functions and classes for django models."""
+
+__author__ = 'Tarashish Mishra'
+
 from django.db import models
-from django.utils import simplejson as json
+from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.translation import ugettext as _
-from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import ValidationError
 from django.forms import fields, util
 
@@ -10,15 +29,10 @@ import ast
 import re
 import datetime
 from decimal import Decimal
-try:
-    from dateutil import parser as date_parser
-except ImportError:
-    raise ImproperlyConfigured('The "dateutil" library is required and was not found.')
+from dateutil import parser as date_parser
 
-try:
-    JSON_DECODE_ERROR = json.JSONDecodeError  # simplejson
-except AttributeError:
-    JSON_DECODE_ERROR = ValueError  # other
+
+JSON_DECODE_ERROR = ValueError
 
 TIME_RE = re.compile(r'^\d{2}:\d{2}:\d{2}')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}(?!T)')
@@ -56,12 +70,12 @@ class JSONFormField(fields.Field):
                 'false': False,
             }
             try:
-                value = json.dumps(eval(value, json_globals, json_locals), **self.encoder_kwargs)
+                value = simplejson.dumps(eval(value, json_globals, json_locals), **self.encoder_kwargs)
             except Exception, e:  # eval can throw many different errors
                 raise util.ValidationError('%s (Caught "%s")' % (self.help_text, e))
 
         try:
-            json.loads(value, **self.decoder_kwargs)
+            simplejson.loads(value, **self.decoder_kwargs)
         except ValueError, e:
             raise util.ValidationError('%s (Caught "%s")' % (self.help_text, e))
 
@@ -116,7 +130,7 @@ class Converter():
         return object_list
 
 
-class JSONDecoder(json.JSONDecoder):
+class JSONDecoder(simplejson.JSONDecoder):
     """ Recursive JSON to Python deserialization. """
 
     _recursable_types = [str, unicode, list, dict]
@@ -230,7 +244,7 @@ class JSONField(models.TextField):
             return None
         elif isinstance(value, basestring):
             try:
-                value = json.loads(value, **self.decoder_kwargs)
+                value = simplejson.loads(value, **self.decoder_kwargs)
                 if not self.primitivelist:
                     schema = self.schema
                     if isinstance(schema, list) and isinstance(schema[0], object):
@@ -254,7 +268,7 @@ class JSONField(models.TextField):
         if self.null and value is None and not kwargs.get('force'):
             return None
         elif isinstance(value, dict) and self.isdict:
-            return json.dumps(value, **self.encoder_kwargs)
+            return simplejson.dumps(value, **self.encoder_kwargs)
         elif isinstance(value, (list, dict)) and not self.primitivelist:
             schema = self.schema
             assert type(schema) == type(value)
@@ -266,7 +280,7 @@ class JSONField(models.TextField):
                     assert key in schema.keys()
                     assert isinstance(val, schema[key])
             return_value = Converter.encode(value)
-            return json.dumps(return_value, **self.encoder_kwargs)
+            return simplejson.dumps(return_value, **self.encoder_kwargs)
         if self.schema:
             try:
                 assert type(self.schema) == type(value)
@@ -275,13 +289,13 @@ class JSONField(models.TextField):
                     "Value %s doesn't match schema %s"
                     % (repr(value), repr(self.schema))
                 )
-        return json.dumps(value, **self.encoder_kwargs)
+        return simplejson.dumps(value, **self.encoder_kwargs)
 
     def value_to_string(self, obj):
         return self.get_db_prep_value(self._get_val_from_obj(obj))
 
     def value_from_object(self, obj):
-        return json.dumps(super(JSONField, self).value_from_object(obj), **self.encoder_kwargs)
+        return simplejson.dumps(super(JSONField, self).value_from_object(obj), **self.encoder_kwargs)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -332,20 +346,3 @@ class ListField(models.CharField):
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
-
-
-try:
-    # add support for South migrations
-    from south.modelsinspector import add_introspection_rules
-    rules = [
-        (
-            (JSONField,),
-            [],
-            {
-                'db_type': ['_db_type', {'default': None}]
-            }
-        )
-    ]
-    add_introspection_rules(rules, ['^json_field\.fields\.JSONField'])
-except ImportError:
-    pass
