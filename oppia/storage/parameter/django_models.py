@@ -20,7 +20,7 @@ import re
 
 from oppia.domain import obj_services
 import oppia.storage.base_model.models as base_models
-from oppia.storage.base_model.models import django_internal_attrs
+from oppia.storage.base_model.django_models import django_internal_attrs
 import utils
 
 from django.db import models

@@ -16,7 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import oppia.storage.base_model.models as base_models
+import oppia.storage.base_model.gae_models as base_models
 import test_utils
 
 

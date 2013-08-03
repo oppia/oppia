@@ -8,3 +8,5 @@ oppia/templates/prod/*
 .viminfo
 libpeerconnection.log
 uploads/*
+venv/
+*.db
