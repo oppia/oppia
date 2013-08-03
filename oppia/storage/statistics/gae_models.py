@@ -20,7 +20,8 @@ __author__ = 'Sean Lip'
 
 import logging
 
-import oppia.storage.base_model.models as base_models
+from oppia.platform import models
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 from google.appengine.ext import ndb
 

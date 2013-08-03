@@ -19,7 +19,8 @@ __author__ = 'Jeremy Emerson'
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 import test_utils
 
 

@@ -31,11 +31,6 @@ class Parameter(object):
 
     Note that the obj_type must be set before the values.
     """
-    name = None
-    obj_type = None
-    values = None
-    description = ''
-
     def __setattr__(self, name, value):
         if name == 'name':
             assert value

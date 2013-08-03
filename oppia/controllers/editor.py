@@ -22,8 +22,9 @@ from oppia.domain import exp_services
 from oppia.domain import rule_domain
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
-import oppia.storage.parameter.models as param_models
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(param_models, state_models) = models.Registry.import_models(
+    [models.NAMES.parameter, models.NAMES.state])
 import utils
 
 EDITOR_MODE = 'editor'

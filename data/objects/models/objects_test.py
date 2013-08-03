@@ -84,6 +84,23 @@ class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
 
         self.check_normalization(objects.NonnegativeInt, mappings, invalid_vals)
 
+    def test_code_evaluation_validation(self):
+        """Tests objects of type codeEvaluation."""
+        mappings = [(
+            {'code': 'a', 'output': '', 'evaluation': '', 'error': ''},
+            {'code': 'a', 'output': '', 'evaluation': '', 'error': ''}
+            ), (
+            {'code': '', 'output': '', 'evaluation': '', 'error': 'e'},
+            {'code': '', 'output': '', 'evaluation': '', 'error': 'e'}
+            )]
+        invalid_values = [
+            {'code': '', 'output': '', 'evaluation': ''},
+            'a', [], None
+         ]
+
+        self.check_normalization(
+            objects.CodeEvaluation, mappings, invalid_values)
+
     def test_coord_2d_validation(self):
         """Tests objects of type Coord2D."""
         mappings = [('-1, 2.2', [-1, 2.2]), ([0, 1], [0, 1]),

@@ -21,8 +21,10 @@ __author__ = 'Sean Lip'
 import feconf
 from oppia.domain import exp_domain
 from oppia.domain import stats_domain
-import oppia.storage.state.models as state_models
-import oppia.storage.statistics.models as stats_models
+from oppia.platform import models
+(state_models, stats_models) = models.Registry.import_models([
+    models.NAMES.state, models.NAMES.statistics
+])
 
 
 IMPROVE_TYPE_DEFAULT = 'default'

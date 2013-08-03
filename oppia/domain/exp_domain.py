@@ -20,8 +20,10 @@ __author__ = 'Sean Lip'
 
 import feconf
 from oppia.domain import base_domain
-import oppia.storage.exploration.models as exp_models
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(exp_models, state_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.state
+])
 
 
 class Exploration(base_domain.BaseDomainObject):
@@ -30,18 +32,6 @@ class Exploration(base_domain.BaseDomainObject):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-
-    id = None
-    category = None
-    title = None
-    state_ids = None
-    parameters = None
-    is_public = None
-    image_id = None
-    editor_ids = None
-
-    _exploration_model = None
-
     def __init__(self, exploration_model):
         self._exploration_model = exploration_model
 

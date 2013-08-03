@@ -37,7 +37,8 @@ import unittest
 
 import feconf
 
-EXPECTED_TEST_COUNT = 103
+EXPECTED_TEST_COUNT = 105
+
 
 
 _PARSER = argparse.ArgumentParser()

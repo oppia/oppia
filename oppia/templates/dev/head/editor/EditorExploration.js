@@ -134,6 +134,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.statsGraphOpacities[END_DEST] = Math.max(
         $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
+    $scope.highlightStates = {};
+    for (var i = 0; i < data.imp.length; i++) {
+      $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+    }
+
     $scope.graphData = $scope.reformatResponse(
           data.states, data.init_state_id);
 

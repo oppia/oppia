@@ -24,7 +24,8 @@ from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(state_models,) = models.Registry.import_models([models.NAMES.state])
 import utils
 
 READER_MODE = 'reader'

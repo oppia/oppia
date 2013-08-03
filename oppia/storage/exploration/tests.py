@@ -17,10 +17,13 @@
 __author__ = 'Jeremy Emerson'
 
 from oppia.domain import exp_domain
-import oppia.storage.exploration.models as exp_models
-import oppia.storage.image.models as image_models
-import oppia.storage.parameter.models as param_models
-import oppia.storage.state.models as state_models
+from oppia.platform import models
+(exp_models, image_models, param_models, state_models) = (
+    models.Registry.import_models([
+        models.NAMES.exploration, models.NAMES.image,
+        models.NAMES.parameter, models.NAMES.state,
+    ])
+)
 import test_utils
 
 from google.appengine.ext.db import BadValueError

@@ -67,6 +67,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
     restrict: 'E',
     scope: {
       val: '=',
+      highlightStates: '=',
       nodeFill: '@',
       opacityMap: '=',
       forbidNodeDeletion: '@'
@@ -80,17 +81,23 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         // TODO(sll): This does not update if a state name is changed.
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
-                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion);
+                    scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
+                    scope.highlightStates);
+          for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
+            document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
+          }
         }
       });
 
-      var vis = d3.select(element[0]).append('svg:svg')
-          .attr('height', h)
-          .attr('class', 'oppia-graph-viz')
-        .append('svg:g')
-          .attr('transform', 'translate(20,30)');
+      var height = 0;
 
-      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion) {
+      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
+        height = 0;
+        var vis = d3.select(element[0]).append('svg:svg')
+            .attr('class', 'oppia-graph-viz')
+          .append('svg:g')
+            .attr('transform', 'translate(20,30)');
+
         // clear the elements inside of the directive
         vis.selectAll('*').remove();
 
@@ -102,14 +109,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .data(['arrowhead'])
           .enter().append('svg:marker')
             .attr('id', String)
-            .attr('viewBox', '0 0 10 10')
+            .attr('viewBox', '-5 -5 18 18')
             .attr('refX', 10)
-            .attr('refY', 5)
+            .attr('refY', 6)
             .attr('markerWidth', 6)
-            .attr('markerHeight', 4.5)
+            .attr('markerHeight', 9)
             .attr('orient', 'auto')
           .append('svg:path')
-            .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+            .attr('d', 'M -5 0 L 12 6 L -5 12 z')
             .attr('fill', 'black');
 
         var linkEnter = link.enter().append('svg:g')
@@ -130,7 +137,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
-                return 'M' + sourcex + ' ' + sourcey;
+		return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) + 
+                       'A' + (sourceWidth/4) + ',20 0 1,1' 
+                           + (sourcex-10-sourceWidth/2) + ' ' + sourcey;
               }
 
               var dx = targetx - sourcex,
@@ -165,9 +174,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                   ' ' + endx + ' ' + endy;
             })
             .attr('marker-end', function(d) {
-              return (
-                (d.source.x0 == d.target.x0 && d.source.y0 == d.target.y0) ?
-                '' : 'url(#arrowhead)');
+              return 'url(#arrowhead)';
             });
 
         // Update the nodes
@@ -181,7 +188,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         // Add nodes to the canvas.
         nodeEnter.append('svg:rect')
             .attr('x', function(d) { return d.x0 - NODE_PADDING_X; })
-            .attr('y', function(d) { return d.y0; })
+            .attr('y', function(d) { height = height > d.y0 + 100? height : d.y0 + 100; return d.y0; })
             .attr('ry', function(d) { return 4; })
             .attr('rx', function(d) { return 4; })
             .attr('width', function(d) {
@@ -189,9 +196,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               return d.hashId != END_DEST ? 'clickable' : null; })
-            .style('stroke', 'black')
+            .style('stroke', function(d) { return (highlightStates? (d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC') : 'black')})
             .style('stroke-width', function(d) {
-              return (d.hashId == initStateId || d.hashId == END_DEST) ? '3' : '2';
+              return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
             })
             .style('fill', function(d) {
               if (nodeFill) {
@@ -205,8 +212,8 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 );
               }
             })
-            .style('opacity', function(d) {
-              return opacityMap ? opacityMap[d.hashId] : 1.0;
+            .style('fill-opacity', function(d) {
+              return opacityMap ? opacityMap[d.hashId] : 0.5;
             })
             .on('click', function (d) {
               if (d.hashId != END_DEST) {
