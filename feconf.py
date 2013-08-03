@@ -158,11 +158,11 @@ INTERACTIVE_WIDGET_COUNT = 9
 
 # Static file url to path mapping
 PATH_MAP = {
+    '/css': 'oppia/templates/dev/head/assets/css',
+    '/data/widgets': 'data/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',
-    '/css': 'oppia/templates/dev/head/assets/css',
     '/img': 'third_party/bootstrap/img',
-    '/third_party/static': 'third_party/static',
     '/lib/static': 'lib/static',
-    '/data/widgets': 'data/widgets',
+    '/third_party/static': 'third_party/static',
 }

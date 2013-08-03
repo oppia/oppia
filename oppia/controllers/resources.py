@@ -93,6 +93,8 @@ class StaticFileHandler(base.BaseHandler):
         try:
             f = open(file_path, 'r')
             self.response.headers['Content-Type'] = mimetypes.guess_type(file_path)[0]
+             # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate caching
+             # headers if that's turned on.
             self.response.write(f.read())
             f.close()
         except Exception:
