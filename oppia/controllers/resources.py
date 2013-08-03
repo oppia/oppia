@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import feconf
+
 from oppia.controllers import base
 from oppia.platform import models
 (image_models,) = models.Registry.import_models([models.NAMES.image])
@@ -83,19 +85,11 @@ class StaticFileHandler(base.BaseHandler):
     """Handles static file serving on non-GAE platforms."""
 
     def get(self):
-        path_map = {
-            '/favicon.ico': 'static/images/favicon.ico',
-            '/images': 'static/images',
-            '/css': 'oppia/templates/dev/head/assets/css',
-            '/img': 'third_party/bootstrap/img',
-            '/third_party/static': 'third_party/static',
-            '/lib/static': 'lib/static',
-            '/data/widgets/': 'data/widgets/',
-        }
+
         file_path = self.request.path
-        for path in path_map:
+        for path in feconf.PATH_MAP:
             if file_path.startswith(path):
-                file_path = file_path.replace(path, path_map[path])
+                file_path = file_path.replace(path, feconf.PATH_MAP[path])
         try:
             f = open(file_path, 'r')
             self.response.headers['Content-Type'] = mimetypes.guess_type(file_path)[0]

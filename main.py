@@ -17,8 +17,8 @@
 __author__ = 'Sean Lip'
 
 import feconf
+import os
 if feconf.PLATFORM == 'django':
-    import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oppia.settings")
 
 from oppia.controllers import admin
@@ -49,6 +49,15 @@ class Error404Handler(base.BaseHandler):
 
 # Regex for base64 id encoding
 r = '[A-Za-z0-9=_-]+'
+
+def generate_static_url_tuples():
+    static_urls = []
+    url_tuples = []
+    for url in feconf.PATH_MAP:
+        static_urls.append(url+'.+')
+    for url in static_urls:
+        url_tuples.append((url, resources.StaticFileHandler))
+    return url_tuples
 
 # Register the URL with the responsible classes
 urls = [
@@ -89,21 +98,22 @@ urls = [
     (r'/widgets/(noninteractive)/(%s)/?' % r, widgets.WidgetHandler),
     (r'/widgets/(interactive)/(%s)/?' % r, widgets.WidgetHandler),
 
-    (r'/lib/static/.+', resources.StaticFileHandler),
-    (r'/third_party/static/.+', resources.StaticFileHandler),
-    (r'/css/.+', resources.StaticFileHandler),
-    (r'/favicon.ico', resources.StaticFileHandler),
-    (r'/data/widgets/.+', resources.StaticFileHandler),
-    (r'/images/.+', resources.StaticFileHandler),
-    (r'/img/.+', resources.StaticFileHandler),
-
     # 404 error handler.
-    (r'/.*', Error404Handler),
+    
 ]
+
+error404_handler = [(r'/.*', Error404Handler)]
+
+if feconf.PLATFORM != 'gae':
+    urls = urls + generate_static_url_tuples() + error404_handler
+else:
+    urls = urls + error404_handler
+
+
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
 
-
+# Called on non-GAE platforms to start the development server.
 def main():
     from paste import httpserver
     httpserver.serve(app, host='127.0.0.1', port='8080')

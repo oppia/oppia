@@ -149,3 +149,14 @@ NONINTERACTIVE_PREFIX = 'noninteractive'
 NONINTERACTIVE_WIDGET_COUNT = 1
 # The total number of interactive widgets. Used as a sanity check.
 INTERACTIVE_WIDGET_COUNT = 9
+
+# Static file url to path mapping
+PATH_MAP = {
+    '/favicon.ico': 'static/images/favicon.ico',
+    '/images': 'static/images',
+    '/css': 'oppia/templates/dev/head/assets/css',
+    '/img': 'third_party/bootstrap/img',
+    '/third_party/static': 'third_party/static',
+    '/lib/static': 'lib/static',
+    '/data/widgets': 'data/widgets',
+}
