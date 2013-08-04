@@ -290,7 +290,7 @@ class StateHandler(base.BaseHandler):
             stats_services.EventHandler.resolve_answers_for_default_rule(
                 exploration.id, state.id, 'submit', resolved_answers)
 
-        exp_services.save_state(state)
+        exp_services.save_state(exploration.id, state)
         self.render_json(exp_services.export_state_to_verbose_dict(
             exploration.id, state.id))
 

@@ -63,7 +63,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         new_state = exp_domain.State(
             'Initial state id', 'name', [], [], None)
-        exp_services.save_state(new_state)
+        exp_services.save_state(exploration.id, new_state)
         exploration.states = [new_state]
 
         # There must be at least one editor id.
@@ -74,14 +74,14 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
     def test_init_state_property(self):
         """Test the init_state property."""
+        exploration = FakeExploration(owner_id='owner@example.com')
+
         INIT_STATE_ID = 'init_state_id'
         INIT_STATE_NAME = 'init_state_name'
-
         init_state = exp_domain.State(
             INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
-        exp_services.save_state(init_state)
+        exp_services.save_state(exploration.id, init_state)
 
-        exploration = FakeExploration(owner_id='owner@example.com')
         exploration.states = [init_state]
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)

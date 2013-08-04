@@ -52,10 +52,8 @@ SUBMIT_HANDLER_NAME = 'submit'
 # Repository methods.
 def _get_state_memcache_key(exploration_id, state_id):
     """Returns a memcache key for a state."""
-    # TODO(sll): This should include the exploration_id. This can only be fixed
-    # once save_state does so as well.
     # TODO(sll): Add memcache counters.
-    return state_id
+    return '%s:%s' % (exploration_id, state_id)
 
 
 def get_exploration_by_id(exploration_id, strict=True):
@@ -105,10 +103,9 @@ def save_exploration(exploration):
     })
 
 
-def save_state(state):
+def save_state(exploration_id, state):
     """Commits a state domain object to persistent storage."""
-    # TODO(sll): This should take an exploration id as an argument.
-    state_memcache_key = _get_state_memcache_key('', state.id)
+    state_memcache_key = _get_state_memcache_key(exploration_id, state.id)
     memcache_services.delete_multi([state_memcache_key])
 
     state.validate()
@@ -131,7 +128,7 @@ def create_new(
 
     state_id = state_models.StateModel.get_new_id(init_state_name)
     new_state = exp_domain.State(state_id, init_state_name, [], [], None)
-    save_state(new_state)
+    save_state(exploration_id, new_state)
 
     # Note that demo explorations do not have owners, so user_id may be None.
     exploration_model = exp_models.ExplorationModel(
@@ -282,7 +279,7 @@ def add_state(exploration_id, state_name, state_id=None):
 
     state_id = state_id or state_models.StateModel.get_new_id(state_name)
     new_state = exp_domain.State(state_id, state_name, [], [], None)
-    save_state(new_state)
+    save_state(exploration_id, new_state)
 
     exploration.states.append(new_state)
     save_exploration(exploration)
@@ -304,7 +301,7 @@ def rename_state(exploration_id, state_id, new_state_name):
         raise ValueError('Duplicate state name: %s' % new_state_name)
 
     state.name = new_state_name
-    save_state(state)
+    save_state(exploration_id, state)
     save_exploration(exploration)
     return get_exploration_by_id(exploration_id)
 
@@ -331,7 +328,7 @@ def delete_state(exploration_id, state_id):
                     rule.dest = other_state_id
                     changed = True
         if changed:
-            save_state(other_state)
+            save_state(exploration_id, other_state)
 
     # Delete the state with id state_id.
     delete_state_model(exploration_id, state_id)
@@ -381,7 +378,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         if wp.name not in wdict['params']:
             state.widget.params[wp.name] = wp.values
 
-    save_state(state)
+    save_state(exploration_id, state)
     return state
 
 

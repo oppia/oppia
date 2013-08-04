@@ -251,7 +251,7 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
             not_default_rule_spec,
             exp_domain.RuleSpec('Default', {}, exp.init_state.id, [], []),
         ]
-        exp_services.save_state(exp.init_state)
+        exp_services.save_state(exp.id, exp.init_state)
 
         stats_services.EventHandler.record_state_hit(
             'eid', exp.init_state.id, True)
