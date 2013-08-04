@@ -64,8 +64,13 @@ class _Django(_Platform):
 
     @classmethod
     def import_user_services(cls):
-        from core.storage.users import django_user_services
+        from core.platform.users import django_user_services
         return django_user_services
+
+    @classmethod
+    def import_memcache_services(cls):
+        from core.platform.memcache import django_memcache_services
+        return django_memcache_services
 
     NAME = 'django'
 
@@ -101,8 +106,13 @@ class _Gae(_Platform):
 
     @classmethod
     def import_user_services(cls):
-        from core.storage.users import gae_user_services
+        from core.platform.users import gae_user_services
         return gae_user_services
+
+    @classmethod
+    def import_memcache_services(cls):
+        from core.platform.memcache import gae_memcache_services
+        return gae_memcache_services
 
     NAME = 'gae'
 
@@ -124,3 +134,7 @@ class Registry(object):
     @classmethod
     def import_user_services(cls):
         return cls._get().import_user_services()
+
+    @classmethod
+    def import_memcache_services(cls):
+        return cls._get().import_memcache_services()

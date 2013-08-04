@@ -14,7 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object for an exploration, its states, and their constituents."""
+"""Domain object for an exploration, its states, and their constituents.
+
+Domain objects capture domain-specific logic and are agnostic of how the
+objects they represent are stored. All methods and properties in this file
+should therefore be independent of the specific storage models used."""
 
 __author__ = 'Sean Lip'
 
@@ -30,17 +34,11 @@ class Content(object):
     """Value object representing non-interactive content."""
 
     def to_dict(self):
-        return {
-            'type': self.type,
-            'value': self.value
-        }
+        return {'type': self.type, 'value': self.value}
 
     @classmethod
     def from_dict(cls, content_dict):
-        return cls(
-            content_dict['type'],
-            content_dict['value'],
-        )
+        return cls(content_dict['type'], content_dict['value'])
 
     def __init__(self, content_type, value=''):
         if content_type not in ['text', 'image', 'video', 'widget']:
@@ -255,20 +253,14 @@ class State(object):
 
 
 class Exploration(object):
-    """Domain object for an Oppia exploration.
-
-    Domain objects capture domain-specific logic and are agnostic of how the
-    objects they represent are stored. All methods and properties in domain
-    files should therefore be independent of the specific storage models used.
-    """
+    """Domain object for an Oppia exploration."""
     def __init__(self, exploration_model):
         self.id = exploration_model.id
         self.category = exploration_model.category
         self.title = exploration_model.title
-        self.states = []
-        for state_id in exploration_model.state_ids:
-            state_model = state_models.StateModel.get(state_id)
-            self.states.append(State.from_dict(state_id, state_model.value))
+        self.states = [State.from_dict(
+            state_id, state_models.StateModel.get(state_id).value
+        ) for state_id in exploration_model.state_ids]
         self.parameters = exploration_model.parameters
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id

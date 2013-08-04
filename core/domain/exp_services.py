@@ -29,7 +29,6 @@ import json
 import logging
 import os
 
-import feconf
 from core.domain import exp_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
@@ -41,6 +40,8 @@ from core.platform import models
         models.NAMES.parameter, models.NAMES.state
     ])
 )
+memcache_services = models.Registry.import_memcache_services()
+import feconf
 import utils
 
 
@@ -49,6 +50,14 @@ SUBMIT_HANDLER_NAME = 'submit'
 
 
 # Repository methods.
+def _get_state_memcache_key(exploration_id, state_id):
+    """Returns a memcache key for a state."""
+    # TODO(sll): This should include the exploration_id. This can only be fixed
+    # once save_state does so as well.
+    # TODO(sll): Add memcache counters.
+    return state_id
+
+
 def get_exploration_by_id(exploration_id, strict=True):
     """Returns a domain object representing an exploration."""
     exploration_model = exp_models.ExplorationModel.get(
@@ -59,14 +68,24 @@ def get_exploration_by_id(exploration_id, strict=True):
 
 def get_state_by_id(exploration_id, state_id, strict=True):
     """Returns a domain object representing a state, given its id."""
+    # TODO(sll): Generalize this to handle multiple state_ids at a time.
     exploration = get_exploration_by_id(exploration_id)
     if state_id not in exploration.state_ids:
         raise ValueError(
             'Invalid state id %s for exploration %s' % (
                 state_id, exploration.id))
 
-    state_model = state_models.StateModel.get(state_id, strict=strict)
-    return exp_domain.State.from_dict(state_id, state_model.value)
+    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
+    memcached_state = memcache_services.get_multi(
+        [state_memcache_key]).get(state_memcache_key)
+
+    if memcached_state is not None:
+        return memcached_state
+    else:
+        state_model = state_models.StateModel.get(state_id, strict=strict)
+        state = exp_domain.State.from_dict(state_id, state_model.value)
+        memcache_services.set_multi({state_memcache_key: state})
+        return state
 
 
 def save_exploration(exploration):
@@ -88,6 +107,10 @@ def save_exploration(exploration):
 
 def save_state(state):
     """Commits a state domain object to persistent storage."""
+    # TODO(sll): This should take an exploration id as an argument.
+    state_memcache_key = _get_state_memcache_key('', state.id)
+    memcache_services.delete_multi([state_memcache_key])
+
     state.validate()
 
     state_model = state_models.StateModel.get(state.id, strict=False)
@@ -123,6 +146,9 @@ def create_new(
 
 def delete_state_model(unused_exploration_id, state_id):
     """Directly deletes a state model."""
+    state_memcache_key = _get_state_memcache_key('', state_id)
+    memcache_services.delete_multi([state_memcache_key])
+
     state_model = state_models.StateModel.get(state_id)
     state_model.delete()
 
