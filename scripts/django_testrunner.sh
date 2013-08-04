@@ -27,8 +27,8 @@ echo Installing dependencies in virtual python environment.
 type virtualenv >/dev/null 2>&1 || { 
 echo "Virtualenv is required but it's not installed. Aborting."; exit 1; }
 
-virtualenv venv
-source venv/bin/activate
+virtualenv ../venv
+source ../venv/bin/activate
 pip install -r requirements.txt || {
 	echo "pip failed to install the dependencies. Aborting";
 	echo "If lxml is failing to install, make sure you have libxml2-dev and libxslt-dev installed."

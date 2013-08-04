@@ -47,7 +47,7 @@ def is_current_user_admin(request):
 
 def get_current_user(request):
     """Returns the current user."""
-    session_key = request.cookies['sessionid']
+    session_key = request.cookies.get('sessionid')
     try:
         session = Session.objects.get(session_key=session_key)
         uid = session.get_decoded().get('_auth_user_id')
