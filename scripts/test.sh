@@ -19,7 +19,7 @@
 # INSTRUCTIONS:                                                          
 #                                                                        
 # Run this script from the oppia root folder:
-#   sh scripts/test.sh
+#   bash scripts/test.sh
 # The root folder MUST be named 'oppia'.
 # It runs tests.
 

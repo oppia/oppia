@@ -19,7 +19,7 @@
 # INSTRUCTIONS:                                                          
 #                                                                        
 # Run this script from the oppia root folder:
-#   sh scripts/start.sh
+#   bash scripts/start.sh
 # The root folder MUST be named 'oppia'.
 # It sets up the third-party files and the local GAE, and runs tests.
 
