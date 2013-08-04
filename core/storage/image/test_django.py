@@ -38,7 +38,7 @@ class ImageUnitTests(unittest.TestCase):
             image.put()
 
         # Set the 'raw' property to be a valid image, then do a put().
-        with open('oppia/tests/data/img.png') as f:
+        with open('core/tests/data/img.png') as f:
             image.raw = File(f)
             image_file_content = image.raw.read()
             image.put()

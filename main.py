@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 import feconf
 import os
 if feconf.PLATFORM == 'django':
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oppia.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
 from core.controllers import admin
 from core.controllers import base
