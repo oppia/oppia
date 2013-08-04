@@ -50,18 +50,33 @@ SUBMIT_HANDLER_NAME = 'submit'
 
 
 # Repository methods.
+def _get_exploration_memcache_key(exploration_id):
+    """Returns a memcache key for an exploration."""
+    # TODO(sll): Add memcache counters.
+    return 'exploration:%s' % exploration_id
+
+
 def _get_state_memcache_key(exploration_id, state_id):
     """Returns a memcache key for a state."""
     # TODO(sll): Add memcache counters.
-    return '%s:%s' % (exploration_id, state_id)
+    return 'state:%s:%s' % (exploration_id, state_id)
 
 
 def get_exploration_by_id(exploration_id, strict=True):
     """Returns a domain object representing an exploration."""
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration_id, strict=strict)
-    return exp_domain.Exploration(
-        exploration_model) if exploration_model else None
+    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    memcached_exploration = memcache_services.get_multi(
+        [exploration_memcache_key]).get(exploration_memcache_key)
+
+    if memcached_exploration is not None:
+        return memcached_exploration
+    else:
+        exploration_model = exp_models.ExplorationModel.get(
+            exploration_id, strict=strict)
+        exploration = exp_domain.Exploration(
+            exploration_model) if exploration_model else None
+        memcache_services.set_multi({exploration_memcache_key: exploration})
+        return exploration
 
 
 def get_state_by_id(exploration_id, state_id, strict=True):
@@ -88,6 +103,9 @@ def get_state_by_id(exploration_id, state_id, strict=True):
 
 def save_exploration(exploration):
     """Commits an exploration domain object to persistent storage."""
+    exploration_memcache_key = _get_exploration_memcache_key(exploration.id)
+    memcache_services.delete_multi([exploration_memcache_key])
+
     exploration.validate()
 
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
@@ -141,9 +159,9 @@ def create_new(
     return exploration_model.id
 
 
-def delete_state_model(unused_exploration_id, state_id):
+def delete_state_model(exploration_id, state_id):
     """Directly deletes a state model."""
-    state_memcache_key = _get_state_memcache_key('', state_id)
+    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
     memcache_services.delete_multi([state_memcache_key])
 
     state_model = state_models.StateModel.get(state_id)
@@ -152,6 +170,9 @@ def delete_state_model(unused_exploration_id, state_id):
 
 def delete_exploration(exploration_id):
     """Deletes the exploration with the given exploration_id."""
+    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    memcache_services.delete_multi([exploration_memcache_key])
+
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration = exp_domain.Exploration(exploration_model)
 
