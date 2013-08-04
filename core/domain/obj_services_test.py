@@ -16,8 +16,8 @@
 
 __author__ = 'Sean Lip'
 
-from data.objects.models import objects
 from core.domain import obj_services
+from extensions.objects.models import objects
 import test_utils
 
 

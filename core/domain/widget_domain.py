@@ -35,7 +35,7 @@ class AnswerHandler(object):
         self.name = name
         self.input_type = input_type
         # TODO(sll): Add an assert for input_type: it should be None or a
-        # class in data.objects.models.objects.
+        # class in extensions.objects.models.objects.
 
     @property
     def rules(self):
@@ -249,7 +249,7 @@ class Registry(object):
 
         registry_dict.clear()
 
-        # Assemble all paths of the form data/widgets/[WIDGET_TYPE]/[WIDGET_ID].
+        # Assemble all extensions/widgets/[WIDGET_TYPE]/[WIDGET_ID] paths.
         ALL_WIDGET_PATHS = []
         full_dir = os.path.join(os.getcwd(), widget_dir)
         ALL_WIDGET_PATHS += [

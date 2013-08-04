@@ -52,9 +52,9 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /data/widgets/(.*)/(.*)/static/(.*)
-  static_files: data/widgets/\1/\2/static/\3
-  upload: data/widgets/(.*)/(.*)/static/(.*)
+- url: /extensions/widgets/(.*)/(.*)/static/(.*)
+  static_files: extensions/widgets/\1/\2/static/\3
+  upload: extensions/widgets/(.*)/(.*)/static/(.*)
   secure: always
   http_headers:
     Cache-Control: 'no-cache'

@@ -1,0 +1,26 @@
+<html ng-app="numeric">
+  <head>
+    <script src="/third_party/static/jquery-1.7.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.8.17/jquery-ui.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+    </script>
+  </head>
+
+  <body>
+    <div ng-controller="NumericInput">
+      <form ng-submit="submitAnswer(answer)">
+        <input type="number" ng-model="answer" placeholder="<[placeholder]>"
+               required autofocus
+               oninvalid="setCustomValidity('Please enter a number.')"
+               onchange="try{setCustomValidity('')}catch(e){}">
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <script src="/extensions/widgets/interactive/NumericInput/static/js/NumericInput.js">
+    </script>
+  </body>
+</html>

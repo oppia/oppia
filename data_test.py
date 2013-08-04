@@ -30,7 +30,7 @@ import utils
 
 
 class DataUnitTest(test_utils.AppEngineTestBase):
-    """Base class for testing files in data/."""
+    """Base class for testing data and extension files."""
 
     def verify_dict_keys_and_types(self, adict, dict_schema):
         """Checks the keys in adict, and that their values have the right types.

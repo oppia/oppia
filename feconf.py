@@ -90,12 +90,12 @@ TESTS_DATA_DIR = 'core/tests/data'
 # The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 SAMPLE_IMAGES_DIR = 'data/images'
-WIDGETS_DIR = 'data/widgets'
-RULES_DIR = 'data/rules'
-INTERACTIVE_WIDGETS_DIR = 'data/widgets/interactive'
-NONINTERACTIVE_WIDGETS_DIR = 'data/widgets/noninteractive'
+WIDGETS_DIR = 'extensions/widgets'
+RULES_DIR = 'extensions/rules'
+INTERACTIVE_WIDGETS_DIR = 'extensions/widgets/interactive'
+NONINTERACTIVE_WIDGETS_DIR = 'extensions/widgets/noninteractive'
 
-OBJECT_TEMPLATES_DIR = 'data/objects/templates'
+OBJECT_TEMPLATES_DIR = 'extensions/objects/templates'
 
 # The jinja environment used for loading object view and edit templates.
 OBJECT_JINJA_ENV = jinja2.Environment(
@@ -104,7 +104,7 @@ OBJECT_JINJA_ENV = jinja2.Environment(
         os.path.dirname(__file__), OBJECT_TEMPLATES_DIR))
 )
 
-SKINS_DIR = 'data/skins'
+SKINS_DIR = 'extensions/skins'
 SKINS_JINJA_ENV = jinja2.Environment(
     autoescape=True,
     loader=jinja2.FileSystemLoader(os.path.join(
@@ -159,7 +159,7 @@ INTERACTIVE_WIDGET_COUNT = 9
 # Static file url to path mapping
 PATH_MAP = {
     '/css': 'core/templates/dev/head/assets/css',
-    '/data/widgets': 'data/widgets',
+    '/extensions/widgets': 'extensions/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',
     '/img': 'third_party/bootstrap/img',

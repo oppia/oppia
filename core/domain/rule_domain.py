@@ -22,7 +22,7 @@ import inspect
 import os
 import pkgutil
 
-from data.objects.models import objects
+from extensions.objects.models import objects
 import feconf
 
 

@@ -74,7 +74,8 @@ ensure_directory_exists(OUT_DIR)
 shutil.rmtree(OUT_DIR)
 
 for root in os.listdir(os.path.join(os.getcwd())):
-    if '.git' in root or 'third_party' in root or 'lib' in root or 'data' in root or 'gae_runtime' in root:
+    if any([s in root for s in [
+            '.git', 'third_party', 'lib', 'extensions', 'gae_runtime']]):
         continue
 
     print 'Processing', os.path.join(os.getcwd(), root)

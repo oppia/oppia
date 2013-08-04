@@ -20,8 +20,8 @@ __author__ = 'Sean Lip'
 
 import unittest
 
-from data.objects.models import objects
 from core.domain import rule_domain
+from extensions.objects.models import objects
 
 
 class FakeRule(rule_domain.Rule):

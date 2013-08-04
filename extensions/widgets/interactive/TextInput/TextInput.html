@@ -1,0 +1,25 @@
+<html ng-app="text">
+  <head>
+    <script src="/third_party/static/jquery-1.7.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.8.17/jquery-ui.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
+    
+    <script>
+      var GLOBALS = {};
+      GLOBALS.placeholder = JSON.parse('{{placeholder}}');
+    </script>
+  </head>
+
+  <body>
+    <div ng-controller="TextInput">
+      <form ng-submit="submitAnswer(answer)">
+        <input type="textarea" ng-model="answer"
+               placeholder="<[placeholder]>" required autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <script src="/extensions/widgets/interactive/TextInput/static/js/TextInput.js">
+    </script>
+  </body>
+</html>

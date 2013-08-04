@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -6,27 +8,25 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, softwar
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Service methods for typed instances."""
+"""Tests for classification of Numbers."""
 
 __author__ = 'Sean Lip'
 
-from extensions.objects.models import objects
+import unittest
+
+from extensions.rules import number
 
 
-def get_object_class(cls_name):
-    """Gets the object class based on the class name."""
-    try:
-        assert cls_name != 'BaseObject'
+class NumberRuleUnitTests(unittest.TestCase):
+    """Tests for rules operating on Number objects."""
 
-        object_class = getattr(objects, cls_name)
-        assert object_class
-    except Exception:
-        raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
-
-    return object_class
+    def test_equals_rule(self):
+        self.assertTrue(number.Equals(3).eval(3))
+        self.assertTrue(number.Equals(3.0).eval(3))
+        self.assertFalse(number.Equals(4).eval(3))

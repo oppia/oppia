@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -6,27 +8,26 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, softwar
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Service methods for typed instances."""
+"""Tests for classification of Sets."""
 
 __author__ = 'Sean Lip'
 
-from extensions.objects.models import objects
+import unittest
+
+import extensions.rules.set as set_rules
 
 
-def get_object_class(cls_name):
-    """Gets the object class based on the class name."""
-    try:
-        assert cls_name != 'BaseObject'
+class SetRuleUnitTests(unittest.TestCase):
+    """Tests for rules operating on Set objects."""
 
-        object_class = getattr(objects, cls_name)
-        assert object_class
-    except Exception:
-        raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
+    def test_equals_rule(self):
+        self.assertTrue(set_rules.Equals([1, 3]).eval([3, 1]))
+        self.assertFalse(set_rules.Equals([1]).eval([3, 1]))
 
-    return object_class
+    # TODO(sll): Add more tests.

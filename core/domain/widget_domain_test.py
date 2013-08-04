@@ -16,9 +16,9 @@
 
 __author__ = 'Jeremy Emerson'
 
-from data.objects.models import objects
-import feconf
 from core.domain import widget_domain
+from extensions.objects.models import objects
+import feconf
 import test_utils
 
 
