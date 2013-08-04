@@ -82,27 +82,26 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
 fi
 
 echo Checking whether select2 is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/select2" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
   echo Installing select2
   mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/ivaynberg/select2/archive/master.zip -O select2-download.zip
+  wget https://github.com/ivaynberg/select2/archive/3.4.1.zip -O select2-download.zip
   unzip select2-download.zip -d $THIRD_PARTY_DIR/static/
   rm select2-download.zip
-  mv $THIRD_PARTY_DIR/static/select2-master $THIRD_PARTY_DIR/static/select2
 fi
 
 echo Checking whether jquery is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/jquery-1.7.1" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
   echo Installing JQuery
-  mkdir -p $THIRD_PARTY_DIR/static/jquery-1.7.1/
-  wget https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js -O $THIRD_PARTY_DIR/static/jquery-1.7.1/jquery.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/jquery-2.0.3/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.js
 fi
 
 echo Checking whether jqueryui is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.8.17" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
   echo Installing JQueryUI
-  mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.8.17/
-  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.8.17/jquery-ui.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
+  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.10.3/jquery-ui.min.js
 fi
 
 echo Checking whether angularjs is installed in third_party
@@ -120,10 +119,10 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.7" ]; then
 fi
 
 echo Checking whether d3.js is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   echo Installing d3.js
-  mkdir -p $THIRD_PARTY_DIR/static/d3js-3/
-  wget http://d3js.org/d3.v3.min.js -O $THIRD_PARTY_DIR/static/d3js-3/d3.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/
+  wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
 fi
 
 echo Checking whether YUI2 is installed in third_party
