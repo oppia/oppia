@@ -69,13 +69,9 @@ DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
-# TODO(sll): This cannot be set directly within the test suite Python code,
-# because jinja is not yet imported. Need to find a fix.
-PLATFORM = 'gae'
-
-# PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
-#                      and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-#                      or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
+                     and (os.environ['SERVER_SOFTWARE'].startswith('Development')
+                     or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':

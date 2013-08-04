@@ -78,6 +78,9 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
 
+    import feconf
+    feconf.PLATFORM = 'gae'
+
     parsed_args = _PARSER.parse_args()
     suites = create_test_suites(parsed_args)
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
