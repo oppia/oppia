@@ -18,6 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import perf_services
 
 
 class AdminPage(base.BaseHandler):
@@ -26,6 +27,12 @@ class AdminPage(base.BaseHandler):
     @base.require_admin
     def get(self):
         """Handles GET requests."""
+        self.values['counters'] = [{
+            'name': counter.name,
+            'description': counter.description,
+            'value': counter.value
+        } for counter in perf_services.Registry.counters.values()]
+
         self.render_template('admin/admin.html')
 
     @base.require_admin

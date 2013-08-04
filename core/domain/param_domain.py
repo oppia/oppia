@@ -57,3 +57,16 @@ class Parameter(object):
         if not self.values:
             return None
         return utils.get_random_choice(self.values)
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'obj_type': self.obj_type,
+            'values': self.values,
+            'description': self.description
+        }
+
+    @classmethod
+    def from_dict(cls, param_dict):
+        return cls(param_dict['name'], param_dict['obj_type'],
+                   param_dict['values'], param_dict.get('description', ''))

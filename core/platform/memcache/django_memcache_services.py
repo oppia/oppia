@@ -47,15 +47,14 @@ def set_multi(key_value_mapping):
     return key_value_mapping.keys()
 
 
-def delete_multi(keys):
-    """Deletes a list of keys in memcache.
+def delete(unused_key):
+  """Deletes a key in memcache.
 
-    Args:
-      - keys: a list of keys (strings) to delete.
+  Args:
+    - key: a key (string) to delete.
 
-    Returns:
-      True if all operations finished successfully, False otherwise.
-    """
-    assert isinstance(keys, list)
-    return memcache.delete_multi(keys)
-
+  Returns:
+    0 on network failure, 1 if the item does not exist, and 2 for a
+    successful delete.
+  """
+  return 1

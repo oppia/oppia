@@ -22,12 +22,13 @@ should therefore be independent of the specific storage models used."""
 
 __author__ = 'Sean Lip'
 
-import feconf
-import utils
+from core.domain import param_domain
 from core.platform import models
 (base_models, state_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.state
 ])
+import feconf
+import utils
 
 
 class Content(object):
@@ -68,7 +69,10 @@ class RuleSpec(object):
             rulespec_dict['inputs'],
             rulespec_dict['dest'],
             rulespec_dict['feedback'],
-            rulespec_dict['param_changes']
+            [param_domain.Parameter(
+                 param_change['name'], param_change['obj_type'],
+                 param_change['values'], param_change['description'])
+             for param_change in rulespec_dict['param_changes']]
         )
 
     def __init__(self, name, inputs, dest, feedback, param_changes):
@@ -229,7 +233,8 @@ class State(object):
             state_id,
             state_dict.get('name', feconf.DEFAULT_STATE_NAME),
             [Content.from_dict(item) for item in state_dict['content']],
-            state_dict['param_changes'],
+            [param_domain.Parameter.from_dict(param)
+             for param in state_dict['param_changes']],
             widget
         )
 
@@ -241,7 +246,12 @@ class State(object):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
-        self.param_changes = param_changes
+        self.param_changes = [
+            param_domain.Parameter(
+                param_change.name, param_change.obj_type,
+                param_change.values, param_change.description)
+            for param_change in param_changes
+        ]
         # The interactive widget instance associated with this state. Set to be
         # the default widget if not explicitly specified by the caller.
         if widget is None:

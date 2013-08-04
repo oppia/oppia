@@ -34,6 +34,17 @@
   </head>
 
   <body ng-controller="Admin">
+    <h3>Performance Counters</h3>
+
+    <ul>
+      {% for counter in counters %}
+        <li>
+          {{counter.description}} : {{counter.value}}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h3>Actions</h3>
     <button ng-click="reload('explorations')">
       Reload explorations
     </button>
