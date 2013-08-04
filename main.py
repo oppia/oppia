@@ -21,15 +21,15 @@ import os
 if feconf.PLATFORM == 'django':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oppia.settings")
 
-from oppia.controllers import admin
-from oppia.controllers import base
-from oppia.controllers import editor
-from oppia.controllers import gallery
-from oppia.controllers import pages
-from oppia.controllers import profile
-from oppia.controllers import reader
-from oppia.controllers import resources
-from oppia.controllers import widgets
+from core.controllers import admin
+from core.controllers import base
+from core.controllers import editor
+from core.controllers import gallery
+from core.controllers import pages
+from core.controllers import profile
+from core.controllers import reader
+from core.controllers import resources
+from core.controllers import widgets
 
 import webapp2
 

@@ -3,7 +3,7 @@
 *.pyc
 gae_runtime/*
 third_party/*
-oppia/templates/prod/*
+core/templates/prod/*
 .coverage
 .viminfo
 libpeerconnection.log

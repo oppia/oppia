@@ -20,7 +20,7 @@ import os
 
 import jinja2
 
-from oppia import settings
+from core import settings
 
 # Code contributors, in alphabetical order.
 CODE_CONTRIBUTORS = [
@@ -68,7 +68,7 @@ DEMO_EXPLORATIONS = [
 DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
-# code in oppia/platform.
+# code in core/platform.
 # TODO(sll): This cannot be set directly within the test suite Python code,
 # because jinja is not yet imported. Need to find a fix.
 PLATFORM = 'gae'
@@ -84,11 +84,8 @@ if PLATFORM == 'gae':
 elif PLATFORM == 'django':
     DEV_MODE = settings.DEV
 
-# The directory containing third-party files.
-THIRD_PARTY_DIR = 'oppia/third_party'
-
 # The directory containing data files for tests.
-TESTS_DATA_DIR = 'oppia/tests/data'
+TESTS_DATA_DIR = 'core/tests/data'
 
 # The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
@@ -117,7 +114,7 @@ SKINS_JINJA_ENV = jinja2.Environment(
 # The jinja environment used for loading frontend templates.
 loader = jinja2.FileSystemLoader(os.path.join(
     os.path.dirname(__file__),
-    'oppia/templates/dev/head' if DEV_MODE else 'oppia/templates/prod/head'
+    'core/templates/dev/head' if DEV_MODE else 'core/templates/prod/head'
 ))
 OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
 
@@ -161,7 +158,7 @@ INTERACTIVE_WIDGET_COUNT = 9
 
 # Static file url to path mapping
 PATH_MAP = {
-    '/css': 'oppia/templates/dev/head/assets/css',
+    '/css': 'core/templates/dev/head/assets/css',
     '/data/widgets': 'data/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',

@@ -1,4 +1,4 @@
-from oppia.domain import widget_domain
+from core.domain import widget_domain
 
 
 class IFrame(widget_domain.BaseWidget):

@@ -27,12 +27,8 @@ set -e
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
-if [ ! -d "oppia" ]; then
-  echo This script should be run from a folder named oppia with a subfolder named oppia.
-  exit 1
-fi
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from a folder named oppia with a subfolder named oppia.
+  echo This script should be run from the oppia/ root folder.
   exit 1
 fi
 

@@ -1,5 +1,5 @@
 from data.objects.models import objects
-from oppia.domain import widget_domain
+from core.domain import widget_domain
 
 
 class CodeRepl(widget_domain.BaseWidget):
@@ -30,9 +30,9 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'Programming language to evalue the code in.',
         'obj_type': 'UnicodeString',
         'values': [
-          'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
-          'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
-          'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
+            'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
+            'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
+            'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
         ]
     }]
 

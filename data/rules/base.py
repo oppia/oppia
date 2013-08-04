@@ -17,7 +17,7 @@
 """Base rules."""
 
 from data.objects.models import objects
-from oppia.domain import rule_domain
+from core.domain import rule_domain
 
 
 class CodeEvaluationRule(rule_domain.Rule):

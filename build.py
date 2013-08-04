@@ -18,8 +18,8 @@ import os
 import re
 import shutil
 
-HEAD_DIR = 'oppia/templates/dev/head/'
-OUT_DIR = 'oppia/templates/prod/head/'
+HEAD_DIR = 'core/templates/dev/head/'
+OUT_DIR = 'core/templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
 CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
     --compilation_level WHITESPACE_ONLY """

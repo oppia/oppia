@@ -27,12 +27,8 @@ set -e
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
-if [ ! -d "oppia" ]; then
-  echo This script should be run from a folder named oppia with a subfolder named oppia.
-  exit 1
-fi
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from a folder named oppia with a subfolder named oppia.
+  echo This script should be run from the oppia/ root folder.
   exit 1
 fi
 
@@ -140,7 +136,7 @@ if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   sudo rm -rf $THIRD_PARTY_DIR/coverage
 fi
 
-coverage run ./oppia/tests/suite.py $@
+coverage run ./core/tests/suite.py $@
 coverage report --omit="$THIRD_PARTY_DIR/*","$RUNTIME_HOME/*","/usr/share/pyshared/*" --show-missing
 
 echo Done!
