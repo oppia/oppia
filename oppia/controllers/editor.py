@@ -18,13 +18,13 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from oppia.controllers import base
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import rule_domain
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
 from oppia.platform import models
-(param_models, state_models) = models.Registry.import_models(
-    [models.NAMES.parameter, models.NAMES.state])
+(param_models,) = models.Registry.import_models([models.NAMES.parameter])
 import utils
 
 EDITOR_MODE = 'editor'
@@ -212,7 +212,7 @@ class StateHandler(base.BaseHandler):
         resolved_answers = self.payload.get('resolved_answers')
 
         if 'state_name' in self.payload:
-            exploration.rename_state(state.id, state_name)
+            exp_services.rename_state(exploration.id, state.id, state_name)
 
         if 'param_changes' in self.payload:
             state.param_changes = []
@@ -235,8 +235,8 @@ class StateHandler(base.BaseHandler):
             ruleset = interactive_rulesets['submit']
             utils.recursively_remove_key(ruleset, u'$$hashKey')
 
-            state.widget.handlers = [state_models.AnswerHandlerInstance(
-                name='submit', rule_specs=[])]
+            state.widget.handlers = [
+                exp_domain.AnswerHandlerInstance('submit', [])]
 
             generic_widget = widget_domain.Registry.get_widget_by_id(
                 'interactive', state.widget.widget_id)
@@ -245,9 +245,9 @@ class StateHandler(base.BaseHandler):
             # parameter changes, if necessary.
             for rule_ind in range(len(ruleset)):
                 rule = ruleset[rule_ind]
-                state_rule = state_models.RuleSpec(
-                    name=rule.get('name'), inputs=rule.get('inputs'),
-                    dest=rule.get('dest'), feedback=rule.get('feedback')
+                state_rule = exp_domain.RuleSpec(
+                    rule.get('name'), rule.get('inputs'), rule.get('dest'),
+                    rule.get('feedback'), []
                 )
 
                 if rule['description'] == feconf.DEFAULT_RULE_NAME:
@@ -282,7 +282,7 @@ class StateHandler(base.BaseHandler):
 
         if content:
             state.content = [
-                state_models.Content(type=item['type'], value=item['value'])
+                exp_domain.Content(item['type'], item['value'])
                 for item in content
             ]
 
@@ -290,7 +290,7 @@ class StateHandler(base.BaseHandler):
             stats_services.EventHandler.resolve_answers_for_default_rule(
                 exploration.id, state.id, 'submit', resolved_answers)
 
-        state.put()
+        exp_services.save_state(state)
         self.render_json(exp_services.export_state_to_verbose_dict(
             exploration.id, state.id))
 

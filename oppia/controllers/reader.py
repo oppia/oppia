@@ -20,12 +20,11 @@ import cgi
 
 import feconf
 from oppia.controllers import base
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import skins_services
 from oppia.domain import stats_services
 from oppia.domain import widget_domain
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 import utils
 
 READER_MODE = 'reader'
@@ -129,8 +128,7 @@ class FeedbackHandler(base.BaseHandler):
         else:
             feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
             return exp_services.export_content_to_html(
-                [state_models.Content(
-                    type='text', value='<br>'.join(feedback_bits))],
+                [exp_domain.Content('text', '<br>'.join(feedback_bits))],
                 block_number, params)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
@@ -170,8 +168,7 @@ class FeedbackHandler(base.BaseHandler):
         """Handles feedback interactions with readers."""
         values = {}
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        old_state = exploration.get_state_by_id(state_id)
+        old_state = exp_services.get_state_by_id(exploration_id, state_id)
 
         # The reader's answer.
         answer = self.payload.get('answer')
@@ -189,8 +186,9 @@ class FeedbackHandler(base.BaseHandler):
             exploration_id, state_id, handler, answer, old_params)
         feedback = rule.get_feedback_string()
         new_state_id = rule.dest
-        new_state = (None if new_state_id == feconf.END_DEST
-                     else exploration.get_state_by_id(new_state_id))
+        new_state = (
+            None if new_state_id == feconf.END_DEST
+            else exp_services.get_state_by_id(exploration_id, new_state_id))
 
         stats_services.EventHandler.record_state_hit(
             exploration_id, new_state_id, (new_state_id not in state_history))

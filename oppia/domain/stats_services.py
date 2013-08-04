@@ -19,12 +19,11 @@
 __author__ = 'Sean Lip'
 
 import feconf
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.platform import models
-(state_models, stats_models) = models.Registry.import_models([
-    models.NAMES.state, models.NAMES.statistics
-])
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -54,7 +53,7 @@ class EventHandler(object):
         """Resolves a list of answers for the default rule of this state."""
         stats_models.resolve_answers(
             exploration_id, state_id, handler_name,
-            state_models.DEFAULT_RULESPEC_STR, answers)
+            exp_domain.DEFAULT_RULESPEC_STR, answers)
 
 
 def get_exploration_visit_count(exploration_id):
@@ -81,7 +80,7 @@ def get_state_stats_for_exploration(exploration_id):
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
-        state = exploration.get_state_by_id(state_id)
+        state = exp_services.get_state_by_id(exploration_id, state_id)
 
         rule_stats = {}
         for handler in state.widget.handlers:
@@ -128,7 +127,7 @@ def get_top_improvable_states(exploration_ids, N):
                 exploration_id, state_id)
             default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
                 exploration.id, state_id, SUBMIT_HANDLER_NAME,
-                state_models.DEFAULT_RULESPEC_STR)
+                exp_domain.DEFAULT_RULESPEC_STR)
 
             total_entry_count = state_counts.total_entry_count
             if total_entry_count == 0:
@@ -139,7 +138,7 @@ def get_top_improvable_states(exploration_ids, N):
 
             eligible_flags = []
 
-            state = exploration.get_state_by_id(state_id)
+            state = exp_services.get_state_by_id(exploration_id, state_id)
             if (default_count > 0.2 * total_entry_count and
                     state.widget.handlers[0].default_rule_spec.dest ==
                     state.id):

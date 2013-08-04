@@ -19,9 +19,239 @@
 __author__ = 'Sean Lip'
 
 import feconf
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 import utils
+from oppia.platform import models
+(base_models, state_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.state
+])
+
+
+class Content(object):
+    """Value object representing non-interactive content."""
+
+    def to_dict(self):
+        return {
+            'type': self.type,
+            'value': self.value
+        }
+
+    @classmethod
+    def from_dict(cls, content_dict):
+        return cls(
+            content_dict['type'],
+            content_dict['value'],
+        )
+
+    def __init__(self, content_type, value=''):
+        if content_type not in ['text', 'image', 'video', 'widget']:
+            raise ValueError('Invalid content type: %s' % content_type)
+        self.type = content_type
+        # TODO(sll): Generalize this so the value can be a dict (for a widget).
+        self.value = value
+
+
+class RuleSpec(object):
+    """Value object representing a rule specification."""
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'inputs': self.inputs,
+            'dest': self.dest,
+            'feedback': self.feedback,
+            'param_changes': [param_change.to_dict()
+                              for param_change in self.param_changes],
+        }
+
+    @classmethod
+    def from_dict(cls, rulespec_dict):
+        return cls(
+            rulespec_dict['name'],
+            rulespec_dict['inputs'],
+            rulespec_dict['dest'],
+            rulespec_dict['feedback'],
+            rulespec_dict['param_changes']
+        )
+
+    def __init__(self, name, inputs, dest, feedback, param_changes):
+        if not name:
+            raise ValueError('No name specified for rule spec')
+        if not dest:
+            raise ValueError('No dest specified for rule spec')
+
+        # The name of the rule class.
+        # TODO(sll): Check that this actually corresponds to a rule class.
+        self.name = name
+        # Key-value map of parameters for the classification rule.
+        self.inputs = inputs or {}
+        # Id of the destination state.
+        # TODO(sll): Check that this state is END_DEST or actually exists.
+        self.dest = dest
+        # Feedback to give the reader if this rule is triggered.
+        self.feedback = feedback or []
+        # Exploration-level parameter changes to make if this rule is
+        # triggered.
+        # TODO(sll): Ensure the types for param_changes are consistent.
+        self.param_changes = param_changes or []
+
+    @property
+    def is_default(self):
+        """Returns True if this spec corresponds to the default rule."""
+        return self.name == 'Default'
+
+    def get_feedback_string(self):
+        """Returns a (possibly empty) string with feedback for this rule."""
+        return utils.get_random_choice(self.feedback) if self.feedback else ''
+
+    def __str__(self):
+        """Returns a string representation of a rule (for the stats log)."""
+        param_list = [
+            utils.to_ascii(self.inputs[key]) for key in self.inputs]
+        return '%s(%s)' % (self.name, ','.join(param_list))
+
+    @classmethod
+    def get_default_rule_spec(cls, state_id):
+        return RuleSpec('Default', {}, state_id, [], [])
+
+
+DEFAULT_RULESPEC_STR = str(RuleSpec.get_default_rule_spec(feconf.END_DEST))
+
+
+class AnswerHandlerInstance(object):
+    """Value object for an answer event stream (submit, click ,drag, etc.)."""
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'rule_specs': [rule_spec.to_dict()
+                           for rule_spec in self.rule_specs]
+        }
+
+    @classmethod
+    def from_dict(cls, handler_dict):
+        return cls(
+            handler_dict['name'],
+            [RuleSpec.from_dict(rs) for rs in handler_dict['rule_specs']],
+        )
+
+    def __init__(self, name, rule_specs=None):
+        if not name:
+            raise ValueError('No name specified for answer handler instance')
+        if rule_specs is None:
+            rule_specs = []
+
+        self.name = name
+        self.rule_specs = [RuleSpec(
+            rule_spec.name, rule_spec.inputs, rule_spec.dest,
+            rule_spec.feedback, rule_spec.param_changes
+        ) for rule_spec in rule_specs]
+
+    @property
+    def default_rule_spec(self):
+        """The default rule spec."""
+        assert self.rule_specs[-1].is_default
+        return self.rule_specs[-1]
+
+    @classmethod
+    def get_default_handler(cls, state_id):
+        return cls('submit', [RuleSpec.get_default_rule_spec(state_id)])
+
+
+class WidgetInstance(object):
+    """Value object for a widget instance."""
+
+    def to_dict(self):
+        return {
+            'widget_id': self.widget_id,
+            'params': self.params,
+            'handlers': [handler.to_dict() for handler in self.handlers],
+            'sticky': self.sticky
+        }
+
+    @classmethod
+    def from_dict(cls, widget_dict):
+        return cls(
+            widget_dict['widget_id'],
+            widget_dict['params'],
+            [AnswerHandlerInstance.from_dict(h)
+             for h in widget_dict['handlers']],
+            widget_dict['sticky'],
+        )
+
+    def __init__(self, widget_id, params, handlers, sticky=False):
+        if not widget_id:
+            raise ValueError('No id specified for widget instance')
+        # TODO(sll): Check whether the widget_id is valid.
+        if not handlers:
+            raise ValueError('No handlers specified for widget instance')
+
+        self.widget_id = widget_id
+        # Parameters for the interactive widget view, stored as key-value
+        # pairs. Each parameter is single-valued. The values may be Jinja
+        # templates that refer to state parameters.
+        self.params = params
+        # Answer handlers and rule specs.
+        self.handlers = [AnswerHandlerInstance(
+            handler.name, handler.rule_specs
+        ) for handler in handlers]
+        # If true, keep the widget instance from the previous state if both are
+        # of the same type.
+        self.sticky = sticky
+
+    @classmethod
+    def create_default_widget(cls, state_id):
+        return cls('Continue', {},
+                   [AnswerHandlerInstance.get_default_handler(state_id)])
+
+
+class State(object):
+    """Domain object for a state."""
+
+    def validate(self):
+        # TODO(sll): This needs lots more validation.
+        pass
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'content': [item.to_dict() for item in self.content],
+            'param_changes': [param_change.to_dict()
+                              for param_change in self.param_changes],
+            'widget': self.widget.to_dict()
+        }
+
+    @classmethod
+    def from_dict(cls, state_id, state_dict):
+        if state_dict['widget']:
+            widget = WidgetInstance.from_dict(state_dict['widget'])
+        else:
+            widget = WidgetInstance.create_default_widget(state_id)
+
+        return cls(
+            state_id,
+            state_dict.get('name', feconf.DEFAULT_STATE_NAME),
+            [Content.from_dict(item) for item in state_dict['content']],
+            state_dict['param_changes'],
+            widget
+        )
+
+    def __init__(self, id, name, content, param_changes, widget):
+        # Id of the state.
+        self.id = id
+        # Human-readable name for the state.
+        self.name = name or feconf.DEFAULT_STATE_NAME
+        # The content displayed to the reader in this state.
+        self.content = [Content(item.type, item.value) for item in content]
+        # Parameter changes associated with this state.
+        self.param_changes = param_changes
+        # The interactive widget instance associated with this state. Set to be
+        # the default widget if not explicitly specified by the caller.
+        if widget is None:
+            self.widget = WidgetInstance.create_default_widget(self.id)
+        else:
+            self.widget = WidgetInstance(
+                widget.widget_id, widget.params, widget.handlers,
+                widget.sticky)
 
 
 class Exploration(object):
@@ -35,7 +265,10 @@ class Exploration(object):
         self.id = exploration_model.id
         self.category = exploration_model.category
         self.title = exploration_model.title
-        self.state_ids = exploration_model.state_ids
+        self.states = []
+        for state_id in exploration_model.state_ids:
+            state_model = state_models.StateModel.get(state_id)
+            self.states.append(State.from_dict(state_id, state_model.value))
         self.parameters = exploration_model.parameters
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
@@ -44,7 +277,7 @@ class Exploration(object):
 
     def validate(self):
         """Validates the exploration before it is committed to storage."""
-        if not self.state_ids:
+        if not self.states:
             raise utils.ValidationError('This exploration has no states.')
 
         # TODO(sll): Check that the template path pointed to by default_skin
@@ -54,8 +287,11 @@ class Exploration(object):
         # place and all state deletion operations are guarded against. Then
         # we can remove it if speed becomes an issue.
         for state_id in self.state_ids:
-            if not self.get_state_by_id(state_id, strict=False):
-                raise utils.ValidationError('Invalid state_id %s.')
+            # This raises an exception if the state_id does not exist.
+            try:
+                state_models.StateModel.get(state_id)
+            except base_models.BaseModel.EntityNotFoundError:
+                raise utils.ValidationError('Invalid state_id %s' % state_id)
 
         if not self.is_demo and not self.editor_ids:
             raise utils.ValidationError('This exploration has no editors.')
@@ -64,12 +300,17 @@ class Exploration(object):
     @property
     def init_state_id(self):
         """The id of the starting state of this exploration."""
-        return self.state_ids[0]
+        return self.states[0].id
 
     @property
     def init_state(self):
         """The state which forms the start of this exploration."""
-        return self.get_state_by_id(self.init_state_id)
+        return self.states[0]
+
+    @property
+    def state_ids(self):
+        """A list of state_ids for this exploration."""
+        return [state.id for state in self.states]
 
     @property
     def is_demo(self):
@@ -102,28 +343,4 @@ class Exploration(object):
     # Methods relating to states comprising this exploration.
     def has_state_named(self, state_name):
         """Whether the exploration contains a state with the given name."""
-        return any([self.get_state_by_id(state_id).name == state_name
-                    for state_id in self.state_ids])
-
-    def get_state_by_id(self, state_id, strict=True):
-        """Returns a state of the exploration, given its id."""
-        if state_id not in self.state_ids:
-            raise ValueError(
-                'Invalid state id %s for exploration %s' % (state_id, self.id))
-
-        return state_models.State.get(state_id, strict=strict)
-
-    def rename_state(self, state_id, new_state_name):
-        """Renames a state of this exploration. Commits changes."""
-        if new_state_name == feconf.END_DEST:
-            raise ValueError('Invalid state name: %s' % feconf.END_DEST)
-
-        state = self.get_state_by_id(state_id)
-        if state.name == new_state_name:
-            return
-
-        if self.has_state_named(new_state_name):
-            raise ValueError('Duplicate state name: %s' % new_state_name)
-
-        state.name = new_state_name
-        state.put()
+        return any([state.name == state_name for state in self.states])

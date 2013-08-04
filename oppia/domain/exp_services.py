@@ -57,6 +57,18 @@ def get_exploration_by_id(exploration_id, strict=True):
         exploration_model) if exploration_model else None
 
 
+def get_state_by_id(exploration_id, state_id, strict=True):
+    """Returns a domain object representing a state, given its id."""
+    exploration = get_exploration_by_id(exploration_id)
+    if state_id not in exploration.state_ids:
+        raise ValueError(
+            'Invalid state id %s for exploration %s' % (
+                state_id, exploration.id))
+
+    state_model = state_models.StateModel.get(state_id, strict=strict)
+    return exp_domain.State.from_dict(state_id, state_model.value)
+
+
 def save_exploration(exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
@@ -74,6 +86,18 @@ def save_exploration(exploration):
     })
 
 
+def save_state(state):
+    """Commits a state domain object to persistent storage."""
+    state.validate()
+
+    state_model = state_models.StateModel.get(state.id, strict=False)
+    if state_model is None:
+        state_model = state_models.StateModel(id=state.id)
+
+    state_model.value = state.to_dict()
+    state_model.put()
+
+
 def create_new(
     user_id, title, category, exploration_id=None,
         init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
@@ -82,9 +106,9 @@ def create_new(
     exploration_id = (exploration_id or
                       exp_models.ExplorationModel.get_new_id(title))
 
-    state_id = state_models.State.get_new_id(init_state_name)
-    new_state = state_models.State(id=state_id, name=init_state_name)
-    new_state.put()
+    state_id = state_models.StateModel.get_new_id(init_state_name)
+    new_state = exp_domain.State(state_id, init_state_name, [], [], None)
+    save_state(new_state)
 
     # Note that demo explorations do not have owners, so user_id may be None.
     exploration_model = exp_models.ExplorationModel(
@@ -97,13 +121,19 @@ def create_new(
     return exploration_model.id
 
 
+def delete_state_model(unused_exploration_id, state_id):
+    """Directly deletes a state model."""
+    state_model = state_models.StateModel.get(state_id)
+    state_model.delete()
+
+
 def delete_exploration(exploration_id):
     """Deletes the exploration with the given exploration_id."""
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration = exp_domain.Exploration(exploration_model)
 
-    for state_id in exploration.state_ids:
-        exploration.get_state_by_id(state_id).delete()
+    for state in exploration.states:
+        delete_state_model(exploration_id, state.id)
     exploration_model.delete()
 
 
@@ -174,8 +204,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
     if reader_params is None:
         reader_params = {}
 
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
+    state = get_state_by_id(exploration_id, state_id)
 
     for item in state.param_changes:
         reader_params[item.name] = (
@@ -202,8 +231,7 @@ def get_state_by_name(exploration_id, state_name, strict=True):
 
     # TODO(sll): This is too slow; improve it.
     state = None
-    for state_id in exploration.state_ids:
-        candidate_state = state_models.State.get(state_id)
+    for candidate_state in exploration.states:
         if candidate_state.name == state_name:
             state = candidate_state
             break
@@ -226,14 +254,33 @@ def add_state(exploration_id, state_name, state_id=None):
     if exploration.has_state_named(state_name):
         raise ValueError('Duplicate state name %s' % state_name)
 
-    state_id = state_id or state_models.State.get_new_id(state_name)
-    new_state = state_models.State(id=state_id, name=state_name)
-    new_state.put()
+    state_id = state_id or state_models.StateModel.get_new_id(state_name)
+    new_state = exp_domain.State(state_id, state_name, [], [], None)
+    save_state(new_state)
 
-    exploration.state_ids.append(new_state.id)
+    exploration.states.append(new_state)
     save_exploration(exploration)
 
     return new_state
+
+
+def rename_state(exploration_id, state_id, new_state_name):
+    """Renames a state of this exploration. Commits changes."""
+    if new_state_name == feconf.END_DEST:
+        raise ValueError('Invalid state name: %s' % feconf.END_DEST)
+
+    state = get_state_by_id(exploration_id, state_id)
+    if state.name == new_state_name:
+        return get_exploration_by_id(exploration_id)
+
+    exploration = get_exploration_by_id(exploration_id)
+    if exploration.has_state_named(new_state_name):
+        raise ValueError('Duplicate state name: %s' % new_state_name)
+
+    state.name = new_state_name
+    save_state(state)
+    save_exploration(exploration)
+    return get_exploration_by_id(exploration_id)
 
 
 def delete_state(exploration_id, state_id):
@@ -250,7 +297,7 @@ def delete_state(exploration_id, state_id):
     # Find all destinations in the exploration which equal the deleted
     # state, and change them to loop back to their containing state.
     for other_state_id in exploration.state_ids:
-        other_state = exploration.get_state_by_id(other_state_id)
+        other_state = get_state_by_id(exploration_id, other_state_id)
         changed = False
         for handler in other_state.widget.handlers:
             for rule in handler.rule_specs:
@@ -258,21 +305,23 @@ def delete_state(exploration_id, state_id):
                     rule.dest = other_state_id
                     changed = True
         if changed:
-            other_state.put()
+            save_state(other_state)
 
     # Delete the state with id state_id.
-    exploration.get_state_by_id(state_id).delete()
-    exploration.state_ids.remove(state_id)
+    delete_state_model(exploration_id, state_id)
+    for state in exploration.states:
+        if state.id == state_id:
+            exploration.states.remove(state)
+            break
     save_exploration(exploration)
 
 
 def modify_using_dict(exploration_id, state_id, sdict):
     """Modifies the properties of a state using values from a dict."""
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
+    state = get_state_by_id(exploration_id, state_id)
 
     state.content = [
-        state_models.Content(type=item['type'], value=item['value'])
+        exp_domain.Content(item['type'], item['value'])
         for item in sdict['content']
     ]
 
@@ -284,12 +333,19 @@ def modify_using_dict(exploration_id, state_id, sdict):
         state.param_changes.append(instance)
 
     wdict = sdict['widget']
-    widget = state_models.WidgetInstance(
-        widget_id=wdict['widget_id'], sticky=wdict['sticky'],
-        params=wdict['params'], handlers=[])
+    widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
+        'name': handler['name'],
+        'rule_specs': [{
+            'name': rule_spec['name'],
+            'inputs': rule_spec['inputs'],
+            'dest': convert_state_name_to_id(exploration_id, rule_spec['dest']),
+            'feedback': rule_spec['feedback'],
+            'param_changes': []
+        } for rule_spec in handler['rule_specs']],
+    }) for handler in wdict['handlers']]
 
-    widget.put()
-    state.widget = widget
+    state.widget = exp_domain.WidgetInstance(
+        wdict['widget_id'], wdict['params'], widget_handlers, wdict['sticky'])
 
     # Augment the list of parameters in state.widget with the default widget
     # params.
@@ -299,19 +355,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
         if wp.name not in wdict['params']:
             state.widget.params[wp.name] = wp.values
 
-    for handler in wdict['handlers']:
-        handler_rule_specs = [state_models.RuleSpec(
-            name=rule_spec['name'],
-            inputs=rule_spec['inputs'],
-            dest=convert_state_name_to_id(exploration_id, rule_spec['dest']),
-            feedback=rule_spec['feedback']
-        ) for rule_spec in handler['rule_specs']]
-
-        state.widget.handlers.append(state_models.AnswerHandlerInstance(
-            name=handler['name'], rule_specs=handler_rule_specs))
-
-    state.widget.put()
-    state.put()
+    save_state(state)
     return state
 
 
@@ -342,8 +386,7 @@ def _find_first_match(handler, all_rule_classes, answer, state_params):
 
 def classify(exploration_id, state_id, handler_name, answer, params):
     """Return the first rule that is satisfied by a reader's answer."""
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
+    state = get_state_by_id(exploration_id, state_id)
 
     # Get the widget to determine the input type.
     generic_handler = widget_domain.Registry.get_widget_by_id(
@@ -470,9 +513,7 @@ def export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=False):
     """Gets a Python dict of the internals of the state."""
 
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
-
+    state = get_state_by_id(exploration_id, state_id)
     state_dict = copy.deepcopy(state.to_dict())
 
     if human_readable_dests:
@@ -480,15 +521,14 @@ def export_state_internals_to_dict(
         for handler in state_dict['widget']['handlers']:
             for rule in handler['rule_specs']:
                 if rule['dest'] != feconf.END_DEST:
-                    dest_state = exploration.get_state_by_id(rule['dest'])
+                    dest_state = get_state_by_id(exploration_id, rule['dest'])
                     rule['dest'] = dest_state.name
     return state_dict
 
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
+    state = get_state_by_id(exploration_id, state_id)
 
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
     state_dict.update({'id': state.id, 'name': state.name})
@@ -502,7 +542,7 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_id):
     # TODO(sll): Should this return just the top N answers instead?
     return stats_domain.StateRuleAnswerLog.get(
         exploration_id, state_id, SUBMIT_HANDLER_NAME,
-        state_models.DEFAULT_RULESPEC_STR).answers
+        exp_domain.DEFAULT_RULESPEC_STR).answers
 
 
 def export_state_to_verbose_dict(exploration_id, state_id):
@@ -516,8 +556,7 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
 
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.get_state_by_id(state_id)
+    state = get_state_by_id(exploration_id, state_id)
 
     for handler in state_dict['widget']['handlers']:
         for rule_spec in handler['rule_specs']:

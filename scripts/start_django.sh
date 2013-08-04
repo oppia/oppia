@@ -20,7 +20,7 @@
 #                                                                        
 # Run this script from the oppia root folder:
 #   bash scripts/start_django.sh
-# It installs the dependecies in a virtualenv ,runs tests and then starts 
+# It installs the dependencies in a virtualenv, runs tests and then starts 
 # django development server.
 
 bash scripts/django_testrunner.sh

@@ -16,11 +16,10 @@
 
 __author__ = 'Jeremy Emerson'
 
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 
 import test_utils
 
@@ -28,7 +27,7 @@ import test_utils
 class EventHandlerUnitTests(test_utils.AppEngineTestBase):
     """Test the event handler methods."""
 
-    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_record_state_hit(self):
@@ -171,7 +170,7 @@ class EventHandlerUnitTests(test_utils.AppEngineTestBase):
 class StatsServicesUnitTests(test_utils.AppEngineTestBase):
     """Test the statistics services."""
 
-    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_delete_all_stats(self):
@@ -195,7 +194,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
 class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
     """Test the get_top_improvable_states() function."""
 
-    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_get_top_improvable_states(self):
@@ -246,13 +245,13 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
 
-        not_default_rule_spec = state_models.RuleSpec(
-            name='NotDefault', dest=exp.init_state.id)
+        not_default_rule_spec = exp_domain.RuleSpec(
+            'NotDefault', {}, exp.init_state.id, [], [])
         exp.init_state.widget.handlers[0].rule_specs = [
             not_default_rule_spec,
-            state_models.RuleSpec(name='Default', dest=exp.init_state.id),
+            exp_domain.RuleSpec('Default', {}, exp.init_state.id, [], []),
         ]
-        exp.init_state.put()
+        exp_services.save_state(exp.init_state)
 
         stats_services.EventHandler.record_state_hit(
             'eid', exp.init_state.id, True)
@@ -300,10 +299,9 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
     def test_two_state_default_hit(self):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
-
         SECOND_STATE = 'State 2'
         second_state = exp_services.add_state(exp.id, SECOND_STATE)
-
+        exp = exp_services.get_exploration_by_id('eid')
         state1_id = exp.init_state_id
         state2_id = second_state.id
 

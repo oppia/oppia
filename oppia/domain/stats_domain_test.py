@@ -18,11 +18,10 @@ __author__ = 'Sean Lip'
 
 import test_utils
 
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.domain import stats_domain
 from oppia.domain import stats_services
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 
 
 class StateCounterUnitTests(test_utils.AppEngineTestBase):
@@ -80,7 +79,7 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
 class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
     """Test the state rule answer log domain object."""
 
-    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):

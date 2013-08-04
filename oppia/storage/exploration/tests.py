@@ -16,6 +16,7 @@
 
 __author__ = 'Jeremy Emerson'
 
+from oppia.domain import exp_domain
 from oppia.domain import exp_services
 from oppia.platform import models
 (exp_models, image_models, param_models, state_models) = (
@@ -42,7 +43,11 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        state = state_models.State(id='The state hash id')
+        state = state_models.StateModel(
+            id='The state hash id', value={
+                'name': 'name', 'content': [], 'param_changes': [],
+                'widget': None
+            })
         state.put()
 
         # The 'state_ids' property must be a list of strings.
@@ -89,7 +94,11 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
             'The exploration hash id')
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')
-        self.assertEqual(retrieved_exploration.state_ids, [state.id])
+
+        self.assertEqual(len(retrieved_exploration.states), 1)
+        retrieved_state = retrieved_exploration.states[0]
+        self.assertEqual(retrieved_state.id, state.id)
+
         self.assertEqual(retrieved_exploration.parameters, [parameter])
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')

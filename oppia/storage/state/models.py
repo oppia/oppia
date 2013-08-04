@@ -20,8 +20,4 @@ __author__ = 'Tarashish Mishra'
 
 from oppia.storage.state import django_models
 
-Content = django_models.Content
-RuleSpec = django_models.RuleSpec
-AnswerHandlerInstance = django_models.AnswerHandlerInstance
-WidgetInstance = django_models.WidgetInstance
-State = django_models.State
+State = django_models.StateModel

@@ -20,8 +20,6 @@ import test_utils
 
 from oppia.domain import exp_domain
 from oppia.domain import exp_services
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 import utils
 
 
@@ -33,7 +31,7 @@ class FakeExploration(exp_domain.Exploration):
         self.id = exp_id
         self.title = 'title'
         self.category = 'category'
-        self.state_ids = []
+        self.states = []
         self.parameters = []
         self.is_public = False
         self.image_id = 'image_id'
@@ -53,18 +51,20 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        exploration.state_ids = []
+        exploration.states = []
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'exploration has no states'):
             exp_services.save_exploration(exploration)
-        exploration.state_ids = ['A string']
+        exploration.states = [
+            exp_domain.State('A string', 'name', [], [], None)]
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid state_id'):
             exp_services.save_exploration(exploration)
 
-        new_state = state_models.State(id='Initial state id')
-        new_state.put()
-        exploration.state_ids = ['Initial state id']
+        new_state = exp_domain.State(
+            'Initial state id', 'name', [], [], None)
+        exp_services.save_state(new_state)
+        exploration.states = [new_state]
 
         # There must be at least one editor id.
         exploration.editor_ids = []
@@ -77,15 +77,18 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         INIT_STATE_ID = 'init_state_id'
         INIT_STATE_NAME = 'init_state_name'
 
-        init_state = state_models.State(id=INIT_STATE_ID, name=INIT_STATE_NAME)
-        init_state.put()
+        init_state = exp_domain.State(
+            INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
+        exp_services.save_state(init_state)
 
         exploration = FakeExploration(owner_id='owner@example.com')
-        exploration.state_ids = ['init_state_id']
+        exploration.states = [init_state]
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
-        exploration.state_ids.append('unused_second_state')
+        second_state = exp_domain.State(
+            'unused_second_state', 'unused', [], [], None)
+        exploration.states.append(second_state)
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 

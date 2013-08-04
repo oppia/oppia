@@ -16,24 +16,10 @@
 
 __author__ = 'Jeremy Emerson'
 
-import feconf
-from oppia.platform import models
-(state_models,) = models.Registry.import_models([models.NAMES.state])
 import test_utils
 
 
 class StateModelUnitTests(test_utils.AppEngineTestBase):
     """Test the state model."""
 
-    def setUp(self):
-        """Loads the default widgets and creates a sample exploration."""
-        super(StateModelUnitTests, self).setUp()
-
-    def test_state_class(self):
-        """Test State Class."""
-        state = state_models.State(id='The exploration hash id')
-
-        # A new state should have a default name property.
-        self.assertEqual(state.name, feconf.DEFAULT_STATE_NAME)
-
-        state.put()
+    pass

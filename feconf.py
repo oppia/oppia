@@ -30,6 +30,7 @@ CODE_CONTRIBUTORS = [
     'Reinaldo Aguiar',
     'Sean Lip',
     'Stephanie Federwisch',
+    'Tarashish Mishra',
     'Wilson Hong',
     'Yana Malysheva',
 ]
@@ -68,9 +69,13 @@ DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in oppia/platform.
-PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
-                     and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-                     or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+# TODO(sll): This cannot be set directly within the test suite Python code,
+# because jinja is not yet imported. Need to find a fix.
+PLATFORM = 'gae'
+
+# PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
+#                      and (os.environ['SERVER_SOFTWARE'].startswith('Development')
+#                      or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
@@ -78,8 +83,6 @@ if PLATFORM == 'gae':
                 and os.environ['SERVER_SOFTWARE'].startswith('Development'))
 elif PLATFORM == 'django':
     DEV_MODE = settings.DEV
-
-
 
 # The directory containing third-party files.
 THIRD_PARTY_DIR = 'oppia/third_party'

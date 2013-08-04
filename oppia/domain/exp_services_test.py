@@ -19,8 +19,6 @@ __author__ = 'Sean Lip'
 import feconf
 from oppia.domain import exp_services
 from oppia.domain import stats_services
-from oppia.platform import models
-(state_models,) = (models.Registry.import_models([models.NAMES.state]))
 import test_utils
 
 
@@ -286,7 +284,7 @@ states:
 class StateServicesUnitTests(ExplorationServicesUnitTests):
     """Test methods operating on states."""
 
-    DEFAULT_RULESPEC_STR = state_models.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC_STR = 'Default()'
     SUBMIT_HANDLER = 'submit'
 
     def test_convert_state_name_to_id(self):
@@ -345,11 +343,12 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         state_1 = exp_services.add_state(eid, name_1, state_id=id_1)
 
         exploration = exp_services.get_exploration_by_id(eid)
-        fetched_state_1 = exploration.get_state_by_id(id_1)
-        self.assertEqual(fetched_state_1, state_1)
+        fetched_state_1 = exp_services.get_state_by_id(exploration.id, id_1)
+        self.assertEqual(fetched_state_1.id, state_1.id)
+        self.assertEqual(fetched_state_1.name, state_1.name)
 
         self.assertEqual(
-            exp_services.get_state_by_name(eid, name_1), state_1)
+            exp_services.get_state_by_name(eid, name_1).id, state_1.id)
 
         name_2 = 'fake_name'
         self.assertIsNone(exp_services.get_state_by_name(
@@ -367,12 +366,15 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 'fake@user.com', 'A title', 'A category', exploration_id))
         exp_services.add_state(exploration_id, 'first_state')
+        exploration = exp_services.get_exploration_by_id(exploration_id)
 
         with self.assertRaisesRegexp(
                 ValueError, 'Cannot delete initial state'):
             exp_services.delete_state(exploration.id, exploration.state_ids[0])
 
         exp_services.add_state(exploration_id, 'second_state')
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         exp_services.delete_state(exploration.id, exploration.state_ids[1])
 
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
@@ -386,17 +388,19 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 'fake@user.com', 'A title', 'A category', exploration_id))
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exploration.get_state_by_id('invalid_state_id')
+            exp_services.get_state_by_id(exploration_id, 'invalid_state_id')
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.assertEqual(len(exploration.state_ids), 1)
 
-        default_state = state_models.State.get(exploration.state_ids[0])
+        default_state = exp_services.get_state_by_id(
+            exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
-        exploration.rename_state(default_state.id, 'Renamed state')
+        exploration = exp_services.rename_state(
+            exploration_id, default_state.id, 'Renamed state')
 
         self.assertEqual(len(exploration.state_ids), 1)
-        self.assertEqual(default_state.name, 'Renamed state')
+        self.assertEqual(exploration.states[0].name, 'Renamed state')
 
         # Add a new state.
         second_state = exp_services.add_state(exploration_id, 'State 2')
@@ -405,8 +409,10 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exploration.rename_state(second_state.id, second_state.name)
-        renamed_second_state = exploration.get_state_by_id(second_state.id)
+        exploration = exp_services.rename_state(
+            exploration_id, second_state.id, second_state.name)
+        renamed_second_state = exp_services.get_state_by_id(
+            exploration.id, second_state.id)
         self.assertEqual(renamed_second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
@@ -414,11 +420,13 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exp_services.add_state(exploration_id, 'State 2')
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exploration.rename_state(second_state.id, 'Renamed state')
+            exp_services.rename_state(
+                exploration_id, second_state.id, 'Renamed state')
 
         # And it is not OK to rename a state to the END_DEST.
         with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exploration.rename_state(second_state.id, feconf.END_DEST)
+            exp_services.rename_state(
+                exploration_id, second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
         self.assertFalse(exploration.has_state_named(default_state_name))
