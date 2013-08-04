@@ -39,7 +39,7 @@ RUNTIME_HOME=../gae_runtime
 GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
 THIRD_PARTY_DIR=third_party
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2:$THIRD_PARTY_DIR/mock-1.0.1
+PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 # Adjust the path to include a reference to node.
 PATH=$PATH:$THIRD_PARTY_DIR/node-0.10.1/bin
@@ -53,15 +53,6 @@ if [ ! -d "$THIRD_PARTY_DIR/webtest-1.4.2" ]; then
   unzip webtest-download.zip -d $THIRD_PARTY_DIR
   rm webtest-download.zip
   mv $THIRD_PARTY_DIR/WebTest-1.4.2 $THIRD_PARTY_DIR/webtest-1.4.2
-fi
-
-# mock is also used for tests.
-echo Checking if mock is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/mock-1.0.1" ]; then
-  echo Installing webtest framework
-  wget https://pypi.python.org/packages/source/m/mock/mock-1.0.1.zip#md5=869f08d003c289a97c1a6610faf5e913 -O mock-1.0.1.zip
-  unzip mock-1.0.1.zip -d $THIRD_PARTY_DIR
-  rm mock-1.0.1.zip
 fi
 
 # Some Angular JS lib files are needed for frontend tests.

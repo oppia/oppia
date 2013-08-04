@@ -54,15 +54,6 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   rm gae-download.zip
 fi
 
-echo Checking whether the Closure Compiler is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/closure-compiler" ]; then
-  echo Installing Closure Compiler
-  mkdir -p $THIRD_PARTY_DIR/closure-compiler
-  wget http://closure-compiler.googlecode.com/files/compiler-latest.zip -O closure-compiler-download.zip
-  unzip closure-compiler-download.zip -d $THIRD_PARTY_DIR/closure-compiler
-  rm closure-compiler-download.zip
-fi
-
 echo Checking if node.js is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
   echo Installing Node.js

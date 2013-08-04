@@ -21,8 +21,6 @@ import shutil
 HEAD_DIR = 'core/templates/dev/head/'
 OUT_DIR = 'core/templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
-CLOSURE_COMPILER = """java -jar third_party/closure-compiler/compiler.jar \
-    --compilation_level WHITESPACE_ONLY """
 
 
 def ensure_directory_exists(f):
@@ -58,10 +56,8 @@ def process_css(filename, target):
 
 
 def process_js(filename, target):
+    # TODO(sll): Add minification.
     ensure_directory_exists(target)
-    # TODO(sll): Reinstate the following once it can handle 'delete'.
-    # cmd = CLOSURE_COMPILER + filename + ' --js_output_file ' + target
-    # call(cmd, shell=True)
     f = open(filename, 'r')
     content = f.read()
     d = open(target, 'w+')
