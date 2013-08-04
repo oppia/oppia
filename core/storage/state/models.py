@@ -20,4 +20,4 @@ __author__ = 'Tarashish Mishra'
 
 from core.storage.state import django_models
 
-State = django_models.StateModel
+StateModel = django_models.StateModel

@@ -38,7 +38,12 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        state = state_models.StateModel(id='The state hash id')
+        state = state_models.StateModel(
+            id='The state hash id', value={
+                'name': 'name', 'content': [], 'param_changes': [],
+                'widget': None
+            })
+
         state.put()
 
         # The 'state_ids' property must be a list of strings.
