@@ -271,7 +271,11 @@ class Exploration(object):
         self.states = [State.from_dict(
             state_id, state_models.StateModel.get(state_id).value
         ) for state_id in exploration_model.state_ids]
-        self.parameters = exploration_model.parameters
+        try:
+            self.parameters = [param_domain.Parameter.from_dict(param_dict)
+                               for param_dict in exploration_model.parameters]
+        except Exception as e:
+            raise Exception('%s %s %s' % (self.id, exploration_model.parameters, Exception(e)))
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
@@ -313,6 +317,11 @@ class Exploration(object):
     def state_ids(self):
         """A list of state_ids for this exploration."""
         return [state.id for state in self.states]
+
+    @property
+    def param_dicts(self):
+        """A list of parameters, represented as JSONifiable Python dicts."""
+        return [param.to_dict() for param in self.parameters]
 
     @property
     def is_demo(self):

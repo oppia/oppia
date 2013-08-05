@@ -20,11 +20,10 @@ import feconf
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_services
 from core.domain import widget_domain
-from core.platform import models
-(param_models,) = models.Registry.import_models([models.NAMES.parameter])
 import utils
 
 EDITOR_MODE = 'editor'
@@ -163,10 +162,7 @@ class ExplorationHandler(base.BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                param_models.Parameter(
-                    name=item['name'], obj_type=item['obj_type'],
-                    description=item['description'], values=item['values']
-                ) for item in parameters
+                param_domain.Parameter.from_dict(param) for param in parameters
             ]
 
         exp_services.save_exploration(exploration)
@@ -218,8 +214,8 @@ class StateHandler(base.BaseHandler):
             state.param_changes = []
             for param_change in param_changes:
                 instance = exp_services.get_or_create_param(
-                    exploration.id, param_change['name'])
-                instance.values = param_change['values']
+                    exploration.id, param_change['name'], None,
+                    param_change['values'])
                 state.param_changes.append(instance)
 
         if interactive_widget:

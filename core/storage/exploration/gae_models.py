@@ -19,8 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.platform import models
-base_models, param_models = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.parameter])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 from google.appengine.ext import ndb
 
@@ -45,8 +44,7 @@ class ExplorationModel(base_models.IdModel):
     # be empty.
     state_ids = ndb.StringProperty(repeated=True)
     # The list of parameters associated with this exploration.
-    parameters = ndb.LocalStructuredProperty(
-        param_models.Parameter, repeated=True)
+    parameters = ndb.JsonProperty(repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.

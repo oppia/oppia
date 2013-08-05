@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import core.storage.base_model.models as base_models
-import core.storage.parameter.models as param_models
 
 from django.db import models
 
@@ -45,7 +44,7 @@ class ExplorationModel(base_models.IdModel):
     # be empty.
     state_ids = ListField(default=[], blank=True)
     # The list of parameters associated with this exploration.
-    parameters = JSONField(blank=True, default=[], schema=[param_models.Parameter])
+    parameters = JSONField(blank=True, default=[])
 
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)

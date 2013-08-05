@@ -18,7 +18,6 @@ __author__ = 'Jeremy Emerson'
 
 from core.domain import exp_services
 import core.storage.exploration.models as exp_models
-import core.storage.parameter.models as param_models
 import core.storage.state.models as state_models
 
 from django.utils import unittest
@@ -64,11 +63,8 @@ class ExplorationModelUnitTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             exploration.parameters = 'A string'
             exploration.put()
-        exploration.parameters = []
 
-        parameter = param_models.Parameter(name='theParameter', obj_type='Int')
-        with self.assertRaises(AttributeError):
-            exploration.parameters = [parameter.key]
+        parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': [6]}
         exploration.parameters = [parameter]
 
         # The 'is_public' property must be a boolean.
@@ -87,7 +83,9 @@ class ExplorationModelUnitTests(unittest.TestCase):
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')
         self.assertEqual(retrieved_exploration.state_ids, [state.id])
-        self.assertEqual(retrieved_exploration.parameters, [parameter])
+        self.assertEqual(len(retrieved_exploration.parameters), 1)
+        self.assertEqual(
+            retrieved_exploration.parameters[0].name, 'theParameter')
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])

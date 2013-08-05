@@ -30,17 +30,15 @@ import logging
 import os
 
 from core.domain import exp_domain
+from core.domain import param_domain
 from core.domain import perf_services
 from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import widget_domain
 from core.platform import models
-(exp_models, image_models, param_models, state_models) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.image,
-        models.NAMES.parameter, models.NAMES.state
-    ])
-)
+(exp_models, image_models, state_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
+
 memcache_services = models.Registry.import_memcache_services()
 import feconf
 import utils
@@ -137,7 +135,7 @@ def save_exploration(exploration):
         'category': exploration.category,
         'title': exploration.title,
         'state_ids': exploration.state_ids,
-        'parameters': exploration.parameters,
+        'parameters': exploration.param_dicts,
         'is_public': exploration.is_public,
         'image_id': exploration.image_id,
         'editor_ids': exploration.editor_ids,
@@ -254,35 +252,46 @@ def count_explorations():
 
 
 # Operations involving exploration parameters.
-def get_or_create_param(exploration_id, param_name, obj_type=None):
-    """Returns a ParamChange instance corresponding to the given inputs.
+def get_or_create_param(exploration_id, name, obj_type, values):
+    """Returns a Parameter instance corresponding to the given inputs.
 
     If the parameter does not exist in the given exploration, it is added to
     the list of exploration parameters.
 
-    If the obj_type is not specified it is taken to be 'UnicodeString'.
+    If the obj_type is None, it is taken to be 'TemplatedString' if any element
+    of values contains '{{' and '}}' characters, and 'UnicodeString' otherwise.
 
-    If the obj_type does not match the obj_type for the parameter in the
-    exploration, an Exception is raised.
+    If a parameter with this name already exists for the exploration, and the
+    new obj_type does not match the existing parameter's obj_type, a
+    ValueError is raised.
     """
     exploration = get_exploration_by_id(exploration_id)
 
     for param in exploration.parameters:
-        if param.name == param_name:
+        if param.name == name:
             if obj_type and param.obj_type != obj_type:
-                raise Exception(
+                raise ValueError(
                     'Parameter %s has wrong obj_type: was %s, expected %s'
-                    % (param_name, obj_type, param.obj_type))
-            return param_models.ParamChange(
-                name=param.name, obj_type=param.obj_type)
+                    % (name, obj_type, param.obj_type))
+            else:
+                return param_domain.Parameter(
+                    param.name, param.obj_type, values)
 
     # The parameter was not found, so add it.
-    if not obj_type:
-        obj_type = 'UnicodeString'
-    exploration.parameters.append(
-        param_models.Parameter(name=param_name, obj_type=obj_type))
+    if obj_type is None:
+        is_template = False
+        for value in values:
+            if (isinstance(value, basestring) and
+                    '{{' in value and '}}' in value):
+                is_template = True
+        obj_type = ('TemplatedString' if is_template else 'UnicodeString')
+
+    added_param = param_domain.Parameter(name, obj_type, values)
+
+    exploration.parameters.append(added_param)
     save_exploration(exploration)
-    return param_models.ParamChange(name=param_name, obj_type=obj_type)
+
+    return added_param
 
 
 def update_with_state_params(exploration_id, state_id, reader_params=None):
@@ -414,8 +423,7 @@ def modify_using_dict(exploration_id, state_id, sdict):
     state.param_changes = []
     for pc in sdict['param_changes']:
         instance = get_or_create_param(
-            exploration_id, pc['name'], obj_type=pc['obj_type'])
-        instance.values = pc['values']
+            exploration_id, pc['name'], pc['obj_type'], pc['values'])
         state.param_changes.append(instance)
 
     wdict = sdict['widget']
@@ -505,10 +513,10 @@ def create_from_yaml(
     init_state = get_state_by_name(exploration.id, init_state_name)
 
     try:
-        exploration.parameters = [param_models.Parameter(
-            name=param['name'], obj_type=param['obj_type'],
-            values=param['values']
-        ) for param in exploration_dict['parameters']]
+        exploration.parameters = [
+            param_domain.Parameter.from_dict(param_dict)
+            for param_dict in exploration_dict['parameters']
+        ]
 
         state_list = []
         for state_description in exploration_dict['states']:

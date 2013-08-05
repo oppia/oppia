@@ -280,6 +280,28 @@ class UnicodeString(BaseObject):
             raise TypeError('Cannot convert to Unicode: %s' % raw)
 
 
+class TemplatedString(BaseObject):
+    """A string representing a Jinja template."""
+
+    description = 'A string representing a Jinja template.'
+    icon_filename = ''
+    view_html_filename = None
+    edit_html_filename = None
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Returns the unevaluated Jinja-template string.
+        """
+        try:
+            assert raw is not None
+            assert isinstance(raw, basestring)
+            return unicode(raw)
+        except Exception:
+            raise TypeError('Cannot convert to Unicode: %s' % raw)
+
+
 class NormalizedString(UnicodeString):
     """Unicode string with spaces collapsed."""
 

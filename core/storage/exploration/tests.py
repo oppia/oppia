@@ -18,12 +18,8 @@ __author__ = 'Jeremy Emerson'
 
 from core.domain import exp_services
 from core.platform import models
-(exp_models, image_models, param_models, state_models) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.image,
-        models.NAMES.parameter, models.NAMES.state,
-    ])
-)
+(exp_models, image_models, state_models) = models.Registry.import_models([
+        models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
 import test_utils
 
 from google.appengine.ext.db import BadValueError
@@ -65,10 +61,8 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         # The 'parameters' property must be a list of Parameter objects.
         with self.assertRaises(BadValueError):
             exploration.parameters = 'A string'
-        exploration.parameters = []
-        parameter = param_models.Parameter(name='theParameter', obj_type='Int')
-        with self.assertRaises(BadValueError):
-            exploration.parameters = [parameter.key]
+
+        parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': []}
         exploration.parameters = [parameter]
 
         # The 'is_public' property must be a boolean.
@@ -98,7 +92,10 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         retrieved_state = retrieved_exploration.states[0]
         self.assertEqual(retrieved_state.id, state.id)
 
-        self.assertEqual(retrieved_exploration.parameters, [parameter])
+        self.assertEqual(len(retrieved_exploration.parameters), 1)
+        self.assertEqual(
+            retrieved_exploration.parameters[0].name, 'theParameter')
+
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])
