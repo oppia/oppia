@@ -268,14 +268,9 @@ class Exploration(object):
         self.id = exploration_model.id
         self.category = exploration_model.category
         self.title = exploration_model.title
-        self.states = [State.from_dict(
-            state_id, state_models.StateModel.get(state_id).value
-        ) for state_id in exploration_model.state_ids]
-        try:
-            self.parameters = [param_domain.Parameter.from_dict(param_dict)
-                               for param_dict in exploration_model.parameters]
-        except Exception as e:
-            raise Exception('%s %s %s' % (self.id, exploration_model.parameters, Exception(e)))
+        self.state_ids = exploration_model.state_ids
+        self.parameters = [param_domain.Parameter.from_dict(param_dict)
+                           for param_dict in exploration_model.parameters]
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
@@ -283,7 +278,7 @@ class Exploration(object):
 
     def validate(self):
         """Validates the exploration before it is committed to storage."""
-        if not self.states:
+        if not self.state_ids:
             raise utils.ValidationError('This exploration has no states.')
 
         # TODO(sll): Check that the template path pointed to by default_skin
@@ -306,17 +301,19 @@ class Exploration(object):
     @property
     def init_state_id(self):
         """The id of the starting state of this exploration."""
-        return self.states[0].id
+        return self.state_ids[0]
+
+    @property
+    def states(self):
+        """A list of states for this exploration."""
+        return [State.from_dict(
+            state_id, state_models.StateModel.get(state_id).value
+        ) for state_id in self.state_ids]
 
     @property
     def init_state(self):
         """The state which forms the start of this exploration."""
         return self.states[0]
-
-    @property
-    def state_ids(self):
-        """A list of state_ids for this exploration."""
-        return [state.id for state in self.states]
 
     @property
     def param_dicts(self):

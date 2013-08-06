@@ -143,6 +143,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
         exp_services.add_state(exploration.id, 'New state')
+
+        exploration = exp_services.get_exploration_by_id(
+            'A different exploration_id')
+        self.assertEqual(len(exploration.state_ids), 2)
+
         yaml_content = exp_services.export_to_yaml(exploration.id)
 
         exploration2 = exp_services.get_exploration_by_id(

@@ -105,8 +105,7 @@ def get_state_by_id(exploration_id, state_id, strict=True):
     else:
         perf_services.MEMCACHE_STATE_MISS.inc()
 
-        state_model = state_models.StateModel.get(state_id, strict=strict)
-        state = exp_domain.State.from_dict(state_id, state_model.value)
+        state = next(s for s in exploration.states if s.id == state_id)
 
         unset_keys = memcache_services.set_multi({state_memcache_key: state})
         if unset_keys:
@@ -353,7 +352,7 @@ def add_state(exploration_id, state_name, state_id=None):
     new_state = exp_domain.State(state_id, state_name, [], [], None)
     save_state(exploration_id, new_state)
 
-    exploration.states.append(new_state)
+    exploration.state_ids.append(state_id)
     save_exploration(exploration)
 
     return new_state
@@ -404,10 +403,7 @@ def delete_state(exploration_id, state_id):
 
     # Delete the state with id state_id.
     delete_state_model(exploration_id, state_id)
-    for state in exploration.states:
-        if state.id == state_id:
-            exploration.states.remove(state)
-            break
+    exploration.state_ids.remove(state_id)
     save_exploration(exploration)
 
 
@@ -622,10 +618,8 @@ def export_state_internals_to_dict(
 
 def export_state_to_dict(exploration_id, state_id):
     """Gets a Python dict representation of the state."""
-    state = get_state_by_id(exploration_id, state_id)
-
     state_dict = export_state_internals_to_dict(exploration_id, state_id)
-    state_dict.update({'id': state.id, 'name': state.name})
+    state_dict.update({'id': state_id})
     return state_dict
 
 

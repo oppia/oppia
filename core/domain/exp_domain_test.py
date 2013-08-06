@@ -31,7 +31,7 @@ class FakeExploration(exp_domain.Exploration):
         self.id = exp_id
         self.title = 'title'
         self.category = 'category'
-        self.states = []
+        self.state_ids = []
         self.parameters = []
         self.is_public = False
         self.image_id = 'image_id'
@@ -51,12 +51,11 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
-        exploration.states = []
+        exploration.state_ids = []
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'exploration has no states'):
             exp_services.save_exploration(exploration)
-        exploration.states = [
-            exp_domain.State('A string', 'name', [], [], None)]
+        exploration.state_ids = ['A string']
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid state_id'):
             exp_services.save_exploration(exploration)
@@ -64,7 +63,7 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
         new_state = exp_domain.State(
             'Initial state id', 'name', [], [], None)
         exp_services.save_state(exploration.id, new_state)
-        exploration.states = [new_state]
+        exploration.state_ids = ['Initial state id']
 
         # There must be at least one editor id.
         exploration.editor_ids = []
@@ -82,13 +81,14 @@ class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
             INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
         exp_services.save_state(exploration.id, init_state)
 
-        exploration.states = [init_state]
+        exploration.state_ids = [INIT_STATE_ID]
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
         second_state = exp_domain.State(
             'unused_second_state', 'unused', [], [], None)
-        exploration.states.append(second_state)
+        exp_services.save_state(exploration.id, second_state)
+        exploration.state_ids.append(second_state.id)
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
