@@ -21,9 +21,10 @@ import logging
 import sys
 import traceback
 
-import feconf
 from core.domain import exp_services
 from core.platform import models
+import feconf
+import jinja_utils
 user_services = models.Registry.import_user_services()
 
 import webapp2
@@ -107,7 +108,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
-        return feconf.OPPIA_JINJA_ENV
+        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):
         # Set self.request, self.response and self.app.

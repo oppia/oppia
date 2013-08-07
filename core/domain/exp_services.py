@@ -36,11 +36,11 @@ from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import widget_domain
 from core.platform import models
+import feconf
+import jinja_utils
+memcache_services = models.Registry.import_memcache_services()
 (exp_models, image_models, state_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
-
-memcache_services = models.Registry.import_memcache_services()
-import feconf
 import utils
 
 
@@ -686,15 +686,18 @@ def export_content_to_html(content_array, block_number, params=None):
     if params is None:
         params = {}
 
+    JINJA_ENV = jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
+
     html, widget_array = '', []
     for content in content_array:
         if content.type in ['text', 'image', 'video']:
             value = (utils.parse_with_jinja(content.value, params)
                      if content.type == 'text' else content.value)
 
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'type': content.type, 'value': value})
+            html += JINJA_ENV.get_template('reader/content.html').render({
+                'type': content.type,
+                'value': value,
+            })
         elif content.type == 'widget':
             # Ignore empty widget specifications.
             if not content.value:
@@ -704,12 +707,11 @@ def export_content_to_html(content_array, block_number, params=None):
             widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
             widget_array_len = len(widget_array)
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'blockIndex': block_number,
-                    'index': widget_array_len,
-                    'type': content.type,
-                })
+            html += JINJA_ENV.get_template('reader/content.html').render({
+                'blockIndex': block_number,
+                'index': widget_array_len,
+                'type': content.type,
+            })
             widget_array.append({
                 'blockIndex': block_number,
                 'index': widget_array_len,

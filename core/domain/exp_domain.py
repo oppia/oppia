@@ -248,8 +248,7 @@ class State(object):
         # Parameter changes associated with this state.
         self.param_changes = [
             param_domain.Parameter(
-                param_change.name, param_change.obj_type,
-                param_change.values, param_change.description)
+                param_change.name, param_change.obj_type, param_change.values)
             for param_change in param_changes
         ]
         # The interactive widget instance associated with this state. Set to be

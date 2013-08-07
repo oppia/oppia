@@ -27,9 +27,8 @@ import utils
 class Parameter(object):
     """Value object for a parameter.
 
-    A parameter consists of a name, an obj_type, a list of values
-    and an optional description. Each element in the list of values
-    must be of the given obj_type.
+    A parameter consists of a name, an obj_type, and a list of values.
+    Each element in the list of values must be of the given obj_type.
 
     Note that the obj_type must be set before the values.
     """
@@ -37,7 +36,6 @@ class Parameter(object):
         self.name = name
         self.obj_type = obj_type
         self.values = values
-        self.description = description
 
     def __setattr__(self, name, value):
         if name == 'name':
@@ -69,11 +67,10 @@ class Parameter(object):
         return {
             'name': self.name,
             'obj_type': self.obj_type,
-            'values': self.values,
-            'description': self.description
+            'values': self.values
         }
 
     @classmethod
     def from_dict(cls, param_dict):
         return cls(param_dict['name'], param_dict['obj_type'],
-                   param_dict['values'], param_dict.get('description', ''))
+                   param_dict['values'])

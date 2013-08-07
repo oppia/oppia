@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import numbers
 
 import feconf
+import jinja_utils
 from lxml.html.clean import clean_html
 
 
@@ -73,8 +74,9 @@ class BaseObject(object):
           data: the normalized Python representation of the Object.
         """
         assert cls.view_html_filename, 'No view template specified.'
-        return feconf.OBJECT_JINJA_ENV.get_template(
-            '%s.html' % cls.view_html_filename).render({'data': data})
+        return jinja_utils.get_jinja_env(
+            feconf.OBJECT_TEMPLATES_DIR).get_template(
+                '%s.html' % cls.view_html_filename).render({'data': data})
 
     @classmethod
     def render_edit(cls, frontend_name, data=None):

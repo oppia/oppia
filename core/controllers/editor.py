@@ -95,7 +95,7 @@ class ExplorationHandler(base.BaseHandler):
 
         parameters = [{
             'name': param.name, 'obj_type': param.obj_type,
-            'description': param.description, 'values': param.values
+            'values': param.values
         } for param in exploration.parameters]
 
         self.values.update({

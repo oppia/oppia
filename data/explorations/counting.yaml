@@ -97,8 +97,7 @@ states:
       you list all the ways you found?<br><br>&nbsp; &nbsp;&nbsp;'
   name: Not 6
   param_changes:
-  - description: ''
-    name: guess
+  - name: guess
     obj_type: TemplatedString
     values:
     - '{{answer}}'
