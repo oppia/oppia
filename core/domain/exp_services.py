@@ -407,40 +407,6 @@ def delete_state(exploration_id, state_id):
     save_exploration(exploration)
 
 
-def modify_using_dict(exploration_id, state_id, sdict):
-    """Modifies the properties of a state using values from a dict."""
-    state = get_state_by_id(exploration_id, state_id)
-
-    state.content = [
-        exp_domain.Content(item['type'], item['value'])
-        for item in sdict['content']
-    ]
-
-    state.param_changes = []
-    for pc in sdict['param_changes']:
-        instance = get_or_create_param(
-            exploration_id, pc['name'], pc['obj_type'], pc['values'])
-        state.param_changes.append(instance)
-
-    wdict = sdict['widget']
-    widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
-        'name': handler['name'],
-        'rule_specs': [{
-            'name': rule_spec['name'],
-            'inputs': rule_spec['inputs'],
-            'dest': convert_state_name_to_id(exploration_id, rule_spec['dest']),
-            'feedback': rule_spec['feedback'],
-            'param_changes': []
-        } for rule_spec in handler['rule_specs']],
-    }) for handler in wdict['handlers']]
-
-    state.widget = exp_domain.WidgetInstance(
-        wdict['widget_id'], wdict['params'], widget_handlers, wdict['sticky'])
-
-    save_state(exploration_id, state)
-    return state
-
-
 def _find_first_match(handler, all_rule_classes, answer, state_params):
     for rule_spec in handler.rule_specs:
         if rule_spec.is_default:
@@ -497,8 +463,9 @@ def create_from_yaml(
     exploration = get_exploration_by_id(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
+    exploration_id = exploration.id
 
-    init_state = get_state_by_name(exploration.id, init_state_name)
+    init_state = get_state_by_name(exploration_id, init_state_name)
 
     try:
         exploration.parameters = [
@@ -510,11 +477,44 @@ def create_from_yaml(
         for state_description in exploration_dict['states']:
             state_name = state_description['name']
             state = (init_state if state_name == init_state_name
-                     else add_state(exploration.id, state_name))
-            state_list.append({'state': state, 'desc': state_description})
+                     else add_state(exploration_id, state_name))
+            state_list.append({
+                'state': state, 'desc': state_description})
 
-        for index, state in enumerate(state_list):
-            modify_using_dict(exploration.id, state['state'].id, state['desc'])
+        for index, state_obj in enumerate(state_list):
+            state = state_obj['state']
+            sdict = state_obj['desc']
+        
+            state.content = [
+                exp_domain.Content(item['type'], item['value'])
+                for item in sdict['content']
+            ]
+        
+            state.param_changes = []
+            for pc in sdict['param_changes']:
+                instance = get_or_create_param(
+                    exploration_id, pc['name'], pc['obj_type'], pc['values'])
+                state.param_changes.append(instance)
+        
+            wdict = sdict['widget']
+            widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
+                'name': handler['name'],
+                'rule_specs': [{
+                    'name': rule_spec['name'],
+                    'inputs': rule_spec['inputs'],
+                    'dest': convert_state_name_to_id(
+                        exploration_id, rule_spec['dest']),
+                    'feedback': rule_spec['feedback'],
+                    'param_changes': []
+                } for rule_spec in handler['rule_specs']],
+            }) for handler in wdict['handlers']]
+        
+            state.widget = exp_domain.WidgetInstance(
+                wdict['widget_id'], wdict['params'], widget_handlers,
+                wdict['sticky'])
+        
+            save_state(exploration_id, state)
+
     except Exception:
         delete_exploration(exploration.id)
         raise
