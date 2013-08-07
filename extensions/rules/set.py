@@ -25,46 +25,46 @@ class Equals(base.SetRule):
     description = 'is equal to {{x|Set}}'
 
     def _evaluate(self, subject):
-        return subject == self.x
+        return set(subject) == set(self.x)
 
 
 class IsSubsetOf(base.SetRule):
     description = 'is a proper subset of {{x|Set}}'
 
     def _evaluate(self, subject):
-        return subject < self.x
+        return set(subject) < set(self.x)
 
 
 class IsSupersetOf(base.SetRule):
     description = 'is a proper superset of {{x|Set}}'
 
     def _evaluate(self, subject):
-        return subject > self.x
+        return set(subject) > set(self.x)
 
 
 class HasElementsIn(base.SetRule):
     description = 'has elements in common with {{x|Set}}'
 
     def _evaluate(self, subject):
-        return bool(subject.intersection(self.x))
+        return bool(set(subject).intersection(set(self.x)))
 
 
 class HasElementsNotIn(base.SetRule):
     description = 'has elements not in {{x|Set}}'
 
     def _evaluate(self, subject):
-        return bool(subject - self.x)
+        return bool(set(subject) - set(self.x))
 
 
 class OmitsElementsIn(base.SetRule):
     description = 'omits some elements of {{x|Set}}'
 
     def _evaluate(self, subject):
-        return bool(self.x - subject)
+        return bool(set(self.x) - set(subject))
 
 
 class IsDisjointFrom(base.SetRule):
     description = 'has no elements in common with {{x|Set}}'
 
     def _evaluate(self, subject):
-        return not bool(subject.intersection(self.x))
+        return not bool(set(subject).intersection(set(self.x)))

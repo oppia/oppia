@@ -30,6 +30,18 @@ class TextInput(widget_domain.BaseWidget):
         'description': 'The placeholder for the text input field.',
         'obj_type': 'UnicodeString',
         'values': ['Type your answer here.']
+    }, {
+        'name': 'rows',
+        'description': 'The number of rows for the text input field.',
+        # TODO(sll): This is wrong; change it.
+        'obj_type': 'UnicodeString',
+        'values': ['1']
+    }, {
+        'name': 'columns',
+        'description': 'The number of columns for the text input field.',
+        # TODO(sll): This is wrong; change it.
+        'obj_type': 'UnicodeString',
+        'values': ['60']
     }]
 
     # Actions that the reader can perform on this widget which trigger a
