@@ -31,6 +31,13 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
+  /**
+   * Returns whether the current URL corresponds to the demo playground server.
+   */
+  $scope.isDemoServer = function() {
+    return location.host == 'oppiaserver.appspot.com';
+  };
+
   // Gets URL parameter values.
   $scope.getUrlParams = function() {
     var params = {};

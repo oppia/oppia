@@ -22,6 +22,10 @@
 {% endblock header_js %}
 
 {% block content %}
+  <div ng-show="isDemoServer()" style="background-color: lightyellow; width: 700px; margin: 0 auto">
+    <strong style="color: red">Warning</strong>: This site is a public demo playground for Oppia, and is updated frequently. Please regard any explorations that you create on it as transient -- they may be deleted at any time.
+  </div>
+
   <div ng-controller="EditorExploration" ng-cloak>
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
