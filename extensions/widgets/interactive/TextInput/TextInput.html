@@ -14,9 +14,14 @@
   <body>
     <div ng-controller="TextInput">
       <form ng-submit="submitAnswer(answer)">
-        <textarea ng-model="answer"
+
+        <input ng-show="rows == 1" ng-model="answer"
+               placeholder="<[placeholder]>" required autofocus>
+
+        <textarea ng-show="rows != 1" ng-model="answer"
                   placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
         </textarea>
+
         <button type="submit">Submit</button>
       </form>
     </div>

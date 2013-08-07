@@ -41,7 +41,7 @@ class TextInput(widget_domain.BaseWidget):
         'description': 'The number of columns for the text input field.',
         # TODO(sll): This is wrong; change it.
         'obj_type': 'UnicodeString',
-        'values': ['200']
+        'values': ['60']
     }]
 
     # Actions that the reader can perform on this widget which trigger a

@@ -437,14 +437,6 @@ def modify_using_dict(exploration_id, state_id, sdict):
     state.widget = exp_domain.WidgetInstance(
         wdict['widget_id'], wdict['params'], widget_handlers, wdict['sticky'])
 
-    # Augment the list of parameters in state.widget with the default widget
-    # params.
-    widget_params = widget_domain.Registry.get_widget_by_id(
-        feconf.INTERACTIVE_PREFIX, wdict['widget_id']).params
-    for wp in widget_params:
-        if wp.name not in wdict['params']:
-            state.widget.params[wp.name] = wp.values
-
     save_state(exploration_id, state)
     return state
 
@@ -715,7 +707,7 @@ def export_content_to_html(content_array, block_number, params=None):
             widget_array.append({
                 'blockIndex': block_number,
                 'index': widget_array_len,
-                'raw': widget.get_with_params(widget_dict['params'])['raw'],
+                'raw': widget.get_raw_code(widget_dict['params']),
             })
         else:
             raise utils.InvalidInputException(
