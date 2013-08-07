@@ -465,37 +465,29 @@ def create_from_yaml(
         init_state_name=init_state_name, image_id=image_id))
     exploration_id = exploration.id
 
-    init_state = get_state_by_name(exploration_id, init_state_name)
-
     try:
         exploration.parameters = [
             param_domain.Parameter.from_dict(param_dict)
             for param_dict in exploration_dict['parameters']
         ]
 
-        state_list = []
-        for state_description in exploration_dict['states']:
-            state_name = state_description['name']
-            state = (init_state if state_name == init_state_name
-                     else add_state(exploration_id, state_name))
-            state_list.append({
-                'state': state, 'desc': state_description})
+        for sdict in exploration_dict['states']:
+            if sdict['name'] != init_state_name:
+                add_state(exploration_id, sdict['name'])
 
-        for index, state_obj in enumerate(state_list):
-            state = state_obj['state']
-            sdict = state_obj['desc']
-        
+        for sdict in exploration_dict['states']:
+            state = get_state_by_name(exploration_id, sdict['name'])
+
             state.content = [
                 exp_domain.Content(item['type'], item['value'])
                 for item in sdict['content']
             ]
-        
-            state.param_changes = []
-            for pc in sdict['param_changes']:
-                instance = get_or_create_param(
-                    exploration_id, pc['name'], pc['obj_type'], pc['values'])
-                state.param_changes.append(instance)
-        
+
+            state.param_changes = [get_or_create_param(
+                exploration_id, pc['name'], pc['obj_type'], pc['values'])
+                for pc in sdict['param_changes']
+            ]
+
             wdict = sdict['widget']
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
                 'name': handler['name'],
@@ -505,14 +497,14 @@ def create_from_yaml(
                     'dest': convert_state_name_to_id(
                         exploration_id, rule_spec['dest']),
                     'feedback': rule_spec['feedback'],
-                    'param_changes': []
+                    'param_changes': rule_spec.get('param_changes', []),
                 } for rule_spec in handler['rule_specs']],
             }) for handler in wdict['handlers']]
-        
+
             state.widget = exp_domain.WidgetInstance(
                 wdict['widget_id'], wdict['params'], widget_handlers,
                 wdict['sticky'])
-        
+
             save_state(exploration_id, state)
 
     except Exception:
