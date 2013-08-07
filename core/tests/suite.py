@@ -35,9 +35,7 @@ import os
 import sys
 import unittest
 
-# import feconf
-
-EXPECTED_TEST_COUNT = 104
+EXPECTED_TEST_COUNT = 105
 
 
 _PARSER = argparse.ArgumentParser()
