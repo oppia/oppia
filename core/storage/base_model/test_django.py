@@ -107,7 +107,7 @@ class ConverterUnitTests(unittest.TestCase):
 
 
 class AttrListUnitTests(unittest.TestCase):
-    """Test the attr_list of the subclasses"""
+    """Test the attr_list of the subclasses."""
 
     def test_elements_of_attr_lists_for_all_classes_are_strings(self):
         subclasses = inheritors(base_models.BaseModel)

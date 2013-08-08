@@ -20,8 +20,8 @@ __author__ = 'Sean Lip'
 
 import imghdr
 
-import feconf
 import core.storage.base_model.models as base_models
+import feconf
 
 from django.db import models
 import caching.base

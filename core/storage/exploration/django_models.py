@@ -18,11 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
-
-from core.django_utils import JSONField, ListField
 
 QUERY_LIMIT = 100
 
@@ -39,9 +38,9 @@ class ExplorationModel(base_models.BaseModel):
     title = models.CharField(max_length=100, default='New exploration')
     # The list of state ids this exploration consists of. This list should not
     # be empty.
-    state_ids = ListField(default=[], blank=True)
+    state_ids = django_utils.ListField(default=[], blank=True)
     # The list of parameters associated with this exploration.
-    parameters = JSONField(blank=True, default=[])
+    parameters = django_utils.JSONField(blank=True, default=[])
 
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)
@@ -51,7 +50,7 @@ class ExplorationModel(base_models.BaseModel):
     # List of ids of users who can edit this exploration. If the exploration is
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.
-    editor_ids = ListField(default=[], blank=True)
+    editor_ids = django_utils.ListField(default=[], blank=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = models.CharField(max_length=100, default='conversation')

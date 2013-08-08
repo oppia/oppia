@@ -29,8 +29,8 @@ primitive = (basestring, bool, float, int)
 class BaseModel(models.Model):
     """A model class containing all common methods.
 
-     All model instances have an id property.
-     """
+    All model instances have an id property.
+    """
 
     id = models.CharField(max_length=100, primary_key=True)
 

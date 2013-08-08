@@ -20,11 +20,10 @@ __author__ = 'Sean Lip'
 
 import logging
 
+from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
-
-from core.django_utils import JSONField
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -96,7 +95,7 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     # how many times the answer has been entered.
     # WARNING: do not use default={} in JsonProperty, it does not work as you
     # expect.
-    answers = JSONField(default={}, isdict=True)
+    answers = django_utils.JSONField(default={}, isdict=True)
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):

@@ -18,11 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
-
-from core.django_utils import JSONField
 
 QUERY_LIMIT = 100
 
@@ -31,7 +30,7 @@ class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.
-    value = JSONField(default={}, isdict=True)
+    value = django_utils.JSONField(default={}, isdict=True)
     # When this entity was first created.
     created = models.DateTimeField(auto_now_add=True)
     # When this entity was last updated.
