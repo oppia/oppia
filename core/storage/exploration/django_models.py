@@ -33,9 +33,6 @@ class ExplorationModel(base_models.BaseModel):
     This class should only be imported by the exploration domain file, the
     exploration services file, and the Exploration model test file.
     """
-    # TODO(sll): Write a test that ensures that the only files that are
-    # allowed to import this class are the ones described above.
-
     # The category this exploration belongs to.
     category = models.CharField(max_length=100)
     # What this exploration is called.
