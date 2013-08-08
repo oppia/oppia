@@ -22,7 +22,7 @@ from core.platform import models
         models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
 import test_utils
 
-from google.appengine.ext.db import BadValueError
+from google.appengine.ext import db
 
 
 class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
@@ -46,35 +46,34 @@ class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
         state.put()
 
         # The 'state_ids' property must be a list of strings.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.state_ids = 'A string'
-            exploration.put()
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.state_ids = [state]
         exploration.state_ids = [state.id]
 
         # An Exploration must have a category.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.put()
         exploration.category = 'The category'
 
         # The 'parameters' property must be a list of Parameter objects.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.parameters = 'A string'
 
         parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': []}
         exploration.parameters = [parameter]
 
         # The 'is_public' property must be a boolean.
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.is_public = 'true'
         exploration.is_public = True
 
         # The 'image_id' property must be a string.
         image = image_models.Image(id='The image')
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.image_id = image
-        with self.assertRaises(BadValueError):
+        with self.assertRaises(db.BadValueError):
             exploration.image_id = image.key
         exploration.image_id = 'A string'
 
