@@ -29,7 +29,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
 
-class Image(caching.base.CachingMixin, base_models.IdModel):
+class Image(caching.base.CachingMixin, base_models.BaseModel):
     """An image."""
     # The raw image blob.
     raw = models.ImageField(upload_to='uploads/images')

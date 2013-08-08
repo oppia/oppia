@@ -39,7 +39,7 @@ class ImageProperty(ndb.BlobProperty):
         assert is_valid, error_message
 
 
-class Image(base_models.IdModel):
+class Image(base_models.BaseModel):
     """An image."""
     # The raw image blob.
     raw = ImageProperty(required=True)

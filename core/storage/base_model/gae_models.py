@@ -25,26 +25,23 @@ from google.appengine.ext import ndb
 
 
 class BaseModel(ndb.Model):
-    """Base model for all object classes in Oppia."""
+    """Base model for all object classes in Oppia.
 
-    class EntityNotFoundError(Exception):
-        """Raised when no entity for a given id exists in the datastore."""
+    All model instances have an id property.
+    """
 
-    def _pre_put_hook(self):
-        pass
-
-
-class IdModel(BaseModel):
-    """An abstract model class with an explicit id property."""
     @property
     def id(self):
         return self.key.id()
 
+    def _pre_put_hook(self):
+        pass
+
     def put(self):
-        super(IdModel, self).put()
+        super(BaseModel, self).put()
 
     def delete(self):
-        super(IdModel, self).key.delete()
+        super(BaseModel, self).key.delete()
 
     @classmethod
     def get_all(cls):
@@ -62,7 +59,7 @@ class IdModel(BaseModel):
               of attempts.
         """
         MAX_RETRIES = 10
-        RAND_RANGE = 127*127
+        RAND_RANGE = 127 * 127
         for i in range(MAX_RETRIES):
             new_id = base64.urlsafe_b64encode(
                 hashlib.sha1(
@@ -73,6 +70,9 @@ class IdModel(BaseModel):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
+
+    class EntityNotFoundError(Exception):
+        """Raised when no entity for a given id exists in the datastore."""
 
     @classmethod
     def get(cls, entity_id, strict=True):

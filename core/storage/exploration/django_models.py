@@ -27,7 +27,7 @@ from core.django_utils import JSONField, ListField
 QUERY_LIMIT = 100
 
 
-class ExplorationModel(base_models.IdModel):
+class ExplorationModel(base_models.BaseModel):
     """Storage model for an Oppia exploration.
 
     This class should only be imported by the exploration domain file, the

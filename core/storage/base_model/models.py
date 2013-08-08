@@ -21,5 +21,4 @@ __author__ = 'Tarashish Mishra'
 from core.storage.base_model import django_models
 
 BaseModel = django_models.BaseModel
-IdModel = django_models.IdModel
-FakeIdModel = django_models.FakeIdModel
+FakeModel = django_models.FakeModel

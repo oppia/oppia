@@ -27,7 +27,7 @@ from core.django_utils import JSONField
 QUERY_LIMIT = 100
 
 
-class StateModel(base_models.IdModel):
+class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.

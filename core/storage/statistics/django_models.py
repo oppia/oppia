@@ -27,7 +27,7 @@ from django.db import models
 from core.django_utils import JSONField
 
 
-class StateCounterModel(base_models.IdModel):
+class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
     The id/key of instances of this class has the form
@@ -72,7 +72,7 @@ class StateCounterModel(base_models.IdModel):
         counter.put()
 
 
-class StateRuleAnswerLogModel(base_models.IdModel):
+class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
     The id/key of instances of this class has the form

@@ -20,25 +20,19 @@ import core.storage.base_model.gae_models as base_models
 import test_utils
 
 
-class IdModelUnitTests(test_utils.AppEngineTestBase):
-    """Test the generic id model."""
-
-    def setUp(self):
-        super(IdModelUnitTests, self).setUp()
-
-    def tearDown(self):
-        super(IdModelUnitTests, self).tearDown()
+class BaseModelUnitTests(test_utils.AppEngineTestBase):
+    """Test the generic base model."""
 
     def test_get_error_cases(self):
         """Test the error cases for the get() method."""
 
-        class FakeIdModel(base_models.IdModel):
+        class FakeModel(base_models.BaseModel):
             pass
 
-        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
-            FakeIdModel.get('Invalid id')
-        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
-            FakeIdModel.get('Invalid id', strict=True)
+        with self.assertRaises(FakeModel.EntityNotFoundError):
+            FakeModel.get('Invalid id')
+        with self.assertRaises(FakeModel.EntityNotFoundError):
+            FakeModel.get('Invalid id', strict=True)
 
         # The get() method should fail silently when strict == False.
-        self.assertIsNone(FakeIdModel.get('Invalid id', strict=False))
+        self.assertIsNone(FakeModel.get('Invalid id', strict=False))

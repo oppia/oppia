@@ -271,7 +271,10 @@ class JSONField(models.TextField):
             return simplejson.dumps(value, **self.encoder_kwargs)
         elif isinstance(value, (list, dict)) and not self.primitivelist:
             schema = self.schema
-            assert type(schema) == type(value)
+            if type(schema) != type(value):
+                raise ValidationError(
+                    'Types for value %s and schema %s differ' %
+                    (value, schema))
             if isinstance(value, list):
                 for val in value:
                     assert isinstance(val, schema[0])
