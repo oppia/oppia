@@ -257,7 +257,8 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        new_state = exp_services.add_state(exploration.id, 'New state')
+        exp_services.add_state(exploration.id, 'New state')
+        new_state = exp_services.get_state_by_name(exploration.id, 'New state')
         state_dict = exp_services.export_state_to_dict(
             exploration.id, new_state.id)
 
@@ -345,7 +346,8 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         id_1 = '123'
         name_1 = 'State 1'
-        state_1 = exp_services.add_state(eid, name_1, state_id=id_1)
+        exp_services.add_state(eid, name_1, state_id=id_1)
+        state_1 = exp_services.get_state_by_name(eid, name_1)
 
         exploration = exp_services.get_exploration_by_id(eid)
         fetched_state_1 = exp_services.get_state_by_id(exploration.id, id_1)
@@ -401,23 +403,26 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         default_state = exp_services.get_state_by_id(
             exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
-        exploration = exp_services.rename_state(
+        exp_services.rename_state(
             exploration_id, default_state.id, 'Renamed state')
 
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         self.assertEqual(len(exploration.state_ids), 1)
         self.assertEqual(exploration.states[0].name, 'Renamed state')
 
         # Add a new state.
-        second_state = exp_services.add_state(exploration_id, 'State 2')
+        exp_services.add_state(exploration_id, 'State 2')
+        second_state = exp_services.get_state_by_name(
+            exploration_id, 'State 2')
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exploration = exp_services.rename_state(
+        exp_services.rename_state(
             exploration_id, second_state.id, second_state.name)
         renamed_second_state = exp_services.get_state_by_id(
-            exploration.id, second_state.id)
+            exploration_id, second_state.id)
         self.assertEqual(renamed_second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
@@ -434,6 +439,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
                 exploration_id, second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         self.assertFalse(exploration.has_state_named(default_state_name))
         self.assertTrue(exploration.has_state_named('Renamed state'))
         self.assertTrue(exploration.has_state_named('State 2'))

@@ -355,8 +355,6 @@ def add_state(exploration_id, state_name, state_id=None):
     exploration.state_ids.append(state_id)
     save_exploration(exploration)
 
-    return new_state
-
 
 def rename_state(exploration_id, state_id, new_state_name):
     """Renames a state of this exploration. Commits changes."""
@@ -374,7 +372,6 @@ def rename_state(exploration_id, state_id, new_state_name):
     state.name = new_state_name
     save_state(exploration_id, state)
     save_exploration(exploration)
-    return get_exploration_by_id(exploration_id)
 
 
 def delete_state(exploration_id, state_id):
