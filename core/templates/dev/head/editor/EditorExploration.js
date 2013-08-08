@@ -416,8 +416,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
               }
               window.location = $scope.explorationUrl;
             }).error(function(data) {
+              // TODO(sll): Actually force a refresh, since the data on the
+              // page may be out of date.
               warningsData.addWarning(
-                  'Server error when adding state: ' + data.error);
+                  'Server error when adding state: ' + data.error + '.' +
+                   'Please refresh your page.');
             });
   };
 

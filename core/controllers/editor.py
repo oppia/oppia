@@ -73,7 +73,7 @@ class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
     @base.require_editor
-    def get(self, unused_exploration):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': EDITOR_MODE,
@@ -85,21 +85,17 @@ class ExplorationHandler(base.BaseHandler):
     """Page with editor data for a single exploration."""
 
     @base.require_editor
-    def get(self, exploration):
+    def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
 
         state_list = {}
         for state_id in exploration.state_ids:
             state_list[state_id] = exp_services.export_state_to_verbose_dict(
-                exploration.id, state_id)
-
-        parameters = [{
-            'name': param.name, 'obj_type': param.obj_type,
-            'values': param.values
-        } for param in exploration.parameters]
+                exploration_id, state_id)
 
         self.values.update({
-            'exploration_id': exploration.id,
+            'exploration_id': exploration_id,
             'init_state_id': exploration.init_state_id,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
@@ -107,34 +103,35 @@ class ExplorationHandler(base.BaseHandler):
             'title': exploration.title,
             'editors': exploration.editor_ids,
             'states': state_list,
-            'parameters': parameters,
+            'parameters': [param.to_dict()
+                           for param in exploration.parameters],
             # Add information for the exploration statistics page.
             'num_visits': stats_services.get_exploration_visit_count(
-                exploration.id),
+                exploration_id),
             'num_completions': stats_services.get_exploration_completed_count(
-                exploration.id),
+                exploration_id),
             'state_stats': stats_services.get_state_stats_for_exploration(
-                exploration.id),
+                exploration_id),
             'imp': stats_services.get_top_improvable_states(
-                [exploration.id], 10),
+                [exploration_id], 10),
         })
         self.render_json(self.values)
 
     @base.require_editor
-    def post(self, exploration):
+    def post(self, exploration_id):
         """Adds a new state to the given exploration."""
 
         state_name = self.payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        exp_services.add_state(exploration.id, state_name)
-        state = exp_services.get_state_by_name(exploration.id, state_name)
+        exp_services.add_state(exploration_id, state_name)
+        state = exp_services.get_state_by_name(exploration_id, state_name)
         self.render_json(
-            exp_services.export_state_to_dict(exploration.id, state.id))
+            exp_services.export_state_to_dict(exploration_id, state_id))
 
     @base.require_editor
-    def put(self, exploration):
+    def put(self, exploration_id):
         """Updates properties of the given exploration."""
 
         is_public = self.payload.get('is_public')
@@ -144,6 +141,7 @@ class ExplorationHandler(base.BaseHandler):
         editors = self.payload.get('editors')
         parameters = self.payload.get('parameters')
 
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         if is_public:
             exploration.is_public = True
         if category:
@@ -169,17 +167,18 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.save_exploration(exploration)
 
     @base.require_editor
-    def delete(self, exploration):
+    def delete(self, exploration_id):
         """Deletes the given exploration."""
-        exp_services.delete_exploration(exploration.id)
+        exp_services.delete_exploration(exploration_id)
 
 
 class ExplorationDownloadHandler(base.BaseHandler):
     """Downloads an exploration as a YAML file."""
 
     @base.require_editor
-    def get(self, exploration):
+    def get(self, exploration_id):
         """Handles GET requests."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         filename = 'oppia-%s' % utils.to_ascii(exploration.title)
         if not filename:
             filename = feconf.DEFAULT_FILE_NAME
@@ -188,14 +187,14 @@ class ExplorationDownloadHandler(base.BaseHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.txt' % filename)
 
-        self.response.write(exp_services.export_to_yaml(exploration.id))
+        self.response.write(exp_services.export_to_yaml(exploration_id))
 
 
 class StateHandler(base.BaseHandler):
     """Handles state transactions."""
 
     @base.require_editor
-    def put(self, exploration, state):
+    def put(self, exploration_id, state_id):
         """Saves updates to a state."""
 
         state_name = self.payload.get('state_name')
@@ -209,13 +208,14 @@ class StateHandler(base.BaseHandler):
         resolved_answers = self.payload.get('resolved_answers')
 
         if 'state_name' in self.payload:
-            exp_services.rename_state(exploration.id, state.id, state_name)
+            exp_services.rename_state(exploration_id, state_id, state_name)
 
+        state = exp_services.get_state_by_id(exploration_id, state_id)
         if 'param_changes' in self.payload:
             state.param_changes = []
             for param_change in param_changes:
                 instance = exp_services.get_or_create_param(
-                    exploration.id, param_change['name'], None,
+                    exploration_id, param_change['name'], None,
                     param_change['values'])
                 state.param_changes.append(instance)
 
@@ -285,13 +285,13 @@ class StateHandler(base.BaseHandler):
 
         if 'resolved_answers' in self.payload:
             stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration.id, state.id, 'submit', resolved_answers)
+                exploration_id, state_id, 'submit', resolved_answers)
 
-        exp_services.save_state(exploration.id, state)
+        exp_services.save_state(exploration_id, state)
         self.render_json(exp_services.export_state_to_verbose_dict(
-            exploration.id, state.id))
+            exploration_id, state_id))
 
     @base.require_editor
-    def delete(self, exploration, state):
+    def delete(self, exploration_id, state_id):
         """Deletes the state with id state_id."""
-        exp_services.delete_state(exploration.id, state.id)
+        exp_services.delete_state(exploration_id, state_id)
