@@ -126,7 +126,7 @@ class ExplorationHandler(base.BaseHandler):
             raise self.InvalidInputException('Please specify a state name.')
 
         exp_services.add_state(exploration_id, state_name)
-        state_id = exp_services.convert_state_name_to_id(state_name)
+        state_id = exp_services.convert_state_name_to_id(exploration_id, state_name)
         self.render_json(
             exp_services.export_state_to_dict(exploration_id, state_id))
 
