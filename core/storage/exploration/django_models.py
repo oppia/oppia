@@ -22,6 +22,7 @@ from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 QUERY_LIMIT = 100
 
@@ -39,8 +40,21 @@ class ExplorationModel(base_models.BaseModel):
     # The list of state ids this exploration consists of. This list should not
     # be empty.
     state_ids = django_utils.ListField(default=[], blank=True)
+
+    #validator for parameters property
+    def validate_parameters(value):
+        try:
+            assert isinstance(value, list)
+            for val in value:
+                assert isinstance(val, dict)
+        except AssertionError:
+            raise ValidationError(
+                "The 'parameters' property must be a list of parameter dicts"
+                )
     # The list of parameters associated with this exploration.
-    parameters = django_utils.JSONField(blank=True, default=[])
+    parameters = django_utils.JSONField(
+        blank=True, default=[], primitivelist=True, validators=[validate_parameters]
+    )
 
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)
