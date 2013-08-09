@@ -126,6 +126,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
 
     $scope.statsGraphOpacities = {};
+    $scope.statsGraphOpacities['legend'] = 'Students entering state';
     for (var stateId in $scope.states) {
       var visits = $scope.stats.stateStats[stateId].firstEntryCount;
       $scope.statsGraphOpacities[stateId] = Math.max(
@@ -135,8 +136,14 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
     $scope.highlightStates = {};
+    $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:Students often leave';
     for (var i = 0; i < data.imp.length; i++) {
-      $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+      if (data.imp[i].type == 'default') {
+        $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+      }
+      if (data.imp[i].type == 'incomplete') {
+        $scope.highlightStates[data.imp[i].state_id] = 'brown';
+      }
     }
 
     $scope.graphData = $scope.reformatResponse(

@@ -3,16 +3,7 @@
   <br><br>
   <b>Common student paths </b>
   <br>
-  <i>(fill colors indicate the number of times the state was first entered, states that may need help are highlighted in blue)</i>
-  <state-graph-viz val="graphData" node-fill="rgba(0, 128, 0, 0.5)" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates"></state-graph-viz>
-  <b ng-show="stats.imp.length > 0">States that need a little help</b>
-  <ol>
-    <li ng-repeat="foo in stats.imp">
-      <a href="/create/<[foo.exp_id]>#/gui/<[foo.state_id]>"><[stats.stateStats[foo.state_id].name]></a>
-        <span ng-show="foo.type == 'incomplete'"> may be confusing. Students often quit when they get to this state.</span>
-        <span ng-show="foo.type == 'default'"> may need a bit more feedback. Students seem to keep hitting a no feedback state.</span>
-    </li>
-  </ol>
+  <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates"></state-graph-viz>
   <table>
     <tr>
       <th class="oppia-stats-table">State name</th>
