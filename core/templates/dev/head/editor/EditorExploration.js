@@ -94,6 +94,18 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
           $scope.states, $scope.initStateId);
   };
 
+  $scope.isEndStateReachable = function() {
+    if (!$scope.graphData) {
+      return true;
+    }
+    for (var i = 0; i < $scope.graphData.nodes.length; i++) {
+      if ($scope.graphData.nodes[i].name == END_DEST) {
+        return $scope.graphData.nodes[i].reachable;
+      }
+    }
+    return true;
+  };
+
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
