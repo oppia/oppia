@@ -23,6 +23,16 @@
 # The root folder MUST be named 'oppia'.
 # It installs dependencies in a virtualenv and runs django tests.
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/django_testrunner.sh"
+  echo ""
+  exit 1
+fi
+
 echo Installing dependencies in virtual python environment. 
 type virtualenv >/dev/null 2>&1 || { 
 echo "Virtualenv is required but it's not installed. Aborting."; exit 1; }

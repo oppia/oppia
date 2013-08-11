@@ -25,6 +25,16 @@
 
 set -e
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/start.sh"
+  echo ""
+  exit 1
+fi
+
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
