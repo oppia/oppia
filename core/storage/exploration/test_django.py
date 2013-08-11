@@ -59,9 +59,13 @@ class ExplorationModelUnitTests(unittest.TestCase):
             exploration.put()
         exploration.category = 'The category'
 
-        # The 'parameters' property must be a list of Parameter objects.
+        # The 'parameters' property must be a list of parameter dicts.
         with self.assertRaises(ValidationError):
             exploration.parameters = 'A string'
+            exploration.put()
+
+        with self.assertRaises(ValidationError):
+            exploration.parameters = [{'name': 'no_obj_type', 'values': [6]}]
             exploration.put()
 
         parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': [6]}

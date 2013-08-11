@@ -41,16 +41,19 @@ class ExplorationModel(base_models.BaseModel):
     # be empty.
     state_ids = django_utils.ListField(default=[], blank=True)
 
-    #validator for parameters property
     def validate_parameters(value):
+        """Validator for the parameters property."""
         try:
             assert isinstance(value, list)
             for val in value:
                 assert isinstance(val, dict)
+                assert all(
+                    [prop in val for prop in ['name', 'obj_type', 'values']])
         except AssertionError:
             raise ValidationError(
                 "The 'parameters' property must be a list of parameter dicts"
-                )
+            )
+
     # The list of parameters associated with this exploration.
     parameters = django_utils.JSONField(
         blank=True, default=[], primitivelist=True, validators=[validate_parameters]
