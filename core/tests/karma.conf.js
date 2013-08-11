@@ -8,10 +8,7 @@ files = [
   'third_party/static/angularjs-1.0.7/angular-sanitize.min.js',
   'third_party/static/angularjs-1.0.7/angular-mocks.js',
   'third_party/static/angular-ui-0.4.0/build/*.js',
-  'core/templates/dev/head/assets/js/*.js',
-  'core/templates/dev/head/assets/js/services/*.js',
-  'core/templates/dev/head/**/*.js',
-  'core/templates/dev/head/editor/views/*.js'
+  'core/templates/dev/head/**/*.js'
 ];
 
 autoWatch = true;

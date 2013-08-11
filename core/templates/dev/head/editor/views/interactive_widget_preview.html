@@ -60,15 +60,15 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          Answer <[rule | parameterizeRuleDescription: interactiveParams.choices]>: (
-          <span ng-show="rule.dest == END_DEST || rule.dest == stateId">
-            <[getStateNameForRule(rule.dest)]>
+          Answer <[rule | parameterizeRuleDescription: interactiveParams.choices]>:
+          <span ng-show="rule.dest == 'END' || rule.dest == stateId">
+            (<[getStateNameForRule(rule.dest)]>,
           </span>
-          <a ng-hide="rule.dest == END_DEST || rule.dest == stateId"
+          <a ng-hide="rule.dest == 'END' || rule.dest == stateId"
              href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-            <[getStateNameForRule(rule.dest)]>
+            (<[getStateNameForRule(rule.dest)]>,
           </a>
-          , <[rule.feedback|truncate]>)
+          <[rule.feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(handler.name, $index)">
