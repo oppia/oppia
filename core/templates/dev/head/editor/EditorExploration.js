@@ -83,9 +83,16 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       // TODO(sll): If $apply() is not called, the $scope.stateId change does
       // not propagate and the 'State Details' tab is still shown. Why?
       $scope.$apply();
-      $scope.$broadcast('updateViz', null);
     }
   });
+
+  /********************************************
+  * Methods affecting the graph visualization.
+  ********************************************/
+  $scope.drawGraph = function() {
+    $scope.graphData = $scope.reformatResponse(
+          $scope.states, $scope.initStateId);
+  };
 
 
   /**********************************************************
@@ -146,8 +153,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       }
     }
 
-    $scope.graphData = $scope.reformatResponse(
-          data.states, data.init_state_id);
+    $scope.drawGraph();
 
     explorationFullyLoaded = true;
   });

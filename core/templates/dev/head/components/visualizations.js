@@ -76,7 +76,6 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
       };
 
       scope.$watch('val', function (newVal, oldVal) {
-        // TODO(sll): This does not update if a state name is changed.
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
                     scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
@@ -91,13 +90,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
 
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
         height = 0;
+
+        // Clear existing SVG elements on the graph visualization canvas.
+        d3.select(element[0]).selectAll('svg').remove();
+
         var vis = d3.select(element[0]).append('svg:svg')
             .attr('class', 'oppia-graph-viz')
           .append('svg:g')
             .attr('transform', 'translate(20,30)');
-
-        // clear the elements inside of the directive
-        vis.selectAll('*').remove();
 
         // Update the links
         var link = vis.selectAll('path.link')
@@ -132,7 +132,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
        gradient.append('stop')
            .attr('offset', '100%')
            .style('stop-color', nodeFill)
-           .style('stop-opacity', .1);
+           .style('stop-opacity', 0.1);
 
         if (opacityMap || highlightStates) {
             var wth = 200;
@@ -149,7 +149,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 .attr('height', 20)
                 .attr('x', x + 10)
                 .attr('y', 10)
-                .style('stroke-width', .5) 
+                .style('stroke-width', 0.5)
                 .style('stroke', 'black')
                 .style('fill', 'url(#nodeGradient)');
               vis.append('svg:text')
@@ -206,9 +206,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
-		return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) + 
-                       'A' + (sourceWidth/4) + ',20 0 1,1' 
-                           + (sourcex-10-sourceWidth/2) + ' ' + sourcey;
+                return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) +
+                       'A' + (sourceWidth/4) + ',20 0 1,1' +
+                       (sourcex-10-sourceWidth/2) + ' ' + sourcey;
               }
 
               var dx = targetx - sourcex,
@@ -265,7 +265,11 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               return d.hashId != END_DEST ? 'clickable' : null; })
-            .style('stroke', function(d) { return (highlightStates? (d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC') : 'black')})
+            .style('stroke', function(d) {
+              return (highlightStates? (
+                  d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC'
+              ) : 'black');
+            })
             .style('stroke-width', function(d) {
               return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
             })

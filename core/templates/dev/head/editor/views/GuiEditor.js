@@ -71,6 +71,9 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       return;
     }
 
+    $scope.states[$scope.stateId].name = $scope.stateName;
+    $scope.drawGraph();
+
     explorationData.saveStateData(
         $scope.stateId, {'state_name': $scope.stateName});
     activeInputData.clear();
