@@ -23,7 +23,12 @@ class Continue(widget_domain.BaseWidget):
 
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
-    _params = []
+    _params = [{
+        'name': 'buttonText',
+        'description': 'The text that should be displayed on the button.',
+        'obj_type': 'UnicodeString',
+        'values': ['Continue']
+    }]
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated input types. Interactive widgets

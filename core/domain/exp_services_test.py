@@ -231,7 +231,8 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    params:
+      buttonText: Continue
     sticky: false
     widget_id: Continue
 - content: []
@@ -246,7 +247,8 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    params:
+      buttonText: Continue
     sticky: false
     widget_id: Continue
 """)
@@ -269,7 +271,9 @@ states:
             'param_changes': [],
             'widget': {
                 'widget_id': u'Continue',
-                'params': {},
+                'params': {
+                  u'buttonText': u'Continue',
+                },
                 'sticky': False,
                 'handlers': [{
                     'name': u'submit',

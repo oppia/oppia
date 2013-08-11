@@ -23,6 +23,7 @@ should therefore be independent of the specific storage models used."""
 __author__ = 'Sean Lip'
 
 from core.domain import param_domain
+from core.domain import widget_domain
 from core.platform import models
 (base_models, state_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.state
@@ -202,7 +203,14 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, state_id):
-        return cls('Continue', {},
+        continue_widget = widget_domain.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, 'Continue')
+
+        continue_params = {}
+        for param in continue_widget.params:
+            continue_params[param.name] = param.value
+        
+        return cls('Continue', continue_params,
                    [AnswerHandlerInstance.get_default_handler(state_id)])
 
 

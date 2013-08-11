@@ -94,12 +94,8 @@ class WidgetHandler(base.BaseHandler):
 
     def post(self, widget_type, widget_id):
         """Handles POST requests, for parameterized widgets."""
+        # Key-value mapping of parameters for the widget.
         params = self.payload.get('params', {})
-        if isinstance(params, list):
-            new_params = {}
-            for item in params:
-                new_params[item['name']] = item['default_value']
-            params = new_params
 
         state_params_dict = {}
         state_params_given = self.payload.get('state_params')
