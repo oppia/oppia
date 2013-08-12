@@ -73,9 +73,5 @@ describe('Gallery controller', function() {
       expect(scope.categories.Geography[0].data.title).toBe('Landmarks');
       expect(scope.getCategoryList()).toEqual(['Geography', 'Personal', '?']);
     });
-
-    it('should check that the current URL is not the demo server', function() {
-      expect(scope.isDemoServer()).toBe(false);
-    });
   });
 });

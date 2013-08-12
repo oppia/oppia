@@ -25,6 +25,16 @@
 
 set -e
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/test.sh"
+  echo ""
+  exit 1
+fi
+
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
@@ -90,7 +100,7 @@ fi
 echo Checking whether Karma has been installed via node.js
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   echo Installing Karma
-  $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g karma
+  $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
 fi
 
 # Note: you can safely delete all of the following code (up to the end of the

@@ -18,33 +18,46 @@
 
 __author__ = 'Sean Lip'
 
+from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
-
-from core.django_utils import JSONField, ListField
+from django.core.exceptions import ValidationError
 
 QUERY_LIMIT = 100
 
 
-class ExplorationModel(base_models.IdModel):
+class ExplorationModel(base_models.BaseModel):
     """Storage model for an Oppia exploration.
 
     This class should only be imported by the exploration domain file, the
     exploration services file, and the Exploration model test file.
     """
-    # TODO(sll): Write a test that ensures that the only files that are
-    # allowed to import this class are the ones described above.
-
     # The category this exploration belongs to.
     category = models.CharField(max_length=100)
     # What this exploration is called.
     title = models.CharField(max_length=100, default='New exploration')
     # The list of state ids this exploration consists of. This list should not
     # be empty.
-    state_ids = ListField(default=[], blank=True)
+    state_ids = django_utils.ListField(default=[], blank=True)
+
+    def validate_parameters(value):
+        """Validator for the parameters property."""
+        try:
+            assert isinstance(value, list)
+            for val in value:
+                assert isinstance(val, dict)
+                assert all(
+                    [prop in val for prop in ['name', 'obj_type', 'values']])
+        except AssertionError:
+            raise ValidationError(
+                "The 'parameters' property must be a list of parameter dicts"
+            )
+
     # The list of parameters associated with this exploration.
-    parameters = JSONField(blank=True, default=[])
+    parameters = django_utils.JSONField(
+        blank=True, default=[], primitivelist=True, validators=[validate_parameters]
+    )
 
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)
@@ -54,7 +67,7 @@ class ExplorationModel(base_models.IdModel):
     # List of ids of users who can edit this exploration. If the exploration is
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.
-    editor_ids = ListField(default=[], blank=True)
+    editor_ids = django_utils.ListField(default=[], blank=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = models.CharField(max_length=100, default='conversation')

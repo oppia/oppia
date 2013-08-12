@@ -27,7 +27,12 @@ primitive = (basestring, bool, float, int)
 
 
 class BaseModel(models.Model):
-    """A model class containing all common methods"""
+    """A model class containing all common methods.
+
+    All model instances have an id property.
+    """
+
+    id = models.CharField(max_length=100, primary_key=True)
 
     @classmethod
     def attr_list(cls):
@@ -47,6 +52,9 @@ class BaseModel(models.Model):
         self.full_clean()
         self.save()
         return self
+
+    def delete(self):
+        super(BaseModel, self).delete()
 
     def to_dict(self, exclude=[], include=[]):
         primitives = (int, long, float, complex, bool, basestring, type(None),
@@ -72,29 +80,6 @@ class BaseModel(models.Model):
             elif isinstance(val, object):
                 obj_dict[attr] = val.to_dict()
         return obj_dict
-
-    @classmethod
-    def get(cls, entity_id, **kwarg):
-        try:
-            entity = cls.objects.get(id=entity_id, **kwarg)
-        except cls.DoesNotExist:
-            entity = None
-        return entity
-
-    class Meta:
-        abstract = True
-
-
-class IdModel(BaseModel):
-    """A model stub which has an explicit id property."""
-    id = models.CharField(max_length=100, primary_key=True)
-
-    def put(self):
-        super(IdModel, self).put()
-        return self
-
-    def delete(self):
-        super(IdModel, self).delete()
 
     @classmethod
     def get_all(cls):
@@ -155,5 +140,5 @@ internal_attrs = ['_json_field_cache']
 
 all_internal_attrs = django_internal_attrs + internal_attrs
 
-class FakeIdModel(IdModel):
+class FakeModel(BaseModel):
     pass

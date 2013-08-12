@@ -23,6 +23,16 @@
 # It installs the dependencies in a virtualenv, runs tests and then starts 
 # django development server.
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/start_django.sh"
+  echo ""
+  exit 1
+fi
+
 bash scripts/django_testrunner.sh
 source ../venv/bin/activate
 python manage.py syncdb --noinput

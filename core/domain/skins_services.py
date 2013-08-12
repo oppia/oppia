@@ -19,10 +19,13 @@
 __author__ = 'Sean Lip'
 
 import feconf
+import jinja_utils
+
 import jinja2
 
 
 def get_skin_html(skin_name):
     """Returns the HTML for a given skin."""
-    return jinja2.Markup(feconf.SKINS_JINJA_ENV.get_template(
-        '%s.html' % skin_name).render())
+    return jinja2.Markup(
+    	jinja_utils.get_jinja_env(feconf.SKINS_TEMPLATES_DIR).get_template(
+            '%s.html' % skin_name).render())

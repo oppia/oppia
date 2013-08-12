@@ -1,6 +1,17 @@
-<button type="button" onclick="submitAnswer()">Continue</button>
+<script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
 
 <script>
+  var GLOBALS = {};
+  GLOBALS.buttonText = JSON.parse('{{buttonText}}');
+</script>
+
+<button id="submitButton" type="button" onclick="submitAnswer()"></button>
+
+<script>
+  $(document).ready(function() {
+    $('#submitButton').text(GLOBALS.buttonText);
+  });
+
   var submitAnswer = function() {
   	if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(

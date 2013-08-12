@@ -28,13 +28,6 @@ function Gallery($scope, $http, warningsData) {
     $scope.categories = galleryData.categories;
   });
 
-  /**
-   * Returns whether the current URL corresponds to the demo playground server.
-   */
-  $scope.isDemoServer = function() {
-    return location.host == 'oppiaserver.appspot.com';
-  };
-
   /******************************************
   * Methods controlling the modal dialogs.
   ******************************************/

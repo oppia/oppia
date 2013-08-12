@@ -35,9 +35,9 @@ import os
 import sys
 import unittest
 
-# import feconf
+import feconf
 
-EXPECTED_TEST_COUNT = 104
+EXPECTED_TEST_COUNT = 108
 
 
 _PARSER = argparse.ArgumentParser()
@@ -54,15 +54,15 @@ def create_test_suites(parsed_args):
     if parsed_args.test_path:
         root_dir = os.path.join(root_dir, parsed_args.test_path)
 
-    suite1 = loader.discover(
+    suite = loader.discover(
         root_dir, pattern='*_test.py', top_level_dir=root_dir)
-    suite2 = loader.discover(
-        root_dir, pattern='*tests.py', top_level_dir=root_dir)
-    return [suite1, suite2]
+    return [suite]
 
 
 def main():
     """Runs the tests."""
+    feconf.PLATFORM = 'gae'
+
     # TODO(sll): Check whether the following dirs exist.
     sys.path.insert(0, os.path.join(
         os.getcwd(), '..', 'gae_runtime', 'google_appengine_1.7.7',
@@ -77,9 +77,6 @@ def main():
 
     import dev_appserver
     dev_appserver.fix_sys_path()
-
-    import feconf
-    feconf.PLATFORM = 'gae'
 
     parsed_args = _PARSER.parse_args()
     suites = create_test_suites(parsed_args)

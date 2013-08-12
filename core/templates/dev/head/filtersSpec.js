@@ -47,4 +47,17 @@ describe('Testing filters', function() {
     expect(filter('{{}}{{hello}}')).toEqual(
       '{{}}<code>INPUT</code>');
   }));
+
+  it('should convert a list to a comma-separated string', inject(function($filter) {
+    var filter = $filter('commaSeparatedList');
+
+    expect(filter('a')).toEqual('ERROR');
+    expect(filter(null)).toEqual('ERROR');
+    expect(filter(undefined)).toEqual('ERROR');
+
+    expect(filter([])).toEqual('');
+    expect(filter(['a'])).toEqual('a');
+    expect(filter(['a', 'b'])).toEqual('a, b');
+    expect(filter(['a', 'b', 'c'])).toEqual('a, b, c');
+  }));
 });

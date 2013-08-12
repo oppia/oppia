@@ -146,3 +146,13 @@ oppia.filter('parameterizeRuleDescription', function() {
     return finalRule;
   };
 });
+
+// Filter that converts a list into a comma-separated string.
+oppia.filter('commaSeparatedList', function() {
+  return function(input) {
+    if (!angular.isArray(input)) {
+      return 'ERROR';
+    }
+    return input.join(', ');
+  };
+});

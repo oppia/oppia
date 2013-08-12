@@ -271,6 +271,11 @@ textarea {
   z-index: 9002;
 }
 
+.oppia-warning {
+  background: #F9EDBE;
+  width: 80%;
+}
+
 .oppia-butterbar {
   background: #F9EDBE;
   -moz-border-radius: 2px;

@@ -52,9 +52,7 @@ oppia.directive('barChart', function() {
 
 oppia.directive('stateGraphViz', function(explorationData, $filter) {
   // constants
-  var w = 960,
-      h = 1500,
-      i = 0;
+  var i = 0;
   var NODE_PADDING_X = 8;
   // The following variable must be at least 3.
   var MAX_NODE_LABEL_LENGTH = 20;
@@ -78,7 +76,6 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
       };
 
       scope.$watch('val', function (newVal, oldVal) {
-        // TODO(sll): This does not update if a state name is changed.
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
                     scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
@@ -93,13 +90,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
 
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
         height = 0;
+
+        // Clear existing SVG elements on the graph visualization canvas.
+        d3.select(element[0]).selectAll('svg').remove();
+
         var vis = d3.select(element[0]).append('svg:svg')
             .attr('class', 'oppia-graph-viz')
           .append('svg:g')
             .attr('transform', 'translate(20,30)');
-
-        // clear the elements inside of the directive
-        vis.selectAll('*').remove();
 
         // Update the links
         var link = vis.selectAll('path.link')
@@ -117,15 +115,86 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('orient', 'auto')
           .append('svg:path')
             .attr('d', 'M -5 0 L 12 6 L -5 12 z')
-            .attr('fill', 'black');
+            .attr('fill', 'grey');
+     
+       var gradient = vis.selectAll('defs').selectAll('linearGradient')
+           .data(['nodeGradient'])
+         .enter().append('svg:linearGradient')
+           .attr('id', String)
+           .attr('x1', '0%')
+           .attr('x2', '100%')
+           .attr('y1', '0%')
+           .attr('y2', '0%');
+       gradient.append('stop')
+           .attr('offset', '0%')
+           .style('stop-color', nodeFill)
+           .style('stop-opacity', 1);
+       gradient.append('stop')
+           .attr('offset', '100%')
+           .style('stop-color', nodeFill)
+           .style('stop-opacity', 0.1);
 
+        if (opacityMap || highlightStates) {
+            var wth = 200;
+            var x = 450;
+            var legendHeight = 0;
+            var legend = vis.append('svg:rect')
+              .attr('width', wth)
+              .attr('x', x)
+              .style('fill', 'transparent')
+              .style('stroke', 'black');
+            if (opacityMap) {
+              vis.append('svg:rect')
+                .attr('width', wth - 20)
+                .attr('height', 20)
+                .attr('x', x + 10)
+                .attr('y', 10)
+                .style('stroke-width', 0.5)
+                .style('stroke', 'black')
+                .style('fill', 'url(#nodeGradient)');
+              vis.append('svg:text')
+                .text(opacityMap['legend'])
+                .attr('x', x + 10)
+                .attr('y', 50);
+              legendHeight += 70;
+            }
+            if (highlightStates) {
+              var legendData = highlightStates['legend'].split(',');
+              for (var i = 0; i < legendData.length; i++) {
+                 legendHeight += 40;
+                 var color = legendData[i].split(':')[0];
+                 var desc = legendData[i].split(':')[1];
+                 var leg_y;
+                 if (opacityMap) {
+                   leg_y = 70;
+                 } else {
+                   leg_y = 10;
+                 }
+                 leg_y += (i * 40);
+                 vis.append('svg:rect')
+                  .attr('height', 30)
+                  .attr('width', 30)
+                  .attr('rx', 4)
+                  .attr('ry', 4)
+                  .attr('x', x + 10)
+                  .attr('y', leg_y)
+                  .style('stroke', color)
+                  .style('fill', 'transparent')
+                  .style('stroke-width', 3);
+                 vis.append('svg:text')
+                  .text(desc)
+                  .attr('x', x + 50)
+                  .attr('y', leg_y + 17);
+              }
+            }
+            legend.attr('height', legendHeight);
+        }
         var linkEnter = link.enter().append('svg:g')
             .attr('class', 'link');
 
         linkEnter.insert('svg:path', 'g')
             .style('stroke-width', 3)
-            .style('stroke', 'grey')
-            .attr('opacity', 0.6)
+            .style('stroke', '#b3b3b3')
             .attr('class', 'link')
             .attr('d', function(d) {
               var sourceWidth = getTextWidth(d.source.name);
@@ -137,9 +206,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               var targety = d.target.y0 + 20;
 
               if (d.source == d.target) {
-		return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) + 
-                       'A' + (sourceWidth/4) + ',20 0 1,1' 
-                           + (sourcex-10-sourceWidth/2) + ' ' + sourcey;
+                return 'M' + (sourcex - sourceWidth/4)  + ',' + (sourcey + 20) +
+                       'A' + (sourceWidth/4) + ',20 0 1,1' +
+                       (sourcex-10-sourceWidth/2) + ' ' + sourcey;
               }
 
               var dx = targetx - sourcex,
@@ -196,7 +265,11 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('height', function(d) { return 40; })
             .attr('class', function(d) {
               return d.hashId != END_DEST ? 'clickable' : null; })
-            .style('stroke', function(d) { return (highlightStates? (d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC') : 'black')})
+            .style('stroke', function(d) {
+              return (highlightStates? (
+                  d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC'
+              ) : 'black');
+            })
             .style('stroke-width', function(d) {
               return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
             })

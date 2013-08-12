@@ -22,6 +22,10 @@
 {% endblock header_js %}
 
 {% block content %}
+  <div ng-show="isDemoServer()" style="background-color: lightyellow; width: 700px; margin: 0 auto">
+    <strong style="color: red">Warning</strong>: This site is a public demo playground for Oppia, and is updated frequently. Please regard any explorations that you create on it as transient -- they may be deleted at any time.
+  </div>
+
   <div ng-controller="EditorExploration" ng-cloak>
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
@@ -144,7 +148,7 @@
   <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
   <script async src="/third_party/static/yui2-2.9.0/yui2-2.9.0.js"></script>
   <script>
-    {{ include_js_file('assets/js/services/explorationData.js') }}
+    {{ include_js_file('services/explorationData.js') }}
     {{ include_js_file('editor/EditorExploration.js') }}
     {{ include_js_file('editor/views/GuiEditor.js') }}
     {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}

@@ -83,9 +83,28 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       // TODO(sll): If $apply() is not called, the $scope.stateId change does
       // not propagate and the 'State Details' tab is still shown. Why?
       $scope.$apply();
-      $scope.$broadcast('updateViz', null);
     }
   });
+
+  /********************************************
+  * Methods affecting the graph visualization.
+  ********************************************/
+  $scope.drawGraph = function() {
+    $scope.graphData = $scope.reformatResponse(
+        $scope.states, $scope.initStateId);
+  };
+
+  $scope.isEndStateReachable = function() {
+    if (!$scope.graphData) {
+      return true;
+    }
+    for (var i = 0; i < $scope.graphData.nodes.length; i++) {
+      if ($scope.graphData.nodes[i].name == END_DEST) {
+        return $scope.graphData.nodes[i].reachable;
+      }
+    }
+    return true;
+  };
 
 
   /**********************************************************
@@ -109,7 +128,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
-    $scope.parameters = data.parameters || [];//TODO(yanamal): make sure this works when explorations actually have parameters
+    $scope.parameters = data.parameters || [];
 
     $scope.stats = {
       'numVisits': data.num_visits,
@@ -126,6 +145,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
 
     $scope.statsGraphOpacities = {};
+    $scope.statsGraphOpacities['legend'] = 'Students entering state';
     for (var stateId in $scope.states) {
       var visits = $scope.stats.stateStats[stateId].firstEntryCount;
       $scope.statsGraphOpacities[stateId] = Math.max(
@@ -135,12 +155,17 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
     $scope.highlightStates = {};
+    $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:Students often leave';
     for (var i = 0; i < data.imp.length; i++) {
-      $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+      if (data.imp[i].type == 'default') {
+        $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+      }
+      if (data.imp[i].type == 'incomplete') {
+        $scope.highlightStates[data.imp[i].state_id] = 'brown';
+      }
     }
 
-    $scope.graphData = $scope.reformatResponse(
-          data.states, data.init_state_id);
+    $scope.drawGraph();
 
     explorationFullyLoaded = true;
   });
@@ -411,13 +436,17 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
+              $scope.states[data.id] = data;
+              $scope.drawGraph();
               if (successCallback) {
-                successCallback(data);
+                successCallback(data.id);
               }
-              window.location = $scope.explorationUrl;
             }).error(function(data) {
+              // TODO(sll): Actually force a refresh, since the data on the
+              // page may be out of date.
               warningsData.addWarning(
-                  'Server error when adding state: ' + data.error);
+                  'Server error when adding state: ' + data.error + '.' +
+                   'Please refresh your page.');
             });
   };
 

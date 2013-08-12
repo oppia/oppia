@@ -243,8 +243,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.saveInteractiveWidget();
   };
 
-  $scope.saveExtendedRuleWithNewDest = function(action, extendedRule, dest) {
-    extendedRule['dest'] = dest.id;
+  $scope.saveExtendedRuleWithNewDest = function(action, extendedRule, destId) {
+    extendedRule['dest'] = destId;
     $scope.saveExtendedRule(action, extendedRule);
   };
 
@@ -282,6 +282,11 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
     $scope.addRuleAction = null;
     $scope.deselectAllRules();
+  };
+
+  $scope.getDefaultRule = function(handlerName) {
+    var ruleset = $scope.interactiveRulesets[handlerName];
+    return ruleset[ruleset.length - 1];
   };
 
   $scope.swapRules = function(action, index1, index2) {
@@ -371,6 +376,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         'interactive_params': $scope.interactiveParams,
         'interactive_rulesets': $scope.interactiveRulesets
     });
+    $scope.drawGraph();
   };
 
   $scope.deleteUnresolvedAnswer = function(answer) {

@@ -24,7 +24,7 @@ from core.platform import models
 from google.appengine.ext import ndb
 
 
-class StateModel(base_models.IdModel):
+class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.

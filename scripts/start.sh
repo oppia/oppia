@@ -25,6 +25,16 @@
 
 set -e
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/start.sh"
+  echo ""
+  exit 1
+fi
+
 # TODO: Consider using getopts command.
 for arg in "$@"; do
   if [ "$arg" == "--jsrepl" ]; then
@@ -182,7 +192,7 @@ fi
 python build.py
 
 # Run the tests.
-sh scripts/test.sh
+bash scripts/test.sh
 
 # Set up a local dev instance
 echo Starting GAE development server

@@ -18,8 +18,6 @@
 
 import os
 
-import jinja2
-
 from core import settings
 
 # Code contributors, in alphabetical order.
@@ -92,41 +90,11 @@ INTERACTIVE_WIDGETS_DIR = 'extensions/widgets/interactive'
 NONINTERACTIVE_WIDGETS_DIR = 'extensions/widgets/noninteractive'
 
 OBJECT_TEMPLATES_DIR = 'extensions/objects/templates'
+SKINS_TEMPLATES_DIR = 'extensions/skins'
+FRONTEND_TEMPLATES_DIR = ('core/templates/dev/head' if DEV_MODE
+                          else 'core/templates/prod/head')
 
-# The jinja environment used for loading object view and edit templates.
-OBJECT_JINJA_ENV = jinja2.Environment(
-    autoescape=True,
-    loader=jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), OBJECT_TEMPLATES_DIR))
-)
-
-SKINS_DIR = 'extensions/skins'
-SKINS_JINJA_ENV = jinja2.Environment(
-    autoescape=True,
-    loader=jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), SKINS_DIR))
-)
-
-# The jinja environment used for loading frontend templates.
-loader = jinja2.FileSystemLoader(os.path.join(
-    os.path.dirname(__file__),
-    'core/templates/dev/head' if DEV_MODE else 'core/templates/prod/head'
-))
-OPPIA_JINJA_ENV = jinja2.Environment(autoescape=True, loader=loader)
-
-
-def include_js_file(name):
-    """Include a raw JS file in the template without evaluating it."""
-    assert name.endswith('.js')
-    return jinja2.Markup(loader.get_source(OPPIA_JINJA_ENV, name)[0])
-
-OPPIA_JINJA_ENV.globals['include_js_file'] = include_js_file
-OPPIA_JINJA_ENV.filters.update({
-    'is_list': lambda x: isinstance(x, list),
-    'is_dict': lambda x: isinstance(x, dict),
-})
-
-
+# The id and name for the final state of an exploration.
 END_DEST = 'END'
 
 # Default name for a state.

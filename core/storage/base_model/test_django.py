@@ -35,8 +35,6 @@ def inheritors(klass):
                 work.append(child)
     return subclasses
 
-FakeIdModel = base_models.FakeIdModel
-
 
 class ConverterUnitTests(unittest.TestCase):
     """Test the Converter class."""
@@ -109,10 +107,10 @@ class ConverterUnitTests(unittest.TestCase):
 
 
 class AttrListUnitTests(unittest.TestCase):
-    """Test the attr_list of the subclasses"""
+    """Test the attr_list of the subclasses."""
 
     def test_elements_of_attr_lists_for_all_classes_are_strings(self):
-        subclasses = inheritors(base_models.BaseModel) - {base_models.IdModel}
+        subclasses = inheritors(base_models.BaseModel)
         primitive = (basestring, bool, float, int)
         for subclass in subclasses:
             attr_list = subclass.attr_list()
@@ -122,22 +120,17 @@ class AttrListUnitTests(unittest.TestCase):
                 self.assertIsInstance(value, basestring)
 
 
-class IdModelUnitTests(unittest.TestCase):
-    """Test the generic id model."""
-
-    def setUp(self):
-        super(IdModelUnitTests, self).setUp()
-
-    def tearDown(self):
-        super(IdModelUnitTests, self).tearDown()
+class BaseModelUnitTests(unittest.TestCase):
+    """Test the generic base model."""
 
     def test_get_error_cases(self):
         """Test the error cases for the get() method."""
+        FakeModel = base_models.FakeModel
 
-        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
-            FakeIdModel.get('Invalid id')
-        with self.assertRaises(base_models.IdModel.EntityNotFoundError):
-            FakeIdModel.get('Invalid id', strict=True)
+        with self.assertRaises(FakeModel.EntityNotFoundError):
+            FakeModel.get('Invalid id')
+        with self.assertRaises(FakeModel.EntityNotFoundError):
+            FakeModel.get('Invalid id', strict=True)
 
         # The get() method should fail silently when strict == False.
-        self.assertIsNone(FakeIdModel.get('Invalid id', strict=False))
+        self.assertIsNone(FakeModel.get('Invalid id', strict=False))

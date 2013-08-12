@@ -23,6 +23,16 @@
 # The root folder MUST be named 'oppia'.
 # It installs dependencies in a virtualenv and runs django tests.
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/django_testrunner.sh"
+  echo ""
+  exit 1
+fi
+
 echo Installing dependencies in virtual python environment. 
 type virtualenv >/dev/null 2>&1 || { 
 echo "Virtualenv is required but it's not installed. Aborting."; exit 1; }
@@ -39,5 +49,5 @@ pip install -r requirements.txt || {
 # TODO(sunu): Add autodiscovery for the tests.
 
 python manage.py test core.storage.base_model.test_django \
-core.storage.image.test_django core.storage.parameter.test_django core.storage.state.test_django \
+core.storage.image.test_django core.storage.state.test_django \
 core.storage.exploration.test_django ;

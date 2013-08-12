@@ -300,9 +300,10 @@ class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         SECOND_STATE = 'State 2'
-        second_state = exp_services.add_state(exp.id, SECOND_STATE)
+        exp_services.add_state(exp.id, SECOND_STATE)
         exp = exp_services.get_exploration_by_id('eid')
         state1_id = exp.init_state_id
+        second_state = exp_services.get_state_by_name('eid', SECOND_STATE)
         state2_id = second_state.id
 
         # Hit the default rule of state 1 once, and the default rule of state 2

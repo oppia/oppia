@@ -6,14 +6,22 @@
     <script>
       var GLOBALS = {};
       GLOBALS.placeholder = JSON.parse('{{placeholder}}');
+      GLOBALS.columns = JSON.parse('{{columns}}');
+      GLOBALS.rows = JSON.parse('{{rows}}');
     </script>
   </head>
 
   <body>
     <div ng-controller="TextInput">
       <form ng-submit="submitAnswer(answer)">
-        <input type="textarea" ng-model="answer"
+
+        <input ng-show="rows == 1" ng-model="answer"
                placeholder="<[placeholder]>" required autofocus>
+
+        <textarea ng-show="rows != 1" ng-model="answer"
+                  placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
+        </textarea>
+
         <button type="submit">Submit</button>
       </form>
     </div>

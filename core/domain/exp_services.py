@@ -36,11 +36,11 @@ from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import widget_domain
 from core.platform import models
+import feconf
+import jinja_utils
+memcache_services = models.Registry.import_memcache_services()
 (exp_models, image_models, state_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
-
-memcache_services = models.Registry.import_memcache_services()
-import feconf
 import utils
 
 
@@ -355,8 +355,6 @@ def add_state(exploration_id, state_name, state_id=None):
     exploration.state_ids.append(state_id)
     save_exploration(exploration)
 
-    return new_state
-
 
 def rename_state(exploration_id, state_id, new_state_name):
     """Renames a state of this exploration. Commits changes."""
@@ -374,7 +372,6 @@ def rename_state(exploration_id, state_id, new_state_name):
     state.name = new_state_name
     save_state(exploration_id, state)
     save_exploration(exploration)
-    return get_exploration_by_id(exploration_id)
 
 
 def delete_state(exploration_id, state_id):
@@ -405,48 +402,6 @@ def delete_state(exploration_id, state_id):
     delete_state_model(exploration_id, state_id)
     exploration.state_ids.remove(state_id)
     save_exploration(exploration)
-
-
-def modify_using_dict(exploration_id, state_id, sdict):
-    """Modifies the properties of a state using values from a dict."""
-    state = get_state_by_id(exploration_id, state_id)
-
-    state.content = [
-        exp_domain.Content(item['type'], item['value'])
-        for item in sdict['content']
-    ]
-
-    state.param_changes = []
-    for pc in sdict['param_changes']:
-        instance = get_or_create_param(
-            exploration_id, pc['name'], pc['obj_type'], pc['values'])
-        state.param_changes.append(instance)
-
-    wdict = sdict['widget']
-    widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
-        'name': handler['name'],
-        'rule_specs': [{
-            'name': rule_spec['name'],
-            'inputs': rule_spec['inputs'],
-            'dest': convert_state_name_to_id(exploration_id, rule_spec['dest']),
-            'feedback': rule_spec['feedback'],
-            'param_changes': []
-        } for rule_spec in handler['rule_specs']],
-    }) for handler in wdict['handlers']]
-
-    state.widget = exp_domain.WidgetInstance(
-        wdict['widget_id'], wdict['params'], widget_handlers, wdict['sticky'])
-
-    # Augment the list of parameters in state.widget with the default widget
-    # params.
-    widget_params = widget_domain.Registry.get_widget_by_id(
-        feconf.INTERACTIVE_PREFIX, wdict['widget_id']).params
-    for wp in widget_params:
-        if wp.name not in wdict['params']:
-            state.widget.params[wp.name] = wp.values
-
-    save_state(exploration_id, state)
-    return state
 
 
 def _find_first_match(handler, all_rule_classes, answer, state_params):
@@ -505,8 +460,7 @@ def create_from_yaml(
     exploration = get_exploration_by_id(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
-
-    init_state = get_state_by_name(exploration.id, init_state_name)
+    exploration_id = exploration.id
 
     try:
         exploration.parameters = [
@@ -514,15 +468,42 @@ def create_from_yaml(
             for param_dict in exploration_dict['parameters']
         ]
 
-        state_list = []
-        for state_description in exploration_dict['states']:
-            state_name = state_description['name']
-            state = (init_state if state_name == init_state_name
-                     else add_state(exploration.id, state_name))
-            state_list.append({'state': state, 'desc': state_description})
+        for sdict in exploration_dict['states']:
+            if sdict['name'] != init_state_name:
+                add_state(exploration_id, sdict['name'])
 
-        for index, state in enumerate(state_list):
-            modify_using_dict(exploration.id, state['state'].id, state['desc'])
+        for sdict in exploration_dict['states']:
+            state = get_state_by_name(exploration_id, sdict['name'])
+
+            state.content = [
+                exp_domain.Content(item['type'], item['value'])
+                for item in sdict['content']
+            ]
+
+            state.param_changes = [get_or_create_param(
+                exploration_id, pc['name'], pc['obj_type'], pc['values'])
+                for pc in sdict['param_changes']
+            ]
+
+            wdict = sdict['widget']
+            widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
+                'name': handler['name'],
+                'rule_specs': [{
+                    'name': rule_spec['name'],
+                    'inputs': rule_spec['inputs'],
+                    'dest': convert_state_name_to_id(
+                        exploration_id, rule_spec['dest']),
+                    'feedback': rule_spec['feedback'],
+                    'param_changes': rule_spec.get('param_changes', []),
+                } for rule_spec in handler['rule_specs']],
+            }) for handler in wdict['handlers']]
+
+            state.widget = exp_domain.WidgetInstance(
+                wdict['widget_id'], wdict['params'], widget_handlers,
+                wdict['sticky'])
+
+            save_state(exploration_id, state)
+
     except Exception:
         delete_exploration(exploration.id)
         raise
@@ -686,15 +667,18 @@ def export_content_to_html(content_array, block_number, params=None):
     if params is None:
         params = {}
 
+    JINJA_ENV = jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
+
     html, widget_array = '', []
     for content in content_array:
         if content.type in ['text', 'image', 'video']:
             value = (utils.parse_with_jinja(content.value, params)
                      if content.type == 'text' else content.value)
 
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'type': content.type, 'value': value})
+            html += JINJA_ENV.get_template('reader/content.html').render({
+                'type': content.type,
+                'value': value,
+            })
         elif content.type == 'widget':
             # Ignore empty widget specifications.
             if not content.value:
@@ -704,16 +688,15 @@ def export_content_to_html(content_array, block_number, params=None):
             widget = widget_domain.Registry.get_widget_by_id(
                 feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
             widget_array_len = len(widget_array)
-            html += feconf.OPPIA_JINJA_ENV.get_template(
-                'reader/content.html').render({
-                    'blockIndex': block_number,
-                    'index': widget_array_len,
-                    'type': content.type,
-                })
+            html += JINJA_ENV.get_template('reader/content.html').render({
+                'blockIndex': block_number,
+                'index': widget_array_len,
+                'type': content.type,
+            })
             widget_array.append({
                 'blockIndex': block_number,
                 'index': widget_array_len,
-                'raw': widget.get_with_params(widget_dict['params'])['raw'],
+                'raw': widget.get_raw_code(widget_dict['params']),
             })
         else:
             raise utils.InvalidInputException(

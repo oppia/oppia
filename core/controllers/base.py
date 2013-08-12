@@ -21,9 +21,10 @@ import logging
 import sys
 import traceback
 
-import feconf
 from core.domain import exp_services
 from core.platform import models
+import feconf
+import jinja_utils
 user_services = models.Registry.import_user_services()
 
 import webapp2
@@ -77,12 +78,12 @@ def require_editor(handler):
                 self.user_id)
 
         if not state_id:
-            return handler(self, exploration, **kwargs)
+            return handler(self, exploration_id, **kwargs)
         try:
-            state = exp_services.get_state_by_id(exploration_id, state_id)
+            exp_services.get_state_by_id(exploration_id, state_id)
         except:
             raise self.PageNotFoundException
-        return handler(self, exploration, state, **kwargs)
+        return handler(self, exploration_id, state_id, **kwargs)
 
     return test_editor
 
@@ -107,7 +108,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
-        return feconf.OPPIA_JINJA_ENV
+        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):
         # Set self.request, self.response and self.app.
