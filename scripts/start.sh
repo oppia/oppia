@@ -16,14 +16,21 @@
 
 ##########################################################################
 
-# INSTRUCTIONS:                                                          
-#                                                                        
+# INSTRUCTIONS:
+#
 # Run this script from the oppia root folder:
 #   bash scripts/start.sh
 # The root folder MUST be named 'oppia'.
 # It sets up the third-party files and the local GAE, and runs tests.
 
 set -e
+
+# TODO: Consider using getopts command.
+for arg in "$@"; do
+  if [ "$arg" == "--jsrepl" ]; then
+    INSTALL_JSREPL=1
+  fi
+done
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
@@ -42,8 +49,10 @@ THIRD_PARTY_DIR=third_party
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 # Adjust the path to include a reference to node.
-PATH=$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
+PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
 MACHINE_TYPE=`uname -m`
+
+mkdir -p $THIRD_PARTY_DIR
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
@@ -137,29 +146,37 @@ fi
 #
 #     sudo apt-get install cakephp-scripts
 #
-# Commenting the rest of the code out for now because it is not working on some systems.
-#
-# echo Checking whether jsrepl is installed in third_party
-# if [ ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-#   echo Checking whether coffeescript has been installed via node.js
-#   if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
-#     echo Installing CoffeeScript
-#     $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
-#   fi
-#
-#   echo Downloading jsrepl
-#   cd $THIRD_PARTY_DIR
-#   git clone git://github.com/replit/jsrepl.git
-#   cd jsrepl
-#   git submodule update --init --recursive
-#
-#   echo Compiling jsrepl
-#   # Reducing jvm memory requirement from 4G to 1G.
-#   sed -i s/Xmx4g/Xmx1g/ Cakefile
-#   NODE_PATH=../node-0.10.1/lib/node_modules cake bake
-#   cd ../../
-#   mv $THIRD_PARTY_DIR/jsrepl/myapp $THIRD_PARTY_DIR/static/jsrepl
-# fi
+echo Checking whether jsrepl is installed in third_party
+if [ "$INSTALL_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
+  echo Checking whether coffeescript has been installed via node.js
+  if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
+    echo Installing CoffeeScript
+    npm install -g coffee-script@1.2.0
+  fi
+  echo Checking whether uglify has been installed via node.js
+  if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/uglify-js" ]; then
+    echo Installing uglify
+    npm install -g uglify-js
+  fi
+
+  echo Downloading jsrepl
+  cd $THIRD_PARTY_DIR
+  git clone git://github.com/replit/jsrepl.git
+  cd jsrepl
+  git submodule update --init --recursive
+
+  echo Compiling jsrepl
+  # Reducing jvm memory requirement from 4G to 1G.
+  sed -i s/Xmx4g/Xmx1g/ Cakefile
+  # This version of node uses fs.exitsSync.
+  sed -i s/path\.existsSync/fs\.existsSync/ Cakefile
+  # CoffeeScript is having trouble with octal representation.
+  sed -i s/0o755/493/ Cakefile
+  NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+
+  cd ../../
+  mv $THIRD_PARTY_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
+fi
 
 # Do a build.
 python build.py
