@@ -64,10 +64,11 @@
           <span ng-show="rule.dest == 'END' || rule.dest == stateId">
             (<[getStateNameForRule(rule.dest)]>,
           </span>
-          <a ng-hide="rule.dest == 'END' || rule.dest == stateId"
-             href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-            (<[getStateNameForRule(rule.dest)]>,
-          </a>
+          <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
+            (<a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
+              <[getStateNameForRule(rule.dest)]>,
+            </a>
+          </span>
           <[rule.feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
@@ -116,8 +117,16 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <[interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1] | parameterizeRuleDescription: interactiveParams.choices]>:
-          (<[getStateNameForRule(interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].dest)]>, <[interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].feedback|truncate]>)
+          <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveParams.choices]>:
+          <span ng-show="getDefaultRule(handler.name).dest == 'END' || getDefaultRule(handler.name).dest == stateId">
+            (<[getStateNameForRule(getDefaultRule(handler.name).dest)]>,
+          </span>
+          <span ng-hide="getDefaultRule(handler.name).dest == 'END' || getDefaultRule(handler.name).dest == stateId">
+            (<a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handler.name).dest]>">
+              <[getStateNameForRule(getDefaultRule(handler.name).dest)]>,
+            </a>
+          </span>
+          <[getDefaultRule(handler.name).feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
           <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">

@@ -91,7 +91,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   ********************************************/
   $scope.drawGraph = function() {
     $scope.graphData = $scope.reformatResponse(
-          $scope.states, $scope.initStateId);
+        $scope.states, $scope.initStateId);
   };
 
   $scope.isEndStateReachable = function() {
@@ -128,7 +128,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
-    $scope.parameters = data.parameters || [];//TODO(yanamal): make sure this works when explorations actually have parameters
+    $scope.parameters = data.parameters || [];
 
     $scope.stats = {
       'numVisits': data.num_visits,
@@ -436,10 +436,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
+              $scope.states[data.id] = data;
+              $scope.drawGraph();
               if (successCallback) {
-                successCallback(data);
+                successCallback(data.id);
               }
-              window.location = $scope.explorationUrl;
             }).error(function(data) {
               // TODO(sll): Actually force a refresh, since the data on the
               // page may be out of date.
