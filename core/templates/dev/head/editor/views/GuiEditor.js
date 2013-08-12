@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $http, $filter, $routeParams, explorationData, warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
     promise.then(function(data) {
@@ -59,6 +59,38 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
       $scope.addContentToIframeWithId(
           'widgetPreview' + widgetData.parent_index, widgetData.widget.raw);
     });
+  };
+
+  $scope.getIncomingStates = function(stateId) {
+    var incomingStates = {},
+        statesToRuleNames = {},
+        otherStateId;
+
+    for (otherStateId in $scope.states) {
+      var handlers = $scope.states[otherStateId].widget.handlers;
+      var widgetParams = $scope.states[otherStateId].widget.params;
+      for (var i = 0; i < handlers.length; i++) {
+        for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+          if (handlers[i].rule_specs[j].dest == stateId) {
+            incomingStates[otherStateId] = $scope.states[otherStateId];
+
+            var ruleName = $filter('parameterizeRuleDescription')(
+                handlers[i].rule_specs[j], widgetParams.choices);
+
+            if (otherStateId in statesToRuleNames) {
+              statesToRuleNames[otherStateId].push(ruleName);
+            } else {
+              statesToRuleNames[otherStateId] = [ruleName];
+            }
+          }
+        }
+      }
+    }
+
+    for (otherStateId in incomingStates) {
+      incomingStates[otherStateId].rules = statesToRuleNames[otherStateId];
+    }
+    return incomingStates;
   };
 
   $scope.saveStateName = function() {
@@ -311,7 +343,7 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   $scope.deleteWidget = function(index) {
     $scope.content[index].value = '';
     $scope.saveStateContent();
-  }
+  };
 
   //logic for parameter change interface
 
@@ -387,5 +419,5 @@ function GuiEditor($scope, $http, $routeParams, explorationData, warningsData, a
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$routeParams', 'explorationData',
-    'warningsData', 'activeInputData'];
+GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams',
+    'explorationData', 'warningsData', 'activeInputData'];

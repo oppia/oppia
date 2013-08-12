@@ -23,6 +23,19 @@
     <div class="span10">
       <div id="editorWindow" ng-show="stateId">
 
+        <h4>States that point to this one</h4>
+        <ul>
+          <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
+            <a href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+              <[incomingState.name]>
+            </a>
+            (<[incomingState.rules | commaSeparatedList]>)
+          </li>
+        </ul>
+        <span ng-show="isEmpty(getIncomingStates(stateId))">
+          <em>No incoming states.</em>
+        </span>
+
         <h4>
           Parameter Changes
           <img class="oppia-help" src="/images/help.png"
