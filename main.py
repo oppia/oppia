@@ -32,6 +32,7 @@ from core.controllers import resources
 from core.controllers import widgets
 
 import webapp2
+from webapp2_extras.routes import RedirectRoute
 
 
 class Error404Handler(base.BaseHandler):
@@ -61,48 +62,74 @@ def generate_static_url_tuples():
 
 # Register the URL with the responsible classes
 urls = [
-    (r'/?', pages.MainPage),
-    (r'/about/?', pages.AboutPage),
-    (r'/terms/?', pages.TermsPage),
-    (r'/feedback/?', pages.FeedbackPage),
+    webapp2.Route(r'/', pages.MainPage, name="home"),
+    RedirectRoute(r'/about', pages.AboutPage, name="about_page", strict_slash=True),
+    RedirectRoute(r'/terms', pages.TermsPage, name="terms_page", strict_slash=True),
+    RedirectRoute(r'/feedback', pages.FeedbackPage, name="feedback_page", strict_slash=True),
 
-    (r'/admin/?', admin.AdminPage),
+    RedirectRoute(r'/admin', admin.AdminPage, name="admin_page", strict_slash=True),
 
-    (r'/editor_views/(%s)/?' % r, resources.EditorViewHandler),
-    (r'/templates/(%s)/?' % r, resources.TemplateHandler),
-    (r'/imagehandler/?', resources.ImageUploadHandler),
-    (r'/imagehandler/(%s)/?' % r, resources.ImageHandler),
+    RedirectRoute(r'/editor_views/<view_type>', resources.EditorViewHandler,
+        name="edit_view_handler", strict_slash=True),
+    RedirectRoute(r'/templates/<template_type>', resources.TemplateHandler,
+        name="template_handler", strict_slash=True),
+    RedirectRoute(r'/imagehandler', resources.ImageUploadHandler,
+        name="image_upload_handler", strict_slash=True),
+    RedirectRoute(r'/imagehandler/<image_id>', resources.ImageHandler,
+        name="image_handler", strict_slash=True),
 
-    (r'/gallery/?', gallery.GalleryPage),
-    (r'/gallery/data/?', gallery.GalleryHandler),
+    RedirectRoute(r'/gallery', gallery.GalleryPage,
+        name="gallery_page", strict_slash=True),
+    RedirectRoute(r'/gallery/data', gallery.GalleryHandler,
+        name="gallery_handler", strict_slash=True),
 
-    (r'/profile/?', profile.ProfilePage),
-    (r'/profile/data/?', profile.ProfileHandler),
+    RedirectRoute(r'/profile', profile.ProfilePage,
+        name="profile_page", strict_slash=True),
+    RedirectRoute(r'/profile/data', profile.ProfileHandler,
+        name="profile_handler", strict_slash=True),
 
-    (r'/learn/(%s)/?' % r, reader.ExplorationPage),
-    (r'/learn/(%s)/data/?' % r, reader.ExplorationHandler),
+    RedirectRoute(
+        r'/learn/<exploration_id>', reader.ExplorationPage,
+        name="exploration_page", strict_slash=True
+        ),
+    RedirectRoute(
+        r'/learn/<exploration_id>/data', reader.ExplorationHandler,
+        name="exploration_handler", strict_slash=True),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/learn/(%s)/(%s)/?' % (r, r), reader.FeedbackHandler),
-    (r'/learn_random/?', reader.RandomExplorationPage),
+    RedirectRoute(
+        r'/learn/<exploration_id>/<state_id>',
+        reader.FeedbackHandler, name="feedback_handler", strict_slash=True),
+    RedirectRoute(
+        r'/learn_random', reader.RandomExplorationPage,
+        name="random_exploration_page", strict_slash=True
+        ),
 
-    (r'/create_new/?', editor.NewExploration),
-    (r'/fork/?', editor.ForkExploration),
-    (r'/create/download/(%s)/?' % r, editor.ExplorationDownloadHandler),
-    (r'/create/(%s)/?' % r, editor.ExplorationPage),
-    (r'/create/(%s)/data/?' % r, editor.ExplorationHandler),
+    RedirectRoute(r'/create_new', editor.NewExploration,
+        name="new_exploration", strict_slash=True),
+    RedirectRoute(r'/fork', editor.ForkExploration,
+        name="fork_exploration", strict_slash=True),
+    RedirectRoute(r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
+        name="exploration_download_helper", strict_slash=True),
+    RedirectRoute(r'/create/<exploration_id>', editor.ExplorationPage,
+        name="editor_exploration_page", strict_slash=True),
+    RedirectRoute(r'/create/<exploration_id>/data', editor.ExplorationHandler,
+        name="editor_exploration_handler", strict_slash=True),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    (r'/create/(%s)/(%s)/data/?' % (r, r), editor.StateHandler),
+    RedirectRoute(r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
+        name="state_handler", strict_slash=True),
 
-    (r'/widgetrepository/?', widgets.WidgetRepositoryPage),
-    (r'/widgetrepository/data/?', widgets.WidgetRepositoryHandler),
-    (r'/widgets/(noninteractive)/(%s)/?' % r, widgets.WidgetHandler),
-    (r'/widgets/(interactive)/(%s)/?' % r, widgets.WidgetHandler),
-
-    # 404 error handler.
-    
+    RedirectRoute(r'/widgetrepository', widgets.WidgetRepositoryPage,
+        name="widget_repository_page", strict_slash=True),
+    RedirectRoute(r'/widgetrepository/data', widgets.WidgetRepositoryHandler,
+        name="widget_repository_handler", strict_slash=True),
+    RedirectRoute(r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
+        name="widget_handler", strict_slash=True, defaults={'widget_type': 'noninteractive'}),
+    RedirectRoute(r'/widgets/interactive/<widget_id>', widgets.WidgetHandler,
+        name="widget_handler", strict_slash=True, defaults={'widget_type': 'interactive'}),
 ]
 
-error404_handler = [(r'/.*', Error404Handler)]
+# 404 error handler.
+error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
 
 if feconf.PLATFORM != 'gae':
     urls = urls + generate_static_url_tuples() + error404_handler

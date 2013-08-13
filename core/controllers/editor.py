@@ -73,7 +73,7 @@ class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
     @base.require_editor
-    def get(self, unused_exploration_id):
+    def get(self, exploration_id):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': EDITOR_MODE,

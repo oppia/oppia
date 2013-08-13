@@ -14,6 +14,8 @@
 
 __author__ = 'Sean Lip'
 
+import re
+
 import main
 import test_utils
 
@@ -23,11 +25,11 @@ class BaseHandlerTest(test_utils.AppEngineTestBase):
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
-        for route_tuple in main.urls:
-            url = str(route_tuple[0])
+        for route in main.urls:
+            url = route.template
             if url.endswith('?'):
                 url = url[:-1]
-            url = url.replace('(%s)' % main.r, 'abc012')
+            url = re.sub('<([^/^:]+)>', 'abc012', url)
 
             # Some of these will 404 or 302. This is expected.
             try:

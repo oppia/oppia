@@ -25,7 +25,7 @@ class EditorTest(test_utils.AppEngineTestBase):
     def testEditorPage(self):
         """Test access to editor pages for the sample exploration."""
         response = self.testapp.get('/create/0/')
-        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.status_int, 301)
 
 
 class StatsIntegrationTest(test_utils.AppEngineTestBase):

@@ -136,7 +136,7 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.payload = {}
 
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         """Base method to handle GET requests."""
         raise self.PageNotFoundException
 
