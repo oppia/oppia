@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Oppia test suite.
+"""Oppia test suite for non-GAE platforms.
 
-Invoke this test script from the command line by running
+First activate the virtual environment by running
 
-    python core/tests/suite.py
+    source venv/bin/activate
+
+from the root folder. Then invoke this test script from the command
+line by running
+
+    python core/tests/django_suite.py
 
 from the root folder.
 
@@ -26,18 +31,19 @@ subdirectory, e.g.:
     python core/tests/suite.py --test_path='core/controllers'
 
 runs all tests in the core/controllers/ directory.
+
+When you are finished running the tests deactivate the virtual environment
+by running
+
+    deactivate
 """
 
-__author__ = 'Sean Lip'
+__author__ = 'Tarashish Mishra'
 
 import argparse
 import os
 import sys
 import unittest
-
-import feconf
-
-EXPECTED_TEST_COUNT = 108
 
 
 _PARSER = argparse.ArgumentParser()
@@ -54,34 +60,36 @@ def create_test_suites(parsed_args):
     if parsed_args.test_path:
         root_dir = os.path.join(root_dir, parsed_args.test_path)
 
-    suite = loader.discover(
+    suite1 = loader.discover(
         root_dir, pattern='*_test.py', top_level_dir=root_dir)
-    return [suite]
+    suite2 = loader.discover(
+        root_dir, pattern='*tests.py', top_level_dir=root_dir)
+    suite3 = loader.discover(
+        root_dir, pattern='test_django.py', top_level_dir=root_dir)
+    return [suite1, suite2, suite3]
 
 
 def main():
     """Runs the tests."""
-    feconf.PLATFORM = 'gae'
-
-    # TODO(sll): Check whether the following dirs exist.
-    sys.path.insert(0, os.path.join(
-        os.getcwd(), '..', 'gae_runtime', 'google_appengine_1.7.7',
-        'google_appengine'))
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
         os.path.join(os.getcwd(), 'third_party/webtest-1.4.2')))
-    sys.path.append(os.path.abspath(os.path.join(
-        os.getcwd(),
-        '../gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')
-    ))
 
-    import dev_appserver
-    dev_appserver.fix_sys_path()
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+
+    from core import settings
+    dbname = settings.DATABASES['default']['NAME']
+    settings.DATABASES['default']['NAME'] = 'testdb.db'
+    os.system('python manage.py syncdb --noinput --setting=core.test_settings')
 
     parsed_args = _PARSER.parse_args()
     suites = create_test_suites(parsed_args)
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
+
+    # Cleaning up.
+    settings.DATABASES['default']['NAME'] = dbname
+    os.remove('testdb.db')
 
     tests_run = 0
     for result in results:
@@ -94,11 +102,6 @@ def main():
 
     if tests_run == 0:
         raise Exception('No tests were run.')
-
-    if parsed_args.test_path is None and tests_run != EXPECTED_TEST_COUNT:
-        raise Exception('Expected %s tests to be run, not %s.' %
-                        (EXPECTED_TEST_COUNT, tests_run))
-
 
 if __name__ == '__main__':
     main()

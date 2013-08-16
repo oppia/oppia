@@ -16,10 +16,15 @@
 
 __author__ = 'Jeremy Emerson'
 
+import feconf
 import test_utils
 
+import unittest
 
-class StateModelUnitTests(test_utils.AppEngineTestBase):
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class StateModelUnitTests(test_utils.GenericTestBase):
     """Test the state model."""
 
     pass

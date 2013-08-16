@@ -19,13 +19,19 @@ __author__ = 'Jeremy Emerson'
 from core.domain import exp_services
 from core.platform import models
 (exp_models, image_models, state_models) = models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
+    models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
+import feconf
 import test_utils
 
-from google.appengine.ext import db
+if feconf.PLATFORM == 'gae':
+    from google.appengine.ext import db
+
+import unittest
 
 
-class ExplorationModelUnitTests(test_utils.AppEngineTestBase):
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class ExplorationModelUnitTests(test_utils.GenericTestBase):
     """Test the exploration model."""
 
     def test_exploration_class(self):

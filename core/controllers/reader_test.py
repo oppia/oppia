@@ -20,7 +20,7 @@ from core.domain import exp_services
 import test_utils
 
 
-class ReaderControllerEndToEndTests(test_utils.AppEngineTestBase):
+class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 
     def setUp(self):

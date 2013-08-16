@@ -71,6 +71,7 @@ PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
                      and (os.environ['SERVER_SOFTWARE'].startswith('Development')
                      or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
 
+
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
@@ -122,7 +123,7 @@ INTERACTIVE_WIDGET_COUNT = 9
 
 # Static file url to path mapping
 PATH_MAP = {
-    '/css': 'core/templates/dev/head/assets/css',
+    '/css': 'core/templates/dev/head/css',
     '/extensions/widgets': 'extensions/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',

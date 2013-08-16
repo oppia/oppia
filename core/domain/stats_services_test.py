@@ -24,7 +24,7 @@ from core.domain import stats_services
 import test_utils
 
 
-class EventHandlerUnitTests(test_utils.AppEngineTestBase):
+class EventHandlerUnitTests(test_utils.GenericTestBase):
     """Test the event handler methods."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
@@ -167,7 +167,7 @@ class EventHandlerUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(answer_log.answers, {})
 
 
-class StatsServicesUnitTests(test_utils.AppEngineTestBase):
+class StatsServicesUnitTests(test_utils.GenericTestBase):
     """Test the statistics services."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
@@ -191,7 +191,7 @@ class StatsServicesUnitTests(test_utils.AppEngineTestBase):
         ).total_answer_count, 0)
 
 
-class TopImprovableStatesUnitTests(test_utils.AppEngineTestBase):
+class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
     """Test the get_top_improvable_states() function."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR

@@ -17,7 +17,7 @@ __author__ = 'Sean Lip'
 import test_utils
 
 
-class PagesTest(test_utils.AppEngineTestBase):
+class PagesTest(test_utils.GenericTestBase):
 
     def testMainPage(self):
         """Test the main splash page."""

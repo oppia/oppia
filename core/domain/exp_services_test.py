@@ -22,7 +22,7 @@ from core.domain import stats_services
 import test_utils
 
 
-class ExplorationServicesUnitTests(test_utils.AppEngineTestBase):
+class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
     def setUp(self):

@@ -23,10 +23,15 @@ from core.platform import models
 (image_models,) = models.Registry.import_models([models.NAMES.image])
 import test_utils
 
-from google.appengine.ext import db
+if feconf.PLATFORM == 'gae':
+    from google.appengine.ext import db
+
+import unittest
 
 
-class ImageUnitTests(test_utils.AppEngineTestBase):
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class ImageUnitTests(test_utils.GenericTestBase):
     """Test image models."""
 
     def test_image_class(self):

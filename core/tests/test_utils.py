@@ -20,6 +20,8 @@ import webtest
 from core.domain import exp_services
 from core.domain import stats_services
 
+import feconf
+
 
 def empty_environ():
     os.environ['AUTH_DOMAIN'] = 'example.com'
@@ -47,6 +49,13 @@ class TestBase(unittest.TestCase):
             haystack = ''.join(haystack.split())
 
         assert needle in haystack
+
+    def setUp(self):
+        self.testapp = webtest.TestApp(main.app)
+
+    def tearDown(self):  # pylint: disable-msg=g-bad-name
+        exp_services.delete_all_explorations()
+        stats_services.delete_all_stats()
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
@@ -92,7 +101,10 @@ class AppEngineTestBase(TestBase):
         self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
-        exp_services.delete_all_explorations()
-        stats_services.delete_all_stats()
         os.environ['USER_IS_ADMIN'] = '0'
         self.testbed.deactivate()
+
+if feconf.PLATFORM == 'gae':
+    GenericTestBase = AppEngineTestBase
+else:
+    GenericTestBase = TestBase

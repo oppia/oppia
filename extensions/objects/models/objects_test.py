@@ -22,7 +22,7 @@ from extensions.objects.models import objects
 import test_utils
 
 
-class ObjectNormalizationUnitTests(test_utils.AppEngineTestBase):
+class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     """Tests normalization of typed objects."""
 
     def check_normalization(self, cls, mappings, invalid_items):

@@ -20,13 +20,16 @@ import main
 import test_utils
 
 
-class BaseHandlerTest(test_utils.AppEngineTestBase):
+class BaseHandlerTest(test_utils.GenericTestBase):
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
         for route in main.urls:
-            url = route.template
+            if isinstance(route, tuple):
+                continue
+            else:
+                url = route.template
             if url.endswith('?'):
                 url = url[:-1]
             url = re.sub('<([^/^:]+)>', 'abc012', url)

@@ -15,12 +15,14 @@
 __author__ = 'Sean Lip'
 
 import json
+import unittest
 
 from core.domain import exp_services
+import feconf
 import test_utils
 
 
-class EditorTest(test_utils.AppEngineTestBase):
+class EditorTest(test_utils.GenericTestBase):
 
     def testEditorPage(self):
         """Test access to editor pages for the sample exploration."""
@@ -28,7 +30,9 @@ class EditorTest(test_utils.AppEngineTestBase):
         self.assertEqual(response.status_int, 301)
 
 
-class StatsIntegrationTest(test_utils.AppEngineTestBase):
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
+class StatsIntegrationTest(test_utils.GenericTestBase):
     """Test statistics recording using the default exploration."""
 
     def test_state_stats_for_default_exploration(self):

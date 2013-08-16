@@ -16,11 +16,18 @@
 
 __author__ = 'Sean Lip'
 
-import core.storage.base_model.gae_models as base_models
+from core.platform import models
+(base_models,) = models.Registry.import_models([
+    models.NAMES.base_model])
+import feconf
 import test_utils
 
+import unittest
 
-class BaseModelUnitTests(test_utils.AppEngineTestBase):
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
 
     def tearDown(self):

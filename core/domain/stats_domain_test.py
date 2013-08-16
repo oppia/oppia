@@ -24,7 +24,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 
 
-class StateCounterUnitTests(test_utils.AppEngineTestBase):
+class StateCounterUnitTests(test_utils.GenericTestBase):
     """Test the state counter domain object."""
 
     def test_state_entry_counts(self):
@@ -77,7 +77,7 @@ class StateCounterUnitTests(test_utils.AppEngineTestBase):
         self.assertEquals(state2_counter.no_answer_count, 2)
 
 
-class StateRuleAnswerLogUnitTests(test_utils.AppEngineTestBase):
+class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     """Test the state rule answer log domain object."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR

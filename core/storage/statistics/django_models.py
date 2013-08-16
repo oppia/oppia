@@ -20,8 +20,10 @@ __author__ = 'Sean Lip'
 
 import logging
 
+from core.platform import models
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
 from core import django_utils
-import core.storage.base_model.models as base_models
 
 from django.db import models
 
@@ -34,7 +36,7 @@ class StateCounterModel(base_models.BaseModel):
     """
     # When this entity was first created.
     created = models.DateTimeField(auto_now_add=True)
-    # When this counter was last updated.
+    # When this entity was last updated.
     last_updated = models.DateTimeField(auto_now=True)
 
     # Number of times the state was entered for the first time in a reader
@@ -75,7 +77,7 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
     The id/key of instances of this class has the form
-        [EXPLORATION_ID].[STATE_ID].[RULE_NAME]
+        [EXPLORATION_ID].[STATE_ID].[HANDLER_NAME].[RULE_NAME]
 
     WARNING: If a change is made to existing rules in data/objects (e.g.
     renaming them or changing their signature), this class will contain
@@ -95,7 +97,7 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     # how many times the answer has been entered.
     # WARNING: do not use default={} in JsonProperty, it does not work as you
     # expect.
-    answers = django_utils.JSONField(default={}, isdict=True)
+    answers = django_utils.JSONField(default={}, isdict=True, blank=True)
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):
@@ -107,7 +109,8 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         return answer_log
 
 
-def process_submitted_answer(exploration_id, state_id, handler_name, rule_str, answer):
+def process_submitted_answer(
+        exploration_id, state_id, handler_name, rule_str, answer):
     """Adds an answer to the answer log for the rule it hits.
 
     Args:
@@ -132,29 +135,32 @@ def process_submitted_answer(exploration_id, state_id, handler_name, rule_str, a
     counter.put()
 
 
-def resolve_answers(exploration_id, state_id, rule, answers):
-    """Resolves answers for the given rule.
+def resolve_answers(exploration_id, state_id, handler_name, rule_str, answers):
+    """Resolves selected answers for the given rule.
 
     Args:
         exploration_id: the exploration id
         state_id: the state id
-        rule: a string representation of the rule
+        handler_name: a string representing the handler name (e.g., 'submit')
+        rule_str: a string representation of the rule
         answers: a list of HTML string representations of the resolved answers
     """
     # TODO(sll): Run this in a transaction (together with any updates to the
     # state).
+    assert isinstance(answers, list)
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_id, rule)
+        exploration_id, state_id, handler_name, rule_str)
 
     resolved_count = 0
     for answer in answers:
         if answer not in answer_log.answers:
             logging.error(
                 'Answer %s not found in answer log for rule %s of exploration '
-                '%s, state %s' % (answer, rule, exploration_id, state_id))
-
-        resolved_count += answer_log.answers[answer]
-        del answer_log.answers[answer]
+                '%s, state %s, handler %s' % (
+                    answer, rule_str, exploration_id, state_id, handler_name))
+        else:
+            resolved_count += answer_log.answers[answer]
+            del answer_log.answers[answer]
     answer_log.put()
 
     counter = StateCounterModel.get_or_create(exploration_id, state_id)

@@ -137,7 +137,7 @@ if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   sudo rm -rf $THIRD_PARTY_DIR/coverage
 fi
 
-coverage run ./core/tests/suite.py $@
+coverage run ./core/tests/gae_suite.py $@
 coverage report --omit="$THIRD_PARTY_DIR/*","$RUNTIME_HOME/*","/usr/share/pyshared/*" --show-missing
 
 echo Done!

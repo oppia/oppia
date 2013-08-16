@@ -42,7 +42,7 @@ class FakeExploration(exp_domain.Exploration):
         self._pre_put_hook()
 
 
-class ExplorationDomainUnitTests(test_utils.AppEngineTestBase):
+class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
     def test_validation(self):

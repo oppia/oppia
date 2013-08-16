@@ -20,7 +20,7 @@ import test_utils
 import utils
 
 
-class UtilsTests(test_utils.AppEngineTestBase):
+class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
     def test_create_enum_method(self):

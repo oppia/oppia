@@ -17,7 +17,7 @@ __author__ = 'Sean Lip'
 import test_utils
 
 
-class GalleryTest(test_utils.AppEngineTestBase):
+class GalleryTest(test_utils.GenericTestBase):
 
     def test_gallery_page(self):
         """Test access to gallery page."""

@@ -22,7 +22,7 @@ import feconf
 import test_utils
 
 
-class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
+class AnswerHandlerUnitTests(test_utils.GenericTestBase):
     """Test the AnswerHandler domain object."""
 
     def test_rules_property(self):
@@ -36,7 +36,7 @@ class AnswerHandlerUnitTests(test_utils.AppEngineTestBase):
         self.assertEqual(len(answer_handler.rules), 1)
 
 
-class WidgetUnitTests(test_utils.AppEngineTestBase):
+class WidgetUnitTests(test_utils.GenericTestBase):
     """Test the widget domain object and registry."""
 
     def test_parameterized_widget(self):

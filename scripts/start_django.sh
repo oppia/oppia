@@ -33,6 +33,7 @@ then
   exit 1
 fi
 
+bash scripts/install_third_party.sh
 bash scripts/django_testrunner.sh
 source ../venv/bin/activate
 python manage.py syncdb --noinput

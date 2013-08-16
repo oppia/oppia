@@ -29,7 +29,7 @@ import test_utils
 import utils
 
 
-class DataUnitTest(test_utils.AppEngineTestBase):
+class DataUnitTest(test_utils.GenericTestBase):
     """Base class for testing data and extension files."""
 
     def verify_dict_keys_and_types(self, adict, dict_schema):

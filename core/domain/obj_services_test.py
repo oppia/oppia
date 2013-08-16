@@ -21,7 +21,7 @@ from extensions.objects.models import objects
 import test_utils
 
 
-class GetObjectClassUnitTests(test_utils.AppEngineTestBase):
+class GetObjectClassUnitTests(test_utils.GenericTestBase):
     """Test the get_object_class() method."""
 
     def test_get_object_class_method(self):

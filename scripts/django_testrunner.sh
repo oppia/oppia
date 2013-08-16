@@ -39,15 +39,10 @@ echo "Virtualenv is required but it's not installed. Aborting."; exit 1; }
 
 virtualenv ../venv
 source ../venv/bin/activate
-pip install -r requirements.txt || {
+pip install -r requirements.txt -q || {
 	echo "pip failed to install the dependencies. Aborting";
 	echo "If lxml is failing to install, make sure you have libxml2-dev and libxslt-dev installed."
 	exit 1;
 }
 
-
-# TODO(sunu): Add autodiscovery for the tests.
-
-python manage.py test core.storage.base_model.test_django \
-core.storage.image.test_django core.storage.state.test_django \
-core.storage.exploration.test_django ;
+python ./core/tests/django_suite.py
