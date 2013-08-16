@@ -52,7 +52,7 @@ THIRD_PARTY_DIR=third_party
 PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
 export PYTHONPATH=$PYTHONPATH
 # Adjust the path to include a reference to node.
-PATH=$PATH:$THIRD_PARTY_DIR/node-0.10.1/bin
+PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
 MACHINE_TYPE=`uname -m`
 
 # webtest is used for tests.

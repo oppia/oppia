@@ -16,6 +16,7 @@
 
 THIRD_PARTY_DIR=third_party
 MACHINE_TYPE=`uname -m`
+PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
 
 echo Checking if node.js is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
@@ -101,7 +102,7 @@ fi
 #     sudo apt-get install cakephp-scripts
 #
 echo Checking whether jsrepl is installed in third_party
-if [ "$INSTALL_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
+if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Checking whether coffeescript has been installed via node.js
   if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
     echo Installing CoffeeScript

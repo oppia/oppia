@@ -37,10 +37,11 @@ fi
 
 # TODO: Consider using getopts command.
 for arg in "$@"; do
-  if [ "$arg" == "--jsrepl" ]; then
-    INSTALL_JSREPL=1
+  if [ "$arg" == "--nojsrepl" ]; then
+    NO_JSREPL=true
   fi
 done
+export NO_JSREPL
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
