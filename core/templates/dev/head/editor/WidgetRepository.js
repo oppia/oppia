@@ -39,7 +39,7 @@
 });
 
 function WidgetRepository($scope, $http, activeInputData) {
-  $scope.widgetDataUrl = '/widgetrepository/data/';
+  $scope.widgetDataUrl = '/widgetrepository/data';
   $scope.widgetParams = [];
 
   $scope.loadPage = function(data) {
