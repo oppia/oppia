@@ -24,36 +24,9 @@
 # It runs tests.
 
 set -e
+source $(dirname $0)/setup.sh || exit 1
+source $(dirname $0)/setup_gae.sh || exit 1
 
-if [ -z "$BASH_VERSION" ]
-then
-  echo ""
-  echo "  Please run me using bash: "
-  echo ""
-  echo "     bash scripts/test.sh"
-  echo ""
-  exit 1
-fi
-
-echo Checking name of current directory
-EXPECTED_PWD='oppia'
-if [ ${PWD##*/} != $EXPECTED_PWD ]; then
-  echo This script should be run from the oppia/ root folder.
-  exit 1
-fi
-
-echo Deleting old *.pyc files
-find . -iname "*.pyc" -exec rm -f {} \;
-
-RUNTIME_HOME=../gae_runtime
-GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
-THIRD_PARTY_DIR=third_party
-# Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
-export PYTHONPATH=$PYTHONPATH
-# Adjust the path to include a reference to node.
-PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
-MACHINE_TYPE=`uname -m`
 
 # webtest is used for tests.
 echo Checking if webtest is installed in third_party

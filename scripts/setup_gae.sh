@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +14,20 @@
 
 ##########################################################################
 
-# INSTRUCTIONS:                                                          
-#                                                                        
-# Run this script from the oppia root folder:
-#   bash scripts/start_django.sh
-# It installs the dependencies in a virtualenv, runs tests and then starts 
-# django development server.
-
-set -e
-source $(dirname $0)/setup.sh || exit 1
+# This file should not be invoked directly, but sourced from other sh scripts.
+# Bash execution environent set up for scripts that requries GAE.
 
 
-bash scripts/install_third_party.sh
-bash scripts/django_testrunner.sh
-source ../venv/bin/activate
-python manage.py syncdb --noinput
-python main.py
+if [ "$SETUP_GAE_DONE" ]; then
+  return 0
+fi
+export SETUP_GAE_DONE=true
+
+export RUNTIME_HOME=../gae_runtime
+export GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
+
+# Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
+export PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
+
+echo Deleting old *.pyc files
+find . -iname "*.pyc" -exec rm -f {} \;

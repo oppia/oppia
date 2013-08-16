@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-THIRD_PARTY_DIR=third_party
-MACHINE_TYPE=`uname -m`
-PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
+set -e
+source $(dirname $0)/setup.sh || exit 1
+
+
+mkdir -p $THIRD_PARTY_DIR
 
 echo Checking if node.js is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
