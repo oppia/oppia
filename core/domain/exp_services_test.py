@@ -217,7 +217,10 @@ class ExportUnitTests(ExplorationServicesUnitTests):
                 'A different exploration_id'))
         exp_services.add_state(exploration.id, 'New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
-        self.assertEqual(yaml_content, """parameters: []
+        self.assertEqual(
+            yaml_content,
+"""default_skin: conversation
+parameters: []
 states:
 - content: []
   name: '[untitled state]'
@@ -252,6 +255,66 @@ states:
     sticky: false
     widget_id: Continue
 """)
+
+    def test_export_to_versionable_dict(self):
+        """Test the export_to_versionable_dict() method."""
+        EXP_ID = 'eid'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', EXP_ID))
+        exp_services.add_state(EXP_ID, 'New state')
+
+        expected_dict = {
+            'parameters': [],
+            'states': [{
+                'content': [],
+                'name': u'[untitled state]',
+                'param_changes': [],
+                'widget': {
+                    'handlers': [{
+                        'name': u'submit',
+                        'rule_specs': [{
+                            'dest': u'[untitled state]',
+                            'feedback': [],
+                            'inputs': {},
+                            'name': u'Default',
+                            'param_changes': []
+                        }]
+                    }],
+                    'params': {
+                        u'buttonText': u'Continue'
+                    },
+                    'sticky': False,
+                    'widget_id': u'Continue'
+                }
+            }, {
+                'content': [],
+                'name': u'New state',
+                'param_changes': [],
+                'widget': {
+                    'handlers': [{
+                        'name': u'submit',
+                        'rule_specs': [{
+                            'dest': u'New state',
+                            'feedback': [],
+                            'inputs': {},
+                            'name': u'Default',
+                            'param_changes': []
+                        }]
+                    }],
+                    'params': {
+                        u'buttonText': u'Continue'
+                    },
+                    'sticky': False,
+                    'widget_id': u'Continue'
+                }
+            }]
+        }
+
+        self.assertEqual(
+            expected_dict,
+            exp_services.export_to_versionable_dict(EXP_ID)
+        )
 
     def test_export_state_to_dict(self):
         """Test the export_state_to_dict() method."""

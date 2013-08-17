@@ -457,6 +457,7 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
+    # TODO(sll): Import the default skin too.
     exploration = get_exploration_by_id(create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id))
@@ -704,6 +705,38 @@ def export_content_to_html(content_array, block_number, params=None):
     return html, widget_array
 
 
+def export_to_versionable_dict(exploration_id):
+    """Returns a serialized version of this exploration for versioning.
+
+    The criterion for whether an item is included in the return dict is:
+    "suppose I am currently at v10 (say) and want to revert to v4; is this
+    property something I would be happy with being overwritten?". Thus, the
+    following properties are excluded for explorations:
+
+        ['category', 'default_skin', 'editor_ids', 'image_id', 'is_public',
+         'title']
+
+    The exploration id will be used to name the object in the history log,
+    so it does not need to be saved within the returned dict.
+
+    For states, all properties except 'id' are versioned. State dests are
+    specified using names and not ids.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+
+    params = [{
+        'name': param.name, 'obj_type': param.obj_type, 'values': param.values
+    } for param in exploration.parameters]
+
+    states_list = [export_state_internals_to_dict(
+        exploration_id, state_id, human_readable_dests=True)
+        for state_id in exploration.state_ids]
+
+    return {
+        'parameters': params, 'states': states_list
+    }
+
+
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
@@ -716,7 +749,8 @@ def export_to_yaml(exploration_id):
         exploration_id, state_id, human_readable_dests=True)
         for state_id in exploration.state_ids]
 
-    # TODO(sll): Add import/export for default_skin.
     return utils.yaml_from_dict({
-        'parameters': params, 'states': states_list
+        'default_skin': exploration.default_skin,
+        'parameters': params,
+        'states': states_list
     })

@@ -36,7 +36,7 @@ def empty_environ():
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
-    maxDiff = 2000
+    maxDiff = 2500
 
     def assertSubstring(self, needle, haystack, strict=True):
         """Tests whether 'needle' is a substring of 'haystack'.
