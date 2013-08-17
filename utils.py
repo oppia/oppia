@@ -75,7 +75,7 @@ def convert_to_js_string(value):
     return string
 
 
-def parse_with_jinja(string, params, default=''):
+def parse_with_jinja(string, params):
     """Parses a string using Jinja templating.
 
     Args:
@@ -97,35 +97,40 @@ def parse_with_jinja(string, params, default=''):
     new_params = copy.deepcopy(params)
     for var in variables:
         if var not in new_params:
-            new_params[var] = default
             logging.info('Cannot parse %s fully using %s', string, params)
 
     return env.from_string(string).render(new_params)
 
 
-def parse_dict_with_params(d, params, default='', convert_to_js=True):
+def parse_dict_with_params(d, params):
     """Optionally converts dict values to strings, then parses them using params.
 
     Args:
       d: the dict whose values are to be parsed.
-      params: the parameters to parse the dict with.
-      default: the default string to use for missing parameters.
-      convert_to_js: whether to convert the values of the dict to JS strings
-        before parsing them.
+      params: the parameters to parse the dict with. These are assumed to be
+        JS-safe.
 
     Returns:
       the parsed dict. This is a copy of the old dict.
     """
-    # TODO(sll): This should find all {{...}} strings in the keys and values
-    # of d, and pass them through Jinja templating.
     parameters = {}
 
     for key in d:
-        value = convert_to_js_string(d[key]) if convert_to_js else d[key]
+        # TODO(sll): This should work more generally and recursively.
+        value = d[key]
         if isinstance(value, basestring):
-            parameters[key] = parse_with_jinja(value, params, default)
-        else:
-            parameters[key] = value
+            value = parse_with_jinja(value, params)
+        elif isinstance(value, list):
+            for ind, item in enumerate(value):
+                if isinstance(item, basestring):
+                    value[ind] = parse_with_jinja(item, params)
+        elif isinstance(value, dict):
+            for key, val in enumerate(value):
+                if isinstance(val, basestring):
+                    value[key] = parse_with_jinja(val, params)
+
+        parameters[key] = value
+
     return parameters
 
 

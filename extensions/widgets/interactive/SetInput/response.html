@@ -1,16 +1,22 @@
 <div class="oppia-reader-response-container">
-  <span class="oppia-reader-response">
-    <!-- This allows unicode items in lists to be displayed properly. -->
-    {% if (answer | length) == 0 %}
-      None
-    {% else %}
-      <ul style="padding-left: 40px">
-        {% for item in answer %}
-          <li>
-            {{item}}
-          </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </span>
+  <span class="oppia-reader-response"></span>
+  <script>
+    var answer = JSON.parse('{{answer}}');
+    var elems = document.getElementsByClassName('oppia-reader-response');
+
+    // Since we have the span tag created before this script section, there
+    // should always be at least one element.
+    var newAnswer = '';
+    if (answer.length == 0) {
+      newAnswer = 'None';
+    } else {
+      var newAnswer = '<ul style="padding-left: 40px">';
+      for (var i = 0; i < answer.length; i++) {
+        newAnswer += '<li>' + answer[i] + '</li>';
+      }
+      newAnswer += '</ul>';
+    }
+
+    elems[elems.length - 1].innerHTML = newAnswer;
+  </script>
 </div>

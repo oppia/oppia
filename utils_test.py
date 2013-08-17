@@ -65,10 +65,6 @@ class UtilsTests(test_utils.GenericTestBase):
         parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {})
         self.assertEqual(parsed_str, ' and ')
 
-        # Default parameters are used.
-        parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {}, 'def')
-        self.assertEqual(parsed_str, 'def and def')
-
         # The string has no parameters.
         parsed_str = utils.parse_with_jinja('no params', {'param': 'hi'})
         self.assertEqual(parsed_str, 'no params')
@@ -79,24 +75,20 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_parse_dict_with_params(self):
         """Test parse_dict_with_params method."""
-        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"b\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {})
+        self.assertEqual(parsed_dict, {'a': 'b'})
 
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {}, 'def')
-        self.assertEqual(parsed_dict, {'a': '\\"def\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3})
+        self.assertEqual(parsed_dict, {'a': '3'})
 
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"3\\"'})
-
-        parsed_dict = utils.parse_dict_with_params(
-            {'a': '{{b}}'}, {'b': 'c'}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 'c'})
+        self.assertEqual(parsed_dict, {'a': 'c'})
 
         # Test that the original dictionary is unchanged.
         orig_dict = {'a': '{{b}}'}
-        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'}, '')
+        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
-        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
+        self.assertEqual(parsed_dict, {'a': 'c'})
 
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""

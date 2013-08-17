@@ -146,11 +146,11 @@ class BaseWidget(object):
             params = {}
 
         # Parameters used to generate the raw code for the widget.
-        parameters = dict(
-            (param.name, utils.convert_to_js_string(
-                params.get(param.name, param.value)
-            )
+        parameters = dict((
+            param.name, utils.convert_to_js_string(param.value)
         ) for param in self.params)
+        for param in params:
+            parameters[param] = utils.convert_to_js_string(params[param])
 
         return utils.parse_with_jinja(self.template, parameters)
 
@@ -199,13 +199,18 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
+        parameters = dict((
+            param.name, utils.convert_to_js_string(param.value)
+        ) for param in self.params)
+        for param in params:
+            parameters[param] = utils.convert_to_js_string(params[param])
+
         html, iframe = self._response_template_and_iframe
-        html = utils.parse_with_jinja(html, params)
-        iframe = utils.parse_with_jinja(iframe, params)
+        html = utils.parse_with_jinja(html, parameters)
+        iframe = utils.parse_with_jinja(iframe, parameters)
         return html, iframe
 
     def get_stats_log_html(self, params=None):
@@ -217,11 +222,14 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
-        return utils.parse_with_jinja(self._stats_log_template, params)
+        parameters = dict((param.name, param.value) for param in self.params)
+        for param in params:
+            parameters[param] = params[param]
+
+        return utils.parse_with_jinja(self._stats_log_template, parameters)
 
     def get_handler_by_name(self, handler_name):
         """Get the handler for a widget, given the name of the handler."""

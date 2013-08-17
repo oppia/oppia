@@ -117,8 +117,7 @@ class WidgetHandler(base.BaseHandler):
             })
         else:
             response = widget.get_with_params(
-                utils.parse_dict_with_params(
-                    params, state_params_dict, convert_to_js=False),
+                utils.parse_dict_with_params(params, state_params_dict),
                 kvps_only=True
             )
             self.render_json({'widget': response})
