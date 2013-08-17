@@ -60,72 +60,92 @@ def generate_static_url_tuples():
         url_tuples.append((url, resources.StaticFileHandler))
     return url_tuples
 
+
+def get_redirect_route(regex_route, handler, name, defaults=None):
+    """Returns a route that redirects /foo/ to /foo.
+
+    Warning: this method strips off parameters after the trailing slash. URLs
+    with parameters should be formulated without the trailing slash.
+    """
+    if defaults is None:
+        defaults = {}
+    return RedirectRoute(
+        regex_route, handler, name, strict_slash=True, defaults=defaults)
+
+
 # Register the URL with the responsible classes
 urls = [
     webapp2.Route(r'/', pages.MainPage, name="home"),
-    RedirectRoute(r'/about', pages.AboutPage, name="about_page", strict_slash=True),
-    RedirectRoute(r'/terms', pages.TermsPage, name="terms_page", strict_slash=True),
-    RedirectRoute(r'/feedback', pages.FeedbackPage, name="feedback_page", strict_slash=True),
+    get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
+    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
+    get_redirect_route(r'/feedback', pages.FeedbackPage, 'feedback_page'),
 
-    RedirectRoute(r'/admin', admin.AdminPage, name="admin_page", strict_slash=True),
+    get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
 
-    RedirectRoute(r'/editor_views/<view_type>', resources.EditorViewHandler,
-        name="edit_view_handler", strict_slash=True),
-    RedirectRoute(r'/templates/<template_type>', resources.TemplateHandler,
-        name="template_handler", strict_slash=True),
-    RedirectRoute(r'/imagehandler', resources.ImageUploadHandler,
-        name="image_upload_handler", strict_slash=True),
-    RedirectRoute(r'/imagehandler/<image_id>', resources.ImageHandler,
-        name="image_handler", strict_slash=True),
+    get_redirect_route(
+        r'/editor_views/<view_type>', resources.EditorViewHandler,
+        'edit_view_handler'),
+    get_redirect_route(
+        r'/templates/<template_type>', resources.TemplateHandler,
+        'template_handler'),
+    get_redirect_route(
+        r'/imagehandler', resources.ImageUploadHandler,
+        'image_upload_handler'),
+    get_redirect_route(
+        r'/imagehandler/<image_id>', resources.ImageHandler,
+        'image_handler'),
 
-    RedirectRoute(r'/gallery', gallery.GalleryPage,
-        name="gallery_page", strict_slash=True),
-    RedirectRoute(r'/gallery/data', gallery.GalleryHandler,
-        name="gallery_handler", strict_slash=True),
+    get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
+    get_redirect_route(
+        r'/gallery/data', gallery.GalleryHandler, 'gallery_handler'),
 
-    RedirectRoute(r'/profile', profile.ProfilePage,
-        name="profile_page", strict_slash=True),
-    RedirectRoute(r'/profile/data', profile.ProfileHandler,
-        name="profile_handler", strict_slash=True),
+    get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/profile/data', profile.ProfileHandler, 'profile_handler'),
 
-    RedirectRoute(
+    get_redirect_route(
         r'/learn/<exploration_id>', reader.ExplorationPage,
-        name="exploration_page", strict_slash=True
-        ),
-    RedirectRoute(
+        'exploration_page'),
+    get_redirect_route(
         r'/learn/<exploration_id>/data', reader.ExplorationHandler,
-        name="exploration_handler", strict_slash=True),
+        'exploration_handler'),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    RedirectRoute(
-        r'/learn/<exploration_id>/<state_id>',
-        reader.FeedbackHandler, name="feedback_handler", strict_slash=True),
-    RedirectRoute(
+    get_redirect_route(
+        r'/learn/<exploration_id>/<state_id>', reader.FeedbackHandler,
+        'feedback_handler'),
+    get_redirect_route(
         r'/learn_random', reader.RandomExplorationPage,
-        name="random_exploration_page", strict_slash=True
-        ),
+        'random_exploration_page'),
 
-    RedirectRoute(r'/create_new', editor.NewExploration,
-        name="new_exploration", strict_slash=True),
-    RedirectRoute(r'/fork', editor.ForkExploration,
-        name="fork_exploration", strict_slash=True),
-    RedirectRoute(r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
-        name="exploration_download_helper", strict_slash=True),
-    RedirectRoute(r'/create/<exploration_id>', editor.ExplorationPage,
-        name="editor_exploration_page", strict_slash=True),
-    RedirectRoute(r'/create/<exploration_id>/data', editor.ExplorationHandler,
-        name="editor_exploration_handler", strict_slash=True),
+    get_redirect_route(r'/create_new', editor.NewExploration, 'new_exploration'),
+    get_redirect_route(r'/fork', editor.ForkExploration, 'fork_exploration'),
+    get_redirect_route(
+        r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
+        'exploration_download_helper'),
+    get_redirect_route(
+        r'/create/<exploration_id>', editor.ExplorationPage,
+        'editor_exploration_page'),
+    get_redirect_route(
+        r'/create/<exploration_id>/data', editor.ExplorationHandler,
+        'editor_exploration_handler'),
     # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    RedirectRoute(r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
-        name="state_handler", strict_slash=True),
+    get_redirect_route(
+        r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
+        'state_handler'),
 
-    RedirectRoute(r'/widgetrepository', widgets.WidgetRepositoryPage,
-        name="widget_repository_page", strict_slash=True),
-    RedirectRoute(r'/widgetrepository/data', widgets.WidgetRepositoryHandler,
-        name="widget_repository_handler", strict_slash=True),
-    RedirectRoute(r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
-        name="widget_handler", strict_slash=True, defaults={'widget_type': 'noninteractive'}),
-    RedirectRoute(r'/widgets/interactive/<widget_id>', widgets.WidgetHandler,
-        name="widget_handler", strict_slash=True, defaults={'widget_type': 'interactive'}),
+    get_redirect_route(
+        r'/widgetrepository', widgets.WidgetRepositoryPage,
+        'widget_repository_page'),
+    get_redirect_route(
+        r'/widgetrepository/data', widgets.WidgetRepositoryHandler,
+        'widget_repository_handler'),
+    get_redirect_route(
+        r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
+        'widget_handler', defaults={'widget_type': 'noninteractive'}),
+    get_redirect_route(
+        r'/widgets/interactive/<widget_id>', widgets.WidgetHandler,
+        'widget_handler', defaults={'widget_type': 'interactive'}),
 ]
 
 # 404 error handler.

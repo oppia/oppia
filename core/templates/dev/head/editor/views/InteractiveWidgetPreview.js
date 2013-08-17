@@ -356,7 +356,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $('#interactiveWidgetModal').modal('hide');
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
-      $scope.interactiveParams = $scope.interactiveWidget.params;
+
+      $scope.interactiveParams = {};
+      // Transform the {PARAM_NAME: {'value': ..., 'obj_type': ...}} dict
+      // returned by the widget repository into a {PARAM_NAME: PARAM_VALUE}
+      // dict.
+      for (var param in $scope.interactiveWidget.params) {
+        $scope.interactiveParams[param] = (
+            $scope.interactiveWidget.params[param].value);
+      }
+
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
         'name': 'Default',
