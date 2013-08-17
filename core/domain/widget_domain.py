@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import inspect
-import json
 import os
 import pkgutil
 
@@ -27,19 +26,6 @@ import feconf
 from core.domain import param_domain
 from core.domain import rule_domain
 import utils
-
-
-def convert_to_js_string(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
-    string = json.dumps(value)
-
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
-
-    for replacement in replacements:
-        string = string.replace(replacement[0], replacement[1])
-    return string
 
 
 class AnswerHandler(object):
@@ -160,11 +146,9 @@ class BaseWidget(object):
             params = {}
 
         # Parameters used to generate the raw code for the widget.
-        parameters = dict((
-            param.name, convert_to_js_string(param.value)
-        ) for param in self.params)
+        parameters = dict((param.name, param.value) for param in self.params)
         for param in params:
-            parameters[param] = convert_to_js_string(params[param])
+            parameters[param] = params[param]
 
         return utils.parse_with_jinja(self.template, parameters)
 
@@ -216,11 +200,9 @@ class BaseWidget(object):
         if params is None:
             params = {}
 
-        parameters = dict((
-            param.name, convert_to_js_string(param.value)
-        ) for param in self.params)
+        parameters = dict((param.name, param.value) for param in self.params)
         for param in params:
-            parameters[param] = convert_to_js_string(params[param])
+            parameters[param] = params[param]
 
         html, iframe = self._response_template_and_iframe
         html = utils.parse_with_jinja(html, parameters)

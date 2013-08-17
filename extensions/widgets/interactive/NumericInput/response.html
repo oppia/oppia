@@ -1,10 +1,5 @@
 <div class="oppia-reader-response-container">
-  <span class="oppia-reader-response"></span>
-  <script>
-    var answer = JSON.parse('{{answer}}');
-    var elems = document.getElementsByClassName('oppia-reader-response');
-    // Since we have the span tag created before this script section, there
-    // should always be at least one element.
-    elems[elems.length - 1].innerHTML = answer;
-  </script>
+  <span class="oppia-reader-response">
+  	{{answer}}
+  </span>
 </div>

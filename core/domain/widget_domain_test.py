@@ -16,8 +16,6 @@
 
 __author__ = 'Jeremy Emerson'
 
-import unittest
-
 from core.domain import widget_domain
 from extensions.objects.models import objects
 import feconf
@@ -72,25 +70,3 @@ class WidgetUnitTests(test_utils.GenericTestBase):
                 'obj_type': 'UnicodeString',
             }
         })
-
-
-class WidgetUtilsUnitTests(unittest.TestCase):
-
-    def test_convert_to_js_string(self):
-        """Test convert_to_js_string method."""
-        expected_values = [
-            ('a', '\\"a\\"'),
-            (2, '2'),
-            (5.5, '5.5'),
-            ("'", '\\"\\\'\\"'),
-            (u'¡Hola!', '\\"\\\\u00a1Hola!\\"'),
-            (['a', '¡Hola!', 2], '[\\"a\\", \\"\\\\u00a1Hola!\\", 2]'),
-            ({'a': 4, '¡Hola!': 2}, '{\\"a\\": 4, \\"\\\\u00a1Hola!\\": 2}'),
-            ('', '\\"\\"'),
-            (None, 'null'),
-            (['a', {'b': 'c', 'd': ['e', None]}],
-                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
-        ]
-
-        for tup in expected_values:
-            self.assertEqual(widget_domain.convert_to_js_string(tup[0]), tup[1])

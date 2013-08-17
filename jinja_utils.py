@@ -17,6 +17,27 @@
 import os
 
 import jinja2
+import json
+
+
+def js_string(value):
+    """Converts a value to a JSON string for use in JavaScript code."""
+    string = json.dumps(value)
+
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
+                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
+
+    for replacement in replacements:
+        string = string.replace(replacement[0], replacement[1])
+    return string
+
+
+FILTERS = {
+    'is_list': lambda x: isinstance(x, list),
+    'is_dict': lambda x: isinstance(x, dict),
+    'js_string': js_string,
+}
 
 
 def get_jinja_env(dir_path):
@@ -30,9 +51,7 @@ def get_jinja_env(dir_path):
         assert name.endswith('.js')
         return jinja2.Markup(loader.get_source(env, name)[0])
 
+
     env.globals['include_js_file'] = include_js_file
-    env.filters.update({
-        'is_list': lambda x: isinstance(x, list),
-        'is_dict': lambda x: isinstance(x, dict),
-    })
+    env.filters.update(FILTERS)
     return env

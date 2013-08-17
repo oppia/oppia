@@ -3,8 +3,8 @@
   <script>
     // We can not simply render choices[answer] in the span tag above
     // because we need to JSON parse them first.
-    var choices = JSON.parse('{{choices}}');
-    var answer = JSON.parse('{{answer}}');
+    var choices = JSON.parse('{{choices|js_string}}');
+    var answer = JSON.parse('{{answer|js_string}}');
     var elems = document.getElementsByClassName('oppia-reader-response');
   
     // Since we have the span tag created before this script section, there

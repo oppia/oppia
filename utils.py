@@ -24,6 +24,7 @@ import unicodedata
 import yaml
 
 import feconf
+import jinja_utils
 
 import jinja2
 from jinja2 import meta
@@ -73,10 +74,7 @@ def parse_with_jinja(string, params):
       the parsed string, or None if the string could not be parsed.
     """
     env = jinja2.Environment()
-    env.filters.update({
-        'is_list': lambda x: isinstance(x, list),
-        'is_dict': lambda x: isinstance(x, dict),
-    })
+    env.filters.update(jinja_utils.FILTERS)
 
     variables = meta.find_undeclared_variables(env.parse(string))
 
