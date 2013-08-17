@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import copy
-import json
 import logging
 import os
 import random
@@ -60,19 +59,6 @@ def get_sample_exploration_yaml(filename):
     """Gets the content of [filename].yaml in the sample explorations folder."""
     return get_file_contents(
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, '%s.yaml' % filename))
-
-
-def convert_to_js_string(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
-    string = json.dumps(value)
-
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
-
-    for replacement in replacements:
-        string = string.replace(replacement[0], replacement[1])
-    return string
 
 
 def parse_with_jinja(string, params):
