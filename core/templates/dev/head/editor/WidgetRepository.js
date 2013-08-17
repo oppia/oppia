@@ -115,10 +115,17 @@ function WidgetRepository($scope, $http, activeInputData) {
     var customizedCode = $scope.createCustomizedCode(
         $scope.widgets[category][index].params, $scope.customizedParams,
         $scope.widgets[category][index].raw);
+
     var data = {
       raw: customizedCode,
-      widget: $scope.widgets[category][index]
+      widget: $scope.cloneObject($scope.widgets[category][index])
     };
+    // Transform the {PARAM_NAME: {'value': ..., 'obj_type': ...}} dict
+    // into a {PARAM_NAME: PARAM_VALUE} dict before returning it.
+    for (var param in data.widget.params) {
+      data.widget.params[param] = data.widget.params[param].value;
+    }
+
     // Parent index for non-interactive widgets.
     if ($scope.parentIndex !== null) {
       data.parentIndex = $scope.parentIndex;

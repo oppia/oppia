@@ -146,16 +146,22 @@ class BaseWidget(object):
             params = {}
 
         # Parameters used to generate the raw code for the widget.
-        # TODO(sll): Why do we convert only the default value to a JS string?
         parameters = dict(
-            (param.name, params.get(
-                param.name, utils.convert_to_js_string(param.value))
-             ) for param in self.params)
+            (param.name, utils.convert_to_js_string(
+                params.get(param.name, param.value)
+            )
+        ) for param in self.params)
 
         return utils.parse_with_jinja(self.template, parameters)
 
-    def get_with_params(self, params):
-        """Gets a dict representing a parameterized widget."""
+    def get_with_params(self, params, kvps_only=False):
+        """Gets a dict representing a parameterized widget.
+
+        If kvps_only is True, then the value for params in the result is
+        a list of key-value pairs. Otherwise it is a dict, formatted as:
+
+            {PARAM_NAME: {'value': PARAM_VALUE, 'obj_type': PARAM_OBJ_TYPE}}.
+        """
 
         param_dict = {}
         for param in self.params:
@@ -163,6 +169,10 @@ class BaseWidget(object):
                 'value': params.get(param.name, param.value),
                 'obj_type': param.obj_type
             }
+
+        if kvps_only:
+            for param in param_dict:
+                param_dict[param] = param_dict[param]['value']
 
         result = {
             'name': self.name,

@@ -53,7 +53,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
 
         code = widget.get_raw_code({'noteToGuess': 'abc'})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');', code)
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');', code)
 
         parameterized_widget_dict = widget.get_with_params(
             {'noteToGuess': 'abc'}
@@ -62,7 +62,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'id', 'name', 'category', 'description',
             'params', 'handlers', 'raw'])
         self.assertEqual(parameterized_widget_dict['id'], MUSIC_STAFF_ID)
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'abc\');',
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');',
                       parameterized_widget_dict['raw'])
         self.assertEqual(parameterized_widget_dict['params'], {
             'noteToGuess': {

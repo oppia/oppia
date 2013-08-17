@@ -78,7 +78,7 @@ class ExplorationHandler(base.BaseHandler):
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_raw_code(
             params=utils.parse_dict_with_params(
-                init_state.widget.params, params)
+                init_state.widget.params, params, convert_to_js=False)
         )
 
         self.values.update({
@@ -158,7 +158,7 @@ class FeedbackHandler(base.BaseHandler):
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
                 ).get_raw_code(
                     params=utils.parse_dict_with_params(
-                        new_state.widget.params, new_params)
+                        new_state.widget.params, new_params, convert_to_js=False)
                 )
             )
 

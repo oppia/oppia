@@ -103,23 +103,29 @@ def parse_with_jinja(string, params, default=''):
     return env.from_string(string).render(new_params)
 
 
-def parse_dict_with_params(d, params, default=''):
-    """Converts the values of a dict to strings, then parses them using params.
+def parse_dict_with_params(d, params, default='', convert_to_js=True):
+    """Optionally converts dict values to strings, then parses them using params.
 
     Args:
       d: the dict whose values are to be parsed.
       params: the parameters to parse the dict with.
       default: the default string to use for missing parameters.
+      convert_to_js: whether to convert the values of the dict to JS strings
+        before parsing them.
 
     Returns:
       the parsed dict. This is a copy of the old dict.
     """
+    # TODO(sll): This should find all {{...}} strings in the keys and values
+    # of d, and pass them through Jinja templating.
     parameters = {}
 
     for key in d:
-        parameters[key] = parse_with_jinja(
-            convert_to_js_string(d[key]), params, default)
-
+        value = convert_to_js_string(d[key]) if convert_to_js else d[key]
+        if isinstance(value, basestring):
+            parameters[key] = parse_with_jinja(value, params, default)
+        else:
+            parameters[key] = value
     return parameters
 
 

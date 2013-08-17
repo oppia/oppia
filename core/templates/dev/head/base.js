@@ -236,6 +236,10 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.setActiveFile = function(file) {
     $scope.file = file;
   };
+
+  $scope.cloneObject = function(obj) {
+    return angular.copy(obj);
+  };
 }
 
 /**
