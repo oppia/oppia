@@ -13,7 +13,7 @@ files = [
 
 autoWatch = true;
 
-browsers = ['Chrome'];
+browsers = ['Chrome', 'Firefox'];
 
 // Kill the browser if it does not capture in the given timeout [ms].
 captureTimeout = 60000;

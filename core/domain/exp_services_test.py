@@ -335,7 +335,7 @@ states:
             'widget': {
                 'widget_id': u'Continue',
                 'params': {
-                  u'buttonText': u'Continue',
+                    u'buttonText': u'Continue',
                 },
                 'sticky': False,
                 'handlers': [{
