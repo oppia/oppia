@@ -33,6 +33,26 @@ class AdminPage(base.BaseHandler):
             'value': counter.value
         } for counter in counters.Registry.get_all_counters()]
 
+        if counters.HTML_RESPONSE_COUNT.value:
+            average_time = (
+                counters.HTML_RESPONSE_TIME_SECS.value /
+                counters.HTML_RESPONSE_COUNT.value)
+            self.values['counters'].append({
+                'name': 'average-html-response-time-secs',
+                'description': 'Average HTML response time in seconds',
+                'value': average_time
+            })
+
+        if counters.JSON_RESPONSE_COUNT.value:
+            average_time = (
+                counters.JSON_RESPONSE_TIME_SECS.value /
+                counters.JSON_RESPONSE_COUNT.value)
+            self.values['counters'].append({
+                'name': 'average-json-response-time-secs',
+                'description': 'Average JSON response time in seconds',
+                'value': average_time
+            })
+
         self.render_template('admin/admin.html')
 
     @base.require_admin

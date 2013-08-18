@@ -16,11 +16,13 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
 import json
 import logging
 import sys
 import traceback
 
+from core import counters
 from core.domain import exp_services
 from core.platform import models
 import feconf
@@ -114,6 +116,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
+        self.start_time = datetime.datetime.utcnow()
+
         # Initializes the return dict for the handlers.
         self.values = {
             'debug': feconf.DEBUG,
@@ -156,6 +160,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.content_type = 'application/json'
         self.response.write(json.dumps(values))
 
+        # Calculate the processing time of this request.
+        duration = datetime.datetime.utcnow() - self.start_time
+        processing_time = duration.seconds + duration.microseconds / 1E6
+
+        counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
+        counters.JSON_RESPONSE_COUNT.inc()
+
     def render_template(self, filename, values=None):
         if values is None:
             values = self.values
@@ -166,6 +177,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.pragma = 'no-cache'
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
+
+        # Calculate the processing time of this request.
+        duration = datetime.datetime.utcnow() - self.start_time
+        processing_time = duration.seconds + duration.microseconds / 1E6
+
+        counters.HTML_RESPONSE_TIME_SECS.inc(increment=processing_time)
+        counters.HTML_RESPONSE_COUNT.inc()
 
     def _render_exception(self, error_code, values):
         assert error_code in [400, 401, 500]

@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 
 class PerfCounter(object):
-    """Generic in-process integer counter; not aggregated across instances."""
+    """Generic in-process numeric counter; not aggregated across instances."""
     # TODO(sll): Add aggregation across instances.
 
     def __init__(self, name, description):
@@ -80,3 +80,16 @@ MEMCACHE_DELETE_MISSING = PerfCounter(
 MEMCACHE_DELETE_FAILURE = PerfCounter(
     'memcache-delete-failure',
     'Number of times an object failed to be deleted from memcache')
+
+HTML_RESPONSE_TIME_SECS = PerfCounter(
+    'html-response-time-secs',
+    'Total processing time for all HTML responses, in seconds')
+HTML_RESPONSE_COUNT = PerfCounter(
+    'html-response-count',
+    'Number of times a HTML response was sent out')
+JSON_RESPONSE_TIME_SECS = PerfCounter(
+    'json-response-time-secs',
+    'Total processing time for all JSON responses, in seconds')
+JSON_RESPONSE_COUNT = PerfCounter(
+    'json-response-count',
+    'Number of times a JSON response was sent out')
