@@ -75,6 +75,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         return $filter('truncate')(text, MAX_NODE_LABEL_LENGTH);
       };
 
+      var height = 0;
+      var width = 0;
+
       scope.$watch('val', function (newVal, oldVal) {
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
@@ -82,14 +85,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                     scope.highlightStates);
           for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
             document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
+            document.getElementsByClassName('oppia-graph-viz')[i].style.width = width;
           }
         }
       });
 
-      var height = 0;
-
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
         height = 0;
+        width = 0;
 
         // Clear existing SVG elements on the graph visualization canvas.
         d3.select(element[0]).selectAll('svg').remove();
@@ -256,8 +259,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
 
         // Add nodes to the canvas.
         nodeEnter.append('svg:rect')
-            .attr('x', function(d) { return d.x0 - NODE_PADDING_X; })
-            .attr('y', function(d) { height = height > d.y0 + 100? height : d.y0 + 100; return d.y0; })
+            .attr('x', function(d) {
+              width = width > d.x0 + 200 ? width: d.x0 + 200;
+              return d.x0 - NODE_PADDING_X;
+            })
+            .attr('y', function(d) {
+              height = height > d.y0 + 100 ? height : d.y0 + 100;
+              return d.y0;
+            })
             .attr('ry', function(d) { return 4; })
             .attr('rx', function(d) { return 4; })
             .attr('width', function(d) {
