@@ -18,10 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $routeParams, explorationData, warningsData, activeInputData) {
+function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
+                   warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
     promise.then(function(data) {
+      if (!data) {
+        // This state does not exist. Redirect to the exploration page.
+        $('#editorViewTab a[href="#explorationMap"]').tab('show');
+      }
       $scope.init(data);
       $scope.updateMath();
     });
