@@ -125,7 +125,7 @@ class ExplorationHandler(base.BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        exp_services.add_state(exploration_id, state_name)
+        exp_services.add_state(self.user_id, exploration_id, state_name)
         state_id = exp_services.convert_state_name_to_id(
             exploration_id, state_name)
         self.render_json(exp_services.export_state_to_verbose_dict(
@@ -165,7 +165,7 @@ class ExplorationHandler(base.BaseHandler):
                 param_domain.Parameter.from_dict(param) for param in parameters
             ]
 
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.user_id, exploration)
 
     @base.require_editor
     def delete(self, exploration_id):
@@ -209,14 +209,15 @@ class StateHandler(base.BaseHandler):
         resolved_answers = self.payload.get('resolved_answers')
 
         if 'state_name' in self.payload:
-            exp_services.rename_state(exploration_id, state_id, state_name)
+            exp_services.rename_state(
+                self.user_id, exploration_id, state_id, state_name)
 
         state = exp_services.get_state_by_id(exploration_id, state_id)
         if 'param_changes' in self.payload:
             state.param_changes = []
             for param_change in param_changes:
                 instance = exp_services.get_or_create_param(
-                    exploration_id, param_change['name'], None,
+                    self.user_id, exploration_id, param_change['name'], None,
                     param_change['values'])
                 state.param_changes.append(instance)
 
@@ -288,11 +289,11 @@ class StateHandler(base.BaseHandler):
             stats_services.EventHandler.resolve_answers_for_default_rule(
                 exploration_id, state_id, 'submit', resolved_answers)
 
-        exp_services.save_state(exploration_id, state)
+        exp_services.save_state(self.user_id, exploration_id, state)
         self.render_json(exp_services.export_state_to_verbose_dict(
             exploration_id, state_id))
 
     @base.require_editor
     def delete(self, exploration_id, state_id):
         """Deletes the state with id state_id."""
-        exp_services.delete_state(exploration_id, state_id)
+        exp_services.delete_state(self.user_id, exploration_id, state_id)

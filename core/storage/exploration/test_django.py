@@ -48,25 +48,25 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # The 'state_ids' property must be a list of strings.
         with self.assertRaises(SyntaxError):
             exploration.state_ids = 'A string'
-            exploration.put()
+            exploration.put('user_id', {})
         with self.assertRaises(ValidationError):
             exploration.state_ids = [state]
-            exploration.put()
+            exploration.put('user_id', {})
         exploration.state_ids = [state.id]
 
         # An Exploration must have a category.
         with self.assertRaises(ValidationError):
-            exploration.put()
+            exploration.put('user_id', {})
         exploration.category = 'The category'
 
         # The 'parameters' property must be a list of parameter dicts.
         with self.assertRaises(ValidationError):
             exploration.parameters = 'A string'
-            exploration.put()
+            exploration.put('user_id', {})
 
         with self.assertRaises(ValidationError):
             exploration.parameters = [{'name': 'no_obj_type', 'values': [6]}]
-            exploration.put()
+            exploration.put('user_id', {})
 
         parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': [6]}
         exploration.parameters = [parameter]
@@ -74,13 +74,13 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # The 'is_public' property must be a boolean.
         with self.assertRaises(ValidationError):
             exploration.is_public = 'true'
-            exploration.put()
+            exploration.put('user_id', {})
         exploration.is_public = True
         exploration.image_id = 'A string'
         exploration.editor_ids = ['A user id']
 
         # Put and retrieve the exploration.
-        exploration.put()
+        exploration.put('user_id', {})
 
         retrieved_exploration = exp_services.get_exploration_by_id(
             'The exploration hash id')

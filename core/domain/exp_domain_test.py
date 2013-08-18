@@ -48,38 +48,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_validation(self):
         """Test validation of explorations."""
         exploration = FakeExploration()
+        USER_ID = 'user_id'
 
         # The 'state_ids property must be a non-empty list of strings
         # representing State ids.
         exploration.state_ids = []
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'exploration has no states'):
-            exp_services.save_exploration(exploration)
+            exp_services.save_exploration(USER_ID, exploration)
         exploration.state_ids = ['A string']
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid state_id'):
-            exp_services.save_exploration(exploration)
+            exp_services.save_exploration(USER_ID, exploration)
 
         new_state = exp_domain.State(
             'Initial state id', 'name', [], [], None)
-        exp_services.save_state(exploration.id, new_state)
+        exp_services.save_state(USER_ID, exploration.id, new_state)
         exploration.state_ids = ['Initial state id']
 
         # There must be at least one editor id.
         exploration.editor_ids = []
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'exploration has no editors'):
-            exp_services.save_exploration(exploration)
+            exp_services.save_exploration(USER_ID, exploration)
 
     def test_init_state_property(self):
         """Test the init_state property."""
         exploration = FakeExploration(owner_id='owner@example.com')
+        USER_ID = 'user_id'
 
         INIT_STATE_ID = 'init_state_id'
         INIT_STATE_NAME = 'init_state_name'
         init_state = exp_domain.State(
             INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
-        exp_services.save_state(exploration.id, init_state)
+        exp_services.save_state(USER_ID, exploration.id, init_state)
 
         exploration.state_ids = [INIT_STATE_ID]
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
@@ -87,7 +89,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         second_state = exp_domain.State(
             'unused_second_state', 'unused', [], [], None)
-        exp_services.save_state(exploration.id, second_state)
+        exp_services.save_state(USER_ID, exploration.id, second_state)
         exploration.state_ids.append(second_state.id)
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)

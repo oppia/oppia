@@ -33,6 +33,11 @@ class ExplorationModel(base_models.BaseModel):
     This class should only be imported by the exploration domain file, the
     exploration services file, and the Exploration model test file.
     """
+    # The current version number of this exploration. In each PUT operation,
+    # this number is incremented and a snapshot of the modified exploration is
+    # stored as an ExplorationSnapshotModel.
+    version = models.IntegerField(default=0)
+
     # The category this exploration belongs to.
     category = models.CharField(max_length=100)
     # What this exploration is called.
@@ -101,14 +106,24 @@ class ExplorationModel(base_models.BaseModel):
         """Deletes the exploration."""
         super(ExplorationModel, self).delete()
 
-    def put(self, properties=None):
-        """Updates the exploration using the properties dict, then saves it."""
+    def put(self, committer_id, properties, snapshot=None):
+        """Updates the exploration using the properties dict, then saves it.
+
+        If snapshot is not None, increments the exploration version and saves
+        a serialized copy or a diff in the history log.
+        """
+        if not isinstance(committer_id, basestring):
+            raise Exception('Invalid committer id: %s' % committer_id)
+
         if properties is None:
             properties = {}
 
-        # In NDB, self._properties returns the list of ndb properties of a
-        # model.
         for key in self.attr_list():
             if key in properties:
                 setattr(self, key, properties[key])
+
+        if snapshot is not None:
+            self.version += 1
+            # TODO(sll): Implement versioning for Django.
+
         super(ExplorationModel, self).put()

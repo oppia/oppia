@@ -18,8 +18,8 @@
 
 __author__ = 'Sean Lip'
 
-from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import core.storage.base_model.gae_models as base_models
+import core.storage.exploration_snapshot.gae_models as exp_snapshot_models
 
 from google.appengine.ext import ndb
 
@@ -28,13 +28,21 @@ QUERY_LIMIT = 100
 
 
 class ExplorationModel(base_models.BaseModel):
-    """Storage model for an Oppia exploration.
+    """Storage model for the Oppia exploration at HEAD.
+
+    Previous versions of this exploration are stored, in serialized form, using
+    ExplorationSnapshotModels.
 
     This class should only be imported by the exploration domain file, the
     exploration services file, and the Exploration model test file.
     """
     # TODO(sll): Write a test that ensures that the only files that are
     # allowed to import this class are the ones described above.
+
+    # The current version number of this exploration. In each PUT operation,
+    # this number is incremented and a snapshot of the modified exploration is
+    # stored as an ExplorationSnapshotModel.
+    version = ndb.IntegerProperty(default=0)
 
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True)
@@ -74,8 +82,15 @@ class ExplorationModel(base_models.BaseModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def put(self, properties=None):
-        """Updates the exploration using the properties dict, then saves it."""
+    def put(self, committer_id, properties, snapshot=None):
+        """Updates the exploration using the properties dict, then saves it.
+
+        If snapshot is not None, increments the exploration version and saves
+        a serialized copy or a diff in the history log.
+        """
+        if not isinstance(committer_id, basestring):
+            raise Exception('Invalid committer id: %s' % committer_id)
+
         if properties is None:
             properties = {}
 
@@ -84,4 +99,10 @@ class ExplorationModel(base_models.BaseModel):
         for key in self._properties:
             if key in properties:
                 setattr(self, key, properties[key])
+
+        if snapshot is not None:
+            self.version += 1
+            exp_snapshot_models.ExplorationSnapshotModel.save_snapshot(
+                self.id, self.version, committer_id, snapshot, False)
+
         super(ExplorationModel, self).put()

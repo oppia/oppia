@@ -16,6 +16,8 @@
 
 __author__ = 'Jeremy Emerson'
 
+import unittest
+
 from core.domain import exp_services
 from core.platform import models
 (exp_models, image_models, state_models) = models.Registry.import_models([
@@ -25,8 +27,6 @@ import test_utils
 
 if feconf.PLATFORM == 'gae':
     from google.appengine.ext import db
-
-import unittest
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
@@ -45,7 +45,8 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.is_public, False)
 
         state = state_models.StateModel(
-            id='The state hash id', value={
+            id='The state hash id',
+            value={
                 'name': 'name', 'content': [], 'param_changes': [],
                 'widget': None
             })
@@ -60,7 +61,7 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
 
         # An Exploration must have a category.
         with self.assertRaises(db.BadValueError):
-            exploration.put()
+            exploration.put('A user id', {})
         exploration.category = 'The category'
 
         # The 'parameters' property must be a list of Parameter objects.
@@ -86,7 +87,7 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         exploration.editor_ids = ['A user id']
 
         # Put and retrieve the exploration.
-        exploration.put()
+        exploration.put('A user id', {})
 
         retrieved_exploration = exp_services.get_exploration_by_id(
             'The exploration hash id')
