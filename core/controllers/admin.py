@@ -16,9 +16,9 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+from core import counters
 from core.controllers import base
 from core.domain import exp_services
-from core.domain import perf_services
 
 
 class AdminPage(base.BaseHandler):
@@ -31,7 +31,7 @@ class AdminPage(base.BaseHandler):
             'name': counter.name,
             'description': counter.description,
             'value': counter.value
-        } for counter in perf_services.Registry.counters.values()]
+        } for counter in counters.Registry.get_all_counters()]
 
         self.render_template('admin/admin.html')
 

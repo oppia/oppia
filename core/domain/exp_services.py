@@ -31,7 +31,6 @@ import os
 
 from core.domain import exp_domain
 from core.domain import param_domain
-from core.domain import perf_services
 from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import widget_domain
@@ -66,23 +65,14 @@ def get_exploration_by_id(exploration_id, strict=True):
         [exploration_memcache_key]).get(exploration_memcache_key)
 
     if memcached_exploration is not None:
-        perf_services.MEMCACHE_EXPLORATION_HIT.inc()
         return memcached_exploration
     else:
-        perf_services.MEMCACHE_EXPLORATION_MISS.inc()
-
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict)
         exploration = exp_domain.Exploration(
             exploration_model) if exploration_model else None
 
-        unset_keys = memcache_services.set_multi(
-            {exploration_memcache_key: exploration})
-        if unset_keys:
-            perf_services.MEMCACHE_EXPLORATION_SET_FAILURE.inc()
-        else:
-            perf_services.MEMCACHE_EXPLORATION_SET_SUCCESS.inc()
-
+        memcache_services.set_multi({exploration_memcache_key: exploration})
         return exploration
 
 
@@ -100,32 +90,17 @@ def get_state_by_id(exploration_id, state_id, strict=True):
         [state_memcache_key]).get(state_memcache_key)
 
     if memcached_state is not None:
-        perf_services.MEMCACHE_STATE_HIT.inc()
         return memcached_state
     else:
-        perf_services.MEMCACHE_STATE_MISS.inc()
-
         state = next(s for s in exploration.states if s.id == state_id)
-
-        unset_keys = memcache_services.set_multi({state_memcache_key: state})
-        if unset_keys:
-            perf_services.MEMCACHE_STATE_SET_FAILURE.inc()
-        else:
-            perf_services.MEMCACHE_STATE_SET_SUCCESS.inc()
-
+        memcache_services.set_multi({state_memcache_key: state})
         return state
 
 
 def save_exploration(exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration_memcache_key = _get_exploration_memcache_key(exploration.id)
-    return_code = memcache_services.delete(exploration_memcache_key)
-    if return_code == 0:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_FAILURE.inc()
-    elif return_code == 1:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_MISSING.inc()
-    else:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_SUCCESS.inc()
+    memcache_services.delete(exploration_memcache_key)
 
     exploration.validate()
 
@@ -145,13 +120,7 @@ def save_exploration(exploration):
 def save_state(exploration_id, state):
     """Commits a state domain object to persistent storage."""
     state_memcache_key = _get_state_memcache_key(exploration_id, state.id)
-    return_code = memcache_services.delete(state_memcache_key)
-    if return_code == 0:
-        perf_services.MEMCACHE_STATE_DELETE_FAILURE.inc()
-    elif return_code == 1:
-        perf_services.MEMCACHE_STATE_DELETE_MISSING.inc()
-    else:
-        perf_services.MEMCACHE_STATE_DELETE_SUCCESS.inc()
+    memcache_services.delete(state_memcache_key)
 
     state.validate()
 
@@ -189,14 +158,7 @@ def create_new(
 def delete_state_model(exploration_id, state_id):
     """Directly deletes a state model."""
     state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
-    return_code = memcache_services.delete(state_memcache_key)
-    if return_code == 0:
-        perf_services.MEMCACHE_STATE_DELETE_FAILURE.inc()
-    elif return_code == 1:
-        perf_services.MEMCACHE_STATE_DELETE_MISSING.inc()
-    else:
-        perf_services.MEMCACHE_STATE_DELETE_SUCCESS.inc()
-
+    memcache_services.delete(state_memcache_key)
     state_model = state_models.StateModel.get(state_id)
     state_model.delete()
 
@@ -204,13 +166,7 @@ def delete_state_model(exploration_id, state_id):
 def delete_exploration(exploration_id):
     """Deletes the exploration with the given exploration_id."""
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
-    return_code = memcache_services.delete(exploration_memcache_key)
-    if return_code == 0:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_FAILURE.inc()
-    elif return_code == 1:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_MISSING.inc()
-    else:
-        perf_services.MEMCACHE_EXPLORATION_DELETE_SUCCESS.inc()
+    memcache_services.delete(exploration_memcache_key)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration = exp_domain.Exploration(exploration_model)

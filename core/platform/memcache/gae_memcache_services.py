@@ -19,48 +19,72 @@
 __author__ = 'Sean Lip'
 
 
+from core import counters
 from google.appengine.api import memcache
 
 
 def get_multi(keys):
-	"""Looks up a list of keys in memcache.
+    """Looks up a list of keys in memcache.
 
-	Args:
-	  - keys: a list of keys (strings) to look up.
+    Args:
+      - keys: a list of keys (strings) to look up.
 
-	Returns:
-	  A dict of key-value pairs for the keys/values that were present in
-	  memcache.
-	"""
-	assert isinstance(keys, list)
-	return memcache.get_multi(keys)
+    Returns:
+      A dict of key-value pairs for the keys/values that were present in
+      memcache.
+    """
+    assert isinstance(keys, list)
+    result = memcache.get_multi(keys)
+
+    if result is not None:
+        counters.MEMCACHE_HIT.inc()
+    else:
+        counters.MEMCACHE_MISS.inc()
+
+    return result
 
 
 def set_multi(key_value_mapping):
-	"""Sets multiple keys' values at once.
+    """Sets multiple keys' values at once.
 
-	Args:
-	  - key_value_mapping: a dict of {key: value} pairs. The key is a string
-	      and the value is anything that is serializable using the Python
-	      pickle module. The combined size of each key and value must be
-	      < 1 MB. The total size of key_value_mapping should be at most 32 MB.
+    Args:
+      - key_value_mapping: a dict of {key: value} pairs. The key is a string
+          and the value is anything that is serializable using the Python
+          pickle module. The combined size of each key and value must be
+          < 1 MB. The total size of key_value_mapping should be at most 32 MB.
 
-	Returns:
-	  A list of the keys whose values were NOT set.
-	"""
-	assert isinstance(key_value_mapping, dict)
-	return memcache.set_multi(key_value_mapping)
+    Returns:
+      A list of the keys whose values were NOT set.
+    """
+    assert isinstance(key_value_mapping, dict)
+    unset_keys = memcache.set_multi(key_value_mapping)
+
+    if unset_keys:
+        counters.MEMCACHE_SET_FAILURE.inc()
+    else:
+        counters.MEMCACHE_SET_SUCCESS.inc()
+
+    return unset_keys
 
 
 def delete(key):
-	"""Deletes a key in memcache.
+    """Deletes a key in memcache.
 
-	Args:
-	  - key: a key (string) to delete.
+    Args:
+      - key: a key (string) to delete.
 
     Returns:
       0 on network failure, 1 if the item does not exist, and 2 for a
       successful delete.
-	"""
-	assert isinstance(key, basestring)
-	return memcache.delete(key)
+    """
+    assert isinstance(key, basestring)
+    return_code = memcache.delete(key)
+
+    if return_code == 0:
+        counters.MEMCACHE_DELETE_FAILURE.inc()
+    elif return_code == 1:
+        counters.MEMCACHE_DELETE_MISSING.inc()
+    else:
+        counters.MEMCACHE_DELETE_SUCCESS.inc()
+
+    return return_code
