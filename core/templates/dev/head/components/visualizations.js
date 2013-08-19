@@ -290,6 +290,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                   d.hashId == initStateId ? 'olive' :
                   d.hashId == END_DEST ? 'green' :
                   d.reachable === false ? 'pink' :
+                  d.reachableFromEnd === false ? 'pink' :
                   'beige'
                 );
               }
@@ -305,7 +306,20 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               }
             })
             .append('svg:title')
-            .text(function(d) { return d.name; });
+            .text(function(d) {
+              var warning = '';
+              if (d.reachable === false) {
+                warning = 'Warning: this state is unreachable.';
+              } else if (d.reachableFromEnd === false) {
+                warning = 'Warning: there is no path from this state to the END state.';
+              }
+
+              var label = d.name;
+              if (warning) {
+                label += ' (' + warning + ')';
+              }
+              return label;
+            });
 
         nodeEnter.append('svg:text')
             .attr('text-anchor', 'middle')
