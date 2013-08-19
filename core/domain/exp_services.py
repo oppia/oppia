@@ -386,16 +386,21 @@ def delete_state_model(exploration_id, state_id):
     state_model.delete()
 
 
-def delete_exploration(exploration_id):
+def delete_exploration(committer_id, exploration_id, force_deletion=False):
     """Deletes the exploration with the given exploration_id."""
+    exploration = get_exploration_by_id(exploration_id)
+    if not force_deletion and not exploration.is_deletable_by(committer_id):
+        raise Exception(
+            'User %s does not have permissions to delete exploration %s' %
+            (committer_id, exploration_id))
+
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
 
-    exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration = exp_domain.Exploration(exploration_model)
-
     for state in exploration.states:
         delete_state_model(exploration_id, state.id)
+
+    exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration_model.delete()
 
 
@@ -655,7 +660,7 @@ def create_from_yaml(
             save_state(user_id, exploration_id, state)
 
     except Exception:
-        delete_exploration(exploration.id)
+        delete_exploration(user_id, exploration.id, force_deletion=True)
         raise
 
     return exploration.id
@@ -713,7 +718,7 @@ def delete_demos():
             exploration_ids_to_delete.append(exploration.id)
 
     for exploration_id in exploration_ids_to_delete:
-        delete_exploration(exploration_id)
+        delete_exploration(ADMIN_COMMITTER_ID, exploration_id)
 
 
 def reload_demos():
@@ -726,4 +731,4 @@ def delete_all_explorations():
     """Deletes all explorations."""
     explorations = get_all_explorations()
     for exploration in explorations:
-        delete_exploration(exploration.id)
+        delete_exploration(None, exploration.id, force_deletion=True)

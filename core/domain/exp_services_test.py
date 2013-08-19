@@ -191,7 +191,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
 
-        exp_services.delete_exploration('A exploration_id')
+        exp_services.delete_exploration(self.owner_id, 'A exploration_id')
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('A exploration_id')
 

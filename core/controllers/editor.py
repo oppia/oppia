@@ -170,7 +170,7 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-        exp_services.delete_exploration(exploration_id)
+        exp_services.delete_exploration(self.user_id, exploration_id)
 
 
 class ExplorationDownloadHandler(base.BaseHandler):
