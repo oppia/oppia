@@ -82,7 +82,7 @@ class ExplorationModel(base_models.BaseModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def put(self, committer_id, properties, snapshot=None):
+    def put(self, committer_id, properties, snapshot=None, commit_message=''):
         """Updates the exploration using the properties dict, then saves it.
 
         If snapshot is not None, increments the exploration version and saves
@@ -103,6 +103,7 @@ class ExplorationModel(base_models.BaseModel):
         if snapshot is not None:
             self.version += 1
             exp_snapshot_models.ExplorationSnapshotModel.save_snapshot(
-                self.id, self.version, committer_id, snapshot, False)
+                self.id, self.version, committer_id, snapshot, commit_message,
+                False)
 
         super(ExplorationModel, self).put()

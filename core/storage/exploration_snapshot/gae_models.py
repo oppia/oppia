@@ -45,6 +45,9 @@ class ExplorationSnapshotModel(base_models.BaseModel):
 
     # The id of the user who committed this revision.
     committer_id = ndb.StringProperty(required=True)
+    # A brief commit message.
+    # TODO(sll): Make this a required property?
+    commit_message = ndb.TextProperty()
 
     # When this entity was first created.
     created = ndb.DateTimeProperty(auto_now_add=True)
@@ -55,7 +58,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
 
     @classmethod
     def save_snapshot(cls, exploration_id, version_number, committer_id,
-                      json_blob, is_diff):
+                      json_blob, commit_message, is_diff):
         """Saves a new snapshot for the given exploration."""
         # TODO(sll): Run this in a transaction.
 
@@ -73,7 +76,8 @@ class ExplorationSnapshotModel(base_models.BaseModel):
         if not json_blob:
             raise Exception('No change detected for versioned exploration.')
     
-        snapshot_model = cls(id=snapshot_id, committer_id=committer_id)
+        snapshot_model = cls(id=snapshot_id, committer_id=committer_id,
+                             commit_message=commit_message)
         if is_diff:
             snapshot_model.diff_from_previous_version = json_blob
         else:
