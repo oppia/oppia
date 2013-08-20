@@ -76,7 +76,9 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.7" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.7/
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.min.js
 
   # Files for tests.

@@ -22,11 +22,10 @@
         <textarea ng-show="largeInput" ng-model="item.label">
         </textarea>
         <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
+        <button type="button" ng-click="deleteItem($index)">Delete</button>
       </span>
     </li>
   </ol>
 
-  <input ng-hide="largeInput" type="text" ng-model="newItem" placeholder="Add New List Item">
-  <textarea ng-show="largeInput" ng-model="newItem" placeholder="Add New List Item"></textarea>
-  <button type="button" ng-click="addItem(newItem)">Add List Element</button>
+  <button type="button" ng-click="addItem()">Add List Element</button>
 </div>
