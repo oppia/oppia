@@ -19,13 +19,13 @@ __author__ = 'Jeremy Emerson'
 import unittest
 
 from core.domain import exp_services
-from core.platform import models
-(exp_models, image_models, state_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
 import feconf
 import test_utils
 
 if feconf.PLATFORM == 'gae':
+    import core.storage.exploration.gae_models as exp_models
+    import core.storage.image.gae_models as image_models
+    import core.storage.state.gae_models as state_models
     from google.appengine.ext import db
 
 
@@ -105,3 +105,70 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])
+
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class ExplorationSnapshotModelUnitTests(test_utils.GenericTestBase):
+    """Test the exploration snapshot model."""
+
+    def get_snapshot_id(self, exploration_id, version_number):
+        return (
+            exp_models.ExplorationSnapshotModel._get_snapshot_id(
+                exploration_id, version_number))
+
+    def test_version_number_changes_only_after_exp_publication(self):
+        USER_ID = 'user_id'
+        EXP_ID = 'exp_id'
+
+        exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID)
+
+        exploration_model = exp_models.ExplorationModel.get(EXP_ID)
+        self.assertEqual(exploration_model.version, 0)
+        self.assertEqual(exploration_model.title, 'A title')
+
+        snapshot_id = self.get_snapshot_id(EXP_ID, 0)
+        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+            snapshot_id, strict=False)
+        self.assertIsNone(snapshot_model)
+
+        # The exploration is not public, so new versions are not created.
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration.title = 'New title'
+        exp_services.save_exploration(USER_ID, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(EXP_ID)
+        self.assertEqual(exploration_model.version, 0)
+        self.assertEqual(exploration_model.title, 'New title')
+
+        snapshot_id = self.get_snapshot_id(EXP_ID, 0)
+        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+            snapshot_id, strict=False)
+        self.assertIsNone(snapshot_model)
+
+        snapshot_id = self.get_snapshot_id(EXP_ID, 1)
+        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+            snapshot_id, strict=False)
+        self.assertIsNone(snapshot_model)
+
+        # The exploration is made public, so a new version is created.
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration.title = 'Newer title'
+        exploration.is_public = True
+        exp_services.save_exploration(USER_ID, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(EXP_ID)
+        self.assertEqual(exploration_model.version, 1)
+        self.assertEqual(exploration_model.title, 'Newer title')
+
+        snapshot_id = self.get_snapshot_id(EXP_ID, 0)
+        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+            snapshot_id, strict=False)
+        self.assertIsNone(snapshot_model)
+
+        snapshot_id = self.get_snapshot_id(EXP_ID, 1)
+        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+            snapshot_id, strict=False)
+        self.assertIsNotNone(snapshot_model)
+        self.assertIsNotNone(snapshot_model.serialized_exploration)
+        self.assertIsNone(snapshot_model.diff_from_previous_version)

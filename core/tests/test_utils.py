@@ -55,6 +55,7 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         exp_services.delete_all_explorations()
+        exp_services.delete_all_exploration_snapshots()
         stats_services.delete_all_stats()
 
     def shortDescription(self):

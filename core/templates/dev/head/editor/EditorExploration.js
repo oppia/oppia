@@ -130,6 +130,16 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.currentUser = data.user;
     $scope.parameters = data.parameters || [];
 
+    $scope.explorationSnapshots = [];
+    for (var i = 0; i < data.snapshots.length; i++) {
+      $scope.explorationSnapshots.push({
+        'committerId': data.snapshots[i].committer_id,
+        'createdOn': data.snapshots[i].created_on,
+        'commitMessage': data.snapshots[i].commit_message,
+        'versionNumber': data.snapshots[i].version_number
+      });
+    }
+
     $scope.stats = {
       'numVisits': data.num_visits,
       'numCompletions': data.num_completions,

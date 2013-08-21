@@ -282,6 +282,7 @@ class Exploration(object):
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
         self.default_skin = exploration_model.default_skin
+        self.version = exploration_model.version
 
     def validate(self):
         """Validates the exploration before it is committed to storage."""

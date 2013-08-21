@@ -309,6 +309,11 @@ def save_exploration(committer_id, exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
+    versionable_dict = None
+    if exploration.is_public:
+        # This must be computed before memcache is cleared.
+        versionable_dict = export_to_versionable_dict(exploration.id)
+
     # TODO(sll): The rest of this should be done in a transaction.
 
     exploration_memcache_key = _get_exploration_memcache_key(exploration.id)
@@ -327,11 +332,12 @@ def save_exploration(committer_id, exploration):
         'version': exploration_model.version,
     }
 
-    if exploration.is_public:
+    if versionable_dict:
         # Create a snapshot for the version history.
         exploration_model.put(
-            committer_id, properties_dict, snapshot=export_to_versionable_dict(
-                exploration.id)
+            committer_id,
+            properties_dict,
+            snapshot=versionable_dict
         )
     else:
         exploration_model.put(committer_id, properties_dict)
@@ -469,6 +475,31 @@ def get_exploration_params(exploration_id):
     for param in exploration.parameters:
         params[param.name] = param.value
     return params
+
+
+# Operations on exploration snapshots.
+def get_exploration_snapshots_metadata(exploration_id, limit):
+    """Returns the most recent snapshots for this exploration, as dicts.
+
+    Args:
+        exploration_id: str. The id of the exploration in question.
+        limit: int. The maximum number of snapshots to return.
+
+    Returns:
+        list of dicts, each representing a recent snapshot. Each dict has the
+        following keys: committer_id, commit_message, created_on,
+        version_number. The version numbers are consecutive and in descending
+        order. There are max(limit, exploration.version_number) items in the
+        returned list.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+    oldest_version = max(exploration.version - limit, 0) + 1
+    current_version = exploration.version
+    version_nums = range(current_version, oldest_version - 1, -1)
+
+    return [exp_models.ExplorationSnapshotModel.get_metadata(
+        exploration_id, version_num
+    ) for version_num in version_nums]
 
 
 # Operations on states belonging to an exploration.
@@ -732,3 +763,9 @@ def delete_all_explorations():
     explorations = get_all_explorations()
     for exploration in explorations:
         delete_exploration(None, exploration.id, force_deletion=True)
+
+
+def delete_all_exploration_snapshots():
+    """Deletes all exploration snapshots."""
+    for snapshot in exp_models.ExplorationSnapshotModel.get_all():
+        snapshot.delete()

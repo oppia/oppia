@@ -510,3 +510,47 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertFalse(exploration.has_state_named(default_state_name))
         self.assertTrue(exploration.has_state_named('Renamed state'))
         self.assertTrue(exploration.has_state_named('State 2'))
+
+
+class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
+    """Test methods relating to exploration snapshots."""
+
+    def test_get_exploration_snapshots_metadata(self):
+        eid = 'exp_id'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new('user_id', 'A title', 'A category', eid))
+
+        self.assertEqual(
+            exp_services.get_exploration_snapshots_metadata(eid, 3), [])
+
+        # Publish the exploration so that version snapshots start getting
+        # recorded.
+        exploration.is_public = True
+        exp_services.save_exploration('committer_id_1', exploration)
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 3)
+        self.assertEqual(len(snapshots_metadata), 1)
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first published.',
+            'version_number': 1,
+        }, snapshots_metadata[0])
+
+        exploration.title = 'New title'
+        exp_services.save_exploration('committer_id_2', exploration)
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 3)
+        self.assertEqual(len(snapshots_metadata), 2)
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_2',
+            'commit_message': '',
+            'version_number': 2,
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first published.',
+            'version_number': 1,
+        }, snapshots_metadata[1])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])

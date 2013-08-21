@@ -27,6 +27,8 @@ from core.domain import widget_domain
 import utils
 
 EDITOR_MODE = 'editor'
+# The maximum number of exploration history snapshots to show by default.
+DEFAULT_NUM_SNAPSHOTS = 10
 
 
 class NewExploration(base.BaseHandler):
@@ -105,6 +107,9 @@ class ExplorationHandler(base.BaseHandler):
             'states': state_list,
             'parameters': [param.to_dict()
                            for param in exploration.parameters],
+            # Add information about the most recent versions.
+            'snapshots': exp_services.get_exploration_snapshots_metadata(
+                exploration_id, DEFAULT_NUM_SNAPSHOTS),
             # Add information for the exploration statistics page.
             'num_visits': stats_services.get_exploration_visit_count(
                 exploration_id),

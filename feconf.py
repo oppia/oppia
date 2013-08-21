@@ -131,3 +131,6 @@ PATH_MAP = {
     '/lib/static': 'lib/static',
     '/third_party/static': 'third_party/static',
 }
+
+# Format string for displaying datetimes in the UI.
+HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M'
