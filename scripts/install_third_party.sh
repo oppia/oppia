@@ -23,17 +23,29 @@ mkdir -p $THIRD_PARTY_DIR
 echo Checking if node.js is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
   echo Installing Node.js
-  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
-    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
-    rm node-download.tgz
+  if [ ${OS} == "Darwin" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v0.10.1-darwin-x64
+    else
+      NODE_FILE_NAME=node-v0.10.1-darwin-x86
+    fi
+  elif [ ${OS} == "Linux" ]; then
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      NODE_FILE_NAME=node-v0.10.1-linux-x64
+    else
+      NODE_FILE_NAME=node-v0.10.1-linux-x86
+    fi
   else
-    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x86.tar.gz -O node-download.tgz
-    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x86 $THIRD_PARTY_DIR/node-0.10.1
-    rm node-download.tgz
+    echo
+    echo     Unsupported OS: failed to determine correct URL for node.js binary.
+    echo     See the install_third_party.sh script for details.
+    echo
   fi
+
+  wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
+  tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
+  mv $THIRD_PARTY_DIR/$NODE_FILE_NAME $THIRD_PARTY_DIR/node-0.10.1
+  rm node-download.tgz
 fi
 
 
