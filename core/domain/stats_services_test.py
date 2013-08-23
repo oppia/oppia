@@ -251,7 +251,7 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
             not_default_rule_spec,
             exp_domain.RuleSpec('Default', {}, exp.init_state.id, [], []),
         ]
-        exp_services.save_state(exp.id, exp.init_state)
+        exp_services.save_state('fake@user.com', exp.id, exp.init_state)
 
         stats_services.EventHandler.record_state_hit(
             'eid', exp.init_state.id, True)
@@ -300,7 +300,7 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         SECOND_STATE = 'State 2'
-        exp_services.add_state(exp.id, SECOND_STATE)
+        exp_services.add_state('fake@user.com', exp.id, SECOND_STATE)
         exp = exp_services.get_exploration_by_id('eid')
         state1_id = exp.init_state_id
         second_state = exp_services.get_state_by_name('eid', SECOND_STATE)

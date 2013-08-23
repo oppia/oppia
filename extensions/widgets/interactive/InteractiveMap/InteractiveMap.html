@@ -6,8 +6,8 @@
 
     <script>
       var GLOBALS = {};
-      GLOBALS.coords = [JSON.parse('{{latitude}}'), JSON.parse('{{longitude}}')];
-      GLOBALS.zoom = JSON.parse('{{zoom}}');
+      GLOBALS.coords = [JSON.parse('{{latitude|js_string}}'), JSON.parse('{{longitude|js_string}}')];
+      GLOBALS.zoom = JSON.parse('{{zoom|js_string}}');
     </script>
 
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />

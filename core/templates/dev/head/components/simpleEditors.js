@@ -39,7 +39,6 @@ oppia.directive('list', function (warningsData) {
           $scope.localItems.push({label: $scope.items[i]});
         }
         $scope.activeItem = null;
-        $scope.newItem = '';
       });
 
       $scope.openItemEditor = function(index) {
@@ -50,14 +49,10 @@ oppia.directive('list', function (warningsData) {
         $scope.activeItem = null;
       };
 
-      $scope.addItem = function(newItem) {
-        if (!newItem) {
-          warningsData.addWarning('Please enter a non-empty item.');
-          return;
-        }
-        $scope.newItem = '';
-        $scope.localItems.push({label: newItem});
-        $scope.items.push(newItem);
+      $scope.addItem = function() {
+        $scope.localItems.push({label: ''});
+        $scope.items.push('');
+        $scope.activeItem = $scope.localItems.length - 1;
       };
 
       $scope.replaceItem = function(index, newItem) {
@@ -75,6 +70,7 @@ oppia.directive('list', function (warningsData) {
       };
 
       $scope.deleteItem = function(index) {
+        $scope.activeItem = null;
         $scope.localItems.splice(index, 1);
         $scope.items.splice(index, 1);
       };

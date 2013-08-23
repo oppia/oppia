@@ -208,7 +208,7 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     form.append('image', image);
 
     $.ajax({
-        url: '/imagehandler/',
+        url: '/imagehandler',
         data: form,
         processData: false,
         contentType: false,
@@ -235,6 +235,10 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 
   $scope.setActiveFile = function(file) {
     $scope.file = file;
+  };
+
+  $scope.cloneObject = function(obj) {
+    return angular.copy(obj);
   };
 }
 

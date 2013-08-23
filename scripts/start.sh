@@ -23,6 +23,16 @@
 # The root folder MUST be named 'oppia'.
 # It sets up the third-party files and the local GAE, and runs tests.
 
+if [ -z "$BASH_VERSION" ]
+then
+  echo ""
+  echo "  Please run me using bash: "
+  echo ""
+  echo "     bash scripts/$0"
+  echo ""
+  return 1
+fi
+
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1

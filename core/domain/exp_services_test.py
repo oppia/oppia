@@ -64,7 +64,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.get_public_explorations(), [])
 
         exploration.is_public = True
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.owner_id, exploration)
         self.assertEqual(
             [e.id for e in exp_services.get_public_explorations()],
             [exploration.id]
@@ -75,7 +75,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.owner_id, exploration)
 
         def get_viewable_ids(user_id):
             return [
@@ -88,7 +88,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Set the exploration's status to published.
         exploration.is_public = True
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.owner_id, exploration)
 
         self.assertEqual(get_viewable_ids(self.owner_id), [exploration.id])
         self.assertEqual(
@@ -100,7 +100,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category', 'A exploration_id'))
         exploration.add_editor(self.editor_id)
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.owner_id, exploration)
 
         def get_editable_ids(user_id):
             return [
@@ -113,7 +113,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Set the exploration's status to published.
         exploration.is_public = True
-        exp_services.save_exploration(exploration)
+        exp_services.save_exploration(self.owner_id, exploration)
 
         self.assertEqual(get_editable_ids(self.owner_id), [exploration.id])
         self.assertEqual(get_editable_ids(self.viewer_id), [])
@@ -142,7 +142,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(exploration.id, 'New state')
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
 
         exploration = exp_services.get_exploration_by_id(
             'A different exploration_id')
@@ -191,7 +191,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
 
-        exp_services.delete_exploration('A exploration_id')
+        exp_services.delete_exploration(self.owner_id, 'A exploration_id')
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('A exploration_id')
 
@@ -215,9 +215,12 @@ class ExportUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(exploration.id, 'New state')
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
         yaml_content = exp_services.export_to_yaml(exploration.id)
-        self.assertEqual(yaml_content, """parameters: []
+        self.assertEqual(
+            yaml_content,
+"""default_skin: conversation
+parameters: []
 states:
 - content: []
   name: '[untitled state]'
@@ -253,13 +256,72 @@ states:
     widget_id: Continue
 """)
 
+    def test_export_to_versionable_dict(self):
+        """Test the export_to_versionable_dict() method."""
+        EXP_ID = 'eid'
+        exp_services.get_exploration_by_id(exp_services.create_new(
+            self.owner_id, 'A title', 'A category', EXP_ID))
+        exp_services.add_state(self.owner_id, EXP_ID, 'New state')
+
+        expected_dict = {
+            'parameters': [],
+            'states': [{
+                'content': [],
+                'name': u'[untitled state]',
+                'param_changes': [],
+                'widget': {
+                    'handlers': [{
+                        'name': u'submit',
+                        'rule_specs': [{
+                            'dest': u'[untitled state]',
+                            'feedback': [],
+                            'inputs': {},
+                            'name': u'Default',
+                            'param_changes': []
+                        }]
+                    }],
+                    'params': {
+                        u'buttonText': u'Continue'
+                    },
+                    'sticky': False,
+                    'widget_id': u'Continue'
+                }
+            }, {
+                'content': [],
+                'name': u'New state',
+                'param_changes': [],
+                'widget': {
+                    'handlers': [{
+                        'name': u'submit',
+                        'rule_specs': [{
+                            'dest': u'New state',
+                            'feedback': [],
+                            'inputs': {},
+                            'name': u'Default',
+                            'param_changes': []
+                        }]
+                    }],
+                    'params': {
+                        u'buttonText': u'Continue'
+                    },
+                    'sticky': False,
+                    'widget_id': u'Continue'
+                }
+            }]
+        }
+
+        self.assertEqual(
+            expected_dict,
+            exp_services.export_to_versionable_dict(EXP_ID)
+        )
+
     def test_export_state_to_dict(self):
         """Test the export_state_to_dict() method."""
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(exploration.id, 'New state')
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
         new_state = exp_services.get_state_by_name(exploration.id, 'New state')
         state_dict = exp_services.export_state_to_dict(
             exploration.id, new_state.id)
@@ -272,7 +334,7 @@ states:
             'widget': {
                 'widget_id': u'Continue',
                 'params': {
-                  u'buttonText': u'Continue',
+                    u'buttonText': u'Continue',
                 },
                 'sticky': False,
                 'handlers': [{
@@ -306,7 +368,8 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         sid = 'state_id'
         state_name = 'State 1'
-        exp_services.add_state(exploration.id, state_name, state_id=sid)
+        exp_services.add_state(
+            'user_id', exploration.id, state_name, state_id=sid)
 
         self.assertEqual(
             exp_services.convert_state_name_to_id(eid, state_name), sid)
@@ -350,7 +413,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         id_1 = '123'
         name_1 = 'State 1'
-        exp_services.add_state(eid, name_1, state_id=id_1)
+        exp_services.add_state('fake@user.com', eid, name_1, state_id=id_1)
         state_1 = exp_services.get_state_by_name(eid, name_1)
 
         exploration = exp_services.get_exploration_by_id(eid)
@@ -372,78 +435,122 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
     def test_delete_state(self):
         """Test deletion of states."""
-        exploration_id = 'A exploration_id'
+        USER_ID = 'fake@user.com'
+        EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                'fake@user.com', 'A title', 'A category', exploration_id))
-        exp_services.add_state(exploration_id, 'first_state')
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+            exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
+        exp_services.add_state(USER_ID, EXP_ID, 'first_state')
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
 
         with self.assertRaisesRegexp(
                 ValueError, 'Cannot delete initial state'):
-            exp_services.delete_state(exploration.id, exploration.state_ids[0])
+            exp_services.delete_state(
+                USER_ID, EXP_ID, exploration.state_ids[0])
 
-        exp_services.add_state(exploration_id, 'second_state')
+        exp_services.add_state(USER_ID, EXP_ID, 'second_state')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        exp_services.delete_state(exploration.id, exploration.state_ids[1])
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exp_services.delete_state(USER_ID, EXP_ID, exploration.state_ids[1])
 
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exp_services.delete_state(exploration.id, 'fake_state')
+            exp_services.delete_state(USER_ID, EXP_ID, 'fake_state')
 
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""
-        exploration_id = 'A exploration_id'
+        USER_ID = 'fake@user.com'
+        EXP_ID = 'A exploration_id'
 
         exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                'fake@user.com', 'A title', 'A category', exploration_id))
+            exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exp_services.get_state_by_id(exploration_id, 'invalid_state_id')
+            exp_services.get_state_by_id(EXP_ID, 'invalid_state_id')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
 
         default_state = exp_services.get_state_by_id(
             exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
         exp_services.rename_state(
-            exploration_id, default_state.id, 'Renamed state')
+            USER_ID, EXP_ID, default_state.id, 'Renamed state')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
         self.assertEqual(exploration.states[0].name, 'Renamed state')
 
         # Add a new state.
-        exp_services.add_state(exploration_id, 'State 2')
-        second_state = exp_services.get_state_by_name(
-            exploration_id, 'State 2')
+        exp_services.add_state(USER_ID, EXP_ID, 'State 2')
+        second_state = exp_services.get_state_by_name(EXP_ID, 'State 2')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
         exp_services.rename_state(
-            exploration_id, second_state.id, second_state.name)
+            USER_ID, EXP_ID, second_state.id, second_state.name)
         renamed_second_state = exp_services.get_state_by_id(
-            exploration_id, second_state.id)
+            EXP_ID, second_state.id)
         self.assertEqual(renamed_second_state.name, 'State 2')
 
         # But it is not OK to add or rename a state using a name that already
         # exists.
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exp_services.add_state(exploration_id, 'State 2')
+            exp_services.add_state(USER_ID, EXP_ID, 'State 2')
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exp_services.rename_state(
-                exploration_id, second_state.id, 'Renamed state')
+                USER_ID, EXP_ID, second_state.id, 'Renamed state')
 
         # And it is not OK to rename a state to the END_DEST.
         with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
             exp_services.rename_state(
-                exploration_id, second_state.id, feconf.END_DEST)
+                USER_ID, EXP_ID, second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertFalse(exploration.has_state_named(default_state_name))
         self.assertTrue(exploration.has_state_named('Renamed state'))
         self.assertTrue(exploration.has_state_named('State 2'))
+
+
+class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
+    """Test methods relating to exploration snapshots."""
+
+    def test_get_exploration_snapshots_metadata(self):
+        eid = 'exp_id'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new('user_id', 'A title', 'A category', eid))
+
+        self.assertEqual(
+            exp_services.get_exploration_snapshots_metadata(eid, 3), [])
+
+        # Publish the exploration so that version snapshots start getting
+        # recorded.
+        exploration.is_public = True
+        exp_services.save_exploration('committer_id_1', exploration)
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 3)
+        self.assertEqual(len(snapshots_metadata), 1)
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first published.',
+            'version_number': 1,
+        }, snapshots_metadata[0])
+
+        exploration.title = 'New title'
+        exp_services.save_exploration('committer_id_2', exploration)
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 3)
+        self.assertEqual(len(snapshots_metadata), 2)
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_2',
+            'commit_message': '',
+            'version_number': 2,
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first published.',
+            'version_number': 1,
+        }, snapshots_metadata[1])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])

@@ -146,16 +146,32 @@ class BaseWidget(object):
             params = {}
 
         # Parameters used to generate the raw code for the widget.
-        # TODO(sll): Why do we convert only the default value to a JS string?
-        parameters = dict(
-            (param.name, params.get(
-                param.name, utils.convert_to_js_string(param.value))
-             ) for param in self.params)
+        parameters = dict((param.name, param.value) for param in self.params)
+        for param in params:
+            parameters[param] = params[param]
 
         return utils.parse_with_jinja(self.template, parameters)
 
-    def get_with_params(self, params):
-        """Gets a dict representing a parameterized widget."""
+    def get_with_params(self, params, kvps_only=False):
+        """Gets a dict representing a parameterized widget.
+
+        If kvps_only is True, then the value for params in the result is
+        a list of key-value pairs. Otherwise it is a dict, formatted as:
+
+            {PARAM_NAME: {'value': PARAM_VALUE, 'obj_type': PARAM_OBJ_TYPE}}.
+        """
+
+        param_dict = {}
+        for param in self.params:
+            param_dict[param.name] = {
+                'value': params.get(param.name, param.value),
+                'obj_type': param.obj_type,
+                'choices': param.choices,
+            }
+
+        if kvps_only:
+            for param in param_dict:
+                param_dict[param] = param_dict[param]['value']
 
         result = {
             'name': self.name,
@@ -163,11 +179,7 @@ class BaseWidget(object):
             'description': self.description,
             'id': self.id,
             'raw': self.get_raw_code(params),
-            'params': dict((param.name, {
-                'value': params.get(param.name, param.value),
-                'obj_type': param.obj_type,
-                'choices': param.choices,
-             }) for param in self.params),
+            'params': param_dict,
         }
 
         if self.type == feconf.INTERACTIVE_PREFIX:
@@ -186,13 +198,16 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
+        parameters = dict((param.name, param.value) for param in self.params)
+        for param in params:
+            parameters[param] = params[param]
+
         html, iframe = self._response_template_and_iframe
-        html = utils.parse_with_jinja(html, params)
-        iframe = utils.parse_with_jinja(iframe, params)
+        html = utils.parse_with_jinja(html, parameters)
+        iframe = utils.parse_with_jinja(iframe, parameters)
         return html, iframe
 
     def get_stats_log_html(self, params=None):
@@ -204,11 +219,14 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        # TODO(kashida): Make this consistent with get_raw_code.
         if params is None:
             params = {}
 
-        return utils.parse_with_jinja(self._stats_log_template, params)
+        parameters = dict((param.name, param.value) for param in self.params)
+        for param in params:
+            parameters[param] = params[param]
+
+        return utils.parse_with_jinja(self._stats_log_template, parameters)
 
     def get_handler_by_name(self, handler_name):
         """Get the handler for a widget, given the name of the handler."""

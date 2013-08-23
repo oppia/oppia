@@ -112,11 +112,12 @@ class WidgetHandler(base.BaseHandler):
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:
             self.render_json({
-                'widget': widget.get_with_params(params),
+                'widget': widget.get_with_params(params, kvps_only=True),
                 'parent_index': self.request.get('parent_index'),
             })
         else:
             response = widget.get_with_params(
-                utils.parse_dict_with_params(params, state_params_dict)
+                utils.parse_dict_with_params(params, state_params_dict),
+                kvps_only=True
             )
             self.render_json({'widget': response})

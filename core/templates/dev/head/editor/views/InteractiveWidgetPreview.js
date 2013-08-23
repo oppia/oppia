@@ -43,7 +43,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
         $scope.interactiveWidget = widgetData.widget;
-        $scope.interactiveParams = widgetParams;
+        $scope.interactiveParams = widgetData.widget.params;
         if ($scope.showPreview) {
           $scope.addContentToIframeWithId(
               'interactiveWidgetPreview', $scope.interactiveWidget.raw);

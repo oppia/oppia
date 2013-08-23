@@ -133,4 +133,16 @@
     </div>
   </div>
   <br>
+
+  <div ng-show="explorationSnapshots.length > 0">
+    <h4>Version History</h4>
+    <ul>
+      <li ng-repeat="snapshot in explorationSnapshots">
+        [<[snapshot.versionNumber]>] (<[snapshot.createdOn]> by <[snapshot.committerId]>)
+        <em>
+          <[snapshot.commitMessage]>
+        </em>
+      </li>
+    </ul>
+  </div>
 </div>

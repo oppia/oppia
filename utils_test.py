@@ -32,25 +32,6 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
-    def test_convert_to_js_string(self):
-        """Test convert_to_js_string method."""
-        expected_values = [
-            ('a', '\\"a\\"'),
-            (2, '2'),
-            (5.5, '5.5'),
-            ("'", '\\"\\\'\\"'),
-            (u'¡Hola!', '\\"\\\\u00a1Hola!\\"'),
-            (['a', '¡Hola!', 2], '[\\"a\\", \\"\\\\u00a1Hola!\\", 2]'),
-            ({'a': 4, '¡Hola!': 2}, '{\\"a\\": 4, \\"\\\\u00a1Hola!\\": 2}'),
-            ('', '\\"\\"'),
-            (None, 'null'),
-            (['a', {'b': 'c', 'd': ['e', None]}],
-                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
-        ]
-
-        for tup in expected_values:
-            self.assertEqual(utils.convert_to_js_string(tup[0]), tup[1])
-
     def test_parse_with_jinja(self):
         """Test parse_with_jinja method."""
         parsed_str = utils.parse_with_jinja('{{test}}', {'test': 'hi'})
@@ -65,10 +46,6 @@ class UtilsTests(test_utils.GenericTestBase):
         parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {})
         self.assertEqual(parsed_str, ' and ')
 
-        # Default parameters are used.
-        parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {}, 'def')
-        self.assertEqual(parsed_str, 'def and def')
-
         # The string has no parameters.
         parsed_str = utils.parse_with_jinja('no params', {'param': 'hi'})
         self.assertEqual(parsed_str, 'no params')
@@ -79,24 +56,20 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_parse_dict_with_params(self):
         """Test parse_dict_with_params method."""
-        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"b\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {})
+        self.assertEqual(parsed_dict, {'a': 'b'})
 
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {}, 'def')
-        self.assertEqual(parsed_dict, {'a': '\\"def\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3})
+        self.assertEqual(parsed_dict, {'a': '3'})
 
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"3\\"'})
-
-        parsed_dict = utils.parse_dict_with_params(
-            {'a': '{{b}}'}, {'b': 'c'}, '')
-        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
+        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 'c'})
+        self.assertEqual(parsed_dict, {'a': 'c'})
 
         # Test that the original dictionary is unchanged.
         orig_dict = {'a': '{{b}}'}
-        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'}, '')
+        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
-        self.assertEqual(parsed_dict, {'a': '\\"c\\"'})
+        self.assertEqual(parsed_dict, {'a': 'c'})
 
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""

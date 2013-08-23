@@ -282,6 +282,7 @@ class Exploration(object):
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
         self.default_skin = exploration_model.default_skin
+        self.version = exploration_model.version
 
     def validate(self):
         """Validates the exploration before it is committed to storage."""
@@ -301,7 +302,7 @@ class Exploration(object):
             except base_models.BaseModel.EntityNotFoundError:
                 raise utils.ValidationError('Invalid state_id %s' % state_id)
 
-        if not self.is_demo and not self.editor_ids:
+        if not self.editor_ids:
             raise utils.ValidationError('This exploration has no editors.')
 
     # Derived attributes of an exploration.
@@ -343,13 +344,17 @@ class Exploration(object):
         """
         return self.is_demo or self.is_editable_by(user_id)
 
+    def is_owned_by(self, user_id):
+        """Whether the given user owns the exploration."""
+        return user_id == self.editor_ids[0]
+
     def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
         return user_id in self.editor_ids
 
-    def is_owned_by(self, user_id):
-        """Whether the given user owns the exploration."""
-        return (not self.is_demo) and (user_id == self.editor_ids[0])
+    def is_deletable_by(self, user_id):
+        """Whether the given user has rights to delete this exploration."""
+        return self.is_owned_by(user_id)
 
     def add_editor(self, editor_id):
         """Adds a new editor. Does not commit changes."""

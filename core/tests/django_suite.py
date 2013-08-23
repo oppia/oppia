@@ -16,7 +16,7 @@
 
 First activate the virtual environment by running
 
-    source venv/bin/activate
+    source ../venv/bin/activate
 
 from the root folder. Then invoke this test script from the command
 line by running
@@ -28,7 +28,7 @@ from the root folder.
 Optionally, you can append a path to run tests in a particular
 subdirectory, e.g.:
 
-    python core/tests/suite.py --test_path='core/controllers'
+    python core/tests/django_suite.py --test_path='core/controllers'
 
 runs all tests in the core/controllers/ directory.
 

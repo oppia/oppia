@@ -130,6 +130,16 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.currentUser = data.user;
     $scope.parameters = data.parameters || [];
 
+    $scope.explorationSnapshots = [];
+    for (var i = 0; i < data.snapshots.length; i++) {
+      $scope.explorationSnapshots.push({
+        'committerId': data.snapshots[i].committer_id,
+        'createdOn': data.snapshots[i].created_on,
+        'commitMessage': data.snapshots[i].commit_message,
+        'versionNumber': data.snapshots[i].version_number
+      });
+    }
+
     $scope.stats = {
       'numVisits': data.num_visits,
       'numCompletions': data.num_completions,
@@ -186,9 +196,19 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     var HORIZ_OFFSET = 100;
     var nodes = {};
     var state;
-    nodes[END_DEST] = {name: END_DEST, depth: SENTINEL_DEPTH, reachable: false};
+    nodes[END_DEST] = {
+      name: END_DEST,
+      depth: SENTINEL_DEPTH,
+      reachable: false,
+      reachableFromEnd: false
+    };
     for (state in states) {
-      nodes[state] = {name: states[state].name, depth: SENTINEL_DEPTH, reachable: false};
+      nodes[state] = {
+        name: states[state].name,
+        depth: SENTINEL_DEPTH,
+        reachable: false,
+        reachableFromEnd: false
+      };
     }
     nodes[initStateId].depth = 0;
 
@@ -230,6 +250,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       }
     }
 
+    // Handle nodes that have not been visited in the forward traversal.
     var horizPositionForLastRow = HORIZ_OFFSET;
     var node;
     for (node in nodes) {
@@ -267,6 +288,22 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
                 inputs: ruleSpecs[i].inputs
             })
           });
+        }
+      }
+    }
+
+    // Mark nodes that are reachable from the END state via backward links.
+    queue = [END_DEST];
+    nodes[END_DEST].reachableFromEnd = true;
+    while (queue.length > 0) {
+      var currNodeId = queue[0];
+      queue.shift();
+
+      for (i = 0; i < links.length; i++) {
+        if (links[i].target.hashId == currNodeId &&
+            !links[i].source.reachableFromEnd) {
+          links[i].source.reachableFromEnd = true;
+          queue.push(links[i].source.hashId);
         }
       }
     }

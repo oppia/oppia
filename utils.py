@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import copy
-import json
 import logging
 import os
 import random
@@ -25,6 +24,7 @@ import unicodedata
 import yaml
 
 import feconf
+import jinja_utils
 
 import jinja2
 from jinja2 import meta
@@ -62,20 +62,7 @@ def get_sample_exploration_yaml(filename):
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, '%s.yaml' % filename))
 
 
-def convert_to_js_string(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
-    string = json.dumps(value)
-
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
-
-    for replacement in replacements:
-        string = string.replace(replacement[0], replacement[1])
-    return string
-
-
-def parse_with_jinja(string, params, default=''):
+def parse_with_jinja(string, params):
     """Parses a string using Jinja templating.
 
     Args:
@@ -87,29 +74,25 @@ def parse_with_jinja(string, params, default=''):
       the parsed string, or None if the string could not be parsed.
     """
     env = jinja2.Environment()
-    env.filters.update({
-        'is_list': lambda x: isinstance(x, list),
-        'is_dict': lambda x: isinstance(x, dict),
-    })
+    env.filters.update(jinja_utils.FILTERS)
 
     variables = meta.find_undeclared_variables(env.parse(string))
 
     new_params = copy.deepcopy(params)
     for var in variables:
         if var not in new_params:
-            new_params[var] = default
             logging.info('Cannot parse %s fully using %s', string, params)
 
     return env.from_string(string).render(new_params)
 
 
-def parse_dict_with_params(d, params, default=''):
-    """Converts the values of a dict to strings, then parses them using params.
+def parse_dict_with_params(d, params):
+    """Optionally converts dict values to strings, then parses them using params.
 
     Args:
       d: the dict whose values are to be parsed.
-      params: the parameters to parse the dict with.
-      default: the default string to use for missing parameters.
+      params: the parameters to parse the dict with. These are assumed to be
+        JS-safe.
 
     Returns:
       the parsed dict. This is a copy of the old dict.
@@ -117,8 +100,20 @@ def parse_dict_with_params(d, params, default=''):
     parameters = {}
 
     for key in d:
-        parameters[key] = parse_with_jinja(
-            convert_to_js_string(d[key]), params, default)
+        # TODO(sll): This should work more generally and recursively.
+        value = d[key]
+        if isinstance(value, basestring):
+            value = parse_with_jinja(value, params)
+        elif isinstance(value, list):
+            for ind, item in enumerate(value):
+                if isinstance(item, basestring):
+                    value[ind] = parse_with_jinja(item, params)
+        elif isinstance(value, dict):
+            for key, val in enumerate(value):
+                if isinstance(val, basestring):
+                    value[key] = parse_with_jinja(val, params)
+
+        parameters[key] = value
 
     return parameters
 

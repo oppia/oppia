@@ -35,7 +35,7 @@ fi
 
 echo Installing dependencies in virtual python environment. 
 type virtualenv >/dev/null 2>&1 || { 
-echo "Virtualenv is required but it's not installed. Aborting."; exit 1; }
+echo "python-virtualenv is required but it's not installed. Aborting."; exit 1; }
 
 virtualenv ../venv
 source ../venv/bin/activate
