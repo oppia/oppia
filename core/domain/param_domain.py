@@ -32,9 +32,13 @@ class Parameter(object):
 
     Note that the obj_type must be set before the values.
     """
-    def __init__(self, name, obj_type, values, description=''):
+    def __init__(self, name, obj_type, values, choices=None, description=''):
         self.name = name
         self.obj_type = obj_type
+
+        # Choices needs to be set before values because we might need to do
+        # validate teh values against possible choices.
+        self.choices = choices
         self.values = values
 
     def __setattr__(self, name, value):
@@ -53,6 +57,10 @@ class Parameter(object):
             if not isinstance(value, list):
                 raise ValueError(
                     'The values property for a parameter should be a list.')
+            if self.choices is not None:
+                for item in value:
+                    if item not in self.choices:
+                        raise ValueError('The values not in choices.')
             value = [obj_services.get_object_class(
                 self.obj_type).normalize(item) for item in value]
 

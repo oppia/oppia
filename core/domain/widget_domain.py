@@ -163,10 +163,11 @@ class BaseWidget(object):
             'description': self.description,
             'id': self.id,
             'raw': self.get_raw_code(params),
-            # TODO(sll): Restructure this so that it is
-            # {key: {value: ..., obj_type: ...}}
-            'params': dict((param.name, params.get(param.name, param.value))
-                           for param in self.params),
+            'params': dict((param.name, {
+                'value': params.get(param.name, param.value),
+                'obj_type': param.obj_type,
+                'choices': param.choices,
+             }) for param in self.params),
         }
 
         if self.type == feconf.INTERACTIVE_PREFIX:

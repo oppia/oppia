@@ -418,8 +418,10 @@ class WidgetDataUnitTests(DataUnitTest):
             )
 
             for param in widget._params:
-                PARAM_KEYS = ['name', 'description', 'obj_type', 'values']
-                self.assertItemsEqual(PARAM_KEYS, param.keys())
+                PARAM_KEYS = ['name', 'description', 'obj_type', 'values', 'choices']
+                for p in param.keys():
+                    self.assertIn(p, PARAM_KEYS)
+
                 self.assertTrue(isinstance(param['name'], basestring))
                 self.assertTrue(self.is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
@@ -430,3 +432,6 @@ class WidgetDataUnitTests(DataUnitTest):
                 self.assertTrue(isinstance(param['values'], list))
                 for value in param['values']:
                     obj_class.normalize(value)
+                if 'choices' in param:
+                  for choice in param['choices']:
+                      obj_class.normalize(value)

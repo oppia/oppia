@@ -29,7 +29,8 @@ class CodeRepl(widget_domain.BaseWidget):
         'name': 'language',
         'description': 'Programming language to evalue the code in.',
         'obj_type': 'UnicodeString',
-        'values': [
+        'values': ['coffeescript'],
+        'choices': [
             'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
             'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
             'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
