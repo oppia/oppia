@@ -138,11 +138,11 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 
   echo Compiling jsrepl
   # Reducing jvm memory requirement from 4G to 1G.
-  sed -i s/Xmx4g/Xmx1g/ Cakefile
+  sed -i '' s/Xmx4g/Xmx1g/ Cakefile
   # This version of node uses fs.exitsSync.
-  sed -i s/path\.existsSync/fs\.existsSync/ Cakefile
+  sed -i '' s/path\.existsSync/fs\.existsSync/ Cakefile
   # CoffeeScript is having trouble with octal representation.
-  sed -i s/0o755/493/ Cakefile
+  sed -i '' s/0o755/493/ Cakefile
   NODE_PATH=../node-0.10.1/lib/node_modules cake bake
 
   cd ../../
