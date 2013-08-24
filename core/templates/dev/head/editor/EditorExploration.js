@@ -66,6 +66,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
   ********************************************/
   // Changes the location hash when the editorView tab is changed.
   $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
+    warningsData.clear();
     if (e.target.hash == '#stateEditor') {
       explorationData.getStateData(explorationData.stateId);
       $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
@@ -412,7 +413,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     if (!explorationFullyLoaded) {
       return;
     }
-    if (oldValue && !$scope.isValidEntityName($scope[frontendName], true)) {
+    newValue = $scope.normalizeWhitespace(newValue);
+    if (oldValue && !$scope.isValidEntityName(newValue, true)) {
       $scope[frontendName] = oldValue;
       return;
     }
@@ -454,6 +456,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
+    newStateName = $scope.normalizeWhitespace(newStateName);
     if (!$scope.isValidEntityName(newStateName, true))
       return;
     if (newStateName.toUpperCase() == END_DEST) {
@@ -482,7 +485,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
               // TODO(sll): Actually force a refresh, since the data on the
               // page may be out of date.
               warningsData.addWarning(
-                  'Server error when adding state: ' + data.error + '.' +
+                  'Server error when adding state: ' + data.error + '. ' +
                    'Please refresh your page.');
             });
   };

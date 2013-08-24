@@ -99,6 +99,7 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
   };
 
   $scope.saveStateName = function() {
+    $scope.stateName = $scope.normalizeWhitespace($scope.stateName);
     if (!$scope.isValidEntityName($scope.stateName, true))
       return;
     if ($scope.isDuplicateInput(

@@ -89,6 +89,7 @@ function Gallery($scope, $http, warningsData) {
     var category = $scope.newExplorationCategory === '?' ?
                    $scope.customExplorationCategory :
                    $scope.newExplorationCategory;
+    category = $scope.normalizeWhitespace(category);
 
     if (!$scope.isValidEntityName(category, true)) {
       return;

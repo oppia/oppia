@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object for an exploration, its states, and their constituents.
+"""Domain objects for an exploration, its states, and their constituents.
 
 Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
@@ -218,6 +218,11 @@ class State(object):
     """Domain object for a state."""
 
     def validate(self):
+        for c in feconf.INVALID_NAME_CHARS:
+            if c in self.name:
+                raise utils.ValidationError(
+                    'Invalid character %s in state name %s' % (c, self.name))
+
         # TODO(sll): This needs lots more validation.
         pass
 
@@ -304,6 +309,12 @@ class Exploration(object):
 
         if not self.editor_ids:
             raise utils.ValidationError('This exploration has no editors.')
+
+        for c in feconf.INVALID_NAME_CHARS:
+            if c in self.title:
+                raise utils.ValidationError(
+                    'Invalid character %s in exploration title %s'
+                    % (c, self.title))
 
     # Derived attributes of an exploration.
     @property

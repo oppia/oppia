@@ -223,13 +223,13 @@ class ExportUnitTests(ExplorationServicesUnitTests):
 parameters: []
 states:
 - content: []
-  name: '[untitled state]'
+  name: (untitled state)
   param_changes: []
   widget:
     handlers:
     - name: submit
       rule_specs:
-      - dest: '[untitled state]'
+      - dest: (untitled state)
         feedback: []
         inputs: {}
         name: Default
@@ -267,13 +267,13 @@ states:
             'parameters': [],
             'states': [{
                 'content': [],
-                'name': u'[untitled state]',
+                'name': u'(untitled state)',
                 'param_changes': [],
                 'widget': {
                     'handlers': [{
                         'name': u'submit',
                         'rule_specs': [{
-                            'dest': u'[untitled state]',
+                            'dest': u'(untitled state)',
                             'feedback': [],
                             'inputs': {},
                             'name': u'Default',
@@ -424,7 +424,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_state_by_name(eid, name_1).id, state_1.id)
 
-        name_2 = 'fake_name'
+        name_2 = 'fake name'
         self.assertIsNone(exp_services.get_state_by_name(
             eid, name_2, strict=False))
         with self.assertRaisesRegexp(Exception, 'not found'):
@@ -439,7 +439,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
-        exp_services.add_state(USER_ID, EXP_ID, 'first_state')
+        exp_services.add_state(USER_ID, EXP_ID, 'first state')
         exploration = exp_services.get_exploration_by_id(EXP_ID)
 
         with self.assertRaisesRegexp(
@@ -447,13 +447,13 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_state(
                 USER_ID, EXP_ID, exploration.state_ids[0])
 
-        exp_services.add_state(USER_ID, EXP_ID, 'second_state')
+        exp_services.add_state(USER_ID, EXP_ID, 'second state')
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.delete_state(USER_ID, EXP_ID, exploration.state_ids[1])
 
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exp_services.delete_state(USER_ID, EXP_ID, 'fake_state')
+            exp_services.delete_state(USER_ID, EXP_ID, 'fake state')
 
     def test_state_operations(self):
         """Test adding, renaming and checking existence of states."""

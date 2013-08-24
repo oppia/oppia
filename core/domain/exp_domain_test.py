@@ -42,6 +42,19 @@ class FakeExploration(exp_domain.Exploration):
         self._pre_put_hook()
 
 
+class StateDomainUnitTests(test_utils.GenericTestBase):
+    """Test the state domain object."""
+
+    def test_validation(self):
+        """Test validation of states."""
+        state = exp_domain.State('id', 'name', [], [], None)
+
+        state.name = '_INVALID_'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character _ in state name'):
+            state.validate()
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
@@ -72,13 +85,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'exploration has no editors'):
             exp_services.save_exploration(USER_ID, exploration)
 
+        exploration.editor_ids = [USER_ID]
+        exploration.title = 'Hello #'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character #'):
+            exp_services.save_exploration(USER_ID, exploration)
+
     def test_init_state_property(self):
         """Test the init_state property."""
         exploration = FakeExploration(owner_id='owner@example.com')
         USER_ID = 'user_id'
 
         INIT_STATE_ID = 'init_state_id'
-        INIT_STATE_NAME = 'init_state_name'
+        INIT_STATE_NAME = 'init state name'
         init_state = exp_domain.State(
             INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
         exp_services.save_state(USER_ID, exploration.id, init_state)
@@ -88,7 +107,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
 
         second_state = exp_domain.State(
-            'unused_second_state', 'unused', [], [], None)
+            'unused_second_state', 'unused name', [], [], None)
         exp_services.save_state(USER_ID, exploration.id, second_state)
         exploration.state_ids.append(second_state.id)
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
