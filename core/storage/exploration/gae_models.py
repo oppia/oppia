@@ -119,6 +119,14 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     def _get_snapshot_id(cls, exploration_id, version_number):
         return '%s-%s' % (exploration_id, version_number)
 
+    @property
+    def exploration_id(self):
+        return self.id.split('-')[0]
+
+    @property
+    def version_number(self):
+        return self.id.split('-')[1]
+
     # The serialized version of the exploration, from which it can be
     # reconstituted later. Either this or diff_from_previous_version
     # should be set, but not both.

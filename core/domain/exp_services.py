@@ -409,6 +409,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration_model.delete()
 
+    for snapshot in exp_models.ExplorationSnapshotModel.get_all():
+        if snapshot.exploration_id == exploration_id:
+            snapshot.delete()
+
 
 # Operations involving exploration parameters.
 def get_or_create_param(committer_id, exploration_id, name, obj_type, values):
@@ -763,9 +767,3 @@ def delete_all_explorations():
     explorations = get_all_explorations()
     for exploration in explorations:
         delete_exploration(None, exploration.id, force_deletion=True)
-
-
-def delete_all_exploration_snapshots():
-    """Deletes all exploration snapshots."""
-    for snapshot in exp_models.ExplorationSnapshotModel.get_all():
-        snapshot.delete()
