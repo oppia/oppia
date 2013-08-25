@@ -111,7 +111,7 @@ class ExplorationModel(base_models.BaseModel):
     def put(self, committer_id, properties, snapshot=None, commit_message=''):
         """Updates the exploration using the properties dict, then saves it.
 
-        If snapshot is not None, increments the exploration version and saves
+        If snapshot is not null, increments the exploration version and saves
         a serialized copy or a diff in the history log.
         """
         if not isinstance(committer_id, basestring):
@@ -124,7 +124,7 @@ class ExplorationModel(base_models.BaseModel):
             if key in properties:
                 setattr(self, key, properties[key])
 
-        if snapshot != feconf.NULL_SNAPSHOT:
+        if snapshot and snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1
             if self.version == 1:
                 commit_message = 'Exploration first published.'

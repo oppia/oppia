@@ -33,7 +33,7 @@ class StateModel(base_models.BaseModel):
     	super(StateModel, self).__init__(**kwargs)
 
     @classmethod
-    def get(cls, unused_exploration_id, state_id, strict=True):
+    def get(cls, exploration_id, state_id, strict=True):
     	"""Gets a state by id."""
     	return super(StateModel, cls).get(state_id, strict=strict)
 
