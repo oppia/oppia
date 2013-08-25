@@ -101,9 +101,6 @@ END_DEST = 'END'
 # Default name for a state.
 DEFAULT_STATE_NAME = '(untitled state)'
 
-# Default file name for newly-created files for download.
-DEFAULT_FILE_NAME = 'New file'
-
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'
 

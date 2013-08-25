@@ -18,12 +18,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from core.controllers import base
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
-from core.domain import rule_domain
 from core.domain import stats_services
-from core.domain import widget_domain
 import utils
 
 EDITOR_MODE = 'editor'
@@ -187,12 +184,10 @@ class ExplorationDownloadHandler(base.BaseHandler):
         """Handles GET requests."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
         filename = 'oppia-%s' % utils.to_ascii(exploration.title)
-        if not filename:
-            filename = feconf.DEFAULT_FILE_NAME
 
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.txt' % filename)
+            'attachment; filename=%s.yaml' % filename)
 
         self.response.write(exp_services.export_to_yaml(exploration_id))
 
