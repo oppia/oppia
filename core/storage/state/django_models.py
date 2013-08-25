@@ -29,7 +29,10 @@ QUERY_LIMIT = 100
 class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
 
-    def __init__(self, unused_exploration_id, **kwargs):
+    def __init__(self, **kwargs):
+    	exploration_id = kwargs.get('exploration_id')
+    	if exploration_id:
+    	    del kwargs['exploration_id']
     	super(StateModel, self).__init__(**kwargs)
 
     @classmethod
