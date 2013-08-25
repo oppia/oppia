@@ -353,9 +353,10 @@ def save_state(committer_id, exploration_id, state):
 
     state.validate()
 
-    state_model = state_models.StateModel.get(state.id, strict=False)
+    state_model = state_models.StateModel.get(
+        exploration_id, state.id, strict=False)
     if state_model is None:
-        state_model = state_models.StateModel(id=state.id)
+        state_model = state_models.StateModel(exploration_id, id=state.id)
 
     state_model.value = state.to_dict()
     state_model.put()
@@ -388,7 +389,7 @@ def delete_state_model(exploration_id, state_id):
     """Directly deletes a state model."""
     state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
     memcache_services.delete(state_memcache_key)
-    state_model = state_models.StateModel.get(state_id)
+    state_model = state_models.StateModel.get(exploration_id, state_id)
     state_model.delete()
 
 

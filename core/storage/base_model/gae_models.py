@@ -43,13 +43,14 @@ class BaseModel(ndb.Model):
         """Raised when no entity for a given id exists in the datastore."""
 
     @classmethod
-    def get(cls, entity_id, strict=True):
+    def get(cls, entity_id, strict=True, parent=None):
         """Gets an entity by id. Fails noisily if strict == True.
 
         Args:
           entity_id: str. The id of the entity.
           strict: bool. Whether to fail noisily if no entity with the given id
             exists in the datastore.
+          parent: key of the parent, if applicable.
 
         Returns:
           None, if strict == False and no entity with the given id exists in
@@ -60,7 +61,7 @@ class BaseModel(ndb.Model):
         - base_models.BaseModel.EntityNotFoundError: if strict == True and
             no entity with the given id exists in the datastore.
         """
-        entity = cls.get_by_id(entity_id)
+        entity = cls.get_by_id(entity_id, parent=parent)
         if strict and not entity:
             raise cls.EntityNotFoundError(
                 'Entity for class %s with id %s not found' %

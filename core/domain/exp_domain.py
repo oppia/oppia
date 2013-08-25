@@ -303,7 +303,7 @@ class Exploration(object):
         for state_id in self.state_ids:
             # This raises an exception if the state_id does not exist.
             try:
-                state_models.StateModel.get(state_id)
+                state_models.StateModel.get(self.id, state_id)
             except base_models.BaseModel.EntityNotFoundError:
                 raise utils.ValidationError('Invalid state_id %s' % state_id)
 
@@ -326,7 +326,7 @@ class Exploration(object):
     def states(self):
         """A list of states for this exploration."""
         return [State.from_dict(
-            state_id, state_models.StateModel.get(state_id).value
+            state_id, state_models.StateModel.get(self.id, state_id).value
         ) for state_id in self.state_ids]
 
     @property

@@ -18,16 +18,32 @@
 
 __author__ = 'Sean Lip'
 
-from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import core.storage.base_model.gae_models as base_models
+import core.storage.exploration.gae_models as exp_models
 
 from google.appengine.ext import ndb
 
 
 class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
+
+    @classmethod
+    def _get_exploration_key(cls, exploration_id):
+    	return ndb.Key(
+    		exp_models.ExplorationModel._get_kind(), exploration_id)
+
+    def __init__(self, exploration_id, **kwargs):
+    	exploration_key = StateModel._get_exploration_key(exploration_id)
+    	super(StateModel, self).__init__(parent=exploration_key, **kwargs)
+
+    @classmethod
+    def get(cls, exploration_id, state_id, strict=True):
+    	"""Gets a state by id."""
+    	exploration_key = cls._get_exploration_key(exploration_id)
+    	return super(StateModel, cls).get(
+    		state_id, strict=strict, parent=exploration_key)
+
     # JSON representation of a state.
-    # TODO(sll): Prepend the exploration id to the id of this entity.
     value = ndb.JsonProperty(required=True)
     # When this entity was first created.
     created = ndb.DateTimeProperty(auto_now_add=True)

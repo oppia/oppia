@@ -28,6 +28,15 @@ QUERY_LIMIT = 100
 
 class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
+
+    def __init__(self, unused_exploration_id, **kwargs):
+    	super(StateModel, self).__init__(**kwargs)
+
+    @classmethod
+    def get(cls, unused_exploration_id, state_id, strict=True):
+    	"""Gets a state by id."""
+    	return super(StateModel, cls).get(state_id, strict=strict)
+
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.
     value = django_utils.JSONField(default={}, isdict=True)
