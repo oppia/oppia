@@ -16,10 +16,11 @@
 
 __author__ = 'Sean Lip'
 
-import feconf
 from core.domain import exp_services
 from core.domain import stats_services
+import feconf
 import test_utils
+import utils
 
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
@@ -456,7 +457,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_state(USER_ID, EXP_ID, 'fake state')
 
     def test_state_operations(self):
-        """Test adding, renaming and checking existence of states."""
+        """Test adding, updating and checking existence of states."""
         USER_ID = 'fake@user.com'
         EXP_ID = 'A exploration_id'
 
@@ -468,11 +469,15 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
 
+        def rename_state(committer_id, exp_id, state_id, new_state_name):
+            return exp_services.update_state(
+                committer_id, exp_id, state_id, new_state_name,
+                None, None, None, None, None, None)
+
         default_state = exp_services.get_state_by_id(
             exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
-        exp_services.rename_state(
-            USER_ID, EXP_ID, default_state.id, 'Renamed state')
+        rename_state(USER_ID, EXP_ID, default_state.id, 'Renamed state')
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
@@ -486,8 +491,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exp_services.rename_state(
-            USER_ID, EXP_ID, second_state.id, second_state.name)
+        rename_state(USER_ID, EXP_ID, second_state.id, second_state.name)
         renamed_second_state = exp_services.get_state_by_id(
             EXP_ID, second_state.id)
         self.assertEqual(renamed_second_state.name, 'State 2')
@@ -497,13 +501,12 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exp_services.add_state(USER_ID, EXP_ID, 'State 2')
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exp_services.rename_state(
-                USER_ID, EXP_ID, second_state.id, 'Renamed state')
+            rename_state(USER_ID, EXP_ID, second_state.id, 'Renamed state')
 
         # And it is not OK to rename a state to the END_DEST.
-        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exp_services.rename_state(
-                USER_ID, EXP_ID, second_state.id, feconf.END_DEST)
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid state name'):
+            rename_state(USER_ID, EXP_ID, second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
         exploration = exp_services.get_exploration_by_id(EXP_ID)

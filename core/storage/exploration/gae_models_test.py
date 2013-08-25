@@ -45,7 +45,7 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.is_public, False)
 
         state = state_models.StateModel(
-            exploration.id,
+            exploration_id=exploration.id,
             id='The state hash id',
             value={
                 'name': 'name', 'content': [], 'param_changes': [],

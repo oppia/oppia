@@ -38,6 +38,7 @@ from core.platform import models
 import feconf
 import jinja_utils
 memcache_services = models.Registry.import_memcache_services()
+transaction_services = models.Registry.import_transaction_services()
 (exp_models, image_models, state_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
 import utils
@@ -309,57 +310,67 @@ def save_exploration(committer_id, exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
-    versionable_dict = None
+    versionable_dict = feconf.NULL_SNAPSHOT
     if exploration.is_public:
         # This must be computed before memcache is cleared.
         versionable_dict = export_to_versionable_dict(exploration.id)
 
-    # TODO(sll): The rest of this should be done in a transaction.
-
     exploration_memcache_key = _get_exploration_memcache_key(exploration.id)
     memcache_services.delete(exploration_memcache_key)
 
-    exploration_model = exp_models.ExplorationModel.get(exploration.id)
-    properties_dict = {
-        'category': exploration.category,
-        'title': exploration.title,
-        'state_ids': exploration.state_ids,
-        'parameters': exploration.param_dicts,
-        'is_public': exploration.is_public,
-        'image_id': exploration.image_id,
-        'editor_ids': exploration.editor_ids,
-        'default_skin': exploration.default_skin,
-        'version': exploration_model.version,
-    }
+    def _save_exploration_transaction(
+            committer_id, exploration, versionable_dict):
+        # TODO(sll): Add check for current version.
+        exploration_model = exp_models.ExplorationModel.get(exploration.id)
+        properties_dict = {
+            'category': exploration.category,
+            'title': exploration.title,
+            'state_ids': exploration.state_ids,
+            'parameters': exploration.param_dicts,
+            'is_public': exploration.is_public,
+            'image_id': exploration.image_id,
+            'editor_ids': exploration.editor_ids,
+            'default_skin': exploration.default_skin,
+            'version': exploration_model.version,
+        }
 
-    if versionable_dict:
         # Create a snapshot for the version history.
-        exploration_model.put(
-            committer_id,
-            properties_dict,
-            snapshot=versionable_dict
-        )
-    else:
-        exploration_model.put(committer_id, properties_dict)
+        exploration_model.put(committer_id, properties_dict, versionable_dict)
+
+    transaction_services.run_in_transaction(
+        _save_exploration_transaction,
+        committer_id, exploration, versionable_dict)
 
 
 def save_state(committer_id, exploration_id, state):
     """Commits a state domain object to persistent storage.
 
-    The caller should also commit the exploration, if appropriate.
+    The caller should also commit the exploration, if appropriate. For safety,
+    calls to save_state() should be in a transaction with calls to
+    save_exploration() (or with datastore operations on the corresponding
+    Explorations).
     """
+    # TODO(sll): This should probably be refactored as follows: the exploration
+    # domain object would store a list that accumulates actions to perform
+    # when the exploration domain object is saved. This method would then not
+    # exist, so it cannot be called independently of save_exploration().
     state_memcache_key = _get_state_memcache_key(exploration_id, state.id)
     memcache_services.delete(state_memcache_key)
 
     state.validate()
 
-    state_model = state_models.StateModel.get(
-        exploration_id, state.id, strict=False)
-    if state_model is None:
-        state_model = state_models.StateModel(exploration_id, id=state.id)
+    def _save_state_transaction(committer_id, exploration_id, state):
+        state_model = state_models.StateModel.get(
+            exploration_id, state.id, strict=False)
+        if state_model is None:
+            state_model = state_models.StateModel(
+                id=state.id, exploration_id=exploration_id)
 
-    state_model.value = state.to_dict()
-    state_model.put()
+        state_model.value = state.to_dict()
+        state_model.put()
+
+    transaction_services.run_in_transaction(
+        _save_state_transaction, committer_id, exploration_id, state)
 
 
 def create_new(
@@ -374,12 +385,9 @@ def create_new(
     new_state = exp_domain.State(state_id, init_state_name, [], [], None)
     save_state(user_id, exploration_id, new_state)
 
-    # Note that demo explorations do not have owners, so user_id may be None.
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
-        image_id=image_id, state_ids=[state_id],
-        editor_ids=[user_id] if user_id else [])
-
+        image_id=image_id, state_ids=[state_id], editor_ids=[user_id])
     exploration_model.put(user_id, {})
 
     return exploration_model.id
@@ -538,28 +546,114 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
 
     state_id = state_id or state_models.StateModel.get_new_id(state_name)
     new_state = exp_domain.State(state_id, state_name, [], [], None)
-    save_state(committer_id, exploration_id, new_state)
 
-    exploration.state_ids.append(state_id)
-    save_exploration(committer_id, exploration)
+    def _add_state_transaction(committer_id, exploration_id, new_state):
+        save_state(committer_id, exploration_id, new_state)
+        exploration = get_exploration_by_id(exploration_id)
+        exploration.state_ids.append(state_id)
+        save_exploration(committer_id, exploration)
+
+    transaction_services.run_in_transaction(
+        _add_state_transaction, committer_id, exploration_id, new_state)
 
 
-def rename_state(committer_id, exploration_id, state_id, new_state_name):
-    """Renames a state of this exploration. Commits changes."""
-    if new_state_name == feconf.END_DEST:
-        raise ValueError('Invalid state name: %s' % feconf.END_DEST)
-
-    state = get_state_by_id(exploration_id, state_id)
-    if state.name == new_state_name:
-        return get_exploration_by_id(exploration_id)
-
+def update_state(committer_id, exploration_id, state_id, new_state_name,
+                 param_changes, interactive_widget, interactive_params,
+                 sticky_interactive_widget, interactive_rulesets, content):
+    """Updates the given state, and commits changes."""
     exploration = get_exploration_by_id(exploration_id)
-    if exploration.has_state_named(new_state_name):
-        raise ValueError('Duplicate state name: %s' % new_state_name)
+    state = get_state_by_id(exploration_id, state_id)
 
-    state.name = new_state_name
-    save_state(committer_id, exploration_id, state)
-    save_exploration(committer_id, exploration)
+    if new_state_name:
+        if (state.name != new_state_name and
+                exploration.has_state_named(new_state_name)):
+            raise ValueError('Duplicate state name: %s' % new_state_name)
+        state.name = new_state_name
+
+    if param_changes:
+        state.param_changes = []
+        for param_change in param_changes:
+            param_instance = get_param_instance(
+                exploration_id, param_change['name'], None,
+                param_change['values'])
+
+            if not any([param.name == param_change['name']
+                        for param in exploration.parameters]):
+                exploration.parameters.append(param_instance)
+
+            state.param_changes.append(param_instance)
+
+    if interactive_widget:
+        state.widget.widget_id = interactive_widget
+
+    if interactive_params is not None:
+        state.widget.params = interactive_params
+
+    if sticky_interactive_widget is not None:
+        state.widget.sticky = sticky_interactive_widget
+
+    if interactive_rulesets:
+        ruleset = interactive_rulesets['submit']
+        utils.recursively_remove_key(ruleset, u'$$hashKey')
+
+        state.widget.handlers = [
+            exp_domain.AnswerHandlerInstance('submit', [])]
+
+        generic_widget = widget_domain.Registry.get_widget_by_id(
+            'interactive', state.widget.widget_id)
+
+        # TODO(yanamal): Do additional calculations here to get the
+        # parameter changes, if necessary.
+        for rule_ind in range(len(ruleset)):
+            rule = ruleset[rule_ind]
+            state_rule = exp_domain.RuleSpec(
+                rule.get('name'), rule.get('inputs'), rule.get('dest'),
+                rule.get('feedback'), []
+            )
+
+            if rule['description'] == feconf.DEFAULT_RULE_NAME:
+                if (rule_ind != len(ruleset) - 1 or
+                        rule['name'] != feconf.DEFAULT_RULE_NAME):
+                    raise ValueError('Invalid ruleset: the last rule '
+                                     'should be a default rule.')
+            else:
+                matched_rule = generic_widget.get_rule_by_name(
+                    'submit', state_rule.name)
+
+                # Normalize and store the rule params.
+                for param_name in state_rule.inputs:
+                    value = state_rule.inputs[param_name]
+                    param_type = rule_domain.get_obj_type_for_param_name(
+                        matched_rule, param_name)
+
+                    if (not isinstance(value, basestring) or
+                            '{{' not in value or '}}' not in value):
+                        normalized_param = param_type.normalize(value)
+                    else:
+                        normalized_param = value
+
+                    if normalized_param is None:
+                        raise Exception(
+                            '%s has the wrong type. Please replace it '
+                            'with a %s.' % (value, param_type.__name__))
+
+                    state_rule.inputs[param_name] = normalized_param
+
+            state.widget.handlers[0].rule_specs.append(state_rule)
+
+    if content:
+        state.content = [
+            exp_domain.Content(item['type'], item['value'])
+            for item in content
+        ]
+
+    def _update_state_transaction(committer_id, exploration_id, state):
+        save_state(committer_id, exploration_id, state)
+        exploration = get_exploration_by_id(exploration_id)
+        save_exploration(committer_id, exploration)
+
+    transaction_services.run_in_transaction(
+        _update_state_transaction, committer_id, exploration_id, state)
 
 
 def delete_state(committer_id, exploration_id, state_id):
@@ -573,23 +667,29 @@ def delete_state(committer_id, exploration_id, state_id):
     if exploration.state_ids[0] == state_id:
         raise ValueError('Cannot delete initial state of an exploration.')
 
-    # Find all destinations in the exploration which equal the deleted
-    # state, and change them to loop back to their containing state.
-    for other_state_id in exploration.state_ids:
-        other_state = get_state_by_id(exploration_id, other_state_id)
-        changed = False
-        for handler in other_state.widget.handlers:
-            for rule in handler.rule_specs:
-                if rule.dest == state_id:
-                    rule.dest = other_state_id
-                    changed = True
-        if changed:
-            save_state(committer_id, exploration_id, other_state)
+    def _delete_state_transaction(committer_id, exploration_id, state_id):
+        exploration = get_exploration_by_id(exploration_id)
 
-    # Delete the state with id state_id.
-    delete_state_model(exploration_id, state_id)
-    exploration.state_ids.remove(state_id)
-    save_exploration(committer_id, exploration)
+        # Find all destinations in the exploration which equal the deleted
+        # state, and change them to loop back to their containing state.
+        for other_state_id in exploration.state_ids:
+            other_state = get_state_by_id(exploration_id, other_state_id)
+            changed = False
+            for handler in other_state.widget.handlers:
+                for rule in handler.rule_specs:
+                    if rule.dest == state_id:
+                        rule.dest = other_state_id
+                        changed = True
+            if changed:
+                save_state(committer_id, exploration_id, other_state)
+
+        # Delete the state with id state_id.
+        delete_state_model(exploration_id, state_id)
+        exploration.state_ids.remove(state_id)
+        save_exploration(committer_id, exploration)
+
+    transaction_services.run_in_transaction(
+        _delete_state_transaction, committer_id, exploration_id, state_id)
 
 
 def _find_first_match(handler, all_rule_classes, answer, state_params):

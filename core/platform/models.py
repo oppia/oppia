@@ -60,6 +60,11 @@ class _Django(_Platform):
         return tuple(returned_models)
 
     @classmethod
+    def import_transaction_services(cls):
+        from core.platform.transactions import django_transaction_services
+        return django_transaction_services
+
+    @classmethod
     def import_user_services(cls):
         from core.platform.users import django_user_services
         return django_user_services
@@ -99,6 +104,11 @@ class _Gae(_Platform):
         return tuple(returned_models)
 
     @classmethod
+    def import_transaction_services(cls):
+        from core.platform.transactions import gae_transaction_services
+        return gae_transaction_services
+
+    @classmethod
     def import_user_services(cls):
         from core.platform.users import gae_user_services
         return gae_user_services
@@ -128,6 +138,10 @@ class Registry(object):
     @classmethod
     def import_user_services(cls):
         return cls._get().import_user_services()
+
+    @classmethod
+    def import_transaction_services(cls):
+        return cls._get().import_transaction_services()
 
     @classmethod
     def import_memcache_services(cls):

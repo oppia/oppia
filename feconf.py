@@ -142,3 +142,6 @@ HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M'
 INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd' + chr(127)
 for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
+
+# A sentinel value to indicate that no exploration snapshot should be saved.
+NULL_SNAPSHOT = {}

@@ -223,6 +223,10 @@ class State(object):
                 raise utils.ValidationError(
                     'Invalid character %s in state name %s' % (c, self.name))
 
+        if self.name == feconf.END_DEST:
+            raise utils.ValidationError(
+                'Invalid state name: %s' % feconf.END_DEST)
+
         # TODO(sll): This needs lots more validation.
         pass
 

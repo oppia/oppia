@@ -212,98 +212,18 @@ class StateHandler(base.BaseHandler):
         sticky_interactive_widget = self.payload.get(
             'sticky_interactive_widget')
         content = self.payload.get('content')
-        resolved_answers = self.payload.get('resolved_answers')
 
-        if 'state_name' in self.payload:
-            exp_services.rename_state(
-                self.user_id, exploration_id, state_id, state_name)
-
-        state = exp_services.get_state_by_id(exploration_id, state_id)
-        if 'param_changes' in self.payload:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-
-            state.param_changes = []
-            for param_change in param_changes:
-                param_instance = exp_services.get_param_instance(
-                    exploration_id, param_change['name'], None,
-                    param_change['values'])
-
-                if not any([param.name == param_change['name']
-                            for param in exploration.parameters]):
-                    exploration.parameters.append(param_instance)
-
-                state.param_changes.append(param_instance)
-
-        if interactive_widget:
-            state.widget.widget_id = interactive_widget
-
-        if interactive_params is not None:
-            state.widget.params = interactive_params
-
-        if sticky_interactive_widget is not None:
-            state.widget.sticky = sticky_interactive_widget
-
-        if interactive_rulesets:
-            ruleset = interactive_rulesets['submit']
-            utils.recursively_remove_key(ruleset, u'$$hashKey')
-
-            state.widget.handlers = [
-                exp_domain.AnswerHandlerInstance('submit', [])]
-
-            generic_widget = widget_domain.Registry.get_widget_by_id(
-                'interactive', state.widget.widget_id)
-
-            # TODO(yanamal): Do additional calculations here to get the
-            # parameter changes, if necessary.
-            for rule_ind in range(len(ruleset)):
-                rule = ruleset[rule_ind]
-                state_rule = exp_domain.RuleSpec(
-                    rule.get('name'), rule.get('inputs'), rule.get('dest'),
-                    rule.get('feedback'), []
-                )
-
-                if rule['description'] == feconf.DEFAULT_RULE_NAME:
-                    if (rule_ind != len(ruleset) - 1 or
-                            rule['name'] != feconf.DEFAULT_RULE_NAME):
-                        raise ValueError('Invalid ruleset: the last rule '
-                                         'should be a default rule.')
-                else:
-                    matched_rule = generic_widget.get_rule_by_name(
-                        'submit', state_rule.name)
-
-                    # Normalize and store the rule params.
-                    for param_name in state_rule.inputs:
-                        value = state_rule.inputs[param_name]
-                        param_type = rule_domain.get_obj_type_for_param_name(
-                            matched_rule, param_name)
-
-                        if (not isinstance(value, basestring) or
-                                '{{' not in value or '}}' not in value):
-                            normalized_param = param_type.normalize(value)
-                        else:
-                            normalized_param = value
-
-                        if normalized_param is None:
-                            raise self.InvalidInputException(
-                                '%s has the wrong type. Please replace it '
-                                'with a %s.' % (value, param_type.__name__))
-
-                        state_rule.inputs[param_name] = normalized_param
-
-                state.widget.handlers[0].rule_specs.append(state_rule)
-
-        if content:
-            state.content = [
-                exp_domain.Content(item['type'], item['value'])
-                for item in content
-            ]
+        exp_services.update_state(
+            self.user_id, exploration_id, state_id, state_name, param_changes,
+            interactive_widget, interactive_params, interactive_rulesets,
+            sticky_interactive_widget, content
+        )
 
         if 'resolved_answers' in self.payload:
             stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit', resolved_answers)
+                exploration_id, state_id, 'submit',
+                self.payload.get('resolved_answers'))
 
-        exp_services.save_state(self.user_id, exploration_id, state)
-        exp_services.save_exploration(self.user_id, exploration)
         self.render_json(exp_services.export_state_to_verbose_dict(
             exploration_id, state_id))
 

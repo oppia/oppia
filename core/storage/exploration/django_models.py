@@ -124,7 +124,7 @@ class ExplorationModel(base_models.BaseModel):
             if key in properties:
                 setattr(self, key, properties[key])
 
-        if snapshot is not None:
+        if snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1
             if self.version == 1:
                 commit_message = 'Exploration first published.'

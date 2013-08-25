@@ -32,8 +32,12 @@ class StateModel(base_models.BaseModel):
     	return ndb.Key(
     		exp_models.ExplorationModel._get_kind(), exploration_id)
 
-    def __init__(self, exploration_id, **kwargs):
-    	exploration_key = StateModel._get_exploration_key(exploration_id)
+    def __init__(self, **kwargs):
+    	exploration_id = kwargs.get('exploration_id')
+    	exploration_key = None
+    	if exploration_id:
+    	    exploration_key = StateModel._get_exploration_key(exploration_id)
+    	    del kwargs['exploration_id']
     	super(StateModel, self).__init__(parent=exploration_key, **kwargs)
 
     @classmethod
