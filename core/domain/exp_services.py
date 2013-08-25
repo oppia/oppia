@@ -415,11 +415,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations involving exploration parameters.
-def get_or_create_param(committer_id, exploration_id, name, obj_type, values):
+def get_param_instance(exploration_id, name, obj_type, values):
     """Returns a Parameter instance corresponding to the given inputs.
 
-    If the parameter does not exist in the given exploration, it is added to
-    the list of exploration parameters.
+    The caller is responsible for adding the new parameter to the exploration
+    parameter list, if it does not already exist.
 
     If the obj_type is None, it is taken to be 'TemplatedString' if any element
     of values contains '{{' and '}}' characters, and 'UnicodeString' otherwise.
@@ -440,19 +440,17 @@ def get_or_create_param(committer_id, exploration_id, name, obj_type, values):
                 return param_domain.Parameter(
                     param.name, param.obj_type, values)
 
-    # The parameter was not found, so add it.
+    # The parameter was not found, so create a new one.
     if obj_type is None:
-        is_template = False
+        is_templated_string = False
         for value in values:
             if (isinstance(value, basestring) and
                     '{{' in value and '}}' in value):
-                is_template = True
-        obj_type = ('TemplatedString' if is_template else 'UnicodeString')
+                is_templated_string = True
+        obj_type = ('TemplatedString' if is_templated_string
+                    else 'UnicodeString')
 
     added_param = param_domain.Parameter(name, obj_type, values)
-
-    exploration.parameters.append(added_param)
-    save_exploration(committer_id, exploration)
 
     return added_param
 
@@ -647,13 +645,12 @@ def create_from_yaml(
     init_state_name = exploration_dict['states'][0]['name']
 
     # TODO(sll): Import the default skin too.
-    exploration = get_exploration_by_id(create_new(
+    exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name, image_id=image_id))
-    exploration_id = exploration.id
+        init_state_name=init_state_name, image_id=image_id)
 
     try:
-        exploration.parameters = [
+        exploration_params = [
             param_domain.Parameter.from_dict(param_dict)
             for param_dict in exploration_dict['parameters']
         ]
@@ -670,10 +667,14 @@ def create_from_yaml(
                 for item in sdict['content']
             ]
 
-            state.param_changes = [get_or_create_param(
-                user_id, exploration_id, pc['name'],
-                pc['obj_type'], pc['values']
+            state.param_changes = [get_param_instance(
+                exploration_id, pc['name'], pc['obj_type'], pc['values']
             ) for pc in sdict['param_changes']]
+
+            for pc in state.param_changes:
+                if not any([param.name == pc.name
+                            for param in exploration_params]):
+                    exploration_params.append(pc)
 
             wdict = sdict['widget']
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
@@ -694,11 +695,14 @@ def create_from_yaml(
 
             save_state(user_id, exploration_id, state)
 
+        exploration = get_exploration_by_id(exploration_id)
+        exploration.parameters = exploration_params
+        save_exploration(user_id, exploration)
     except Exception:
         delete_exploration(user_id, exploration.id, force_deletion=True)
         raise
 
-    return exploration.id
+    return exploration_id
 
 
 def fork_exploration(exploration_id, user_id):

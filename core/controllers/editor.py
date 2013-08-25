@@ -107,6 +107,7 @@ class ExplorationHandler(base.BaseHandler):
             'states': state_list,
             'parameters': [param.to_dict()
                            for param in exploration.parameters],
+            'version': exploration.version,
             # Add information about the most recent versions.
             'snapshots': exp_services.get_exploration_snapshots_metadata(
                 exploration_id, DEFAULT_NUM_SNAPSHOTS),
@@ -219,12 +220,19 @@ class StateHandler(base.BaseHandler):
 
         state = exp_services.get_state_by_id(exploration_id, state_id)
         if 'param_changes' in self.payload:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+
             state.param_changes = []
             for param_change in param_changes:
-                instance = exp_services.get_or_create_param(
-                    self.user_id, exploration_id, param_change['name'], None,
+                param_instance = exp_services.get_param_instance(
+                    exploration_id, param_change['name'], None,
                     param_change['values'])
-                state.param_changes.append(instance)
+
+                if not any([param.name == param_change['name']
+                            for param in exploration.parameters]):
+                    exploration.parameters.append(param_instance)
+
+                state.param_changes.append(param_instance)
 
         if interactive_widget:
             state.widget.widget_id = interactive_widget
@@ -295,6 +303,7 @@ class StateHandler(base.BaseHandler):
                 exploration_id, state_id, 'submit', resolved_answers)
 
         exp_services.save_state(self.user_id, exploration_id, state)
+        exp_services.save_exploration(self.user_id, exploration)
         self.render_json(exp_services.export_state_to_verbose_dict(
             exploration_id, state_id))
 
