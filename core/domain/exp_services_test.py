@@ -311,9 +311,10 @@ states:
             }]
         }
 
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(
             expected_dict,
-            exp_services.export_to_versionable_dict(EXP_ID)
+            exp_services.export_to_versionable_dict(exploration)
         )
 
     def test_export_state_to_dict(self):
@@ -539,6 +540,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 1,
         }, snapshots_metadata[0])
 
+        # Using the old version of the exploration should raise an error.
+        with self.assertRaisesRegexp(Exception, 'version 0, which is too old'):
+            exp_services.save_exploration('committer_id_2', exploration)
+
+        exploration = exp_services.get_exploration_by_id(eid)
         exploration.title = 'New title'
         exp_services.save_exploration('committer_id_2', exploration)
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(

@@ -123,6 +123,13 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
 
         state_name = self.payload.get('state_name')
         if not state_name:
@@ -131,12 +138,25 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.add_state(self.user_id, exploration_id, state_name)
         state_id = exp_services.convert_state_name_to_id(
             exploration_id, state_name)
-        self.render_json(exp_services.export_state_to_verbose_dict(
-            exploration_id, state_id))
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version,
+            'stateData': exp_services.export_state_to_verbose_dict(
+                exploration_id, state_id)
+        })
 
     @base.require_editor
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
 
         is_public = self.payload.get('is_public')
         category = self.payload.get('category')
@@ -145,7 +165,6 @@ class ExplorationHandler(base.BaseHandler):
         editors = self.payload.get('editors')
         parameters = self.payload.get('parameters')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
         if is_public:
             exploration.is_public = True
         if category:
@@ -170,26 +189,15 @@ class ExplorationHandler(base.BaseHandler):
 
         exp_services.save_exploration(self.user_id, exploration)
 
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version
+        })
+
     @base.require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
         exp_services.delete_exploration(self.user_id, exploration_id)
-
-
-class ExplorationDownloadHandler(base.BaseHandler):
-    """Downloads an exploration as a YAML file."""
-
-    @base.require_editor
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        filename = 'oppia-%s' % utils.to_ascii(exploration.title)
-
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.yaml' % filename)
-
-        self.response.write(exp_services.export_to_yaml(exploration_id))
 
 
 class StateHandler(base.BaseHandler):
@@ -198,6 +206,19 @@ class StateHandler(base.BaseHandler):
     @base.require_editor
     def put(self, exploration_id, state_id):
         """Saves updates to a state."""
+
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration_id, state_id, 'submit',
+                self.payload.get('resolved_answers'))
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
 
         state_name = self.payload.get('state_name')
         param_changes = self.payload.get('param_changes')
@@ -214,15 +235,39 @@ class StateHandler(base.BaseHandler):
             sticky_interactive_widget, content
         )
 
-        if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit',
-                self.payload.get('resolved_answers'))
-
-        self.render_json(exp_services.export_state_to_verbose_dict(
-            exploration_id, state_id))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version,
+            'stateData': exp_services.export_state_to_verbose_dict(
+                exploration_id, state_id)
+        })
 
     @base.require_editor
     def delete(self, exploration_id, state_id):
         """Deletes the state with id state_id."""
+        # TODO(sll): Add a version check here. This probably involves NOT using
+        # delete(), but regarding this as an exploration put() instead. Or the
+        # param can be passed via the URL.
+
         exp_services.delete_state(self.user_id, exploration_id, state_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version
+        })
+
+
+class ExplorationDownloadHandler(base.BaseHandler):
+    """Downloads an exploration as a YAML file."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        filename = 'oppia-%s-v%s' % (
+            utils.to_ascii(exploration.title), exploration.version)
+
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s.yaml' % filename)
+
+        self.response.write(exp_services.export_to_yaml(exploration_id))

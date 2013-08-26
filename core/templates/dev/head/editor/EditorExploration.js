@@ -327,10 +327,14 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.parameters.push({name:name, obj_type:type});
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({parameters: $scope.parameters}),
+        $scope.createRequest({
+          parameters: $scope.parameters,
+          version: explorationData.data.version
+        }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               console.log('PUT request succeeded');
+              explorationData.data.version = data.version;
             }).
             error(function(data) {
               warningsData.addWarning(
@@ -364,10 +368,14 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({editors: $scope.explorationEditors}),
+        $scope.createRequest({
+          editors: $scope.explorationEditors,
+          version: explorationData.data.version
+        }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               console.log('PUT request succeeded');
+              explorationData.data.version = data.version;
             }).
             error(function(data) {
               warningsData.addWarning(
@@ -420,6 +428,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
     var requestParameters = {};
     requestParameters[backendName] = newValue;
+    requestParameters['version'] = explorationData.data.version;
 
     $http.put(
         $scope.explorationDataUrl,
@@ -430,11 +439,15 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
                 $scope[frontendName] = newValue;
               }
               console.log('PUT request succeeded');
+              explorationData.data.version = data.version;
             }).
             error(function(data) {
+              console.log('ERROR');
               warningsData.addWarning(
                   'Error modifying exploration properties: ' + data.error);
-              $scope[frontendName] = oldValue;
+              // TODO(sll): Reinstate the following line without causing the
+              //     $watch to trigger.
+              // $scope[frontendName] = oldValue;
             });
   };
 
@@ -472,14 +485,18 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http.post(
         $scope.explorationDataUrl,
-        $scope.createRequest({state_name: newStateName}),
+        $scope.createRequest({
+          state_name: newStateName,
+          version: explorationData.data.version
+        }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
-              $scope.states[data.id] = data;
+              $scope.states[data.stateData.id] = data.stateData;
               $scope.drawGraph();
+              explorationData.data.version = data.version;
               if (successCallback) {
-                successCallback(data.id);
+                successCallback(data.stateData.id);
               }
             }).error(function(data) {
               // TODO(sll): Actually force a refresh, since the data on the
@@ -514,6 +531,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
     .success(function(data) {
+      // Reloads the page.
+      explorationData.data.version = data.version;
       window.location = $scope.explorationUrl;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
@@ -687,10 +706,14 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     // addParameter)
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({parameters: $scope.parameters}),
+        $scope.createRequest({
+          parameters: $scope.parameters,
+          version: explorationData.data.version
+        }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               console.log('PUT request succeeded');
+              explorationData.data.version = data.version;
             }).
             error(function(data) {
               warningsData.addWarning(

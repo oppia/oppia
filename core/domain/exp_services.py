@@ -254,7 +254,7 @@ def export_content_to_html(content_array, block_number, params=None):
     return html, widget_array
 
 
-def export_to_versionable_dict(exploration_id):
+def export_to_versionable_dict(exploration):
     """Returns a serialized version of this exploration for versioning.
 
     The criterion for whether an item is included in the return dict is:
@@ -271,14 +271,13 @@ def export_to_versionable_dict(exploration_id):
     For states, all properties except 'id' are versioned. State dests are
     specified using names and not ids.
     """
-    exploration = get_exploration_by_id(exploration_id)
-
+    # TODO(sll): Make this a part of save_exploration().
     params = [{
         'name': param.name, 'obj_type': param.obj_type, 'values': param.values
     } for param in exploration.parameters]
 
     states_list = [export_state_internals_to_dict(
-        exploration_id, state_id, human_readable_dests=True)
+        exploration.id, state_id, human_readable_dests=True)
         for state_id in exploration.state_ids]
 
     return {
@@ -310,18 +309,24 @@ def save_exploration(committer_id, exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
-    versionable_dict = feconf.NULL_SNAPSHOT
-    if exploration.is_public:
-        # This must be computed before memcache is cleared.
-        versionable_dict = export_to_versionable_dict(exploration.id)
-
-    exploration_memcache_key = _get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exploration_memcache_key)
-
-    def _save_exploration_transaction(
-            committer_id, exploration, versionable_dict):
-        # TODO(sll): Add check for current version.
+    def _save_exploration_transaction(committer_id, exploration):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
+        if exploration.version != exploration_model.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration_model.version, exploration.version))
+
+        versionable_dict = feconf.NULL_SNAPSHOT
+        if exploration.is_public:
+            # This must be computed before memcache is cleared.
+            # TODO(sll): Is this correct?
+            versionable_dict = export_to_versionable_dict(exploration)
+
+        exploration_memcache_key = _get_exploration_memcache_key(
+            exploration.id)
+        memcache_services.delete(exploration_memcache_key)
+        
         properties_dict = {
             'category': exploration.category,
             'title': exploration.title,
@@ -338,8 +343,7 @@ def save_exploration(committer_id, exploration):
         exploration_model.put(committer_id, properties_dict, versionable_dict)
 
     transaction_services.run_in_transaction(
-        _save_exploration_transaction,
-        committer_id, exploration, versionable_dict)
+        _save_exploration_transaction, committer_id, exploration)
 
 
 def save_state(committer_id, exploration_id, state):
