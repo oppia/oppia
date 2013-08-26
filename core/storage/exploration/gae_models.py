@@ -27,6 +27,36 @@ from google.appengine.ext import ndb
 QUERY_LIMIT = 100
 
 
+class StateModel(base_models.BaseModel):
+    """A state, represented as a JSON blob."""
+
+    @classmethod
+    def _get_exploration_key(cls, exploration_id):
+        return ndb.Key(ExplorationModel._get_kind(), exploration_id)
+
+    def __init__(self, **kwargs):
+        exploration_id = kwargs.get('exploration_id')
+        exploration_key = None
+        if exploration_id:
+            exploration_key = StateModel._get_exploration_key(exploration_id)
+            del kwargs['exploration_id']
+        super(StateModel, self).__init__(parent=exploration_key, **kwargs)
+
+    @classmethod
+    def get(cls, exploration_id, state_id, strict=True):
+        """Gets a state by id."""
+        exploration_key = cls._get_exploration_key(exploration_id)
+        return super(StateModel, cls).get(
+            state_id, strict=strict, parent=exploration_key)
+
+    # JSON representation of a state.
+    value = ndb.JsonProperty(required=True)
+    # When this entity was first created.
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    # When this entity was last updated.
+    last_updated = ndb.DateTimeProperty(auto_now=True)
+
+
 class ExplorationModel(base_models.BaseModel):
     """Storage model for the Oppia exploration at HEAD.
 
@@ -170,7 +200,6 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     def save_snapshot(cls, exploration_id, version_number, committer_id,
                       json_blob, commit_message, is_diff):
         """Saves a new snapshot for the given exploration."""
-        # TODO(sll): Run this in a transaction.
 
         if not isinstance(version_number, int) or version_number < 0:
             raise Exception('Invalid version number: %s' % version_number)

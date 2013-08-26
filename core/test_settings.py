@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'django_nose',
     'core.storage.base_model',
     'core.storage.image',
-    'core.storage.state',
     'core.storage.exploration',
     'core.storage.statistics',
 )

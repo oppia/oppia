@@ -39,8 +39,8 @@ import feconf
 import jinja_utils
 memcache_services = models.Registry.import_memcache_services()
 transaction_services = models.Registry.import_transaction_services()
-(exp_models, image_models, state_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.image, models.NAMES.state])
+(exp_models, image_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.image])
 import utils
 
 
@@ -364,10 +364,10 @@ def save_state(committer_id, exploration_id, state):
     state.validate()
 
     def _save_state_transaction(committer_id, exploration_id, state):
-        state_model = state_models.StateModel.get(
+        state_model = exp_models.StateModel.get(
             exploration_id, state.id, strict=False)
         if state_model is None:
-            state_model = state_models.StateModel(
+            state_model = exp_models.StateModel(
                 id=state.id, exploration_id=exploration_id)
 
         state_model.value = state.to_dict()
@@ -385,7 +385,7 @@ def create_new(
     exploration_id = (exploration_id or
                       exp_models.ExplorationModel.get_new_id(title))
 
-    state_id = state_models.StateModel.get_new_id(init_state_name)
+    state_id = exp_models.StateModel.get_new_id(init_state_name)
     new_state = exp_domain.State(state_id, init_state_name, [], [], None)
     save_state(user_id, exploration_id, new_state)
 
@@ -401,7 +401,7 @@ def delete_state_model(exploration_id, state_id):
     """Directly deletes a state model."""
     state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
     memcache_services.delete(state_memcache_key)
-    state_model = state_models.StateModel.get(exploration_id, state_id)
+    state_model = exp_models.StateModel.get(exploration_id, state_id)
     state_model.delete()
 
 
@@ -548,7 +548,7 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
     if exploration.has_state_named(state_name):
         raise ValueError('Duplicate state name %s' % state_name)
 
-    state_id = state_id or state_models.StateModel.get_new_id(state_name)
+    state_id = state_id or exp_models.StateModel.get_new_id(state_name)
     new_state = exp_domain.State(state_id, state_name, [], [], None)
 
     def _add_state_transaction(committer_id, exploration_id, new_state):

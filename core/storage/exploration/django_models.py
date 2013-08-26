@@ -29,6 +29,29 @@ import feconf
 QUERY_LIMIT = 100
 
 
+class StateModel(base_models.BaseModel):
+    """A state, represented as a JSON blob."""
+
+    def __init__(self, **kwargs):
+        exploration_id = kwargs.get('exploration_id')
+        if exploration_id:
+            del kwargs['exploration_id']
+        super(StateModel, self).__init__(**kwargs)
+
+    @classmethod
+    def get(cls, exploration_id, state_id, strict=True):
+        """Gets a state by id."""
+        return super(StateModel, cls).get(state_id, strict=strict)
+
+    # JSON representation of a state.
+    # TODO(sll): Prepend the exploration id to the id of this entity.
+    value = django_utils.JSONField(default={}, isdict=True)
+    # When this entity was first created.
+    created = models.DateTimeField(auto_now_add=True)
+    # When this entity was last updated.
+    last_updated = models.DateTimeField(auto_now=True)
+
+
 class ExplorationModel(base_models.BaseModel):
     """Storage model for an Oppia exploration.
 
@@ -63,7 +86,8 @@ class ExplorationModel(base_models.BaseModel):
 
     # The list of parameters associated with this exploration.
     parameters = django_utils.JSONField(
-        blank=True, default=[], primitivelist=True, validators=[validate_parameters]
+        blank=True, default=[], primitivelist=True,
+        validators=[validate_parameters]
     )
 
     # Whether this exploration is publicly viewable.
@@ -195,7 +219,6 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     def save_snapshot(cls, exploration_id, version_number, committer_id,
                       json_blob, commit_message, is_diff):
         """Saves a new snapshot for the given exploration."""
-        # TODO(sll): Run this in a transaction.
 
         if not isinstance(version_number, int) or version_number < 0:
             raise Exception('Invalid version number: %s' % version_number)

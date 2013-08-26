@@ -25,8 +25,15 @@ import test_utils
 if feconf.PLATFORM == 'gae':
     import core.storage.exploration.gae_models as exp_models
     import core.storage.image.gae_models as image_models
-    import core.storage.state.gae_models as state_models
     from google.appengine.ext import db
+
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class StateModelUnitTests(test_utils.GenericTestBase):
+    """Test the state model."""
+
+    pass
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
@@ -44,7 +51,7 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        state = state_models.StateModel(
+        state = exp_models.StateModel(
             exploration_id=exploration.id,
             id='The state hash id',
             value={
