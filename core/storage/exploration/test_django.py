@@ -43,7 +43,7 @@ class ExplorationModelUnitTests(unittest.TestCase):
         self.assertEqual(exploration.is_public, False)
 
         state = exp_models.StateModel(
-            exploration.id,
+            exploration_id=exploration.id,
             id='The state hash id', value={
                 'name': 'name', 'content': [], 'param_changes': [],
                 'widget': None

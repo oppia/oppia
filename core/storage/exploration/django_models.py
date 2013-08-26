@@ -153,8 +153,9 @@ class ExplorationModel(base_models.BaseModel):
             if self.version == 1:
                 commit_message = 'Exploration first published.'
             ExplorationSnapshotModel.save_snapshot(
-                self.id, self.version, committer_id, snapshot, commit_message,
-                False)
+                self.id, self.version, committer_id,
+                ExplorationSnapshotContentModel.FORMAT_TYPE_FULL,
+                snapshot, commit_message)
 
         super(ExplorationModel, self).put()
 
@@ -174,18 +175,6 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     def version_number(self):
         return self.id.split('-')[1]
 
-    # The serialized version of the exploration, from which it can be
-    # reconstituted later. Either this or diff_from_previous_version
-    # should be set, but not both.
-    serialized_exploration = django_utils.JSONField(
-        blank=True, isdict=True, default={})
-    # The diff from the previous version. It should be possible to apply this
-    # diff to the previous exploration to get the serialized form of the
-    # current exploration. Either this or serialized_exploration should be
-    # set, but not both.
-    diff_from_previous_version = django_utils.JSONField(
-        blank=True, isdict=True, default={})
-
     # The id of the user who committed this revision.
     committer_id = models.CharField(max_length=100)
     # A brief commit message.
@@ -203,10 +192,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     def get_metadata(cls, exploration_id, version_number):
         """Returns a dict representing an exploration snapshot."""
         snapshot_id = cls._get_snapshot_id(exploration_id, version_number)
-
         snapshot = cls.get(snapshot_id)
-        # TODO(sll): Do a projection query so that the serialized exploration
-        # or the diff are only fetched on demand from the datastore.
         return {
             'committer_id': snapshot.committer_id,
             'commit_message': snapshot.commit_message,
@@ -217,7 +203,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
 
     @classmethod
     def save_snapshot(cls, exploration_id, version_number, committer_id,
-                      json_blob, commit_message, is_diff):
+                      snapshot_format, json_blob, commit_message):
         """Saves a new snapshot for the given exploration."""
 
         if not isinstance(version_number, int) or version_number < 0:
@@ -231,14 +217,66 @@ class ExplorationSnapshotModel(base_models.BaseModel):
                 'Snapshot with exploration id %s and version number %s '
                 'already exists' % (exploration_id, version_number))
 
-        if not json_blob:
-            raise Exception('No change detected for versioned exploration.')
-    
+        # Save the snapshot content.    
+        ExplorationSnapshotContentModel.save_snapshot_content(
+            snapshot_id, snapshot_format, json_blob)
+
         snapshot_model = cls(id=snapshot_id, committer_id=committer_id,
                              commit_message=commit_message)
-        if is_diff:
-            snapshot_model.diff_from_previous_version = json_blob
-        else:
-            snapshot_model.serialized_exploration = json_blob
-
         snapshot_model.put()
+
+
+class ExplorationSnapshotContentModel(base_models.BaseModel):
+    """Storage model for the content of an exploration snapshot."""
+
+    @classmethod
+    def _get_snapshot_id(cls, exploration_id, version_number):
+        return '%s-%s' % (exploration_id, version_number)
+
+    @property
+    def exploration_id(self):
+        return self.id.split('-')[0]
+
+    @property
+    def version_number(self):
+        return self.id.split('-')[1]
+
+    FORMAT_TYPE_FULL = 'full'
+    FORMAT_TYPE_DIFF = 'diff'
+
+    def _pre_put_hook(self):
+        if self.format not in [self.FORMAT_TYPE_FULL, self.FORMAT_TYPE_DIFF]:
+            raise Exception('Invalid snapshot format: %s' % self.format)
+
+    # The format of the snapshot (the full serialization, or a diff from the
+    # previous snapshot; these correspond to the possible values
+    # FORMAT_TYPE_FULL or FORMAT_TYPE_DIFF, respectively).
+    format = models.CharField(max_length=10)
+    # The snapshot content, as a JSON blob.
+    content = django_utils.JSONField(default={}, isdict=True)
+
+    @classmethod
+    def get_snapshot_content(cls, exploration_id, version_number):
+        """Returns the exploration snapshot content."""
+        snapshot_id = cls._get_snapshot_id(exploration_id, version_number)
+
+        snapshot = cls.get(snapshot_id)
+        return {
+            'format': snapshot.format,
+            'content': snapshot.content
+        }
+
+    @classmethod
+    def save_snapshot_content(cls, snapshot_id, snapshot_format, json_blob):
+        """Saves a new snapshot content for the given exploration.
+
+        This method should only be called from ExplorationSnapshotModel.
+        """
+
+        if not json_blob:
+            raise Exception(
+                'Empty content submitted for exploration snapshot.')
+
+        snapshot_content_model = cls(
+            id=snapshot_id, format=snapshot_format, content=json_blob)
+        snapshot_content_model.put()
