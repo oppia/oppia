@@ -32,11 +32,11 @@ QUERY_LIMIT = 100
 class StateModel(base_models.BaseModel):
     """A state, represented as a JSON blob."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         exploration_id = kwargs.get('exploration_id')
         if exploration_id:
             del kwargs['exploration_id']
-        super(StateModel, self).__init__(**kwargs)
+        super(StateModel, self).__init__(*args, **kwargs)
 
     @classmethod
     def get(cls, exploration_id, state_id, strict=True):

@@ -104,7 +104,9 @@ class BaseModel(models.Model):
                     '%s%s' % (entity_name.encode('utf-8'),
                               utils.get_random_int(RAND_RANGE))
                 ).digest())[:12]
-            if not cls.get(new_id, strict=False):
+            try:
+                cls.objects.get(id=new_id)
+            except cls.DoesNotExist:
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
