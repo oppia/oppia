@@ -426,6 +426,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         if snapshot.exploration_id == exploration_id:
             snapshot.delete()
 
+    for snapshot in exp_models.ExplorationSnapshotContentModel.get_all():
+        if snapshot.exploration_id == exploration_id:
+            snapshot.delete()
+
 
 # Operations involving exploration parameters.
 def get_param_instance(exploration_id, name, obj_type, values):
