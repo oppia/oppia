@@ -136,14 +136,20 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   cd jsrepl
   git submodule update --init --recursive
 
+  # Add a temporary backup file so that this script works on both Linux and Mac.
+  TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
+
   echo Compiling jsrepl
   # Reducing jvm memory requirement from 4G to 1G.
-  sed -i '' s/Xmx4g/Xmx1g/ Cakefile
+  sed -i $TMP_FILE -e 's/Xmx4g/Xmx1g/' Cakefile
   # This version of node uses fs.exitsSync.
-  sed -i '' s/path\.existsSync/fs\.existsSync/ Cakefile
+  sed -i $TMP_FILE -e 's/path\.existsSync/fs\.existsSync/' Cakefile
   # CoffeeScript is having trouble with octal representation.
-  sed -i '' s/0o755/493/ Cakefile
+  sed -i $TMP_FILE -e 's/0o755/493/' Cakefile
   NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+
+  # Delete the temporary file.
+  rm $TMP_FILE
 
   cd ../../
   mv $THIRD_PARTY_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
