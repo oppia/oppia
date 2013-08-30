@@ -92,111 +92,63 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
       });
 
       function addPopup(vis, stateName, stats) {
-        var glass = vis.append('svg:rect')
-          .attr('width', '100%')
-          .attr('height', height)
-          .style('fill', 'black')
-          .style('fill-opacity', 0.3)
-          .attr('x', 0)
-          .attr('y', 0);
-        var popup = vis.append('svg:g')
-          .attr('width', '100%')
-          .attr('x', '40%')
-          .attr('y', '40%');
-        var rect = popup.append('svg:rect')
-          .attr('x', 145)
-          .attr('y', height * .3)
-          .attr('rx', 6)
-          .attr('ry', 6)
-          .attr('width', 420)
-          .attr('height', '30%')
-          .style('fill', 'white')
-          .attr('stroke-width', 3)
-          .attr('stroke', 'seagreen');
-        popup.append('svg:text')
-          .text(stateName)
-          .attr('x', 150)
-          .attr('y', (height * .3) + 20)
-          .attr('fill', 'seagreen')
-          .style('font-size', '20px')
-          .style('font-weight', 'bold');
-        var title = popup.append('svg:text')
-          .attr('x', 150)
-          .attr('y', (height * .3) + 40)
-          .attr('text-anchor', 'start')
-          .attr('fill', 'seagreen')
+        var modal = d3.select(element[0]).append('div')
+          .attr('class', 'modal')
+          .attr('aria-hidden', 'false')
+          .attr('id','infoModal')
+          .style('top', '400px');
+        var header =  modal.append('div')
+          .attr('class', 'modal-header');
+        header.append('button')
+          .attr('class', 'close')
+          .attr('data-dismiss', 'modal')
+          .attr('aria-hidden', 'true')
+          .html('&times;')
+          .on('click', function (d) {
+            modal.remove() 
+          });
+
+        header.append('h3')
+          .attr('class', 'customizeModalLabel')
+          .text('Statistics for ' + stateName);
+        var body = modal.append('div')
+          .attr('class', 'modal-body');
+        body.append('div')
           .style('font-weight', 'bold')
-          .text('Times hit:');
-        popup.append('svg:text')
-          .attr('x', 150 + title[0][0].clientWidth + 10)
-          .attr('y', (height * .3) + 40) 
-          .attr('text-anchor', 'start')
-          .text(stats.totalEntryCount);
-        var i = 0;
-        var popupHeight = 60;
-        var title = popup.append('svg:text')
-          .attr('x', 150)
-          .attr('y', (height * .3) + 60 + (i * 20))
-          .attr('text-anchor', 'start')
-          .attr('fill', 'seagreen')
+          .text('Times hit:')
+          .append('span')
+            .style('font-weight', 'normal').text("   " + stats.totalEntryCount);
+        var showTitle = false;
+        var title = body.append('div')
           .style('font-weight', 'bold')
           .text('Answers:');
-        var showTitle = false;
+        var ruleList = body.append('ul')
         for(rule in stats.rule_stats) {
           if (stats.rule_stats[rule].answers.length == 0) {
             continue;
           }
           showTitle = true;
-          popup.append('svg:text')
-            .attr('x', 160)
-            .attr('y', (height * .3) + 80 + (i * 20))
+          var answerList = ruleList.append('li')
             .attr('text-anchor', 'start')
-            .style('font-weight', 'bold')
-            .attr('fill', '#888888')
-            .text(rule);
+            .text(rule)
+            .append('ul');
           for (ans in stats.rule_stats[rule].answers) {
-            ++ i;
             var answer = stats.rule_stats[rule].answers[ans][0];
             var count = stats.rule_stats[rule].answers[ans][1];
-            popup.append('svg:circle')
-              .attr('cx', 165)
-              .attr('cy', (height * .3) + 75 + (i * 20)) 
-              .attr('fill', 'white')
-              .attr('stroke', 'black')
-              .attr('r', 2);
-            popup.append('svg:text')
-              .attr('x', 175)
-              .attr('y', (height * .3) + 80 + (i * 20)) 
-              .attr('text-anchor', 'start')
-              .attr('fill', '#555555')
+            answerList.append('li')
               .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")");
           }
-          ++i;
-          popupHeight = 60 + (i * 20) + 10;
-        }
+        }       
         if (!showTitle) {
           title.remove();
         }
-        popup.append('svg:rect')
-          .attr('y', height * .3)
-          .attr('x', 545)
-          .attr('height', 20)
-          .attr('width', 20)
-          .attr('stroke-width', '0')
-          .attr('fill', 'transparent')
-          .on('click', function(d) {
-             glass.remove();
-             popup.remove();
-          });
-        popup.append('svg:text')
-          .attr('y', (height * .3) + 15)
-          .attr('x', 550)
-          .attr('height', 20)
-          .attr('width', 20)
-          .style('font-size', 20)
-          .style('font-weight', 'bold')
-          .text('x');
-        rect.attr('height', popupHeight);
+        var footer = modal.append('div')
+          .attr('class', 'modal-footer');
+        footer.append('a')
+          .attr('class', 'btn')
+          .attr('data-dismiss', 'modal')
+          .text('Close')
+          .on('click', function (d) {modal.remove() });
       }
 
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
