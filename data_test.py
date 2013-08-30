@@ -433,5 +433,5 @@ class WidgetDataUnitTests(DataUnitTest):
                 for value in param['values']:
                     obj_class.normalize(value)
                 if 'choices' in param:
-                  for choice in param['choices']:
-                      obj_class.normalize(value)
+                    for choice in param['choices']:
+                        obj_class.normalize(value)

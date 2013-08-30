@@ -36,8 +36,8 @@ class Parameter(object):
         self.name = name
         self.obj_type = obj_type
 
-        # Choices needs to be set before values because we might need to do
-        # validate teh values against possible choices.
+        # "choices" needs to be set before values because we might need to
+        # validate the values against possible choices.
         self.choices = choices
         self.values = values
 

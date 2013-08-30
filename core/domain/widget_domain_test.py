@@ -68,5 +68,6 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'noteToGuess': {
                 'value': 'abc',
                 'obj_type': 'UnicodeString',
+                'choices': None,
             }
         })
