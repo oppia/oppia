@@ -91,6 +91,114 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         }
       });
 
+      function addPopup(vis, stateName, stats) {
+        var glass = vis.append('svg:rect')
+          .attr('width', '100%')
+          .attr('height', height)
+          .style('fill', 'black')
+          .style('fill-opacity', 0.3)
+          .attr('x', 0)
+          .attr('y', 0);
+        var popup = vis.append('svg:g')
+          .attr('width', '100%')
+          .attr('x', '40%')
+          .attr('y', '40%');
+        var rect = popup.append('svg:rect')
+          .attr('x', 145)
+          .attr('y', height * .3)
+          .attr('rx', 6)
+          .attr('ry', 6)
+          .attr('width', 420)
+          .attr('height', '30%')
+          .style('fill', 'white')
+          .attr('stroke-width', 3)
+          .attr('stroke', 'seagreen');
+        popup.append('svg:text')
+          .text(stateName)
+          .attr('x', 150)
+          .attr('y', (height * .3) + 20)
+          .attr('fill', 'seagreen')
+          .style('font-size', '20px')
+          .style('font-weight', 'bold');
+        var title = popup.append('svg:text')
+          .attr('x', 150)
+          .attr('y', (height * .3) + 40)
+          .attr('text-anchor', 'start')
+          .attr('fill', 'seagreen')
+          .style('font-weight', 'bold')
+          .text('Times hit:');
+        popup.append('svg:text')
+          .attr('x', 150 + title[0][0].clientWidth + 10)
+          .attr('y', (height * .3) + 40) 
+          .attr('text-anchor', 'start')
+          .text(stats.totalEntryCount);
+        var i = 0;
+        var popupHeight = 60;
+        var title = popup.append('svg:text')
+          .attr('x', 150)
+          .attr('y', (height * .3) + 60 + (i * 20))
+          .attr('text-anchor', 'start')
+          .attr('fill', 'seagreen')
+          .style('font-weight', 'bold')
+          .text('Answers:');
+        var showTitle = false;
+        for(rule in stats.rule_stats) {
+          if (stats.rule_stats[rule].answers.length == 0) {
+            continue;
+          }
+          showTitle = true;
+          popup.append('svg:text')
+            .attr('x', 160)
+            .attr('y', (height * .3) + 80 + (i * 20))
+            .attr('text-anchor', 'start')
+            .style('font-weight', 'bold')
+            .attr('fill', '#888888')
+            .text(rule);
+          for (ans in stats.rule_stats[rule].answers) {
+            ++ i;
+            var answer = stats.rule_stats[rule].answers[ans][0];
+            var count = stats.rule_stats[rule].answers[ans][1];
+            popup.append('svg:circle')
+              .attr('cx', 165)
+              .attr('cy', (height * .3) + 75 + (i * 20)) 
+              .attr('fill', 'white')
+              .attr('stroke', 'black')
+              .attr('r', 2);
+            popup.append('svg:text')
+              .attr('x', 175)
+              .attr('y', (height * .3) + 80 + (i * 20)) 
+              .attr('text-anchor', 'start')
+              .attr('fill', '#555555')
+              .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")");
+          }
+          ++i;
+          popupHeight = 60 + (i * 20) + 10;
+        }
+        if (!showTitle) {
+          title.remove();
+        }
+        popup.append('svg:rect')
+          .attr('y', height * .3)
+          .attr('x', 545)
+          .attr('height', 20)
+          .attr('width', 20)
+          .attr('stroke-width', '0')
+          .attr('fill', 'transparent')
+          .on('click', function(d) {
+             glass.remove();
+             popup.remove();
+          });
+        popup.append('svg:text')
+          .attr('y', (height * .3) + 15)
+          .attr('x', 550)
+          .attr('height', 20)
+          .attr('width', 20)
+          .style('font-size', 20)
+          .style('font-weight', 'bold')
+          .text('x');
+        rect.attr('height', popupHeight);
+      }
+
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
         height = 0;
         width = 0;
@@ -305,112 +413,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 if (!stateStats) {
                   $('#editorViewTab a[href="#stateEditor"]').tab('show');     
                 } else {
-                  var glass = vis.append('svg:rect')
-                     .attr('width', '100%')
-                     .attr('height', height)
-                     .style('fill', 'black')
-                     .style('fill-opacity', 0.3)
-                     .attr('x', 0)
-                     .attr('y', 0);
-                  var popup = vis.append('svg:g')
-                     .attr('width', '100%')
-                     .attr('x', '40%')
-                     .attr('y', '40%');
-                  var rect = popup.append('svg:rect')
-                     .attr('x', 145)
-                     .attr('y', height * .3)
-                     .attr('rx', 6)
-                     .attr('ry', 6)
-                     .attr('width', 420)
-                     .attr('height', '30%')
-                     .style('fill', 'white')
-                     .attr('stroke-width', 3)
-                     .attr('stroke', 'seagreen');
-                  popup.append('svg:text')
-                     .text(d.name)
-                     .attr('x', 150)
-                     .attr('y', (height * .3) + 20)
-                     .attr('fill', 'seagreen')
-                     .style('font-size', '20px')
-                     .style('font-weight', 'bold');
-                  var title = popup.append('svg:text')
-                     .attr('x', 150)
-                     .attr('y', (height * .3) + 40)
-                     .attr('text-anchor', 'start')
-                     .attr('fill', 'seagreen')
-                     .style('font-weight', 'bold')
-                     .text('Times hit:');
-                  console.log(title);
-                  popup.append('svg:text')
-                     .attr('x', 150 + title[0][0].clientWidth + 10)
-                     .attr('y', (height * .3) + 40) 
-                     .attr('text-anchor', 'start')
-                     .text(stateStats[d.hashId].totalEntryCount);
-                  var i = 0;
-                  var popupHeight = 60;
-                  var title = popup.append('svg:text')
-                     .attr('x', 150)
-                     .attr('y', (height * .3) + 60 + (i * 20))
-                     .attr('text-anchor', 'start')
-                     .attr('fill', 'seagreen')
-                     .style('font-weight', 'bold')
-                     .text('Answers:');
-                  var showTitle = false;
-                  for(rule in stateStats[d.hashId].rule_stats) {
-                    if (stateStats[d.hashId].rule_stats[rule].answers.length == 0) {
-                      continue;
-                    }
-                    showTitle = true;
-                    popup.append('svg:text')
-                       .attr('x', 160)
-                       .attr('y', (height * .3) + 80 + (i * 20))
-                       .attr('text-anchor', 'start')
-                       .style('font-weight', 'bold')
-                       .attr('fill', '#888888')
-                       .text(rule);
-                    for (ans in stateStats[d.hashId].rule_stats[rule].answers) {
-                      ++ i;
-                      var answer = stateStats[d.hashId].rule_stats[rule].answers[ans][0];
-                      var count = stateStats[d.hashId].rule_stats[rule].answers[ans][1];
-                      popup.append('svg:circle')
-                         .attr('cx', 165)
-                         .attr('cy', (height * .3) + 75 + (i * 20)) 
-                         .attr('fill', 'white')
-                         .attr('stroke', 'black')
-                         .attr('r', 2);
-                      popup.append('svg:text')
-                         .attr('x', 175)
-                         .attr('y', (height * .3) + 80 + (i * 20)) 
-                         .attr('text-anchor', 'start')
-                         .attr('fill', '#555555')
-                         .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")");
-                    }
-                    ++i;
-                    popupHeight = 60 + (i * 20) + 10;
-                  }
-                  if (!showTitle) {
-                    title.remove();
-                  }
-                  popup.append('svg:rect')
-                    .attr('y', height * .3)
-                    .attr('x', 545)
-                    .attr('height', 20)
-                    .attr('width', 20)
-                    .attr('stroke-width', '0')
-                    .attr('fill', 'transparent')
-                    .on('click', function(d) {
-                      glass.remove();
-                      popup.remove();
-                    });
-                  popup.append('svg:text')
-                    .attr('y', (height * .3) + 15)
-                    .attr('x', 550)
-                    .attr('height', 20)
-                    .attr('width', 20)
-                    .style('font-size', 20)
-                    .style('font-weight', 'bold')
-                    .text('x');
-                  rect.attr('height', popupHeight);
+                  addPopup(vis, d.name, stateStats[d.hashId]);
                 }
               };
             })
