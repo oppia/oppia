@@ -3,49 +3,7 @@
   <br><br>
   <b>Common student paths </b>
   <br>
-  <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates"></state-graph-viz>
-  <table>
-    <tr>
-      <th class="oppia-stats-table">State name</th>
-      <th class="oppia-stats-table">Times hit</th>
-      <th class="oppia-stats-table">Rules hit</th>
-    </tr>
-
-    <tr ng-repeat="(state, stateData) in stats.stateStats | orderBy:'totalEntryCount':true">
-      <td class="oppia-stats-table">
-        <a href="/create/<[explorationId]>#/gui/<[state]>">
-          <[stateData.name]>
-        </a>
-      </td>
-      <td class="oppia-stats-table">
-        <[stateData.totalEntryCount]>
-      </td>
-      <td class="oppia-stats-table">
-          <table ng-show="stateData.totalEntryCount > 0">
-            <tr ng-show="ruleData.chartData[1][1] > 0" ng-repeat="(rule, ruleData) in stateData.rule_stats | orderBy:'totalEntryCount':true">
-               <td valign="top" width="200"><[rule]></td>
-               <td valign="top" width="100">
-                 <bar-chart ng-show="ruleData.chartData[1][1] > 0" chart-colors="ruleChartColors" chart-data="ruleData.chartData" width=100 height=30 show-legend="false"></bar-chart></td>
-               <td>
-                 <ul>
-                   <li ng-repeat="answer in ruleData.answers"> <[answer[0]]> <i>(<[answer[1]]> time<div ng-show="answer[1] > 1">s</div>)</i></li>
-                 </ul>
-               </td>
-            </tr>
-            <tr>
-               <td valign="top" width="200">No answer given 
-                  <img class="oppia-help" src="/images/help.png" 
-                    ui-jq="tooltip" ng-hide="isPublic" 
-                    title="The student navigated away from the page 
-                           without entering an answer." />
-               </td>
-               <td valign="top" width="100"><bar-chart width=100 height=30 show-legend="false" chart-colors="ruleChartColors" chart-data="stateData.no_answer_chartdata"></bar-chart></td>
-               <td></td>
-            </tr>
-          </table>
-      </td>
-    </tr>
-  </table>
+  <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats"></state-graph-viz>
 </div>
 
 <div ng-show="stats.numVisits == 0">
