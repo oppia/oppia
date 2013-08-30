@@ -16,10 +16,11 @@
 
 __author__ = 'Sean Lip'
 
-import feconf
 from core.domain import exp_services
 from core.domain import stats_services
+import feconf
 import test_utils
+import utils
 
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
@@ -223,13 +224,13 @@ class ExportUnitTests(ExplorationServicesUnitTests):
 parameters: []
 states:
 - content: []
-  name: '[untitled state]'
+  name: (untitled state)
   param_changes: []
   widget:
     handlers:
     - name: submit
       rule_specs:
-      - dest: '[untitled state]'
+      - dest: (untitled state)
         feedback: []
         inputs: {}
         name: Default
@@ -267,13 +268,13 @@ states:
             'parameters': [],
             'states': [{
                 'content': [],
-                'name': u'[untitled state]',
+                'name': u'(untitled state)',
                 'param_changes': [],
                 'widget': {
                     'handlers': [{
                         'name': u'submit',
                         'rule_specs': [{
-                            'dest': u'[untitled state]',
+                            'dest': u'(untitled state)',
                             'feedback': [],
                             'inputs': {},
                             'name': u'Default',
@@ -310,9 +311,10 @@ states:
             }]
         }
 
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(
             expected_dict,
-            exp_services.export_to_versionable_dict(EXP_ID)
+            exp_services.export_to_versionable_dict(exploration)
         )
 
     def test_export_state_to_dict(self):
@@ -424,7 +426,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_state_by_name(eid, name_1).id, state_1.id)
 
-        name_2 = 'fake_name'
+        name_2 = 'fake name'
         self.assertIsNone(exp_services.get_state_by_name(
             eid, name_2, strict=False))
         with self.assertRaisesRegexp(Exception, 'not found'):
@@ -439,7 +441,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
-        exp_services.add_state(USER_ID, EXP_ID, 'first_state')
+        exp_services.add_state(USER_ID, EXP_ID, 'first state')
         exploration = exp_services.get_exploration_by_id(EXP_ID)
 
         with self.assertRaisesRegexp(
@@ -447,16 +449,16 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_state(
                 USER_ID, EXP_ID, exploration.state_ids[0])
 
-        exp_services.add_state(USER_ID, EXP_ID, 'second_state')
+        exp_services.add_state(USER_ID, EXP_ID, 'second state')
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.delete_state(USER_ID, EXP_ID, exploration.state_ids[1])
 
         with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
-            exp_services.delete_state(USER_ID, EXP_ID, 'fake_state')
+            exp_services.delete_state(USER_ID, EXP_ID, 'fake state')
 
     def test_state_operations(self):
-        """Test adding, renaming and checking existence of states."""
+        """Test adding, updating and checking existence of states."""
         USER_ID = 'fake@user.com'
         EXP_ID = 'A exploration_id'
 
@@ -468,11 +470,15 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
 
+        def rename_state(committer_id, exp_id, state_id, new_state_name):
+            return exp_services.update_state(
+                committer_id, exp_id, state_id, new_state_name,
+                None, None, None, None, None, None)
+
         default_state = exp_services.get_state_by_id(
             exploration.id, exploration.state_ids[0])
         default_state_name = default_state.name
-        exp_services.rename_state(
-            USER_ID, EXP_ID, default_state.id, 'Renamed state')
+        rename_state(USER_ID, EXP_ID, default_state.id, 'Renamed state')
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
@@ -486,8 +492,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(exploration.state_ids), 2)
 
         # It is OK to rename a state to itself.
-        exp_services.rename_state(
-            USER_ID, EXP_ID, second_state.id, second_state.name)
+        rename_state(USER_ID, EXP_ID, second_state.id, second_state.name)
         renamed_second_state = exp_services.get_state_by_id(
             EXP_ID, second_state.id)
         self.assertEqual(renamed_second_state.name, 'State 2')
@@ -497,13 +502,12 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exp_services.add_state(USER_ID, EXP_ID, 'State 2')
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exp_services.rename_state(
-                USER_ID, EXP_ID, second_state.id, 'Renamed state')
+            rename_state(USER_ID, EXP_ID, second_state.id, 'Renamed state')
 
         # And it is not OK to rename a state to the END_DEST.
-        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exp_services.rename_state(
-                USER_ID, EXP_ID, second_state.id, feconf.END_DEST)
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid state name'):
+            rename_state(USER_ID, EXP_ID, second_state.id, feconf.END_DEST)
 
         # The exploration now has exactly two states.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
@@ -536,6 +540,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 1,
         }, snapshots_metadata[0])
 
+        # Using the old version of the exploration should raise an error.
+        with self.assertRaisesRegexp(Exception, 'version 0, which is too old'):
+            exp_services.save_exploration('committer_id_2', exploration)
+
+        exploration = exp_services.get_exploration_by_id(eid)
         exploration.title = 'New title'
         exp_services.save_exploration('committer_id_2', exploration)
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(

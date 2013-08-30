@@ -22,8 +22,7 @@ import feconf
 import utils
 
 # Valid model names.
-NAMES = utils.create_enum(
-    'base_model', 'exploration', 'image', 'parameter', 'state', 'statistics')
+NAMES = utils.create_enum('base_model', 'exploration', 'image', 'statistics')
 
 
 class _Platform(object):
@@ -48,9 +47,6 @@ class _Django(_Platform):
             elif name == NAMES.image:
                 from core.storage.image import django_models as image_model
                 returned_models.append(image_model)
-            elif name == NAMES.state:
-                from core.storage.state import django_models as state_model
-                returned_models.append(state_model)
             elif name == NAMES.statistics:
                 from core.storage.statistics import django_models as statistics_model
                 returned_models.append(statistics_model)
@@ -58,6 +54,11 @@ class _Django(_Platform):
                 raise Exception('Invalid model name: %s' % name)
 
         return tuple(returned_models)
+
+    @classmethod
+    def import_transaction_services(cls):
+        from core.platform.transactions import django_transaction_services
+        return django_transaction_services
 
     @classmethod
     def import_user_services(cls):
@@ -87,9 +88,6 @@ class _Gae(_Platform):
             elif name == NAMES.image:
                 from core.storage.image import gae_models as image_model
                 returned_models.append(image_model)
-            elif name == NAMES.state:
-                from core.storage.state import gae_models as state_model
-                returned_models.append(state_model)
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_model
                 returned_models.append(statistics_model)
@@ -97,6 +95,11 @@ class _Gae(_Platform):
                 raise Exception('Invalid model name: %s' % name)
 
         return tuple(returned_models)
+
+    @classmethod
+    def import_transaction_services(cls):
+        from core.platform.transactions import gae_transaction_services
+        return gae_transaction_services
 
     @classmethod
     def import_user_services(cls):
@@ -128,6 +131,10 @@ class Registry(object):
     @classmethod
     def import_user_services(cls):
         return cls._get().import_user_services()
+
+    @classmethod
+    def import_transaction_services(cls):
+        return cls._get().import_transaction_services()
 
     @classmethod
     def import_memcache_services(cls):

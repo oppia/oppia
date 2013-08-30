@@ -122,6 +122,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.values = {
             'debug': feconf.DEBUG,
             'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
+            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
         }
 
         self.user = user_services.get_current_user(self.request)

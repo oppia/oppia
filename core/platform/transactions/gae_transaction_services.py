@@ -14,24 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Model for an Oppia state."""
+"""Provides a seam for transaction services."""
 
 __author__ = 'Sean Lip'
 
-from core import django_utils
-import core.storage.base_model.models as base_models
 
-from django.db import models
-
-QUERY_LIMIT = 100
+from google.appengine.ext import ndb
 
 
-class StateModel(base_models.BaseModel):
-    """A state, represented as a JSON blob."""
-    # JSON representation of a state.
-    # TODO(sll): Prepend the exploration id to the id of this entity.
-    value = django_utils.JSONField(default={}, isdict=True)
-    # When this entity was first created.
-    created = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = models.DateTimeField(auto_now=True)
+def run_in_transaction(fn, *args, **kwargs):
+    """Run a function in a transaction."""
+    return ndb.transaction(
+    	lambda: fn(*args, **kwargs),
+    	xg=True,
+    	propagation=ndb.TransactionOptions.ALLOWED,
+    )

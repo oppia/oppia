@@ -25,8 +25,15 @@ import test_utils
 if feconf.PLATFORM == 'gae':
     import core.storage.exploration.gae_models as exp_models
     import core.storage.image.gae_models as image_models
-    import core.storage.state.gae_models as state_models
     from google.appengine.ext import db
+
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'not running on GAE')
+class StateModelUnitTests(test_utils.GenericTestBase):
+    """Test the state model."""
+
+    pass
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
@@ -44,7 +51,8 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        state = state_models.StateModel(
+        state = exp_models.StateModel(
+            exploration_id=exploration.id,
             id='The state hash id',
             value={
                 'name': 'name', 'content': [], 'param_changes': [],
@@ -167,8 +175,8 @@ class ExplorationSnapshotModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(snapshot_model)
 
         snapshot_id = self.get_snapshot_id(EXP_ID, 1)
-        snapshot_model = exp_models.ExplorationSnapshotModel.get(
+        snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get(
             snapshot_id, strict=False)
-        self.assertIsNotNone(snapshot_model)
-        self.assertIsNotNone(snapshot_model.serialized_exploration)
-        self.assertIsNone(snapshot_model.diff_from_previous_version)
+        self.assertIsNotNone(snapshot_content_model)
+        self.assertIsNotNone(snapshot_content_model.content)
+        self.assertEqual(snapshot_content_model.format, 'full')

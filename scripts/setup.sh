@@ -54,3 +54,4 @@ export THIRD_PARTY_DIR=third_party
 # Adjust the path to include a reference to node.
 export PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
 export MACHINE_TYPE=`uname -m`
+export OS=`uname`

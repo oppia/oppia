@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
+"""Provides a seam for transaction services."""
 
-from django.utils import unittest
+__author__ = 'Sean Lip'
 
 
-class StateModelUnitTests(unittest.TestCase):
-    """Test the state model."""
-
-    pass
+def run_in_transaction(fn, *args, **kwargs):
+    """Run a function in a transaction."""
+    # TODO(sll): Actually run the function in a transaction.
+    return fn(*args, **kwargs)

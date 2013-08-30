@@ -63,10 +63,8 @@ def create_test_suites(parsed_args):
     suite1 = loader.discover(
         root_dir, pattern='*_test.py', top_level_dir=root_dir)
     suite2 = loader.discover(
-        root_dir, pattern='*tests.py', top_level_dir=root_dir)
-    suite3 = loader.discover(
         root_dir, pattern='test_django.py', top_level_dir=root_dir)
-    return [suite1, suite2, suite3]
+    return [suite1, suite2]
 
 
 def main():

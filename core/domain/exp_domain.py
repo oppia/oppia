@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object for an exploration, its states, and their constituents.
+"""Domain objects for an exploration, its states, and their constituents.
 
 Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
@@ -25,8 +25,8 @@ __author__ = 'Sean Lip'
 from core.domain import param_domain
 from core.domain import widget_domain
 from core.platform import models
-(base_models, state_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.state
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration
 ])
 import feconf
 import utils
@@ -218,6 +218,15 @@ class State(object):
     """Domain object for a state."""
 
     def validate(self):
+        for c in feconf.INVALID_NAME_CHARS:
+            if c in self.name:
+                raise utils.ValidationError(
+                    'Invalid character %s in state name %s' % (c, self.name))
+
+        if self.name == feconf.END_DEST:
+            raise utils.ValidationError(
+                'Invalid state name: %s' % feconf.END_DEST)
+
         # TODO(sll): This needs lots more validation.
         pass
 
@@ -298,12 +307,18 @@ class Exploration(object):
         for state_id in self.state_ids:
             # This raises an exception if the state_id does not exist.
             try:
-                state_models.StateModel.get(state_id)
+                exp_models.StateModel.get(self.id, state_id)
             except base_models.BaseModel.EntityNotFoundError:
                 raise utils.ValidationError('Invalid state_id %s' % state_id)
 
         if not self.editor_ids:
             raise utils.ValidationError('This exploration has no editors.')
+
+        for c in feconf.INVALID_NAME_CHARS:
+            if c in self.title:
+                raise utils.ValidationError(
+                    'Invalid character %s in exploration title %s'
+                    % (c, self.title))
 
     # Derived attributes of an exploration.
     @property
@@ -315,7 +330,7 @@ class Exploration(object):
     def states(self):
         """A list of states for this exploration."""
         return [State.from_dict(
-            state_id, state_models.StateModel.get(state_id).value
+            state_id, exp_models.StateModel.get(self.id, state_id).value
         ) for state_id in self.state_ids]
 
     @property

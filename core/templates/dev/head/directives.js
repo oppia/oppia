@@ -19,29 +19,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('mustBeValidString', function($timeout) {
-  return {
-    require: 'ngModel',
-    link: function(scope, elm, attrs, ctrl) {
-      ctrl.$parsers.unshift(function(viewValue) {
-        if (scope.isValidEntityName(viewValue, false)) {
-          // it is valid
-          ctrl.$setValidity('invalidChar', true);
-          return viewValue;
-        } else {
-          // it is invalid, return the old model value
-          elm[0].value = ctrl.$modelValue;
-          ctrl.$setValidity('invalidChar', false);
-          $timeout(function() {
-            ctrl.$setValidity('invalidChar', true);
-          }, 2000);
-          return ctrl.$modelValue;
-        }
-      });
-    }
-  };
-});
-
 oppia.directive('angularHtmlBind', function($compile) {
   return function(scope, elm, attrs) {
     scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {

@@ -30,7 +30,7 @@ def js_string(value):
 
     for replacement in replacements:
         string = string.replace(replacement[0], replacement[1])
-    return string
+    return jinja2.utils.Markup(string)
 
 
 FILTERS = {

@@ -109,17 +109,22 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       }
     }
 
+    propertyValueMap['version'] = explorationData.data.version;
+
     console.log(propertyValueMap);
     console.log(JSON.stringify(propertyValueMap));
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
-        $.param({payload: JSON.stringify(propertyValueMap)}, true),
+        $.param({
+          payload: JSON.stringify(propertyValueMap)
+        }, true),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       warningsData.clear();
       console.log('Changes to this state were saved successfully.');
-      explorationData.data['states'][stateId] = data;
+      explorationData.data.version = data.version;
+      explorationData.data['states'][stateId] = data.stateData;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });

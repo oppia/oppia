@@ -18,12 +18,9 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import feconf
 from core.controllers import base
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
-from core.domain import rule_domain
 from core.domain import stats_services
-from core.domain import widget_domain
 import utils
 
 EDITOR_MODE = 'editor'
@@ -107,6 +104,7 @@ class ExplorationHandler(base.BaseHandler):
             'states': state_list,
             'parameters': [param.to_dict()
                            for param in exploration.parameters],
+            'version': exploration.version,
             # Add information about the most recent versions.
             'snapshots': exp_services.get_exploration_snapshots_metadata(
                 exploration_id, DEFAULT_NUM_SNAPSHOTS),
@@ -125,6 +123,13 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
 
         state_name = self.payload.get('state_name')
         if not state_name:
@@ -133,12 +138,25 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.add_state(self.user_id, exploration_id, state_name)
         state_id = exp_services.convert_state_name_to_id(
             exploration_id, state_name)
-        self.render_json(exp_services.export_state_to_verbose_dict(
-            exploration_id, state_id))
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version,
+            'stateData': exp_services.export_state_to_verbose_dict(
+                exploration_id, state_id)
+        })
 
     @base.require_editor
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
 
         is_public = self.payload.get('is_public')
         category = self.payload.get('category')
@@ -147,7 +165,6 @@ class ExplorationHandler(base.BaseHandler):
         editors = self.payload.get('editors')
         parameters = self.payload.get('parameters')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
         if is_public:
             exploration.is_public = True
         if category:
@@ -172,28 +189,15 @@ class ExplorationHandler(base.BaseHandler):
 
         exp_services.save_exploration(self.user_id, exploration)
 
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version
+        })
+
     @base.require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
         exp_services.delete_exploration(self.user_id, exploration_id)
-
-
-class ExplorationDownloadHandler(base.BaseHandler):
-    """Downloads an exploration as a YAML file."""
-
-    @base.require_editor
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        filename = 'oppia-%s' % utils.to_ascii(exploration.title)
-        if not filename:
-            filename = feconf.DEFAULT_FILE_NAME
-
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.txt' % filename)
-
-        self.response.write(exp_services.export_to_yaml(exploration_id))
 
 
 class StateHandler(base.BaseHandler):
@@ -203,6 +207,19 @@ class StateHandler(base.BaseHandler):
     def put(self, exploration_id, state_id):
         """Saves updates to a state."""
 
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration_id, state_id, 'submit',
+                self.payload.get('resolved_answers'))
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload['version']
+        if version != exploration.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration.version, version))
+
         state_name = self.payload.get('state_name')
         param_changes = self.payload.get('param_changes')
         interactive_widget = self.payload.get('interactive_widget')
@@ -211,94 +228,46 @@ class StateHandler(base.BaseHandler):
         sticky_interactive_widget = self.payload.get(
             'sticky_interactive_widget')
         content = self.payload.get('content')
-        resolved_answers = self.payload.get('resolved_answers')
 
-        if 'state_name' in self.payload:
-            exp_services.rename_state(
-                self.user_id, exploration_id, state_id, state_name)
+        exp_services.update_state(
+            self.user_id, exploration_id, state_id, state_name, param_changes,
+            interactive_widget, interactive_params, interactive_rulesets,
+            sticky_interactive_widget, content
+        )
 
-        state = exp_services.get_state_by_id(exploration_id, state_id)
-        if 'param_changes' in self.payload:
-            state.param_changes = []
-            for param_change in param_changes:
-                instance = exp_services.get_or_create_param(
-                    self.user_id, exploration_id, param_change['name'], None,
-                    param_change['values'])
-                state.param_changes.append(instance)
-
-        if interactive_widget:
-            state.widget.widget_id = interactive_widget
-
-        if interactive_params is not None:
-            state.widget.params = interactive_params
-
-        if sticky_interactive_widget is not None:
-            state.widget.sticky = sticky_interactive_widget
-
-        if interactive_rulesets:
-            ruleset = interactive_rulesets['submit']
-            utils.recursively_remove_key(ruleset, u'$$hashKey')
-
-            state.widget.handlers = [
-                exp_domain.AnswerHandlerInstance('submit', [])]
-
-            generic_widget = widget_domain.Registry.get_widget_by_id(
-                'interactive', state.widget.widget_id)
-
-            # TODO(yanamal): Do additional calculations here to get the
-            # parameter changes, if necessary.
-            for rule_ind in range(len(ruleset)):
-                rule = ruleset[rule_ind]
-                state_rule = exp_domain.RuleSpec(
-                    rule.get('name'), rule.get('inputs'), rule.get('dest'),
-                    rule.get('feedback'), []
-                )
-
-                if rule['description'] == feconf.DEFAULT_RULE_NAME:
-                    if (rule_ind != len(ruleset) - 1 or
-                            rule['name'] != feconf.DEFAULT_RULE_NAME):
-                        raise ValueError('Invalid ruleset: the last rule '
-                                         'should be a default rule.')
-                else:
-                    matched_rule = generic_widget.get_rule_by_name(
-                        'submit', state_rule.name)
-
-                    # Normalize and store the rule params.
-                    for param_name in state_rule.inputs:
-                        value = state_rule.inputs[param_name]
-                        param_type = rule_domain.get_obj_type_for_param_name(
-                            matched_rule, param_name)
-
-                        if (not isinstance(value, basestring) or
-                                '{{' not in value or '}}' not in value):
-                            normalized_param = param_type.normalize(value)
-                        else:
-                            normalized_param = value
-
-                        if normalized_param is None:
-                            raise self.InvalidInputException(
-                                '%s has the wrong type. Please replace it '
-                                'with a %s.' % (value, param_type.__name__))
-
-                        state_rule.inputs[param_name] = normalized_param
-
-                state.widget.handlers[0].rule_specs.append(state_rule)
-
-        if content:
-            state.content = [
-                exp_domain.Content(item['type'], item['value'])
-                for item in content
-            ]
-
-        if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit', resolved_answers)
-
-        exp_services.save_state(self.user_id, exploration_id, state)
-        self.render_json(exp_services.export_state_to_verbose_dict(
-            exploration_id, state_id))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version,
+            'stateData': exp_services.export_state_to_verbose_dict(
+                exploration_id, state_id)
+        })
 
     @base.require_editor
     def delete(self, exploration_id, state_id):
         """Deletes the state with id state_id."""
+        # TODO(sll): Add a version check here. This probably involves NOT using
+        # delete(), but regarding this as an exploration put() instead. Or the
+        # param can be passed via the URL.
+
         exp_services.delete_state(self.user_id, exploration_id, state_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        self.render_json({
+            'version': exploration.version
+        })
+
+
+class ExplorationDownloadHandler(base.BaseHandler):
+    """Downloads an exploration as a YAML file."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        filename = 'oppia-%s-v%s' % (
+            utils.to_ascii(exploration.title), exploration.version)
+
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s.yaml' % filename)
+
+        self.response.write(exp_services.export_to_yaml(exploration_id))

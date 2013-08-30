@@ -20,11 +20,6 @@
 
 var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
-var ALPHANUMERIC_REGEXP = {
-    'regexp': /^[ A-Za-z0-9\.\,\+\(\)\[\]\;\!\'\"\:_-]+$/,
-    'warning': 'Invalid input. Please use a non-empty ' +
-        'description consisting of alphanumeric characters, underscores, ' +
-        'spaces and/or hyphens.'};
 
 // Global utility methods.
 function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
@@ -112,6 +107,14 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     $scope.addContentToIframe(document.getElementById(iframeId), content);
   };
 
+  $scope.normalizeWhitespace = function(input) {
+    // Remove whitespace from the beginning and end of the string, and replace
+    // interior whitespace with a single space character.
+    input = input.trim();
+    input = input.replace(/\s{2,}/g, ' ');
+    return input;
+  };
+
   /**
    * Checks whether an entity name is valid, and displays a warning message
    * if it isn't.
@@ -120,29 +123,25 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
    * @return {boolean} True if the entity name is valid, false otherwise.
    */
   $scope.isValidEntityName = function(input, showWarnings) {
+    input = $scope.normalizeWhitespace(input);
+
     if (!input) {
       if (showWarnings) {
         warningsData.addWarning('Please enter a non-empty name.');
       }
       return false;
     }
-    // Remove whitespace from the beginning and end of the string, and replace
-    // interior whitespace with a single space character.
-    input = input.trim();
-    input = input.replace(/\s{2,}/g, ' ');
-    // Do not allow input to start with '[', since this is part of the prefix
-    // used in the auto-suggest boxes to identify chapters, questions, etc.
-    if (input[0] == '[') {
-      if (showWarnings) {
-        warningsData.addWarning('Names should not start with a \'[\'.');
+
+    for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
+      if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
+        if (showWarnings) {
+          warningsData.addWarning(
+           'Invalid input. Please use a non-empty description consisting ' +
+           'of alphanumeric characters, underscores, spaces and/or hyphens.'
+          );
+        }
+        return false;
       }
-      return false;
-    }
-    if (!ALPHANUMERIC_REGEXP.regexp.test(input)) {
-      if (showWarnings) {
-        warningsData.addWarning(ALPHANUMERIC_REGEXP.warning);
-      }
-      return false;
     }
     return true;
   };

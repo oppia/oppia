@@ -18,10 +18,15 @@ __author__ = 'Jeremy Emerson'
 
 from core.domain import exp_services
 import core.storage.exploration.models as exp_models
-import core.storage.state.models as state_models
 
 from django.utils import unittest
 from django.core.exceptions import ValidationError
+
+
+class StateModelUnitTests(unittest.TestCase):
+    """Test the state model."""
+
+    pass
 
 
 class ExplorationModelUnitTests(unittest.TestCase):
@@ -37,7 +42,8 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # A new exploration should have a default is_public property.
         self.assertEqual(exploration.is_public, False)
 
-        state = state_models.StateModel(
+        state = exp_models.StateModel(
+            exploration_id=exploration.id,
             id='The state hash id', value={
                 'name': 'name', 'content': [], 'param_changes': [],
                 'widget': None
