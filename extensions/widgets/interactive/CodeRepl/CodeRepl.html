@@ -1,9 +1,12 @@
-<html ng-app="im">
+<html ng-app="repl">
   <head>
-    <script src="/third_party/static/angularjs-1.0.3/angular.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
     <script>
       var GLOBALS = {};
       GLOBALS.language = JSON.parse('{{language|js_string}}');
+      GLOBALS.placeholder = JSON.parse('{{placeholder|js_string}}');
+      GLOBALS.columns = JSON.parse('{{columns|js_string}}');
+      GLOBALS.rows = JSON.parse('{{rows|js_string}}');
     </script>
 
     <script type="text/javascript"
@@ -15,9 +18,18 @@
     </script>
   </head>
   <body>
-  <form method="post" action="javascript:runCode()">
-    <textarea id="code" cols="80" rows="1"></textarea><br>
-    <input id="run_button" type="submit" value="RUN" disabled></input>
-  </form>
+    <div ng-controller="CodeRepl">
+      <form ng-submit="runCode(code)">
+
+        <input ng-show="rows == 1" ng-model="code"
+         placeholder="<[placeholder]>" required autofocus>
+
+        <textarea ng-show="rows != 1" ng-model="code"
+         placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
+        </textarea>
+
+        <button type="submit">Run</button>
+      </form>
+    </div>
   </body>
 </html>
