@@ -35,6 +35,7 @@ CODE_CONTRIBUTORS = [
 
 # Idea contributors, in alphabetical order.
 IDEA_CONTRIBUTORS = [
+    'Albert Gural',
     'Alex Kauffmann',
     'Catherine Colman',
     'John Cox',
@@ -60,6 +61,7 @@ DEMO_EXPLORATIONS = [
     ('hola', '¡Hola!', 'Languages'),
     ('landmarks', 'Landmarks', 'Geography'),
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
+    ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem', 'Mathematics'),
 ]
 
 # Whether to unconditionally log info messages.
