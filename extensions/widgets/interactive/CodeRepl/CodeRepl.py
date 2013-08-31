@@ -35,6 +35,21 @@ class CodeRepl(widget_domain.BaseWidget):
             'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
             'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
         ]
+    }, {
+        'name': 'placeholder',
+        'description': 'The placeholder for the text input field.',
+        'obj_type': 'UnicodeString',
+        'values': ['Type your code here.']
+    }, {
+        'name': 'rows',
+        'description': 'The number of rows for the text input field.',
+        'obj_type': 'UnicodeString',
+        'values': ['1']
+    }, {
+        'name': 'columns',
+        'description': 'The number of columns for the text input field.',
+        'obj_type': 'UnicodeString',
+        'values': ['60']
     }]
 
     # Actions that the reader can perform on this widget which trigger a
