@@ -27,12 +27,12 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
 
     def test_copier(self):
         generator = generators.Copier()
-        self.assertEqual(generator.generate_value('a'), 'a')
+        self.assertEqual(generator.generate_value(**{'value': 'a'}), 'a')
 
     def test_random_selector(self):
         generator = generators.RandomSelector()
-        self.assertIn(
-            generator.generate_value(['a', 'b', 'c']), ['a', 'b', 'c'])
+        self.assertIn(generator.generate_value(
+            **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
 
     def test_inclusive_int_range_picker(self):
         generator = generators.InclusiveIntRangePicker()

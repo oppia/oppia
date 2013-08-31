@@ -31,7 +31,7 @@ class BaseValueGenerator(object):
     to normalize the output of each generator.
     """
 
-    def generate_value(self, *args):
+    def generate_value(self, *args, **kwargs):
         """Generates a new value, using the given customization args."""
         raise NotImplementedError
 
