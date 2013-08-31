@@ -1,5 +1,5 @@
 default_skin: conversation_v1
-parameters: []
+param_specs: []
 states:
 - name: Taj Mahal on map
   content:

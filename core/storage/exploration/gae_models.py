@@ -83,8 +83,10 @@ class ExplorationModel(base_models.BaseModel):
     # The list of state ids this exploration consists of. This list should not
     # be empty.
     state_ids = ndb.StringProperty(repeated=True)
-    # The list of parameters associated with this exploration.
-    parameters = ndb.JsonProperty(repeated=True)
+    # The list of parameter specifications associated with this exploration.
+    # Each specification is a dict with the keys 'name' and 'obj_type', both of
+    # whose values are strings.
+    param_specs = ndb.JsonProperty(repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
@@ -134,15 +136,15 @@ class ExplorationModel(base_models.BaseModel):
 
         # Do validation.
         try:
-            assert isinstance(self.parameters, list)
-            for param in self.parameters:
-                assert isinstance(param, dict)
-                assert len(param.keys()) == 2
-                assert 'name' in param
-                assert 'obj_type' in param
+            assert isinstance(self.param_specs, list)
+            for param_spec in self.param_specs:
+                assert isinstance(param_spec, dict)
+                assert len(param_spec.keys()) == 2
+                assert 'name' in param_spec
+                assert 'obj_type' in param_spec
         except AssertionError:
             raise db.BadValueError(
-                "The 'parameters' property must be a list of parameter dicts"
+                "The 'param_specs' property must be a list of param_spec dicts"
             )
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:

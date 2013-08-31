@@ -102,8 +102,9 @@ class ExplorationHandler(base.BaseHandler):
             'title': exploration.title,
             'editors': exploration.editor_ids,
             'states': state_list,
-            'parameters': [param.to_dict()
-                           for param in exploration.parameters],
+            # TODO(sll): Update this name in the frontend to param_specs.
+            'parameters': [param_spec.to_dict()
+                           for param_spec in exploration.param_specs],
             'version': exploration.version,
             # Add information about the most recent versions.
             'snapshots': exp_services.get_exploration_snapshots_metadata(
@@ -163,7 +164,8 @@ class ExplorationHandler(base.BaseHandler):
         title = self.payload.get('title')
         image_id = self.payload.get('image_id')
         editors = self.payload.get('editors')
-        parameters = self.payload.get('parameters')
+        # TODO(sll): Update this name in the frontend to param_specs.
+        param_specs = self.payload.get('parameters')
 
         if is_public:
             exploration.is_public = True
@@ -182,9 +184,10 @@ class ExplorationHandler(base.BaseHandler):
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
-        if parameters:
-            exploration.parameters = [
-                param_domain.ParamSpec.from_dict(param) for param in parameters
+        if param_specs:
+            exploration.param_specs = [
+                param_domain.ParamSpec.from_dict(param_spec)
+                for param_spec in param_specs
             ]
 
         exp_services.save_exploration(self.user_id, exploration)

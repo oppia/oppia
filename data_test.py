@@ -232,12 +232,12 @@ class ExplorationDataUnitTests(DataUnitTest):
 
     def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""
-        EXPLORATION_SCHEMA = [('parameters', list), ('states', list),
+        EXPLORATION_SCHEMA = [('param_specs', list), ('states', list),
                               ('default_skin', basestring)]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 
         PARAMETER_SCHEMA = [('name', basestring), ('obj_type', basestring)]
-        for param in exploration_dict['parameters']:
+        for param in exploration_dict['param_specs']:
             self.verify_dict_keys_and_types(param, PARAMETER_SCHEMA)
 
         # Verify there is at least one state.

@@ -67,21 +67,21 @@ class ExplorationModelUnitTests(unittest.TestCase):
 
         # The 'parameters' property must be a list of parameter dicts.
         with self.assertRaises(ValidationError):
-            exploration.parameters = 'A string'
+            exploration.param_specs = 'A string'
             exploration.put('user_id', {})
 
         with self.assertRaises(ValidationError):
-            exploration.parameters = [{'name': 'no_obj_type'}]
+            exploration.param_specs = [{'name': 'no_obj_type'}]
             exploration.put('user_id', {})
 
         with self.assertRaises(ValidationError):
-            exploration.parameters = [{
+            exploration.param_specs = [{
                 'name': 'has_values', 'obj_type': 'Int', 'values': [6]
             }]
             exploration.put('user_id', {})
 
         parameter = {'name': 'theParameter', 'obj_type': 'Int'}
-        exploration.parameters = [parameter]
+        exploration.param_specs = [parameter]
 
         # The 'is_public' property must be a boolean.
         with self.assertRaises(ValidationError):
@@ -99,9 +99,9 @@ class ExplorationModelUnitTests(unittest.TestCase):
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')
         self.assertEqual(retrieved_exploration.state_ids, [state.id])
-        self.assertEqual(len(retrieved_exploration.parameters), 1)
+        self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
-            retrieved_exploration.parameters[0].name, 'theParameter')
+            retrieved_exploration.param_specs[0].name, 'theParameter')
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])

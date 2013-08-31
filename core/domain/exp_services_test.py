@@ -222,7 +222,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             yaml_content,
 """default_skin: conversation_v1
-parameters: []
+param_specs: []
 states:
 - content: []
   name: (untitled state)
@@ -266,7 +266,7 @@ states:
         exp_services.add_state(self.owner_id, EXP_ID, 'New state')
 
         expected_dict = {
-            'parameters': [],
+            'param_specs': [],
             'states': [{
                 'content': [],
                 'name': u'(untitled state)',

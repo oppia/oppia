@@ -271,17 +271,17 @@ def export_to_versionable_dict(exploration):
     For states, all properties except 'id' are versioned. State dests are
     specified using names and not ids.
     """
-    # TODO(sll): Make this a part of save_exploration().
-    params = [{
-        'name': param.name, 'obj_type': param.obj_type
-    } for param in exploration.parameters]
+    # TODO(sll): Make this function a part of save_exploration().
+    param_specs = [{
+        'name': param_spec.name, 'obj_type': param_spec.obj_type
+    } for param_spec in exploration.param_specs]
 
     states_list = [export_state_internals_to_dict(
         exploration.id, state_id, human_readable_dests=True)
         for state_id in exploration.state_ids]
 
     return {
-        'parameters': params, 'states': states_list
+        'param_specs': param_specs, 'states': states_list
     }
 
 
@@ -289,9 +289,9 @@ def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
 
-    params = [{
-        'name': param.name, 'obj_type': param.obj_type
-    } for param in exploration.parameters]
+    param_specs = [{
+        'name': param_spec.name, 'obj_type': param_spec.obj_type
+    } for param_spec in exploration.param_specs]
 
     states_list = [export_state_internals_to_dict(
         exploration_id, state_id, human_readable_dests=True)
@@ -299,7 +299,7 @@ def export_to_yaml(exploration_id):
 
     return utils.yaml_from_dict({
         'default_skin': exploration.default_skin,
-        'parameters': params,
+        'param_specs': param_specs,
         'states': states_list
     })
 
@@ -331,7 +331,7 @@ def save_exploration(committer_id, exploration):
             'category': exploration.category,
             'title': exploration.title,
             'state_ids': exploration.state_ids,
-            'parameters': exploration.param_dicts,
+            'param_specs': exploration.param_spec_dicts,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
             'editor_ids': exploration.editor_ids,
@@ -447,15 +447,15 @@ def get_param_instance(exploration_id, name, obj_type, values):
     """
     exploration = get_exploration_by_id(exploration_id)
 
-    for param in exploration.parameters:
-        if param.name == name:
-            if obj_type and param.obj_type != obj_type:
+    for param_spec in exploration.param_specs:
+        if param_spec.name == name:
+            if obj_type and param_spec.obj_type != obj_type:
                 raise ValueError(
                     'Parameter %s has wrong obj_type: was %s, expected %s'
-                    % (name, obj_type, param.obj_type))
+                    % (name, obj_type, param_spec.obj_type))
             else:
                 return param_domain.Parameter(
-                    param.name, param.obj_type, values)
+                    param_spec.name, param_spec.obj_type, values)
 
     # The parameter was not found, so create a new one.
     if obj_type is None:
@@ -575,9 +575,9 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 exploration_id, param_change['name'], None,
                 param_change['values'])
 
-            if not any([param.name == param_change['name']
-                        for param in exploration.parameters]):
-                exploration.parameters.append(
+            if not any([param_spec.name == param_change['name']
+                        for param_spec in exploration.param_specs]):
+                exploration.param_specs.append(
                     param_domain.ParamSpec(param_change['name'], None))
 
             state.param_changes.append(param_instance)
@@ -755,9 +755,9 @@ def create_from_yaml(
 
     try:
         # Make this into an exploration store.
-        exploration_params = [
-            param_domain.ParamSpec.from_dict(param_dict)
-            for param_dict in exploration_dict['parameters']
+        exploration_param_specs = [
+            param_domain.ParamSpec.from_dict(param_spec_dict)
+            for param_spec_dict in exploration_dict['param_specs']
         ]
 
         for sdict in exploration_dict['states']:
@@ -777,9 +777,9 @@ def create_from_yaml(
             ) for pc in sdict['param_changes']]
 
             for pc in state.param_changes:
-                if not any([param.name == pc.name
-                            for param in exploration_params]):
-                    exploration_params.append(pc)
+                if not any([param_spec.name == pc.name
+                            for param_spec in exploration_param_specs]):
+                    exploration_param_specs.append(pc)
 
             wdict = sdict['widget']
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
@@ -801,7 +801,7 @@ def create_from_yaml(
             save_state(user_id, exploration_id, state)
 
         exploration = get_exploration_by_id(exploration_id)
-        exploration.parameters = exploration_params
+        exploration.param_specs = exploration_param_specs
         save_exploration(user_id, exploration)
     except Exception:
         delete_exploration(user_id, exploration_id, force_deletion=True)

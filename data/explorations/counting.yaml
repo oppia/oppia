@@ -1,5 +1,5 @@
 default_skin: conversation_v1
-parameters:
+param_specs:
 - name: guess
   obj_type: TemplatedString
 states:

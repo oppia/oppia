@@ -71,8 +71,8 @@ class ExplorationModel(base_models.BaseModel):
     # be empty.
     state_ids = django_utils.ListField(default=[], blank=True)
 
-    def validate_parameters(value):
-        """Validator for the parameters property."""
+    def validate_param_specs(value):
+        """Validator for the param_specs property."""
         try:
             assert isinstance(value, list)
             for val in value:
@@ -82,13 +82,15 @@ class ExplorationModel(base_models.BaseModel):
                     [prop in val for prop in ['name', 'obj_type']])
         except AssertionError:
             raise ValidationError(
-                "The 'parameters' property must be a list of parameter dicts"
+                "The 'param_specs' property must be a list of param_spec dicts"
             )
 
-    # The list of parameters associated with this exploration.
-    parameters = django_utils.JSONField(
+    # The list of parameter specifications associated with this exploration.
+    # Each specification is a dict with the keys 'name' and 'obj_type', both of
+    # whose values are strings.
+    param_specs = django_utils.JSONField(
         blank=True, default=[], primitivelist=True,
-        validators=[validate_parameters]
+        validators=[validate_param_specs]
     )
 
     # Whether this exploration is publicly viewable.

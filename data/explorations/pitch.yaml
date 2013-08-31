@@ -67,6 +67,6 @@ states:
       noteToGuess: '{{noteStart}}'
     sticky: True
     widget_id: MusicStaff
-parameters:
+param_specs:
 - name: noteStart
   obj_type: UnicodeString
