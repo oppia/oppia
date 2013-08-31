@@ -68,7 +68,8 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
       highlightStates: '=',
       nodeFill: '@',
       opacityMap: '=',
-      forbidNodeDeletion: '@'
+      forbidNodeDeletion: '@',
+      stateStats: '='
     },
     link: function(scope, element, attrs) {
       scope.truncate = function(text) {
@@ -82,15 +83,75 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         if (newVal) {
           drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
                     scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
-                    scope.highlightStates);
+                    scope.highlightStates, scope.stateStats);
           for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
             document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
-            document.getElementsByClassName('oppia-graph-viz')[i].style.width = width;
+            document.getElementsByClassName('oppia-graph-viz')[i].style.width = width > 680 ? width : 680;
           }
         }
       });
 
-      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates) {
+      function addPopup(vis, stateName, stats) {
+        var modal = d3.select(element[0]).append('div')
+          .attr('class', 'modal')
+          .attr('aria-hidden', 'false')
+          .attr('id','infoModal')
+          .style('top', '400px');
+        var header =  modal.append('div')
+          .attr('class', 'modal-header');
+        header.append('button')
+          .attr('class', 'close')
+          .attr('data-dismiss', 'modal')
+          .attr('aria-hidden', 'true')
+          .html('&times;')
+          .on('click', function (d) {
+            modal.remove() 
+          });
+
+        header.append('h3')
+          .attr('class', 'customizeModalLabel')
+          .text('Statistics for ' + stateName);
+        var body = modal.append('div')
+          .attr('class', 'modal-body');
+        body.append('div')
+          .style('font-weight', 'bold')
+          .text('Times hit:')
+          .append('span')
+            .style('font-weight', 'normal').text("   " + stats.totalEntryCount);
+        var showTitle = false;
+        var title = body.append('div')
+          .style('font-weight', 'bold')
+          .text('Answers:');
+        var ruleList = body.append('ul')
+        for(rule in stats.rule_stats) {
+          if (stats.rule_stats[rule].answers.length == 0) {
+            continue;
+          }
+          showTitle = true;
+          var answerList = ruleList.append('li')
+            .attr('text-anchor', 'start')
+            .text(rule)
+            .append('ul');
+          for (ans in stats.rule_stats[rule].answers) {
+            var answer = stats.rule_stats[rule].answers[ans][0];
+            var count = stats.rule_stats[rule].answers[ans][1];
+            answerList.append('li')
+              .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")");
+          }
+        }       
+        if (!showTitle) {
+          title.remove();
+        }
+        var footer = modal.append('div')
+          .attr('class', 'modal-footer');
+        footer.append('a')
+          .attr('class', 'btn')
+          .attr('data-dismiss', 'modal')
+          .text('Close')
+          .on('click', function (d) {modal.remove() });
+      }
+
+      function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
         height = 0;
         width = 0;
 
@@ -99,8 +160,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
 
         var vis = d3.select(element[0]).append('svg:svg')
             .attr('class', 'oppia-graph-viz')
-          .append('svg:g')
-            .attr('transform', 'translate(20,30)');
+            .attr('width', 680);
 
         // Update the links
         var link = vis.selectAll('path.link')
@@ -302,8 +362,12 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               if (d.hashId != END_DEST) {
                 explorationData.getStateData(d.hashId);
                 scope.$parent.$parent.stateId = d.hashId;
-                $('#editorViewTab a[href="#stateEditor"]').tab('show');
-              }
+                if (!stateStats) {
+                  $('#editorViewTab a[href="#stateEditor"]').tab('show');     
+                } else {
+                  addPopup(vis, d.name, stateStats[d.hashId]);
+                }
+              };
             })
             .append('svg:title')
             .text(function(d) {
