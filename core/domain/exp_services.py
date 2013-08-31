@@ -567,7 +567,7 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
 
 def update_state(committer_id, exploration_id, state_id, new_state_name,
                  param_changes, interactive_widget, interactive_params,
-                 sticky_interactive_widget, interactive_rulesets, content):
+                 interactive_rulesets, sticky_interactive_widget, content):
     """Updates the given state, and commits changes."""
     exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
@@ -598,6 +598,10 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.params = interactive_params
 
     if sticky_interactive_widget is not None:
+        if not isinstance(sticky_interactive_widget, bool):
+            raise Exception(
+                'Expected sticky_interactive_widget to be a boolean, '
+                'received %s' % sticky_interactive_widget)
         state.widget.sticky = sticky_interactive_widget
 
     if interactive_rulesets:
