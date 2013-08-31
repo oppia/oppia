@@ -273,7 +273,7 @@ def export_to_versionable_dict(exploration):
     """
     # TODO(sll): Make this a part of save_exploration().
     params = [{
-        'name': param.name, 'obj_type': param.obj_type, 'values': param.values
+        'name': param.name, 'obj_type': param.obj_type
     } for param in exploration.parameters]
 
     states_list = [export_state_internals_to_dict(
@@ -290,7 +290,7 @@ def export_to_yaml(exploration_id):
     exploration = get_exploration_by_id(exploration_id)
 
     params = [{
-        'name': param.name, 'obj_type': param.obj_type, 'values': param.values
+        'name': param.name, 'obj_type': param.obj_type
     } for param in exploration.parameters]
 
     states_list = [export_state_internals_to_dict(
@@ -486,16 +486,6 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
     return reader_params
 
 
-def get_exploration_params(exploration_id):
-    """Gets exploration-scoped parameters when an exploration is started."""
-    exploration = get_exploration_by_id(exploration_id)
-
-    params = {}
-    for param in exploration.parameters:
-        params[param.name] = param.value
-    return params
-
-
 # Operations on exploration snapshots.
 def get_exploration_snapshots_metadata(exploration_id, limit):
     """Returns the most recent snapshots for this exploration, as dicts.
@@ -587,7 +577,8 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
 
             if not any([param.name == param_change['name']
                         for param in exploration.parameters]):
-                exploration.parameters.append(param_instance)
+                exploration.parameters.append(
+                    param_domain.ParamSpec(param_change['name'], None))
 
             state.param_changes.append(param_instance)
 
@@ -763,8 +754,9 @@ def create_from_yaml(
         init_state_name=init_state_name, image_id=image_id)
 
     try:
+        # Make this into an exploration store.
         exploration_params = [
-            param_domain.Parameter.from_dict(param_dict)
+            param_domain.ParamSpec.from_dict(param_dict)
             for param_dict in exploration_dict['parameters']
         ]
 
@@ -812,7 +804,7 @@ def create_from_yaml(
         exploration.parameters = exploration_params
         save_exploration(user_id, exploration)
     except Exception:
-        delete_exploration(user_id, exploration.id, force_deletion=True)
+        delete_exploration(user_id, exploration_id, force_deletion=True)
         raise
 
     return exploration_id

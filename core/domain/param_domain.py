@@ -82,3 +82,20 @@ class Parameter(object):
     def from_dict(cls, param_dict):
         return cls(param_dict['name'], param_dict['obj_type'],
                    param_dict['values'])
+
+
+class ParamSpec(object):
+    """Value object for a exploration parameter specification."""
+    def __init__(self, name, obj_type):
+        self.name = name
+        self.obj_type = obj_type
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'obj_type': self.obj_type,
+        }
+
+    @classmethod
+    def from_dict(cls, param_dict):
+        return cls(param_dict['name'], param_dict['obj_type'])

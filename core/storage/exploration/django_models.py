@@ -77,8 +77,9 @@ class ExplorationModel(base_models.BaseModel):
             assert isinstance(value, list)
             for val in value:
                 assert isinstance(val, dict)
+                assert len(val.keys()) == 2
                 assert all(
-                    [prop in val for prop in ['name', 'obj_type', 'values']])
+                    [prop in val for prop in ['name', 'obj_type']])
         except AssertionError:
             raise ValidationError(
                 "The 'parameters' property must be a list of parameter dicts"

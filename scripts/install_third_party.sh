@@ -72,7 +72,9 @@ echo Checking whether jquery is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
   echo Installing JQuery
   mkdir -p $THIRD_PARTY_DIR/static/jquery-2.0.3/
+  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.js -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.js
   wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.js
+  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.map -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.map
 fi
 
 echo Checking whether jqueryui is installed in third_party

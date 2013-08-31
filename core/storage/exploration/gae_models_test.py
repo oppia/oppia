@@ -76,7 +76,13 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(db.BadValueError):
             exploration.parameters = 'A string'
 
-        parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': []}
+        with self.assertRaises(db.BadValueError):
+            exploration.parameters = [{
+                'name': 'has_values', 'obj_type': 'Int', 'values': []
+            }]
+            exploration.put('A user id', {})
+
+        parameter = {'name': 'theParameter', 'obj_type': 'Int'}
         exploration.parameters = [parameter]
 
         # The 'is_public' property must be a boolean.

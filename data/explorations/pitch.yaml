@@ -8,7 +8,21 @@ states:
       When you''re ready, click the button to play a note. Listen to it, and guess
       what it is by moving the note to the right place on the staff using the up and
       down arrow keys. When you think you have it, click the ''check answer'' button.'
-  param_changes: []
+  param_changes:
+  - name: noteStart
+    obj_type: UnicodeString
+    values:
+    - C4
+    - D4
+    - E4
+    - F4
+    - G4
+    - A4
+    - B4
+    - C5
+    - D5
+    - E5
+    - F5
   widget:
     handlers:
     - name: submit
@@ -55,15 +69,3 @@ states:
 parameters:
 - name: noteStart
   obj_type: UnicodeString
-  values:
-  - C4
-  - D4
-  - E4
-  - F4
-  - G4
-  - A4
-  - B4
-  - C5
-  - D5
-  - E5
-  - F5

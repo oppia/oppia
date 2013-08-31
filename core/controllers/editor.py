@@ -184,7 +184,7 @@ class ExplorationHandler(base.BaseHandler):
                     'Only the exploration owner can add new collaborators.')
         if parameters:
             exploration.parameters = [
-                param_domain.Parameter.from_dict(param) for param in parameters
+                param_domain.ParamSpec.from_dict(param) for param in parameters
             ]
 
         exp_services.save_exploration(self.user_id, exploration)

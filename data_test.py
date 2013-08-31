@@ -233,12 +233,9 @@ class ExplorationDataUnitTests(DataUnitTest):
         EXPLORATION_SCHEMA = [('parameters', list), ('states', list)]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 
-        PARAMETER_SCHEMA = [('name', basestring), ('values', list),
-                            ('obj_type', basestring)]
+        PARAMETER_SCHEMA = [('name', basestring), ('obj_type', basestring)]
         for param in exploration_dict['parameters']:
             self.verify_dict_keys_and_types(param, PARAMETER_SCHEMA)
-            # TODO(sll): Test that the elements of 'values' are of the correct
-            # type.
 
         # Verify there is at least one state.
         self.assertTrue(exploration_dict['states'])

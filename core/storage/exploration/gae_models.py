@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import core.storage.base_model.gae_models as base_models
 import feconf
 
+from google.appengine.ext import db
 from google.appengine.ext import ndb
 
 
@@ -130,6 +131,19 @@ class ExplorationModel(base_models.BaseModel):
         for key in self._properties:
             if key in properties:
                 setattr(self, key, properties[key])
+
+        # Do validation.
+        try:
+            assert isinstance(self.parameters, list)
+            for param in self.parameters:
+                assert isinstance(param, dict)
+                assert len(param.keys()) == 2
+                assert 'name' in param
+                assert 'obj_type' in param
+        except AssertionError:
+            raise db.BadValueError(
+                "The 'parameters' property must be a list of parameter dicts"
+            )
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1

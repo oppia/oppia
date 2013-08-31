@@ -67,7 +67,7 @@ class ExplorationHandler(base.BaseHandler):
         params = exp_services.update_with_state_params(
             exploration_id,
             exploration.init_state_id,
-            reader_params=exp_services.get_exploration_params(exploration_id)
+            reader_params={}
         )
 
         init_state = exploration.init_state

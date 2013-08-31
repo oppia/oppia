@@ -71,10 +71,16 @@ class ExplorationModelUnitTests(unittest.TestCase):
             exploration.put('user_id', {})
 
         with self.assertRaises(ValidationError):
-            exploration.parameters = [{'name': 'no_obj_type', 'values': [6]}]
+            exploration.parameters = [{'name': 'no_obj_type'}]
             exploration.put('user_id', {})
 
-        parameter = {'name': 'theParameter', 'obj_type': 'Int', 'values': [6]}
+        with self.assertRaises(ValidationError):
+            exploration.parameters = [{
+                'name': 'has_values', 'obj_type': 'Int', 'values': [6]
+            }]
+            exploration.put('user_id', {})
+
+        parameter = {'name': 'theParameter', 'obj_type': 'Int'}
         exploration.parameters = [parameter]
 
         # The 'is_public' property must be a boolean.

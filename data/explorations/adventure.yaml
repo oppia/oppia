@@ -1,22 +1,16 @@
 parameters:
 - name: Name
   obj_type: UnicodeString
-  values: []
 - name: Weapon
   obj_type: UnicodeString
-  values: []
 - name: sneezeitem
   obj_type: UnicodeString
-  values: []
 - name: payitem
   obj_type: UnicodeString
-  values: []
 - name: numcoins
   obj_type: UnicodeString
-  values: []
 - name: Test
   obj_type: UnicodeString
-  values: []
 states:
 - content:
   - type: text

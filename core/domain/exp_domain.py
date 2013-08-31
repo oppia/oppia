@@ -285,8 +285,8 @@ class Exploration(object):
         self.category = exploration_model.category
         self.title = exploration_model.title
         self.state_ids = exploration_model.state_ids
-        self.parameters = [param_domain.Parameter.from_dict(param_dict)
-                           for param_dict in exploration_model.parameters]
+        self.parameters = [param_domain.ParamSpec.from_dict(param_spec_dict)
+                           for param_spec_dict in exploration_model.parameters]
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
@@ -340,7 +340,7 @@ class Exploration(object):
 
     @property
     def param_dicts(self):
-        """A list of parameters, represented as JSONifiable Python dicts."""
+        """A list of param specs, represented as JSONifiable Python dicts."""
         return [param.to_dict() for param in self.parameters]
 
     @property
