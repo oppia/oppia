@@ -1,4 +1,4 @@
-default_skin: conversation
+default_skin: conversation_v1
 parameters: []
 states:
 - content:
@@ -201,7 +201,8 @@ states:
         name: Equals
         param_changes: []
       - dest: Coefficient Signs
-        feedback: []
+        feedback:
+        - Oops, if you have reached this case, something has gone wrong...
         inputs: {}
         name: Default
         param_changes: []

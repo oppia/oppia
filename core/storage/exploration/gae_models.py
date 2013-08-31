@@ -95,7 +95,7 @@ class ExplorationModel(base_models.BaseModel):
     editor_ids = ndb.StringProperty(repeated=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
-    default_skin = ndb.StringProperty(default='conversation')
+    default_skin = ndb.StringProperty(default='conversation_v1')
 
     @classmethod
     def get_public_explorations(cls):

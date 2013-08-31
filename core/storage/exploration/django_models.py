@@ -102,7 +102,7 @@ class ExplorationModel(base_models.BaseModel):
     editor_ids = django_utils.ListField(default=[], blank=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
-    default_skin = models.CharField(max_length=100, default='conversation')
+    default_skin = models.CharField(max_length=100, default='conversation_v1')
 
     @classmethod
     def get_all_explorations(cls):

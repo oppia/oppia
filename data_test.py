@@ -113,10 +113,12 @@ class ExplorationDataUnitTests(DataUnitTest):
                     self.assertIn(rule['dest'], state_name_list)
 
                 # Check that there are no feedback-less self-loops.
+                # TODO(sll): For multiple-choice questions in which the other
+                # rules cover all cases, do not raise an error.
                 self.assertFalse(
                     rule['dest'] == curr_state and not rule['feedback']
                     and not state_dict['widget']['sticky'],
-                    msg='State %s has a self-loop with no feedback. This is '
+                    msg='State "%s" has a self-loop with no feedback. This is '
                     'likely to frustrate the reader.' % curr_state)
 
                 # TODO(sll): Does 'inputs' need any tests?
@@ -230,7 +232,8 @@ class ExplorationDataUnitTests(DataUnitTest):
 
     def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""
-        EXPLORATION_SCHEMA = [('parameters', list), ('states', list)]
+        EXPLORATION_SCHEMA = [('parameters', list), ('states', list),
+                              ('default_skin', basestring)]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 
         PARAMETER_SCHEMA = [('name', basestring), ('obj_type', basestring)]

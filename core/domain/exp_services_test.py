@@ -201,7 +201,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.count_explorations(), 0)
 
         exp_services.load_demos()
-        self.assertEqual(exp_services.count_explorations(), 7)
+        self.assertEqual(
+            exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))
 
         exp_services.delete_demos()
         self.assertEqual(exp_services.count_explorations(), 0)
@@ -220,7 +221,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
         yaml_content = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(
             yaml_content,
-"""default_skin: conversation
+"""default_skin: conversation_v1
 parameters: []
 states:
 - content: []
