@@ -51,7 +51,8 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
         response = collections.defaultdict(list)
         for widget in widgets:
-            response[widget.category].append(widget.get_with_params({}))
+            response[widget.category].append(
+                widget.get_widget_instance_dict({}, {}))
 
         for category in response:
             response[category].sort()
@@ -87,7 +88,7 @@ class WidgetHandler(base.BaseHandler):
             widget = widget_domain.Registry.get_widget_by_id(
                 widget_type, widget_id)
             self.render_json({
-                'widget': widget.get_with_params({}),
+                'widget': widget.get_widget_instance_dict({}, {}),
             })
         except:
             raise self.PageNotFoundException
@@ -95,7 +96,7 @@ class WidgetHandler(base.BaseHandler):
     def post(self, widget_type, widget_id):
         """Handles POST requests, for parameterized widgets."""
         # Key-value mapping of parameters for the widget.
-        params = self.payload.get('params', {})
+        customization_args = self.payload.get('params', {})
 
         state_params_dict = {}
         state_params_given = self.payload.get('state_params')
@@ -105,19 +106,17 @@ class WidgetHandler(base.BaseHandler):
                 state_params_dict[param['name']] = (
                     utils.get_random_choice(param['values']))
 
-        # TODO(sll): We need a better convention for which params must be
-        # JSONified and which should not. Fix this.
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:
             self.render_json({
-                'widget': widget.get_with_params(params, kvps_only=True),
+                'widget': widget.get_widget_instance_dict(
+                    customization_args, state_params_dict, kvps_only=True),
                 'parent_index': self.request.get('parent_index'),
             })
         else:
-            response = widget.get_with_params(
-                utils.parse_dict_with_params(params, state_params_dict),
-                kvps_only=True
+            response = widget.get_widget_instance_dict(
+                customization_args, state_params_dict, kvps_only=True
             )
             self.render_json({'widget': response})

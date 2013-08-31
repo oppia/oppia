@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class CodeRepl(widget_domain.BaseWidget):
@@ -27,29 +28,47 @@ class CodeRepl(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'language',
-        'description': 'Programming language to evalue the code in.',
+        'description': 'Programming language to evaluate the code in.',
+        'generator': generators.RestrictedCopier,
+        'init_args': {
+            'choices': [
+                'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
+                'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
+                'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
+            ]
+        },
+        # These are the default args.
+        'customization_args': {
+            'value': 'coffeescript'
+        },
         'obj_type': 'UnicodeString',
-        'values': ['coffeescript'],
-        'choices': [
-            'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
-            'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
-            'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
-        ]
     }, {
         'name': 'placeholder',
         'description': 'The placeholder for the text input field.',
-        'obj_type': 'UnicodeString',
-        'values': ['Type your code here.']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 'Type your code here.'
+        },        
+        'obj_type': 'UnicodeString',        
     }, {
         'name': 'rows',
         'description': 'The number of rows for the text input field.',
-        'obj_type': 'UnicodeString',
-        'values': ['1']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 1
+        },
+        'obj_type': 'Int',
     }, {
         'name': 'columns',
         'description': 'The number of columns for the text input field.',
-        'obj_type': 'UnicodeString',
-        'values': ['60']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 60
+        },
+        'obj_type': 'Int',
     }]
 
     # Actions that the reader can perform on this widget which trigger a

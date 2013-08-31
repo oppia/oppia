@@ -37,11 +37,12 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - It's translated from a different language.
-      - It's a nonsense word that someone made up.
-      - It's the name of a popular cartoon character.
+        value:
+        - It's translated from a different language.
+        - It's a nonsense word that someone made up.
+        - It's the name of a popular cartoon character.
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -67,7 +68,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -113,8 +114,9 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      noteToGuess: B4
+    customization_args:
+      noteToGuess:
+        value: B4
     sticky: true
     widget_id: MusicStaff
 - content:
@@ -170,7 +172,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -195,7 +197,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -326,7 +328,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput

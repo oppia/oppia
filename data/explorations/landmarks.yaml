@@ -29,9 +29,12 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      latitude: '27.171781'
-      longitude: '78.04217'
-      zoom: '10'
+    customization_args:
+      latitude:
+        value: 27.171781
+      longitude:
+        value: 78.04217
+      zoom:
+        value: 10
     sticky: True
     widget_id: InteractiveMap

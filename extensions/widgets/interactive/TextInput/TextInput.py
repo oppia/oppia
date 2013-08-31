@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class TextInput(widget_domain.BaseWidget):
@@ -28,20 +29,30 @@ class TextInput(widget_domain.BaseWidget):
     _params = [{
         'name': 'placeholder',
         'description': 'The placeholder for the text input field.',
-        'obj_type': 'UnicodeString',
-        'values': ['Type your answer here.']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 'Type your answer here.'
+        },        
+        'obj_type': 'UnicodeString',        
     }, {
         'name': 'rows',
         'description': 'The number of rows for the text input field.',
-        # TODO(sll): This is wrong; change it.
-        'obj_type': 'UnicodeString',
-        'values': ['1']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 1
+        },
+        'obj_type': 'Int',
     }, {
         'name': 'columns',
         'description': 'The number of columns for the text input field.',
-        # TODO(sll): This is wrong; change it.
-        'obj_type': 'UnicodeString',
-        'values': ['60']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 60
+        },
+        'obj_type': 'Int',
     }]
 
     # Actions that the reader can perform on this widget which trigger a

@@ -87,3 +87,21 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value('a'), 'a')
         with self.assertRaises(AssertionError):
             generator.generate_value('c')
+
+    def test_range_restricted_copier(self):
+        with self.assertRaises(TypeError):
+            generators.RangeRestrictedCopier()
+
+        with self.assertRaisesRegexp(TypeError, 'Expected a number'):
+            generators.RangeRestrictedCopier('a', 3)
+        with self.assertRaisesRegexp(TypeError, 'Expected a number'):
+            generators.RangeRestrictedCopier(3, 'b')
+
+        generator = generators.RangeRestrictedCopier(-90, 90.5)
+
+        self.assertEqual(generator.generate_value(-88), -88)
+        self.assertEqual(generator.generate_value(90.25), 90.25)
+        with self.assertRaises(AssertionError):
+            generator.generate_value(-90.1)
+        with self.assertRaises(AssertionError):
+            generator.generate_value(90.51)

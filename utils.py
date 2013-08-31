@@ -86,6 +86,31 @@ def parse_with_jinja(string, params):
     return env.from_string(string).render(new_params)
 
 
+def evaluate_object_with_params(obj, params):
+    """Recursively replaces all {{...}} strings in obj using params.
+
+    In particular, any string in obj that starts with '{{' and ends with '}}'
+    is evaluated using the value from params."""
+
+    if isinstance(obj, basestring):
+        if obj.startswith('{{') and obj.endswith('}}'):
+            return params[obj[2:-2]]
+        else:
+            return obj
+    elif isinstance(obj, list):
+        new_list = []
+        for item in obj:
+            new_list.append(evaluate_object_with_params(item, params))
+        return new_list
+    elif isinstance(obj, dict):
+        new_dict = {}
+        for key in obj:
+            new_dict[key] = evaluate_object_with_params(obj[key], params)
+        return new_dict
+    else:
+        return copy.deepcopy(obj)
+
+
 def parse_dict_with_params(d, params):
     """Optionally converts dict values to strings, then parses them using params.
 

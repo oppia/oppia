@@ -228,6 +228,7 @@ states:
   name: (untitled state)
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -236,14 +237,13 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      buttonText: Continue
     sticky: false
     widget_id: Continue
 - content: []
   name: New state
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -252,8 +252,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      buttonText: Continue
     sticky: false
     widget_id: Continue
 """)
@@ -282,9 +280,7 @@ states:
                             'param_changes': []
                         }]
                     }],
-                    'params': {
-                        u'buttonText': u'Continue'
-                    },
+                    'customization_args': {},
                     'sticky': False,
                     'widget_id': u'Continue'
                 }
@@ -303,9 +299,7 @@ states:
                             'param_changes': []
                         }]
                     }],
-                    'params': {
-                        u'buttonText': u'Continue'
-                    },
+                    'customization_args': {},
                     'sticky': False,
                     'widget_id': u'Continue'
                 }
@@ -336,9 +330,7 @@ states:
             'param_changes': [],
             'widget': {
                 'widget_id': u'Continue',
-                'params': {
-                    u'buttonText': u'Continue',
-                },
+                'customization_args': {},
                 'sticky': False,
                 'handlers': [{
                     'name': u'submit',

@@ -246,7 +246,8 @@ def export_content_to_html(content_array, block_number, params=None):
             widget_array.append({
                 'blockIndex': block_number,
                 'index': widget_array_len,
-                'raw': widget.get_raw_code(widget_dict['params']),
+                'raw': widget.get_raw_code(
+                    widget_dict['customization_args'], params),
             })
         else:
             raise utils.InvalidInputException(
@@ -795,8 +796,8 @@ def create_from_yaml(
             }) for handler in wdict['handlers']]
 
             state.widget = exp_domain.WidgetInstance(
-                wdict['widget_id'], wdict['params'], widget_handlers,
-                wdict['sticky'])
+                wdict['widget_id'], wdict['customization_args'],
+                widget_handlers, wdict['sticky'])
 
             save_state(user_id, exploration_id, state)
 

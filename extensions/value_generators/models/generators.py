@@ -17,6 +17,7 @@
 """Custom value generator classes."""
 
 import copy
+import numbers
 import random
 
 import utils
@@ -108,4 +109,23 @@ class RestrictedCopier(BaseValueGenerator):
 
     def generate_value(self, value):
         assert value in self.choices
+        return copy.deepcopy(value)
+
+
+class RangeRestrictedCopier(BaseValueGenerator):
+    """Returns the input, after checking it is in a given interval."""
+
+    min_value = 0
+    max_value = 0
+
+    def __init__(self, min_value, max_value):
+        if not isinstance(min_value, numbers.Number):
+            raise TypeError('Expected a number, received %s' % min_value)
+        if not isinstance(max_value, numbers.Number):
+            raise TypeError('Expected a number, received %s' % max_value)
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def generate_value(self, value):
+        assert self.min_value <= value <= self.max_value
         return copy.deepcopy(value)

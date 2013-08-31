@@ -27,8 +27,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -88,8 +87,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -178,8 +176,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -227,8 +224,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -270,9 +266,10 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - Go north
+        value:
+        - Go north
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -293,7 +290,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -346,7 +343,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -367,7 +364,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -398,7 +395,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput

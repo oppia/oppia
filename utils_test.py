@@ -54,6 +54,46 @@ class UtilsTests(test_utils.GenericTestBase):
         parsed_str = utils.parse_with_jinja('int {{i}}', {'i': 2})
         self.assertEqual(parsed_str, 'int 2')
 
+    def evaluate_object_with_params(self):
+        """Test evaluate_object_with_params method."""
+        parsed_object = utils.evaluate_object_with_params('abc', {})
+        self.assertEqual(parsed_object, 'abc')
+
+        parsed_object = utils.evaluate_object_with_params(
+            '{{ab}}', {'ab': 'c'})
+        self.assertEqual(parsed_object, 'c')
+
+        parsed_object = utils.evaluate_object_with_params(
+            'abc{{ab}}', {'ab': 'c'})
+        self.assertEqual(parsed_object, 'abc{{ab}}')
+
+        parsed_object = utils.evaluate_object_with_params(
+            ['a', '{{a}}', 'a{{a}}'], {'a': 'b'})
+        self.assertEqual(parsed_object, ['a', 'b', 'a{{a}}'])
+
+        parsed_object = utils.evaluate_object_with_params({}, {})
+        self.assertEqual(parsed_object, {})
+
+        parsed_object = utils.evaluate_object_with_params({}, {'a': 'b'})
+        self.assertEqual(parsed_object, {})
+
+        parsed_object = utils.evaluate_object_with_params({'a': 'b'}, {})
+        self.assertEqual(parsed_object, {'a': 'b'})
+
+        with self.assertRaises(KeyError):
+            utils.evaluate_object_with_params('{{c}}', {})
+
+        with self.assertRaises(KeyError):
+            utils.evaluate_object_with_params('{{c}}', {'a': 'b'})
+
+        parsed_object = utils.evaluate_object_with_params(
+            {'a': '{{b}}'}, {'b': 3})
+        self.assertEqual(parsed_object, {'a': 3})
+
+        parsed_object = utils.evaluate_object_with_params(
+            {'a': '{{b}}'}, {'b': 'c'})
+        self.assertEqual(parsed_object, {'a': 'c'})
+
     def test_parse_dict_with_params(self):
         """Test parse_dict_with_params method."""
         parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {})

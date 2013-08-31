@@ -1,4 +1,5 @@
 from core.domain import widget_domain
+from extensions.value_generators.models import generators
 
 
 class Continue(widget_domain.BaseWidget):
@@ -26,8 +27,12 @@ class Continue(widget_domain.BaseWidget):
     _params = [{
         'name': 'buttonText',
         'description': 'The text that should be displayed on the button.',
-        'obj_type': 'UnicodeString',
-        'values': ['Continue']
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 'Continue'
+        },
+        'obj_type': 'UnicodeString'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

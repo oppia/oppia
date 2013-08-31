@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class MultipleChoiceInput(widget_domain.BaseWidget):
@@ -26,10 +27,12 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
     _params = [{
         'name': 'choices',
         'description': 'The options that the reader can select from.',
-        'obj_type': 'List',
-        'values': [
-            ['Default choice']
-        ]
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': ['Default choice']
+        },
+        'obj_type': 'List'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

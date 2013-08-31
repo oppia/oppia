@@ -63,8 +63,9 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      noteToGuess: '{{noteStart}}'
+    customization_args:
+      noteToGuess:
+        value: '{{noteStart}}'
     sticky: True
     widget_id: MusicStaff
 param_specs:

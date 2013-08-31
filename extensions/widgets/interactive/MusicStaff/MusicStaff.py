@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class MusicStaff(widget_domain.BaseWidget):
@@ -29,10 +30,12 @@ class MusicStaff(widget_domain.BaseWidget):
     _params = [{
         'name': 'noteToGuess',
         'description': 'The note that the reader should guess.',
-        'obj_type': 'UnicodeString',
-        'values': [
-            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'
-        ]
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 'C5'
+        },
+        'obj_type': 'UnicodeString'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

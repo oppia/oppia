@@ -18,7 +18,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -46,8 +46,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      placeholder: Type your answer here.
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -72,12 +71,13 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - x^3 - a * x^2 - b * x - c
-      - x^3 + (a+b+c) * x^2 + (ab+bc+ca) * x + abc
-      - x^3 - (a+b+c) * x^2 + (ab+bc+ca) * x - abc
-      - x^3 + (a+b+c) * x^2 - (ab+bc+ca) * x + abc
+        value:
+        - x^3 - a * x^2 - b * x - c
+        - x^3 + (a+b+c) * x^2 + (ab+bc+ca) * x + abc
+        - x^3 - (a+b+c) * x^2 + (ab+bc+ca) * x - abc
+        - x^3 + (a+b+c) * x^2 - (ab+bc+ca) * x + abc
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -105,12 +105,13 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - a1
-      - a1 + a2 + a3 + ... + an
-      - '1'
-      - a1 * a2 * a3 * ... * an
+        value:
+        - a1
+        - a1 + a2 + a3 + ... + an
+        - '1'
+        - a1 * a2 * a3 * ... * an
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -147,13 +148,14 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - a1 * a2 + a2 * a3 + ... + an * a1
-      - a1 + a2 + a3 + ... + an
-      - a2
-      - a1 * a2 * ... * a(n-1) + a1 * a2 * ... * a(n-2) * an + ... + a2 * a3 * ...
-        * an
+        value:
+        - a1 * a2 + a2 * a3 + ... + an * a1
+        - a1 + a2 + a3 + ... + an
+        - a2
+        - a1 * a2 * ... * a(n-1) + a1 * a2 * ... * a(n-2) * an + ... + a2 * a3 * ...
+          * an
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -206,12 +208,13 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - +,-,-,+
-      - +,+,+,+
-      - +,-,+,-
-      - -,+,-,+
+        value:
+        - +,-,-,+
+        - +,+,+,+
+        - +,-,+,-
+        - -,+,-,+
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -241,10 +244,11 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - Positive
-      - Negative
+        value:
+        - Positive
+        - Negative
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -272,7 +276,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -300,7 +304,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -329,12 +333,13 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - '1'
-      - (-1)^n * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
-      - (-1) * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
-      - (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
+        value:
+        - '1'
+        - (-1)^n * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
+        - (-1) * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
+        - (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -357,6 +362,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: Continue

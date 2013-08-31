@@ -63,8 +63,7 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        # TODO: get params from exploration specification instead
-        params = exp_services.update_with_state_params(
+        reader_params = exp_services.update_with_state_params(
             exploration_id,
             exploration.init_state_id,
             reader_params={}
@@ -72,21 +71,19 @@ class ExplorationHandler(base.BaseHandler):
 
         init_state = exploration.init_state
         init_html, init_widgets = exp_services.export_content_to_html(
-            init_state.content, 0, params)
+            init_state.content, 0, reader_params)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_raw_code(
-            params=utils.parse_dict_with_params(
-                init_state.widget.params, params)
-        )
+            init_state.widget.customization_args, reader_params)
 
         self.values.update({
             'block_number': 0,
             'interactive_html': interactive_html,
-            'interactive_params': init_state.widget.params,
+            'interactive_params': init_state.widget.customization_args,
             'oppia_html': init_html,
-            'params': params,
+            'params': reader_params,
             'state_history': [exploration.init_state_id],
             'state_id': exploration.init_state_id,
             'title': exploration.title,
@@ -102,21 +99,15 @@ class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_id, handler,
-            rule):
+            self, old_state, answer, exploration_id, old_state_id,
+            old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
         )
 
-        # TODO(sll): Parse this using old_params, but do not convert into
-        # a JSON string.
-        recorded_answer_params = old_state.widget.params
-        recorded_answer_params.update({
-            'answer': answer,
-        })
         recorded_answer = widget.get_stats_log_html(
-            params=recorded_answer_params)
+            old_state.widget.customization_args, old_params, answer)
 
         stats_services.EventHandler.record_answer_submitted(
             exploration_id, old_state_id, handler, str(rule), recorded_answer)
@@ -156,10 +147,7 @@ class FeedbackHandler(base.BaseHandler):
             interactive_html = '' if sticky else (
                 widget_domain.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-                ).get_raw_code(
-                    params=utils.parse_dict_with_params(
-                        new_state.widget.params, new_params)
-                )
+                ).get_raw_code(new_state.widget.customization_args, new_params)
             )
 
             return (new_params, html_output, iframe_output, interactive_html)
@@ -209,22 +197,18 @@ class FeedbackHandler(base.BaseHandler):
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, state_id, handler, rule)
+            old_state, answer, exploration_id, state_id, old_params,
+            handler, rule)
 
         # Append the reader's answer to the response HTML.
         reader_response_html = ''
         reader_response_iframe = ''
         if not sticky:
-            reader_response_params = utils.parse_dict_with_params(
-                old_state.widget.params, old_params)
-            # TODO(sll): This is a hack to solve an issue with unnecessary
-            # conversion of the answer to a JavaScript-safe string. Fix it by
-            # using a custom filter.
-            reader_response_params['answer'] = answer
+            old_widget = widget_domain.Registry.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
             reader_response_html, reader_response_iframe = (
-                widget_domain.Registry.get_widget_by_id(
-                    feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
-                ).get_reader_response_html(reader_response_params)
+                old_widget.get_reader_response_html(
+                    old_state.widget.customization_args, old_params, answer)
             )
         values['reader_response_html'] = reader_response_html
         values['reader_response_iframe'] = reader_response_iframe

@@ -166,7 +166,7 @@ class WidgetInstance(object):
     def to_dict(self):
         return {
             'widget_id': self.widget_id,
-            'params': self.params,
+            'customization_args': self.customization_args,
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }
@@ -175,13 +175,13 @@ class WidgetInstance(object):
     def from_dict(cls, widget_dict):
         return cls(
             widget_dict['widget_id'],
-            widget_dict['params'],
+            widget_dict['customization_args'],
             [AnswerHandlerInstance.from_dict(h)
              for h in widget_dict['handlers']],
             widget_dict['sticky'],
         )
 
-    def __init__(self, widget_id, params, handlers, sticky=False):
+    def __init__(self, widget_id, customization_args, handlers, sticky=False):
         if not widget_id:
             raise ValueError('No id specified for widget instance')
         # TODO(sll): Check whether the widget_id is valid.
@@ -189,10 +189,9 @@ class WidgetInstance(object):
             raise ValueError('No handlers specified for widget instance')
 
         self.widget_id = widget_id
-        # Parameters for the interactive widget view, stored as key-value
-        # pairs. Each parameter is single-valued. The values may be Jinja
-        # templates that refer to state parameters.
-        self.params = params
+        # Customization args for the interactive widget view. Parts of these
+        # args may be Jinja templates that refer to state parameters.
+        self.customization_args = customization_args
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(
             handler.name, handler.rule_specs
@@ -203,14 +202,7 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, state_id):
-        continue_widget = widget_domain.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, 'Continue')
-
-        continue_params = {}
-        for param in continue_widget.params:
-            continue_params[param.name] = param.value
-        
-        return cls('Continue', continue_params,
+        return cls('Continue', {},
                    [AnswerHandlerInstance.get_default_handler(state_id)])
 
 
@@ -274,7 +266,7 @@ class State(object):
             self.widget = WidgetInstance.create_default_widget(self.id)
         else:
             self.widget = WidgetInstance(
-                widget.widget_id, widget.params, widget.handlers,
+                widget.widget_id, widget.customization_args, widget.handlers,
                 widget.sticky)
 
 

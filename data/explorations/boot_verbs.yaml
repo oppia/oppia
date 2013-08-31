@@ -31,7 +31,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False
     widget_id: TextInput
 - name: So...
@@ -55,7 +55,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: boot verb
@@ -86,7 +86,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: subject
@@ -111,7 +111,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: verb endings
@@ -148,6 +148,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput

@@ -39,7 +39,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: Adios
@@ -71,7 +71,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: Colores
@@ -121,13 +121,14 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - negro y azul
-      - anaranjado y blanco
-      - rojo y verde
-      - amarillo y gris
-      - I don't know
+        value:
+        - negro y azul
+        - anaranjado y blanco
+        - rojo y verde
+        - amarillo y gris
+        - I don't know
     sticky: False      
     widget_id: MultipleChoiceInput
 - name: Como meaning
@@ -166,7 +167,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: Me llamo
@@ -202,7 +203,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: Me llamo meaning
@@ -243,7 +244,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: False      
     widget_id: TextInput
 - name: Supermercado
@@ -291,11 +292,12 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - Ventanas
-      - Coches
-      - Manzanas
-      - I don't know
+        value:
+        - Ventanas
+        - Coches
+        - Manzanas
+        - I don't know
     sticky: False      
     widget_id: MultipleChoiceInput

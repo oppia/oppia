@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class InteractiveMap(widget_domain.BaseWidget):
@@ -27,18 +28,36 @@ class InteractiveMap(widget_domain.BaseWidget):
     _params = [{
         'name': 'latitude',
         'description': 'Starting map center latitude (-90 to 90).',
-        'obj_type': 'Real',
-        'values': [0.0]
+        'generator': generators.RangeRestrictedCopier,
+        'init_args': {
+            'min_value': -90.0,
+            'max_value': 90.0
+        },
+        'customization_args': {
+            'value': 0.0
+        },
+        'obj_type': 'Real'
     }, {
         'name': 'longitude',
         'description': 'Starting map center longitude (-180 to 180).',
-        'obj_type': 'Real',
-        'values': [0.0]
+        'generator': generators.RangeRestrictedCopier,
+        'init_args': {
+            'min_value': -180.0,
+            'max_value': 180.0
+        },
+        'customization_args': {
+            'value': 0.0
+        },
+        'obj_type': 'Real'
     }, {
         'name': 'zoom',
         'description': 'Starting map zoom level (0 shows the entire earth).',
-        'obj_type': 'Real',
-        'values': [0.0]
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': 0.0
+        },
+        'obj_type': 'Real'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

@@ -23,7 +23,7 @@ import os
 import pkgutil
 
 import feconf
-from core.domain import param_domain
+from core.domain import obj_services
 from core.domain import rule_domain
 import utils
 
@@ -34,8 +34,8 @@ class AnswerHandler(object):
     def __init__(self, name='submit', input_type=None):
         self.name = name
         self.input_type = input_type
-        # TODO(sll): Add an assert for input_type: it should be None or a
-        # class in extensions.objects.models.objects.
+        # TODO(sll): Add an assertion to check that input_type is either None
+        # or a class in extensions.objects.models.objects.
 
     @property
     def rules(self):
@@ -48,6 +48,45 @@ class AnswerHandler(object):
                 None if self.input_type is None else self.input_type.__name__
             )
         }
+
+
+class WidgetParam(object):
+    """Value object for a widget parameter."""
+
+    def __init__(self, name, description, generator, init_args,
+                 customization_args, obj_type):
+        self.name = name
+        self.description = description
+        self.generator = generator
+        self.init_args = init_args
+        self.customization_args = customization_args
+        self.obj_type = obj_type
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'generator_id': self.generator.__name__,
+            # TODO(sll): Check that the next two dicts are JSON-ifiable.
+            'init_args': self.init_args,
+            'customization_args': self.customization_args,
+            'obj_type': self.obj_type,
+        }
+
+    @classmethod
+    def from_dict(cls, widget_param_dict):
+        raise NotImplementedError
+
+    @property
+    def value(self):
+        """Generates a new value using the parameter's customization args."""
+        value_generator = self.generator(**self.init_args)
+        generated_value = value_generator.generate_value(
+            **self.customization_args)
+
+        # Check that the generated value has the correct type.
+        obj_class = obj_services.get_object_class(self.obj_type)
+        return obj_class.normalize(generated_value)
 
 
 class BaseWidget(object):
@@ -84,7 +123,7 @@ class BaseWidget(object):
 
     @property
     def params(self):
-        return [param_domain.Parameter(**param) for param in self._params]
+        return [WidgetParam(**param) for param in self._params]
 
     @property
     def handlers(self):
@@ -139,20 +178,90 @@ class BaseWidget(object):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
 
-    def get_raw_code(self, params=None):
+    def _get_widget_param_instances(self, state_customization_args, 
+                                    context_params):
+        """Returns a dict of parameter names and values for the widget.
+
+        This dict is used to evaluate widget templates. The parameter values
+        are generated based on the widget customizations that are defined by
+        the exploration creator. These customizations may also make use of the
+        state parameters.
+
+        Args:
+          - state_customization_args: dict that maps parameter names to
+              custom customization args that are defined in the exploration.
+          - context_params: dict with state parameters that is used to
+              evaluate any values in state_customization_args that are of the
+              form {{STATE_PARAM_NAME}}.
+
+        Returns:
+          A dict of key-value pairs; the keys are parameter names and the
+          values are the generated values for the parameter instance.
+        """
+        if state_customization_args is None:
+            state_customization_args = {}
+        # TODO(sll): Move this out of here and put it in the reader
+        # controller? Widgets should not know about the states they are in.
+        state_customization_args = utils.evaluate_object_with_params(
+            state_customization_args, context_params)
+
+        parameters = {}
+        for param in self.params:
+            value_generator = param.generator(**param.init_args)
+            # Use the given customization args. If they do not exist, use the
+            # default customization args for the parameter.
+            args_to_use = (
+                state_customization_args[param.name]
+                if param.name in state_customization_args
+                else param.customization_args
+            )
+
+            parameters[param.name] = value_generator.generate_value(
+                **args_to_use)
+
+        return parameters
+
+    def get_raw_code(self, state_customization_args, context_params):
         """Gets the raw code for a parameterized widget."""
+        return utils.parse_with_jinja(
+            self.template,
+            self._get_widget_param_instances(
+                state_customization_args, context_params))
 
-        if params is None:
-            params = {}
+    def get_reader_response_html(self, state_customization_args,
+                                 context_params, answer):
+        """Gets the parameterized HTML and iframes for a reader response."""
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
 
-        # Parameters used to generate the raw code for the widget.
-        parameters = dict((param.name, param.value) for param in self.params)
-        for param in params:
-            parameters[param] = params[param]
+        parameters = self._get_widget_param_instances(
+            state_customization_args, context_params)
+        parameters['answer'] = answer
 
-        return utils.parse_with_jinja(self.template, parameters)
+        html, iframe = self._response_template_and_iframe
+        html = utils.parse_with_jinja(html, parameters)
+        iframe = utils.parse_with_jinja(iframe, parameters)
+        return html, iframe
 
-    def get_with_params(self, params, kvps_only=False):
+    def get_stats_log_html(self, state_customization_args,
+                           context_params, answer):
+        """Gets the HTML for recording a reader response for the stats log.
+
+        Returns an HTML string.
+        """
+        if not self.is_interactive:
+            raise Exception(
+                'This method should only be called for interactive widgets.')
+
+        parameters = self._get_widget_param_instances(
+            state_customization_args, context_params)
+        parameters['answer'] = answer
+
+        return utils.parse_with_jinja(self._stats_log_template, parameters)
+
+    def get_widget_instance_dict(self, customization_args, context_params,
+                                 kvps_only=False):
         """Gets a dict representing a parameterized widget.
 
         If kvps_only is True, then the value for params in the result is
@@ -160,7 +269,10 @@ class BaseWidget(object):
 
             {PARAM_NAME: {'value': PARAM_VALUE, 'obj_type': PARAM_OBJ_TYPE}}.
         """
+        # TODO(sll): This needs to be clarified; it should send the entire
+        # param dict.
 
+        """
         param_dict = {}
         for param in self.params:
             param_dict[param.name] = {
@@ -172,14 +284,15 @@ class BaseWidget(object):
         if kvps_only:
             for param in param_dict:
                 param_dict[param] = param_dict[param]['value']
+        """
 
         result = {
             'name': self.name,
             'category': self.category,
             'description': self.description,
             'id': self.id,
-            'raw': self.get_raw_code(params),
-            'params': param_dict,
+            'raw': self.get_raw_code(customization_args, context_params),
+            # 'params': param_dict,
         }
 
         if self.type == feconf.INTERACTIVE_PREFIX:
@@ -191,42 +304,6 @@ class BaseWidget(object):
                 ) for rule_cls in handler.rules)
 
         return result
-
-    def get_reader_response_html(self, params=None):
-        """Gets the parameterized HTML and iframes for a reader response."""
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
-        if params is None:
-            params = {}
-
-        parameters = dict((param.name, param.value) for param in self.params)
-        for param in params:
-            parameters[param] = params[param]
-
-        html, iframe = self._response_template_and_iframe
-        html = utils.parse_with_jinja(html, parameters)
-        iframe = utils.parse_with_jinja(iframe, parameters)
-        return html, iframe
-
-    def get_stats_log_html(self, params=None):
-        """Gets the HTML for recording a reader response for the stats log.
-
-        Returns an HTML string.
-        """
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
-        if params is None:
-            params = {}
-
-        parameters = dict((param.name, param.value) for param in self.params)
-        for param in params:
-            parameters[param] = params[param]
-
-        return utils.parse_with_jinja(self._stats_log_template, parameters)
 
     def get_handler_by_name(self, handler_name):
         """Get the handler for a widget, given the name of the handler."""

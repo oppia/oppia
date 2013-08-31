@@ -90,8 +90,8 @@ class ExplorationDataUnitTests(DataUnitTest):
             # type.
 
         WIDGET_SCHEMA = [
-            ('widget_id', basestring), ('params', dict), ('handlers', list),
-            ('sticky', bool)]
+            ('widget_id', basestring), ('customization_args', dict),
+            ('handlers', list), ('sticky', bool)]
         self.verify_dict_keys_and_types(state_dict['widget'], WIDGET_SCHEMA)
 
         for handler in state_dict['widget']['handlers']:
@@ -131,7 +131,8 @@ class ExplorationDataUnitTests(DataUnitTest):
                     # TODO(sll): Test that the elements of 'values' are of the
                     # correct type.
 
-        for wp_name, wp_value in state_dict['widget']['params'].iteritems():
+        for wp_name, wp_value in (
+                state_dict['widget']['customization_args'].iteritems()):
             self.assertTrue(isinstance(wp_name, basestring))
 
             # Check that the parameter name is valid.
@@ -159,7 +160,11 @@ class ExplorationDataUnitTests(DataUnitTest):
                     break
 
             # Check that the parameter value has the correct type.
-            obj_class.normalize(wp_value)
+            # TODO(sll): Replace this with a method that generates the
+            # parameter and tests it. This method needs to be able to
+            # substitute parameters if necessary, or be able to ignore
+            # those cases.
+            # obj_class.normalize(wp_value)
 
     def get_state_ind_from_name(self, states_list, state_name):
         """Given a state name, returns its index in the state list."""
@@ -418,20 +423,26 @@ class WidgetDataUnitTests(DataUnitTest):
             )
 
             for param in widget._params:
-                PARAM_KEYS = ['name', 'description', 'obj_type', 'values', 'choices']
-                for p in param.keys():
+                PARAM_KEYS = ['name', 'description', 'generator', 'init_args',
+                              'customization_args', 'obj_type']
+                for p in param:
                     self.assertIn(p, PARAM_KEYS)
 
                 self.assertTrue(isinstance(param['name'], basestring))
                 self.assertTrue(self.is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
 
-                # Check that the default values have the correct types.
+                # TODO(sll): Check that the generator is an subclass of
+                # BaseValueGenerator.
+
+                self.assertTrue(isinstance(param['init_args'], dict))
+                self.assertTrue(isinstance(param['customization_args'], dict))
+                self.assertTrue(isinstance(param['obj_type'], basestring))
+
                 obj_class = obj_services.get_object_class(param['obj_type'])
                 self.assertIsNotNone(obj_class)
-                self.assertTrue(isinstance(param['values'], list))
-                for value in param['values']:
-                    obj_class.normalize(value)
-                if 'choices' in param:
-                    for choice in param['choices']:
-                        obj_class.normalize(value)
+
+            # Check that the default customization args result in
+            # parameters with the correct types.
+            for param in widget.params:
+                param.value

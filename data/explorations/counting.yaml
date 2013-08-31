@@ -37,7 +37,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -84,10 +84,9 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      columns: '60'
-      placeholder: Type your answer here.
-      rows: '5'
+    customization_args:
+      rows:
+        value: '5'
     sticky: false
     widget_id: TextInput
 - content:
@@ -171,7 +170,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: true
     widget_id: SetInput
 - content:
@@ -203,10 +202,11 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - 'Yes'
-      - 'No'
+        value:
+        - 'Yes'
+        - 'No'
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -241,10 +241,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      columns: '60'
-      placeholder: Type your answer here.
-      rows: '1'
+    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -276,10 +273,11 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
+    customization_args:
       choices:
-      - Yes! It's clearly 8.
-      - No, I don't think it's 8.
+        value:
+        - Yes! It's clearly 8.
+        - No, I don't think it's 8.
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -347,7 +345,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -423,7 +421,7 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params: {}
+    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -500,9 +498,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    params:
-      columns: '60'
-      placeholder: Type your answer here.
-      rows: '1'
+    customization_args: {}
     sticky: false
     widget_id: TextInput
