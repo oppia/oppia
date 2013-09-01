@@ -42,34 +42,6 @@ oppia.directive('copier', function($compile) {
       $scope.initArgs = $scope.$parent.initArgs;
       $scope.customizationArgs = $scope.$parent.customizationArgs;
       $scope.objType = $scope.$parent.objType;
-
-      console.log($scope);
-      console.log($scope.$parent);
-
-      // Reset the component each time the item changes.
-      $scope.$watch('customizationArgs.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'item'.
-        $scope.localItem = {label: $scope.customizationArgs.value};
-        $scope.active = false;
-      });
-
-      $scope.openItemEditor = function() {
-        $scope.active = true;
-      };
-
-      $scope.closeItemEditor = function() {
-        $scope.active = false;
-      };
-
-      $scope.replaceItem = function(newItem) {
-        if (!newItem) {
-          warningsData.addWarning('Please enter a non-empty item.');
-          return;
-        }
-        $scope.localItem = {label: newItem};
-        $scope.customizationArgs.value = newItem;
-        $scope.closeItemEditor();
-      };
     }
   };
 });
