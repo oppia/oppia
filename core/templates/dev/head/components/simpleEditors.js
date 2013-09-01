@@ -18,13 +18,13 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('list', function (warningsData) {
+oppia.directive('list', function(warningsData) {
   // Editable list directive.
   return {
     restrict: 'E',
     scope: {items: '=', largeInput: '@'},
     templateUrl: '/templates/list',
-    controller: function ($scope, $attrs) {
+    controller: function($scope, $attrs) {
       $scope.largeInput = ($scope.largeInput || false);
 
       // Reset the component each time the item list changes.

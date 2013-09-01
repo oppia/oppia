@@ -13,29 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the parameter generator editors.
+ * @fileoverview Directives for the parameter generator editors.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('paramGeneratorEditor', function ($compile, $http, warningsData) {
-  var valueGeneratorTemplatesUrl = '/value_generator_templates/';
+var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_templates/';
+var GENERATOR_ID_TO_DIRECTIVE_MAPPING = {
+  'Copier': 'copier'
+};
 
-  var linker = function(scope, element, attrs) {
-    // TODO(sll): This is a bit clumsy. It is possible to specify a dynamic
-    // templateUrl in AngularJS 1.1.4, so update this when we upgrade the
-    // Angular dependency.
-    scope.getTemplateUrl = function(generatorId) {
-      return valueGeneratorTemplatesUrl + generatorId;
-    };
-
-    $compile(element.contents())(scope);
-  };
-
+oppia.directive('copier', function($compile) {
   return {
-    link: linker,
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
+      };
+      $compile(element.contents())(scope);
+    },
     restrict: 'E',
-    scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='},
-    template: '<div ng-include="getTemplateUrl(generatorId)"></div>'
+    scope: true,
+    template: '<div ng-include="getTemplateUrl()"></div>',
+    controller: function($scope, $attrs) {
+      console.log('Insert controller logic here.');
+    }
+  };
+});
+
+oppia.directive('paramGeneratorEditor', function($compile, $http, warningsData) {
+  return {
+    link: function(scope, element, attrs) {
+      var directiveName = GENERATOR_ID_TO_DIRECTIVE_MAPPING[scope.generatorId];
+      element.html('<' + directiveName + '></' + directiveName + '>');
+      $compile(element.contents())(scope);
+    },
+    restrict: 'E',
+    scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='}
   };
 });
