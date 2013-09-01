@@ -26,12 +26,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         """Test that no GET request results in a 500 error."""
 
         for route in main.urls:
-            if isinstance(route, tuple):
-                continue
-            else:
-                url = route.template
-            if url.endswith('?'):
-                url = url[:-1]
+            url = route.template
             url = re.sub('<([^/^:]+)>', 'abc012', url)
 
             # Some of these will 404 or 302. This is expected.

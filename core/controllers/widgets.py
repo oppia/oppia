@@ -18,11 +18,11 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
 
-import feconf
 from core.controllers import base
+from core.domain import widget_domain
 from core.platform import models
 user_services = models.Registry.import_user_services()
-from core.domain import widget_domain
+import feconf
 import utils
 
 
