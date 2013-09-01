@@ -18,6 +18,8 @@ __author__ = 'Sean Lip'
 
 from core.domain import exp_services
 from core.domain import stats_services
+from core.platform import models
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 import test_utils
 import utils
@@ -401,7 +403,8 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
-        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
+        with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError, 'not found'):
             exp_services.get_state_by_id(EXP_ID, 'invalid_state_id')
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
@@ -500,3 +503,68 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
+
+    def test_versioning_with_add_and_delete_states(self):
+        eid = 'exp_id'
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new('user_id', 'A title', 'A category', eid))
+
+        # Publish the exploration so that version snapshots start getting
+        # recorded.
+        exploration.is_public = True
+        exp_services.save_exploration('committer_id_1', exploration)
+        commit_dict_1 = {
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first published.',
+            'version_number': 1,
+        }
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 5)
+        self.assertEqual(len(snapshots_metadata), 1)
+
+        exp_services.add_state('committer_id_2', eid, 'New state')
+        commit_dict_2 = {
+            'committer_id': 'committer_id_2',
+            'commit_message': '',
+            'version_number': 2,
+        }
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 5)
+        self.assertEqual(len(snapshots_metadata), 2)
+        self.assertDictContainsSubset(
+            commit_dict_2, snapshots_metadata[0])
+        self.assertDictContainsSubset(commit_dict_1, snapshots_metadata[1])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])
+
+        # Perform an invalid action: delete a state that does not exist. This
+        # should not create a new version.
+        with self.assertRaisesRegexp(ValueError, 'Invalid state id'):
+            exp_services.delete_state(
+                'bad_committer', eid, 'invalid_state_id')
+
+        # Now delete the new state.
+        new_state_id = exp_services.convert_state_name_to_id(eid, 'New state')
+        exp_services.delete_state('committer_id_3', eid, new_state_id)
+        commit_dict_3 = {
+            'committer_id': 'committer_id_3',
+            'commit_message': '',
+            'version_number': 3,
+        }
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 5)
+        self.assertEqual(len(snapshots_metadata), 3)
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[0])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+        self.assertDictContainsSubset(commit_dict_1, snapshots_metadata[2])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])
+        self.assertGreaterEqual(
+            snapshots_metadata[1]['created_on'],
+            snapshots_metadata[2]['created_on'])
+
+        # The final exploration should have exactly one state.
+        exploration = exp_services.get_exploration_by_id(eid)
+        self.assertEqual(len(exploration.states), 1)

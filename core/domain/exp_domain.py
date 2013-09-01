@@ -23,7 +23,6 @@ should therefore be independent of the specific storage models used."""
 __author__ = 'Sean Lip'
 
 from core.domain import param_domain
-from core.domain import widget_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration

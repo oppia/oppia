@@ -82,7 +82,6 @@ class ImageHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            # TODO(sll): Support other image types.
             self.response.headers['Content-Type'] = (
                 str('image/%s' % image.format))
             self.response.write(image.raw)

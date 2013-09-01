@@ -62,43 +62,42 @@ def _get_state_memcache_key(exploration_id, state_id):
 
 def get_exploration_by_id(exploration_id, strict=True):
     """Returns a domain object representing an exploration."""
-    # exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
-    # memcached_exploration = memcache_services.get_multi(
-    #     [exploration_memcache_key]).get(exploration_memcache_key)
-    memcached_exploration = None
+    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    memcached_exploration = memcache_services.get_multi(
+        [exploration_memcache_key]).get(exploration_memcache_key)
 
     if memcached_exploration is not None:
         return memcached_exploration
     else:
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict)
-        exploration = exp_domain.Exploration(
-            exploration_model) if exploration_model else None
-
-        # memcache_services.set_multi({exploration_memcache_key: exploration})
-        return exploration
+        if exploration_model:
+            exploration = exp_domain.Exploration(exploration_model)
+            memcache_services.set_multi({
+                exploration_memcache_key: exploration})
+            return exploration
+        else:
+            return None
 
 
 def get_state_by_id(exploration_id, state_id, strict=True):
     """Returns a domain object representing a state, given its id."""
     # TODO(sll): Generalize this to handle multiple state_ids at a time.
-    exploration = get_exploration_by_id(exploration_id)
-    if state_id not in exploration.state_ids:
-        raise ValueError(
-            'Invalid state id %s for exploration %s' % (
-                state_id, exploration.id))
-
-    memcached_state = None
-    # state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
-    # memcached_state = memcache_services.get_multi(
-    #     [state_memcache_key]).get(state_memcache_key)
+    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
+    memcached_state = memcache_services.get_multi(
+        [state_memcache_key]).get(state_memcache_key)
 
     if memcached_state is not None:
         return memcached_state
     else:
-        state = next(s for s in exploration.states if s.id == state_id)
-        # memcache_services.set_multi({state_memcache_key: state})
-        return state
+        state_model = exp_models.StateModel.get(
+            exploration_id, state_id, strict=strict)
+        if state_model:
+            state = exp_domain.State.from_dict(state_id, state_model.value)
+            memcache_services.set_multi({state_memcache_key: state})
+            return state
+        else:
+            return None
 
 
 # Query methods.
@@ -545,6 +544,10 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
     new_state = exp_domain.State(state_id, state_name, [], [], None)
 
     def _add_state_transaction(committer_id, exploration_id, new_state):
+        exploration_memcache_key = _get_exploration_memcache_key(
+            exploration_id)
+        memcache_services.delete(exploration_memcache_key)
+
         save_state(committer_id, exploration_id, new_state)
         exploration = get_exploration_by_id(exploration_id)
         exploration.state_ids.append(state_id)
@@ -664,7 +667,7 @@ def delete_state(committer_id, exploration_id, state_id):
     exploration = get_exploration_by_id(exploration_id)
     if state_id not in exploration.state_ids:
         raise ValueError('Invalid state id %s for exploration %s' %
-                        (state_id, exploration.id))
+                         (state_id, exploration.id))
 
     # Do not allow deletion of initial states.
     if exploration.state_ids[0] == state_id:
@@ -687,6 +690,10 @@ def delete_state(committer_id, exploration_id, state_id):
                 save_state(committer_id, exploration_id, other_state)
 
         # Delete the state with id state_id.
+        exploration_memcache_key = _get_exploration_memcache_key(
+            exploration_id)
+        memcache_services.delete(exploration_memcache_key)
+
         delete_state_model(exploration_id, state_id)
         exploration.state_ids.remove(state_id)
         save_exploration(committer_id, exploration)
