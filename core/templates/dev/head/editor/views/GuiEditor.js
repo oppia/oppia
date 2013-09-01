@@ -88,10 +88,9 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
           if (handlers[i].rule_specs[j].dest == stateId) {
             incomingStates[otherStateId] = $scope.states[otherStateId];
 
-            console.log(widgetParams);
             var previousChoices = null;
             if (widgetParams.hasOwnProperty('choices')) {
-              previousChoices = widgetParams.choices.value;
+              previousChoices = widgetParams.choices;
             }
 
             var ruleName = $filter('parameterizeRuleDescription')(

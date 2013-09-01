@@ -120,11 +120,6 @@ oppia.filter('parameterizeRuleDescription', function() {
     var description = input.description;
     var inputs = input.inputs;
 
-    var isMultipleChoice = false;
-    if (choices) {
-      isMultipleChoice = true;
-    }
-
     var finalRule = description;
 
     var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
@@ -137,8 +132,8 @@ oppia.filter('parameterizeRuleDescription', function() {
 
       var varName = description.match(pattern)[1];
       var replacementText = inputs[varName];
-      if (isMultipleChoice) {
-        replacementText = "'" + choices[inputs[varName]] + "'";
+      if (choices) {
+        replacementText = "'" + choices.value[inputs[varName]] + "'";
       }
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);

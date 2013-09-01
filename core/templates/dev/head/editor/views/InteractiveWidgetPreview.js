@@ -79,7 +79,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveRulesets[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
-    $scope.interactiveParams = data.widget.customization_args;
     $scope.stickyInteractiveWidget = data.widget.sticky;
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
 
