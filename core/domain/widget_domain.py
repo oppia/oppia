@@ -58,24 +58,11 @@ class WidgetParam(object):
         self.name = name
         self.description = description
         self.generator = generator
+        # TODO(sll): init_args and customization_args should be JSONifiable;
+        # need to check this.
         self.init_args = init_args
         self.customization_args = customization_args
         self.obj_type = obj_type
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'description': self.description,
-            'generator_id': self.generator.__name__,
-            # TODO(sll): Check that the next two dicts are JSON-ifiable.
-            'init_args': self.init_args,
-            'customization_args': self.customization_args,
-            'obj_type': self.obj_type,
-        }
-
-    @classmethod
-    def from_dict(cls, widget_param_dict):
-        raise NotImplementedError
 
     @property
     def value(self):
@@ -265,25 +252,12 @@ class BaseWidget(object):
         """Gets a dict representing a parameterized widget.
 
         If kvps_only is True, then the value for params in the result is
-        a list of key-value pairs. Otherwise it is a dict, formatted as:
+        a list of name-value pairs. Otherwise it is a dict, formatted as:
 
-            {PARAM_NAME: {'value': PARAM_VALUE, 'obj_type': PARAM_OBJ_TYPE}}.
-        """
-        # TODO(sll): This needs to be clarified; it should send the entire
-        # param dict.
+            {PARAM_NAME: PARAM_DESCRIPTION_DICT}
 
-        """
-        param_dict = {}
-        for param in self.params:
-            param_dict[param.name] = {
-                'value': params.get(param.name, param.value),
-                'obj_type': param.obj_type,
-                'choices': param.choices,
-            }
-
-        if kvps_only:
-            for param in param_dict:
-                param_dict[param] = param_dict[param]['value']
+        where PARAM_DESCRIPTION_DICT has the keys ['value', 'generator_id',
+        'init_args', 'customization_args', 'obj_type'].
         """
 
         result = {
@@ -292,9 +266,29 @@ class BaseWidget(object):
             'description': self.description,
             'id': self.id,
             'raw': self.get_raw_code(customization_args, context_params),
-            # 'params': param_dict,
         }
 
+        param_instances = self._get_widget_param_instances(
+            customization_args, context_params)
+        if kvps_only:
+            result['params'] = param_instances
+        else:
+            param_dict = {}
+            for param in self.params:
+                param_dict[param.name] = {
+                    'value': param_instances[param.name],
+                    'generator_id': param.generator.__name__,
+                    'init_args': param.init_args,
+                    'customization_args': (
+                        customization_args[param.name]
+                        if param.name in customization_args
+                        else param.customization_args),
+                    'obj_type': param.obj_type,
+                }
+
+            result['params'] = param_dict
+
+        # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:
             result['handlers'] = [h.to_dict() for h in self.handlers]
             for idx, handler in enumerate(self.handlers):

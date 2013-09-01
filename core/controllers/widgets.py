@@ -43,32 +43,27 @@ class WidgetRepositoryPage(base.BaseHandler):
 
 
 class WidgetRepositoryHandler(base.BaseHandler):
-    """Provides data to populate the widget repository page."""
+    """Populates the widget repository pages."""
 
-    def get_widgets(self, widget_type):
-        """Load widgets."""
-        widgets = widget_domain.Registry.get_widgets_of_type(widget_type)
+    def get(self, widget_type):
+        """Handles GET requests."""
+        try:
+            widget_list = widget_domain.Registry.get_widgets_of_type(
+                widget_type)
+        except Exception:
+            raise self.PageNotFoundException
 
-        response = collections.defaultdict(list)
-        for widget in widgets:
-            response[widget.category].append(
+        widgets = collections.defaultdict(list)
+        for widget in widget_list:
+            widgets[widget.category].append(
                 widget.get_widget_instance_dict({}, {}))
 
-        for category in response:
-            response[category].sort()
+        for category in widgets:
+            widgets[category].sort()
 
-        return response
+        response = {'widgets': widgets}
 
-    def get(self):  # pylint: disable-msg=C6409
-        """Handles GET requests."""
-        response = {}
-        if self.request.get('interactive') == 'true':
-            response['widgets'] = self.get_widgets(
-                feconf.INTERACTIVE_PREFIX)
-        else:
-            response['widgets'] = self.get_widgets(
-                feconf.NONINTERACTIVE_PREFIX)
-
+        if widget_type == feconf.NONINTERACTIVE_PREFIX:
             parent_index = self.request.get('parent_index')
             if parent_index is None:
                 raise Exception(
@@ -80,22 +75,11 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
 
 class WidgetHandler(base.BaseHandler):
-    """Handles requests for individual widgets."""
-
-    def get(self, widget_type, widget_id):
-        """Handles GET requests."""
-        try:
-            widget = widget_domain.Registry.get_widget_by_id(
-                widget_type, widget_id)
-            self.render_json({
-                'widget': widget.get_widget_instance_dict({}, {}),
-            })
-        except:
-            raise self.PageNotFoundException
+    """Returns instance dicts for individual widgets."""
 
     def post(self, widget_type, widget_id):
-        """Handles POST requests, for parameterized widgets."""
-        # Key-value mapping of parameters for the widget.
+        """Handles POST requests for parameterized widgets."""
+        # TODO(sll): Rename 'params' in the frontend.
         customization_args = self.payload.get('params', {})
 
         state_params_dict = {}
@@ -108,15 +92,16 @@ class WidgetHandler(base.BaseHandler):
 
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
+        widget_instance_dict = widget.get_widget_instance_dict(
+            customization_args, state_params_dict, kvps_only=True)
+        response = {'widget': widget_instance_dict}
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:
-            self.render_json({
-                'widget': widget.get_widget_instance_dict(
-                    customization_args, state_params_dict, kvps_only=True),
-                'parent_index': self.request.get('parent_index'),
-            })
-        else:
-            response = widget.get_widget_instance_dict(
-                customization_args, state_params_dict, kvps_only=True
-            )
-            self.render_json({'widget': response})
+            parent_index = self.request.get('parent_index')
+            if parent_index is None:
+                raise Exception(
+                    'Non-interactive widgets require a parent_index.')
+            else:
+                response['parent_index'] = parent_index
+
+        self.render_json(response)

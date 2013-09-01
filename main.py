@@ -138,14 +138,11 @@ urls = [
         r'/widgetrepository', widgets.WidgetRepositoryPage,
         'widget_repository_page'),
     get_redirect_route(
-        r'/widgetrepository/data', widgets.WidgetRepositoryHandler,
-        'widget_repository_handler'),
+        r'/widgetrepository/data/<widget_type>',
+        widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
     get_redirect_route(
         r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
-        'widget_handler', defaults={'widget_type': 'noninteractive'}),
-    get_redirect_route(
-        r'/widgets/interactive/<widget_id>', widgets.WidgetHandler,
-        'widget_handler', defaults={'widget_type': 'interactive'}),
+        'widget_handler'),
 ]
 
 # 404 error handler.
@@ -155,7 +152,6 @@ if feconf.PLATFORM != 'gae':
     urls = urls + generate_static_url_tuples() + error404_handler
 else:
     urls = urls + error404_handler
-
 
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)

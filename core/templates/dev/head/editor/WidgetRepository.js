@@ -59,8 +59,11 @@ function WidgetRepository($scope, $http, activeInputData) {
 
   var dataUrl = $scope.widgetDataUrl;
   if ('interactive' in WidgetRepositoryConfig) {
-    dataUrl += '?interactive=true';
+    dataUrl += '/interactive';
+  } else {
+    dataUrl += '/noninteractive';
   }
+
   if ('parent_index' in WidgetRepositoryConfig) {
     dataUrl += '?parent_index=';
     dataUrl += WidgetRepositoryConfig['parent_index'];

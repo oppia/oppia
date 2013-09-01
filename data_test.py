@@ -432,7 +432,7 @@ class WidgetDataUnitTests(DataUnitTest):
                 self.assertTrue(self.is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
 
-                # TODO(sll): Check that the generator is an subclass of
+                # TODO(sll): Check that the generator is a subclass of
                 # BaseValueGenerator.
 
                 self.assertTrue(isinstance(param['init_args'], dict))
