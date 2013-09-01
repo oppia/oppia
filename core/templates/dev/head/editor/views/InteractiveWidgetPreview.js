@@ -36,10 +36,13 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return toString.call(obj) === '[object Array]';
   };
 
-  $scope.generateWidgetPreview = function(widgetId, widgetParams) {
+  $scope.generateWidgetPreview = function(widgetId, customizationArgs) {
     $http.post(
         '/widgets/interactive/' + widgetId,
-        $scope.createRequest({params: widgetParams, state_params: $scope.paramChanges}),
+        $scope.createRequest({
+          customization_args: customizationArgs,
+          state_params: $scope.paramChanges
+        }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
         $scope.interactiveWidget = widgetData.widget;
@@ -76,9 +79,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveRulesets[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
-    $scope.interactiveParams = data.widget.params;
+    $scope.interactiveParams = data.widget.customization_args;
     $scope.stickyInteractiveWidget = data.widget.sticky;
-    $scope.generateWidgetPreview(data.widget.id, data.widget.params);
+    $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
 
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
@@ -97,6 +100,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       console.log('No state data exists for state ' + $scope.stateId);
     }
   }
+
+  $scope.saveWidgetParams = function() {
+    var customization_args = {};
+    for (var param in $scope.interactiveParams) {
+      customization_args[param] = $scope.interactiveParams[param].customization_args;
+    }
+
+    $scope.generateWidgetPreview(
+        $scope.interactiveWidget.id, customization_args);
+    $scope.saveInteractiveWidget();
+  };
 
   $scope.getStateNameForRule = function(stateId) {
     if (stateId === $scope.stateId) {
@@ -341,12 +355,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     F[0].src = F[0].src;
   });
 
-  $scope.saveWidgetParams = function() {
-    $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, $scope.interactiveParams);
-    $scope.saveInteractiveWidget();
-  };
-
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     if (!arg.data.widgetType || arg.data.widgetType != 'interactive') {
@@ -371,10 +379,18 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   });
 
   $scope.saveInteractiveWidget = function() {
+    var customization_args = {};
+    for (var param in $scope.interactiveParams) {
+      customization_args[param] = $scope.interactiveParams[param].customization_args;
+    }
+    $scope.generateWidgetPreview(
+        $scope.interactiveWidget.id, customization_args);
+
     explorationData.saveStateData($scope.stateId, {
         // The backend actually just saves the id of the widget.
         'interactive_widget': $scope.interactiveWidget.id,
-        'interactive_params': $scope.interactiveParams,
+        // TODO(sll): Rename this and other instances of interactive_params.
+        'interactive_params': customization_args,
         'interactive_rulesets': $scope.interactiveRulesets
     });
     $scope.drawGraph();

@@ -79,8 +79,8 @@ class WidgetHandler(base.BaseHandler):
 
     def post(self, widget_type, widget_id):
         """Handles POST requests for parameterized widgets."""
-        # TODO(sll): Rename 'params' in the frontend.
-        customization_args = self.payload.get('params', {})
+
+        customization_args = self.payload.get('customization_args', {})
 
         state_params_dict = {}
         state_params_given = self.payload.get('state_params')

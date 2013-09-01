@@ -56,9 +56,18 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
 
   $scope.initWidget = function(index) {
     var widget = JSON.parse($scope.content[index].value);
+
+    var customization_args = {};
+    for (var param in widget.params) {
+      customization_args[param] = widget.params[param].customization_args;
+    }
+
     $http.post(
       '/widgets/noninteractive/' + widget.id + '?parent_index=' + index,
-      $scope.createRequest({params: widget.params, state_params: $scope.paramChanges}),
+      $scope.createRequest({
+        customization_args: customization_args,
+        state_params: $scope.paramChanges
+      }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
       $scope.addContentToIframeWithId(

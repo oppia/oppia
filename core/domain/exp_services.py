@@ -587,7 +587,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.widget_id = interactive_widget
 
     if interactive_params is not None:
-        state.widget.params = interactive_params
+        state.widget.customization_args = interactive_params
 
     if sticky_interactive_widget is not None:
         if not isinstance(sticky_interactive_widget, bool):
