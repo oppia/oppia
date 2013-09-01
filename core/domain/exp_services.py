@@ -62,9 +62,10 @@ def _get_state_memcache_key(exploration_id, state_id):
 
 def get_exploration_by_id(exploration_id, strict=True):
     """Returns a domain object representing an exploration."""
-    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
+    # exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    # memcached_exploration = memcache_services.get_multi(
+    #     [exploration_memcache_key]).get(exploration_memcache_key)
+    memcached_exploration = None
 
     if memcached_exploration is not None:
         return memcached_exploration
@@ -74,7 +75,7 @@ def get_exploration_by_id(exploration_id, strict=True):
         exploration = exp_domain.Exploration(
             exploration_model) if exploration_model else None
 
-        memcache_services.set_multi({exploration_memcache_key: exploration})
+        # memcache_services.set_multi({exploration_memcache_key: exploration})
         return exploration
 
 
@@ -87,15 +88,16 @@ def get_state_by_id(exploration_id, state_id, strict=True):
             'Invalid state id %s for exploration %s' % (
                 state_id, exploration.id))
 
-    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
-    memcached_state = memcache_services.get_multi(
-        [state_memcache_key]).get(state_memcache_key)
+    memcached_state = None
+    # state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
+    # memcached_state = memcache_services.get_multi(
+    #     [state_memcache_key]).get(state_memcache_key)
 
     if memcached_state is not None:
         return memcached_state
     else:
         state = next(s for s in exploration.states if s.id == state_id)
-        memcache_services.set_multi({state_memcache_key: state})
+        # memcache_services.set_multi({state_memcache_key: state})
         return state
 
 
@@ -255,37 +257,6 @@ def export_content_to_html(content_array, block_number, params=None):
     return html, widget_array
 
 
-def export_to_versionable_dict(exploration):
-    """Returns a serialized version of this exploration for versioning.
-
-    The criterion for whether an item is included in the return dict is:
-    "suppose I am currently at v10 (say) and want to revert to v4; is this
-    property something I would be happy with being overwritten?". Thus, the
-    following properties are excluded for explorations:
-
-        ['category', 'default_skin', 'editor_ids', 'image_id', 'is_public',
-         'title']
-
-    The exploration id will be used to name the object in the history log,
-    so it does not need to be saved within the returned dict.
-
-    For states, all properties except 'id' are versioned. State dests are
-    specified using names and not ids.
-    """
-    # TODO(sll): Make this function a part of save_exploration().
-    param_specs = [{
-        'name': param_spec.name, 'obj_type': param_spec.obj_type
-    } for param_spec in exploration.param_specs]
-
-    states_list = [export_state_internals_to_dict(
-        exploration.id, state_id, human_readable_dests=True)
-        for state_id in exploration.state_ids]
-
-    return {
-        'param_specs': param_specs, 'states': states_list
-    }
-
-
 def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
@@ -310,6 +281,35 @@ def save_exploration(committer_id, exploration):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
+    def export_to_versionable_dict(exploration):
+        """Returns a serialized version of this exploration for versioning.
+
+        The criterion for whether an item is included in the return dict is:
+        "suppose I am currently at v10 (say) and want to revert to v4; is this
+        property something I would be happy with being overwritten?". Thus, the
+        following properties are excluded for explorations:
+
+            ['category', 'default_skin', 'editor_ids', 'image_id', 'is_public',
+             'title']
+
+        The exploration id will be used to name the object in the history log,
+        so it does not need to be saved within the returned dict.
+
+        For states, all properties except 'id' are versioned. State dests are
+        specified using names and not ids.
+        """
+        param_specs = [{
+            'name': param_spec.name, 'obj_type': param_spec.obj_type
+        } for param_spec in exploration.param_specs]
+
+        states_list = [export_state_internals_to_dict(
+            exploration.id, state_id, human_readable_dests=True)
+            for state_id in exploration.state_ids]
+
+        return {
+            'param_specs': param_specs, 'states': states_list
+        }
+
     def _save_exploration_transaction(committer_id, exploration):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
         if exploration.version != exploration_model.version:
@@ -317,12 +317,6 @@ def save_exploration(committer_id, exploration):
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
-
-        versionable_dict = feconf.NULL_SNAPSHOT
-        if exploration.is_public:
-            # This must be computed before memcache is cleared.
-            # TODO(sll): Is this correct?
-            versionable_dict = export_to_versionable_dict(exploration)
 
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration.id)
@@ -339,6 +333,10 @@ def save_exploration(committer_id, exploration):
             'default_skin': exploration.default_skin,
             'version': exploration_model.version,
         }
+
+        versionable_dict = feconf.NULL_SNAPSHOT
+        if exploration.is_public:
+            versionable_dict = export_to_versionable_dict(exploration)
 
         # Create a snapshot for the version history.
         exploration_model.put(committer_id, properties_dict, versionable_dict)
@@ -579,7 +577,8 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
             if not any([param_spec.name == param_change['name']
                         for param_spec in exploration.param_specs]):
                 exploration.param_specs.append(
-                    param_domain.ParamSpec(param_change['name'], None))
+                    param_domain.ParamSpec(param_change['name'],
+                    'UnicodeString'))
 
             state.param_changes.append(param_instance)
 
