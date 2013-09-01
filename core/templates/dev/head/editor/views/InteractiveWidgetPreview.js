@@ -357,7 +357,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $('#interactiveWidgetModal').modal('hide');
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
-      $scope.interactiveParams = $scope.interactiveWidget.params;
+      $scope.interactiveParams = arg.data.widget.params;
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
         'name': 'Default',

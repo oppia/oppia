@@ -73,14 +73,20 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
 
     for (otherStateId in $scope.states) {
       var handlers = $scope.states[otherStateId].widget.handlers;
-      var widgetParams = $scope.states[otherStateId].widget.params;
+      var widgetParams = $scope.states[otherStateId].widget.customization_args;
       for (var i = 0; i < handlers.length; i++) {
         for (var j = 0; j < handlers[i].rule_specs.length; j++) {
           if (handlers[i].rule_specs[j].dest == stateId) {
             incomingStates[otherStateId] = $scope.states[otherStateId];
 
+            console.log(widgetParams);
+            var previousChoices = null;
+            if (widgetParams.hasOwnProperty('choices')) {
+              previousChoices = widgetParams.choices.value;
+            }
+
             var ruleName = $filter('parameterizeRuleDescription')(
-                handlers[i].rule_specs[j], widgetParams.choices);
+                handlers[i].rule_specs[j], previousChoices);
 
             if (otherStateId in statesToRuleNames) {
               statesToRuleNames[otherStateId].push(ruleName);

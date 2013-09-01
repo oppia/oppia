@@ -95,6 +95,10 @@ urls = [
     get_redirect_route(
         r'/imagehandler/<image_id>', resources.ImageHandler,
         'image_handler'),
+    get_redirect_route(
+        r'/value_generator_templates/<generator_id>',
+        resources.GeneratorTemplateHandler,
+        'generator_template_handler'),
 
     get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(

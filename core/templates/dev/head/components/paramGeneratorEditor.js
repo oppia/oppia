@@ -18,58 +18,24 @@
  * @author sll@google.com (Sean Lip)
  */
 
-
-oppia.directive('paramGeneratorEditor', function ($compile, warningsData) {
-  var paramGeneratorTemplates = {
-    'Copier': '<[generatorId]>: make a copy of <[generatorArgs]>',
-    'RestrictedCopier': '<[generatorId]>: pick a value in <[initArgs.choices]>; current value is <[generatorArgs.value]>',
-    'InclusiveIntRangePicker': '<[generatorId]>: currently picks a value between <[generatorArgs.lower_bound]> and <[generatorArgs.upper_bound]>, inclusive'
-  }
-
-  // TODO(sll): This function should make a call to the backend resource instead.
-  var getTemplate = function(generatorId) {
-    return paramGeneratorTemplates[generatorId];
-  }
+oppia.directive('paramGeneratorEditor', function ($compile, $http, warningsData) {
+  var valueGeneratorTemplatesUrl = '/value_generator_templates/';
 
   var linker = function(scope, element, attrs) {
-    element.html(getTemplate(scope.generatorId));
+    // TODO(sll): This is a bit clumsy. It is possible to specify a dynamic
+    // templateUrl in AngularJS 1.1.4, so update this when we upgrade the
+    // Angular dependency.
+    scope.getTemplateUrl = function(generatorId) {
+      return valueGeneratorTemplatesUrl + generatorId;
+    };
+
     $compile(element.contents())(scope);
-  }
+  };
 
   return {
     link: linker,
     restrict: 'E',
-    scope: {generatorId: '=', initArgs: '=', generatorArgs: '='}
+    scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='},
+    template: '<div ng-include="getTemplateUrl(generatorId)"></div>'
   };
 });
-
-
-// USAGE: In a controller scope which contains a 'parameters' attr, write HTML
-// code similar to the following:
-//
-//  <div>
-//    <div ng-repeat="param in parameters">
-//      Param NAME: <[param.name]>
-//      Param GENERATOR:
-//      <param-generator-editor generator-id="param.generator" generator-args="param.customization_args" init-args="param.init_args"></param-generator-editor>
-//    </div>
-//  </div>
-//
-// This is an example of how to define $scope.parameters in the controller:
-//
-// $scope.parameters = [{
-//   'name': 'Language',
-//   'generator': 'RestrictedCopier',
-//   'init_args': {
-//     'choices': ['Coffeescript', 'Python']
-//   },
-//   // NB: these are CURRENT args, not the default ones
-//   'customization_args': {'value': 'Python'},
-//   'expected_type': 'UnicodeString'
-// }, {
-//   'name': 'Width',
-//   'generator': 'InclusiveIntRangePicker',
-//   'init_args': [],
-//   'customization_args': {'lower_bound': 100, 'upper_bound': 100},
-//   'expected_type': 'Int'
-// }];

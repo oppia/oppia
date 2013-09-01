@@ -16,13 +16,15 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import feconf
+import logging
+import mimetypes
+import os
 
 from core.controllers import base
 from core.platform import models
 (image_models,) = models.Registry.import_models([models.NAMES.image])
-
-import mimetypes
+import feconf
+import utils
 
 
 class EditorViewHandler(base.BaseHandler):
@@ -49,6 +51,23 @@ class TemplateHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
+class GeneratorTemplateHandler(base.BaseHandler):
+    """Retrieves a template for a value generator editor."""
+
+    def get(self, generator_id):
+        """Handles GET requests."""
+        template_path = os.path.join(
+            feconf.VALUE_GENERATOR_TEMPLATES_DIR, '%s.html' % generator_id)
+        try:
+            # NB: These generators should use only Angular templating. The
+            # variables they have access to are generatorId, initArgs,
+            # customizationArgs and objType.
+            self.response.write(utils.get_file_contents(template_path))
+        except:
+            logging.error('Template not found: %s' % template_path)
+            raise self.PageNotFoundException
+
+
 class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
@@ -61,8 +80,11 @@ class ImageHandler(base.BaseHandler):
         try:
             image = image_models.Image.get(image_id)
 
+            # If the following is not cast to str, an error occurs in the wsgi
+            # library because unicode gets used.
             # TODO(sll): Support other image types.
-            self.response.headers['Content-Type'] = str('image/%s' % image.format)
+            self.response.headers['Content-Type'] = (
+                str('image/%s' % image.format))
             self.response.write(image.raw)
         except:
             raise self.PageNotFoundException
