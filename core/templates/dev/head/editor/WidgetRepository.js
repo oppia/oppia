@@ -19,136 +19,41 @@
  */
 
 function WidgetRepository($scope, $http, activeInputData) {
-  $scope.widgetDataUrl = '/widgetrepository/data';
-  $scope.widgetParams = [];
+  $scope.widgetType = ('interactive' in WidgetRepositoryConfig ?
+                       'interactive' : 'noninteractive');
 
-  $scope.loadPage = function(data) {
-    $scope.parentIndex = data.parent_index || null;
-    $scope.widgets = data.widgets;
-    // Display previews of each widget.
-    for (var category in data.widgets) {
-      for (var i = 0; i < $scope.widgets[category].length; ++i) {
-        var rawCode = $scope.widgets[category][i].raw;
-        $scope.addContentToIframeWithId(
-            'widget-' + category + '-' + i,
-            $scope.createCustomizedCode(
-                $scope.widgets[category][i].params, null, rawCode));
-      }
-    }
-  };
-
-  // Creates the final, parameterized code for a widget.
-  $scope.createCustomizedCode = function(params, customValues, rawCode) {
-    var result = rawCode;
-    for (var param in params) {
-      var val = param.value;
-      if (customValues && (param.name in customValues)) {
-        val = customValues[param.name];
-      }
-
-      // TODO(sll): Figure out whether to add single quotes around a string
-      // using "formattedVal = '\'' + val + '\''". Currently we don't.
-      var formattedVal = val;
-      // The following regex matches {{, then arbitrary whitespace, then the
-      // parameter name, then arbitrary whitespace, then }}.
-      result = result.replace(
-          new RegExp('{{\\s*' + param.name + '\\s*}}', 'g'), formattedVal);
-    }
-    return result;
-  };
-
-  var dataUrl = $scope.widgetDataUrl;
-  if ('interactive' in WidgetRepositoryConfig) {
-    dataUrl += '/interactive';
-  } else {
-    dataUrl += '/noninteractive';
-  }
-
+  var dataUrl = '/widgetrepository/data';
+  dataUrl += ('/' + $scope.widgetType);
   if ('parent_index' in WidgetRepositoryConfig) {
-    dataUrl += '?parent_index=';
-    dataUrl += WidgetRepositoryConfig['parent_index'];
+    dataUrl += ('?parent_index=' + WidgetRepositoryConfig['parent_index']);
   }
 
   // Initializes the widget list using data from the server.
   $http.get(dataUrl).success(function(data) {
-    $scope.loadPage(data);
+    $scope.parentIndex = data.parent_index || null;
+    $scope.widgets = data.widgets;
   });
-
-  // Inserts content into the preview tab just before it is shown.
-  $('#modalTabs a[href="#preview"]').on('show', function (e) {
-    $scope.addContentToIframeWithId(
-      'modalPreview',
-      $scope.createCustomizedCode($scope.modalWidget.params, null, $scope.modalWidget.raw));
-  });
-
-  /**
-   * Displays a modal allowing customization of the widget's parameters.
-   * @param {string} category The category of the widget to customize.
-   * @param {string} index The index of the widget in this category.
-   */
-  $scope.showCustomizeModal = function(category, index) {
-    $scope.customizeCategory = category;
-    $scope.customizeIndex = index;
-    // TODO(sll): Have a global customizedParams for each widget id, which retains
-    // state between successive invocations of the customize modal.
-    $scope.customizedParams = [];
-    $('#customizeModal').modal();
-  };
-
-  $scope.submitCustomization = function() {
-    var category = $scope.customizeCategory;
-    var index = $scope.customizeIndex;
-    // Display the new widget, but DO NOT save the code.
-    var customizedCode = $scope.createCustomizedCode(
-        $scope.widgets[category][index].params, $scope.customizedParams,
-        $scope.widgets[category][index].raw);
-    $scope.$apply();
-    $scope.addContentToIframeWithId(
-        'widget-' + category + '-' + index, customizedCode);
-    $scope.closeCustomizeModal();
-  };
-
-  $scope.closeCustomizeModal = function() {
-    $scope.customizeCategory = '';
-    $scope.customizeIndex = '';
-    $('#customizeModal').modal('hide');
-  };
 
   $scope.selectWidget = function(category, index) {
-    var customizedCode = $scope.createCustomizedCode(
-        $scope.widgets[category][index].params, $scope.customizedParams,
-        $scope.widgets[category][index].raw);
-
     var data = {
-      raw: customizedCode,
-      widget: $scope.cloneObject($scope.widgets[category][index])
+      widget: $scope.cloneObject($scope.widgets[category][index]),
+      widgetType: $scope.widgetType
     };
-    // Transform the {PARAM_NAME: {'value': ..., 'obj_type': ...}} dict
-    // into a {PARAM_NAME: PARAM_VALUE} dict before returning it.
-    for (var param in data.widget.params) {
-      data.widget.params[param] = data.widget.params[param].value;
-    }
 
     // Parent index for non-interactive widgets.
-    if ($scope.parentIndex !== null) {
+    if ($scope.widgetType == 'noninteractive') {
       data.parentIndex = $scope.parentIndex;
-      data.widgetType = 'noninteractive';
-    } else {
-      data.widgetType = 'interactive';
+      if ($scope.parentIndex === null) {
+        console.log('ERROR: Non-interactive widget has no parentIndex.');
+      }
     }
 
     window.parent.postMessage(data, '*');
   };
 
   $scope.previewWidget = function(category, index) {
-    $scope.previewCategory = category;
-    $scope.previewIndex = index;
-
-    var rawCode = $scope.widgets[category][index].raw;
     $scope.addContentToIframeWithId(
-        'widgetPreview',
-        $scope.createCustomizedCode(
-             $scope.widgets[category][index].params, null, rawCode));
+      'widgetPreview', $scope.widgets[category][index].raw);
   };
 }
 

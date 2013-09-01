@@ -79,6 +79,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.interactiveParams = data.widget.params;
     $scope.stickyInteractiveWidget = data.widget.sticky;
     $scope.generateWidgetPreview(data.widget.id, data.widget.params);
+
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
   };

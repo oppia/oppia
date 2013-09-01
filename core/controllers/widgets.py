@@ -92,9 +92,10 @@ class WidgetHandler(base.BaseHandler):
 
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
-        widget_instance_dict = widget.get_widget_instance_dict(
-            customization_args, state_params_dict, kvps_only=True)
-        response = {'widget': widget_instance_dict}
+        response = {
+            'widget': widget.get_widget_instance_dict(
+                customization_args, state_params_dict),
+        }
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:
             parent_index = self.request.get('parent_index')

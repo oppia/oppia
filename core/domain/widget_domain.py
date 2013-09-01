@@ -247,12 +247,10 @@ class BaseWidget(object):
 
         return utils.parse_with_jinja(self._stats_log_template, parameters)
 
-    def get_widget_instance_dict(self, customization_args, context_params,
-                                 kvps_only=False):
+    def get_widget_instance_dict(self, customization_args, context_params):
         """Gets a dict representing a parameterized widget.
 
-        If kvps_only is True, then the value for params in the result is
-        a list of name-value pairs. Otherwise it is a dict, formatted as:
+        The value for params in the result is a dict, formatted as:
 
             {PARAM_NAME: PARAM_DESCRIPTION_DICT}
 
@@ -270,23 +268,20 @@ class BaseWidget(object):
 
         param_instances = self._get_widget_param_instances(
             customization_args, context_params)
-        if kvps_only:
-            result['params'] = param_instances
-        else:
-            param_dict = {}
-            for param in self.params:
-                param_dict[param.name] = {
-                    'value': param_instances[param.name],
-                    'generator_id': param.generator.__name__,
-                    'init_args': param.init_args,
-                    'customization_args': (
-                        customization_args[param.name]
-                        if param.name in customization_args
-                        else param.customization_args),
-                    'obj_type': param.obj_type,
-                }
 
-            result['params'] = param_dict
+        param_dict = {}
+        for param in self.params:
+            param_dict[param.name] = {
+                'value': param_instances[param.name],
+                'generator_id': param.generator.__name__,
+                'init_args': param.init_args,
+                'customization_args': (
+                    customization_args[param.name]
+                    if param.name in customization_args
+                    else param.customization_args),
+                'obj_type': param.obj_type,
+            }
+        result['params'] = param_dict
 
         # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:

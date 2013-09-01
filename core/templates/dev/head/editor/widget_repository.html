@@ -6,16 +6,19 @@
 
 {% block content %}
 <div ng-controller="WidgetRepository">
+
   {% if not iframed %}
     <h3>Oppia Widget Repository</h3>
     <br>
   {% endif %}
+
   <div class="tabbable tabs-left">
     <ul class="nav nav-tabs">
       <li ng-repeat="(category, widgetList) in widgets" ng-class="{active: $index == 0}">
         <a data-toggle="tab" href="#<[category|spacesToUnderscores]>"><[category]></a>
       </li>
     </ul>
+
     <div class="tab-content">
       <div ng-repeat="(category, widgetList) in widgets" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
         <div class="container-fluid">
@@ -24,12 +27,8 @@
             <div class="accordion-group" ng-repeat="widget in widgetList">
               <div style="margin: 10px">
                 <span class="pull-right">
-                  <a ng-click="previewWidget(category, $index)">
-                    Preview
-                  </a> |
-                  <a ng-click="selectWidget(category, $index)">
-                    Use
-                  </a>
+                  <a ng-click="previewWidget(category, $index)">Preview</a> |
+                  <a ng-click="selectWidget(category, $index)">Use</a>
                 </span>
                 <h5><[widget.name]></h5>
                 <i><[widget.description]></i>
@@ -41,42 +40,7 @@
     </div>
 
     <div>
-      <br>
-      <a ng-click="showCustomizeModal(previewCategory, previewIndex)" ng-show="widget.params.length > 0">
-        Customize
-      </a>
       <iframe id="widgetPreview" frameborder="0" width="100%" height="500px"></iframe>
-    </div>
-  </div>
-
-  <div ui-modal class="modal hide fade" id="customizeModal" ng-model="modalShown">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="customizeModalLabel">Customize this widget</h3>
-    </div>
-    <div class="modal-body">
-      <p>
-        Enter parameters below to customize your widget:
-      </p>
-      <form>
-        <div ng-repeat="(param, param_info) in widgets[customizeCategory][customizeIndex].params">
-          <[param]>:
-          <span ng-switch on="param_info.obj_type">
-            <span ng-switch-when="Number">
-              <input type="number" ng-model="customizedParams[param]" placeholder="<[param_info.value]>">
-            </span>
-            <span ng-switch-default>
-              <input type="text" ng-model="customizedParams[param]" placeholder="<[param_info.value]>">
-            </span>
-          </span>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <a class="btn" ng-click="submitCustomization()">Submit</a>
-      <a class="btn" data-dismiss="modal" ng-click="closeCustomizeModal()">Close</a>
     </div>
   </div>
 
