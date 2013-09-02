@@ -200,7 +200,7 @@ class ExplorationDataUnitTests(DataUnitTest):
         if len(states_list) != len(processed_queue):
             unseen_states = list(
                 set([s['name'] for s in states_list]) - set(processed_queue))
-            raise Exception('The following states are not reachable from the'
+            raise Exception('The following states are not reachable from the '
                             'initial state: %s' % ', '.join(unseen_states))
 
     def verify_no_dead_ends(self, states_list):
@@ -232,8 +232,9 @@ class ExplorationDataUnitTests(DataUnitTest):
         if len(states_list) != len(processed_queue):
             dead_end_states = list(
                 set([s['name'] for s in states_list]) - set(processed_queue))
-            raise Exception('The END state is not reachable from the following'
-                            'states: %s' % ', '.join(dead_end_states))
+            raise Exception('The END state is not reachable from the '
+                            'following states: %s' %
+                            ', '.join(dead_end_states))
 
     def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""

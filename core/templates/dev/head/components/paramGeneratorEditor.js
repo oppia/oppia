@@ -37,7 +37,6 @@ oppia.directive('copier', function($compile) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      console.log('Insert controller logic here.');
       $scope.generatorId = $scope.$parent.generatorId;
       $scope.initArgs = $scope.$parent.initArgs;
       $scope.customizationArgs = $scope.$parent.customizationArgs;

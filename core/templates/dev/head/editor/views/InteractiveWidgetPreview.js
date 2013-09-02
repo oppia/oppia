@@ -46,7 +46,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
         $scope.interactiveWidget = widgetData.widget;
-        $scope.interactiveParams = widgetData.widget.params;
         if ($scope.showPreview) {
           $scope.addContentToIframeWithId(
               'interactiveWidgetPreview', $scope.interactiveWidget.raw);
@@ -100,14 +99,18 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     }
   }
 
-  $scope.saveWidgetParams = function() {
-    var customization_args = {};
-    for (var param in $scope.interactiveParams) {
-      customization_args[param] = $scope.interactiveParams[param].customization_args;
+  $scope.getCustomizationArgs = function() {
+    // Returns a dict mapping param names to customization args.
+    var customizationArgs = {};
+    for (var param in $scope.interactiveWidget.params) {
+      customizationArgs[param] = $scope.interactiveWidget.params[param].customization_args;
     }
+    return customizationArgs;
+  };
 
+  $scope.saveWidgetParams = function() {
     $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, customization_args);
+        $scope.interactiveWidget.id, $scope.getCustomizationArgs());
     $scope.saveInteractiveWidget();
   };
 
@@ -364,7 +367,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $('#interactiveWidgetModal').modal('hide');
     if ($scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
-      $scope.interactiveParams = arg.data.widget.params;
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
         'name': 'Default',
@@ -378,18 +380,15 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   });
 
   $scope.saveInteractiveWidget = function() {
-    var customization_args = {};
-    for (var param in $scope.interactiveParams) {
-      customization_args[param] = $scope.interactiveParams[param].customization_args;
-    }
+    var customizationArgs = $scope.getCustomizationArgs();
     $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, customization_args);
+        $scope.interactiveWidget.id, customizationArgs);
 
     explorationData.saveStateData($scope.stateId, {
         // The backend actually just saves the id of the widget.
         'interactive_widget': $scope.interactiveWidget.id,
         // TODO(sll): Rename this and other instances of interactive_params.
-        'interactive_params': customization_args,
+        'interactive_params': customizationArgs,
         'interactive_rulesets': $scope.interactiveRulesets
     });
     $scope.drawGraph();

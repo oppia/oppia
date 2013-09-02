@@ -60,7 +60,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          Answer <[rule | parameterizeRuleDescription: interactiveParams.choices]>:
+          Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>:
           <span ng-show="rule.dest == 'END' || rule.dest == stateId">
             (<[getStateNameForRule(rule.dest)]>,
           </span>
@@ -117,7 +117,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveParams.choices]>:
+          <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>:
           <span ng-show="getDefaultRule(handler.name).dest == 'END' || getDefaultRule(handler.name).dest == stateId">
             (<[getStateNameForRule(getDefaultRule(handler.name).dest)]>,
           </span>
@@ -237,7 +237,7 @@
       </div>
 
       <div ng-show="addRuleActionDescription">
-        <span angular-html-bind="addRuleActionDescription | bracesToInput: interactiveParams.choices"></span>
+        <span angular-html-bind="addRuleActionDescription | bracesToInput: interactiveWidget.params.choices"></span>
 
         <hr>
         <div>
