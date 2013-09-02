@@ -653,13 +653,12 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
             for item in content
         ]
 
-    def _update_state_transaction(committer_id, exploration_id, state):
-        save_state(committer_id, exploration_id, state)
-        exploration = get_exploration_by_id(exploration_id)
+    def _update_state_transaction(committer_id, exploration, state):
+        save_state(committer_id, exploration.id, state)
         save_exploration(committer_id, exploration)
 
     transaction_services.run_in_transaction(
-        _update_state_transaction, committer_id, exploration_id, state)
+        _update_state_transaction, committer_id, exploration, state)
 
 
 def delete_state(committer_id, exploration_id, state_id):
