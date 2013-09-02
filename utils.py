@@ -75,8 +75,12 @@ def parse_with_jinja(string, params):
     """
     env = jinja2.Environment()
     env.filters.update(jinja_utils.FILTERS)
+    try:
+        parsed_string = env.parse(string)
+    except Exception:
+        raise Exception('Unable to parse string with Jinja: %s' % string)
 
-    variables = meta.find_undeclared_variables(env.parse(string))
+    variables = meta.find_undeclared_variables(parsed_string)
 
     new_params = copy.deepcopy(params)
     for var in variables:

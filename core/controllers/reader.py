@@ -16,8 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-import cgi
-
 import feconf
 from core.controllers import base
 from core.domain import exp_domain
@@ -71,7 +69,7 @@ class ExplorationHandler(base.BaseHandler):
 
         init_state = exploration.init_state
         init_html, init_widgets = exp_services.export_content_to_html(
-            init_state.content, 0, reader_params)
+            init_state.content, 0, reader_params, escape_text_strings=False)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
@@ -117,7 +115,7 @@ class FeedbackHandler(base.BaseHandler):
         if not feedback:
             return '', []
         else:
-            feedback_bits = [cgi.escape(bit) for bit in feedback.split('\n')]
+            feedback_bits = feedback.split('\n')
             return exp_services.export_content_to_html(
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
                 block_number, params)
@@ -136,7 +134,8 @@ class FeedbackHandler(base.BaseHandler):
             if state_has_changed:
                 # Append the content for the new state.
                 state_html, state_widgets = exp_services.export_content_to_html(
-                    new_state.content, block_number, new_params)
+                    new_state.content, block_number, new_params,
+                    escape_text_strings=False)
 
                 if html_output and state_html:
                     html_output += '<br>'

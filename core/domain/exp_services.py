@@ -24,6 +24,7 @@ storage model to be changed without affecting this module and others above it.
 
 __author__ = 'Sean Lip'
 
+import cgi
 import copy
 import json
 import logging
@@ -192,7 +193,8 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     return state_dict
 
 
-def export_content_to_html(content_array, block_number, params=None):
+def export_content_to_html(content_array, block_number, params=None,
+                           escape_text_strings=True):
     """Takes a Content array and transforms it into HTML.
 
     Args:
@@ -207,6 +209,8 @@ def export_content_to_html(content_array, block_number, params=None):
                     constructed
         block_number: the number of content blocks preceding this one.
         params: any parameters used for templatizing text strings.
+        escape_text_strings: True if values supplied with content of type 'text'
+            should be escaped after Jinja evaluation; False otherwise.
 
     Returns:
         the HTML string representing the array.
@@ -225,6 +229,9 @@ def export_content_to_html(content_array, block_number, params=None):
         if content.type in ['text', 'image', 'video']:
             value = (utils.parse_with_jinja(content.value, params)
                      if content.type == 'text' else content.value)
+
+            if escape_text_strings:
+                value = cgi.escape(value)
 
             html += JINJA_ENV.get_template('reader/content.html').render({
                 'type': content.type,
