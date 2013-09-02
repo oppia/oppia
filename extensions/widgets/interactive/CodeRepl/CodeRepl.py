@@ -57,7 +57,7 @@ class CodeRepl(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
-            'value': 1
+            'value': 10
         },
         'obj_type': 'Int',
     }, {

@@ -92,6 +92,7 @@ class WidgetHandler(base.BaseHandler):
 
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
+
         response = {
             'widget': widget.get_widget_instance_dict(
                 customization_args, state_params_dict),

@@ -105,7 +105,85 @@ oppia.directive('string', function (warningsData) {
           warningsData.addWarning('Please enter a non-empty item.');
           return;
         }
+        warningsData.clear();
         $scope.localItem = {label: newItem};
+        $scope.item = newItem;
+        $scope.closeItemEditor();
+      };
+    }
+  };
+});
+
+oppia.directive('real', function (warningsData) {
+  // Editable real number directive.
+  return {
+    restrict: 'E',
+    scope: {item: '='},
+    templateUrl: '/templates/real',
+    controller: function ($scope, $attrs) {
+      // Reset the component each time the item changes.
+      $scope.$watch('item', function(newValue, oldValue) {
+        // Maintain a local copy of 'item'.
+        $scope.localItem = {label: $scope.item};
+        $scope.active = false;
+      });
+
+      $scope.openItemEditor = function() {
+        $scope.active = true;
+      };
+
+      $scope.closeItemEditor = function() {
+        $scope.active = false;
+      };
+
+      $scope.replaceItem = function(newItem) {
+        if (!newItem || !angular.isNumber(newItem)) {
+          warningsData.addWarning('Please enter a number.');
+          return;
+        }
+        warningsData.clear();
+        $scope.localItem = {label: (newItem || 0.0)};
+        $scope.item = newItem;
+        $scope.closeItemEditor();
+      };
+    }
+  };
+});
+
+oppia.directive('int', function (warningsData) {
+  // Editable integer directive.
+  return {
+    restrict: 'E',
+    scope: {item: '='},
+    templateUrl: '/templates/int',
+    controller: function ($scope, $attrs) {
+      // Reset the component each time the item changes.
+      $scope.$watch('item', function(newValue, oldValue) {
+        // Maintain a local copy of 'item'.
+        $scope.localItem = {label: $scope.item};
+        $scope.active = false;
+      });
+
+      $scope.openItemEditor = function() {
+        $scope.active = true;
+      };
+
+      $scope.closeItemEditor = function() {
+        $scope.active = false;
+      };
+
+      $scope.isInteger = function(value) {
+        return (!isNaN(parseInt(value,10)) &&
+                (parseFloat(value,10) == parseInt(value,10)));
+      };
+
+      $scope.replaceItem = function(newItem) {
+        if (!newItem || !$scope.isInteger(newItem)) {
+          warningsData.addWarning('Please enter an integer.');
+          return;
+        }
+        warningsData.clear();
+        $scope.localItem = {label: (newItem || 0)};
         $scope.item = newItem;
         $scope.closeItemEditor();
       };

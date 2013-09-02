@@ -51,7 +51,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       } else {
         // Retrieve data from the server.
         return $http.get(explorationUrl + '/data').then(function(response) {
-          console.trace();
           console.log('Retrieved exploration data.');
           console.log(response.data);
 
@@ -112,7 +111,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     propertyValueMap['version'] = explorationData.data.version;
 
     console.log(propertyValueMap);
-    console.log(JSON.stringify(propertyValueMap));
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',

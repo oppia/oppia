@@ -30,8 +30,12 @@ class MusicStaff(widget_domain.BaseWidget):
     _params = [{
         'name': 'noteToGuess',
         'description': 'The note that the reader should guess.',
-        'generator': generators.Copier,
-        'init_args': {},
+        'generator': generators.RestrictedCopier,
+        'init_args': {
+            'choices': [
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'
+            ]
+        },
         'customization_args': {
             'value': 'C5'
         },

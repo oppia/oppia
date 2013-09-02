@@ -36,7 +36,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return toString.call(obj) === '[object Array]';
   };
 
-  $scope.generateWidgetPreview = function(widgetId, customizationArgs) {
+  $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
         '/widgets/interactive/' + widgetId,
         $scope.createRequest({
@@ -50,8 +50,13 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
           $scope.addContentToIframeWithId(
               'interactiveWidgetPreview', $scope.interactiveWidget.raw);
         }
+        if (successCallback) {
+          successCallback();
+        }
       }
-    );
+    ).error(function(errorData) {
+      warningsData.addWarning(errorData.error);
+    });
   };
 
   $scope.generateUnresolvedAnswersMap = function() {
@@ -110,8 +115,8 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
   $scope.saveWidgetParams = function() {
     $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, $scope.getCustomizationArgs());
-    $scope.saveInteractiveWidget();
+        $scope.interactiveWidget.id, $scope.getCustomizationArgs(),
+        $scope.saveInteractiveWidget);
   };
 
   $scope.getStateNameForRule = function(stateId) {
@@ -365,7 +370,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
 
     $scope.addContentToIframeWithId('interactiveWidgetPreview', arg.data.raw);
     $('#interactiveWidgetModal').modal('hide');
-    if ($scope.interactiveWidget.id != arg.data.widget.id) {
+    if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
       $scope.interactiveWidget = arg.data.widget;
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
@@ -382,16 +387,16 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
   $scope.saveInteractiveWidget = function() {
     var customizationArgs = $scope.getCustomizationArgs();
     $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, customizationArgs);
-
-    explorationData.saveStateData($scope.stateId, {
-        // The backend actually just saves the id of the widget.
-        'interactive_widget': $scope.interactiveWidget.id,
-        // TODO(sll): Rename this and other instances of interactive_params.
-        'interactive_params': customizationArgs,
-        'interactive_rulesets': $scope.interactiveRulesets
-    });
-    $scope.drawGraph();
+        $scope.interactiveWidget.id, customizationArgs, function() {
+          explorationData.saveStateData($scope.stateId, {
+            // The backend actually just saves the id of the widget.
+            'interactive_widget': $scope.interactiveWidget.id,
+            // TODO(sll): Rename this and other instances of interactive_params.
+            'interactive_params': customizationArgs,
+            'interactive_rulesets': $scope.interactiveRulesets
+          });
+          $scope.drawGraph();
+        });
   };
 
   $scope.deleteUnresolvedAnswer = function(answer) {

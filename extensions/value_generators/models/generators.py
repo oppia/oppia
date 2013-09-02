@@ -18,9 +18,6 @@
 
 import copy
 import numbers
-import random
-
-import utils
 
 
 class BaseValueGenerator(object):
@@ -36,66 +33,12 @@ class BaseValueGenerator(object):
         """Generates a new value, using the given customization args."""
         raise NotImplementedError
 
-    @classmethod
-    def render_view(cls):
-        """Renders a view-only version of the generator."""
-        raise NotImplementedError
-
-    @classmethod
-    def render_edit(cls, frontend_name, data=None):
-        """Renders a value generator customization UI."""
-        raise NotImplementedError
-
 
 class Copier(BaseValueGenerator):
     """Returns a copy of the input value."""
 
     def generate_value(self, value):
         return copy.deepcopy(value)
-
-
-class RandomSelector(BaseValueGenerator):
-    """Returns a random value from the input list."""
-
-    def generate_value(self, list_of_values):
-        return copy.deepcopy(utils.get_random_choice(list_of_values))
-
-
-class InclusiveIntRangePicker(BaseValueGenerator):
-    """Selects a random value from a given range of consecutive integers."""
-
-    def generate_value(self, lower_bound, upper_bound):
-        assert lower_bound <= upper_bound
-        assert isinstance(lower_bound, int) and isinstance(upper_bound, int)
-        return random.SystemRandom().randrange(lower_bound, upper_bound + 1)
-
-
-class RandomStringGenerator(BaseValueGenerator):
-    """Generates a random string of a specified length from a given charset."""
-
-    def generate_value(self, length, charset):
-        output = u''
-        for i in range(length):
-            ind = random.SystemRandom().randrange(0, len(charset))
-            output += charset[ind]
-        return output
-
-
-class JinjaEvaluator(BaseValueGenerator):
-    """Returns the result of evaluating a Jinja template string."""
-
-    def generate_value(self, jinja_string, values_dict):
-        return utils.parse_with_jinja(jinja_string, values_dict)
-
-
-class Accumulator(BaseValueGenerator):
-    """Returns the sum of the values in the input list."""
-
-    def generate_value(self, list_of_values):
-        output = 0
-        for item in list_of_values:
-            output += item
-        return output
 
 
 class RestrictedCopier(BaseValueGenerator):
@@ -108,7 +51,9 @@ class RestrictedCopier(BaseValueGenerator):
         self.choices = choices
 
     def generate_value(self, value):
-        assert value in self.choices
+        if not value in self.choices:
+            raise Exception(
+                'Value must be one of %s; received %s' % (self.choices, value))
         return copy.deepcopy(value)
 
 
@@ -127,5 +72,8 @@ class RangeRestrictedCopier(BaseValueGenerator):
         self.max_value = max_value
 
     def generate_value(self, value):
-        assert self.min_value <= value <= self.max_value
+        if not self.min_value <= value <= self.max_value:
+            raise Exception(
+                'Value must be between %s and %s, inclusive; received %s' %
+                (self.min_value, self.max_value, value))
         return copy.deepcopy(value)

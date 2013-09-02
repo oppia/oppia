@@ -52,31 +52,36 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         code = widget.get_raw_code({}, {})
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
 
-        code = widget.get_raw_code({'noteToGuess': {'value': 'abc'}}, {})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');', code)
+        code = widget.get_raw_code({'noteToGuess': {'value': 'F4'}}, {})
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
 
         code = widget.get_raw_code(
-            {'noteToGuess': {'value': '{{ntg}}'}}, {'ntg': 'abc'})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');', code)
+            {'noteToGuess': {'value': '{{ntg}}'}}, {'ntg': 'F4'})
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
-            {'noteToGuess': {'value': 'abc'}}, {}
+            {'noteToGuess': {'value': 'F4'}}, {}
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'id', 'name', 'category', 'description', 'params',
             'handlers', 'raw'])
         self.assertEqual(parameterized_widget_dict['id'], MUSIC_STAFF_ID)
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"abc\\"\');',
+        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');',
                       parameterized_widget_dict['raw'])
 
         self.assertEqual(parameterized_widget_dict['params'], {
             'noteToGuess': {
-                'value': 'abc',
+                'value': 'F4',
                 'obj_type': 'UnicodeString',
-                'generator_id': 'Copier',
-                'init_args': {},
+                'generator_id': 'RestrictedCopier',
+                'init_args': {
+                    'choices': [
+                        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
+                        'E5', 'F5'
+                    ]
+                },
                 'customization_args': {
-                    'value': 'abc',
+                    'value': 'F4',
                 }
             }
         })

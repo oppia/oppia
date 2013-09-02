@@ -7,7 +7,7 @@ repl.config(function($interpolateProvider) {
 });
 
 function CodeRepl($scope) {
-  $scope.language = GLOBALS.languae;
+  $scope.language = GLOBALS.language;
   $scope.placeholder = GLOBALS.placeholder;
   $scope.rows = GLOBALS.rows;
   $scope.cols = GLOBALS.columns;
@@ -53,18 +53,18 @@ function CodeRepl($scope) {
     output = '';
 
     // Running the code. This triggers one of the callbacks set to jsrepl which
-    // then call sendResponse with the result.
+    // then calls sendResponse with the result.
     jsrepl.eval(code);
   };
 
-  var sendResponse = function(eval, err) {
+  var sendResponse = function(evaluation, err) {
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
           JSON.stringify({
             'submit': {
               code: code,
               output: output,
-              evaluation: eval,
+              evaluation: evaluation,
               error: err
             }
           }),

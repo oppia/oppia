@@ -19,6 +19,10 @@
   </head>
   <body>
     <div ng-controller="CodeRepl">
+      <div>
+        <em>Language: <[language]></em>
+      </div>
+      <br>
       <form ng-submit="runCode(code)">
 
         <input ng-show="rows == 1" ng-model="code"

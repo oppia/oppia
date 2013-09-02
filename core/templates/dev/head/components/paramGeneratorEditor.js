@@ -29,7 +29,7 @@ oppia.directive('copier', function($compile) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return VALUE_GENERATOR_TEMPLATES_URL + 'Copier';// scope.generatorId;
+        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
       };
       $compile(element.contents())(scope);
     },
@@ -41,6 +41,78 @@ oppia.directive('copier', function($compile) {
       $scope.initArgs = $scope.$parent.initArgs;
       $scope.customizationArgs = $scope.$parent.customizationArgs;
       $scope.objType = $scope.$parent.objType;
+    }
+  };
+});
+
+GENERATOR_ID_TO_DIRECTIVE_MAPPING['RestrictedCopier'] = 'restricted-copier';
+oppia.directive('restrictedCopier', function($compile, warningsData) {
+  return {
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
+      };
+      $compile(element.contents())(scope);
+    },
+    restrict: 'E',
+    scope: true,
+    template: '<div ng-include="getTemplateUrl()"></div>',
+    controller: function($scope, $attrs) {
+      $scope.generatorId = $scope.$parent.generatorId;
+      $scope.initArgs = $scope.$parent.initArgs;
+      $scope.customizationArgs = $scope.$parent.customizationArgs;
+      $scope.objType = $scope.$parent.objType;
+
+      $scope.$watch($scope.customizationArgs, function(newValue, oldValue) {
+        // TODO(sll): This does not have any effect; why?
+        if (newValue !== undefined || oldValue !== undefined) {
+          var isInList = false;
+          for (var i = 0; i < $scope.initArgs.choices.length; i++) {
+            if ($scope.initArgs.choices[i] == newValue) {
+              isInList = true;
+            }
+          }
+          if (!isInList) {
+            warningsData.addWarning(
+              'Value must be one of ' + $scope.initArgs.choices + '; received ' +
+              newValue);
+            return;
+          }
+        }
+      });
+    }
+  };
+});
+
+GENERATOR_ID_TO_DIRECTIVE_MAPPING['RangeRestrictedCopier'] = 'range-restricted-copier';
+oppia.directive('rangeRestrictedCopier', function($compile, warningsData) {
+  return {
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
+      };
+      $compile(element.contents())(scope);
+    },
+    restrict: 'E',
+    scope: true,
+    template: '<div ng-include="getTemplateUrl()"></div>',
+    controller: function($scope, $attrs) {
+      $scope.generatorId = $scope.$parent.generatorId;
+      $scope.initArgs = $scope.$parent.initArgs;
+      $scope.customizationArgs = $scope.$parent.customizationArgs;
+      $scope.objType = $scope.$parent.objType;
+
+      $scope.$watch($scope.customizationArgs, function(newValue, oldValue) {
+        // TODO(sll): This does not have any effect; why?
+        if (newValue !== undefined || oldValue !== undefined) {
+          if (newValue > $scope.initArgs.upper_bound || newValue < $scope.initArgs.lower_bound) {
+            warningsData.addWarning(
+              'Value must be between ' + $scope.initArgs.upper_bound +
+              ' and ' + $scope.initArgs.lower_bound + ', inclusive.');
+            return;
+          }
+        }
+      });
     }
   };
 });
