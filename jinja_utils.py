@@ -15,6 +15,7 @@
 """Jinja-related utilities."""
 
 import os
+import math
 
 import jinja2
 import json
@@ -32,11 +33,15 @@ def js_string(value):
         string = string.replace(replacement[0], replacement[1])
     return jinja2.utils.Markup(string)
 
+def log_floor(value):
+    """Returns the logarithm base 2 of value, rounded down"""
+    return int(math.log(value, 2))
 
 FILTERS = {
     'is_list': lambda x: isinstance(x, list),
     'is_dict': lambda x: isinstance(x, dict),
     'js_string': js_string,
+    'log_floor': log_floor,
 }
 
 
