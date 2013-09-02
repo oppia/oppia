@@ -1384,7 +1384,7 @@ states:
   - name: largestValidRange
     obj_type: TemplatedString
     values:
-    - '{{2**((rangeSize|float)|log_floor)-1}}'
+    - '{{2**((rangeSize|float)|log2_floor)-1}}'
   - name: upperBound
     obj_type: TemplatedString
     values:
@@ -1541,7 +1541,7 @@ states:
   - name: largestValidRange
     obj_type: TemplatedString
     values:
-    - '{{2**((rangeSize|float)|log_floor)-1}}'
+    - '{{2**((rangeSize|float)|log2_floor)-1}}'
   - name: upperBound
     obj_type: TemplatedString
     values:
@@ -1663,7 +1663,7 @@ states:
   - name: largestValidRange
     obj_type: TemplatedString
     values:
-    - '{{2**((rangeSize|float)|log_floor)-1}}'
+    - '{{2**((rangeSize|float)|log2_floor)-1}}'
   - name: upperBound
     obj_type: TemplatedString
     values:

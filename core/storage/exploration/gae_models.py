@@ -144,7 +144,8 @@ class ExplorationModel(base_models.BaseModel):
                 assert 'obj_type' in param_spec
         except AssertionError:
             raise db.BadValueError(
-                "The 'param_specs' property must be a list of param_spec dicts "+str(param_spec)
+                'The \'param_specs\' property must be a list of param_spec '
+                ' dicts; received %s' % self.param_specs
             )
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:

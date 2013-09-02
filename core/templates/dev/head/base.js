@@ -83,7 +83,7 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
       iframe = document.getElementById(iframe);
     }
     if (!iframe) {
-      // TODO(sll): Raise an error here.
+      console.log('No iframe found.');
       return;
     }
     if (iframe.contentDocument) {
@@ -94,8 +94,6 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
     doc.open();
     doc.writeln(content);
     doc.close();
-
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
   };
 
   /**

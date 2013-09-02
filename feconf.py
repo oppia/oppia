@@ -62,7 +62,7 @@ DEMO_EXPLORATIONS = [
     ('landmarks', 'Landmarks', 'Geography'),
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem', 'Mathematics'),
-    ('binary', 'The Lazy Magician', 'Mathematics'),
+    ('binary_search', 'The Lazy Magician', 'Mathematics'),
 ]
 
 # Whether to unconditionally log info messages.

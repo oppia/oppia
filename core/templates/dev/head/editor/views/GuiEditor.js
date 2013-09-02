@@ -131,6 +131,10 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     activeInputData.clear();
   };
 
+  $scope.defaultTextContent = (
+      'Click \'Edit\' to enter text here. Text enclosed in dollar signs ' +
+      'will be displayed as $LaTeX$.');
+
 
   var editors = {};
 
@@ -173,7 +177,9 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     myEditor.render();
 
     myEditor.on('windowRender', function() {
-      myEditor.setEditorHTML(initContent || 'Click \'Edit\' to enter text here.');
+      myEditor.setEditorHTML(
+        initContent || $scope.defaultTextContent
+      );
     });
 
     editors[index] = myEditor;

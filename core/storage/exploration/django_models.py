@@ -82,7 +82,8 @@ class ExplorationModel(base_models.BaseModel):
                     [prop in val for prop in ['name', 'obj_type']])
         except AssertionError:
             raise ValidationError(
-                "The 'param_specs' property must be a list of param_spec dicts"
+                'The \'param_specs\' property must be a list of param_spec '
+                ' dicts; received %s' % value
             )
 
     # The list of parameter specifications associated with this exploration.

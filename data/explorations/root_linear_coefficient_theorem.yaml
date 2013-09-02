@@ -10,6 +10,7 @@ states:
   name: Start
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -18,7 +19,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -30,6 +30,7 @@ states:
   name: Simple Expansion
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -46,7 +47,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -55,6 +55,13 @@ states:
   name: More General Expansion
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - $x^3 - a x^2 - b x - c$
+        - $x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc$
+        - $x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc$
+        - $x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc$
     handlers:
     - name: submit
       rule_specs:
@@ -71,13 +78,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - x^3 - a * x^2 - b * x - c
-        - x^3 + (a+b+c) * x^2 + (ab+bc+ca) * x + abc
-        - x^3 - (a+b+c) * x^2 + (ab+bc+ca) * x - abc
-        - x^3 + (a+b+c) * x^2 - (ab+bc+ca) * x + abc
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -89,6 +89,13 @@ states:
   name: Particular coefficients (part 1)
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - $a_1$
+        - $a_1 + a_2 + a_3 + ... + a_n$
+        - $1$
+        - $a_1 a_2 a_3 ... a_n$
     handlers:
     - name: submit
       rule_specs:
@@ -105,13 +112,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - a1
-        - a1 + a2 + a3 + ... + an
-        - '1'
-        - a1 * a2 * a3 * ... * an
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -130,6 +130,13 @@ states:
   name: Particular coefficients (part 2)
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - $a_1 a_2 + a_2 a_3 + ... + a_n a_1$
+        - $a_1 + a_2 + a_3 + ... + a_n$
+        - $a_2$
+        - $a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n$
     handlers:
     - name: submit
       rule_specs:
@@ -148,14 +155,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - a1 * a2 + a2 * a3 + ... + an * a1
-        - a1 + a2 + a3 + ... + an
-        - a2
-        - a1 * a2 * ... * a(n-1) + a1 * a2 * ... * a(n-2) * an + ... + a2 * a3 * ...
-          * an
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -169,6 +168,13 @@ states:
   name: Coefficient Signs
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - $+,-,-,+$
+        - $+,+,+,+$
+        - $+,-,+,-$
+        - $-,+,-,+$
     handlers:
     - name: submit
       rule_specs:
@@ -208,13 +214,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - +,-,-,+
-        - +,+,+,+
-        - +,-,+,-
-        - -,+,-,+
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -227,6 +226,11 @@ states:
   name: Quotient of terms
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - Positive
+        - Negative
     handlers:
     - name: submit
       rule_specs:
@@ -244,11 +248,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - Positive
-        - Negative
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -259,6 +258,7 @@ states:
   name: Coefficient signs WA1
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -276,7 +276,6 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
@@ -288,6 +287,7 @@ states:
   name: Coefficient signs WA2
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -304,19 +304,25 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
   - type: text
-    value: 'Now for the fun part. &nbsp;Do you remember how the linear
-      coefficient was:<br>$(-1)^{n+1} a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n
-      + ... + a_2 a_3 ... a_n$<br><br>and the constant term was:<br>$(-1)^n a_1 a_2
-      ... a_n$<br><br>(where, as discussed before, the sign is added in).<br><br>What
-      happens when we divide the linear coefficient by the constant term?'
+    value: Now for the fun part. &nbsp;Do you remember how the linear coefficient
+      was:<br>$(-1)^{n+1} a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2
+      a_3 ... a_n$<br><br>and the constant term was:<br>$(-1)^n a_1 a_2 ... a_n$<br><br>(where,
+      as discussed before, the sign is added in).<br><br>What happens when we divide
+      the linear coefficient by the constant term?
   name: Quotient part 2
   param_changes: []
   widget:
+    customization_args:
+      choices:
+        value:
+        - $1$
+        - $(-1)^n * (1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
+        - $(-1)(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
+        - $(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
     handlers:
     - name: submit
       rule_specs:
@@ -329,17 +335,10 @@ states:
         param_changes: []
       - dest: Quotient part 2
         feedback:
-        - Oops, that's not right.  Signs can be tricky, can't they?
+        - Oops, that's not right.  Careful; signs can be tricky!
         inputs: {}
         name: Default
         param_changes: []
-    customization_args:
-      choices:
-        value:
-        - '1'
-        - (-1)^n * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
-        - (-1) * (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
-        - (1 / a1 + 1/a2 + 1/a3 + ... + 1/an)
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -352,6 +351,7 @@ states:
   name: Theorem
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -362,6 +362,5 @@ states:
         inputs: {}
         name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: Continue
