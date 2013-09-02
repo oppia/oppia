@@ -77,6 +77,8 @@ class WidgetRepositoryHandler(base.BaseHandler):
 class WidgetHandler(base.BaseHandler):
     """Returns instance dicts for individual widgets."""
 
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     def post(self, widget_type, widget_id):
         """Handles POST requests for parameterized widgets."""
 

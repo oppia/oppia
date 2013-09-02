@@ -58,7 +58,10 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
         be JSON-stringified and stored under 'payload'.
    */
   $scope.createRequest = function(requestObj) {
-    return $.param({payload: JSON.stringify(requestObj)}, true);
+    return $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify(requestObj)
+    }, true);
   };
 
   /**
@@ -106,11 +109,15 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
   };
 
   $scope.normalizeWhitespace = function(input) {
-    // Remove whitespace from the beginning and end of the string, and replace
-    // interior whitespace with a single space character.
-    input = input.trim();
-    input = input.replace(/\s{2,}/g, ' ');
-    return input;
+    if (typeof input == 'string' || input instanceof String) {
+      // Remove whitespace from the beginning and end of the string, and
+      // replace interior whitespace with a single space character.
+      input = input.trim();
+      input = input.replace(/\s{2,}/g, ' ');
+      return input;
+    } else {
+      return input;
+    }
   };
 
   /**

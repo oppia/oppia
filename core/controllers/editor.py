@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import feconf
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import param_domain
@@ -28,48 +27,10 @@ EDITOR_MODE = 'editor'
 DEFAULT_NUM_SNAPSHOTS = 10
 
 
-class NewExploration(base.BaseHandler):
-    """Creates a new exploration."""
-
-    @base.require_user
-    def post(self):
-        """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
-        yaml_content = self.request.get('yaml')
-
-        if yaml_content and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exploration_id = exp_services.create_from_yaml(
-                yaml_content, self.user_id, title, category)
-        else:
-            exploration_id = exp_services.create_new(
-                self.user_id, title=title, category=category)
-
-        self.render_json({'explorationId': exploration_id})
-
-
-class ForkExploration(base.BaseHandler):
-    """Forks an existing exploration."""
-
-    @base.require_user
-    def post(self):
-        """Handles POST requests."""
-        exploration_id = self.payload.get('exploration_id')
-
-        self.render_json({
-            'explorationId': exp_services.fork_exploration(
-                exploration_id, self.user_id)
-        })
-
-
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
     def get(self, exploration_id):
@@ -82,6 +43,8 @@ class ExplorationPage(base.BaseHandler):
 
 class ExplorationHandler(base.BaseHandler):
     """Page with editor data for a single exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
     def get(self, exploration_id):
@@ -205,6 +168,8 @@ class ExplorationHandler(base.BaseHandler):
 
 class StateHandler(base.BaseHandler):
     """Handles state transactions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
     def put(self, exploration_id, state_id):

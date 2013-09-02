@@ -22,7 +22,8 @@ import feconf
 import utils
 
 # Valid model names.
-NAMES = utils.create_enum('base_model', 'exploration', 'image', 'statistics')
+NAMES = utils.create_enum(
+    'base_model', 'config', 'exploration', 'image', 'statistics')
 
 
 class _Platform(object):
@@ -41,6 +42,9 @@ class _Django(_Platform):
             if name == NAMES.base_model:
                 from core.storage.base_model import django_models as base_model
                 returned_models.append(base_model)
+            elif name == NAMES.config:
+                from core.storage.config import django_models as config_model
+                returned_models.append(config_model)
             elif name == NAMES.exploration:
                 from core.storage.exploration import django_models as exp_model
                 returned_models.append(exp_model)
@@ -82,6 +86,9 @@ class _Gae(_Platform):
             if name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
+            elif name == NAMES.config:
+                from core.storage.config import gae_models as config_model
+                returned_models.append(config_model)
             elif name == NAMES.exploration:
                 from core.storage.exploration import gae_models as exp_model
                 returned_models.append(exp_model)

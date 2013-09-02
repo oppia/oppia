@@ -115,6 +115,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     $http.put(
         explorationUrl + '/' + stateId + '/data',
         $.param({
+          csrf_token: GLOBALS.csrf_token,
           payload: JSON.stringify(propertyValueMap)
         }, true),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}

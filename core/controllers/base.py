@@ -16,13 +16,19 @@
 
 __author__ = 'Sean Lip'
 
+import base64
 import datetime
+import hmac
 import json
 import logging
+import os
 import sys
+import time
 import traceback
 
 from core import counters
+from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_services
 from core.platform import models
 import feconf
@@ -30,6 +36,13 @@ import jinja_utils
 user_services = models.Registry.import_user_services()
 
 import webapp2
+
+
+DEFAULT_CSRF_SECRET = 'oppia csrf secret'
+
+CSRF_SECRET = config_domain.ConfigProperty(
+    'oppia_csrf_secret', str, 'Text used to encrypt CSRF tokens.',
+    DEFAULT_CSRF_SECRET)
 
 
 def require_user(handler):
@@ -108,6 +121,17 @@ def require_admin(handler):
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 
+    # Whether to check POST and PUT payloads for CSRF tokens prior to
+    # processing them. Can be overridden by subclasses if this check is
+    # not necessary.
+    REQUIRE_PAYLOAD_CSRF_CHECK = True
+    # Specific page name to use as a key for generating CSRF tokens. This name
+    # must be overwritten by subclasses. This represents both the source
+    # page name and the destination page name.
+    # TODO(sll): A weakness of the current approach is that the source and
+    # destination page names have to be the same. Consider fixing this.
+    PAGE_NAME_FOR_CSRF = ''
+
     @webapp2.cached_property
     def jinja2_env(self):
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
@@ -131,7 +155,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['logout_url'] = (
                 user_services.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
-            self.values['is_admin'] = user_services.is_current_user_admin(self.request)
+            self.values['is_admin'] = user_services.is_current_user_admin(
+                self.request)
         else:
             self.values['login_url'] = user_services.create_login_url(
                 self.request.uri)
@@ -139,7 +164,36 @@ class BaseHandler(webapp2.RequestHandler):
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
-            self.payload = {}
+            self.payload = None
+
+    def dispatch(self):
+        """Overrides dispatch method in webapp2 superclass."""
+        if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+            try:
+                if not self.PAGE_NAME_FOR_CSRF:
+                    raise Exception('No page name specified for this '
+                                    'handler.')
+
+                csrf_token = self.request.get('csrf_token')
+                if not csrf_token:
+                    raise Exception(
+                        'Missing CSRF token. Changes were not saved. '
+                        'Please report this bug.')
+
+                is_csrf_token_valid = CsrfTokenManager.is_csrf_token_valid(
+                    self.user_id, self.PAGE_NAME_FOR_CSRF, csrf_token)
+
+                if not is_csrf_token_valid:
+                    raise Exception(
+                        'Invalid CSRF token. Changes were not saved. '
+                        'Please reload the page.')
+            except Exception as e:
+                logging.error('%s: page name %s, payload %s',
+                    e, self.PAGE_NAME_FOR_CSRF, self.payload)
+
+                return self.handle_exception(e, self.app.debug)
+
+        super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):
         """Base method to handle GET requests."""
@@ -172,6 +226,14 @@ class BaseHandler(webapp2.RequestHandler):
         if values is None:
             values = self.values
 
+        # Create a new csrf token for inclusion in HTML responses. This assumes
+        # that tokens generated in one handler will be sent back to a handler
+        # with the same page name.
+        values['csrf_token'] = ''
+        if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
+            values['csrf_token'] = CsrfTokenManager.create_csrf_token(
+                self.user_id, self.PAGE_NAME_FOR_CSRF)
+
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
@@ -191,7 +253,7 @@ class BaseHandler(webapp2.RequestHandler):
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
-        if self.payload:
+        if self.payload is not None:
             self.response.content_type = 'application/json'
             self.response.write(json.dumps(values))
         else:
@@ -245,3 +307,77 @@ class BaseHandler(webapp2.RequestHandler):
 
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+
+class CsrfTokenManager(object):
+    """Manages page/user tokens in memcache to protect against CSRF."""
+
+    # Max age of the token (2 hours).
+    CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
+    # Default user id for non-logged-in users.
+    USER_ID_DEFAULT = 'non_logged_in_user'
+
+    @classmethod
+    def init_csrf_secret(cls):
+        """Verify that non-default CSRF secret exists; creates one if not."""
+
+        # Any non-default value is fine.
+        if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
+            return
+
+        # Initialize to random value.
+        config_services.set_property(
+            CSRF_SECRET.name, base64.urlsafe_b64encode(os.urandom(20)))
+
+    @classmethod
+    def _create_token(cls, user_id, page_name, issued_on):
+        """Creates a digest (string representation) of a token."""
+        cls.init_csrf_secret()
+
+        # The token has 4 parts: hash of the actor user id, hash of the page
+        # name, hash of the time issued and plain text of the time issued.
+
+        if user_id is None:
+            user_id = cls.USER_ID_DEFAULT
+
+        # Round time to seconds.
+        issued_on = long(issued_on)
+
+        digester = hmac.new(str(CSRF_SECRET.value))
+        digester.update(str(user_id))
+        digester.update(':')
+        digester.update(str(page_name))
+        digester.update(':')
+        digester.update(str(issued_on))
+
+        digest = digester.digest()
+        token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
+
+        return token
+
+    @classmethod
+    def create_csrf_token(cls, user_id, page_name):
+        if not page_name:
+            raise Exception('Cannot create CSRF token if page name is empty.')
+        return cls._create_token(user_id, page_name, time.time())
+
+    @classmethod
+    def is_csrf_token_valid(cls, user_id, page_name, token):
+        """Validate a given CSRF token with the CSRF secret in memcache."""
+        try:
+            parts = token.split('/')
+            if len(parts) != 2:
+                return False
+
+            issued_on = long(parts[0])
+            age = time.time() - issued_on
+            if age > cls.CSRF_TOKEN_AGE_SECS:
+                return False
+
+            authentic_token = cls._create_token(user_id, page_name, issued_on)
+            if authentic_token == token:
+                return True
+
+            return False
+        except Exception:
+            return False

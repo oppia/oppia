@@ -96,6 +96,8 @@ class ExplorationHandler(base.BaseHandler):
 class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     def _append_answer_to_stats_log(
             self, old_state, answer, exploration_id, old_state_id,
             old_params, handler, rule):

@@ -44,6 +44,7 @@ class EventHandler(object):
     def record_answer_submitted(
             cls, exploration_id, state_id, handler_name, rule_str, answer):
         """Records an event when an answer triggers a rule."""
+        # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
             exploration_id, state_id, handler_name, rule_str, answer)
 
@@ -51,6 +52,7 @@ class EventHandler(object):
     def resolve_answers_for_default_rule(
             cls, exploration_id, state_id, handler_name, answers):
         """Resolves a list of answers for the default rule of this state."""
+        # TODO(sll): Escape these args?
         stats_models.resolve_answers(
             exploration_id, state_id, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)

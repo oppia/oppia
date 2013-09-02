@@ -5,6 +5,9 @@
 
     {% include 'header_js_libs.html' %}
     <script>
+      var GLOBALS = {};
+      GLOBALS.csrf_token = JSON.parse('{{csrf_token|js_string}}');
+
       var oppia = angular.module('oppia', []);
       oppia.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('<[');
@@ -15,16 +18,26 @@
         $scope.message = '';
 
         $scope.reload = function(item) {
+          if ($scope.message == 'Processing...') {
+            return;
+          }
+
           $scope.message = 'Processing...';
-          var request = $.param({payload: JSON.stringify(
-              {action: 'reload', item: item})}, true);
+          var request = $.param({
+            csrf_token: GLOBALS.csrf_token,
+            payload: JSON.stringify({
+              action: 'reload',
+              item: item, 
+            })
+          }, true);
 
           $http.post(
             '/admin',
             request,
             {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
           success(function(data) {
-              $scope.message = 'Data reloaded successfully. Please remember to flush memcache so that users do not see stale values.';
+              $scope.message = 'Data reloaded successfully. Please remember ' +
+                'to flush memcache so that users do not see stale values.';
             }).error(function(errorResponse) {
               $scope.message = 'Server error: ' + errorResponse.error;
             });

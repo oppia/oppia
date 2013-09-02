@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
+import feconf
 
 from core.controllers import base
 from core.domain import exp_services
@@ -26,6 +27,8 @@ user_services = models.Registry.import_user_services()
 
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
     def get(self):
         """Handles GET requests."""
@@ -70,3 +73,47 @@ class GalleryHandler(base.BaseHandler):
             'categories': categories,
         })
         self.render_json(self.values)
+
+
+class NewExploration(base.BaseHandler):
+    """Creates a new exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        yaml_content = self.request.get('yaml')
+
+        if yaml_content and feconf.ALLOW_YAML_FILE_UPLOAD:
+            exploration_id = exp_services.create_from_yaml(
+                yaml_content, self.user_id, title, category)
+        else:
+            exploration_id = exp_services.create_new(
+                self.user_id, title=title, category=category)
+
+        self.render_json({'explorationId': exploration_id})
+
+
+class ForkExploration(base.BaseHandler):
+    """Forks an existing exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        exploration_id = self.payload.get('exploration_id')
+
+        self.render_json({
+            'explorationId': exp_services.fork_exploration(
+                exploration_id, self.user_id)
+        })

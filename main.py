@@ -103,6 +103,8 @@ urls = [
     get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(
         r'/gallery/data', gallery.GalleryHandler, 'gallery_handler'),
+    get_redirect_route(r'/create_new', gallery.NewExploration, 'new_exploration'),
+    get_redirect_route(r'/fork', gallery.ForkExploration, 'fork_exploration'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
@@ -122,8 +124,6 @@ urls = [
         r'/learn_random', reader.RandomExplorationPage,
         'random_exploration_page'),
 
-    get_redirect_route(r'/create_new', editor.NewExploration, 'new_exploration'),
-    get_redirect_route(r'/fork', editor.ForkExploration, 'fork_exploration'),
     get_redirect_route(
         r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
         'exploration_download_helper'),

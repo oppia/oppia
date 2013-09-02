@@ -92,6 +92,8 @@ class ImageHandler(base.BaseHandler):
 class ImageUploadHandler(base.BaseHandler):
     """Handles image uploads."""
 
+    PAGE_NAME_FOR_CSRF = 'editor'
+
     def post(self):
         """Saves an image uploaded by a content creator."""
         raw = self.request.get('image')

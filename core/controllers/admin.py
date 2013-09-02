@@ -24,6 +24,8 @@ from core.domain import exp_services
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
 
+    PAGE_NAME_FOR_CSRF = 'admin'
+
     @base.require_admin
     def get(self):
         """Handles GET requests."""
