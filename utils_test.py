@@ -32,28 +32,6 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
-    def test_parse_with_jinja(self):
-        """Test parse_with_jinja method."""
-        parsed_str = utils.parse_with_jinja('{{test}}', {'test': 'hi'})
-        self.assertEqual(parsed_str, 'hi')
-
-        # Some parameters are missing.
-        parsed_str = utils.parse_with_jinja(
-            '{{test}} and {{test2}}', {'test2': 'hi'})
-        self.assertEqual(parsed_str, ' and hi')
-
-        # All parameters are missing.
-        parsed_str = utils.parse_with_jinja('{{test}} and {{test2}}', {})
-        self.assertEqual(parsed_str, ' and ')
-
-        # The string has no parameters.
-        parsed_str = utils.parse_with_jinja('no params', {'param': 'hi'})
-        self.assertEqual(parsed_str, 'no params')
-
-        # Integer parameters are used.
-        parsed_str = utils.parse_with_jinja('int {{i}}', {'i': 2})
-        self.assertEqual(parsed_str, 'int 2')
-
     def evaluate_object_with_params(self):
         """Test evaluate_object_with_params method."""
         parsed_object = utils.evaluate_object_with_params('abc', {})
@@ -94,20 +72,9 @@ class UtilsTests(test_utils.GenericTestBase):
             {'a': '{{b}}'}, {'b': 'c'})
         self.assertEqual(parsed_object, {'a': 'c'})
 
-    def test_parse_dict_with_params(self):
-        """Test parse_dict_with_params method."""
-        parsed_dict = utils.parse_dict_with_params({'a': 'b'}, {})
-        self.assertEqual(parsed_dict, {'a': 'b'})
-
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 3})
-        self.assertEqual(parsed_dict, {'a': '3'})
-
-        parsed_dict = utils.parse_dict_with_params({'a': '{{b}}'}, {'b': 'c'})
-        self.assertEqual(parsed_dict, {'a': 'c'})
-
         # Test that the original dictionary is unchanged.
         orig_dict = {'a': '{{b}}'}
-        parsed_dict = utils.parse_dict_with_params(orig_dict, {'b': 'c'})
+        parsed_dict = utils.evaluate_object_with_params(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
 

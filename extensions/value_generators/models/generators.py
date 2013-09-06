@@ -19,6 +19,8 @@
 import copy
 import numbers
 
+import jinja_utils
+
 
 class BaseValueGenerator(object):
     """Base value generator class.
@@ -37,8 +39,24 @@ class BaseValueGenerator(object):
 class Copier(BaseValueGenerator):
     """Returns a copy of the input value."""
 
-    def generate_value(self, value):
-        return copy.deepcopy(value)
+    def generate_value(self, value, parse_with_jinja=False,
+                       context_params=None):
+        """Returns a copy of the input value.
+
+        If parse_with_jinja is True, the input value is treated as a template
+        string and parsed against context_params before being copied. The
+        output will be a unicode string.
+
+        If parse_with_jinja is False, the input value is copied and returned
+        without changing its type.
+        """
+        if context_params is None:
+            context_params = {}
+
+        if parse_with_jinja:
+            return jinja_utils.parse_string(unicode(value), context_params)
+        else:
+            return copy.deepcopy(value)
 
 
 class RestrictedCopier(BaseValueGenerator):

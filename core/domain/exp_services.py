@@ -227,7 +227,7 @@ def export_content_to_html(content_array, block_number, params=None,
     html, widget_array = '', []
     for content in content_array:
         if content.type in ['text', 'image', 'video']:
-            value = (utils.parse_with_jinja(content.value, params)
+            value = (jinja_utils.parse_string(content.value, params)
                      if content.type == 'text' else content.value)
 
             if escape_text_strings:
@@ -486,7 +486,7 @@ def update_with_state_params(exploration_id, state_id, reader_params=None):
 
     for item in state.param_changes:
         reader_params[item.name] = (
-            None if item.value is None else utils.parse_with_jinja(
+            None if item.value is None else jinja_utils.parse_string(
                 item.value, reader_params))
     return reader_params
 
@@ -720,8 +720,7 @@ def _find_first_match(handler, all_rule_classes, answer, state_params):
         for (param_name, obj_cls) in param_defns:
             parsed_param = rule_spec.inputs[param_name]
             if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
-                parsed_param = utils.parse_with_jinja(
-                    parsed_param, state_params)
+                parsed_param = jinja_utils.parse_string(parsed_param, state_params)
             normalized_param = obj_cls.normalize(parsed_param)
             param_list.append(normalized_param)
 

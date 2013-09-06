@@ -22,9 +22,10 @@ import inspect
 import os
 import pkgutil
 
-import feconf
 from core.domain import obj_services
 from core.domain import rule_domain
+import feconf
+import jinja_utils
 import utils
 
 
@@ -210,7 +211,7 @@ class BaseWidget(object):
 
     def get_raw_code(self, state_customization_args, context_params):
         """Gets the raw code for a parameterized widget."""
-        return utils.parse_with_jinja(
+        return jinja_utils.parse_string(
             self.template,
             self._get_widget_param_instances(
                 state_customization_args, context_params))
@@ -227,8 +228,8 @@ class BaseWidget(object):
         parameters['answer'] = answer
 
         html, iframe = self._response_template_and_iframe
-        html = utils.parse_with_jinja(html, parameters)
-        iframe = utils.parse_with_jinja(iframe, parameters)
+        html = jinja_utils.parse_string(html, parameters)
+        iframe = jinja_utils.parse_string(iframe, parameters)
         return html, iframe
 
     def get_stats_log_html(self, state_customization_args,
@@ -245,7 +246,7 @@ class BaseWidget(object):
             state_customization_args, context_params)
         parameters['answer'] = answer
 
-        return utils.parse_with_jinja(self._stats_log_template, parameters)
+        return jinja_utils.parse_string(self._stats_log_template, parameters)
 
     def get_widget_instance_dict(self, customization_args, context_params):
         """Gets a dict representing a parameterized widget.
