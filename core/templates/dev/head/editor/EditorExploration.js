@@ -43,6 +43,17 @@ oppia.run(function($rootScope) {
   });
 });
 
+oppia.run(function($rootScope, $location, $anchorScroll, $routeParams) {
+  //when the route is changed scroll to the proper element.
+  $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
+    // TODO(sfederwisch): Change trigger to when page finishes loading
+    setTimeout( function () {
+      $location.hash($routeParams.scrollTo);
+      $anchorScroll();  
+    }, 2000);
+  });
+});
+
 
 function StatsViewerTab($scope, explorationData) {
   // Changes the tab to the Stats Viewer view.
@@ -60,7 +71,6 @@ function ExplorationTab($scope, explorationData) {
 
 function EditorExploration($scope, $http, $location, $route, $routeParams,
     $filter, explorationData, warningsData, activeInputData) {
-
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
@@ -166,7 +176,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
         $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
     $scope.highlightStates = {};
-    $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:Students often leave';
+    $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
     for (var i = 0; i < data.imp.length; i++) {
       if (data.imp[i].type == 'default') {
         $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
@@ -725,6 +735,6 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
+EditorExploration.$inject = ['$scope', '$http', '$location', '$route', 
     '$routeParams', '$filter', 'explorationData', 'warningsData', 'activeInputData'];
 ExplorationTab.$inject = ['$scope', 'explorationData'];

@@ -91,7 +91,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         }
       });
 
-      function addPopup(vis, stateName, stats) {
+      function addPopup(vis, expId, stateId, stateName, stats, improvementType) {
         var modal = d3.select(element[0]).append('div')
           .attr('class', 'modal')
           .attr('aria-hidden', 'false')
@@ -113,11 +113,17 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .text('Statistics for ' + stateName);
         var body = modal.append('div')
           .attr('class', 'modal-body');
+        if (improvementType) {
+          body.append('div')
+            .text("It looks like this state " + improvementType.toLowerCase());
+        }
         body.append('div')
           .style('font-weight', 'bold')
           .text('Times hit:')
           .append('span')
-            .style('font-weight', 'normal').text("   " + stats.totalEntryCount);
+            .style('font-weight', 'normal')
+            .style('margin-left', '5px')
+            .text(stats.totalEntryCount);
         var showTitle = false;
         var title = body.append('div')
           .style('font-weight', 'bold')
@@ -136,10 +142,27 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             var answer = stats.rule_stats[rule].answers[ans][0];
             var count = stats.rule_stats[rule].answers[ans][1];
             answerList.append('li')
-              .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")");
+              .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")")
+              .append('a')
+                .style('font-weight', 'normal')
+                .style('font-size', '12px')
+                .style('margin-left', '5px')
+                .attr('href', expId + '#/gui/' + stateId + '?scrollTo=rules')
+                .text('Add a rule for this answer');
           }
         }       
         if (!showTitle) {
+          if (stats.totalEntryCount) {
+            body.append('i')
+              .text('No students gave answers')
+              .append('a')
+                .style('font-weight', 'normal')
+                .style('font-size', '12px')
+                .style('font-style', 'normal')
+                .style('margin-left', '5px')
+                .attr('href', expId + '#/gui/' + stateId + '?scrollTo=noninteractive')
+                .text('Edit non-interactive content');
+          }
           title.remove();
         }
         var footer = modal.append('div')
@@ -365,7 +388,15 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 if (!stateStats) {
                   $('#editorViewTab a[href="#stateEditor"]').tab('show');     
                 } else {
-                  addPopup(vis, d.name, stateStats[d.hashId]);
+                  var legendList = highlightStates['legend'].split(',');
+                  var improvementType = "";
+                  for (index in legendList) {
+                    if (legendList[index].indexOf(highlightStates[d.hashId]) == 0) {
+                      improvementType = legendList[index].split(':')[1];
+                      break;
+                    }
+                  }
+                  addPopup(vis, explorationData.data.exploration_id, d.hashId, d.name, stateStats[d.hashId], improvementType);
                 }
               };
             })
