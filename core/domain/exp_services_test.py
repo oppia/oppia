@@ -198,6 +198,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('A exploration_id')
 
+
+class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
+
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def test_loading_and_deletion_of_demo_explorations(self):
         """Test loading and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)

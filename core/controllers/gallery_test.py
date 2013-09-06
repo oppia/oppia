@@ -23,4 +23,4 @@ class GalleryTest(test_utils.GenericTestBase):
         """Test access to gallery page."""
         response = self.testapp.get('/gallery')
         self.assertEqual(response.status_int, 200)
-        self.assertSubstring('Gallery', response.body)
+        self.assertIn('Gallery', response.body)

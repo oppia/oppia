@@ -35,6 +35,8 @@ class EditorTest(test_utils.GenericTestBase):
 class StatsIntegrationTest(test_utils.GenericTestBase):
     """Test statistics recording using the default exploration."""
 
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def test_state_stats_for_default_exploration(self):
         exp_services.reload_demos()
 

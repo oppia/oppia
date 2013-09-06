@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from core.domain import param_domain
+import test_utils
 
 
-class ParameterDomainUnitTests(unittest.TestCase):
+class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
     def test_parameter_object(self):

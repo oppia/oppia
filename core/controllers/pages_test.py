@@ -17,13 +17,18 @@ __author__ = 'Sean Lip'
 import test_utils
 
 
-class PagesTest(test_utils.GenericTestBase):
+class MainPageTest(test_utils.GenericTestBase):
+
+    TAGS = [test_utils.TestTags.SLOW_TEST]
 
     def testMainPage(self):
         """Test the main splash page."""
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         self.assertIn('Browse more explorations', response)
+
+
+class NoninteractivePagesTest(test_utils.GenericTestBase):
 
     def testAboutPage(self):
         """Test the About page."""

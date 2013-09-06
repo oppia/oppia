@@ -23,6 +23,8 @@ import test_utils
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
         exp_services.reload_demos()

@@ -18,12 +18,11 @@
 
 __author__ = 'Koji Ashida'
 
-import unittest
-
 from extensions.rules import code_evaluation
+import test_utils
 
 
-class CodeEvaluationRuleUnitTests(unittest.TestCase):
+class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on CodeEvaluation objects."""
 
     def test_equals_rule(self):

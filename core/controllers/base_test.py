@@ -22,6 +22,8 @@ import test_utils
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 

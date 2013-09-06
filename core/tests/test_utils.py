@@ -33,22 +33,20 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
 
 
+class TestTags(object):
+    """Tags for labelling particular tests."""
+
+    # Tag that is used to flag tests which take a long time to run, so that
+    # they can be excluded via a command-line argument.
+    SLOW_TEST = 1
+
+
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
     maxDiff = 2500
 
-    def assertSubstring(self, needle, haystack, strict=True):
-        """Tests whether 'needle' is a substring of 'haystack'.
-
-        If strict is False, then all whitespace is stripped from both strings
-        strings before the comparison.
-        """
-        if not strict:
-            needle = ''.join(needle.split())
-            haystack = ''.join(haystack.split())
-
-        assert needle in haystack
+    TAGS = []
 
     def setUp(self):
         self.testapp = webtest.TestApp(main.app)
@@ -81,19 +79,19 @@ class AppEngineTestBase(TestBase):
 
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
-        # setup an app to be tested
 
+        # Set up an app to be tested.
         self.testapp = webtest.TestApp(main.app)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
-        # configure datastore policy to emulate instantaneously and globally
+        # Configure datastore policy to emulate instantaneously and globally
         # consistent HRD; we also patch dev_appserver in main.py to run under
-        # the same policy
+        # the same policy.
         policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
             probability=1)
 
-        # declare any relevant App Engine service stubs here
+        # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)

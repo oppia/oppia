@@ -62,7 +62,6 @@ def get_jinja_env(dir_path):
         assert name.endswith('.js')
         return jinja2.Markup(loader.get_source(env, name)[0])
 
-
     env.globals['include_js_file'] = include_js_file
     env.filters.update(JinjaConfig.FILTERS)
     return env
@@ -87,8 +86,7 @@ def parse_string(string, params):
 
     variables = meta.find_undeclared_variables(parsed_string)
 
-    for var in variables:
-        if var not in params:
-            logging.info('Cannot parse %s fully using %s', string, params)
+    if any([var not in params for var in variables]):
+        logging.info('Cannot parse %s fully using %s', string, params)
 
     return env.from_string(string).render(params)

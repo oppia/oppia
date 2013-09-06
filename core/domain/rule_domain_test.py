@@ -18,10 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from core.domain import rule_domain
 from extensions.objects.models import objects
+import test_utils
 
 
 class FakeRule(rule_domain.Rule):
@@ -32,7 +31,7 @@ class FakeRule(rule_domain.Rule):
         return subject == self.x
 
 
-class RuleServicesUnitTests(unittest.TestCase):
+class RuleServicesUnitTests(test_utils.GenericTestBase):
     """Tests for rule services."""
 
     def test_get_rules_for_input_type(self):
@@ -44,7 +43,7 @@ class RuleServicesUnitTests(unittest.TestCase):
             len(rule_domain.get_rules_for_input_type(objects.Real)), 7)
 
 
-class RuleDomainUnitTests(unittest.TestCase):
+class RuleDomainUnitTests(test_utils.GenericTestBase):
     """Tests for rules."""
 
     def test_rule_initialization(self):

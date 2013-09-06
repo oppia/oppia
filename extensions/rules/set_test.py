@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 import extensions.rules.set as set_rules
+import test_utils
 
 
-class SetRuleUnitTests(unittest.TestCase):
+class SetRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Set objects."""
 
     def test_equals_rule(self):

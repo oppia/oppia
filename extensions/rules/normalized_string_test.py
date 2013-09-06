@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from extensions.rules import normalized_string
+import test_utils
 
 
-class NormalizedStringRuleUnitTests(unittest.TestCase):
+class NormalizedStringRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on NormalizedString objects."""
 
     def test_equals_rule(self):

@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
-
-import unittest
+__author__ = 'Sean Lip'
 
 import jinja_utils
+import test_utils
 
 
-class JinjaUtilsUnitTests(unittest.TestCase):
+class JinjaUtilsUnitTests(test_utils.GenericTestBase):
 
     def test_js_string_filter(self):
         """Test js_string filter."""

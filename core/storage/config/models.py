@@ -20,4 +20,4 @@ __author__ = 'Tarashish Mishra'
 
 from core.storage.config import django_models
 
-ConfigProperty = django_models.ConfigProperty
+ConfigPropertyModel = django_models.ConfigPropertyModel

@@ -20,12 +20,37 @@ Invoke this test script from the command line by running
 
 from the root folder.
 
-Optionally, you can append a path to run tests in a particular
-subdirectory, e.g.:
+
+=====================
+CUSTOMIZATION OPTIONS
+=====================
+
+You can customize this script as follows:
+
+(1) Append a test target to make the script run all tests in a given module
+or class, or run a particular test. For example,
+
+    python core/tests/gae_suite.py --test_target='foo.bar.Baz'
+
+runs all tests in test class Baz in the foo/bar.py module, and
+
+    python core/tests/gae_suite.py --test_target='foo.bar.Baz.quux'
+
+runs the test method quux in the test class Baz in the foo/bar.py module.
+
+
+(2) Append a test path to make the script run all tests in a given
+subdirectory. For example,
 
     python core/tests/gae_suite.py --test_path='core/controllers'
 
 runs all tests in the core/controllers/ directory.
+
+
+Only one of test_path and test_target should be specified.
+
+In addition, you can add the --omit_slow_tests flag to exclude tests that are
+tagged with test_utils.TestBase.SLOW_TEST.
 """
 
 __author__ = 'Sean Lip'
@@ -45,15 +70,35 @@ EXPECTED_TEST_COUNT = 114
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--test_path',
-    help='optional file or subdirectory path containing the test(s) to run',
+    '--test_target',
+    help='optional dotted module name of the test(s) to run',
     type=str)
+_PARSER.add_argument(
+    '--test_path',
+    help='optional subdirectory path containing the test(s) to run',
+    type=str)
+_PARSER.add_argument(
+    '--omit_slow_tests',
+    help='whether to omit tests that are flagged as slow',
+    action='store_true')
 
 
 def create_test_suites(parsed_args):
     """Creates test suites. If test_dir is None, runs all tests."""
     loader = unittest.TestLoader()
     root_dir = os.path.realpath(os.path.join(os.getcwd()))
+
+    if parsed_args.test_target and parsed_args.test_path:
+        raise Exception('At most one of test_path and test_target '
+                        'should be specified.')
+    if parsed_args.test_target and '/' in parsed_args.test_target:
+        raise Exception('The delimiter in test_target should be a slash (/)')
+    if parsed_args.test_path and '.' in parsed_args.test_path:
+        raise Exception('The delimiter in test_target should be a dot (.)')
+
+    if parsed_args.test_target:
+        return [loader.loadTestsFromName(parsed_args.test_target)]
+
     if parsed_args.test_path:
         root_dir = os.path.join(root_dir, parsed_args.test_path)
 
@@ -64,6 +109,18 @@ def create_test_suites(parsed_args):
 
 def main():
     """Runs the tests."""
+
+    def _iterate(test_suite_or_case):
+        """Iterate through all the test cases in `test_suite_or_case`."""
+        try:
+            suite = iter(test_suite_or_case)
+        except TypeError:
+            yield test_suite_or_case
+        else:
+            for test in suite:
+                for subtest in _iterate(test):
+                    yield subtest
+
     feconf.PLATFORM = 'gae'
 
     # TODO(sll): Check whether the following dirs exist.
@@ -83,6 +140,21 @@ def main():
 
     parsed_args = _PARSER.parse_args()
     suites = create_test_suites(parsed_args)
+
+    import test_utils
+
+    if parsed_args.omit_slow_tests:
+        new_suites = []
+        for suite in suites:
+            new_suite = unittest.TestSuite()
+            for test in _iterate(suite):
+                if (not hasattr(test, 'TAGS') or
+                        not test_utils.TestTags.SLOW_TEST in test.TAGS):
+                    new_suite.addTest(test)
+            new_suites.append(new_suite)
+
+        suites = new_suites
+
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
 
@@ -98,7 +170,9 @@ def main():
     if tests_run == 0:
         raise Exception('No tests were run.')
 
-    if parsed_args.test_path is None and tests_run != EXPECTED_TEST_COUNT:
+    if (parsed_args.test_path is None and parsed_args.test_target is None
+            and not parsed_args.omit_slow_tests
+            and tests_run != EXPECTED_TEST_COUNT):
         raise Exception('Expected %s tests to be run, not %s.' %
                         (EXPECTED_TEST_COUNT, tests_run))
 

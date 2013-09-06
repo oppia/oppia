@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from extensions.rules import coord_2d
+import test_utils
 
 
-class Coord2DRuleUnitTests(unittest.TestCase):
+class Coord2DRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Coord2D objects."""
 
     def test_within_rule(self):

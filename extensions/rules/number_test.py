@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from extensions.rules import number
+import test_utils
 
 
-class NumberRuleUnitTests(unittest.TestCase):
+class NumberRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Number objects."""
 
     def test_equals_rule(self):

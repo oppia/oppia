@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from extensions.rules import real
+import test_utils
 
 
-class RealRuleUnitTests(unittest.TestCase):
+class RealRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Real objects."""
 
     def test_equals_rule(self):

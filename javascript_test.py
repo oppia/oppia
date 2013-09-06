@@ -1,4 +1,6 @@
-# Copyright 2012 Google Inc. All Rights Reserved.
+# coding: utf-8
+#
+# Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__author__ = 'Sean Lip'
+
 import subprocess
-import unittest
+import test_utils
 
 
-class JavaScriptTests(unittest.TestCase):
+class JavaScriptTests(test_utils.GenericTestBase):
+
+    TAGS = [test_utils.TestTags.SLOW_TEST]
 
     def test_with_karma(self):
         return_code = subprocess.call([
-            'third_party/node-0.10.1/bin/karma', 'start',
-            'core/tests/karma.conf.js'])
-        #self.assertEqual(return_code, 0)
+             'third_party/node-0.10.1/bin/karma', 'start',
+             'core/tests/karma.conf.js'])
+        self.assertEqual(return_code, 0)

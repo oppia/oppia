@@ -18,12 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from extensions.rules import music_note
+import test_utils
 
 
-class MusicNoteRuleUnitTests(unittest.TestCase):
+class MusicNoteRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on MusicNote objects."""
 
     def test_equals_rule(self):
