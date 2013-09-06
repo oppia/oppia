@@ -23,30 +23,32 @@ from jinja2 import meta
 import json
 
 
-def js_string(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
-    string = json.dumps(value)
+class JinjaConfig(object):
+    """Contains Jinja configuration properties."""
 
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
+    def _js_string_filter(value):
+        """Converts a value to a JSON string for use in JavaScript code."""
+        string = json.dumps(value)
 
-    for replacement in replacements:
-        string = string.replace(replacement[0], replacement[1])
-    return jinja2.utils.Markup(string)
+        replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+                        ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
+                        ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-
-def log2_floor(value):
-    """Returns the logarithm base 2 of the given value, rounded down."""
-    return int(math.log(value, 2))
+        for replacement in replacements:
+            string = string.replace(replacement[0], replacement[1])
+        return jinja2.utils.Markup(string)
 
 
-FILTERS = {
-    'is_list': lambda x: isinstance(x, list),
-    'is_dict': lambda x: isinstance(x, dict),
-    'js_string': js_string,
-    'log_floor': log2_floor,
-}
+    def _log2_floor_filter(value):
+        """Returns the logarithm base 2 of the given value, rounded down."""
+        return int(math.log(value, 2))
+
+    FILTERS = {
+        'is_list': lambda x: isinstance(x, list),
+        'is_dict': lambda x: isinstance(x, dict),
+        'js_string': _js_string_filter,
+        'log_floor': _log2_floor_filter,
+    }
 
 
 def get_jinja_env(dir_path):
@@ -62,7 +64,7 @@ def get_jinja_env(dir_path):
 
 
     env.globals['include_js_file'] = include_js_file
-    env.filters.update(FILTERS)
+    env.filters.update(JinjaConfig.FILTERS)
     return env
 
 
@@ -77,7 +79,7 @@ def parse_string(string, params):
       the parsed string, or None if the string could not be parsed.
     """
     env = jinja2.Environment()
-    env.filters.update(FILTERS)
+    env.filters.update(JinjaConfig.FILTERS)
     try:
         parsed_string = env.parse(string)
     except Exception:

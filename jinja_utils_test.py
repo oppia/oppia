@@ -23,7 +23,7 @@ import jinja_utils
 
 class JinjaUtilsUnitTests(unittest.TestCase):
 
-    def test_js_string(self):
+    def test_js_string_filter(self):
         """Test js_string filter."""
         expected_values = [
             ('a', '\\"a\\"'),
@@ -40,7 +40,8 @@ class JinjaUtilsUnitTests(unittest.TestCase):
         ]
 
         for tup in expected_values:
-            self.assertEqual(jinja_utils.js_string(tup[0]), tup[1])
+            self.assertEqual(jinja_utils.JinjaConfig.FILTERS['js_string'](
+                tup[0]), tup[1])
 
     def test_parse_string(self):
         """Test parse_string method."""
