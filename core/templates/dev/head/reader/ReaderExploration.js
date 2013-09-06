@@ -191,12 +191,9 @@
             iframes[iframes.length - 1], data.reader_response_iframe);
       }
     }
-
-    var currentScrollTop = $('body').scrollTop();
-    // TODO(sll): This should actually scroll to the location of last element in
-    // response log.
-    $('html,body').animate({scrollTop: Math.max(
-        $(document).height() - 1000, currentScrollTop + 50)});
+    $('html, body, iframe').animate(
+        {'scrollTop': document.getElementById('response').offsetTop}, 
+        'slow', 'swing');
   };
 
   window.addEventListener('message', receiveMessage, false);

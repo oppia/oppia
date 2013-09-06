@@ -15,6 +15,7 @@
       <div ng-repeat="response in responseLog">
         <div ng-show="response"
           class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
+          id="<[{true: 'response', false: 'conversation'}[$last]]>"
           ng-bind-html-unsafe="response">
         </div>
       </div>
@@ -31,7 +32,7 @@
         the only element. For more information, please see the
         ReaderExploration.js file. -->
         <iframe id="inputTemplate" width="100%"
-                frameborder="0" height="400px"></iframe>
+                frameborder="0" height="2000px"></iframe>
       </div>
     </div>
   </div>
