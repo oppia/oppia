@@ -21,7 +21,7 @@ import unittest
 import jinja_utils
 
 
-class JinjaFiltersUnitTests(unittest.TestCase):
+class JinjaUtilsUnitTests(unittest.TestCase):
 
     def test_js_string(self):
         """Test js_string filter."""
@@ -41,3 +41,25 @@ class JinjaFiltersUnitTests(unittest.TestCase):
 
         for tup in expected_values:
             self.assertEqual(jinja_utils.js_string(tup[0]), tup[1])
+
+    def test_parse_string(self):
+        """Test parse_string method."""
+        parsed_str = jinja_utils.parse_string('{{test}}', {'test': 'hi'})
+        self.assertEqual(parsed_str, 'hi')
+
+        # Some parameters are missing.
+        parsed_str = jinja_utils.parse_string(
+            '{{test}} and {{test2}}', {'test2': 'hi'})
+        self.assertEqual(parsed_str, ' and hi')
+
+        # All parameters are missing.
+        parsed_str = jinja_utils.parse_string('{{test}} and {{test2}}', {})
+        self.assertEqual(parsed_str, ' and ')
+
+        # The string has no parameters.
+        parsed_str = jinja_utils.parse_string('no params', {'param': 'hi'})
+        self.assertEqual(parsed_str, 'no params')
+
+        # Integer parameters are used.
+        parsed_str = jinja_utils.parse_string('int {{i}}', {'i': 2})
+        self.assertEqual(parsed_str, 'int 2')

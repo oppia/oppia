@@ -17,17 +17,12 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import copy
-import logging
 import os
 import random
 import unicodedata
 import yaml
 
 import feconf
-import jinja_utils
-
-import jinja2
-from jinja2 import meta
 
 
 class InvalidInputException(Exception):
@@ -62,34 +57,6 @@ def get_sample_exploration_yaml(filename):
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, '%s.yaml' % filename))
 
 
-def parse_with_jinja(string, params):
-    """Parses a string using Jinja templating.
-
-    Args:
-      string: the string to be parsed.
-      params: the parameters to parse the string with.
-      default: the default string to use for missing parameters.
-
-    Returns:
-      the parsed string, or None if the string could not be parsed.
-    """
-    env = jinja2.Environment()
-    env.filters.update(jinja_utils.FILTERS)
-    try:
-        parsed_string = env.parse(string)
-    except Exception:
-        raise Exception('Unable to parse string with Jinja: %s' % string)
-
-    variables = meta.find_undeclared_variables(parsed_string)
-
-    new_params = copy.deepcopy(params)
-    for var in variables:
-        if var not in new_params:
-            logging.info('Cannot parse %s fully using %s', string, params)
-
-    return env.from_string(string).render(new_params)
-
-
 def evaluate_object_with_params(obj, params):
     """Recursively replaces all {{...}} strings in obj using params.
 
@@ -113,38 +80,6 @@ def evaluate_object_with_params(obj, params):
         return new_dict
     else:
         return copy.deepcopy(obj)
-
-
-def parse_dict_with_params(d, params):
-    """Optionally converts dict values to strings, then parses them using params.
-
-    Args:
-      d: the dict whose values are to be parsed.
-      params: the parameters to parse the dict with. These are assumed to be
-        JS-safe.
-
-    Returns:
-      the parsed dict. This is a copy of the old dict.
-    """
-    parameters = {}
-
-    for key in d:
-        # TODO(sll): This should work more generally and recursively.
-        value = d[key]
-        if isinstance(value, basestring):
-            value = parse_with_jinja(value, params)
-        elif isinstance(value, list):
-            for ind, item in enumerate(value):
-                if isinstance(item, basestring):
-                    value[ind] = parse_with_jinja(item, params)
-        elif isinstance(value, dict):
-            for key, val in enumerate(value):
-                if isinstance(val, basestring):
-                    value[key] = parse_with_jinja(val, params)
-
-        parameters[key] = value
-
-    return parameters
 
 
 def get_comma_sep_string_from_list(items):

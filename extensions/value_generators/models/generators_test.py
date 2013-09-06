@@ -28,6 +28,13 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
     def test_copier(self):
         generator = generators.Copier()
         self.assertEqual(generator.generate_value(**{'value': 'a'}), 'a')
+        self.assertEqual(generator.generate_value(
+            **{'value': 'a', 'parse_with_jinja': False}), 'a')
+        self.assertEqual(generator.generate_value(
+            **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
+        self.assertEqual(generator.generate_value(
+            **{'value': '{{a}}', 'parse_with_jinja': True,
+               'context_params': {'a': 'b'}}), 'b')
 
     def test_restricted_copier(self):
         with self.assertRaises(TypeError):
