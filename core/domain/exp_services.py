@@ -437,57 +437,16 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations involving exploration parameters.
-def get_param_instance(exploration_id, name, obj_type, values):
-    """Returns a Parameter instance corresponding to the given inputs.
-
-    The caller is responsible for adding the new parameter to the exploration
-    parameter list, if it does not already exist.
-
-    If the obj_type is None, it is taken to be 'TemplatedString' if any element
-    of values contains '{{' and '}}' characters, and 'UnicodeString' otherwise.
-
-    If a parameter with this name already exists for the exploration, and the
-    new obj_type does not match the existing parameter's obj_type, a
-    ValueError is raised.
-    """
-    exploration = get_exploration_by_id(exploration_id)
-
-    for param_spec in exploration.param_specs:
-        if param_spec.name == name:
-            if obj_type and param_spec.obj_type != obj_type:
-                raise ValueError(
-                    'Parameter %s has wrong obj_type: was %s, expected %s'
-                    % (name, obj_type, param_spec.obj_type))
-            else:
-                return param_domain.Parameter(
-                    param_spec.name, param_spec.obj_type, values)
-
-    # The parameter was not found, so create a new one.
-    if obj_type is None:
-        is_templated_string = False
-        for value in values:
-            if (isinstance(value, basestring) and
-                    '{{' in value and '}}' in value):
-                is_templated_string = True
-        obj_type = ('TemplatedString' if is_templated_string
-                    else 'UnicodeString')
-
-    added_param = param_domain.Parameter(name, obj_type, values)
-
-    return added_param
-
-
-def update_with_state_params(exploration_id, state_id, reader_params=None):
+def update_with_state_params(exploration_id, state_id, reader_params):
     """Updates a reader's params using the params for the given state."""
-    if reader_params is None:
-        reader_params = {}
-
+    exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
 
-    for item in state.param_changes:
-        reader_params[item.name] = (
-            None if item.value is None else jinja_utils.parse_string(
-                item.value, reader_params))
+    old_params = copy.deepcopy(reader_params)
+
+    for pc in state.param_changes:
+        obj_type = exploration.get_obj_type_for_param(pc.name)
+        reader_params[pc.name] = pc.get_normalized_value(obj_type, old_params)
     return reader_params
 
 
@@ -577,20 +536,28 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
             raise ValueError('Duplicate state name: %s' % new_state_name)
         state.name = new_state_name
 
+    # TODO(sll): Deal with added exploration params here. Need another arg
+    # called added_params.
+
     if param_changes:
         state.param_changes = []
         for param_change in param_changes:
-            param_instance = get_param_instance(
-                exploration_id, param_change['name'], None,
-                param_change['values'])
 
-            if not any([param_spec.name == param_change['name']
-                        for param_spec in exploration.param_specs]):
-                exploration.param_specs.append(
-                    param_domain.ParamSpec(param_change['name'],
-                    'UnicodeString'))
+            exp_param_spec = None
+            for param_spec in exploration.param_specs:
+                if param_spec.name == param_change['name']:
+                    # TODO(sll): Check whether some sample generated values
+                    # match the expected obj_type.
+                    exp_param_spec = param_spec
+                    break
 
-            state.param_changes.append(param_instance)
+            if exp_param_spec is None:
+                raise Exception('No parameter named %s exists in this '
+                                'exploration' % param_change['name'])
+
+            state.param_changes.append(param_domain.ParamChange(
+                param_change['name'], param_change['generator_id'],
+                param_change['customization_args']))
 
     if interactive_widget:
         state.widget.widget_id = interactive_widget
@@ -766,7 +733,6 @@ def create_from_yaml(
         init_state_name=init_state_name, image_id=image_id)
 
     try:
-        # Make this into an exploration store.
         exploration_param_specs = [
             param_domain.ParamSpec.from_dict(param_spec_dict)
             for param_spec_dict in exploration_dict['param_specs']
@@ -784,14 +750,15 @@ def create_from_yaml(
                 for item in sdict['content']
             ]
 
-            state.param_changes = [get_param_instance(
-                exploration_id, pc['name'], pc['obj_type'], pc['values']
+            state.param_changes = [param_domain.ParamChange(
+                pc['name'], pc['generator_id'], pc['customization_args']
             ) for pc in sdict['param_changes']]
 
             for pc in state.param_changes:
                 if not any([param_spec.name == pc.name
                             for param_spec in exploration_param_specs]):
-                    exploration_param_specs.append(pc)
+                    raise Exception('Parameter %s was used in a state but not '
+                                    'declared in the exploration param_specs.')
 
             wdict = sdict['widget']
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
@@ -861,6 +828,8 @@ def load_demos():
         exploration.is_public = True
         save_exploration(ADMIN_COMMITTER_ID, exploration)
 
+        logging.info('Exploration with id %s was loaded.' % exploration_id)
+
 
 def delete_demos():
     """Deletes the demo explorations."""
@@ -869,7 +838,8 @@ def delete_demos():
         exploration = get_exploration_by_id(str(int_id), strict=False)
         if not exploration:
             # This exploration does not exist, so it cannot be deleted.
-            logging.info('No exploration with id %s found.' % int_id)
+            logging.info('Exploration with id %s was not deleted, because it '
+                         'does not exist.' % int_id)
         else:
             exploration_ids_to_delete.append(exploration.id)
 

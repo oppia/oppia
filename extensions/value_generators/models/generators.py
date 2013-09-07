@@ -21,6 +21,7 @@ import numbers
 
 from core.domain import value_generators_domain
 import jinja_utils
+import utils
 
 
 class Copier(value_generators_domain.BaseValueGenerator):
@@ -43,6 +44,13 @@ class Copier(value_generators_domain.BaseValueGenerator):
             return jinja_utils.evaluate_object(value, context_params)
         else:
             return copy.deepcopy(value)
+
+
+class RandomSelector(value_generators_domain.BaseValueGenerator):
+    """Returns a random value from the input list."""
+
+    def generate_value(self, context_params, list_of_values):
+        return copy.deepcopy(utils.get_random_choice(list_of_values))
 
 
 class RestrictedCopier(value_generators_domain.BaseValueGenerator):

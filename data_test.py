@@ -29,6 +29,10 @@ import test_utils
 import utils
 
 
+# Sentinel indicating that a value can take any type.
+ANY_TYPE = 1
+
+
 class DataUnitTest(test_utils.GenericTestBase):
     """Base class for testing data and extension files."""
 
@@ -44,7 +48,8 @@ class DataUnitTest(test_utils.GenericTestBase):
             self.assertEqual(
                 len(item), 2, msg='Schema %s is invalid.' % dict_schema)
             self.assertTrue(isinstance(item[0], str))
-            self.assertTrue(isinstance(item[1], type))
+            if item[1] != ANY_TYPE:
+                self.assertTrue(isinstance(item[1], type))
 
         TOP_LEVEL_KEYS = [item[0] for item in dict_schema]
         self.assertItemsEqual(
@@ -52,6 +57,8 @@ class DataUnitTest(test_utils.GenericTestBase):
             msg='Dict %s should conform to schema %s.' % (adict, dict_schema))
 
         for item in dict_schema:
+            if item[1] == ANY_TYPE:
+                continue
             self.assertTrue(
                 isinstance(adict[item[0]], item[1]),
                 'Value \'%s\' for key \'%s\' is not of type %s in:\n\n %s' % (
@@ -83,7 +90,8 @@ class ExplorationDataUnitTests(DataUnitTest):
             self.assertIn(content_item['type'], ['text', 'image', 'video'])
 
         PARAM_CHANGES_SCHEMA = [
-            ('name', basestring), ('values', list), ('obj_type', basestring)]
+            ('name', basestring), ('generator_id', basestring),
+            ('customization_args', ANY_TYPE)]
         for param_change in state_dict['param_changes']:
             self.verify_dict_keys_and_types(param_change, PARAM_CHANGES_SCHEMA)
             # TODO(sll): Test that the elements of 'values' are of the correct

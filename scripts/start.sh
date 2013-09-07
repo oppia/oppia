@@ -54,7 +54,7 @@ bash scripts/install_third_party.sh
 python build.py
 
 # Run the tests.
-bash scripts/test.sh
+bash scripts/test.sh $@
 
 # Set up a local dev instance
 echo Starting GAE development server

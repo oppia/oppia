@@ -17,8 +17,6 @@
 __author__ = 'Sean Lip'
 
 from core.domain import value_generators_domain
-from extensions.objects.models import objects
-import feconf
 import test_utils
 
 
@@ -34,4 +32,4 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
-        self.assertEqual(len(all_generator_classes), 3)
+        self.assertEqual(len(all_generator_classes), 4)

@@ -35,6 +35,11 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')
 
+    def test_random_selector(self):
+        generator = generators.RandomSelector()
+        self.assertIn(generator.generate_value(
+            {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
+
     def test_restricted_copier(self):
         with self.assertRaises(TypeError):
             generators.RestrictedCopier()

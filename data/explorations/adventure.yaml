@@ -236,21 +236,22 @@ states:
   name: Road
   param_changes:
   - name: Name
-    obj_type: UnicodeString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   - name: Weapon
-    obj_type: UnicodeString
-    values:
-    - towel
+    generator_id: Copier
+    customization_args:
+      value: towel
   - name: sneezeitem
-    obj_type: UnicodeString
-    values:
-    - nothing
+    generator_id: Copier
+    customization_args:
+      value: nothing
   - name: payitem
-    obj_type: UnicodeString
-    values:
-    - nothing
+    generator_id: Copier
+    customization_args:
+      value: nothing
   widget:
     handlers:
     - name: submit
@@ -278,9 +279,9 @@ states:
   name: picking
   param_changes:
   - name: sneezeitem
-    obj_type: UnicodeString
-    values:
-    - flowers
+    generator_id: Copier
+    customization_args:
+      value: flowers
   widget:
     handlers:
     - name: submit
@@ -352,9 +353,9 @@ states:
   name: get coins
   param_changes:
   - name: payitem
-    obj_type: UnicodeString
-    values:
-    - coins
+    generator_id: Copier
+    customization_args:
+      value: coins
   widget:
     handlers:
     - name: submit
@@ -374,18 +375,19 @@ states:
   name: pre-rainbow
   param_changes:
   - name: numcoins
-    obj_type: UnicodeString
-    values:
-    - '1'
-    - '2'
-    - '3'
-    - '4'
-    - '5'
-    - '6'
-    - '7'
-    - '8'
-    - '9'
-    - '10'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      - '8'
+      - '9'
+      - '10'
   widget:
     handlers:
     - name: submit

@@ -69,9 +69,9 @@ class RuleSpec(object):
             rulespec_dict['inputs'],
             rulespec_dict['dest'],
             rulespec_dict['feedback'],
-            [param_domain.Parameter(
-                 param_change['name'], param_change['obj_type'],
-                 param_change['values'], param_change['description'])
+            [param_domain.ParamChange(
+                 param_change['name'], param_change['generator_id'],
+                 param_change['customization_args'])
              for param_change in rulespec_dict['param_changes']]
         )
 
@@ -93,7 +93,6 @@ class RuleSpec(object):
         self.feedback = feedback or []
         # Exploration-level parameter changes to make if this rule is
         # triggered.
-        # TODO(sll): Ensure the types for param_changes are consistent.
         self.param_changes = param_changes or []
 
     @property
@@ -241,7 +240,7 @@ class State(object):
             state_id,
             state_dict.get('name', feconf.DEFAULT_STATE_NAME),
             [Content.from_dict(item) for item in state_dict['content']],
-            [param_domain.Parameter.from_dict(param)
+            [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             widget
         )
@@ -254,11 +253,10 @@ class State(object):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
-        self.param_changes = [
-            param_domain.Parameter(
-                param_change.name, param_change.obj_type, param_change.values)
-            for param_change in param_changes
-        ]
+        self.param_changes = [param_domain.ParamChange(
+            param_change.name, param_change.generator.id,
+            param_change.customization_args)
+        for param_change in param_changes]
         # The interactive widget instance associated with this state. Set to be
         # the default widget if not explicitly specified by the caller.
         if widget is None:
@@ -334,6 +332,15 @@ class Exploration(object):
     def param_spec_dicts(self):
         """A list of param specs, represented as JSONifiable Python dicts."""
         return [param_spec.to_dict() for param_spec in self.param_specs]
+
+    def get_obj_type_for_param(self, param_name):
+        """Returns the obj_type for the given parameter."""
+        for param_spec in self.param_specs:
+            if param_spec.name == param_name:
+                return param_spec.obj_type
+
+        raise Exception('Exploration %s has no parameter named %s' %
+                        (self.title, param_name))
 
     @property
     def is_demo(self):

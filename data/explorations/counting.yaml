@@ -1,7 +1,7 @@
 default_skin: conversation_v1
 param_specs:
 - name: guess
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 states:
 - content:
   - type: text
@@ -10,9 +10,10 @@ states:
   name: Intro
   param_changes:
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   widget:
     handlers:
     - name: submit
@@ -100,9 +101,10 @@ states:
   name: Not 6
   param_changes:
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   widget:
     handlers:
     - name: submit

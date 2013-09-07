@@ -21,72 +21,20 @@ __author__ = 'Sean Lip'
 import re
 
 from core.domain import obj_services
-import utils
-
-
-class Parameter(object):
-    """Value object for a parameter.
-
-    A parameter consists of a name, an obj_type, and a list of values.
-    Each element in the list of values must be of the given obj_type.
-
-    Note that the obj_type must be set before the values.
-    """
-    def __init__(self, name, obj_type, values, choices=None, description=''):
-        self.name = name
-        self.obj_type = obj_type
-
-        # "choices" needs to be set before values because we might need to
-        # validate the values against possible choices.
-        self.choices = choices
-        self.values = values
-
-    def __setattr__(self, name, value):
-        if name == 'name':
-            if not value or not re.compile('^[a-zA-Z0-9]+$').match(value):
-                raise ValueError(
-                    'Only parameter names with characters in [a-zA-Z0-9] are '
-                    'accepted.')
-        elif name == 'obj_type':
-            # TODO(sll): Accept actual obj_types (not the string for the name).
-            # Or maybe accept both?
-            if (not isinstance(value, basestring) or
-                    not obj_services.get_object_class(value)):
-                raise ValueError('Invalid obj_type: %s' % value)
-        elif name == 'values':
-            if not isinstance(value, list):
-                raise ValueError(
-                    'The values property for a parameter should be a list.')
-            if self.choices is not None:
-                for item in value:
-                    if item not in self.choices:
-                        raise ValueError('The values not in choices.')
-            value = [obj_services.get_object_class(
-                self.obj_type).normalize(item) for item in value]
-
-        super(Parameter, self).__setattr__(name, value)
-
-    @property
-    def value(self):
-        """Picks one of the values in the list at random."""
-        return utils.get_random_choice(self.values) if self.values else None
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'obj_type': self.obj_type,
-            'values': self.values
-        }
-
-    @classmethod
-    def from_dict(cls, param_dict):
-        return cls(param_dict['name'], param_dict['obj_type'],
-                   param_dict['values'])
+from core.domain import value_generators_domain
 
 
 class ParamSpec(object):
     """Value object for a exploration parameter specification."""
     def __init__(self, name, obj_type):
+        if not re.compile('^[a-zA-Z0-9]+$').match(name):
+            raise ValueError(
+                'Only parameter names with characters in [a-zA-Z0-9] are '
+                'accepted.')
+
+        if not obj_services.get_object_class(obj_type):
+            raise ValueError('Invalid obj_type: %s' % obj_type)
+
         self.name = name
         self.obj_type = obj_type
 
@@ -99,3 +47,68 @@ class ParamSpec(object):
     @classmethod
     def from_dict(cls, param_dict):
         return cls(param_dict['name'], param_dict['obj_type'])
+
+
+class ParamChange(object):
+    """Value object for a parameter change."""
+
+    def __init__(self, name, generator_id, customization_args):
+        if not re.compile('^[a-zA-Z0-9]+$').match(name):
+            raise ValueError(
+                'Only parameter names with characters in [a-zA-Z0-9] are '
+                'accepted.')
+
+        if not isinstance(customization_args, dict):
+            raise ValueError(
+                'Expected a dict of customization_args, received %s'
+                % customization_args)
+
+        # TODO(sll): Check that all required args for customization exist in
+        # customization_args.
+
+        self._name = name
+        self._generator_id = generator_id
+        self._customization_args = customization_args
+
+        try:
+            self.generator
+        except KeyError:
+            raise ValueError('Invalid generator id %s' % generator_id)
+        except Exception:
+            raise ValueError('Generator %s is not a valid generator for '
+                             'exploration parameters. Valid generators must '
+                             'not require any initialization arguments.'
+                             % generator_id)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def generator(self):
+        return value_generators_domain.Registry.get_generator_class_by_id(
+            self._generator_id)()
+
+    @property
+    def customization_args(self):
+        return self._customization_args
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'generator_id': self.generator.id,
+            'customization_args': self.customization_args
+        }
+
+    @classmethod
+    def from_dict(cls, param_change_dict):
+        return cls(
+            param_change_dict['name'], param_change_dict['generator_id'],
+            param_change_dict['customization_args']
+        )
+
+    def get_normalized_value(self, obj_type, context_params):
+        """Generates a single normalized value for a parameter change."""
+        raw_value = self.generator.generate_value(
+            context_params, **self.customization_args)
+        return obj_services.get_object_class(obj_type).normalize(raw_value)

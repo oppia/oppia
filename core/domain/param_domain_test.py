@@ -25,18 +25,32 @@ import test_utils
 class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
-    def test_parameter_object(self):
-        """Test the parameter domain object class."""
-        # Raise an error because no obj_type is specified.
-        with self.assertRaises(ValueError):
-            param_domain.Parameter('param1', None, ['hello'])
+    def test_parameter_change_class(self):
+        """Test the ParamChange class."""
+        # Raise an error because the name is invalid.
+        with self.assertRaisesRegexp(ValueError, 'Only parameter names'):
+            param_domain.ParamChange('¡hola', 'Copier', {})
 
-        # Raise an error because the value does not match the obj_type.
-        with self.assertRaises(TypeError):
-            param_domain.Parameter('param1', 'Int', ['hello'])
+        # Raise an error because no such generator type exists.
+        with self.assertRaisesRegexp(ValueError, 'Invalid generator id'):
+            param_domain.ParamChange('abc', 'InvalidGenerator', {})
 
-        param = param_domain.Parameter('param1', 'Int', [6])
-        self.assertEqual(param.value, 6)
+        # Raise an error because the given generator requires initialization
+        # args.
+        with self.assertRaisesRegexp(ValueError, 'require any initialization'):
+            param_domain.ParamChange('abc', 'RestrictedCopier', {})
 
-        param.values = []
-        self.assertIsNone(param.value)
+        # Raise an error because customization_args is not a dict.
+        with self.assertRaisesRegexp(ValueError, 'Expected a dict'):
+            param_domain.ParamChange('abc', 'Copier', ['a', 'b'])
+
+        param_change = param_domain.ParamChange(
+            'abc', 'Copier', {'value': '3'})
+        self.assertEqual(param_change.name, 'abc')
+        self.assertEqual(param_change.generator.id, 'Copier')
+        self.assertEqual(param_change.to_dict(), {
+            'name': 'abc',
+            'generator_id': 'Copier',
+            'customization_args': {'value': '3'}
+        })
+        self.assertEqual(param_change.get_normalized_value('Int', {}), 3)

@@ -7,31 +7,31 @@ param_specs:
 - name: highest
   obj_type: UnicodeString
 - name: guess
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: precomputeHighest
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: precomputeGuess
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: precomputeLowest
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: MagicianNumber
   obj_type: UnicodeString
 - name: tries
   obj_type: UnicodeString
 - name: worstnum
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: rangeSize
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: middle
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: OptimalityProxy
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: largestValidRange
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: upperBound
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: lowerBound
-  obj_type: TemplatedString
+  obj_type: UnicodeString
 - name: comparison
   obj_type: UnicodeString
 - name: newLowest
@@ -101,25 +101,26 @@ states:
   name: Town Square
   param_changes:
   - name: previousNumber
-    obj_type: UnicodeString
-    values:
-    - '27'
-    - '485'
-    - '692'
-    - '950'
-    - '378'
-    - '93'
-    - '858'
-    - '203'
-    - '869'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '27'
+      - '485'
+      - '692'
+      - '950'
+      - '378'
+      - '93'
+      - '858'
+      - '203'
+      - '869'
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '1'
+    generator_id: Copier
+    customization_args:
+      value: '1'
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '86'
+    generator_id: Copier
+    customization_args:
+      value: '86'
   widget:
     customization_args:
       buttonText:
@@ -140,9 +141,10 @@ states:
   name: Magician Guesses
   param_changes:
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+      parse_with_jinja: True
   widget:
     customization_args:
       choices:
@@ -184,21 +186,25 @@ states:
   name: lower-reguess
   param_changes:
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '{{guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{guess}}'
+      parse_with_jinja: True
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+      parse_with_jinja: True
   - name: precomputeHighest
-    obj_type: TemplatedString
-    values:
-    - '{{guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{guess}}'
+      parse_with_jinja: True
   - name: precomputeGuess
-    obj_type: TemplatedString
-    values:
-    - '{{[lowest|int/2]|sum(start=precomputeHighest|int/2)|int}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[lowest|int/2]|sum(start=precomputeHighest|int/2)|int}}'
+      parse_with_jinja: True
   widget:
     customization_args:
       choices:
@@ -241,21 +247,25 @@ states:
   name: higher-reguess
   param_changes:
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '{{guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{guess}}'
+      parse_with_jinja: True
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+      parse_with_jinja: True
   - name: precomputeLowest
-    obj_type: TemplatedString
-    values:
-    - '{{guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{guess}}'
+      parse_with_jinja: True
   - name: precomputeGuess
-    obj_type: TemplatedString
-    values:
-    - '{{[precomputeLowest|int/2]|sum(start=highest|int/2)|int}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[precomputeLowest|int/2]|sum(start=highest|int/2)|int}}'
+      parse_with_jinja: True
   widget:
     customization_args:
       choices:
@@ -421,22 +431,23 @@ states:
   name: Player Guess Setup
   param_changes:
   - name: MagicianNumber
-    obj_type: UnicodeString
-    values:
-    - '5'
-    - '16'
-    - '30'
-    - '38'
-    - '47'
-    - '55'
-    - '66'
-    - '80'
-    - '83'
-    - '97'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '5'
+      - '16'
+      - '30'
+      - '38'
+      - '47'
+      - '55'
+      - '66'
+      - '80'
+      - '83'
+      - '97'
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '1'
+    generator_id: Copier
+    customization_args:
+      value: '1'
   widget:
     customization_args: {}
     handlers:
@@ -528,13 +539,14 @@ states:
   name: Think of a number
   param_changes:
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '{{answer|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer|int+1}}'
+      parse_with_jinja: True
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '1'
+    generator_id: Copier
+    customization_args:
+      value: '1'
   widget:
     customization_args:
       buttonText:
@@ -553,9 +565,10 @@ states:
   name: PlayerGuessing
   param_changes:
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '{{[tries|int]|sum(start=1)}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{[tries|int]|sum(start=1)}}'
+      parse_with_jinja: True
   widget:
     customization_args: {}
     handlers:
@@ -1298,17 +1311,17 @@ states:
   name: Worst Case start
   param_changes:
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '0'
+    generator_id: Copier
+    customization_args:
+      value: '0'
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '31'
+    generator_id: Copier
+    customization_args:
+      value: '31'
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '0'
+    generator_id: Copier
+    customization_args:
+      value: '0'
   widget:
     customization_args:
       buttonText:
@@ -1366,33 +1379,40 @@ states:
   name: Worst Case Guess
   param_changes:
   - name: worstnum
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+      parse_with_jinja: True
   - name: rangeSize
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-lowest|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-lowest|int-1}}'
+      parse_with_jinja: True
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '{{tries|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{tries|int+1}}'
+      parse_with_jinja: True
   - name: middle
-    obj_type: TemplatedString
-    values:
-    - '{{(highest|int+lowest|int)/2}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{(highest|int+lowest|int)/2}}'
+      parse_with_jinja: True
   - name: largestValidRange
-    obj_type: TemplatedString
-    values:
-    - '{{2**((rangeSize|float)|log2_floor)-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+      parse_with_jinja: True
   - name: upperBound
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+largestValidRange|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+largestValidRange|int+1}}'
+      parse_with_jinja: True
   - name: lowerBound
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-largestValidRange|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-largestValidRange|int-1}}'
+      parse_with_jinja: True
   widget:
     customization_args: {}
     handlers:
@@ -1494,9 +1514,10 @@ states:
   name: Worst Case Finished
   param_changes:
   - name: OptimalityProxy
-    obj_type: TemplatedString
-    values:
-    - '{{'''' if (tries|int)<=5 else ''false''}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{'''' if (tries|int)<=5 else ''false''}}'
+      parse_with_jinja: True
   widget:
     customization_args:
       buttonText:
@@ -1515,41 +1536,50 @@ states:
   name: worst case smaller
   param_changes:
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   - name: worstnum
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+      parse_with_jinja: True
   - name: rangeSize
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-lowest|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-lowest|int-1}}'
+      parse_with_jinja: True
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '{{tries|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{tries|int+1}}'
+      parse_with_jinja: True
   - name: middle
-    obj_type: TemplatedString
-    values:
-    - '{{(highest|int+lowest|int)/2}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{(highest|int+lowest|int)/2}}'
+      parse_with_jinja: True
   - name: largestValidRange
-    obj_type: TemplatedString
-    values:
-    - '{{2**((rangeSize|float)|log2_floor)-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+      parse_with_jinja: True
   - name: upperBound
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+largestValidRange|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+largestValidRange|int+1}}'
+      parse_with_jinja: True
   - name: lowerBound
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-largestValidRange|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-largestValidRange|int-1}}'
+      parse_with_jinja: True
   widget:
     customization_args: {}
     handlers:
@@ -1637,41 +1667,50 @@ states:
   name: worst case bigger
   param_changes:
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '{{answer}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{answer}}'
+      parse_with_jinja: True
   - name: worstnum
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+      parse_with_jinja: True
   - name: rangeSize
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-lowest|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-lowest|int-1}}'
+      parse_with_jinja: True
   - name: tries
-    obj_type: UnicodeString
-    values:
-    - '{{tries|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{tries|int+1}}'
+      parse_with_jinja: True
   - name: middle
-    obj_type: TemplatedString
-    values:
-    - '{{(highest|int+lowest|int)/2}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{(highest|int+lowest|int)/2}}'
+      parse_with_jinja: True
   - name: largestValidRange
-    obj_type: TemplatedString
-    values:
-    - '{{2**((rangeSize|float)|log2_floor)-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+      parse_with_jinja: True
   - name: upperBound
-    obj_type: TemplatedString
-    values:
-    - '{{lowest|int+largestValidRange|int+1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{lowest|int+largestValidRange|int+1}}'
+      parse_with_jinja: True
   - name: lowerBound
-    obj_type: TemplatedString
-    values:
-    - '{{highest|int-largestValidRange|int-1}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{highest|int-largestValidRange|int-1}}'
+      parse_with_jinja: True
   widget:
     customization_args: {}
     handlers:
@@ -1856,40 +1895,46 @@ states:
   name: practice ranges
   param_changes:
   - name: lowest
-    obj_type: UnicodeString
-    values:
-    - '1'
-    - '2'
-    - '3'
-    - '4'
-    - '5'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
   - name: highest
-    obj_type: UnicodeString
-    values:
-    - '10'
-    - '11'
-    - '12'
-    - '13'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '10'
+      - '11'
+      - '12'
+      - '13'
   - name: guess
-    obj_type: TemplatedString
-    values:
-    - '6'
-    - '7'
-    - '8'
-    - '9'
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - '6'
+      - '7'
+      - '8'
+      - '9'
   - name: comparison
-    obj_type: UnicodeString
-    values:
-    - bigger
-    - smaller
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - bigger
+      - smaller
   - name: newLowest
-    obj_type: UnicodeString
-    values:
-    - '{{ lowest if comparison=="smaller" else guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{ lowest if comparison=="smaller" else guess}}'
+      parse_with_jinja: True
   - name: newHighest
-    obj_type: TemplatedString
-    values:
-    - '{{ highest if comparison=="bigger" else guess}}'
+    generator_id: Copier
+    customization_args:
+      value: '{{ highest if comparison=="bigger" else guess}}'
+      parse_with_jinja: True
   widget:
     customization_args: {}
     handlers:

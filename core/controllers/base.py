@@ -249,7 +249,7 @@ class BaseHandler(webapp2.RequestHandler):
         counters.HTML_RESPONSE_COUNT.inc()
 
     def _render_exception(self, error_code, values):
-        assert error_code in [400, 401, 500]
+        assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
 
         # This checks if the response should be JSON or HTML.
@@ -268,6 +268,7 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
+            self._render_exception(404, {'error': 'Page not found.'})
             return
 
         if isinstance(exception, self.NotLoggedInException):

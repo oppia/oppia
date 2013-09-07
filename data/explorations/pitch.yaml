@@ -1,4 +1,7 @@
 default_skin: conversation_v1
+param_specs:
+- name: noteStart
+  obj_type: UnicodeString
 states:
 - name: Main window
   content:
@@ -11,19 +14,20 @@ states:
       down arrow keys. When you think you have it, click the ''check answer'' button.'
   param_changes:
   - name: noteStart
-    obj_type: UnicodeString
-    values:
-    - C4
-    - D4
-    - E4
-    - F4
-    - G4
-    - A4
-    - B4
-    - C5
-    - D5
-    - E5
-    - F5
+    generator_id: RandomSelector
+    customization_args:
+      list_of_values:
+      - C4
+      - D4
+      - E4
+      - F4
+      - G4
+      - A4
+      - B4
+      - C5
+      - D5
+      - E5
+      - F5
   widget:
     handlers:
     - name: submit
@@ -69,6 +73,3 @@ states:
         parse_with_jinja: True
     sticky: True
     widget_id: MusicStaff
-param_specs:
-- name: noteStart
-  obj_type: UnicodeString
