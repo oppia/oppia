@@ -1,12 +1,25 @@
-<span ng-show="objType == 'List'">
-  <list items="customizationArgs.value"></list>
-</span>
-<span ng-show="objType == 'UnicodeString'">
-  <string item="customizationArgs.value"></string>
-</span>
-<span ng-show="objType == 'Real'">
-  <real item="customizationArgs.value"></real>
-</span>
-<span ng-show="objType == 'Int'">
-  <int item="customizationArgs.value"></int>
-</span>
+<table>
+  <tr>
+    <td><em>Value: </em></td>
+    <td></td>
+    <td>
+      <span ng-show="objType == 'List'">
+        <list items="customizationArgs.value"></list>
+      </span>
+      <span ng-show="objType == 'UnicodeString'">
+        <string item="customizationArgs.value"></string>
+      </span>
+      <span ng-show="objType == 'Real'">
+        <real item="customizationArgs.value"></real>
+      </span>
+      <span ng-show="objType == 'Int'">
+        <int item="customizationArgs.value"></int>
+      </span>
+    </td>
+  </tr>
+</table>
+
+<label ng-show="objType == 'List' || objType == 'UnicodeString'">
+  <em>Parse with Jinja?</em>
+  <input type="checkbox" ng-model="customizationArgs.parse_with_jinja">
+</label>

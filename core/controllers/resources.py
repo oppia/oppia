@@ -21,6 +21,7 @@ import mimetypes
 import os
 
 from core.controllers import base
+from core.domain import value_generators_domain
 from core.platform import models
 (image_models,) = models.Registry.import_models([models.NAMES.image])
 import feconf
@@ -51,20 +52,18 @@ class TemplateHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class GeneratorTemplateHandler(base.BaseHandler):
-    """Retrieves a template for a value generator editor."""
+class ValueGeneratorHandler(base.BaseHandler):
+    """Retrieves the HTML template for a value generator editor."""
 
     def get(self, generator_id):
         """Handles GET requests."""
-        template_path = os.path.join(
-            feconf.VALUE_GENERATOR_TEMPLATES_DIR, '%s.html' % generator_id)
         try:
-            # NB: These generators should use only Angular templating. The
-            # variables they have access to are generatorId, initArgs,
-            # customizationArgs and objType.
-            self.response.write(utils.get_file_contents(template_path))
-        except:
-            logging.error('Template not found: %s' % template_path)
+            self.response.write(
+                value_generators_domain.Registry.get_generator_class_by_id(
+                    generator_id).get_html_template())
+        except Exception as e:
+            logging.error('Value generator not found: %s. %s' %
+                          (generator_id, e))
             raise self.PageNotFoundException
 
 

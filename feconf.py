@@ -97,7 +97,7 @@ OBJECT_TEMPLATES_DIR = 'extensions/objects/templates'
 SKINS_TEMPLATES_DIR = 'extensions/skins'
 FRONTEND_TEMPLATES_DIR = ('core/templates/dev/head' if DEV_MODE
                           else 'core/templates/prod/head')
-VALUE_GENERATOR_TEMPLATES_DIR = 'extensions/value_generators/templates'
+VALUE_GENERATORS_DIR = 'extensions/value_generators'
 
 # The id and name for the final state of an exploration.
 END_DEST = 'END'

@@ -56,7 +56,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
 
         code = widget.get_raw_code(
-            {'noteToGuess': {'value': '{{ntg}}'}}, {'ntg': 'F4'})
+            {'noteToGuess': {'value': '{{ntg}}', 'parse_with_jinja': True}},
+            {'ntg': 'F4'})
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(

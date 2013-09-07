@@ -268,7 +268,6 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self.redirect('/gallery')
             return
 
         if isinstance(exception, self.NotLoggedInException):

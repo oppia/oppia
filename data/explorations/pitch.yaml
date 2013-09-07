@@ -66,6 +66,7 @@ states:
     customization_args:
       noteToGuess:
         value: '{{noteStart}}'
+        parse_with_jinja: True
     sticky: True
     widget_id: MusicStaff
 param_specs:

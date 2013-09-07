@@ -65,12 +65,15 @@ class WidgetParam(object):
         self.customization_args = customization_args
         self.obj_type = obj_type
 
-    @property
-    def value(self):
+    def get_value(self, context_params=None):
         """Generates a new value using the parameter's customization args."""
+        if context_params is None:
+            context_params = {}
+
         value_generator = self.generator(**self.init_args)
+
         generated_value = value_generator.generate_value(
-            **self.customization_args)
+            context_params, **self.customization_args)
 
         # Check that the generated value has the correct type.
         obj_class = obj_services.get_object_class(self.obj_type)
@@ -188,10 +191,6 @@ class BaseWidget(object):
         """
         if state_customization_args is None:
             state_customization_args = {}
-        # TODO(sll): Move this out of here and put it in the reader
-        # controller? Widgets should not know about the states they are in.
-        state_customization_args = utils.evaluate_object_with_params(
-            state_customization_args, context_params)
 
         parameters = {}
         for param in self.params:
@@ -204,8 +203,12 @@ class BaseWidget(object):
                 else param.customization_args
             )
 
-            parameters[param.name] = value_generator.generate_value(
-                **args_to_use)
+            generated_value = value_generator.generate_value(
+                context_params, **args_to_use)
+
+            # Normalize the generated values to the correct obj_type.
+            obj_class = obj_services.get_object_class(param.obj_type)
+            parameters[param.name] = obj_class.normalize(generated_value)
 
         return parameters
 

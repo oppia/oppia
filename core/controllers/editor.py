@@ -20,7 +20,10 @@ from core.controllers import base
 from core.domain import exp_services
 from core.domain import param_domain
 from core.domain import stats_services
+from core.domain import value_generators_domain
 import utils
+
+import jinja2
 
 EDITOR_MODE = 'editor'
 # The maximum number of exploration history snapshots to show by default.
@@ -35,8 +38,16 @@ class ExplorationPage(base.BaseHandler):
     @base.require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
+        all_value_generators = (
+            value_generators_domain.Registry.get_all_generator_classes())
+
+        value_generators_js = ''
+        for gid, generator_cls in all_value_generators.iteritems():
+            value_generators_js += generator_cls.get_js_template()
+
         self.values.update({
             'nav_mode': EDITOR_MODE,
+            'value_generators_js': jinja2.utils.Markup(value_generators_js)
         })
         self.render_template('editor/editor_exploration.html')
 

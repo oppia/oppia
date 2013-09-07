@@ -1,0 +1,112 @@
+# coding: utf-8
+#
+# Copyright 2013 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Classes relating to value generators."""
+
+__author__ = 'Sean Lip'
+
+import copy
+import inspect
+import os
+import pkgutil
+
+import feconf
+import utils
+
+
+class BaseValueGenerator(object):
+    """Base value generator class.
+
+    A value generator is a class containing a function that takes in
+    customization args and uses them to generate a value. The generated values
+    are not typed, so if the caller wants strongly-typed values it would need
+    to normalize the output of each generator.
+
+    Each value generator should define a template file and an AngularJS
+    directive. The names of these two files should be [ClassName].html and
+    [ClassName].js respectively, where [ClassName] is the name of the value
+    generator class.
+    """
+
+    @property
+    def id(self):
+        return self.__class__.__name__
+
+    @classmethod
+    def get_html_template(cls):
+        return utils.get_file_contents(os.path.join(
+            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
+            '%s.html' % cls.__name__))
+
+    @classmethod
+    def get_js_template(cls):
+        # NB: These generators should use only Angular templating. The
+        # variables they have access to are generatorId, initArgs,
+        # customizationArgs and objType.
+        return utils.get_file_contents(os.path.join(
+            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
+            '%s.js' % cls.__name__))
+
+    def generate_value(self, *args, **kwargs):
+        """Generates a new value, using the given customization args.
+
+        The first arg should be context_params.
+        """
+        raise NotImplementedError
+
+
+class Registry(object):
+    """Registry of all value generators."""
+
+    # Dict mapping value generator class names to their classes.
+    value_generators_dict = {}
+
+    @classmethod
+    def _refresh_registry(cls):
+        cls.value_generators_dict.clear()
+
+        # Assemble all generators in extensions/value_generators/models/generators.py.
+        VALUE_GENERATOR_PATHS = [os.path.join(
+            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'models')]
+
+        # Crawl the directories and add new generator instances to the registries.
+        for loader, name, _ in pkgutil.iter_modules(path=VALUE_GENERATOR_PATHS):
+            if name.endswith('_test'):
+                continue
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                if issubclass(clazz, BaseValueGenerator):
+                    if clazz.__name__ in cls.value_generators_dict:
+                        raise Exception(
+                            'Duplicate widget name %s' % clazz.__name__)
+
+                    cls.value_generators_dict[clazz.__name__] = clazz
+
+    @classmethod
+    def get_all_generator_classes(cls):
+        """Get the dict of all value generator classes."""
+        cls._refresh_registry()
+        return copy.deepcopy(cls.value_generators_dict)
+
+    @classmethod
+    def get_generator_class_by_id(cls, generator_id):
+        """Gets a generator class by its id.
+
+        Refreshes once if the generator is not found; subsequently, throws an
+        error."""
+        if generator_id not in cls.value_generators_dict:
+            cls._refresh_registry()
+        return cls.value_generators_dict[generator_id]

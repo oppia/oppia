@@ -16,7 +16,7 @@
       <form ng-submit="submitAnswer(answer)">
 
         <input ng-show="rows == 1" ng-model="answer"
-               placeholder="<[placeholder]>" required autofocus>
+               placeholder="<[placeholder]>" size="<[cols]>" required autofocus>
 
         <textarea ng-show="rows != 1" ng-model="answer"
                   placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">

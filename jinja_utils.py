@@ -14,6 +14,7 @@
 
 """Jinja-related utilities."""
 
+import copy
 import logging
 import os
 import math
@@ -90,3 +91,22 @@ def parse_string(string, params):
         logging.info('Cannot parse %s fully using %s', string, params)
 
     return env.from_string(string).render(params)
+
+
+def evaluate_object(obj, params):
+    """Returns a copy of `obj` after parsing strings in it using `params`."""
+
+    if isinstance(obj, basestring):
+        return parse_string(obj, params)
+    elif isinstance(obj, list):
+        new_list = []
+        for item in obj:
+            new_list.append(evaluate_object(item, params))
+        return new_list
+    elif isinstance(obj, dict):
+        new_dict = {}
+        for key in obj:
+            new_dict[key] = evaluate_object(obj[key], params)
+        return new_dict
+    else:
+        return copy.deepcopy(obj)

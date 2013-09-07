@@ -57,31 +57,6 @@ def get_sample_exploration_yaml(filename):
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, '%s.yaml' % filename))
 
 
-def evaluate_object_with_params(obj, params):
-    """Recursively replaces all {{...}} strings in obj using params.
-
-    In particular, any string in obj that starts with '{{' and ends with '}}'
-    is evaluated using the value from params."""
-
-    if isinstance(obj, basestring):
-        if obj.startswith('{{') and obj.endswith('}}'):
-            return params[obj[2:-2]]
-        else:
-            return obj
-    elif isinstance(obj, list):
-        new_list = []
-        for item in obj:
-            new_list.append(evaluate_object_with_params(item, params))
-        return new_list
-    elif isinstance(obj, dict):
-        new_dict = {}
-        for key in obj:
-            new_dict[key] = evaluate_object_with_params(obj[key], params)
-        return new_dict
-    else:
-        return copy.deepcopy(obj)
-
-
 def get_comma_sep_string_from_list(items):
     """Turns a list of items into a comma-separated string."""
 

@@ -50,6 +50,8 @@ def get_rules_for_input_type(input_type):
     results = []
 
     for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+        if name.endswith('_test'):
+            continue
         module = loader.find_module(name).load_module(name)
         for name, clazz in inspect.getmembers(module, inspect.isclass):
             ancestors = clazz.__bases__

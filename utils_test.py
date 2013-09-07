@@ -32,52 +32,6 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaises(AttributeError):
             o.fourth
 
-    def evaluate_object_with_params(self):
-        """Test evaluate_object_with_params method."""
-        parsed_object = utils.evaluate_object_with_params('abc', {})
-        self.assertEqual(parsed_object, 'abc')
-
-        parsed_object = utils.evaluate_object_with_params(
-            '{{ab}}', {'ab': 'c'})
-        self.assertEqual(parsed_object, 'c')
-
-        parsed_object = utils.evaluate_object_with_params(
-            'abc{{ab}}', {'ab': 'c'})
-        self.assertEqual(parsed_object, 'abc{{ab}}')
-
-        parsed_object = utils.evaluate_object_with_params(
-            ['a', '{{a}}', 'a{{a}}'], {'a': 'b'})
-        self.assertEqual(parsed_object, ['a', 'b', 'a{{a}}'])
-
-        parsed_object = utils.evaluate_object_with_params({}, {})
-        self.assertEqual(parsed_object, {})
-
-        parsed_object = utils.evaluate_object_with_params({}, {'a': 'b'})
-        self.assertEqual(parsed_object, {})
-
-        parsed_object = utils.evaluate_object_with_params({'a': 'b'}, {})
-        self.assertEqual(parsed_object, {'a': 'b'})
-
-        with self.assertRaises(KeyError):
-            utils.evaluate_object_with_params('{{c}}', {})
-
-        with self.assertRaises(KeyError):
-            utils.evaluate_object_with_params('{{c}}', {'a': 'b'})
-
-        parsed_object = utils.evaluate_object_with_params(
-            {'a': '{{b}}'}, {'b': 3})
-        self.assertEqual(parsed_object, {'a': 3})
-
-        parsed_object = utils.evaluate_object_with_params(
-            {'a': '{{b}}'}, {'b': 'c'})
-        self.assertEqual(parsed_object, {'a': 'c'})
-
-        # Test that the original dictionary is unchanged.
-        orig_dict = {'a': '{{b}}'}
-        parsed_dict = utils.evaluate_object_with_params(orig_dict, {'b': 'c'})
-        self.assertEqual(orig_dict, {'a': '{{b}}'})
-        self.assertEqual(parsed_dict, {'a': 'c'})
-
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""
         alist = ['a', 'b', 'c', 'd']

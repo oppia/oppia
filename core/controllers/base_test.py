@@ -33,14 +33,17 @@ class BaseHandlerTest(test_utils.GenericTestBase):
                 continue
             else:
                 url = route.template
-            url = re.sub('<([^/^:]+)>', 'abc012', url)
+            url = re.sub('<([^/^:]+)>', 'abc123', url)
 
             # Some of these will 404 or 302. This is expected.
             try:
                 response = self.testapp.get(url)
-            except:
-                raise Exception('GET: %s' % url)
-            self.assertNotEqual(response.status_int, 500)
+            except Exception as e:
+                if response.status_int < 500:
+                    continue
+
+                raise Exception(
+                    'GET: %s, %s, %s' % (url, response.status_int, e))
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
