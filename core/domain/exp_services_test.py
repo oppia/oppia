@@ -229,6 +229,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             yaml_content,
 """default_skin: conversation_v1
+param_changes: []
 param_specs: []
 states:
 - content: []

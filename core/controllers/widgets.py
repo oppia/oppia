@@ -88,7 +88,7 @@ class WidgetHandler(base.BaseHandler):
 
         response = {
             'widget': widget.get_widget_instance_dict(
-                customization_args, {}),
+                customization_args, {}, preview_mode=True),
         }
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:

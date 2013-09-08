@@ -267,6 +267,9 @@ def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
 
+    param_changes = [param_change.to_dict()
+                     for param_change in exploration.param_changes]
+
     param_specs = [{
         'name': param_spec.name, 'obj_type': param_spec.obj_type
     } for param_spec in exploration.param_specs]
@@ -277,6 +280,7 @@ def export_to_yaml(exploration_id):
 
     return utils.yaml_from_dict({
         'default_skin': exploration.default_skin,
+        'param_changes': param_changes,
         'param_specs': param_specs,
         'states': states_list
     })
@@ -304,6 +308,9 @@ def save_exploration(committer_id, exploration):
         For states, all properties except 'id' are versioned. State dests are
         specified using names and not ids.
         """
+        param_changes = [param_change.to_dict()
+                         for param_change in exploration.param_changes]
+
         param_specs = [{
             'name': param_spec.name, 'obj_type': param_spec.obj_type
         } for param_spec in exploration.param_specs]
@@ -313,7 +320,9 @@ def save_exploration(committer_id, exploration):
             for state_id in exploration.state_ids]
 
         return {
-            'param_specs': param_specs, 'states': states_list
+            'param_changes': param_changes,
+            'param_specs': param_specs,
+            'states': states_list
         }
 
     def _save_exploration_transaction(committer_id, exploration):
@@ -333,6 +342,7 @@ def save_exploration(committer_id, exploration):
             'title': exploration.title,
             'state_ids': exploration.state_ids,
             'param_specs': exploration.param_spec_dicts,
+            'param_changes': exploration.param_change_dicts,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
             'editor_ids': exploration.editor_ids,
@@ -437,6 +447,17 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations involving exploration parameters.
+def get_init_params(exploration_id):
+    """Returns an initial set of exploration parameters for a reader."""
+    exploration = get_exploration_by_id(exploration_id)
+
+    reader_params = {}
+    for pc in exploration.param_changes:
+        obj_type = exploration.get_obj_type_for_param(pc.name)
+        reader_params[pc.name] = pc.get_normalized_value(obj_type, {})
+    return reader_params
+
+
 def update_with_state_params(exploration_id, state_id, reader_params):
     """Updates a reader's params using the params for the given state."""
     exploration = get_exploration_by_id(exploration_id)
@@ -535,9 +556,6 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 exploration.has_state_named(new_state_name)):
             raise ValueError('Duplicate state name: %s' % new_state_name)
         state.name = new_state_name
-
-    # TODO(sll): Deal with added exploration params here. Need another arg
-    # called added_params.
 
     if param_changes:
         state.param_changes = []
@@ -727,7 +745,6 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
     init_state_name = exploration_dict['states'][0]['name']
 
-    # TODO(sll): Import the default skin too.
     exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, image_id=image_id)
@@ -780,6 +797,10 @@ def create_from_yaml(
             save_state(user_id, exploration_id, state)
 
         exploration = get_exploration_by_id(exploration_id)
+        exploration.default_skin = exploration_dict['default_skin']
+        exploration.param_changes = [param_domain.ParamChange(
+            pc['name'], pc['generator_id'], pc['customization_args']
+        ) for pc in exploration_dict['param_changes']]
         exploration.param_specs = exploration_param_specs
         save_exploration(user_id, exploration)
     except Exception:

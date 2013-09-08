@@ -61,10 +61,11 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        init_params = exp_services.get_init_params(exploration_id)
         reader_params = exp_services.update_with_state_params(
             exploration_id,
             exploration.init_state_id,
-            reader_params={}
+            reader_params=init_params
         )
 
         init_state = exploration.init_state

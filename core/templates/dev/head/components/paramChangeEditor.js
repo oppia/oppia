@@ -40,7 +40,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
 
       var DEFAULT_TMP_PARAM_CHANGE = {
         generator_id: 'Copier',
-        customization_args: {value: 'New parameter value'},
+        customization_args: {},
         select2Name: {id: '[New parameter]', text: '[New parameter]'}
       };
 
@@ -94,10 +94,6 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         angular.extend($scope.paramSelector.data, namedata);
       };
 
-
-      //TODO: (in html) see if there's a clean way of having the editor pop-up in
-      //the list itself
-    
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
         $scope.activeItem = $scope.NEW_PARAM_CHANGE_SENTINEL;
@@ -105,14 +101,48 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         $scope.tmpParamChange = angular.copy(DEFAULT_TMP_PARAM_CHANGE);
       };
 
+      // TODO(sll): Move this list somewhere more global.
+      // The 'true' values in each sub-dict are merely placeholders.
+      $scope.ALLOWED_KEYS = {
+        'Copier': ['value', 'parse_with_jinja'],
+        'RestrictedCopier':  ['value', 'parse_with_jinja'],
+        'RandomSelector': ['list_of_values'],
+        'RangeRestrictedCopier': ['value']
+      };
+
+      $scope.inArray = function(array, value) {
+        for (var i = 0; i < array.length; i++) {
+          if (array[i] == value) {
+            return true;
+          }
+        }
+        return false;
+      };
+
       // Called when an 'edit param change' action is triggered.
       $scope.startEditParamChange = function(index) {
         var param = $scope.paramChanges[index];
         $scope.initSelectorOptions();
         $scope.activeItem = index;
+
+        var newCustomizationArgs = angular.copy(param.customization_args);
+        var customizationArgsKeys = [];
+        for (var key in newCustomizationArgs) {
+          if (newCustomizationArgs.hasOwnProperty(key)) {
+            customizationArgsKeys.push(key);
+          }
+        }
+        for (var j = 0; j < customizationArgsKeys.length; j++) {
+          if (!$scope.inArray($scope.ALLOWED_KEYS[param.generator_id],
+                              customizationArgsKeys[j])) {
+            console.log(customizationArgsKeys[j]);
+            delete newCustomizationArgs[customizationArgsKeys[j]];
+          }
+        }
+
         $scope.tmpParamChange = {
           generator_id: param.generator_id,
-          customization_args: angular.copy(param.customization_args),
+          customization_args: newCustomizationArgs,
           select2Name: {id: param.name, text: param.name}
         };
       };

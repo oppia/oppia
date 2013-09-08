@@ -30,12 +30,7 @@ oppia.directive('copier', function($compile) {
       }, true);
 
       $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
-        // TODO(sll): In this and other generator directives, strip out keys
-        // that do not belong here.
         $scope.customizationArgs = $scope.$parent.customizationArgs;
-        if (!$scope.customizationArgs.hasOwnProperty('parse_with_jinja')) {
-          $scope.customizationArgs.parse_with_jinja = false;
-        }
       }, true);
     }
   };

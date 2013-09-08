@@ -27,6 +27,8 @@ import utils
 class Copier(value_generators_domain.BaseValueGenerator):
     """Returns a copy of the input value."""
 
+    default_value = ''
+
     def generate_value(self, context_params, value, parse_with_jinja=False):
         """Returns a copy of the input value.
 
@@ -49,6 +51,8 @@ class Copier(value_generators_domain.BaseValueGenerator):
 class RandomSelector(value_generators_domain.BaseValueGenerator):
     """Returns a random value from the input list."""
 
+    default_value = ''
+
     def generate_value(self, context_params, list_of_values):
         return copy.deepcopy(utils.get_random_choice(list_of_values))
 
@@ -57,6 +61,10 @@ class RestrictedCopier(value_generators_domain.BaseValueGenerator):
     """Returns a copy of the input, after checking its existence in a list."""
 
     choices = []
+
+    @property
+    def default_value(self):
+        return self.choices[0]
 
     def __init__(self, choices):
         if not isinstance(choices, list):
@@ -81,6 +89,10 @@ class RangeRestrictedCopier(value_generators_domain.BaseValueGenerator):
 
     min_value = 0
     max_value = 0
+
+    @property
+    def default_value(self):
+        return (self.min_value + self.max_value) / 2
 
     def __init__(self, min_value, max_value):
         if not isinstance(min_value, numbers.Number):

@@ -140,6 +140,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
     $scope.paramSpecs = data.param_specs || [];
+    $scope.explorationParamChanges = data.param_changes || [];
 
     $scope.explorationSnapshots = [];
     for (var i = 0; i < data.snapshots.length; i++) {
@@ -420,6 +421,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       $scope.saveExplorationProperty(
           'explorationImageId', 'image_id', $scope.explorationImageId, null);
     });
+  };
+
+  $scope.saveExplorationParamChanges = function() {
+    $scope.saveExplorationProperty(
+      'explorationParamChanges', 'param_changes',
+      $scope.explorationParamChanges, null);
   };
 
   /**

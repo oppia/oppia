@@ -277,6 +277,9 @@ class Exploration(object):
         self.param_specs = [
             param_domain.ParamSpec.from_dict(param_spec_dict)
             for param_spec_dict in exploration_model.param_specs]
+        self.param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in exploration_model.param_changes]
         self.is_public = exploration_model.is_public
         self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
@@ -332,6 +335,11 @@ class Exploration(object):
     def param_spec_dicts(self):
         """A list of param specs, represented as JSONifiable Python dicts."""
         return [param_spec.to_dict() for param_spec in self.param_specs]
+
+    @property
+    def param_change_dicts(self):
+        """A list of param changes, represented as JSONifiable Python dicts."""
+        return [param_change.to_dict() for param_change in self.param_changes]
 
     def get_obj_type_for_param(self, param_name):
         """Returns the obj_type for the given parameter."""

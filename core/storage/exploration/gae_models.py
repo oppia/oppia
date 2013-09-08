@@ -87,6 +87,9 @@ class ExplorationModel(base_models.BaseModel):
     # Each specification is a dict with the keys 'name' and 'obj_type', both of
     # whose values are strings.
     param_specs = ndb.JsonProperty(repeated=True)
+    # The list of parameter changes to be performed once at the start of a
+    # reader's encounter with an exploration.
+    param_changes = ndb.JsonProperty(repeated=True)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.

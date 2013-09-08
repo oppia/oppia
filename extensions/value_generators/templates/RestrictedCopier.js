@@ -38,6 +38,12 @@ oppia.directive('restrictedCopier', function($compile, warningsData) {
       $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
         $scope.customizationArgs = $scope.$parent.customizationArgs;
         $scope.initArgs = $scope.$parent.initArgs;
+
+        if ($scope.customizationArgs.parse_with_jinja === true) {
+          // Do not try to do frontend validation of the input in this case.
+          return;
+        }
+
         if ($scope.customizationArgs !== undefined || oldValue !== undefined) {
           var isInList = false;
           for (var i = 0; i < $scope.initArgs.choices.length; i++) {
@@ -45,6 +51,7 @@ oppia.directive('restrictedCopier', function($compile, warningsData) {
               isInList = true;
             }
           }
+
           if (!isInList) {
             warningsData.addWarning(
               'Value must be one of ' + $scope.initArgs.choices + '; received ' +

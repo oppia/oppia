@@ -52,15 +52,6 @@
           </div>
         </div>
       </div>
-
-      <div>
-        <strong>Parameters used in this exploration</strong>
-        <ol>
-          <li ng-repeat="paramSpec in paramSpecs">
-            <b><[paramSpec.name]></b> (<[paramSpec.obj_type]>)
-          </li>
-        </ol>
-      </div>
     </div>
 
     <div class="span6">
@@ -99,6 +90,32 @@
       </div>
     </div>
   </div>
+  <br>
+
+  <div>
+    <h4>Parameters used in this exploration</h4>
+    <ol>
+      <li ng-repeat="paramSpec in paramSpecs">
+        <b><[paramSpec.name]></b> (<[paramSpec.obj_type]>)
+      </li>
+    </ol>
+
+    <br>
+
+    <h4>
+      Parameter initializations
+      <img class="oppia-help" src="/images/help.png"
+           ui-jq="tooltip"
+           title="This allows you to initialize the values of a reader's parameters before the reader begins the exploration.">
+    </h4>
+
+    <param-change-editor param-changes="explorationParamChanges"
+                         param-specs="paramSpecs"
+                         save-param-changes="saveExplorationParamChanges"
+                         add-exploration-param-spec="addExplorationParamSpec">
+    </param-change-editor>
+  </div>
+
   <br>
 
   <div ng-show="explorationSnapshots.length > 0">

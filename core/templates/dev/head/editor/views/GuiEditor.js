@@ -37,7 +37,7 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
   $scope.init = function(data) {
     $scope.stateName = data.name;
     $scope.content = data.content || [];
-    $scope.paramChanges = data.param_changes || [];
+    $scope.stateParamChanges = data.param_changes || [];
     $scope.initAllWidgets();
 
     console.log('Content updated.');
@@ -66,7 +66,7 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
       '/widgets/noninteractive/' + widget.id + '?parent_index=' + index,
       $scope.createRequest({
         customization_args: customization_args,
-        state_params: $scope.paramChanges
+        state_params: $scope.stateParamChanges
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
@@ -371,12 +371,12 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     $scope.saveStateContent();
   };
 
-  $scope.saveParamChanges = function() {
-    console.log($scope.paramChanges);
+  $scope.saveStateParamChanges = function() {
+    console.log($scope.stateParamChanges);
 
     explorationData.saveStateData(
       $scope.stateId,
-      {'param_changes': $scope.paramChanges});
+      {'param_changes': $scope.stateParamChanges});
   };
 
 }

@@ -246,8 +246,10 @@ class ExplorationDataUnitTests(DataUnitTest):
 
     def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""
-        EXPLORATION_SCHEMA = [('param_specs', list), ('states', list),
-                              ('default_skin', basestring)]
+        EXPLORATION_SCHEMA = [
+            ('param_specs', list), ('states', list),
+            ('default_skin', basestring), ('param_changes', list)
+        ]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 
         PARAMETER_SCHEMA = [('name', basestring), ('obj_type', basestring)]

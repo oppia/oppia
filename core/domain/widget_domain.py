@@ -156,7 +156,7 @@ class BaseWidget(object):
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
 
     def _get_widget_param_instances(self, state_customization_args, 
-                                    context_params):
+                                    context_params, preview_mode=False):
         """Returns a dict of parameter names and values for the widget.
 
         This dict is used to evaluate widget templates. The parameter values
@@ -170,6 +170,10 @@ class BaseWidget(object):
           - context_params: dict with state parameters that is used to
               evaluate any values in state_customization_args that are of the
               form {{STATE_PARAM_NAME}}.
+          - preview_mode: if True, default values are generated if the
+              customization_args do not permit the generation of an acceptable
+              parameter value. Otherwise, this method fails noisily if the
+              customization_args are not valid.
 
         Returns:
           A dict of key-value pairs; the keys are parameter names and the
@@ -189,8 +193,14 @@ class BaseWidget(object):
                 else param.customization_args
             )
 
-            generated_value = value_generator.generate_value(
-                context_params, **args_to_use)
+            try:
+                generated_value = value_generator.generate_value(
+                    context_params, **args_to_use)
+            except Exception:
+                if preview_mode:
+                    generated_value = value_generator.default_value
+                else:
+                    raise
 
             # Normalize the generated values to the correct obj_type.
             obj_class = obj_services.get_object_class(param.obj_type)
@@ -198,12 +208,14 @@ class BaseWidget(object):
 
         return parameters
 
-    def get_raw_code(self, state_customization_args, context_params):
+    def get_raw_code(self, state_customization_args, context_params,
+                     preview_mode=False):
         """Gets the raw code for a parameterized widget."""
         return jinja_utils.parse_string(
             self.template,
             self._get_widget_param_instances(
-                state_customization_args, context_params))
+                state_customization_args, context_params,
+                preview_mode=preview_mode))
 
     def get_reader_response_html(self, state_customization_args,
                                  context_params, answer):
@@ -237,7 +249,8 @@ class BaseWidget(object):
 
         return jinja_utils.parse_string(self._stats_log_template, parameters)
 
-    def get_widget_instance_dict(self, customization_args, context_params):
+    def get_widget_instance_dict(self, customization_args, context_params,
+                                 preview_mode=True):
         """Gets a dict representing a parameterized widget.
 
         The value for params in the result is a dict, formatted as:
@@ -246,6 +259,11 @@ class BaseWidget(object):
 
         where PARAM_DESCRIPTION_DICT has the keys ['value', 'generator_id',
         'init_args', 'customization_args', 'obj_type'].
+
+        If preview_mode is True then a default parameter value is used when the
+        customization_args are invalid. This is necessary if, for example, a
+        widget parameter depends on a state parameter which has not been set,
+        as would be the case in the editor preview mode.
         """
 
         result = {
@@ -253,11 +271,12 @@ class BaseWidget(object):
             'category': self.category,
             'description': self.description,
             'id': self.id,
-            'raw': self.get_raw_code(customization_args, context_params),
+            'raw': self.get_raw_code(
+                customization_args, context_params, preview_mode=preview_mode),
         }
 
         param_instances = self._get_widget_param_instances(
-            customization_args, context_params)
+            customization_args, context_params, preview_mode=preview_mode)
 
         param_dict = {}
         for param in self.params:
