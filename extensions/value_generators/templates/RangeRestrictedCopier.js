@@ -13,10 +13,6 @@
 // limitations under the License.
 
 
-// This is needed in order to register the directive in the
-// GENERATOR_ID_TO_DIRECTIVE_MAPPING in valueGeneratorEditor.js.
-GENERATOR_ID_TO_DIRECTIVE_MAPPING['RangeRestrictedCopier'] = 'range-restricted-copier';
-
 oppia.directive('rangeRestrictedCopier', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
@@ -29,22 +25,29 @@ oppia.directive('rangeRestrictedCopier', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      $scope.generatorId = $scope.$parent.generatorId;
-      $scope.initArgs = $scope.$parent.initArgs;
-      $scope.customizationArgs = $scope.$parent.customizationArgs;
-      $scope.objType = $scope.$parent.objType;
+      // TODO(sll): Should initArgs be set in the template, rather than passed
+      // down through the parent?
+      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
+        $scope.initArgs = $scope.$parent.initArgs;
+      }, true);
 
-      $scope.$watch($scope.customizationArgs, function(newValue, oldValue) {
-        // TODO(sll): This does not have any effect; why?
-        if (newValue !== undefined || oldValue !== undefined) {
-          if (newValue > $scope.initArgs.upper_bound || newValue < $scope.initArgs.lower_bound) {
+      $scope.$watch('$parent.objType', function(newValue, oldValue) {
+        $scope.objType = $scope.$parent.objType;
+      }, true);
+
+      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
+        $scope.customizationArgs = $scope.$parent.customizationArgs;
+        $scope.initArgs = $scope.$parent.initArgs;
+        if ($scope.customizationArgs !== undefined || oldValue !== undefined) {
+          if ($scope.customizationArgs.value > $scope.initArgs.max_value ||
+              $scope.customizationArgs.value < $scope.initArgs.min_value) {
             warningsData.addWarning(
-              'Value must be between ' + $scope.initArgs.upper_bound +
-              ' and ' + $scope.initArgs.lower_bound + ', inclusive.');
+              'Value must be between ' + $scope.initArgs.max_value +
+              ' and ' + $scope.initArgs.min_value + ', inclusive.');
             return;
           }
         }
-      });
+      }, true);
     }
   };
 });

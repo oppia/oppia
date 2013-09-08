@@ -57,42 +57,9 @@
         <strong>Parameters</strong>
         <ol>
           <li ng-repeat="param in parameters">
-            <span class="oppia-editable-name"
-                ng-hide="editingParam == $index"
-                ng-click="startEditParam($index)">
-              <span ng-show="param.name"><b><[param.name]></b></span>
-              <span ng-show="param.description"><br><[param.description]></span>
-              <span ng-show="param.values"><br>initialize to one of: <[param.values]></span>
-            </span>
+            <b><[param.name]></b> (<[param.obj_type]>)
           </li>
         </ol>
-
-        <button type="button"
-                ng-hide="editingParam != null"
-                ng-click="startAddParam()">
-          Add Parameter
-        </button>
-
-        <br>
-
-        <div ng-show="editingParam != null">
-          <form novalidate class="oppia-form" name="newParameterForm" ng-submit="addParam(editingParam)">
-            Parameter name:
-            <input ng-model="tmpParamName" ui-select2="paramSelector"
-                   placeholder="Parameter Name" style="width:300px" required>
-            <br>
-            Description: <input type="text" ng-model="tmpParamDesc" ng-model-onblur
-                   placeholder="Parameter Description" style="width:300px">
-            <br>
-            Possible initial values:
-            <input ng-model="tmpParamValues" ui-select2="valueSelector" multiple
-                   placeholder="New Value(s)" style="width:300px">
-            <br>
-            <input type="submit" value="Save Changes"
-                   ng-disabled="newParameterForm.$invalid">
-            <button type="button" ng-click="resetParamInput()">Cancel</button>
-          </form>
-        </div>
       </div>
     </div>
 

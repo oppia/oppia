@@ -150,9 +150,11 @@
   <script>
     {{ include_js_file('services/explorationData.js') }}
     {{ include_js_file('editor/EditorExploration.js') }}
-    {{ include_js_file('editor/views/GuiEditor.js') }}
-    {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
+    {{ include_js_file('editor/views/GuiEditor.js') }}
+    // These should come after the valueGeneratorEditor scripts.
+    {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}
+    {{ include_js_file('components/paramChangeEditor.js') }}
   </script>
 {% endblock footer_js %}

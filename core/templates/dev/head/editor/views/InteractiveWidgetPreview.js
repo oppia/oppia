@@ -40,8 +40,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $http.post(
         '/widgets/interactive/' + widgetId,
         $scope.createRequest({
-          customization_args: customizationArgs,
-          state_params: $scope.paramChanges
+          customization_args: customizationArgs
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {

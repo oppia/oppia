@@ -49,7 +49,7 @@ oppia.run(function($rootScope, $location, $anchorScroll, $routeParams) {
     // TODO(sfederwisch): Change trigger to when page finishes loading
     setTimeout( function () {
       $location.hash($routeParams.scrollTo);
-      $anchorScroll();  
+      $anchorScroll();
     }, 2000);
   });
 });
@@ -331,8 +331,8 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     }
   });
 
-  //TODO: also add values list 
-  $scope.addParameter = function(name, type) {
+
+  $scope.addExplorationParamSpec = function(name, type, successCallback) {
     console.log("adding parameter to exploration");
     $scope.parameters.push({name:name, obj_type:type});
     $http.put(
@@ -345,6 +345,9 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             success(function(data) {
               console.log('PUT request succeeded');
               explorationData.data.version = data.version;
+              if (successCallback) {
+                successCallback();
+              }
             }).
             error(function(data) {
               warningsData.addWarning(
@@ -555,186 +558,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
       window.location = '/gallery/';
     });
   };
-
-  // parameter logic
-
-  //controllers for ui boxes: parameter and value options/list
-  $scope.paramSelector = {
-    createSearchChoice:function(term, data) {
-      if ($(data).filter(function() {
-        return this.text.localeCompare(term) === 0;
-      }).length===0) {
-        return {id: 'new', text: term};
-      }
-    },
-    data:[],
-    formatNoMatches:function(term) {
-      return '(choose a parameter name)';
-    }
-  };
-  $scope.valueSelector = {
-    createSearchChoice:function(term, data) {
-      if ($(data).filter(function() {
-        return this.text.localeCompare(term) === 0;
-      }).length === 0) {
-        return {id: term, text: '"' + term + '"'};
-      }
-    },
-    data: [],
-    tokenSeparators: [','],
-    formatNoMatches:function(term) {
-      return '(list new values)';
-    }
-  };
-
-  // initialize dropdown options for both selectors in the parameter interface
-  // (parameter name, parameter value(s) )
-  // also applies to the per-state parameter change interface
-  // the select2 library expects the options to have 'id' and 'text' fields.
-  $scope.initSelectorOptions = function() {
-    var namedata = [];
-    $scope.parameters.forEach(function(param){
-      namedata.push({id:param.name, text:param.name});
-    });
-    angular.extend($scope.paramSelector.data, namedata);
-
-    // TODO(yanamal): the student input option only applies to parameter
-    // changes that are associated with actions
-    var changedata = [{id:'{{answer}}', text:'Answer'}];
-    $scope.parameters.forEach(function(param){
-      changedata.push({id:'{{'+param.name+'}}', text:param.name});
-    });
-    angular.extend($scope.valueSelector.data, changedata);
-  };
-
-  //reset and/or initialize variables for parameter input
-  $scope.resetParamInput = function() {
-    $scope.editingParam = null; //used to determine what to display in the html
-    $scope.tmpParamName = '';
-    $scope.tmpParamDesc = '';
-    $scope.tmpParamValues = [];
-  };
-
-  $scope.resetParamInput();
-
-  //start editing/adding a parameter change
-  $scope.startAddParam = function() {
-    $scope.editingParam = 'New change';
-    $scope.initSelectorOptions();
-  };
-
-  // TODO(sll): Change the following to take an $index.
-  $scope.startEditParam = function(index) {
-    var param = $scope.parameters[index];
-    fields = $scope.initParamFields(param);
-    $scope.tmpParamName = fields[0];
-    $scope.tmpParamDesc = fields[1];
-    $scope.tmpParamValues = fields[2];
-    $scope.editingParam = index;
-  };
-
-  $scope.initParamFields = function(param) {
-    var pName = param.name;
-    tmpParamName = {id:pName, text: pName};
-    tmpParamDesc = param.description;
-
-    tmpParamValues = [];
-    if(param.values) {
-      (param.values).forEach(function(change){
-        // I think other stuff, like hashes, ends up in this object
-        if (typeof change === 'string') {
-          var txt = '';
-          if(change.lastIndexOf('{{', 0) === 0) {
-            // change starts with '{{', so it is a variable.
-            txt = change.substring(2, change.length - 2);
-          }
-          else {
-            // otherwise, it is a literal; display in quotes
-            txt = '"' + change + '"';
-          }
-          tmpParamValues.push({id:change, text:txt});
-        }
-      });
-    }
-    $scope.initSelectorOptions();
-    return [tmpParamName, tmpParamDesc, tmpParamValues];
-  };
-
-  // TODO(yanamal): there is $scope.addParameter and an unrelated
-  // $scope.addParam. probably bad.
-  $scope.addParam = function(index) {
-    if (!$scope.tmpParamName) {
-      warningsData.addWarning('Please specify a parameter name.');
-      return;
-    }
-    // TODO(yanamal): function that takes in name, values, description, and
-    // outputs object to push?
-    // needs to have ways to specify whether to include description (and other
-    // fields?)
-    // maybe just if null, don't include? will this break expectations on the
-    // server side?
-
-    // tmpParamName as output by the selector is usually of the format
-    // {id:param_name, text:param_name}
-    // except when the user is creating a new parameter, then it is
-    // {id:'new', text:param_name}
-    var name = $scope.tmpParamName.text;
-    // tmpParamValues comes back with the string that needs to be stored as
-    // the id; for changing to other parameter values or student input, this is
-    // {{pname}} or {{input}}. Otherwise the value option is interpreted as a
-    // string literal
-    var vals = [];
-    $scope.tmpParamValues.forEach(function(val) {
-      vals.push(val.id);
-    });
-
-    if (index !== 'New change') {
-      $scope.parameters[index] = {
-        'obj_type': 'UnicodeString', 'values': vals, 'name': name,
-        'description': $scope.tmpParamDesc};
-    } else {
-      $scope.parameters.push({
-        'obj_type': 'UnicodeString',
-        'values': vals,
-        'name': name,
-        'description': $scope.tmpParamDesc
-      });
-    }
-
-    $scope.saveParams();
-    $scope.resetParamInput();
-  };
-
-  $scope.saveParams = function() {
-    var requestParameters = {};
-    requestParameters['parameters'] = $scope.parameters;
-
-    console.log(requestParameters);
-    console.log(JSON.stringify(requestParameters));
-
-    // TODO: separate out/reuse logic for saving params? (also used in
-    // addParameter)
-    $http.put(
-        $scope.explorationDataUrl,
-        $scope.createRequest({
-          parameters: $scope.parameters,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              console.log('PUT request succeeded');
-              explorationData.data.version = data.version;
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  'Error modifying exploration parameters: ' + data.error);
-            });
-  };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$location', '$route', 
+EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
     '$routeParams', '$filter', 'explorationData', 'warningsData', 'activeInputData'];
 ExplorationTab.$inject = ['$scope', 'explorationData'];

@@ -19,16 +19,16 @@
  */
 
 var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_handler/';
-var GENERATOR_ID_TO_DIRECTIVE_MAPPING = {};
 
 // Individual value generator directives can be found in
-// extensions/value_generators/templates. They should be registered in the
-// GENERATOR_ID_TO_DIRECTIVE_MAPPING object above.
+// extensions/value_generators/templates.
 
 oppia.directive('valueGeneratorEditor', function($compile, $http, warningsData) {
   return {
     link: function(scope, element, attrs) {
-      var directiveName = GENERATOR_ID_TO_DIRECTIVE_MAPPING[scope.generatorId];
+      // Converts a camel-cased string to a lower-case hyphen-separated string.
+      var directiveName = scope.generatorId.replace(
+        /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
       element.html('<' + directiveName + '></' + directiveName + '>');
       $compile(element.contents())(scope);
     },

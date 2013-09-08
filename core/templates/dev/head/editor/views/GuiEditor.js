@@ -371,78 +371,14 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     $scope.saveStateContent();
   };
 
-  //logic for parameter change interface
-
-  //TODO: (in html) see if there's a clean way of having the editor pop-up in
-  //the list itself
-
-  //start editing/adding a parameter change
-  $scope.startAddParamChange = function() {
-    $scope.editingParamChange = 'New change';
-    $scope.initSelectorOptions();
-  };
-
-  // TODO(sll): Change the following to take an $index.
-  $scope.startEditParamChange = function(index) {
-    var param = $scope.paramChanges[index];
-    fields = $scope.initParamFields(param);
-    $scope.tmpParamName = fields[0];   // There are $scope issues that don't let me 
-    $scope.tmpParamValues = fields[2]; // reuse the exploration-level tmp* variables
-    $scope.editingParamChange = index;
-  };
-
-  //reset and/or initialize variables for parameter change input
-  $scope.resetParamChangeInput = function() {
-    $scope.editingParamChange = null; //used to determine what to display in the html
-    $scope.tmpParamName = '';
-    $scope.tmpParamValues = [];
-  };
-
-  $scope.resetParamChangeInput();
-
-  $scope.addParamChange = function(index) {
-    if (!$scope.tmpParamName) {
-      warningsData.addWarning('Please specify a parameter name.');
-      return;
-    }
-    if ($scope.tmpParamValues.length === 0) {
-      warningsData.addWarning('Please specify at least one value for the parameter.');
-      return;
-    }
-
-    // tmpParamName as output by the selector is usually of the format {id:param_name, text:param_name}
-    // except when the user is creating a new parameter, then it is {id:'new', text:param_name}
-    var name = $scope.tmpParamName.text;
-    // tmpParamValues comes back with the string that needs to be stored as the id;
-    // for changing to other parameter values or student input, this is {{pname}} or {{input}}
-    // otherwise the value option is interpreted as a string literal
-    var vals = [];
-    $scope.tmpParamValues.forEach(function(val){
-      vals.push(val.id);
-    });
-
-    if (index !== 'New change') {
-      $scope.paramChanges[index] = {
-        'obj_type': 'UnicodeString', 'values': vals, 'name': name};
-    } else {
-      $scope.paramChanges.push(
-        {'obj_type': 'UnicodeString', 'values': vals, 'name': name});
-    }
-
-    $scope.saveParamChanges();
-    $scope.resetParamChangeInput();
-  };
-
-  $scope.deleteParamChange = function (index) {
-    $scope.paramChanges.splice(index, 1);
-    $scope.saveParamChanges();
-  };
-
   $scope.saveParamChanges = function() {
+    console.log($scope.paramChanges);
+
     explorationData.saveStateData(
       $scope.stateId,
       {'param_changes': $scope.paramChanges});
   };
+
 }
 
 GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams',

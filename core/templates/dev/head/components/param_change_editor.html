@@ -1,0 +1,54 @@
+<div>
+  <ol>
+    <li ng-repeat="param in paramChanges">
+      <a class="close" ng-click="deleteParamChange($index)">
+        &times;
+      </a>
+      <span class="oppia-editable-name"
+          ng-hide="activeItem == $index"
+          ng-click="startEditParamChange($index)">
+        Change <b><[param.name]></b> to <b><[param.generator_id]>(<[getCustomizationArgsAsString(param.customization_args)]>)</b>
+      </span>
+
+      <div ng-show="activeItem == $index">
+        <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
+          <b>Parameter name:</b>
+          <input ng-model="tmpParamChange.select2Name"
+                 ui-select2="paramSelector"
+                 placeholder="Parameter Name" style="width:300px" required>
+          <br>
+          <value-generator-editor generator-id="tmpParamChange.generator_id"
+                                  customization-args="tmpParamChange.customization_args"
+                                  obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+          </value-generator-editor>
+          <br>
+          <input type="submit" value="Close editor">
+        </form>
+      </div>
+    </li>
+  </ol>
+
+  <button type="button" ng-hide="activeItem != -1"
+          ng-click="startAddParamChange()">
+    Add Parameter Change
+  </button>
+
+  <div ng-show="activeItem == NEW_PARAM_CHANGE_SENTINEL">
+    <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
+      <b>Parameter name:</b>
+      <input ng-model="tmpParamChange.select2Name"
+             ui-select2="paramSelector"
+             placeholder="Parameter Name" style="width:300px" required>
+      <br>
+
+      <value-generator-editor generator-id="tmpParamChange.generator_id"
+                              customization-args="tmpParamChange.customization_args"
+                              obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+      </value-generator-editor>
+      <br>
+
+      <input type="submit" value="Close editor">
+      
+    </form>
+  </div>
+</div>

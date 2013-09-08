@@ -19,7 +19,7 @@
  */
 
 oppia.directive('list', function(warningsData) {
-  // Editable list directive.
+  // Directive that implements an editable list.
   return {
     restrict: 'E',
     scope: {items: '=', largeInput: '@'},

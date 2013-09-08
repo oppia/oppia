@@ -13,11 +13,11 @@
 // limitations under the License.
 
 
-oppia.directive('copier', function($compile) {
+oppia.directive('randomSelector', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
-        return VALUE_GENERATOR_TEMPLATES_URL + scope.$parent.generatorId;
+        return VALUE_GENERATOR_TEMPLATES_URL + scope.generatorId;
       };
       $compile(element.contents())(scope);
     },
@@ -30,12 +30,7 @@ oppia.directive('copier', function($compile) {
       }, true);
 
       $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
-        // TODO(sll): In this and other generator directives, strip out keys
-        // that do not belong here.
         $scope.customizationArgs = $scope.$parent.customizationArgs;
-        if (!$scope.customizationArgs.hasOwnProperty('parse_with_jinja')) {
-          $scope.customizationArgs.parse_with_jinja = false;
-        }
       }, true);
     }
   };

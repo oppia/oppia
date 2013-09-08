@@ -51,8 +51,8 @@ class AnswerHandler(object):
         }
 
 
-class WidgetParam(object):
-    """Value object for a widget parameter."""
+class WidgetParamSpec(object):
+    """Value object for a widget parameter specification."""
 
     def __init__(self, name, description, generator, init_args,
                  customization_args, obj_type):
@@ -64,20 +64,6 @@ class WidgetParam(object):
         self.init_args = init_args
         self.customization_args = customization_args
         self.obj_type = obj_type
-
-    def get_value(self, context_params=None):
-        """Generates a new value using the parameter's customization args."""
-        if context_params is None:
-            context_params = {}
-
-        value_generator = self.generator(**self.init_args)
-
-        generated_value = value_generator.generate_value(
-            context_params, **self.customization_args)
-
-        # Check that the generated value has the correct type.
-        obj_class = obj_services.get_object_class(self.obj_type)
-        return obj_class.normalize(generated_value)
 
 
 class BaseWidget(object):
@@ -114,7 +100,7 @@ class BaseWidget(object):
 
     @property
     def params(self):
-        return [WidgetParam(**param) for param in self._params]
+        return [WidgetParamSpec(**param) for param in self._params]
 
     @property
     def handlers(self):

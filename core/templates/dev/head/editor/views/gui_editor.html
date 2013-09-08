@@ -43,7 +43,8 @@
                title="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields.">
         </h4>
 
-        {% include 'editor/parameter_change.html' %}
+        <param-change-editor param-changes="paramChanges" parameters="parameters" save-param-changes="saveParamChanges" add-exploration-param-spec="addExplorationParamSpec">
+        </param-change-editor>
 
         <br>
 

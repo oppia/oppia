@@ -23,7 +23,6 @@ from core.domain import widget_domain
 from core.platform import models
 user_services = models.Registry.import_user_services()
 import feconf
-import utils
 
 
 class WidgetRepositoryPage(base.BaseHandler):
@@ -84,20 +83,12 @@ class WidgetHandler(base.BaseHandler):
 
         customization_args = self.payload.get('customization_args', {})
 
-        state_params_dict = {}
-        state_params_given = self.payload.get('state_params')
-        if state_params_given:
-            for param in state_params_given:
-                # Pick a random parameter for each key.
-                state_params_dict[param['name']] = (
-                    utils.get_random_choice(param['values']))
-
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
 
         response = {
             'widget': widget.get_widget_instance_dict(
-                customization_args, state_params_dict),
+                customization_args, {}),
         }
 
         if widget_type == feconf.NONINTERACTIVE_PREFIX:

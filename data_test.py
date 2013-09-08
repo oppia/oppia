@@ -454,4 +454,4 @@ class WidgetDataUnitTests(DataUnitTest):
             # Check that the default customization args result in
             # parameters with the correct types.
             for param in widget.params:
-                param.get_value()
+                widget._get_widget_param_instances({}, {})

@@ -25,7 +25,7 @@ import test_utils
 class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
-    def test_parameter_change_class(self):
+    def test_param_change_class(self):
         """Test the ParamChange class."""
         # Raise an error because the name is invalid.
         with self.assertRaisesRegexp(ValueError, 'Only parameter names'):
