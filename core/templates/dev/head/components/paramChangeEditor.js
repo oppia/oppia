@@ -22,7 +22,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
   // Directive that implements an editor for specifying parameter changes.
   return {
     restrict: 'E',
-    scope: {paramChanges: '=', parameters: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
+    scope: {paramChanges: '=', paramSpecs: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
     templateUrl: '/templates/param_change_editor',
     controller: function($scope, $attrs) {
 
@@ -53,13 +53,12 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       $scope.resetParamChangeInput();
 
       $scope.getObjTypeForParam = function(paramName) {
-        if (!$scope.parameters) {
-          console.log('No exploration parameters found.');
+        if (!$scope.paramSpecs) {
           return '';
         }
-        for (var i = 0; i < $scope.parameters.length; i++) {
-          if ($scope.parameters[i].name == paramName) {
-            return $scope.parameters[i].obj_type;
+        for (var i = 0; i < $scope.paramSpecs.length; i++) {
+          if ($scope.paramSpecs[i].name == paramName) {
+            return $scope.paramSpecs[i].obj_type;
           }
         }
         return '';
@@ -84,12 +83,14 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       // select2 library expects the options to have 'id' and 'text' fields.
       $scope.initSelectorOptions = function() {
         var namedata = [];
-        $scope.parameters.forEach(function(param) {
-          namedata.push({
-            id: param.name,
-            text: param.name
+        if ($scope.paramSpecs) {
+          $scope.paramSpecs.forEach(function(param) {
+            namedata.push({
+              id: param.name,
+              text: param.name
+            });
           });
-        });
+        }
         angular.extend($scope.paramSelector.data, namedata);
       };
 

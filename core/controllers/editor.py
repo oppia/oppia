@@ -76,8 +76,7 @@ class ExplorationHandler(base.BaseHandler):
             'title': exploration.title,
             'editors': exploration.editor_ids,
             'states': state_list,
-            # TODO(sll): Update this name in the frontend to param_specs.
-            'parameters': [param_spec.to_dict()
+            'param_specs': [param_spec.to_dict()
                            for param_spec in exploration.param_specs],
             'version': exploration.version,
             # Add information about the most recent versions.
@@ -138,8 +137,7 @@ class ExplorationHandler(base.BaseHandler):
         title = self.payload.get('title')
         image_id = self.payload.get('image_id')
         editors = self.payload.get('editors')
-        # TODO(sll): Update this name in the frontend to param_specs.
-        param_specs = self.payload.get('parameters')
+        param_specs = self.payload.get('param_specs')
 
         if is_public:
             exploration.is_public = True

@@ -12,7 +12,6 @@ describe('Gallery controller', function() {
         id: '5',
         image_id: null,
         is_public: true,
-        parameters: [],
         title: 'Landmarks'
       }
     };
@@ -26,7 +25,6 @@ describe('Gallery controller', function() {
         id: '6',
         image_id: null,
         is_public: true,
-        parameters: [],
         title: 'My Exploration'
       }
     };

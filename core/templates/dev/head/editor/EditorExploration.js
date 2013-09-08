@@ -139,7 +139,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
-    $scope.parameters = data.parameters || [];
+    $scope.paramSpecs = data.param_specs || [];
 
     $scope.explorationSnapshots = [];
     for (var i = 0; i < data.snapshots.length; i++) {
@@ -334,11 +334,11 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     console.log("adding parameter to exploration");
-    $scope.parameters.push({name:name, obj_type:type});
+    $scope.paramSpecs.push({name:name, obj_type:type});
     $http.put(
         $scope.explorationDataUrl,
         $scope.createRequest({
-          parameters: $scope.parameters,
+          param_specs: $scope.paramSpecs,
           version: explorationData.data.version
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
@@ -352,7 +352,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             error(function(data) {
               warningsData.addWarning(
                   'Error adding parameter: ' + data.error);
-              $scope.parameters.pop();
+              $scope.paramSpecs.pop();
             });
   };
 
