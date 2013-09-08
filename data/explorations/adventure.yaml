@@ -13,6 +13,7 @@ param_specs:
   obj_type: UnicodeString
 - name: Test
   obj_type: UnicodeString
+schema_version: 1
 states:
 - content:
   - type: text
@@ -20,15 +21,15 @@ states:
   name: Welcome
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Road
+      - definition:
+          rule_type: default
+        dest: Road
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -39,56 +40,71 @@ states:
   name: Fork
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Troll
+      - definition:
+          inputs:
+            x: northeast
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You go northeast
-        inputs:
-          x: northeast
-        name: Contains
         param_changes: []
-      - dest: Clearing
+      - definition:
+          inputs:
+            x: northwest
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Clearing
         feedback:
         - You go northwest
-        inputs:
-          x: northwest
-        name: Contains
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: ne
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You go northeast
-        inputs:
-          x: ne
-        name: StartsWith
         param_changes: []
-      - dest: Clearing
+      - definition:
+          inputs:
+            x: nw
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Clearing
         feedback:
         - You go northwest
-        inputs:
-          x: nw
-        name: StartsWith
         param_changes: []
-      - dest: Fork
+      - definition:
+          inputs:
+            x: back
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Fork
         feedback:
         - You cannot go back
         - The gate is closed
         - There is no way back. You must carry on!
-        inputs:
-          x: back
-        name: Contains
         param_changes: []
-      - dest: Fork
+      - definition:
+          rule_type: default
+        dest: Fork
         feedback:
         - Pardon?
         - Nothing happens
         - Maybe you should pick a direction to go in. Northwest or Northeast?
         - I'm not sure how to {{answer}}
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -99,85 +115,112 @@ states:
   name: Troll
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Fork
+      - definition:
+          inputs:
+            x: southwest
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Fork
         feedback:
         - You go southwest
-        inputs:
-          x: southwest
-        name: Contains
         param_changes: []
-      - dest: Fork
+      - definition:
+          inputs:
+            x: sw
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Fork
         feedback:
         - You go southwest
-        inputs:
-          x: sw
-        name: StartsWith
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: use nothing
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You use nothing. Nothing happens.
-        inputs:
-          x: use nothing
-        name: StartsWith
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: nothing
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You do nothing. nothing happens.
-        inputs:
-          x: nothing
-        name: Contains
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: '{{Weapon}}'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You flail at the troll with your {{Weapon}}. He is not amused.
-        inputs:
-          x: '{{Weapon}}'
-        name: Contains
         param_changes: []
-      - dest: pre-rainbow
+      - definition:
+          inputs:
+            x: '{{sneezeitem}}'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: pre-rainbow
         feedback:
         - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
           he sneezes really loudly and you are carried away by the gust...
-        inputs:
-          x: '{{sneezeitem}}'
-        name: Contains
         param_changes: []
-      - dest: END
+      - definition:
+          inputs:
+            x: '{{payitem}}'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: END
         feedback:
         - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
           \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
           \ and toward victory!"
-        inputs:
-          x: '{{payitem}}'
-        name: Contains
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: use
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You don't have that!
-        inputs:
-          x: use
-        name: StartsWith
         param_changes: []
-      - dest: Troll
+      - definition:
+          inputs:
+            x: troll
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Troll
         feedback:
         - You flail at the troll with your bare hands. He is not amused.
-        inputs:
-          x: troll
-        name: Contains
         param_changes: []
-      - dest: Troll
+      - definition:
+          rule_type: default
+        dest: Troll
         feedback:
         - Pardon?
         - I don't know how to {{answer}}
         - I don't understand
         - Have you tried using things? (use [item])
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -188,44 +231,56 @@ states:
   name: Clearing
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: picking
+      - definition:
+          inputs:
+            x: pick
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: picking
         feedback: []
-        inputs:
-          x: pick
-        name: Contains
         param_changes: []
-      - dest: picking
+      - definition:
+          inputs:
+            x: flower
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: picking
         feedback: []
-        inputs:
-          x: flower
-        name: Contains
         param_changes: []
-      - dest: Fork
+      - definition:
+          inputs:
+            x: southeast
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Fork
         feedback:
         - You go southeast
-        inputs:
-          x: southeast
-        name: Contains
         param_changes: []
-      - dest: Fork
+      - definition:
+          inputs:
+            x: se
+          name: StartsWith
+          rule_type: atomic
+          subject: answer
+        dest: Fork
         feedback:
         - You go southeast
-        inputs:
-          x: se
-        name: StartsWith
         param_changes: []
-      - dest: Clearing
+      - definition:
+          rule_type: default
+        dest: Clearing
         feedback:
         - Pardon?
         - Huh?
         - Did you mean "pick some flowers"?
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput
 - content:
@@ -236,42 +291,45 @@ states:
       way to adventure!"</div>'
   name: Road
   param_changes:
-  - name: Name
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer}}'
-      parse_with_jinja: True
-  - name: Weapon
     generator_id: Copier
-    customization_args:
+    name: Name
+  - customization_args:
       value: towel
-  - name: sneezeitem
     generator_id: Copier
-    customization_args:
+    name: Weapon
+  - customization_args:
       value: nothing
-  - name: payitem
     generator_id: Copier
-    customization_args:
+    name: sneezeitem
+  - customization_args:
       value: nothing
+    generator_id: Copier
+    name: payitem
   widget:
-    handlers:
-    - name: submit
-      rule_specs:
-      - dest: Fork
-        feedback: []
-        inputs:
-          x: 0
-        name: Equals
-        param_changes: []
-      - dest: Fork
-        feedback: []
-        inputs: {}
-        name: Default
-        param_changes: []
     customization_args:
       choices:
         value:
         - Go north
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Fork
+        feedback: []
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Fork
+        feedback: []
+        param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
 - content:
@@ -279,20 +337,20 @@ states:
     value: 'You pick a pretty bouquet of <span style="font-weight: bold;">flowers</span>.'
   name: picking
   param_changes:
-  - name: sneezeitem
-    generator_id: Copier
-    customization_args:
+  - customization_args:
       value: flowers
+    generator_id: Copier
+    name: sneezeitem
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Clearing
+      - definition:
+          rule_type: default
+        dest: Clearing
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -301,72 +359,88 @@ states:
   name: Rainbow
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: get coins
+      - definition:
+          inputs:
+            x: '{{numcoins}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: get coins
         feedback:
         - Correct!
-        inputs:
-          x: '{{numcoins}}'
-        name: Equals
         param_changes: []
-      - dest: Rainbow
+      - definition:
+          inputs:
+            x: 10.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Rainbow
         feedback:
         - Actually, I can't hold any more than 10 coins. My hands are too small.
-        inputs:
-          x: 10.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: Rainbow
+      - definition:
+          inputs:
+            x: 1.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Rainbow
         feedback:
         - I do have some coins!
-        inputs:
-          x: 1.0
-        name: IsLessThan
         param_changes: []
-      - dest: Rainbow
+      - definition:
+          inputs:
+            x: '{{numcoins}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Rainbow
         feedback:
         - No, fewer than that!
-        inputs:
-          x: '{{numcoins}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: Rainbow
+      - definition:
+          inputs:
+            x: '{{numcoins}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Rainbow
         feedback:
         - More than that!
-        inputs:
-          x: '{{numcoins}}'
-        name: IsLessThan
         param_changes: []
-      - dest: Rainbow
+      - definition:
+          rule_type: default
+        dest: Rainbow
         feedback:
         - This should never happen
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: NumericInput
 - content:
   - type: text
-    value: 'He gives you the <span style="font-weight: bold;">coins</span> and uses his magic to return you back to the troll.'
+    value: 'He gives you the <span style="font-weight: bold;">coins</span> and uses
+      his magic to return you back to the troll.'
   name: get coins
   param_changes:
-  - name: payitem
-    generator_id: Copier
-    customization_args:
+  - customization_args:
       value: coins
+    generator_id: Copier
+    name: payitem
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Troll
+      - definition:
+          rule_type: default
+        dest: Troll
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: Continue
 - content:
@@ -375,9 +449,7 @@ states:
       says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
   name: pre-rainbow
   param_changes:
-  - name: numcoins
-    generator_id: RandomSelector
-    customization_args:
+  - customization_args:
       list_of_values:
       - '1'
       - '2'
@@ -389,15 +461,17 @@ states:
       - '8'
       - '9'
       - '10'
+    generator_id: RandomSelector
+    name: numcoins
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Rainbow
+      - definition:
+          rule_type: default
+        dest: Rainbow
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
     sticky: false
     widget_id: TextInput

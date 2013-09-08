@@ -1,66 +1,75 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs: []
+schema_version: 1
 states:
-- name: Sentence
-  content:
+- content:
   - type: text
     value: "Yo __________ (jugar) al f\xFAtbol con amigos los domingos\n\nWhat verb\
       \ conjugation goes in the blank? \nOr type 'I don't know'"
+  name: Sentence
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: END
+      - definition:
+          inputs:
+            x: juego
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: END
         feedback:
         - That is correct! Great job!
-        inputs:
-          x: juego
-        name: Equals
         param_changes: []
-      - dest: boot verb
+      - definition:
+          inputs:
+            x: jugo
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: boot verb
         feedback:
         - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
           because jugar is a boot verb.
-        inputs:
-          x: jugo
-        name: Equals
         param_changes: []
-      - dest: subject
+      - definition:
+          rule_type: default
+        dest: subject
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
-    sticky: False
+    sticky: false
     widget_id: TextInput
-- name: So...
-  content:
+- content:
   - type: text
     value: So now put that stem together with the ending, and what is the answer?
+  name: So...
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: END
+      - definition:
+          inputs:
+            x: juego
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: END
         feedback: []
-        inputs:
-          x: juego
-        name: Equals
         param_changes: []
-      - dest: So...
+      - definition:
+          rule_type: default
+        dest: So...
         feedback:
         - Try that again. Put jueg- together with -o and you get...?
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
-    sticky: False      
+    sticky: false
     widget_id: TextInput
-- name: boot verb
-  content:
+- content:
   - type: text
     value: "Boot verbs can also be called stem-changing verbs.<br>\nWhat is it that\
       \ makes it a boot verb? Well... if you use the normal way of writing out verb\
@@ -70,85 +79,98 @@ states:
       \ yo, t\xFA, \xE9l/ella/usted and ustedes forms. And if you draw a line around\
       \ those, it looks like a boot.<br>\n<br>\nIn the case of jugar, since it is\
       \ a verb ending in -gar, it uses the u > ue stem, so what does the stem become?"
+  name: boot verb
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: So...
+      - definition:
+          inputs:
+            x: jueg
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: So...
         feedback: []
-        inputs:
-          x: jueg
-        name: Equals
         param_changes: []
-      - dest: So...
+      - definition:
+          rule_type: default
+        dest: So...
         feedback:
         - Not quite. Just change the u to a ue and you get jueg-
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
-    sticky: False      
+    sticky: false
     widget_id: TextInput
-- name: subject
-  content:
+- content:
   - type: text
     value: So what is the subject of the sentence?
+  name: subject
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: verb endings
+      - definition:
+          inputs:
+            x: yo
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: verb endings
         feedback: []
-        inputs:
-          x: yo
-        name: Equals
         param_changes: []
-      - dest: subject
+      - definition:
+          rule_type: default
+        dest: subject
         feedback:
         - The subject of the sentence is the noun in the sentence that is doing the
           action. It is usually near the beginning of the sentence.
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
-    sticky: False      
+    sticky: false
     widget_id: TextInput
-- name: verb endings
-  content:
+- content:
   - type: text
     value: So what is the correct verb ending for yo?
+  name: verb endings
   param_changes: []
   widget:
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: boot verb
+      - definition:
+          inputs:
+            x: -o
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: boot verb
         feedback:
         - But if you just drop the -ar and at -o, you get jugo which means juice,
           so that's not quite right. That's because jugar is a boot verb!
-        inputs:
-          x: -o
-        name: Equals
         param_changes: []
-      - dest: boot verb
+      - definition:
+          inputs:
+            x: o
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: boot verb
         feedback:
         - But if you just drop the -ar and at -o, you get jugo which means juice,
           so that's not quite right. That's because jugar is a boot verb!
-        inputs:
-          x: o
-        name: Equals
         param_changes: []
-      - dest: verb endings
+      - definition:
+          rule_type: default
+        dest: verb endings
         feedback:
         - "That doesn't look right. Here is the conjugation of hablo (to speak): yo\
           \ hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as hablamos, vosotros/as\
           \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
           \ the corresponding ending for 'yo' is?"
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args: {}
-    sticky: False      
+    sticky: false
     widget_id: TextInput

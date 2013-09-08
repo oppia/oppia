@@ -49,6 +49,11 @@ import utils
 SUBMIT_HANDLER_NAME = 'submit'
 ADMIN_COMMITTER_ID = 'admin'
 
+# The current version of the exploration schema. If any backward-incompatible
+# changes are made to the exploration schema in the YAML definitions, this
+# version number must be changed and a migration process put in place.
+CURRENT_EXPLORATION_SCHEMA_VERSION = 1
+
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id):
@@ -168,6 +173,7 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_id):
 
 def export_state_to_verbose_dict(exploration_id, state_id):
     """Gets a state dict with rule descriptions and unresolved answers."""
+    exploration = get_exploration_by_id(exploration_id)
 
     state_dict = export_state_to_dict(exploration_id, state_id)
 
@@ -177,18 +183,19 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
 
-    state = get_state_by_id(exploration_id, state_id)
-
     for handler in state_dict['widget']['handlers']:
         for rule_spec in handler['rule_specs']:
-            if rule_spec['name'] == feconf.DEFAULT_RULE_NAME:
-                rule_spec['description'] = feconf.DEFAULT_RULE_NAME
-            else:
-                rule_spec['description'] = (
-                    widget_domain.Registry.get_widget_by_id(
-                        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-                    ).get_rule_description(handler['name'], rule_spec['name'])
-                )
+
+            widget = widget_domain.Registry.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX,
+                state_dict['widget']['widget_id']
+            )
+
+            input_type = widget.get_handler_by_name(handler['name']).input_type
+
+            rule_spec['description'] = rule_domain.get_rule_description(
+                rule_spec['definition'], exploration.param_specs, input_type
+            )
 
     return state_dict
 
@@ -282,7 +289,8 @@ def export_to_yaml(exploration_id):
         'default_skin': exploration.default_skin,
         'param_changes': param_changes,
         'param_specs': param_specs,
-        'states': states_list
+        'states': states_list,
+        'schema_version': CURRENT_EXPLORATION_SCHEMA_VERSION
     })
 
 
@@ -605,22 +613,25 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         for rule_ind in range(len(ruleset)):
             rule = ruleset[rule_ind]
             state_rule = exp_domain.RuleSpec(
-                rule.get('name'), rule.get('inputs'), rule.get('dest'),
-                rule.get('feedback'), []
+                rule.get('definition'), rule.get('dest'), rule.get('feedback'),
+                rule.get('param_changes')                
             )
 
             if rule['description'] == feconf.DEFAULT_RULE_NAME:
                 if (rule_ind != len(ruleset) - 1 or
-                        rule['name'] != feconf.DEFAULT_RULE_NAME):
+                        rule['definition']['rule_type'] !=
+                        rule_domain.DEFAULT_RULE_TYPE):
                     raise ValueError('Invalid ruleset: the last rule '
                                      'should be a default rule.')
             else:
+                # TODO(sll): Generalize this to Boolean combinations of rules.
                 matched_rule = generic_widget.get_rule_by_name(
-                    'submit', state_rule.name)
+                    'submit', state_rule.definition['name'])
 
                 # Normalize and store the rule params.
-                for param_name in state_rule.inputs:
-                    value = state_rule.inputs[param_name]
+                # TODO(sll): Generalize this to Boolean combinations of rules.
+                rule_inputs = state_rule.definition['inputs']
+                for param_name, value in rule_inputs.iteritems():
                     param_type = rule_domain.get_obj_type_for_param_name(
                         matched_rule, param_name)
 
@@ -635,7 +646,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                             '%s has the wrong type. Please replace it '
                             'with a %s.' % (value, param_type.__name__))
 
-                    state_rule.inputs[param_name] = normalized_param
+                    rule_inputs[param_name] = normalized_param
 
             state.widget.handlers[0].rule_specs.append(state_rule)
 
@@ -693,32 +704,10 @@ def delete_state(committer_id, exploration_id, state_id):
         _delete_state_transaction, committer_id, exploration_id, state_id)
 
 
-def _find_first_match(handler, all_rule_classes, answer, state_params):
-    for rule_spec in handler.rule_specs:
-        if rule_spec.is_default:
-            return rule_spec
-
-        r = next(r for r in all_rule_classes if r.__name__ == rule_spec.name)
-
-        param_list = []
-        param_defns = rule_domain.get_param_list(r.description)
-        for (param_name, obj_cls) in param_defns:
-            parsed_param = rule_spec.inputs[param_name]
-            if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
-                parsed_param = jinja_utils.parse_string(parsed_param, state_params)
-            normalized_param = obj_cls.normalize(parsed_param)
-            param_list.append(normalized_param)
-
-        match = r(*param_list).eval(answer)
-        if match:
-            return rule_spec
-
-    raise Exception(
-        'No matching rule found for handler %s.' % handler.name)
-
-
 def classify(exploration_id, state_id, handler_name, answer, params):
     """Return the first rule that is satisfied by a reader's answer."""
+
+    exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
 
     # Get the widget to determine the input type.
@@ -729,12 +718,16 @@ def classify(exploration_id, state_id, handler_name, answer, params):
     handler = next(h for h in state.widget.handlers if h.name == handler_name)
 
     if generic_handler.input_type is None:
-        selected_rule = handler.rule_specs[0]
+        return handler.rule_specs[0]
     else:
-        selected_rule = _find_first_match(
-            handler, generic_handler.rules, answer, params)
+        for rule_spec in handler.rule_specs:
+            if rule_domain.evaluate_rule(
+                    rule_spec.definition, exploration.param_specs,
+                    generic_handler.input_type, params, answer):
+                return rule_spec
 
-    return selected_rule
+        raise Exception(
+            'No matching rule found for handler %s.' % handler.name)
 
 
 # Creation and deletion methods.
@@ -743,6 +736,12 @@ def create_from_yaml(
         image_id=None):
     """Creates an exploration from a YAML text string."""
     exploration_dict = utils.dict_from_yaml(yaml_content)
+
+    exploration_schema_version = exploration_dict.get('schema_version')
+
+    if exploration_schema_version != CURRENT_EXPLORATION_SCHEMA_VERSION:
+        raise Exception('Sorry, we can only process v1 YAML files at present.')
+
     init_state_name = exploration_dict['states'][0]['name']
 
     exploration_id = create_new(
@@ -781,8 +780,7 @@ def create_from_yaml(
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
                 'name': handler['name'],
                 'rule_specs': [{
-                    'name': rule_spec['name'],
-                    'inputs': rule_spec['inputs'],
+                    'definition': rule_spec['definition'],
                     'dest': convert_state_name_to_id(
                         exploration_id, rule_spec['dest']),
                     'feedback': rule_spec['feedback'],

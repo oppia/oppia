@@ -94,6 +94,12 @@ class ExplorationModel(base_models.BaseModel):
         validators=[validate_param_specs]
     )
 
+    # The list of parameter changes to be performed once at the start of a
+    # reader's encounter with an exploration.
+    param_changes = django_utils.JSONField(
+        blank=True, default=[], primitivelist=True, validators=[]
+    )
+
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)
 

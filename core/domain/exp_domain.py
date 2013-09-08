@@ -23,6 +23,7 @@ should therefore be independent of the specific storage models used."""
 __author__ = 'Sean Lip'
 
 from core.domain import param_domain
+from core.domain import rule_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration
@@ -54,38 +55,45 @@ class RuleSpec(object):
 
     def to_dict(self):
         return {
-            'name': self.name,
-            'inputs': self.inputs,
+            'definition': self.definition,
             'dest': self.dest,
             'feedback': self.feedback,
             'param_changes': [param_change.to_dict()
-                              for param_change in self.param_changes],
+                              for param_change in self.param_changes]
         }
 
     @classmethod
     def from_dict(cls, rulespec_dict):
         return cls(
-            rulespec_dict['name'],
-            rulespec_dict['inputs'],
+            rulespec_dict['definition'],
             rulespec_dict['dest'],
             rulespec_dict['feedback'],
             [param_domain.ParamChange(
                  param_change['name'], param_change['generator_id'],
                  param_change['customization_args'])
-             for param_change in rulespec_dict['param_changes']]
+             for param_change in rulespec_dict['param_changes']],
         )
 
-    def __init__(self, name, inputs, dest, feedback, param_changes):
-        if not name:
-            raise ValueError('No name specified for rule spec')
+    def __init__(self, definition, dest, feedback, param_changes):
         if not dest:
             raise ValueError('No dest specified for rule spec')
 
-        # The name of the rule class.
-        # TODO(sll): Check that this actually corresponds to a rule class.
-        self.name = name
-        # Key-value map of parameters for the classification rule.
-        self.inputs = inputs or {}
+        # TODO(sll): Add validation for the rule definition.
+
+        # A dict specifying the rule definition. E.g.
+        #
+        #   {rule_type: 'default'}
+        #
+        # or
+        #
+        #   {
+        #     'rule_type': 'atomic',
+        #     'name': 'LessThan',
+        #     'subject': 'answer',
+        #     'inputs': {'x': 5}}
+        #   }
+        #
+        self.definition = definition
         # Id of the destination state.
         # TODO(sll): Check that this state is END_DEST or actually exists.
         self.dest = dest
@@ -98,7 +106,7 @@ class RuleSpec(object):
     @property
     def is_default(self):
         """Returns True if this spec corresponds to the default rule."""
-        return self.name == 'Default'
+        return self.definition['rule_type'] == 'default'
 
     def get_feedback_string(self):
         """Returns a (possibly empty) string with feedback for this rule."""
@@ -106,16 +114,21 @@ class RuleSpec(object):
 
     def __str__(self):
         """Returns a string representation of a rule (for the stats log)."""
-        param_list = [
-            utils.to_ascii(self.inputs[key]) for key in self.inputs]
-        return '%s(%s)' % (self.name, ','.join(param_list))
+        if self.definition['rule_type'] == rule_domain.DEFAULT_RULE_TYPE:
+            return 'Default'
+        else:
+            # TODO(sll): Treat non-atomic rules too.
+            param_list = [utils.to_ascii(val) for
+                          (key, val) in self.definition['inputs'].iteritems()]
+            return '%s(%s)' % (self.definition['name'], ','.join(param_list))
 
     @classmethod
     def get_default_rule_spec(cls, state_id):
-        return RuleSpec('Default', {}, state_id, [], [])
+        return RuleSpec({'rule_type': 'default'}, state_id, [], [])
 
 
-DEFAULT_RULESPEC_STR = str(RuleSpec.get_default_rule_spec(feconf.END_DEST))
+DEFAULT_RULESPEC = RuleSpec.get_default_rule_spec(feconf.END_DEST)
+DEFAULT_RULESPEC_STR = str(DEFAULT_RULESPEC)
 
 
 class AnswerHandlerInstance(object):
@@ -143,8 +156,8 @@ class AnswerHandlerInstance(object):
 
         self.name = name
         self.rule_specs = [RuleSpec(
-            rule_spec.name, rule_spec.inputs, rule_spec.dest,
-            rule_spec.feedback, rule_spec.param_changes
+            rule_spec.definition, rule_spec.dest, rule_spec.feedback,
+            rule_spec.param_changes
         ) for rule_spec in rule_specs]
 
     @property

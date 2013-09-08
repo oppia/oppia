@@ -239,8 +239,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.addRuleActionIndex = index;
     var rule = $scope.interactiveRulesets[action][index];
     $scope.addRuleActionDescription = rule.description;
-    $scope.addRuleActionName = rule.name;
-    $scope.addRuleActionInputs = rule.inputs;
+    // TODO(sll): Generalize these to Boolean combinations of rules.
+    $scope.addRuleActionName = rule.definition.name;
+    $scope.addRuleActionInputs = rule.definition.inputs;
     $scope.addRuleActionDest = rule.dest;
     $scope.addRuleActionDestNew = '';
     $scope.addRuleActionFeedback = rule.feedback;
@@ -273,8 +274,12 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     if (description) {
       var extendedRule = {
         description: description,
-        name: name,
-        inputs: inputs,
+        definition: {
+          rule_type: 'atomic',
+          name: name,
+          inputs: inputs,
+          subject: 'answer'
+        },
         dest: dest,
         feedback: feedback
       };
@@ -373,8 +378,9 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       $scope.interactiveWidget = arg.data.widget;
       $scope.interactiveRulesets = {'submit': [{
         'description': 'Default',
-        'name': 'Default',
-        'inputs': {},
+        'definition': {
+          'rule_type': 'default'
+        },
         'dest': $scope.stateId,
         'feedback': [],
         'paramChanges': []

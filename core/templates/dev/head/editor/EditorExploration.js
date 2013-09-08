@@ -295,10 +295,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
           links.push({
             source: nodeList[nodes[state].id],
             target: nodeList[nodes[ruleSpecs[i].dest].id],
-            name: $filter('parameterizeRuleDescription')({
-                description: ruleSpecs[i].description,
-                inputs: ruleSpecs[i].inputs
-            })
+            name: $filter('parameterizeRuleDescription')(ruleSpecs[i])
           });
         }
       }

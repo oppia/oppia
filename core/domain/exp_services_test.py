@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
@@ -231,6 +232,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
 """default_skin: conversation_v1
 param_changes: []
 param_specs: []
+schema_version: 1
 states:
 - content: []
   name: (untitled state)
@@ -240,10 +242,10 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: (untitled state)
+      - definition:
+          rule_type: default
+        dest: (untitled state)
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -255,10 +257,10 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: New state
+      - definition:
+          rule_type: default
+        dest: New state
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -287,8 +289,9 @@ states:
                 'handlers': [{
                     'name': u'submit',
                     'rule_specs': [{
-                        'name': u'Default',
-                        'inputs': {},
+                        'definition': {
+                            u'rule_type': u'default'
+                        },
                         'dest': new_state.id,
                         'feedback': [],
                         'param_changes': [],
@@ -303,7 +306,7 @@ states:
 class StateServicesUnitTests(ExplorationServicesUnitTests):
     """Test methods operating on states."""
 
-    DEFAULT_RULESPEC_STR = 'Default()'
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = 'submit'
 
     def test_convert_state_name_to_id(self):

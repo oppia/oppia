@@ -63,36 +63,3 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
             fake_rule._PARAMS,
             [('x', objects.Number), ('y', objects.UnicodeString)]
         )
-
-    def test_rule_composition(self):
-        fake_rule_1 = FakeRule(2, 'unused')
-        and_rule = rule_domain.AndRule(fake_rule_1, fake_rule_1)
-
-        self.assertTrue(and_rule.eval(2))
-        self.assertFalse(and_rule.eval(3))
-        self.assertEqual(
-            and_rule.description,
-            'is between {{x|Number}} and {{y|UnicodeString}} and '
-            'is between {{x|Number}} and {{y|UnicodeString}}'
-        )
-
-        fake_rule_2 = FakeRule(3, 'unused')
-        or_rule = rule_domain.OrRule(fake_rule_1, fake_rule_2)
-
-        self.assertTrue(or_rule.eval(2))
-        self.assertTrue(or_rule.eval(3))
-        self.assertFalse(or_rule.eval(4))
-        self.assertEqual(
-            or_rule.description,
-            'is between {{x|Number}} and {{y|UnicodeString}} or '
-            'is between {{x|Number}} and {{y|UnicodeString}}'
-        )
-
-        not_rule = rule_domain.NotRule(fake_rule_1)
-
-        self.assertTrue(not_rule.eval(3))
-        self.assertFalse(not_rule.eval(2))
-        self.assertEqual(
-            not_rule.description,
-            'is not between {{x|Number}} and {{y|UnicodeString}}'
-        )

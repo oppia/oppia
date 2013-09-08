@@ -119,7 +119,8 @@ oppia.filter('parameterizeRuleDescription', function() {
       return '';
     }
     var description = input.description;
-    var inputs = input.inputs;
+    // TODO(sll): Generalize this to allow Boolean combinations of rules.
+    var inputs = input.definition.inputs;
 
     var finalRule = description;
 

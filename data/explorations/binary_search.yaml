@@ -39,6 +39,7 @@ param_specs:
   obj_type: UnicodeString
 - name: newHighest
   obj_type: UnicodeString
+schema_version: 1
 states:
 - content:
   - type: text
@@ -69,24 +70,30 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Town Square
+      - definition:
+          inputs:
+            x: binary
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Town Square
         feedback:
         - '"Well, let''s just pretend you don''t know what binary search is and go
           along with the story for a bit, eh?"'
-        inputs:
-          x: binary
-        name: Contains
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: middle
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback: []
-        inputs:
-          x: middle
-        name: Contains
         param_changes: []
-      - dest: Town Square
+      - definition:
+          rule_type: default
+        dest: Town Square
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -101,9 +108,7 @@ states:
       the magician points to you<br>"Think of a number between 1 and 85!"'
   name: Town Square
   param_changes:
-  - name: previousNumber
-    generator_id: RandomSelector
-    customization_args:
+  - customization_args:
       list_of_values:
       - '27'
       - '485'
@@ -114,14 +119,16 @@ states:
       - '858'
       - '203'
       - '869'
-  - name: lowest
-    generator_id: Copier
-    customization_args:
+    generator_id: RandomSelector
+    name: previousNumber
+  - customization_args:
       value: '1'
-  - name: highest
     generator_id: Copier
-    customization_args:
+    name: lowest
+  - customization_args:
       value: '86'
+    generator_id: Copier
+    name: highest
   widget:
     customization_args:
       buttonText:
@@ -129,10 +136,10 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Magician Guesses
+      - definition:
+          rule_type: default
+        dest: Magician Guesses
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -141,11 +148,11 @@ states:
     value: '"Is it {{guess}}?"'
   name: Magician Guesses
   param_changes:
-  - name: guess
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: guess
   widget:
     customization_args:
       choices:
@@ -156,28 +163,37 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: lower-reguess
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: lower-reguess
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: higher-reguess
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: higher-reguess
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: correct
         feedback: []
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          rule_type: default
+        dest: correct
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -186,26 +202,26 @@ states:
     value: '"Is it {{guess}}?"'
   name: lower-reguess
   param_changes:
-  - name: highest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{guess}}'
-      parse_with_jinja: True
-  - name: guess
     generator_id: Copier
-    customization_args:
+    name: highest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
-      parse_with_jinja: True
-  - name: precomputeHighest
     generator_id: Copier
-    customization_args:
+    name: guess
+  - customization_args:
+      parse_with_jinja: true
       value: '{{guess}}'
-      parse_with_jinja: True
-  - name: precomputeGuess
     generator_id: Copier
-    customization_args:
+    name: precomputeHighest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[lowest|int/2]|sum(start=precomputeHighest|int/2)|int}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: precomputeGuess
   widget:
     customization_args:
       choices:
@@ -216,29 +232,38 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: lower-reguess
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: lower-reguess
         feedback:
         - Is it {{precomputeGuess}}?
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: higher-reguess
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: higher-reguess
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: correct
         feedback: []
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          rule_type: default
+        dest: correct
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -247,26 +272,26 @@ states:
     value: '"Is it {{guess}}"?'
   name: higher-reguess
   param_changes:
-  - name: lowest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{guess}}'
-      parse_with_jinja: True
-  - name: guess
     generator_id: Copier
-    customization_args:
+    name: lowest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
-      parse_with_jinja: True
-  - name: precomputeLowest
     generator_id: Copier
-    customization_args:
+    name: guess
+  - customization_args:
+      parse_with_jinja: true
       value: '{{guess}}'
-      parse_with_jinja: True
-  - name: precomputeGuess
     generator_id: Copier
-    customization_args:
+    name: precomputeLowest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[precomputeLowest|int/2]|sum(start=highest|int/2)|int}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: precomputeGuess
   widget:
     customization_args:
       choices:
@@ -277,29 +302,38 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: lower-reguess
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: lower-reguess
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: higher-reguess
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: higher-reguess
         feedback:
         - Is it {{precomputeGuess}}?
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: correct
         feedback: []
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          rule_type: default
+        dest: correct
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -319,29 +353,38 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Pick Limit for Magician
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Pick Limit for Magician
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Discussion Start
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Discussion Start
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Player Guess Setup
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Player Guess Setup
         feedback: []
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: correct
+      - definition:
+          rule_type: default
+        dest: correct
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -355,18 +398,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Pick Limit for Magician
+      - definition:
+          inputs:
+            x: 1000000.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Pick Limit for Magician
         feedback:
         - '"No, that could take me more than 19 guesses! Then everyone would get bored.
           Try something smaller than a million."'
-        inputs:
-          x: 1000000.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: Think of a number
+      - definition:
+          rule_type: default
+        dest: Think of a number
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -386,42 +432,57 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: half
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback: []
-        inputs:
-          x: half
-        name: Contains
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: halves
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback: []
-        inputs:
-          x: halves
-        name: Contains
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: middle
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback: []
-        inputs:
-          x: middle
-        name: Contains
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: divide
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback: []
-        inputs:
-          x: divide
-        name: Contains
         param_changes: []
-      - dest: Discussion Start
+      - definition:
+          inputs:
+            x: binary
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Discussion Start
         feedback:
         - '"What does binary mean?"'
-        inputs:
-          x: binary
-        name: Contains
         param_changes: []
-      - dest: Degenerate Case
+      - definition:
+          rule_type: default
+        dest: Degenerate Case
         feedback:
         - '"Hmm, I have a thought..."'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -431,9 +492,7 @@ states:
       I''ll tell you if it''s bigger or smaller!<br>See if you can get it in 7 guesses!"'
   name: Player Guess Setup
   param_changes:
-  - name: MagicianNumber
-    generator_id: RandomSelector
-    customization_args:
+  - customization_args:
       list_of_values:
       - '5'
       - '16'
@@ -445,40 +504,51 @@ states:
       - '80'
       - '83'
       - '97'
-  - name: tries
-    generator_id: Copier
-    customization_args:
+    generator_id: RandomSelector
+    name: MagicianNumber
+  - customization_args:
       value: '1'
+    generator_id: Copier
+    name: tries
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: PlayerCorrect
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: PlayerCorrect
         feedback:
         - '"Hey, that''s right! first try - beginner''s luck!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: Equals
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: PlayerGuessing
         feedback:
         - '"No, it''s smaller than that!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: PlayerGuessing
         feedback:
         - '"No, it''s bigger than that!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: IsLessThan
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          rule_type: default
+        dest: PlayerGuessing
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -507,30 +577,36 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: practice ranges
+      - definition:
+          inputs:
+            x: 5-7
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: practice ranges
         feedback:
         - '"You got it!"'
-        inputs:
-          x: 5-7
-        name: Contains
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '-'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - That's not right... Remember, we already knew it was greater than 5. And
           the magician gave us a new number it's smaller than.
         - That's not right... Remember, the magician told us it's smaller than 7.
           And we already had a number it was greater than.
-        inputs:
-          x: '-'
-        name: Contains
         param_changes: []
-      - dest: Ranges
+      - definition:
+          rule_type: default
+        dest: Ranges
         feedback:
         - 'I don''t think you''ve got the format right - it should be something like:
 
           X-Y except X and Y will be numbers.'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -539,15 +615,15 @@ states:
     value: '"OK, think of a number between {{lowest}} and {{highest|int-1}}"!'
   name: Think of a number
   param_changes:
-  - name: highest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer|int+1}}'
-      parse_with_jinja: True
-  - name: lowest
     generator_id: Copier
-    customization_args:
+    name: highest
+  - customization_args:
       value: '1'
+    generator_id: Copier
+    name: lowest
   widget:
     customization_args:
       buttonText:
@@ -555,52 +631,61 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Magician Guesses
+      - definition:
+          rule_type: default
+        dest: Magician Guesses
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
 - content: []
   name: PlayerGuessing
   param_changes:
-  - name: tries
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{[tries|int]|sum(start=1)}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: tries
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: PlayerCorrect
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: PlayerCorrect
         feedback:
         - '"That''s right!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: Equals
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: PlayerGuessing
         feedback:
         - '"No, it''s bigger than that!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: IsLessThan
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          inputs:
+            x: '{{MagicianNumber}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: PlayerGuessing
         feedback:
         - '"No, it''s smaller than that!"'
-        inputs:
-          x: '{{MagicianNumber}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: PlayerGuessing
+      - definition:
+          rule_type: default
+        dest: PlayerGuessing
         feedback:
         - '"This should never happen"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -614,10 +699,10 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: correct
+      - definition:
+          rule_type: default
+        dest: correct
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -636,35 +721,44 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Middle try it out
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Middle try it out
         feedback:
         - '"Exactly! A range of 6 numbers is worse than a range of 3 numbers, and
           certainly worse than being right on the first try!"'
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"No, that doesn''t make sense. Winning is the best possible thing, not
           the worst!"'
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"No, I don''t think so. In this case we would have a range of just 3 numbers
           left to guess. There''s a worse case."'
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: Middle try it out
+      - definition:
+          rule_type: default
+        dest: Middle try it out
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -682,29 +776,35 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Three Case
+      - definition:
+          inputs:
+            x: 2.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Three Case
         feedback:
         - '"Right! since it can only be 1 or 2, whatever I choose first, I could be
           wrong; but then I can always get it right on the second try"'
-        inputs:
-          x: 2.0
-        name: Equals
         param_changes: []
-      - dest: Degenerate Case
+      - definition:
+          inputs:
+            x: 2.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Degenerate Case
         feedback:
         - '"I don''t think I can always get it that fast though. If you''re thinking
           of a 1 or a 2 and I''m just guessing, there''s always a chance I don''t
           get it right at first."'
-        inputs:
-          x: 2.0
-        name: IsLessThan
         param_changes: []
-      - dest: Degenerate Case
+      - definition:
+          rule_type: default
+        dest: Degenerate Case
         feedback:
         - '"No, I don''t think I would ever need that many tries... All I''m trying
           to do is guess whether you''re thinking 1 or 2!"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -720,32 +820,41 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Three Case
+      - definition:
+          inputs:
+            x: 3.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Three Case
         feedback:
         - '"No, I don''t think I ever need more than 3 guesses if I''m only guessing
           3 numbers."'
-        inputs:
-          x: 3.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: 2.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"Oh! You think we can still do it in 2?"'
-        inputs:
-          x: 2.0
-        name: Equals
         param_changes: []
-      - dest: 3 case 3 tries
+      - definition:
+          inputs:
+            x: 3.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: 3 case 3 tries
         feedback: []
-        inputs:
-          x: 3.0
-        name: Equals
         param_changes: []
-      - dest: Three Case
+      - definition:
+          rule_type: default
+        dest: Three Case
         feedback:
         - '"But I made the range bigger! how can I possible need fewer guesses now?"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -767,39 +876,48 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"But then in the worst case, the number could be either 2 or 3, and we''d
           only have one try left to pick between those two! And all we would know
           is that it''s bigger than 1!"'
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"But then in the worst case, the number could be either 1 or 2, and we''d
           only have one try left to pick between those two. And all we would know
           is that it''s smaller than 3!"'
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: After three case
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: After three case
         feedback:
         - '"Interesting! If we pick 2 the first time, then in the worst case the number
           is either 1 or 3. But the Magician will also tell us if the number is smaller
           or greater than our guess! So we''ll be able to tell whether it''s 1 or
           3 because we''ll know if it''s bigger or smaller than 2!"'
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          rule_type: default
+        dest: Explain two guesses
         feedback:
         - '"There should be no default"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -817,59 +935,77 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: bigger
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"Oh yeah! when the magician responds to our guess, he also tells us if
           his number is bigger or smaller!"'
-        inputs:
-          x: bigger
-        name: Contains
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: smaller
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"Oh yeah! when the magician responds to our guess, he also tells us if
           his number is bigger or smaller!"'
-        inputs:
-          x: smaller
-        name: Contains
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: lower
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback: []
-        inputs:
-          x: lower
-        name: Contains
         param_changes: []
-      - dest: Explain two guesses
+      - definition:
+          inputs:
+            x: higher
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Explain two guesses
         feedback:
         - '"Oh yeah! when the magician responds to our guess, he also tells us if
           his number is bigger or smaller!"'
-        inputs:
-          x: higher
-        name: Contains
         param_changes: []
-      - dest: After three case
+      - definition:
+          inputs:
+            x: '2'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: After three case
         feedback:
         - '"Oh! so if we guess ''2'' as our first try, then we know what number to
           guess on the second try, even if 2 wasn''t right!"'
-        inputs:
-          x: '2'
-        name: Contains
         param_changes: []
-      - dest: After three case
+      - definition:
+          inputs:
+            x: two
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: After three case
         feedback:
         - '"Oh! so if we guess ''2'' as our first try, then we know what number to
           guess on the second try, even if 2 wasn''t right!"'
-        inputs:
-          x: two
-        name: Contains
         param_changes: []
-      - dest: 3 case 3 tries
+      - definition:
+          rule_type: default
+        dest: 3 case 3 tries
         feedback:
         - '"What kind of extra information does the magician give us?"'
         - '"What else do we know about the magician''s number after we make our guess?"'
         - '"What can we use to eliminate more than one number with our first guess?"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -891,57 +1027,78 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: double
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback: []
-        inputs:
-          x: double
-        name: Contains
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: twice
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback: []
-        inputs:
-          x: twice
-        name: Contains
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: two
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback: []
-        inputs:
-          x: two
-        name: Contains
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: '6'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback:
         - '"Six! Whoa, that''s twice as many!"'
-        inputs:
-          x: '6'
-        name: Contains
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: six
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback:
         - '"Six! Whoa, that''s twice as many!"'
-        inputs:
-          x: six
-        name: Contains
         param_changes: []
-      - dest: 3 tries 7 numbers
+      - definition:
+          inputs:
+            x: '7'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: 3 tries 7 numbers
         feedback: []
-        inputs:
-          x: '7'
-        name: Contains
         param_changes: []
-      - dest: 3 tries 7 numbers
+      - definition:
+          inputs:
+            x: seven
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: 3 tries 7 numbers
         feedback: []
-        inputs:
-          x: seven
-        name: Contains
         param_changes: []
-      - dest: Reduce 3 guesses to 2
+      - definition:
+          rule_type: default
+        dest: Reduce 3 guesses to 2
         feedback:
         - '"Here is another thing I like to do when I''m thinking about a hard question.
           I try to imagine what the world would be like if I already knew the answer,
           and what it would feel like."'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -956,7 +1113,13 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Three tries explanation
+      - definition:
+          inputs:
+            x: 4.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Three tries explanation
         feedback:
         - '"I see! So if the magician said it was smaller than that, we would be back
           to the ''between 1 and 3'' case!"
@@ -968,36 +1131,39 @@ states:
           "But what if he said it was bigger than 4? Then we would still have to guess
           a number between 5 and 7... But wait, that''s the same thing as between
           1 and 3, just shifted over!"'
-        inputs:
-          x: 4.0
-        name: Equals
         param_changes: []
-      - dest: 3 tries 7 numbers
+      - definition:
+          inputs:
+            x: 4.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: 3 tries 7 numbers
         feedback:
         - '"OK, but what if the magician says that his number is greater than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between {{[answer|int]|sum(start=1)}} and 7. That''s {{[7|int]|sum(start=-answer)}}
           possible options! I don''t think we could do that in 2 tries."'
-        inputs:
-          x: 4.0
-        name: IsLessThan
         param_changes: []
-      - dest: 3 tries 7 numbers
+      - definition:
+          inputs:
+            x: 4.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: 3 tries 7 numbers
         feedback:
         - '"OK, but what if the magician says that his number is smaller than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
           possible options! I don''t think we could do that in 2 tries. We can do
           between 1 and 3 in 2 tries though..."'
-        inputs:
-          x: 4.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: 3 tries 7 numbers
+      - definition:
+          rule_type: default
+        dest: 3 tries 7 numbers
         feedback:
         - But that's not even between 1 and 7!
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1014,7 +1180,14 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Add one more
+      - definition:
+          inputs:
+            a: 3.0
+            b: 4.0
+          name: IsInclusivelyBetween
+          rule_type: atomic
+          subject: answer
+        dest: Add one more
         feedback:
         - '"So if the magician said it was smaller than that, we would be back to
           the ''between 1 and {{[answer|int]|sum(start=-1)}}'' case!"
@@ -1027,37 +1200,39 @@ states:
           have to guess a number between {{[answer|int]|sum(start=1)}} and 6... But
           wait, that''s the same thing as between 1 and {{[6]|sum(start=-answer|int)}},
           just shifted over a bit!"'
-        inputs:
-          a: 3.0
-          b: 4.0
-        name: IsInclusivelyBetween
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: 3.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback:
         - '"OK, but what if the magician says that his number is greater than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between {{[answer|int]|sum(start=1)}} and 6. That''s {{[6|int]|sum(start=-answer)}}
           possible options! I don''t think we could do that in 2 tries."'
-        inputs:
-          x: 3.0
-        name: IsLessThan
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          inputs:
+            x: 4.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Doubling range concept
         feedback:
         - '"OK, but what if the magician says that his number is smaller than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
           possible options! I don''t think we could do that in 2 tries. We can do
           between 1 and 3 in 2 tries though..."'
-        inputs:
-          x: 4.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: Doubling range concept
+      - definition:
+          rule_type: default
+        dest: Doubling range concept
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1086,35 +1261,44 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Reduce 3 guesses to 2
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Reduce 3 guesses to 2
         feedback:
         - '"But if our first guess was correct, we wouldn''t need any more guesses!"'
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: Reduce 3 guesses to 2
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Reduce 3 guesses to 2
         feedback:
         - '"No, I don''t think we could ever make a reasonable guess where the number
           turned out to be between 1 and 3 and was bigger than our guess"'
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Reduce2 - what was the guess
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Reduce2 - what was the guess
         feedback:
         - '"Yeah, that sounds right! if we narrowed it down to between 1 and 3, then
           it''s a pretty small number, and we must have guessed something slightly
           bigger!"'
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Reduce 3 guesses to 2
+      - definition:
+          rule_type: default
+        dest: Reduce 3 guesses to 2
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -1129,18 +1313,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: What if it was bigger than 4
+      - definition:
+          inputs:
+            x: 4.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: What if it was bigger than 4
         feedback: []
-        inputs:
-          x: 4.0
-        name: Equals
         param_changes: []
-      - dest: Reduce2 - what was the guess
+      - definition:
+          rule_type: default
+        dest: Reduce2 - what was the guess
         feedback:
         - '"Hmm, but if the number was less than {{answer}}, wouldn''t it be between
           1 and {{[answer|int]|sum(start=-1)}}?"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1167,44 +1354,56 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Three tries explanation
+      - definition:
+          inputs:
+            x: 7.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Three tries explanation
         feedback:
         - '"Aha! ''between 5 and 7'' is just like ''between 1 and 3'' but shifted
           over to be bigger than 4!"'
-        inputs:
-          x: 7.0
-        name: Equals
         param_changes: []
-      - dest: What if it was bigger than 4
+      - definition:
+          inputs:
+            x: 5.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: What if it was bigger than 4
         feedback:
         - '"Wait, that doesn''t make sense! how can a number be greater than 4 but
           less than {{answer}}?"'
-        inputs:
-          x: 5.0
-        name: IsLessThan
         param_changes: []
-      - dest: What if it was bigger than 4
+      - definition:
+          inputs:
+            x: 7.0
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: What if it was bigger than 4
         feedback:
         - '"Hmm, I suppose it''s pretty easy to guess a number between 5 and {{answer}}
           in 2 tries, but I think we can do even better!"'
-        inputs:
-          x: 7.0
-        name: IsLessThan
         param_changes: []
-      - dest: What if it was bigger than 4
+      - definition:
+          inputs:
+            x: 7.0
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: What if it was bigger than 4
         feedback:
         - But there are {{[answer|int]|sum(start=-4)}} numbers between 5 and {{answer}}!
           I don't think we can always find the right number in 2 tries if the range
           is that big.
-        inputs:
-          x: 7.0
-        name: IsGreaterThan
         param_changes: []
-      - dest: What if it was bigger than 4
+      - definition:
+          rule_type: default
+        dest: What if it was bigger than 4
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1232,29 +1431,38 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Worst Case start
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case start
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Magician or Player guess
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Magician or Player guess
         feedback: []
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: Three tries explanation
+      - definition:
+          rule_type: default
+        dest: Three tries explanation
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -1273,33 +1481,42 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Three tries explanation
+      - definition:
+          inputs:
+            x: '7'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Three tries explanation
         feedback:
         - '"Exactly!"'
-        inputs:
-          x: '7'
-        name: Contains
         param_changes: []
-      - dest: Three tries explanation
+      - definition:
+          inputs:
+            x: seven
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Three tries explanation
         feedback:
         - '"Yeah!"'
-        inputs:
-          x: seven
-        name: Contains
         param_changes: []
-      - dest: Three tries explanation
+      - definition:
+          inputs:
+            x: '"one more"'
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Three tries explanation
         feedback:
         - '"That''s what I was thinking!"'
-        inputs:
-          x: '"one more"'
-        name: Contains
         param_changes: []
-      - dest: Three tries explanation
+      - definition:
+          rule_type: default
+        dest: Three tries explanation
         feedback:
         - '"... That we can actually add one more number to the range! We can do numbers
           from 1 to 7 in three tries!"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -1311,18 +1528,18 @@ states:
       </b>as well in all the other cases, and maybe even better!"<br>'
   name: Worst Case start
   param_changes:
-  - name: lowest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
       value: '0'
-  - name: highest
     generator_id: Copier
-    customization_args:
+    name: lowest
+  - customization_args:
       value: '31'
-  - name: tries
     generator_id: Copier
-    customization_args:
+    name: highest
+  - customization_args:
       value: '0'
+    generator_id: Copier
+    name: tries
   widget:
     customization_args:
       buttonText:
@@ -1330,11 +1547,11 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Worst Case Guess
+      - definition:
+          rule_type: default
+        dest: Worst Case Guess
         feedback:
         - '"OK, try to guess a number between 1 and 30!"'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -1354,23 +1571,29 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Pick Limit for Magician
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Pick Limit for Magician
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Player Guess Setup
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Player Guess Setup
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Magician or Player guess
+      - definition:
+          rule_type: default
+        dest: Magician or Player guess
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -1379,87 +1602,108 @@ states:
     value: ' '
   name: Worst Case Guess
   param_changes:
-  - name: worstnum
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
-      parse_with_jinja: True
-  - name: rangeSize
     generator_id: Copier
-    customization_args:
+    name: worstnum
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-lowest|int-1}}'
-      parse_with_jinja: True
-  - name: tries
     generator_id: Copier
-    customization_args:
+    name: rangeSize
+  - customization_args:
+      parse_with_jinja: true
       value: '{{tries|int+1}}'
-      parse_with_jinja: True
-  - name: middle
     generator_id: Copier
-    customization_args:
+    name: tries
+  - customization_args:
+      parse_with_jinja: true
       value: '{{(highest|int+lowest|int)/2}}'
-      parse_with_jinja: True
-  - name: largestValidRange
     generator_id: Copier
-    customization_args:
+    name: middle
+  - customization_args:
+      parse_with_jinja: true
       value: '{{2**((rangeSize|float)|log2_floor)-1}}'
-      parse_with_jinja: True
-  - name: upperBound
     generator_id: Copier
-    customization_args:
+    name: largestValidRange
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+largestValidRange|int+1}}'
-      parse_with_jinja: True
-  - name: lowerBound
     generator_id: Copier
-    customization_args:
+    name: upperBound
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-largestValidRange|int-1}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: lowerBound
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{lowest}}'
+          name: IsLessThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - '"Wait, but I already said that the number is bigger than {{lowest}}!
 
           Hmm, there''s gotta be a better way of keeping track of that than just looking
           through all the answers all the time..."'
-        inputs:
-          x: '{{lowest}}'
-        name: IsLessThanOrEqualTo
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{highest}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - "\"Wait, but I already said that the number is smaller than {{highest}}!\
           \ \nHmm, there's gotta be a better way of keeping track of this than just\
           \ looking through all the previous answers all the time.\""
-        inputs:
-          x: '{{highest}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Worst Case Finished
+      - definition:
+          inputs:
+            x: '{{worstnum}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case Finished
         feedback:
         - That's right!
-        inputs:
-          x: '{{worstnum}}'
-        name: Equals
         param_changes: []
-      - dest: worst case bigger
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: worst case bigger
         feedback:
         - '"Let''s say that the number is bigger than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsLessThan
         param_changes: []
-      - dest: worst case smaller
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: worst case smaller
         feedback:
         - '"Let''s say that the number is smaller than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{upperBound}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1467,11 +1711,14 @@ states:
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{upperBound}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{lowerBound}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1479,11 +1726,10 @@ states:
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{lowerBound}}'
-        name: IsLessThan
         param_changes: []
-      - dest: Worst Case Guess
+      - definition:
+          rule_type: default
+        dest: Worst Case Guess
         feedback:
         - '{{rangeSize}}
 
@@ -1492,8 +1738,6 @@ states:
           {{answer}}
 
           {{middle}}'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1514,11 +1758,11 @@ states:
       path, planning your next adventure...<br><br>'
   name: Worst Case Finished
   param_changes:
-  - name: OptimalityProxy
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{'''' if (tries|int)<=5 else ''false''}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: OptimalityProxy
   widget:
     customization_args:
       buttonText:
@@ -1526,107 +1770,128 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: END
+      - definition:
+          rule_type: default
+        dest: END
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
 - content: []
   name: worst case smaller
   param_changes:
-  - name: highest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer}}'
-      parse_with_jinja: True
-  - name: guess
     generator_id: Copier
-    customization_args:
+    name: highest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer}}'
-      parse_with_jinja: True
-  - name: worstnum
     generator_id: Copier
-    customization_args:
+    name: guess
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
-      parse_with_jinja: True
-  - name: rangeSize
     generator_id: Copier
-    customization_args:
+    name: worstnum
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-lowest|int-1}}'
-      parse_with_jinja: True
-  - name: tries
     generator_id: Copier
-    customization_args:
+    name: rangeSize
+  - customization_args:
+      parse_with_jinja: true
       value: '{{tries|int+1}}'
-      parse_with_jinja: True
-  - name: middle
     generator_id: Copier
-    customization_args:
+    name: tries
+  - customization_args:
+      parse_with_jinja: true
       value: '{{(highest|int+lowest|int)/2}}'
-      parse_with_jinja: True
-  - name: largestValidRange
     generator_id: Copier
-    customization_args:
+    name: middle
+  - customization_args:
+      parse_with_jinja: true
       value: '{{2**((rangeSize|float)|log2_floor)-1}}'
-      parse_with_jinja: True
-  - name: upperBound
     generator_id: Copier
-    customization_args:
+    name: largestValidRange
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+largestValidRange|int+1}}'
-      parse_with_jinja: True
-  - name: lowerBound
     generator_id: Copier
-    customization_args:
+    name: upperBound
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-largestValidRange|int-1}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: lowerBound
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{lowest}}'
+          name: IsLessThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - '"Wait, but I already said that the number is bigger than {{lowest}}!
 
           Hmm, there''s gotta be a better way of keeping track of that than just looking
           through all the answers all the time..."'
-        inputs:
-          x: '{{lowest}}'
-        name: IsLessThanOrEqualTo
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{highest}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - "\"Wait, but I already said that the number is smaller than {{highest}}!\
           \ \nHmm, there's gotta be a better way of keeping track of this than just\
           \ looking through all the previous answers all the time.\""
-        inputs:
-          x: '{{highest}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Worst Case Finished
+      - definition:
+          inputs:
+            x: '{{worstnum}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case Finished
         feedback:
         - That's right!
-        inputs:
-          x: '{{worstnum}}'
-        name: Equals
         param_changes: []
-      - dest: worst case bigger
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: worst case bigger
         feedback:
         - '"Let''s say that the number is bigger than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsLessThan
         param_changes: []
-      - dest: worst case smaller
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: worst case smaller
         feedback:
         - '"Let''s say that the number is smaller than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{upperBound}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1634,11 +1899,14 @@ states:
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{upperBound}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{lowerBound}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1646,11 +1914,10 @@ states:
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{lowerBound}}'
-        name: IsLessThan
         param_changes: []
-      - dest: Worst Case Guess
+      - definition:
+          rule_type: default
+        dest: Worst Case Guess
         feedback:
         - '{{rangeSize}}
 
@@ -1659,105 +1926,124 @@ states:
           {{answer}}
 
           {{middle}}'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
 - content: []
   name: worst case bigger
   param_changes:
-  - name: lowest
-    generator_id: Copier
-    customization_args:
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer}}'
-      parse_with_jinja: True
-  - name: guess
     generator_id: Copier
-    customization_args:
+    name: lowest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{answer}}'
-      parse_with_jinja: True
-  - name: worstnum
     generator_id: Copier
-    customization_args:
+    name: guess
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
-      parse_with_jinja: True
-  - name: rangeSize
     generator_id: Copier
-    customization_args:
+    name: worstnum
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-lowest|int-1}}'
-      parse_with_jinja: True
-  - name: tries
     generator_id: Copier
-    customization_args:
+    name: rangeSize
+  - customization_args:
+      parse_with_jinja: true
       value: '{{tries|int+1}}'
-      parse_with_jinja: True
-  - name: middle
     generator_id: Copier
-    customization_args:
+    name: tries
+  - customization_args:
+      parse_with_jinja: true
       value: '{{(highest|int+lowest|int)/2}}'
-      parse_with_jinja: True
-  - name: largestValidRange
     generator_id: Copier
-    customization_args:
+    name: middle
+  - customization_args:
+      parse_with_jinja: true
       value: '{{2**((rangeSize|float)|log2_floor)-1}}'
-      parse_with_jinja: True
-  - name: upperBound
     generator_id: Copier
-    customization_args:
+    name: largestValidRange
+  - customization_args:
+      parse_with_jinja: true
       value: '{{lowest|int+largestValidRange|int+1}}'
-      parse_with_jinja: True
-  - name: lowerBound
     generator_id: Copier
-    customization_args:
+    name: upperBound
+  - customization_args:
+      parse_with_jinja: true
       value: '{{highest|int-largestValidRange|int-1}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: lowerBound
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{lowest}}'
+          name: IsLessThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - '"Wait, but I already said that the number is bigger than {{lowest}}!
 
           Hmm, there''s gotta be a better way of keeping track of that than just looking
           through all the answers all the time..."'
-        inputs:
-          x: '{{lowest}}'
-        name: IsLessThanOrEqualTo
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: '{{highest}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback:
         - "\"Wait, but I already said that the number is smaller than {{highest}}!\
           \ \nHmm, there's gotta be a better way of keeping track of this than just\
           \ looking through all the previous answers all the time.\""
-        inputs:
-          x: '{{highest}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Worst Case Finished
+      - definition:
+          inputs:
+            x: '{{worstnum}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case Finished
         feedback:
         - That's right!
-        inputs:
-          x: '{{worstnum}}'
-        name: Equals
         param_changes: []
-      - dest: worst case bigger
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: worst case bigger
         feedback:
         - '"Let''s say that the number is bigger than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsLessThan
         param_changes: []
-      - dest: worst case smaller
+      - definition:
+          inputs:
+            x: '{{middle}}'
+          name: IsGreaterThanOrEqualTo
+          rule_type: atomic
+          subject: answer
+        dest: worst case smaller
         feedback:
         - '"Let''s say that the number is smaller than that"'
-        inputs:
-          x: '{{middle}}'
-        name: IsGreaterThanOrEqualTo
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{upperBound}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1765,11 +2051,14 @@ states:
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{upperBound}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: Picking in the middle
+      - definition:
+          inputs:
+            x: '{{lowerBound}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
         feedback:
         - '"Hmm, I don''t know if that was the best guess to make.
 
@@ -1777,11 +2066,10 @@ states:
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
           that''s too many, we can do better."'
-        inputs:
-          x: '{{lowerBound}}'
-        name: IsLessThan
         param_changes: []
-      - dest: Worst Case Guess
+      - definition:
+          rule_type: default
+        dest: Worst Case Guess
         feedback:
         - '{{rangeSize}}
 
@@ -1790,8 +2078,6 @@ states:
           {{answer}}
 
           {{middle}}'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1819,13 +2105,18 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Middle Explanation
+      - definition:
+          inputs:
+            x: 10
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Middle Explanation
         feedback: []
-        inputs:
-          x: 10
-        name: Equals
         param_changes: []
-      - dest: Middle try it out
+      - definition:
+          rule_type: default
+        dest: Middle try it out
         feedback:
         - 'If it''s less than {{(answer|int)+1}}, then the number is between 1 and
           {{answer}}. That is a range of {{answer}} numbers. {{"Oh wait, it doesn''t
@@ -1841,8 +2132,6 @@ states:
           and 10. That''s a range of {{9-(answer|int)}} numbers. {{"Oh wait, it doesn''t
           make sense for the number to be bigger than 10! We''re guessing a number
           between 1 and 10!" if 9==(answer|int) else ""}}'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -1867,23 +2156,29 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Worst Case start
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case start
         feedback: []
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Ranges
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback: []
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Middle Explanation
+      - definition:
+          rule_type: default
+        dest: Middle Explanation
         feedback:
         - ERROR
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -1895,72 +2190,78 @@ states:
       That is, what is our number <b>smaller than</b>?'
   name: practice ranges
   param_changes:
-  - name: lowest
-    generator_id: RandomSelector
-    customization_args:
+  - customization_args:
       list_of_values:
       - '1'
       - '2'
       - '3'
       - '4'
       - '5'
-  - name: highest
     generator_id: RandomSelector
-    customization_args:
+    name: lowest
+  - customization_args:
       list_of_values:
       - '10'
       - '11'
       - '12'
       - '13'
-  - name: guess
     generator_id: RandomSelector
-    customization_args:
+    name: highest
+  - customization_args:
       list_of_values:
       - '6'
       - '7'
       - '8'
       - '9'
-  - name: comparison
     generator_id: RandomSelector
-    customization_args:
+    name: guess
+  - customization_args:
       list_of_values:
       - bigger
       - smaller
-  - name: newLowest
-    generator_id: Copier
-    customization_args:
+    generator_id: RandomSelector
+    name: comparison
+  - customization_args:
+      parse_with_jinja: true
       value: '{{ lowest if comparison=="smaller" else guess}}'
-      parse_with_jinja: True
-  - name: newHighest
     generator_id: Copier
-    customization_args:
+    name: newLowest
+  - customization_args:
+      parse_with_jinja: true
       value: '{{ highest if comparison=="bigger" else guess}}'
-      parse_with_jinja: True
+    generator_id: Copier
+    name: newHighest
   widget:
     customization_args: {}
     handlers:
     - name: submit
       rule_specs:
-      - dest: practice ranges lowest
+      - definition:
+          inputs:
+            x: '{{newHighest}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: practice ranges lowest
         feedback:
         - '"Yep!"'
-        inputs:
-          x: '{{newHighest}}'
-        name: Equals
         param_changes: []
-      - dest: practice ranges
+      - definition:
+          inputs:
+            x: '{{newHighest}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: practice ranges
         feedback:
         - Well, technically that's true... it does have to be smaller than {{answer}}.
           But we can be even more precise!
-        inputs:
-          x: '{{newHighest}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: practice ranges
+      - definition:
+          rule_type: default
+        dest: practice ranges
         feedback:
         - No, we can't really say that!
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -1975,28 +2276,34 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Worst Case start
+      - definition:
+          inputs:
+            x: '{{newLowest}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case start
         feedback:
         - '"You got it! Alright, now let''s practice the whole game!"'
-        inputs:
-          x: '{{newLowest}}'
-        name: Equals
         param_changes: []
-      - dest: practice ranges lowest
+      - definition:
+          inputs:
+            x: '{{newLowest}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: practice ranges lowest
         feedback:
         - '"Technically, it does have to be smaller than {{answer}}... but that''s
           not the best we can do! What''s the biggest number it has to be smaller
           than?"'
-        inputs:
-          x: '{{newLowest}}'
-        name: IsLessThan
         param_changes: []
-      - dest: practice ranges lowest
+      - definition:
+          rule_type: default
+        dest: practice ranges lowest
         feedback:
         - '"No, that''s not right... the number doesn''t have to be bigger than that
           based on the information we have."'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput

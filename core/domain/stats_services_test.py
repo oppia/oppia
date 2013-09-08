@@ -18,6 +18,7 @@ __author__ = 'Jeremy Emerson'
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 
@@ -245,11 +246,14 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
 
-        not_default_rule_spec = exp_domain.RuleSpec(
-            'NotDefault', {}, exp.init_state.id, [], [])
+        not_default_rule_spec = exp_domain.RuleSpec({
+            'rule_type': rule_domain.ATOMIC_RULE_TYPE,
+            'name': 'NotDefault',
+            'inputs': {},
+            'subject': 'answer'
+        }, exp.init_state.id, [], [])
         exp.init_state.widget.handlers[0].rule_specs = [
-            not_default_rule_spec,
-            exp_domain.RuleSpec('Default', {}, exp.init_state.id, [], []),
+            not_default_rule_spec, exp_domain.DEFAULT_RULESPEC
         ]
         exp_services.save_state('fake@user.com', exp.id, exp.init_state)
 

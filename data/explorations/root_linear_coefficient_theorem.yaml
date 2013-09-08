@@ -1,6 +1,7 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs: []
+schema_version: 1
 states:
 - content:
   - type: text
@@ -15,10 +16,10 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Simple Expansion
+      - definition:
+          rule_type: default
+        dest: Simple Expansion
         feedback: []
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue
@@ -35,18 +36,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: More General Expansion
+      - definition:
+          inputs:
+            x: 1,-6,-1,30
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: More General Expansion
         feedback:
         - Good!  Now let's look at a slightly more general expansion.
-        inputs:
-          x: 1,-6,-1,30
-        name: Equals
         param_changes: []
-      - dest: Simple Expansion
+      - definition:
+          rule_type: default
+        dest: Simple Expansion
         feedback:
         - Sorry, try again.  Remember to format it exactly as shown.
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -66,18 +70,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Particular coefficients (part 1)
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Particular coefficients (part 1)
         feedback:
         - Great!
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: More General Expansion
+      - definition:
+          rule_type: default
+        dest: More General Expansion
         feedback:
         - Nope!  Try again.
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -100,18 +107,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Particular coefficients (part 2)
+      - definition:
+          inputs:
+            x: 3
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Particular coefficients (part 2)
         feedback:
         - That's correct!
-        inputs:
-          x: 3
-        name: Equals
         param_changes: []
-      - dest: Particular coefficients (part 1)
+      - definition:
+          rule_type: default
+        dest: Particular coefficients (part 1)
         feedback:
         - Nope!  Try again.
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -141,20 +151,23 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Coefficient Signs
+      - definition:
+          inputs:
+            x: 3
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient Signs
         feedback:
         - Yep!  Admit it, you just chose the longest answer...
-        inputs:
-          x: 3
-        name: Equals
         param_changes: []
-      - dest: Particular coefficients (part 2)
+      - definition:
+          rule_type: default
+        dest: Particular coefficients (part 2)
         feedback:
         - 'This one''s a little tricky.  Maybe trying on this case will help you out?
 
           (x - a1) * (x - a2) * (x - a3)'
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -179,41 +192,53 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Quotient of terms
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Quotient of terms
         feedback:
         - Good.  As a side note, what do you think the sign is of the x^i term given
           n is even? Given n is odd?
-        inputs:
-          x: 0
-        name: Equals
         param_changes: []
-      - dest: Coefficient signs WA1
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient signs WA1
         feedback:
         - Hmm... that's a bit weird isn't it?  The expression had only negative signs,
           and your answer has all positive signs...
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Coefficient signs WA1
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient signs WA1
         feedback:
         - That looks correct, but let's try a sample case just to make sure.
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: Coefficient signs WA2
+      - definition:
+          inputs:
+            x: 3
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient signs WA2
         feedback:
         - That looks a little fishy... let's try a sample case just to be sure...
-        inputs:
-          x: 3
-        name: Equals
         param_changes: []
-      - dest: Coefficient Signs
+      - definition:
+          rule_type: default
+        dest: Coefficient Signs
         feedback:
         - Oops, if you have reached this case, something has gone wrong...
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -235,19 +260,22 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Quotient part 2
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Quotient part 2
         feedback:
         - Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative, but 3 /
           5 is positive.
-        inputs:
-          x: 1
-        name: Equals
         param_changes: []
-      - dest: Quotient of terms
+      - definition:
+          rule_type: default
+        dest: Quotient of terms
         feedback:
         - Try again!  (If you're wrong this time... I have no words for you...)
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -263,19 +291,22 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Coefficient Signs
+      - definition:
+          inputs:
+            x: -12.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient Signs
         feedback:
         - Right!  But wait-- that's not positive.  Let's try the previous question
           again...
-        inputs:
-          x: -12.0
-        name: Equals
         param_changes: []
-      - dest: Coefficient signs WA1
+      - definition:
+          rule_type: default
+        dest: Coefficient signs WA1
         feedback:
         - Try again.  We want the constant term.
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -292,18 +323,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Coefficient Signs
+      - definition:
+          inputs:
+            x: 12.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Coefficient Signs
         feedback:
         - Right.  And that's not negative.  Let's try the previous question again...
-        inputs:
-          x: 12.0
-        name: Equals
         param_changes: []
-      - dest: Coefficient signs WA2
+      - definition:
+          rule_type: default
+        dest: Coefficient signs WA2
         feedback:
         - Nope!  Try again.
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: NumericInput
@@ -327,18 +361,21 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: Theorem
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Theorem
         feedback:
         - Yep... that leads us to the statement of the theorem...
-        inputs:
-          x: 2
-        name: Equals
         param_changes: []
-      - dest: Quotient part 2
+      - definition:
+          rule_type: default
+        dest: Quotient part 2
         feedback:
         - Oops, that's not right.  Careful; signs can be tricky!
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -356,12 +393,12 @@ states:
     handlers:
     - name: submit
       rule_specs:
-      - dest: END
+      - definition:
+          rule_type: default
+        dest: END
         feedback:
         - Congrats!  We may use this theorem later on to prove something even more
           interesting...
-        inputs: {}
-        name: Default
         param_changes: []
     sticky: false
     widget_id: Continue

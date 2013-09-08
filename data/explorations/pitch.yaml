@@ -1,8 +1,6 @@
 default_skin: conversation_v1
 param_changes:
-- name: noteStart
-  generator_id: RandomSelector
-  customization_args:
+- customization_args:
     list_of_values:
     - C4
     - D4
@@ -15,62 +13,76 @@ param_changes:
     - D5
     - E5
     - F5
+  generator_id: RandomSelector
+  name: noteStart
 param_specs:
 - name: noteStart
   obj_type: UnicodeString
+schema_version: 1
 states:
-- name: Main window
-  content:
+- content:
   - type: text
-    value: 'This exploration will help you develop your skills at recognizing music
-      note pitches.
-      <br><br>
-      When you''re ready, click the button to play a note. Listen to it, and guess
-      what it is by moving the note to the right place on the staff using the up and
-      down arrow keys. When you think you have it, click the ''check answer'' button.'
+    value: This exploration will help you develop your skills at recognizing music
+      note pitches. <br><br> When you're ready, click the button to play a note. Listen
+      to it, and guess what it is by moving the note to the right place on the staff
+      using the up and down arrow keys. When you think you have it, click the 'check
+      answer' button.
+  name: Main window
   param_changes: []
   widget:
+    customization_args:
+      noteToGuess:
+        parse_with_jinja: true
+        value: '{{noteStart}}'
     handlers:
     - name: submit
       rule_specs:
-      - dest: END
+      - definition:
+          inputs:
+            x: '{{noteStart}}'
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: END
         feedback:
         - Yay, that's correct!
-        inputs:
-          x: '{{noteStart}}'
-        name: Equals
         param_changes: []
-      - dest: Main window
+      - definition:
+          inputs:
+            tol: '1'
+            x: '{{noteStart}}'
+          name: IsWithinTolerance
+          rule_type: atomic
+          subject: answer
+        dest: Main window
         feedback:
         - No, but you're very close!
-        inputs:
-          tol: '1'
-          x: '{{noteStart}}'
-        name: IsWithinTolerance
         param_changes: []
-      - dest: Main window
+      - definition:
+          inputs:
+            x: '{{noteStart}}'
+          name: IsLessThan
+          rule_type: atomic
+          subject: answer
+        dest: Main window
         feedback:
         - I think the original note is higher.
-        inputs:
-          x: '{{noteStart}}'
-        name: IsLessThan
         param_changes: []
-      - dest: Main window
+      - definition:
+          inputs:
+            x: '{{noteStart}}'
+          name: IsGreaterThan
+          rule_type: atomic
+          subject: answer
+        dest: Main window
         feedback:
         - I think the original pitch is lower.
-        inputs:
-          x: '{{noteStart}}'
-        name: IsGreaterThan
         param_changes: []
-      - dest: Main window
+      - definition:
+          rule_type: default
+        dest: Main window
         feedback:
         - That's not right. Why not try again?
-        inputs: {}
-        name: Default
         param_changes: []
-    customization_args:
-      noteToGuess:
-        value: '{{noteStart}}'
-        parse_with_jinja: True
-    sticky: True
+    sticky: true
     widget_id: MusicStaff

@@ -111,8 +111,8 @@ class ExplorationDataUnitTests(DataUnitTest):
 
             for rule in handler['rule_specs']:
                 RULE_SCHEMA = [
-                    ('dest', basestring), ('feedback', list), ('inputs', dict),
-                    ('name', basestring), ('param_changes', list)
+                    ('dest', basestring), ('feedback', list),
+                    ('definition', dict), ('param_changes', list)
                 ]
                 self.verify_dict_keys_and_types(rule, RULE_SCHEMA)
 
@@ -138,6 +138,8 @@ class ExplorationDataUnitTests(DataUnitTest):
                         param_change, PARAM_CHANGES_SCHEMA)
                     # TODO(sll): Test that the elements of 'values' are of the
                     # correct type.
+
+                # TODO(sll): Add validation for the rule definition.
 
         for wp_name, wp_value in (
                 state_dict['widget']['customization_args'].iteritems()):
@@ -248,7 +250,8 @@ class ExplorationDataUnitTests(DataUnitTest):
         """Verifies an exploration dict."""
         EXPLORATION_SCHEMA = [
             ('param_specs', list), ('states', list),
-            ('default_skin', basestring), ('param_changes', list)
+            ('default_skin', basestring), ('param_changes', list),
+            ('schema_version', int)
         ]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 

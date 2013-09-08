@@ -313,10 +313,6 @@ class BaseWidget(object):
         return next(
             r for r in handler.rules if r.__name__ == rule_name)
 
-    def get_rule_description(self, handler_name, rule_name):
-        """Gets a rule description, given its name and ancestors."""
-        return self.get_rule_by_name(handler_name, rule_name).description
-
 
 class Registry(object):
     """Registry of all widgets."""
