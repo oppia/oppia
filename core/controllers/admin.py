@@ -19,6 +19,8 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core import counters
 from core.controllers import base
 from core.domain import exp_services
+import feconf
+import logging
 
 
 class AdminPage(base.BaseHandler):
@@ -55,11 +57,16 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
+        demo_explorations = [(str(ind), exp[0]) for ind, exp in
+                             enumerate(feconf.DEMO_EXPLORATIONS)]
+        self.values['demo_explorations'] = demo_explorations
+
         self.render_template('admin/admin.html')
 
     @base.require_admin
     def post(self):
         """Reloads the default explorations."""
-        if self.payload.get('action') == 'reload':
-            if self.payload.get('item') == 'explorations':
-                exp_services.reload_demos()
+        if self.payload.get('action') == 'reload_exploration':
+            exploration_id = self.payload.get('explorationId')
+            exp_services.delete_demo(str(exploration_id))
+            exp_services.load_demo(str(exploration_id))

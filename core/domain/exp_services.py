@@ -820,50 +820,61 @@ def fork_exploration(exploration_id, user_id):
     )
 
 
+def load_demo(exploration_id):
+    """Loads a demo exploration."""
+    if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
+        raise Exception('Invalid demo exploration id %s' % exploration_id)
+
+    exploration = feconf.DEMO_EXPLORATIONS[int(exploration_id)]
+
+    if len(exploration) == 3:
+        (exp_filename, title, category) = exploration
+        image_filename = None
+    elif len(exploration) == 4:
+        (exp_filename, title, category, image_filename) = exploration
+    else:
+        raise Exception('Invalid demo exploration: %s' % exploration)
+
+    image_id = None
+    if image_filename:
+        image_filepath = os.path.join(
+            feconf.SAMPLE_IMAGES_DIR, image_filename)
+        image_id = image_models.Image.create(utils.get_file_contents(
+            image_filepath, raw_bytes=True))
+
+    yaml_content = utils.get_sample_exploration_yaml(exp_filename)
+    exploration_id = create_from_yaml(
+        yaml_content, ADMIN_COMMITTER_ID, title, category,
+        exploration_id=exploration_id, image_id=image_id)
+
+    exploration = get_exploration_by_id(exploration_id)
+    exploration.is_public = True
+    save_exploration(ADMIN_COMMITTER_ID, exploration)
+
+    logging.info('Exploration with id %s was loaded.' % exploration_id)
+
+
+def delete_demo(exploration_id):
+    """Deletes a single demo exploration."""
+    exploration = get_exploration_by_id(exploration_id, strict=False)
+    if not exploration:
+        # This exploration does not exist, so it cannot be deleted.
+        logging.info('Exploration with id %s was not deleted, because it '
+                     'does not exist.' % exploration_id)
+    else:
+        delete_exploration(ADMIN_COMMITTER_ID, exploration_id)
+
+
 def load_demos():
     """Initializes the demo explorations."""
-    for index, exploration in enumerate(feconf.DEMO_EXPLORATIONS):
-        if len(exploration) == 3:
-            (exp_filename, title, category) = exploration
-            image_filename = None
-        elif len(exploration) == 4:
-            (exp_filename, title, category, image_filename) = exploration
-        else:
-            raise Exception('Invalid demo exploration: %s' % exploration)
-
-        image_id = None
-        if image_filename:
-            image_filepath = os.path.join(
-                feconf.SAMPLE_IMAGES_DIR, image_filename)
-            image_id = image_models.Image.create(utils.get_file_contents(
-                image_filepath, raw_bytes=True))
-
-        yaml_content = utils.get_sample_exploration_yaml(exp_filename)
-        exploration_id = create_from_yaml(
-            yaml_content, ADMIN_COMMITTER_ID, title, category,
-            exploration_id=str(index), image_id=image_id)
-
-        exploration = get_exploration_by_id(exploration_id)
-        exploration.is_public = True
-        save_exploration(ADMIN_COMMITTER_ID, exploration)
-
-        logging.info('Exploration with id %s was loaded.' % exploration_id)
+    for index in range(len(feconf.DEMO_EXPLORATIONS)):
+        load_demo(str(index))
 
 
 def delete_demos():
     """Deletes the demo explorations."""
-    exploration_ids_to_delete = []
-    for int_id in range(len(feconf.DEMO_EXPLORATIONS)):
-        exploration = get_exploration_by_id(str(int_id), strict=False)
-        if not exploration:
-            # This exploration does not exist, so it cannot be deleted.
-            logging.info('Exploration with id %s was not deleted, because it '
-                         'does not exist.' % int_id)
-        else:
-            exploration_ids_to_delete.append(exploration.id)
-
-    for exploration_id in exploration_ids_to_delete:
-        delete_exploration(ADMIN_COMMITTER_ID, exploration_id)
+    for index in range(len(feconf.DEMO_EXPLORATIONS)):
+        delete_demo(str(index))
 
 
 def reload_demos():
