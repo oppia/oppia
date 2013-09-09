@@ -30,7 +30,7 @@ class ParamSpec(object):
         if not re.compile('^[a-zA-Z0-9]+$').match(name):
             raise ValueError(
                 'Only parameter names with characters in [a-zA-Z0-9] are '
-                'accepted.')
+                'accepted, received %s.' % name)
 
         if not obj_services.get_object_class(obj_type):
             raise ValueError('Invalid obj_type: %s' % obj_type)

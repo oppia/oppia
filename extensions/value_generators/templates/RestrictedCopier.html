@@ -1,8 +1,16 @@
-<span ng-show="objType == 'UnicodeString'">
+Pick an item:
+<select ng-model="customizationArgs.value"
+        ng-options="choice for choice in initArgs.choices"
+        required>
+</select>
+
+<br><br>
+
+or enter a value (make sure to check the Jinja box if necessary):
+<br><br>
+
+<span>
   <string item="customizationArgs.value"></string>
-</span>
-<span ng-show="objType == 'Int'">
-  <int item="customizationArgs.value"></int>
 </span>
 
 <label ng-show="objType == 'UnicodeString'">

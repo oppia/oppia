@@ -40,7 +40,10 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
 
       var DEFAULT_TMP_PARAM_CHANGE = {
         generator_id: 'Copier',
-        customization_args: {},
+        customization_args: {
+          value: '[New parameter value]',
+          parse_with_jinja: false
+        },
         select2Name: {id: '[New parameter]', text: '[New parameter]'}
       };
 
@@ -101,13 +104,11 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         $scope.tmpParamChange = angular.copy(DEFAULT_TMP_PARAM_CHANGE);
       };
 
-      // TODO(sll): Move this list somewhere more global.
-      // The 'true' values in each sub-dict are merely placeholders.
+      // TODO(sll): Move this list (of value generators without init_args)
+      // somewhere more global.
       $scope.ALLOWED_KEYS = {
         'Copier': ['value', 'parse_with_jinja'],
-        'RestrictedCopier':  ['value', 'parse_with_jinja'],
         'RandomSelector': ['list_of_values'],
-        'RangeRestrictedCopier': ['value']
       };
 
       $scope.inArray = function(array, value) {
@@ -119,13 +120,11 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         return false;
       };
 
-      // Called when an 'edit param change' action is triggered.
-      $scope.startEditParamChange = function(index) {
-        var param = $scope.paramChanges[index];
-        $scope.initSelectorOptions();
-        $scope.activeItem = index;
-
-        var newCustomizationArgs = angular.copy(param.customization_args);
+      // Returns a new customization args object that has been stripped of
+      // unwanted keys.
+      $scope.getCleanCustomizationArgs = function(
+          generatorId, customizationArgs) {
+        var newCustomizationArgs = angular.copy(customizationArgs);
         var customizationArgsKeys = [];
         for (var key in newCustomizationArgs) {
           if (newCustomizationArgs.hasOwnProperty(key)) {
@@ -133,12 +132,23 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           }
         }
         for (var j = 0; j < customizationArgsKeys.length; j++) {
-          if (!$scope.inArray($scope.ALLOWED_KEYS[param.generator_id],
+          if (!$scope.inArray($scope.ALLOWED_KEYS[generatorId],
                               customizationArgsKeys[j])) {
             console.log(customizationArgsKeys[j]);
             delete newCustomizationArgs[customizationArgsKeys[j]];
           }
         }
+        return newCustomizationArgs;
+      };
+
+      // Called when an 'edit param change' action is triggered.
+      $scope.startEditParamChange = function(index) {
+        var param = $scope.paramChanges[index];
+        $scope.initSelectorOptions();
+        $scope.activeItem = index;
+
+        var newCustomizationArgs = $scope.getCleanCustomizationArgs(
+          param.generator_id, param.customization_args);
 
         $scope.tmpParamChange = {
           generator_id: param.generator_id,
@@ -177,8 +187,8 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         // a new parameter, in which case it is {id:'new', text:param_name}.
         var name = $scope.tmpParamChange.select2Name.text;
         var generator_id = $scope.tmpParamChange.generator_id;
-        var customization_args = angular.copy($scope.tmpParamChange.customization_args);
-        console.log(customization_args);
+        var customization_args = $scope.getCleanCustomizationArgs(
+          generator_id, $scope.tmpParamChange.customization_args);
 
         if (!$scope.getObjTypeForParam(name)) {
           // The name is new, so add the parameter to the exploration parameter

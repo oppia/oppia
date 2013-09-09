@@ -3,9 +3,6 @@
     <td><em>Value: </em></td>
     <td></td>
     <td>
-      <span ng-show="objType == 'List'">
-        <list items="customizationArgs.value"></list>
-      </span>
       <span ng-show="objType == 'UnicodeString'">
         <string item="customizationArgs.value"></string>
       </span>
@@ -14,6 +11,9 @@
       </span>
       <span ng-show="objType == 'Int'">
         <int item="customizationArgs.value"></int>
+      </span>
+      <span ng-show="objType == 'List'">
+        <list items="customizationArgs.value"></list>
       </span>
     </td>
   </tr>

@@ -1,3 +1,28 @@
+{% macro edit_parameter_form() -%}
+  <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
+    <b>Parameter name:</b>
+    <input ng-model="tmpParamChange.select2Name"
+           ui-select2="paramSelector"
+           placeholder="Parameter Name" style="width:300px" required>
+    <br>
+
+    Generator:
+    <select ng-model="tmpParamChange.generator_id"
+            ng-options="key as key for (key, value) in ALLOWED_KEYS"
+            required>
+    </select>
+
+    <value-generator-editor generator-id="tmpParamChange.generator_id"
+                            customization-args="tmpParamChange.customization_args"
+                            obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+    </value-generator-editor>
+    <br>
+
+    <input type="submit" value="Close editor">
+  </form>
+{%- endmacro %}
+
+
 <div>
   <ol>
     <li ng-repeat="param in paramChanges">
@@ -11,19 +36,7 @@
       </span>
 
       <div ng-show="activeItem == $index">
-        <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
-          <b>Parameter name:</b>
-          <input ng-model="tmpParamChange.select2Name"
-                 ui-select2="paramSelector"
-                 placeholder="Parameter Name" style="width:300px" required>
-          <br>
-          <value-generator-editor generator-id="tmpParamChange.generator_id"
-                                  customization-args="tmpParamChange.customization_args"
-                                  obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
-          </value-generator-editor>
-          <br>
-          <input type="submit" value="Close editor">
-        </form>
+        {{ edit_parameter_form() }}
       </div>
     </li>
   </ol>
@@ -34,21 +47,6 @@
   </button>
 
   <div ng-show="activeItem == NEW_PARAM_CHANGE_SENTINEL">
-    <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
-      <b>Parameter name:</b>
-      <input ng-model="tmpParamChange.select2Name"
-             ui-select2="paramSelector"
-             placeholder="Parameter Name" style="width:300px" required>
-      <br>
-
-      <value-generator-editor generator-id="tmpParamChange.generator_id"
-                              customization-args="tmpParamChange.customization_args"
-                              obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
-      </value-generator-editor>
-      <br>
-
-      <input type="submit" value="Close editor">
-      
-    </form>
+    {{ edit_parameter_form() }}
   </div>
 </div>

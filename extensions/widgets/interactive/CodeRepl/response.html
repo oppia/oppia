@@ -1,12 +1,19 @@
 <div class="oppia-reader-response-container">
   <span class="oppia-reader-response">
-    <b>{{answer.code}}</b><br>
+    <br>
+
+    <h5>Code</h5>
+    <pre>{{answer.code}}</pre>
+
     {% if answer.output %}
-      {{answer.output}}<br>
+      <h5>Output</h5>
+      <pre>{{answer.output}}</pre>
     {% endif %}
+
     {% if answer.error %}
       <font color=red>Error: {{answer.error}}</font><br>
     {% endif %}
+
     {% if answer.evaluation %}
       &gt;&gt; {{answer.evaluation}}
     {% endif %}

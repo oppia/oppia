@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+ // TODO(sll): Combine all of these into a single directive.
+
 oppia.directive('list', function(warningsData) {
   // Directive that implements an editable list.
   return {
@@ -33,10 +35,11 @@ oppia.directive('list', function(warningsData) {
         // possible to modify 'item' directly when using "for item in items";
         // we need a 'constant key'. So we represent each item as {label: ...}
         // instead, and manipulate item.label.
-        $scope.items = ($scope.items || []);
         $scope.localItems = [];
-        for (var i = 0; i < $scope.items.length; i++) {
-          $scope.localItems.push({label: $scope.items[i]});
+        if ($scope.items) {
+          for (var i = 0; i < $scope.items.length; i++) {
+            $scope.localItems.push({'label': angular.copy($scope.items[i])});
+          }
         }
         $scope.activeItem = null;
       });
@@ -51,8 +54,12 @@ oppia.directive('list', function(warningsData) {
 
       $scope.addItem = function() {
         $scope.localItems.push({label: ''});
-        $scope.items.push('');
         $scope.activeItem = $scope.localItems.length - 1;
+        if ($scope.items) {
+          $scope.items.push('');
+        } else {
+          $scope.items = [''];
+        }
       };
 
       $scope.replaceItem = function(index, newItem) {
@@ -88,7 +95,7 @@ oppia.directive('string', function (warningsData) {
       // Reset the component each time the item changes.
       $scope.$watch('item', function(newValue, oldValue) {
         // Maintain a local copy of 'item'.
-        $scope.localItem = {label: $scope.item};
+        $scope.localItem = {label: $scope.item || ''};
         $scope.active = false;
       });
 
@@ -124,7 +131,7 @@ oppia.directive('real', function (warningsData) {
       // Reset the component each time the item changes.
       $scope.$watch('item', function(newValue, oldValue) {
         // Maintain a local copy of 'item'.
-        $scope.localItem = {label: $scope.item};
+        $scope.localItem = {label: $scope.item || 0.0};
         $scope.active = false;
       });
 
@@ -160,7 +167,7 @@ oppia.directive('int', function (warningsData) {
       // Reset the component each time the item changes.
       $scope.$watch('item', function(newValue, oldValue) {
         // Maintain a local copy of 'item'.
-        $scope.localItem = {label: $scope.item};
+        $scope.localItem = {label: $scope.item || 0};
         $scope.active = false;
       });
 
