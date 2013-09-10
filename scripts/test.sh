@@ -38,54 +38,6 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
 
-# webtest is used for tests.
-echo Checking if webtest is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/webtest-1.4.2" ]; then
-  echo Installing webtest framework
-  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
-  unzip webtest-download.zip -d $THIRD_PARTY_DIR
-  rm webtest-download.zip
-  mv $THIRD_PARTY_DIR/WebTest-1.4.2 $THIRD_PARTY_DIR/webtest-1.4.2
-fi
-
-# Some Angular JS lib files are needed for frontend tests.
-echo Checking whether angularjs is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.7" ]; then
-  echo Installing AngularJS and angular-sanitize
-  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.7/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.min.js
-
-  # Files for tests.
-  wget http://code.angularjs.org/1.0.7/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-mocks.js
-  wget http://code.angularjs.org/1.0.7/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-scenario.js
-fi
-
-# Node is needed to install karma.
-echo Checking if node.js is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
-  echo Installing Node.js
-  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x64.tar.gz -O node-download.tgz
-    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x64 $THIRD_PARTY_DIR/node-0.10.1
-    rm node-download.tgz
-  else
-    wget http://nodejs.org/dist/v0.10.1/node-v0.10.1-linux-x86.tar.gz -O node-download.tgz
-    tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-    mv $THIRD_PARTY_DIR/node-v0.10.1-linux-x86 $THIRD_PARTY_DIR/node-0.10.1
-    rm node-download.tgz
-  fi
-fi
-
-echo Checking whether Karma has been installed via node.js
-if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/karma" ]; then
-  echo Installing Karma
-  $THIRD_PARTY_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
-fi
-
 # Note: you can safely delete all of the following code (up to the end of the
 # file) if it leads to errors on your system. It runs checks to see how well
 # the tests cover the code.
@@ -108,19 +60,19 @@ EOF
 
 if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   echo Installing coverage
-  sudo rm -rf $THIRD_PARTY_DIR/coverage
+  sudo rm -rf $TOOLS_DIR/coverage
   wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
-  tar xvzf coverage.tar.gz -C $THIRD_PARTY_DIR
+  tar xvzf coverage.tar.gz -C $TOOLS_DIR
   rm coverage.tar.gz
-  mv $THIRD_PARTY_DIR/coverage-3.6 $THIRD_PARTY_DIR/coverage
+  mv $TOOLS_DIR/coverage-3.6 $TOOLS_DIR/coverage
 
-  cd $THIRD_PARTY_DIR/coverage
+  cd $TOOLS_DIR/coverage
   sudo python setup.py install
   cd ../../../
-  sudo rm -rf $THIRD_PARTY_DIR/coverage
+  sudo rm -rf $TOOLS_DIR/coverage
 fi
 
 coverage run ./core/tests/gae_suite.py $@
-coverage report --omit="$THIRD_PARTY_DIR/*","$RUNTIME_HOME/*","/usr/share/pyshared/*" --show-missing
+coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/pyshared/*" --show-missing
 
 echo Done!

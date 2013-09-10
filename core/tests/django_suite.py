@@ -128,7 +128,7 @@ def main():
 
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
-        os.path.join(os.getcwd(), 'third_party/webtest-1.4.2')))
+        os.path.join(os.getcwd(), '../tools/webtest-1.4.2')))
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 

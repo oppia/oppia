@@ -49,9 +49,13 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
   return 1
 fi
 
+export TOOLS_DIR=../tools
 export THIRD_PARTY_DIR=third_party
 
+mkdir -p $TOOLS_DIR
+mkdir -p $THIRD_PARTY_DIR
+
 # Adjust the path to include a reference to node.
-export PATH=`pwd`/$THIRD_PARTY_DIR/node-0.10.1/bin:$PATH
+export PATH=`pwd`/$TOOLS_DIR/node-0.10.1/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`

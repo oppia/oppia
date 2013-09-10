@@ -23,11 +23,10 @@ if [ "$SETUP_GAE_DONE" ]; then
 fi
 export SETUP_GAE_DONE=true
 
-export RUNTIME_HOME=../gae_runtime
-export GOOGLE_APP_ENGINE_HOME=$RUNTIME_HOME/google_appengine_1.7.7/google_appengine
+export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.7.7/google_appengine
 
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
-export PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$THIRD_PARTY_DIR/webtest-1.4.2
+export PYTHONPATH=.:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$TOOLS_DIR/webtest-1.4.2
 
 echo Deleting old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;

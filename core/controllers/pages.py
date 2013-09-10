@@ -30,7 +30,8 @@ class MainPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         if not exp_services.get_exploration_by_id('0', strict=False):
-            exp_services.reload_demos()
+            exp_services.delete_demo('0')
+            exp_services.load_demo('0')
 
         self.values.update({
             'gallery_login_url': user_services.create_login_url('/gallery'),

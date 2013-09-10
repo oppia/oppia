@@ -18,10 +18,8 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
-mkdir -p $THIRD_PARTY_DIR
-
-echo Checking if node.js is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
+echo Checking if node.js is installed in tools
+if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
@@ -43,11 +41,64 @@ if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1" ]; then
   fi
 
   wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
-  tar xzf node-download.tgz --directory $THIRD_PARTY_DIR
-  mv $THIRD_PARTY_DIR/$NODE_FILE_NAME $THIRD_PARTY_DIR/node-0.10.1
+  tar xzf node-download.tgz --directory $TOOLS_DIR
+  mv $TOOLS_DIR/$NODE_FILE_NAME $TOOLS_DIR/node-0.10.1
   rm node-download.tgz
 fi
 
+echo Checking whether Karma is installed in tools
+if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
+  echo Installing Karma
+  if ! `$TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7`; then
+    sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
+    sudo chmod -R 644 $TOOLS_DIR/node-0.10.1/lib/node_modules
+  fi
+fi
+
+# For this to work, you must first run
+#
+#     sudo apt-get install cakephp-scripts
+#
+echo Checking whether jsrepl is installed in third_party
+if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
+  echo Checking whether coffeescript has been installed via node.js
+  if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
+    echo Installing CoffeeScript
+    $TOOLS_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
+  fi
+  echo Checking whether uglify has been installed via node.js
+  if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/uglify-js" ]; then
+    echo Installing uglify
+    $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js
+  fi
+
+  echo Downloading jsrepl
+  cd $TOOLS_DIR
+  # git clone git://github.com/replit/jsrepl.git
+  cd jsrepl
+  # git submodule update --init --recursive
+
+  # Add a temporary backup file so that this script works on both Linux and Mac.
+  TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
+
+  echo Compiling jsrepl
+  # Reducing jvm memory requirement from 4G to 1G.
+  sed -i $TMP_FILE -e 's/Xmx4g/Xmx1g/' Cakefile
+  # This version of node uses fs.exitsSync.
+  sed -i $TMP_FILE -e 's/path\.existsSync/fs\.existsSync/' Cakefile
+  # CoffeeScript is having trouble with octal representation.
+  sed -i $TMP_FILE -e 's/0o755/493/' Cakefile
+  NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+
+  # Delete the temporary file.
+  rm $TMP_FILE
+
+  # Return to the Oppia root folder.
+  cd ../../oppia
+  # Move the build directory to the static resources folder.
+  mkdir -p $THIRD_PARTY_DIR/static/jsrepl
+  mv $TOOLS_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
+fi
 
 # Static resources.
 echo Checking whether angular-ui is installed in third_party
@@ -113,46 +164,4 @@ if [ ! -d "$THIRD_PARTY_DIR/static/yui2-2.9.0" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/yui2-2.9.0
   wget "http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/container/container_core-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/element/element-min.js&2.9.0/build/button/button-min.js&2.9.0/build/editor/editor-min.js" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.js
   wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.css
-fi
-
-# For this to work, you must first run
-#
-#     sudo apt-get install cakephp-scripts
-#
-echo Checking whether jsrepl is installed in third_party
-if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-  echo Checking whether coffeescript has been installed via node.js
-  if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
-    echo Installing CoffeeScript
-    npm install -g coffee-script@1.2.0
-  fi
-  echo Checking whether uglify has been installed via node.js
-  if [ ! -d "$THIRD_PARTY_DIR/node-0.10.1/lib/node_modules/uglify-js" ]; then
-    echo Installing uglify
-    npm install -g uglify-js
-  fi
-
-  echo Downloading jsrepl
-  cd $THIRD_PARTY_DIR
-  git clone git://github.com/replit/jsrepl.git
-  cd jsrepl
-  git submodule update --init --recursive
-
-  # Add a temporary backup file so that this script works on both Linux and Mac.
-  TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
-
-  echo Compiling jsrepl
-  # Reducing jvm memory requirement from 4G to 1G.
-  sed -i $TMP_FILE -e 's/Xmx4g/Xmx1g/' Cakefile
-  # This version of node uses fs.exitsSync.
-  sed -i $TMP_FILE -e 's/path\.existsSync/fs\.existsSync/' Cakefile
-  # CoffeeScript is having trouble with octal representation.
-  sed -i $TMP_FILE -e 's/0o755/493/' Cakefile
-  NODE_PATH=../node-0.10.1/lib/node_modules cake bake
-
-  # Delete the temporary file.
-  rm $TMP_FILE
-
-  cd ../../
-  mv $THIRD_PARTY_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
 fi

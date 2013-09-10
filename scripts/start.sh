@@ -43,8 +43,18 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
   wget http://googleappengine.googlecode.com/files/google_appengine_1.7.7.zip -O gae-download.zip
-  unzip gae-download.zip -d $RUNTIME_HOME/google_appengine_1.7.7/
+  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.7.7/
   rm gae-download.zip
+fi
+
+# webtest is used for tests.
+echo Checking if webtest is installed in third_party
+if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+  echo Installing webtest framework
+  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
+  unzip webtest-download.zip -d $TOOLS_DIR
+  rm webtest-download.zip
+  mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/webtest-1.4.2
 fi
 
 # Install third party dependencies

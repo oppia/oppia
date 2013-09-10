@@ -20,7 +20,6 @@ from core import counters
 from core.controllers import base
 from core.domain import exp_services
 import feconf
-import logging
 
 
 class AdminPage(base.BaseHandler):

@@ -248,8 +248,5 @@ class RandomExplorationPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         explorations = exp_services.get_public_explorations()
-
-        # Skip the first exploration; users have seen it on the main page.
-        selected_exploration = utils.get_random_choice(explorations[1:])
-
+        selected_exploration = utils.get_random_choice(explorations)
         self.redirect('/learn/%s' % selected_exploration.id)
