@@ -49,11 +49,19 @@ fi
 echo Checking whether Karma is installed in tools
 if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   echo Installing Karma
-  if ! `$TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7`; then
+  $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
+  returncode=$?
+  if [[ $returncode -ne 0 ]]; then
+    echo
+  else
     sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
-    sudo chmod -R 644 $TOOLS_DIR/node-0.10.1/lib/node_modules
   fi
 fi
+
+ME=$(whoami)
+sudo chown -R $ME $TOOLS_DIR
+sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 
 # For this to work, you must first run
 #
@@ -74,9 +82,9 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 
   echo Downloading jsrepl
   cd $TOOLS_DIR
-  # git clone git://github.com/replit/jsrepl.git
+  git clone git://github.com/replit/jsrepl.git
   cd jsrepl
-  # git submodule update --init --recursive
+  git submodule update --init --recursive
 
   # Add a temporary backup file so that this script works on both Linux and Mac.
   TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`

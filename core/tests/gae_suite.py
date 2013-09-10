@@ -125,14 +125,14 @@ def main():
 
     # TODO(sll): Check whether the following dirs exist.
     sys.path.insert(0, os.path.join(
-        os.getcwd(), '..', 'gae_runtime', 'google_appengine_1.7.7',
+        os.getcwd(), '..', 'tools', 'google_appengine_1.7.7',
         'google_appengine'))
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
-        os.path.join(os.getcwd(), 'third_party/webtest-1.4.2')))
+        os.path.join(os.getcwd(), '../tools/webtest-1.4.2')))
     sys.path.append(os.path.abspath(os.path.join(
         os.getcwd(),
-        '../gae_runtime/google_appengine_1.7.7/google_appengine/lib/webob_0_9')
+        '../tools/google_appengine_1.7.7/google_appengine/lib/webob_0_9')
     ))
 
     import dev_appserver
