@@ -90,16 +90,15 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
   echo Compiling jsrepl
-  # Reducing jvm memory requirement from 4G to 1G.
-  sed -i $TMP_FILE -e 's/Xmx4g/Xmx1g/' Cakefile
-  # This version of node uses fs.exitsSync.
-  sed -i $TMP_FILE -e 's/path\.existsSync/fs\.existsSync/' Cakefile
-  # CoffeeScript is having trouble with octal representation.
-  sed -i $TMP_FILE -e 's/0o755/493/' Cakefile
+  # Sed fixes some issues:
+  # - Reducing jvm memory requirement from 4G to 1G.
+  # - This version of node uses fs.exitsSync.
+  # - CoffeeScript is having trouble with octal representation.
+  sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
+  sed -e 's/path\.existsSync/fs\.existsSync/' |\
+  sed -e 's/0o755/493/' > $TMP_FILE
+  mv $TMP_FILE Cakefile
   NODE_PATH=../node-0.10.1/lib/node_modules cake bake
-
-  # Delete the temporary file.
-  rm $TMP_FILE
 
   # Return to the Oppia root folder.
   cd ../../oppia

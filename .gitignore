@@ -1,6 +1,7 @@
 .gitignore
 *~
 *.pyc
+*.swp
 gae_runtime/*
 third_party/*
 core/templates/prod/*
