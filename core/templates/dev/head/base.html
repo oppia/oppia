@@ -18,7 +18,10 @@
       MathJax.Hub.Config({
         /* Hide the 'loading' and 'processing' messages. */
         messageStyle: 'none',
-        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        tex2jax: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          processEscapes: true
+        }
       });
     </script>
     <script type="text/javascript"
