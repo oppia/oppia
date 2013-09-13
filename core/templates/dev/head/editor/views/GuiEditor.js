@@ -134,7 +134,7 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
   $scope.defaultTextContent = (
       'Click \'Edit\' to enter text here. Text enclosed in dollar signs ' +
       'will be displayed as $LaTeX$. To write a non-LaTeXed dollar sign, ' +
-      'type \\\\$.');
+      'type a single backslash (\'\\\') followed by \'$\'.');
 
 
   var editors = {};
