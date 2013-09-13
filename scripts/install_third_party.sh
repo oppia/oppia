@@ -93,7 +93,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   cd ../../oppia
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
-  mv $TOOLS_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
+  mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
 
 ME=$(whoami)
