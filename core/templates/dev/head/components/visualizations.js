@@ -114,14 +114,12 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         var body = modal.append('div')
           .attr('class', 'modal-body');
         if (improvementType) {
-          var CONFUSING_EXPLANATION = 'We believe that this state may be confusing ' +
-              'because students often leave the page when they get to this state. ' +
-              'This could mean the non-interactive content didn\'t make sense, so ' +
-              'they didn\'t know how to respond to it.';
-          var NEED_FEEDBACK_EXPLANATION = 'We believe that this state may need more ' +
-              'feedback because students often return to this state after giving an ' +
-              'answer. This could mean that the feedback they are getting is ' +
-              'insufficient to help them learn.';
+          var CONFUSING_EXPLANATION = 'Students often leave the page when they get ' +
+              'to this state -- this could mean the non-interactive content didn\'t ' +
+              'make sense, so they didn\'t know how to respond to it.';
+          var NEED_FEEDBACK_EXPLANATION = 'Students often return to this state ' +
+              'after giving an answer -- this could mean that the feedback they are ' +
+              'getting is insufficient to help them learn.';
 
           var improvementExplanation = (
               improvementType == 'May be confusing' ?
