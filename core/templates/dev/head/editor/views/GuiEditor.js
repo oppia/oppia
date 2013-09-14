@@ -134,8 +134,9 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
   $scope.defaultTextContent = (
       'Click \'Edit\' to enter text here. Text enclosed in dollar signs ' +
       'will be displayed as $LaTeX$. To write a non-LaTeXed dollar sign, ' +
-      'type a single backslash (\'\\\') followed by \'$\'.');
-
+      'type a single backslash (\'\\\') followed by \'$\'. For more ' +
+      'information about LaTeX, see ' +
+      'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
 
   var editors = {};
 
