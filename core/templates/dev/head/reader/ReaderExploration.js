@@ -165,8 +165,6 @@
       // A non-empty interactive_html means that the previous widget
       // is not sticky and should be replaced.
       $scope.reloadInteractiveIframe($scope.inputTemplate);
-    } else if ($scope.finished) {
-      $scope.reloadInteractiveIframe('');
     }
 
     // TODO(sll): Try and get rid of the "$digest already in progress" error here.
@@ -191,9 +189,12 @@
             iframes[iframes.length - 1], data.reader_response_iframe);
       }
     }
-    $('html, body, iframe').animate(
-        {'scrollTop': document.getElementById('response').offsetTop}, 
-        'slow', 'swing');
+
+    if (document.getElementById('response')) {
+      $('html, body, iframe').animate(
+          {'scrollTop': document.getElementById('response').offsetTop},
+          'slow', 'swing');
+    }
   };
 
   window.addEventListener('message', receiveMessage, false);

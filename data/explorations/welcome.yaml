@@ -84,61 +84,61 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: 'You might want to build something more complicated than that, though.
-      The good news is that you can integrate your own interactive questions into
-      Oppia!<div><br></div><div>For example, have a go at this custom activity that
-      uses an interaction built by Phil Wagner:</div><hr><h4>Goal: Listen to the pitch
-      played, then match it by moving the note on the musical staff.</h4>Instructions:<ol><li>Click
-      the black circle representing the note. It should turn red.</li><li>Move the
-      note up and down using the <span style="font-weight: bold;">up</span>&nbsp;and
-      <span style="font-weight: bold;">down</span>&nbsp;arrow keys.</li> </ol>'
-  name: Music widget
+    value: You might want to build something more complicated than that, though. The
+      good news is that you can integrate your own interactive questions into Oppia!<div><br>Where
+      would people say the word 'Oppia'? Well, in Finland, and probably in its capital,
+      Helsinki. Can you find Helsinki on a map of the world?</div><ol> </ol>
+  name: Finding Helsinki
   param_changes: []
   widget:
     customization_args:
-      noteToGuess:
-        value: B4
+      latitude:
+        value: 60.1708
+      longitude:
+        value: 24.9375
+      zoom:
+        value: 2
     handlers:
     - name: submit
       rule_specs:
       - definition:
           inputs:
-            x: B4
-          name: Equals
+            d: 1.0
+            p:
+            - 60.1708
+            - 24.9375
+          name: Within
           rule_type: atomic
           subject: answer
         dest: Things you can do
         feedback:
-        - That's right!
+        - Hooray, you found it!
         param_changes: []
       - definition:
           inputs:
-            x: B4
-          name: IsGreaterThan
+            d: 10.0
+            p:
+            - 60.1708
+            - 24.9375
+          name: Within
           rule_type: atomic
           subject: answer
-        dest: Music widget
+        dest: Finding Helsinki
         feedback:
-        - I think the original note is lower.
-        param_changes: []
-      - definition:
-          inputs:
-            x: B4
-          name: IsLessThan
-          rule_type: atomic
-          subject: answer
-        dest: Music widget
-        feedback:
-        - Actually, the original note sounds higher. Try comparing both pitches and
-          listening carefully to the difference.
+        - Close, but not quite. Helsinki is on the south coast of Finland; try looking
+          there.
+        - That's not too far, but you can get closer! Try looking on the south coast
+          of Finland.
         param_changes: []
       - definition:
           rule_type: default
-        dest: Music widget
-        feedback: []
+          subject: answer
+        dest: Finding Helsinki
+        feedback:
+        - That is rather far away! Try zooming into Finland.
         param_changes: []
     sticky: true
-    widget_id: MusicStaff
+    widget_id: InteractiveMap
 - content:
   - type: text
     value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
@@ -155,7 +155,7 @@ states:
           name: Equals
           rule_type: atomic
           subject: answer
-        dest: Music widget
+        dest: Finding Helsinki
         feedback:
         - 'Yes, that''s correct: 11 times 11 is 121.'
         param_changes: []
