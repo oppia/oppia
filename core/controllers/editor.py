@@ -77,7 +77,7 @@ class ExplorationHandler(base.BaseHandler):
             'editors': exploration.editor_ids,
             'states': state_list,
             'param_changes': exploration.param_change_dicts,
-            'param_specs': exploration.param_spec_dicts,
+            'param_specs': exploration.param_specs_dict,
             'version': exploration.version,
             # Add information about the most recent versions.
             'snapshots': exp_services.get_exploration_snapshots_metadata(
@@ -158,10 +158,10 @@ class ExplorationHandler(base.BaseHandler):
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
         if param_specs is not None:
-            exploration.param_specs = [
-                param_domain.ParamSpec.from_dict(param_spec)
-                for param_spec in param_specs
-            ]
+            exploration.param_specs = {
+                ps_name: param_domain.ParamSpec.from_dict(ps_val)
+                for (ps_name, ps_val) in param_specs.iteritems()
+            }
         if param_changes is not None:
             exploration.param_changes = [
                 param_domain.ParamChange.from_dict(param_change)

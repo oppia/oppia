@@ -74,10 +74,10 @@ for root in os.listdir(os.path.join(os.getcwd())):
             '.git', 'third_party', 'lib', 'extensions', 'gae_runtime']]):
         continue
 
-    print 'Processing', os.path.join(os.getcwd(), root)
+    print('Processing %s' % os.path.join(os.getcwd(), root))
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
         for directory in dirs:
-            print 'Processing', os.path.join(root, directory)
+            print('Processing %s' % os.path.join(root, directory))
         for fn in files:
             full_filename = os.path.join(root) + '/' + fn
             if full_filename.find(OUT_DIR) > 0:

@@ -72,18 +72,21 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
             exploration.put('A user id', {})
         exploration.category = 'The category'
 
-        # The 'parameters' property must be a list of Parameter objects.
+        # The 'param_specs' property must be a dict of param_spec dicts.
         with self.assertRaises(db.BadValueError):
             exploration.param_specs = 'A string'
-
-        with self.assertRaises(db.BadValueError):
-            exploration.param_specs = [{
-                'name': 'has_values', 'obj_type': 'Int', 'values': []
-            }]
             exploration.put('A user id', {})
 
-        parameter = {'name': 'theParameter', 'obj_type': 'Int'}
-        exploration.param_specs = [parameter]
+        with self.assertRaises(db.BadValueError):
+            exploration.param_specs = {
+                'has_values': {
+                    'obj_type': 'Int',
+                    'values': [6]
+                }
+            }
+            exploration.put('A user id', {})
+
+        exploration.param_specs = {'theParameter': {'obj_type': 'Int'}}
 
         # The 'is_public' property must be a boolean.
         with self.assertRaises(db.BadValueError):
@@ -114,7 +117,7 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
-            retrieved_exploration.param_specs[0].name, 'theParameter')
+            retrieved_exploration.param_specs.keys()[0], 'theParameter')
 
         self.assertEqual(retrieved_exploration.is_public, True)
         self.assertEqual(retrieved_exploration.image_id, 'A string')

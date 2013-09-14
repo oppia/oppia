@@ -56,14 +56,10 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       $scope.resetParamChangeInput();
 
       $scope.getObjTypeForParam = function(paramName) {
-        if (!$scope.paramSpecs) {
-          return '';
+        if ($scope.paramSpecs && paramName in $scope.paramSpecs) {
+          return $scope.paramSpecs[paramName].obj_type;
         }
-        for (var i = 0; i < $scope.paramSpecs.length; i++) {
-          if ($scope.paramSpecs[i].name == paramName) {
-            return $scope.paramSpecs[i].obj_type;
-          }
-        }
+
         return '';
       };
 
@@ -87,12 +83,9 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       $scope.initSelectorOptions = function() {
         var namedata = [];
         if ($scope.paramSpecs) {
-          $scope.paramSpecs.forEach(function(param) {
-            namedata.push({
-              id: param.name,
-              text: param.name
-            });
-          });
+          for (var paramName in $scope.paramSpecs) {
+            namedata.push({id: paramName, text: paramName});
+          }
         }
         angular.extend($scope.paramSelector.data, namedata);
       };

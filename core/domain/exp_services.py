@@ -274,22 +274,13 @@ def export_to_yaml(exploration_id):
     """Returns a YAML version of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
 
-    param_changes = [param_change.to_dict()
-                     for param_change in exploration.param_changes]
-
-    param_specs = [{
-        'name': param_spec.name, 'obj_type': param_spec.obj_type
-    } for param_spec in exploration.param_specs]
-
-    states_list = [export_state_internals_to_dict(
-        exploration_id, state_id, human_readable_dests=True)
-        for state_id in exploration.state_ids]
-
     return utils.yaml_from_dict({
         'default_skin': exploration.default_skin,
-        'param_changes': param_changes,
-        'param_specs': param_specs,
-        'states': states_list,
+        'param_changes': exploration.param_change_dicts,
+        'param_specs': exploration.param_specs_dict,
+        'states': [export_state_internals_to_dict(
+            exploration_id, state_id, human_readable_dests=True)
+            for state_id in exploration.state_ids],
         'schema_version': CURRENT_EXPLORATION_SCHEMA_VERSION
     })
 
@@ -316,21 +307,12 @@ def save_exploration(committer_id, exploration):
         For states, all properties except 'id' are versioned. State dests are
         specified using names and not ids.
         """
-        param_changes = [param_change.to_dict()
-                         for param_change in exploration.param_changes]
-
-        param_specs = [{
-            'name': param_spec.name, 'obj_type': param_spec.obj_type
-        } for param_spec in exploration.param_specs]
-
-        states_list = [export_state_internals_to_dict(
-            exploration.id, state_id, human_readable_dests=True)
-            for state_id in exploration.state_ids]
-
         return {
-            'param_changes': param_changes,
-            'param_specs': param_specs,
-            'states': states_list
+            'param_changes': exploration.param_change_dicts,
+            'param_specs': exploration.param_specs_dict,
+            'states': [export_state_internals_to_dict(
+                exploration.id, state_id, human_readable_dests=True)
+                for state_id in exploration.state_ids]
         }
 
     def _save_exploration_transaction(committer_id, exploration):
@@ -349,7 +331,7 @@ def save_exploration(committer_id, exploration):
             'category': exploration.category,
             'title': exploration.title,
             'state_ids': exploration.state_ids,
-            'param_specs': exploration.param_spec_dicts,
+            'param_specs': exploration.param_specs_dict,
             'param_changes': exploration.param_change_dicts,
             'is_public': exploration.is_public,
             'image_id': exploration.image_id,
@@ -569,17 +551,14 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.param_changes = []
         for param_change in param_changes:
 
-            exp_param_spec = None
-            for param_spec in exploration.param_specs:
-                if param_spec.name == param_change['name']:
-                    # TODO(sll): Check whether some sample generated values
-                    # match the expected obj_type.
-                    exp_param_spec = param_spec
-                    break
-
+            exp_param_spec = exploration.param_specs.get(param_change['name'])
             if exp_param_spec is None:
                 raise Exception('No parameter named %s exists in this '
                                 'exploration' % param_change['name'])
+
+            # TODO(sll): Here (or when validating the state before committing),
+            # check whether some sample generated values match the expected
+            # obj_type.
 
             state.param_changes.append(param_domain.ParamChange(
                 param_change['name'], param_change['generator_id'],
@@ -749,10 +728,10 @@ def create_from_yaml(
         init_state_name=init_state_name, image_id=image_id)
 
     try:
-        exploration_param_specs = [
-            param_domain.ParamSpec.from_dict(param_spec_dict)
-            for param_spec_dict in exploration_dict['param_specs']
-        ]
+        exploration_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
+        }
 
         for sdict in exploration_dict['states']:
             if sdict['name'] != init_state_name:
@@ -771,10 +750,10 @@ def create_from_yaml(
             ) for pc in sdict['param_changes']]
 
             for pc in state.param_changes:
-                if not any([param_spec.name == pc.name
-                            for param_spec in exploration_param_specs]):
+                if pc.name not in exploration_param_specs:
                     raise Exception('Parameter %s was used in a state but not '
-                                    'declared in the exploration param_specs.')
+                                    'declared in the exploration param_specs.'
+                                    % pc.name)
 
             wdict = sdict['widget']
             widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({

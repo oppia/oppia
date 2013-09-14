@@ -95,8 +95,8 @@
   <div>
     <h4>Parameters used in this exploration</h4>
     <ol>
-      <li ng-repeat="paramSpec in paramSpecs">
-        <b><[paramSpec.name]></b> (<[paramSpec.obj_type]>)
+      <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
+        <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
       </li>
     </ol>
 

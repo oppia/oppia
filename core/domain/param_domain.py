@@ -25,28 +25,21 @@ from core.domain import value_generators_domain
 
 
 class ParamSpec(object):
-    """Value object for a exploration parameter specification."""
-    def __init__(self, name, obj_type):
-        if not re.compile('^[a-zA-Z0-9]+$').match(name):
-            raise ValueError(
-                'Only parameter names with characters in [a-zA-Z0-9] are '
-                'accepted, received %s.' % name)
-
+    """Value object for an exploration parameter specification."""
+    def __init__(self, obj_type):
         if not obj_services.get_object_class(obj_type):
             raise ValueError('Invalid obj_type: %s' % obj_type)
 
-        self.name = name
         self.obj_type = obj_type
 
     def to_dict(self):
         return {
-            'name': self.name,
             'obj_type': self.obj_type,
         }
 
     @classmethod
-    def from_dict(cls, param_dict):
-        return cls(param_dict['name'], param_dict['obj_type'])
+    def from_dict(cls, param_spec_dict):
+        return cls(param_spec_dict['obj_type'])
 
 
 class ParamChange(object):

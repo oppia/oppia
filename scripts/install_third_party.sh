@@ -93,12 +93,13 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   cd ../../oppia
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
-  mv $TOOLS_DIR/jsrepl/build $THIRD_PARTY_DIR/static/jsrepl
+  mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
 
 ME=$(whoami)
-sudo chown -R $ME $TOOLS_DIR
+sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
 sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
 sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 
 # Static resources.

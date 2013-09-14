@@ -275,7 +275,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       var extendedRule = {
         description: description,
         definition: {
-          rule_type: 'atomic',
+          rule_type: description == 'Default' ? 'default' : 'atomic',
           name: name,
           inputs: inputs,
           subject: 'answer'

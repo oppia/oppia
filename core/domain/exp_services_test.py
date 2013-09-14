@@ -231,7 +231,7 @@ class ExportUnitTests(ExplorationServicesUnitTests):
             yaml_content,
 """default_skin: conversation_v1
 param_changes: []
-param_specs: []
+param_specs: {}
 schema_version: 1
 states:
 - content: []

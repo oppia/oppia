@@ -1,8 +1,8 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs:
-- name: guess
-  obj_type: UnicodeString
+  guess:
+    obj_type: UnicodeString
 schema_version: 1
 states:
 - content:

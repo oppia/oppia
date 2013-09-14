@@ -22,6 +22,8 @@ should therefore be independent of the specific storage models used."""
 
 __author__ = 'Sean Lip'
 
+import re
+
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.platform import models
@@ -287,9 +289,10 @@ class Exploration(object):
         self.category = exploration_model.category
         self.title = exploration_model.title
         self.state_ids = exploration_model.state_ids
-        self.param_specs = [
-            param_domain.ParamSpec.from_dict(param_spec_dict)
-            for param_spec_dict in exploration_model.param_specs]
+        self.param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exploration_model.param_specs.iteritems()
+        }
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in exploration_model.param_changes]
@@ -326,6 +329,12 @@ class Exploration(object):
                     'Invalid character %s in exploration title %s'
                     % (c, self.title))
 
+        for param_name in self.param_specs:
+            if not re.compile('^[a-zA-Z0-9]+$').match(param_name):
+                raise ValueError(
+                    'Only parameter names with characters in [a-zA-Z0-9] are '
+                    'accepted.')
+
     # Derived attributes of an exploration.
     @property
     def init_state_id(self):
@@ -345,9 +354,10 @@ class Exploration(object):
         return self.states[0]
 
     @property
-    def param_spec_dicts(self):
-        """A list of param specs, represented as JSONifiable Python dicts."""
-        return [param_spec.to_dict() for param_spec in self.param_specs]
+    def param_specs_dict(self):
+        """A dict of param specs, each represented as Python dicts."""
+        return {ps_name: ps_val.to_dict()
+                for (ps_name, ps_val) in self.param_specs.iteritems()}
 
     @property
     def param_change_dicts(self):
@@ -356,12 +366,11 @@ class Exploration(object):
 
     def get_obj_type_for_param(self, param_name):
         """Returns the obj_type for the given parameter."""
-        for param_spec in self.param_specs:
-            if param_spec.name == param_name:
-                return param_spec.obj_type
-
-        raise Exception('Exploration %s has no parameter named %s' %
-                        (self.title, param_name))
+        try:
+            return self.param_specs[param_name].obj_type
+        except:
+            raise Exception('Exploration %s has no parameter named %s' %
+                            (self.title, param_name))
 
     @property
     def is_demo(self):

@@ -114,8 +114,25 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         var body = modal.append('div')
           .attr('class', 'modal-body');
         if (improvementType) {
-          body.append('div')
+          var CONFUSING_EXPLANATION = 'Students often leave the page when they get ' +
+              'to this state -- this could mean the non-interactive content didn\'t ' +
+              'make sense, so they didn\'t know how to respond to it.';
+          var NEED_FEEDBACK_EXPLANATION = 'Students often return to this state ' +
+              'after giving an answer -- this could mean that the feedback they are ' +
+              'getting is insufficient to help them learn.';
+
+          var improvementExplanation = (
+              improvementType == 'May be confusing' ?
+              CONFUSING_EXPLANATION : NEED_FEEDBACK_EXPLANATION);
+
+          var improvementDiv = body.append('div')
             .text("It looks like this state " + improvementType.toLowerCase());
+          improvementDiv.append('img')
+            .attr('class', 'oppia-help')
+            .attr('src', '/images/help.png')
+            .attr('ui-jq', 'tooltip')
+            .attr('title', improvementExplanation)
+            .style('margin-left', '5px');
         }
         body.append('div')
           .style('font-weight', 'bold')
