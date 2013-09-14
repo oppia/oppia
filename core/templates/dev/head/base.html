@@ -92,6 +92,14 @@
                           <li>
                             <a href="{{logout_url}}">Logout</a>
                           </li>
+
+                          {% if is_admin %}
+                            <li class="dropdown">
+                              <a href="admin">
+                                Admin Page
+                              </a>
+                            </li>
+                          {% endif %}
                         </ul>
                       </li>
                     {% else %}
