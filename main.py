@@ -29,6 +29,7 @@ from core.controllers import pages
 from core.controllers import profile
 from core.controllers import reader
 from core.controllers import resources
+from core.controllers import services
 from core.controllers import widgets
 
 import webapp2
@@ -50,6 +51,7 @@ class Error404Handler(base.BaseHandler):
 
 # Regex for base64 id encoding
 r = '[A-Za-z0-9=_-]+'
+
 
 def generate_static_url_tuples():
     static_urls = []
@@ -146,6 +148,9 @@ urls = [
     get_redirect_route(
         r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
         'widget_handler'),
+
+    get_redirect_route(
+        r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
 ]
 
 # 404 error handler.
@@ -158,6 +163,7 @@ else:
 
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
+
 
 # Called on non-GAE platforms to start the development server.
 def main():
