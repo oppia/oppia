@@ -74,23 +74,22 @@ class ExplorationModel(base_models.BaseModel):
     def validate_param_specs(value):
         """Validator for the param_specs property."""
         try:
-            assert isinstance(value, list)
-            for val in value:
-                assert isinstance(val, dict)
-                assert len(val.keys()) == 2
-                assert all(
-                    [prop in val for prop in ['name', 'obj_type']])
+            assert isinstance(value, dict)
+            for key in value:
+                assert isinstance(key, basestring)
+                assert len(value[key]) == 1
+                assert 'obj_type' in value[key]
         except AssertionError:
             raise ValidationError(
-                'The \'param_specs\' property must be a list of param_spec '
-                ' dicts; received %s' % value
+                'The \'param_specs\' property must be a dict of param_specs; '
+                'received %s' % value
             )
 
-    # The list of parameter specifications associated with this exploration.
-    # Each specification is a dict with the keys 'name' and 'obj_type', both of
-    # whose values are strings.
+    # The dict of parameter specifications associated with this exploration.
+    # Each specification is a dict whose keys are param names and whose values
+    # are each dicts with a single key, 'obj_type', whose value is a string.
     param_specs = django_utils.JSONField(
-        blank=True, default=[], primitivelist=True,
+        blank=True, default={}, primitivelist=True,
         validators=[validate_param_specs]
     )
 

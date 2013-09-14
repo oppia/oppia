@@ -16,8 +16,8 @@ param_changes:
   generator_id: RandomSelector
   name: noteStart
 param_specs:
-- name: noteStart
-  obj_type: UnicodeString
+  noteStart:
+    obj_type: UnicodeString
 schema_version: 1
 states:
 - content:

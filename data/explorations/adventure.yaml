@@ -1,18 +1,18 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs:
-- name: Name
-  obj_type: UnicodeString
-- name: Weapon
-  obj_type: UnicodeString
-- name: sneezeitem
-  obj_type: UnicodeString
-- name: payitem
-  obj_type: UnicodeString
-- name: numcoins
-  obj_type: UnicodeString
-- name: Test
-  obj_type: UnicodeString
+  Name:
+    obj_type: UnicodeString
+  Weapon:
+    obj_type: UnicodeString
+  sneezeitem:
+    obj_type: UnicodeString
+  payitem:
+    obj_type: UnicodeString
+  numcoins:
+    obj_type: UnicodeString
+  Test:
+    obj_type: UnicodeString
 schema_version: 1
 states:
 - content:

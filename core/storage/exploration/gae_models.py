@@ -83,10 +83,10 @@ class ExplorationModel(base_models.BaseModel):
     # The list of state ids this exploration consists of. This list should not
     # be empty.
     state_ids = ndb.StringProperty(repeated=True)
-    # The list of parameter specifications associated with this exploration.
-    # Each specification is a dict with the keys 'name' and 'obj_type', both of
-    # whose values are strings.
-    param_specs = ndb.JsonProperty(repeated=True)
+    # The dict of parameter specifications associated with this exploration.
+    # Each specification is a dict whose keys are param names and whose values
+    # are each dicts with a single key, 'obj_type', whose value is a string.
+    param_specs = ndb.JsonProperty(default={})
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True)
@@ -139,16 +139,16 @@ class ExplorationModel(base_models.BaseModel):
 
         # Do validation.
         try:
-            assert isinstance(self.param_specs, list)
-            for param_spec in self.param_specs:
-                assert isinstance(param_spec, dict)
-                assert len(param_spec.keys()) == 2
-                assert 'name' in param_spec
-                assert 'obj_type' in param_spec
+            assert isinstance(self.param_specs, dict)
+            for param_name in self.param_specs:
+                assert isinstance(param_name, basestring)
+                assert len(self.param_specs[param_name]) == 1
+                assert 'obj_type' in self.param_specs[param_name]
+
         except AssertionError:
             raise db.BadValueError(
-                'The \'param_specs\' property must be a list of param_spec '
-                ' dicts; received %s' % self.param_specs
+                'The \'param_specs\' property must be a dict of param_specs; '
+                'received %s' % self.param_specs
             )
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:

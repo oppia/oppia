@@ -187,8 +187,7 @@ def get_rule_description(definition, param_specs, answer_type):
         if definition['subject'] == 'answer':
             subject_type = answer_type
         else:
-            subject_type = next(ps.obj_type for ps in param_specs
-                                if ps.name == definition['subject'])
+            subject_type = param_specs[definition['subject']].obj_type
 
         all_rule_classes = get_rules_for_input_type(subject_type)
 
@@ -235,8 +234,7 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer):
         if subject_name == 'answer':
             subject_type = answer_type
         else:
-            subject_type = next(ps.obj_type for ps in param_specs
-                                if ps.name == subject_name)
+            subject_type = param_specs[subject_name].obj_type
 
         all_rule_classes = get_rules_for_input_type(subject_type)
         rule = next(r for r in all_rule_classes

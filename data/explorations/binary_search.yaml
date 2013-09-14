@@ -1,44 +1,44 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs:
-- name: previousNumber
-  obj_type: UnicodeString
-- name: lowest
-  obj_type: UnicodeString
-- name: highest
-  obj_type: UnicodeString
-- name: guess
-  obj_type: UnicodeString
-- name: precomputeHighest
-  obj_type: UnicodeString
-- name: precomputeGuess
-  obj_type: UnicodeString
-- name: precomputeLowest
-  obj_type: UnicodeString
-- name: MagicianNumber
-  obj_type: UnicodeString
-- name: tries
-  obj_type: UnicodeString
-- name: worstnum
-  obj_type: UnicodeString
-- name: rangeSize
-  obj_type: UnicodeString
-- name: middle
-  obj_type: UnicodeString
-- name: OptimalityProxy
-  obj_type: UnicodeString
-- name: largestValidRange
-  obj_type: UnicodeString
-- name: upperBound
-  obj_type: UnicodeString
-- name: lowerBound
-  obj_type: UnicodeString
-- name: comparison
-  obj_type: UnicodeString
-- name: newLowest
-  obj_type: UnicodeString
-- name: newHighest
-  obj_type: UnicodeString
+  previousNumber:
+    obj_type: UnicodeString
+  lowest:
+    obj_type: UnicodeString
+  highest:
+    obj_type: UnicodeString
+  guess:
+    obj_type: UnicodeString
+  precomputeHighest:
+    obj_type: UnicodeString
+  precomputeGuess:
+    obj_type: UnicodeString
+  precomputeLowest:
+    obj_type: UnicodeString
+  MagicianNumber:
+    obj_type: UnicodeString
+  tries:
+    obj_type: UnicodeString
+  worstnum:
+    obj_type: UnicodeString
+  rangeSize:
+    obj_type: UnicodeString
+  middle:
+    obj_type: UnicodeString
+  OptimalityProxy:
+    obj_type: UnicodeString
+  largestValidRange:
+    obj_type: UnicodeString
+  upperBound:
+    obj_type: UnicodeString
+  lowerBound:
+    obj_type: UnicodeString
+  comparison:
+    obj_type: UnicodeString
+  newLowest:
+    obj_type: UnicodeString
+  newHighest:
+    obj_type: UnicodeString
 schema_version: 1
 states:
 - content:

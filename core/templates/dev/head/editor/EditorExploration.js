@@ -139,7 +139,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
     $scope.initStateId = data.init_state_id;
     $scope.isPublic = data.is_public;
     $scope.currentUser = data.user;
-    $scope.paramSpecs = data.param_specs || [];
+    $scope.paramSpecs = data.param_specs || {};
     $scope.explorationParamChanges = data.param_changes || [];
 
     $scope.explorationSnapshots = [];
@@ -178,12 +178,12 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
     $scope.highlightStates = {};
     $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
-    for (var i = 0; i < data.imp.length; i++) {
-      if (data.imp[i].type == 'default') {
-        $scope.highlightStates[data.imp[i].state_id] = '#EE8800';
+    for (var j = 0; j < data.imp.length; j++) {
+      if (data.imp[j].type == 'default') {
+        $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
       }
-      if (data.imp[i].type == 'incomplete') {
-        $scope.highlightStates[data.imp[i].state_id] = 'brown';
+      if (data.imp[j].type == 'incomplete') {
+        $scope.highlightStates[data.imp[j].state_id] = 'brown';
       }
     }
 
@@ -332,7 +332,13 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     console.log("adding parameter to exploration");
-    $scope.paramSpecs.push({name:name, obj_type:type});
+    if (name in $scope.paramSpecs) {
+      warningsData.addWarning(
+        'Parameter ' + name + ' already exists, so it was not added.');
+      return;
+    }
+
+    $scope.paramSpecs[name] = {obj_type: type};
     $http.put(
         $scope.explorationDataUrl,
         $scope.createRequest({
@@ -350,7 +356,7 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
             error(function(data) {
               warningsData.addWarning(
                   'Error adding parameter: ' + data.error);
-              $scope.paramSpecs.pop();
+              delete $scope.paramSpecs[name];
             });
   };
 

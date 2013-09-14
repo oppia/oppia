@@ -249,15 +249,21 @@ class ExplorationDataUnitTests(DataUnitTest):
     def verify_exploration_dict(self, exploration_dict):
         """Verifies an exploration dict."""
         EXPLORATION_SCHEMA = [
-            ('param_specs', list), ('states', list),
+            ('param_specs', dict), ('states', list),
             ('default_skin', basestring), ('param_changes', list),
             ('schema_version', int)
         ]
         self.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
 
-        PARAMETER_SCHEMA = [('name', basestring), ('obj_type', basestring)]
-        for param in exploration_dict['param_specs']:
-            self.verify_dict_keys_and_types(param, PARAMETER_SCHEMA)
+        # Each param spec value should be a dict of the form
+        # {obj_type: [STRING]}.
+        for param_key in exploration_dict['param_specs']:
+            ps_value = exploration_dict['param_specs'][param_key]
+            if len(ps_value) != 1 or ps_value.keys()[0] != 'obj_type':
+                raise Exception('Invalid param_spec dict: %s' % ps_value)
+
+            obj_class = obj_services.get_object_class(ps_value['obj_type'])
+            self.assertIsNotNone(obj_class)
 
         # Verify there is at least one state.
         self.assertTrue(exploration_dict['states'])
