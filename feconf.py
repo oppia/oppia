@@ -63,6 +63,7 @@ DEMO_EXPLORATIONS = [
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem', 'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
+    ('tar', 'Missions - Tar', 'Tar'),
 ]
 
 # Whether to unconditionally log info messages.
@@ -84,6 +85,9 @@ elif PLATFORM == 'django':
 
 # The directory containing data files for tests.
 TESTS_DATA_DIR = 'core/tests/data'
+
+# The directory containing data files for explorations
+DATA_DIR = 'data/files/'
 
 # The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'

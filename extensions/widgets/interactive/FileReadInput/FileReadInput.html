@@ -1,0 +1,22 @@
+<html ng-app="fileInputWidget">
+  <head>
+    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+    </script>
+  </head>
+
+  <body>
+    <div ng-controller="FileReadInput">
+
+        <!-- TODO(sll): Can not call submitAnswer without addressing it via prototype. -->
+        <input onchange="FileReadInput.prototype.submitAnswer(this)"
+               type="file" required>
+    </div>
+
+    <script src="/extensions/widgets/interactive/FileReadInput/static/js/FileReadInput.js">
+    </script>
+  </body>
+</html>

@@ -54,3 +54,7 @@ class RealRule(rule_domain.Rule):
 
 class SetRule(rule_domain.Rule):
     subject_type = objects.Set
+
+
+class UnicodeStringRule(rule_domain.Rule):
+    subject_type = objects.UnicodeString
