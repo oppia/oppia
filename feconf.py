@@ -63,7 +63,7 @@ DEMO_EXPLORATIONS = [
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem', 'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('tar', 'Missions - Tar', 'Tar'),
+    ('tar', 'Missions - Tar', 'Open Source Tools'),
 ]
 
 # Whether to unconditionally log info messages.
@@ -124,7 +124,7 @@ NONINTERACTIVE_PREFIX = 'noninteractive'
 # The total number of non-interactive widgets. Used as a sanity check.
 NONINTERACTIVE_WIDGET_COUNT = 1
 # The total number of interactive widgets. Used as a sanity check.
-INTERACTIVE_WIDGET_COUNT = 9
+INTERACTIVE_WIDGET_COUNT = 10
 
 # Static file url to path mapping
 PATH_MAP = {

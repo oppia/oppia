@@ -18,6 +18,8 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
+ME=$(whoami)
+
 echo Checking if node.js is installed in tools
 if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
@@ -50,6 +52,11 @@ echo Checking whether Karma is installed in tools
 if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   echo Installing Karma
   sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
+
+  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
+  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
 # For this to work, you must first run
@@ -94,13 +101,12 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
-fi
 
-ME=$(whoami)
-sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
+  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
+  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
+fi
 
 # Static resources.
 echo Checking whether angular-ui is installed in third_party

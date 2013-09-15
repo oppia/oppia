@@ -12,11 +12,11 @@ function FileReadInput($scope) {
     var theFile = element.files[0];
 
     if (theFile.size === 0) {
-      alert("Please choose a non-empty file.")
+      alert("Please choose a non-empty file.");
       return;
     }
-    if (theFile.size >= 2000) {
-      alert("File too large. Please choose a file less than 2 kilobyte in size.")
+    if (theFile.size >= 1000) {
+      alert("File too large. Please choose a file less than 2 kilobyte in size.");
       return;
     }
 
@@ -31,10 +31,10 @@ function FileReadInput($scope) {
       type: 'POST',
       datatype: 'json',
       success: function(data) {
-        console.log(data)
+        console.log(data);
         var answer = data['base64_file_content'];
         if (!answer) {
-          alert("An error occurred while processing your input.")
+          alert("An error occurred while processing your input.");
           return;
         }
         if (parent.location.pathname.indexOf('/learn') === 0) {
@@ -46,5 +46,4 @@ function FileReadInput($scope) {
       }
     });
   };
-};
-
+}
