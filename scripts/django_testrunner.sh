@@ -45,4 +45,4 @@ pip install -r requirements.txt -q || {
 	exit 1;
 }
 
-python ./core/tests/django_suite.py
+python ./core/tests/django_suite.py $@
