@@ -3,6 +3,55 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.1.0 (14 Sep 2013)
+--------------------
+Reader-visible improvements:
+* Add better support for LaTeX.
+* Improve the scrolling behavior in the reader view.
+
+Editor improvements:
+* Make the exploration statistics view much more intuitive: introduce a graph showing what fraction of reader entries reach each state, provide helpful suggestions to improve state content and rules, and add direct links to the state editor to make such improvements easy.
+* Add links in the state editor to incoming and destination states for easy navigation.
+* Display a warning if the END state for an exploration is unreachable.
+* Update the exploration graph when a change is made, without requiring the editor to refresh the page.
+* Add simple versioning for explorations.
+
+Extensions:
+* Add interactive widgets for code REPL and file input.
+* Add new binary search and tar explorations; rewrite the combinatorics and welcome explorations.
+* Allow customization of the text on the button for the Continue widget.
+
+Admin page:
+* Add a link to a simple admin page for app owners.
+* Add latency and memcache counters.
+* Allow an admin to reload individual demo explorations.
+
+Domain models and infrastructure:
+* Substantial cleanup of the domain modelling across the entire backend.
+* Finalize v1 of the exploration data file schema.
+* Rewrite the statistics models to be more conceptually expressive.
+* Add pluggable storage models, thus allowing Oppia to run on Django as well as App Engine.
+* Add a new datastore model for app configuration properties.
+* Replace the classifier datastore model with individual rule domain objects to improve flexibility.
+* Add a registry for widgets, and take them out of the datastore; they now run at the code level.
+* Add a new parameter value generator extension framework, and some examples.
+* Allow explorations to define custom skins for the reader view.
+* Add memcache functionality.
+* Add transactions around exploration update operations.
+
+Testing:
+* Add karma test framework for the frontend.
+* Add lots of backend and frontend tests.
+* Add flags that allow individual tests and tests within a particular class or module to be run, instead of the entire suite.
+* Add a flag that allows slow tests to be omitted from a test run.
+* Added a test runner that 'plays through' reader explorations.
+
+Development:
+* Start scripts now run on (at least) Ubuntu Linux and Mac.
+
+Security:
+* Add CSRF protection.
+
 
 v1.0.5 (30 Jun 2013)
 --------------------
