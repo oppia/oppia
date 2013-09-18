@@ -303,19 +303,13 @@ textarea {
 
 .oppia-editable-name {
   color: #8f8661;
+  font-weight: bold;
 }
 .oppia-editable-name:hover {
   background: #efefef;
 }
 .oppia-editable-name:hover::after {
   content: ' ✎';
-}
-
-.oppia-droppable-active {
-  background: lightyellow;
-}
-.oppia-droppable-trash-active {
-  background: red;
 }
 
 .oppia-add-content-box {

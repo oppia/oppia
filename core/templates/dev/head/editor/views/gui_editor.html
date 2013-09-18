@@ -73,78 +73,75 @@
                 <a ng-click="deleteContent($index)">Delete</a>
               </span>
 
-              <ng-switch on="item.type">
-
-                <div ng-switch-when="text">
-                  <div ng-show="activeInputData.name == 'content.' + $index">
-                    <!-- The display of this element is controlled manually, outside Angular JS. -->
-                    <div class="yui-skin-sam">
-                      <textarea name="yuiEditor<[$index]>" id="yuiEditor<[$index]>" cols="50" rows="10">
-                        <[content[$index]]>
-                      </textarea>
-                    </div>
-                    <button ng-click="saveContent($index)">Save</button>
+              <div ng-if="item.type == 'text'">
+                <div ng-show="activeInputData.name == 'content.' + $index">
+                  <!-- The display of this element is controlled manually, outside Angular JS. -->
+                  <div class="yui-skin-sam">
+                    <textarea name="yuiEditor<[$index]>" id="yuiEditor<[$index]>" cols="50" rows="10">
+                      <[content[$index]]>
+                    </textarea>
                   </div>
-
-                  <div ng-hide="activeInputData.name == 'content.' + $index">
-                    <span ng-show="item.value == ''" class="oppia-placeholder">
-                      <[defaultTextContent]>
-                    </span>
-                    <span ng-bind-html="item.value"></span>
-                  </div>
+                  <button ng-click="saveContent($index)">Save</button>
                 </div>
 
-                <div ng-switch-when="image">
-                  <ng-switch on="item.value == ''">
-                    <div ng-switch-when="true" class="oppia-placeholder">
-                      <form id="newImageForm">
-                        Upload an image:
-                        <input type="file" id="newImage" name="newImage" image-upload="true">
-                        <button type="button" ng-click="saveStateContentImage($index)">Save</button>
-                      </form>
-                      <span class="oppia-loading" id="uploadImageLoading"></span>
-                    </div>
-                    <div ng-switch-default>
-                      <img class="oppia-small-image" ng-src="/imagehandler/<[item.value]>"></img>
-                      <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
-                    </div>
-                  </ng-switch>
+                <div ng-hide="activeInputData.name == 'content.' + $index">
+                  <span ng-show="item.value == ''" class="oppia-placeholder">
+                    <[defaultTextContent]>
+                  </span>
+                  <span ng-bind-html="item.value"></span>
                 </div>
+              </div>
 
-                <div ng-switch-when="video">
-                  <ng-switch on="item.value == ''">
-                    <div ng-switch-when="true" class="oppia-placeholder">
-                      <form novalidate name="addVideoContent" ng-submit="hideVideoInputDialog(newVideoLink, $index)">
-                        Add a Youtube video link:
-                        <input type="text" ng-model="newVideoLink" id="newVideoLink" required>
-                        <input type="submit" value="Save" ng-disabled="addVideoContent.$invalid">
-                      </form>
-                    </div>
-                    <div ng-switch-default>
-                      <iframe width="100" height="56" src="https://www.youtube.com/embed/<[item.value]>?rel=0"
-                              frameborder="0" allowfullscreen></iframe>
-                      <span ng-click="deleteVideo($index)" class="oppia-thumbnail">&times;</span>
-                    </div>
-                  </ng-switch>
-                </div>
-
-                <div ng-switch-when="widget">
-                  <div ng-show="item.value == ''">
-                    <iframe ng-src="/widgetrepository?iframed=true&interactive=false&parent_index=<[$index]>" width="100%" height="400px" frameborder="0"></iframe>
+              <div ng-if="item.type == 'image'">
+                <ng-switch on="item.value == ''">
+                  <div ng-switch-when="true" class="oppia-placeholder">
+                    <form id="newImageForm">
+                      Upload an image:
+                      <input type="file" id="newImage" name="newImage" image-upload="true">
+                      <button type="button" ng-click="saveStateContentImage($index)">Save</button>
+                    </form>
+                    <span class="oppia-loading" id="uploadImageLoading"></span>
                   </div>
-
-                  <div ng-hide="item.value == ''">
-                    <button type="button" ng-click="deleteWidget($index)">Change widget</button>
-                    <span ng-show="hasCustomizableParams(item.value)">
-                      <a href="#" ng-click="customizeWidget($index)" data-toggle="modal" data-target="#customizeNonInteractiveWidgetModal">
-                        Customize
-                      </a>
-                    </span>
-                    <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
+                  <div ng-switch-default>
+                    <img class="oppia-small-image" ng-src="/imagehandler/<[item.value]>"></img>
+                    <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
                   </div>
+                </ng-switch>
+              </div>
+
+              <div ng-if="item.type == 'video'">
+                <div ng-if="item.value == ''" class="oppia-placeholder">
+                  <form novalidate name="addVideoContent" ng-submit="hideVideoInputDialog(newVideoLink, $index)">
+                    Add a Youtube video link:
+                    <input type="text" ng-model="newVideoLink" id="newVideoLink" required>
+                    <input type="submit" value="Save" ng-disabled="addVideoContent.$invalid">
+                  </form>
+                </div>
+                <div ng-if="item.value != ''">
+                  <iframe width="100" height="56"
+                          ng-src="<[getYoutubeVideoUrl(item.value)]>"
+                          frameborder="0" allowfullscreen>
+                  </iframe>
+                  <span ng-click="deleteVideo($index)" class="oppia-thumbnail">&times;</span>
+                </div>
+              </div>
+
+              <div ng-if="item.type == 'widget'">
+                <div ng-show="item.value == ''">
+                  <iframe ng-src="<[getWidgetRepositoryUrl($index)]>" width="100%" height="400px" frameborder="0"></iframe>
                 </div>
 
-              </ng-switch>
+                <div ng-hide="item.value == ''">
+                  <button type="button" ng-click="deleteWidget($index)">Change widget</button>
+                  <span ng-show="hasCustomizableParams(item.value)">
+                    <button ng-click="customizeWidget($index)" data-toggle="modal" data-target="#customizeNonInteractiveWidgetModal">
+                      Customize
+                    </button>
+                  </span>
+                  <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
+                </div>
+              </div>
+
             </li>
           </ul>
 
@@ -172,16 +169,21 @@
       </button>
       <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
     </div>
+
     <div class="modal-body">
-      <div ng-repeat="(key, val) in customizationParams">
-        <span ng-show="isArray(val)">
-          <[key]>: <list items="val"></list>
-        </span>
-        <span ng-hide="isArray(val)">
-          <[key]>: <string item="customizationParams[key]">
-        </span>
+      The following widget parameters can be customized:
+      <br><br>
+      <div ng-repeat="(key, paramDict) in customizationParams">
+        <strong><[key]></strong>
+        <value-generator-editor generator-id="paramDict.generator_id"
+                                init-args="paramDict.init_args"
+                                customization-args="paramDict.customization_args"
+                                obj-type="paramDict.obj_type">
+        </value-generator-editor>
+        <br>
       </div>
     </div>
+
     <div class="modal-footer">
       <button type="button" class="btn" data-dismiss="modal" ng-click="saveNonInteractiveWidgetParams()">Save</button>
     </div>

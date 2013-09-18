@@ -16,7 +16,7 @@
         <div ng-show="response"
           class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
           id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>"
-          ng-bind-html-unsafe="response">
+          ng-bind-html="response">
         </div>
       </div>
 

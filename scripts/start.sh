@@ -67,6 +67,7 @@ python build.py
 bash scripts/test.sh $@
 
 # Set up a local dev instance
+# TODO(sll): Do this in a new shell.
 echo Starting GAE development server
 python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
 

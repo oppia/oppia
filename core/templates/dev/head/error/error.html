@@ -5,8 +5,6 @@
     Error 400 - Bad Request
   {% elif code == 401 %}
     Error 401 - Unauthorized
-  {% elif code == 404 %}
-    Error 404 - Page Not Found
   {% elif code == 500 %}
     Error 500 - System Error
   {% endif %}
@@ -23,8 +21,6 @@
             Error 400 - Bad Request
           {% elif code == 401 %}
             Error 401 - Unauthorized
-          {% elif code == 404 %}
-            Error 404 - Page Not Found
           {% elif code == 500 %}
             Error 500 - System Error
           {% endif %}
@@ -35,8 +31,6 @@
             Oops! You reached this page because you entered some input that Oppia doesn't know how to process.
           {% elif code == 401 %}
             Sorry, you are not authorized to access this page.
-          {% elif code == 404 %}
-            Sorry, this page does not exist.
           {% elif code == 500 %}
             Oops! An internal error occurred.
           {% endif %}

@@ -10,31 +10,30 @@
   <[interactiveWidget.name]>
 
   <span class="pull-right">
-    <span ng-show="showPreview" class="oppia-grayed">Preview |</span>
     <span ng-hide="showPreview">
-      <a ng-click="setShowPreview(true)">Preview</a> |
+      <button ng-click="setShowPreview(true)">Preview</button>
     </span>
-
     <span ng-hide="isEmpty(interactiveWidget.params)">
-      <a href="#" data-toggle="modal" data-target="#customizeWidgetModal">
+      <button data-toggle="modal" data-target="#customizeWidgetModal">
         Customize
-      </a> |
+      </button>
     </span>
-    <a href="#" data-toggle="modal" data-target="#interactiveWidgetModal">
+    <button data-toggle="modal" data-target="#interactiveWidgetModal">
       Choose a different interaction
-    </a>
+    </button>
   </span>
 
-  <div ui-if="showPreview">
+  <br><br>
+
+  <div ng-if="showPreview">
     <a class="pull-right" ng-click="setShowPreview(false)"><b>&times;</b></a>
     <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
     </iframe>
   </div>
   <div style="margin-left:30px;">
     <label>
-      <input type="checkbox"
-        ng-model="stickyInteractiveWidget"
-        ng-click="saveStickyInteractiveWidget()">
+      <input type="checkbox" ng-model="stickyInteractiveWidget"
+             ng-click="saveStickyInteractiveWidget()">
       Do not reload if the previous state uses the same widget.
     </label>
   </div>
@@ -60,7 +59,10 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>:
+          <span class="oppia-editable-name" data-toggle="modal" data-target="#addRuleModal"
+                ng-click="openEditRuleModal(handler.name, $index)">
+            Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>
+          </span>:
           <span ng-show="rule.dest == 'END' || rule.dest == stateId">
             (<[getStateNameForRule(rule.dest)]>,
           </span>
@@ -72,15 +74,11 @@
           <[rule.feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
-          <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(handler.name, $index)">
-            Edit
-          </a>
-
           <span ng-show="$index != 0">
-            | <a ng-click="swapRules(handler.name, $index, $index - 1)"> ⇑ </a>
+            <a ng-click="swapRules(handler.name, $index, $index - 1)"> ⇑ </a>
           </span>
           <span ng-hide="$index != 0">
-            | <span class="oppia-grayed"> ⇑ </span>
+            <span class="oppia-grayed"> ⇑ </span>
           </span>
 
           <span ng-show="$index < interactiveRulesets[handler.name].length - 2">
@@ -100,10 +98,10 @@
           •
         </td>
         <td style="width: 75%; vertical-align: top">
-          <a href="#" data-toggle="modal"
-            data-target="#addRuleModal" ng-click="openAddRuleModal(handler.name)">
+          <span class="oppia-editable-name" data-toggle="modal"
+                data-target="#addRuleModal" ng-click="openAddRuleModal(handler.name)">
             Add new rule...
-          </a>
+          </span>
         </td>
         <td style="width: 20%; vertical-align: top"></td>
       </tr>
@@ -117,7 +115,10 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>:
+          <span class="oppia-editable-name" data-toggle="modal" data-target="#addRuleModal"
+                ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">
+            <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>
+          </span>:
           <span ng-show="getDefaultRule(handler.name).dest == 'END' || getDefaultRule(handler.name).dest == stateId">
             (<[getStateNameForRule(getDefaultRule(handler.name).dest)]>,
           </span>
@@ -129,21 +130,11 @@
           <[getDefaultRule(handler.name).feedback|truncate]>)
         </td>
         <td style="width: 20%; vertical-align: top">
-          <a href="#" data-toggle="modal" data-target="#addRuleModal" ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">
-            Edit
-          </a>
-
-          <span>
-            | <span class="oppia-grayed"> ⇑ </span>
-          </span>
-
-          <span>
-            | <span class="oppia-grayed"> ⇓ </span>
-          </span>
-
-          <span>
-            | <span class="oppia-grayed"> &times; </span>
-          </span>
+          <span class="oppia-grayed"> ⇑ </span>
+          |
+          <span class="oppia-grayed"> ⇓ </span>
+          |
+          <span class="oppia-grayed"> &times; </span>
         </td>
       </tr>
     </table>

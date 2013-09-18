@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $timeout, warningsData) {
+ function ReaderExploration($scope, $http, $sce, $timeout, warningsData) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
@@ -92,7 +92,7 @@
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [data.oppia_html];
+    $scope.responseLog = [$sce.trustAsHtml(data.oppia_html)];
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
@@ -154,7 +154,10 @@
     $scope.stateHistory = data.state_history;
 
     $scope.responseLog = $scope.responseLog || [];
-    $scope.responseLog.push(data.reader_response_html, data.oppia_html);
+    $scope.responseLog.push(
+        $sce.trustAsHtml(data.reader_response_html),
+        $sce.trustAsHtml(data.oppia_html)
+      );
 
     for (var i = 0; i < data.iframe_output.length; i++) {
       $scope.iframeOutput.push(data.iframe_output[i]);
@@ -211,4 +214,4 @@
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ReaderExploration.$inject = ['$scope', '$http', '$timeout', 'warningsData'];
+ReaderExploration.$inject = ['$scope', '$http', '$sce', '$timeout', 'warningsData'];

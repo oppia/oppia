@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
+function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
                    warningsData, activeInputData) {
   explorationData.getData().then(function(data) {
     var promise = explorationData.getStateData($scope.$parent.stateId);
@@ -218,6 +218,11 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     }
   });
 
+  $scope.getYoutubeVideoUrl = function(videoId) {
+    return $sce.trustAsResourceUrl(
+      '//www.youtube.com/embed/' + videoId + '?rel=0');
+  };
+
   $scope.hideVideoInputDialog = function(videoLink, index) {
     if (videoLink) {
       // The content creator has added a new video link. Extract its ID.
@@ -336,8 +341,17 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
     $scope.saveWidget(arg.data.widget, arg.data.parentIndex);
   });
 
+  $scope.getWidgetRepositoryUrl = function(parentIndex) {
+    return $sce.trustAsResourceUrl(
+      '/widgetrepository?iframed=true&interactive=false&parent_index=' + parentIndex);
+  };
+
   $scope.hasCustomizableParams = function(widgetValue) {
-    return Boolean(JSON.parse(widgetValue).params);
+    if (widgetValue) {
+      return Boolean(JSON.parse(widgetValue).params);
+    } else {
+      return false;
+    }
   };
 
   $scope.customizeWidget = function(index) {
@@ -383,5 +397,5 @@ function GuiEditor($scope, $http, $filter, $routeParams, explorationData,
 
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams',
+GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams', '$sce',
     'explorationData', 'warningsData', 'activeInputData'];

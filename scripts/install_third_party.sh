@@ -144,19 +144,28 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
 fi
 
 echo Checking whether angularjs is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.0.7" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2" ]; then
   echo Installing AngularJS and angular-sanitize
-  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.0.7/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-sanitize.min.js
+  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.min.js.map
+
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.min.js.map
+
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.min.js.map
+
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js.map  
 
   # Files for tests.
-  wget http://code.angularjs.org/1.0.7/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-mocks.js
-  wget http://code.angularjs.org/1.0.7/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.0.7/angular-scenario.js
+  wget http://code.angularjs.org/1.2.0-rc.2/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-mocks.js
+  wget http://code.angularjs.org/1.2.0-rc.2/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-scenario.js
 fi
 
 echo Checking whether d3.js is installed in third_party

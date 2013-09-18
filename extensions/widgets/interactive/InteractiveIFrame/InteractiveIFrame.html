@@ -1,7 +1,7 @@
 <html ng-app="app">
   <head>
     <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
-    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
+    <script src="/third_party/static/angularjs-1.2.0-rc.2/angular.min.js"></script>
 
     <script>
       var GLOBALS = {};
@@ -14,6 +14,6 @@
     </script>
   </head>
   <body ng-controller="IFrame">
-    <iframe id="iframe" src="<[childPageUrl]>" width="90%" height="400px">
+    <iframe id="iframe" ng-src="<[childPageUrl]>" width="90%" height="400px"></iframe>
   </body>
 </html>

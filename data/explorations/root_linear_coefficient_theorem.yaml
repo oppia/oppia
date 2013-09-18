@@ -165,9 +165,9 @@ states:
           rule_type: default
         dest: Particular coefficients (part 2)
         feedback:
-        - 'This one''s a little tricky.  Maybe trying on this case will help you out?
+        - 'This one''s a little tricky.  Maybe trying this case will help you out?
 
-          (x - a1) * (x - a2) * (x - a3)'
+          $(x - a_1) * (x - a_2) * (x - a_3)$'
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
