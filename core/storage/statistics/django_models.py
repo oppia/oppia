@@ -73,6 +73,28 @@ class StateCounterModel(base_models.BaseModel):
         counter.put()
 
 
+class StateFeedbackFromReaderModel(base_models.BaseModel):
+    """A record of all the feedback given by readers for a particular state.
+
+    The id/key for instances of this class has the form
+        [EXPLORATION_ID].[STATE_ID]
+    """
+    # When this entity was first created.
+    created = models.DateTimeField(auto_now_add=True)
+    # When this entity was last updated.
+    last_updated = models.DateTimeField(auto_now=True)
+
+    feedback_log = django_utils.JSONField(default=[], isdict=False, blank=True)
+
+    @classmethod
+    def get_or_create(cls, exploration_id, state_id):
+      instance_id = '.'.join([exploration_id, state_id])
+      reader_feedback = cls.get(instance_id, strict=False)
+      if not reader_feedback:
+          reader_feedback = cls(id=instance_id, feedback_log=[])
+      return reader_feedback
+
+
 class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
@@ -107,6 +129,23 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         if not answer_log:
             answer_log = cls(id=instance_id, answers={})
         return answer_log
+
+
+def record_state_feedback_from_reader(
+        exploration_id, state_id, feedback, history):
+    """Adds feedback to the reader feedback log for the given state.
+
+    Args:
+        exploration_id: the exploration id
+        state_id: the state id
+        feedback: str. The feedback typed by the reader.
+        history: list. The history of the exploration for this reader.
+    """
+    reader_feedback = StateFeedbackFromReaderModel.get_or_create(
+        exploration_id, state_id)
+    reader_feedback.feedback_log.append({
+        'feedback': feedback, 'history': history})
+    reader_feedback.put()
 
 
 def process_submitted_answer(

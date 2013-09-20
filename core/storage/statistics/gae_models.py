@@ -93,23 +93,6 @@ class StateFeedbackFromReaderModel(base_models.BaseModel):
       return reader_feedback
 
 
-def record_state_feedback_from_reader(
-        exploration_id, state_id, feedback, history):
-    """Adds feedback to the reader feedback log for the given state.
-
-    Args:
-        exploration_id: the exploration id
-        state_id: the state id
-        feedback: str. The feedback typed by the reader.
-        history: list. The history of the exploration for this reader.
-    """
-    reader_feedback = StateFeedbackFromReaderModel.get_or_create(
-        exploration_id, state_id)
-    reader_feedback.feedback_log.append({
-        'feedback': feedback, 'history': history})
-    reader_feedback.put()
- 
-
 class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
@@ -145,6 +128,23 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
             answer_log = cls(id=instance_id, answers={})
         return answer_log
 
+
+def record_state_feedback_from_reader(
+        exploration_id, state_id, feedback, history):
+    """Adds feedback to the reader feedback log for the given state.
+
+    Args:
+        exploration_id: the exploration id
+        state_id: the state id
+        feedback: str. The feedback typed by the reader.
+        history: list. The history of the exploration for this reader.
+    """
+    reader_feedback = StateFeedbackFromReaderModel.get_or_create(
+        exploration_id, state_id)
+    reader_feedback.feedback_log.append({
+        'feedback': feedback, 'history': history})
+    reader_feedback.put()
+ 
 
 def process_submitted_answer(
         exploration_id, state_id, handler_name, rule_str, answer):

@@ -251,8 +251,10 @@ class ReaderFeedbackHandler(base.BaseHandler):
      """Handles POST requests."""
 
      feedback = self.payload.get('feedback')
+     # TODO(sll): Add the reader's history log here.
+
      stats_services.EventHandler.record_state_feedback_from_reader(
-         exploration_id, state_id, feedback, None)
+         exploration_id, state_id, feedback, [])
 
 
 class RandomExplorationPage(base.BaseHandler):
