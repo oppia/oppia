@@ -31,9 +31,11 @@ import logging
 import os
 
 from core.domain import exp_domain
+from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
+from core.domain import value_generators_domain
 from core.domain import widget_domain
 from core.platform import models
 import feconf
@@ -867,3 +869,266 @@ def delete_all_explorations():
     explorations = get_all_explorations()
     for exploration in explorations:
         delete_exploration(None, exploration.id, force_deletion=True)
+
+
+# Verification methods.
+def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
+    """Verifies a state dictionary that came from a YAML file."""
+
+    def _verify_content(state_content_list):
+        """Checks that a state content list specification is valid."""
+        CONTENT_ITEM_SCHEMA = [
+            ('type', basestring), ('value', basestring)]
+        ALLOWED_CONTENT_TYPES = ['text', 'image', 'video']
+
+        for content_item in state_content_list:
+            utils.verify_dict_keys_and_types(content_item, CONTENT_ITEM_SCHEMA)
+            if content_item['type'] not in ALLOWED_CONTENT_TYPES:
+                raise Exception('Unsupported content type %s.' %
+                                content_item['type'])
+
+    def _verify_param_changes(param_changes, exp_param_specs_dict):
+        """Checks that a param_changes specification is valid."""
+
+        PARAM_CHANGE_SCHEMA = [
+            ('name', basestring), ('generator_id', basestring),
+            ('customization_args', utils.ANY_TYPE)]
+
+        generator_registry = value_generators_domain.Registry
+
+        for pc in param_changes:
+            utils.verify_dict_keys_and_types(pc, PARAM_CHANGE_SCHEMA)
+            if pc['name'] not in exp_param_specs_dict:
+                raise Exception('Undeclared param name: %s' % pc['name'])
+
+            value_generator = generator_registry.get_generator_class_by_id(
+                pc['generator_id'])
+
+            for arg_name in pc['customization_args']:
+                if not isinstance(arg_name, basestring):
+                    raise Exception('Invalid param change customization arg '
+                                    'name: %s' % arg_name)
+
+        # TODO(sll): Find a way to verify the customization args when they
+        # depend on context parameters. Can we get sample values for the
+        # reader's answer and these parameters by looking at states that
+        # link to this one?
+
+    ATOMIC_RULE_DEFINITION_SCHEMA = [
+        ('inputs', dict), ('name', basestring), ('rule_type', basestring),
+        ('subject', basestring)]
+    COMPOSITE_RULE_DEFINITION_SCHEMA = [
+       ('children', list), ('rule_type', basestring)]
+    DEFAULT_RULE_DEFINITION_SCHEMA = [('rule_type', basestring)]
+    ALLOWED_COMPOSITE_RULE_TYPES = [
+        rule_domain.AND_RULE_TYPE, rule_domain.OR_RULE_TYPE,
+        rule_domain.NOT_RULE_TYPE]
+
+    def _verify_rule_definition(rule_definition, exp_param_specs_dict):
+        """Verify a rule definition."""
+
+        if 'rule_type' not in rule_definition:
+            raise Exception('Rule definition %s contains no rule type.'
+                            % rule_definition)
+
+        rule_type = rule_definition['rule_type']
+
+        if rule_type == rule_domain.DEFAULT_RULE_TYPE:
+            utils.verify_dict_keys_and_types(
+                rule_definition, DEFAULT_RULE_DEFINITION_SCHEMA)
+        elif rule_type  == rule_domain.ATOMIC_RULE_TYPE:
+            utils.verify_dict_keys_and_types(
+                rule_definition, ATOMIC_RULE_DEFINITION_SCHEMA)
+
+            if (rule_definition['subject'] not in exp_param_specs_dict
+                    and rule_definition['subject'] != 'answer'):
+                raise Exception('Unrecognized rule subject: %s' %
+                                rule_definition['subject'])
+        else:
+            if rule_type not in ALLOWED_COMPOSITE_RULE_TYPES:
+                raise Exception('Unsupported rule type %s.' % rule_type)
+
+            utils.verify_dict_keys_and_types(
+                rule_definition, COMPOSITE_RULE_DEFINITION_SCHEMA)
+            for child_rule in rule_definition['children']:
+                _verify_rule_definition(child_rule, exp_param_specs_dict)
+
+    STATE_DICT_SCHEMA = [
+        ('content', list), ('name', basestring), ('param_changes', list),
+        ('widget', dict)]
+    WIDGET_SCHEMA = [
+        ('widget_id', basestring), ('customization_args', dict),
+        ('handlers', list), ('sticky', bool)]
+    HANDLER_SCHEMA = [('name', basestring), ('rule_specs', list)]
+    RULE_SCHEMA = [
+        ('definition', dict), ('dest', basestring), ('feedback', list),
+        ('param_changes', list)]
+
+    utils.verify_dict_keys_and_types(state_dict, STATE_DICT_SCHEMA)
+    _verify_content(state_dict['content'])
+    _verify_param_changes(state_dict['param_changes'], exp_param_specs_dict)
+    utils.verify_dict_keys_and_types(state_dict['widget'], WIDGET_SCHEMA)
+
+    curr_state_name = state_dict['name']
+
+    for handler in state_dict['widget']['handlers']:
+        utils.verify_dict_keys_and_types(handler, HANDLER_SCHEMA)
+
+        if not handler['rule_specs']:
+            raise Exception('There must be at least one rule.')
+
+        for rule in handler['rule_specs']:
+            utils.verify_dict_keys_and_types(rule, RULE_SCHEMA)
+
+            _verify_rule_definition(rule['definition'], exp_param_specs_dict)
+
+            if rule['dest'] not in state_name_list + [feconf.END_DEST]:
+                raise Exception('Destination %s is invalid.' % rule['dest'])
+
+            # Check that there are no feedback-less self-loops. 
+            # NB: Sometimes it makes sense for a self-loop to not have
+            # feedback, such as unreachable rules in a ruleset for multiple-
+            # choice questions. This should be handled in the frontend so
+            # that a valid dict with feedback for every self-loop is always
+            # saved to the backend.
+            if (rule['dest'] == curr_state_name and not rule['feedback']
+                    and not state_dict['widget']['sticky']):
+                raise Exception('State "%s" has a self-loop with no feedback. '
+                                'This is likely to frustrate the reader.' %
+                                curr_state_name)
+
+            _verify_param_changes(rule['param_changes'], exp_param_specs_dict)
+
+    for wp_name, wp_value in (
+            state_dict['widget']['customization_args'].iteritems()):
+        if not isinstance(wp_name, basestring):
+            raise Exception('Invalid widget customization arg name: %s'
+                            % wp_name)
+
+        try:
+            widget = widget_domain.Registry.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX, state_dict['widget']['widget_id'])
+        except Exception as e:
+            raise Exception(
+                '%s; widget id: %s' % (e, state_dict['widget']['widget_id']))
+
+        widget_param_names = [wp.name for wp in widget.params]
+        if wp.name not in widget_param_names:
+            raise Exception('Parameter %s for widget %s is invalid.' % (
+                wp_name, state_dict['widget']['widget_id']))
+
+        # Get the object class used to normalize the value for this param.
+        for wp in widget.params:
+            if wp.name == wp_name:
+                obj_class = obj_services.get_object_class(wp.obj_type)
+                if obj_class is None:
+                    raise Exception('No obj_class specified.' % obj_class)
+                break
+
+        # TODO(sll): Find a way to verify that the widget parameter values
+        # have the correct type. Can we get sample values for the context
+        # parameters?
+
+def _verify_all_states_reachable(states_list):
+    """Verifies that all states are reachable from the initial state."""
+
+    # This queue stores state names.
+    processed_queue = []
+    curr_queue = [states_list[0]['name']]
+
+    while curr_queue:
+        curr_state = curr_queue[0]
+        curr_queue = curr_queue[1:]
+
+        if curr_state in processed_queue:
+            continue
+
+        processed_queue.append(curr_state)
+
+        curr_state_ind = next(ind for ind, state in enumerate(states_list)
+                              if state['name'] == curr_state)
+
+        for handler in states_list[curr_state_ind]['widget']['handlers']:
+            for rule in handler['rule_specs']:
+                dest_state = rule['dest']
+                if (dest_state not in curr_queue and
+                        dest_state not in processed_queue and
+                        dest_state != feconf.END_DEST):
+                    curr_queue.append(dest_state)
+
+    if len(states_list) != len(processed_queue):
+        unseen_states = list(
+            set([s['name'] for s in states_list]) - set(processed_queue))
+        raise Exception('The following states are not reachable from the '
+                        'initial state: %s' % ', '.join(unseen_states))
+
+def _verify_no_dead_ends(states_list):
+    """Verifies that the END state is reachable from all states."""
+
+    # This queue stores state names.
+    processed_queue = []
+    curr_queue = [feconf.END_DEST]
+
+    while curr_queue:
+        curr_state = curr_queue[0]
+        curr_queue = curr_queue[1:]
+
+        if curr_state in processed_queue:
+            continue
+
+        if curr_state != feconf.END_DEST:
+            processed_queue.append(curr_state)
+
+        for ind, state in enumerate(states_list):
+            state_name = state['name']
+            if (state_name not in curr_queue
+                    and state_name not in processed_queue):
+                state_widget = states_list[ind]['widget']
+                for handler in state_widget['handlers']:
+                    for rule in handler['rule_specs']:
+                        if rule['dest'] == curr_state:
+                            curr_queue.append(state_name)
+                            break
+
+    if len(states_list) != len(processed_queue):
+        dead_end_states = list(
+            set([s['name'] for s in states_list]) - set(processed_queue))
+        raise Exception('The END state is not reachable from the '
+                        'following states: %s' %
+                        ', '.join(dead_end_states))
+
+def verify_exploration_dict(exploration_dict):
+    """Verifies an exploration dict."""
+    EXPLORATION_SCHEMA = [
+        ('default_skin', basestring), ('param_changes', list),
+        ('param_specs', dict), ('schema_version', int), ('states', list)
+    ]
+    utils.verify_dict_keys_and_types(exploration_dict, EXPLORATION_SCHEMA)
+
+    # Each param spec value should be a dict of the form {obj_type: [STRING]}.
+    for param_key in exploration_dict['param_specs']:
+        ps_value = exploration_dict['param_specs'][param_key]
+        if len(ps_value) != 1 or ps_value.keys()[0] != 'obj_type':
+            raise Exception('Invalid param_spec dict: %s' % ps_value)
+
+        obj_class = obj_services.get_object_class(ps_value['obj_type'])
+        if obj_class is None:
+            raise Exception('No object class specified.')
+
+    # Verify there is at least one state.
+    if not exploration_dict['states']:
+        raise Exception('Each exploration should have at least one state.')
+
+    state_name_list = []
+    for state_desc in exploration_dict['states']:
+        state_name = state_desc['name']
+        if state_name in state_name_list:
+            raise Exception('Duplicate state name: %s' % state_name)
+        state_name_list.append(state_name)
+
+    for state_desc in exploration_dict['states']:
+        verify_state_dict(
+            state_desc, state_name_list, exploration_dict['param_specs'])
+
+    _verify_all_states_reachable(exploration_dict['states'])
+    _verify_no_dead_ends(exploration_dict['states'])
