@@ -21,4 +21,5 @@ __author__ = 'Tarashish Mishra'
 from core.storage.statistics import django_models
 
 StateCounterModel = django_models.StateCounterModel
+StateFeedbackFromReaderModel = django_models.StateFeedbackFromReaderModel
 StateRuleAnswerLogModel = django_models.StateRuleAnswerLogModel
