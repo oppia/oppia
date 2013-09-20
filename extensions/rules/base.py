@@ -58,3 +58,7 @@ class SetRule(rule_domain.Rule):
 
 class UnicodeStringRule(rule_domain.Rule):
     subject_type = objects.UnicodeString
+
+
+class TarFileStringRule(rule_domain.Rule):
+    subject_type = objects.TarFileString

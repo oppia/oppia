@@ -59,20 +59,56 @@ states:
     - name: submit
       rule_specs:
       - definition:
-          inputs:
-            filepath: 'learn_tar/myproject-0.1.tar.gz'
-          name: MatchesBase64EncodedFile
+          inputs: {}
+          name: ChecksWrapperDirPresence
           rule_type: atomic
           subject: answer
-        dest: END
-        feedback:
-        - Yes! You got it right.
-        param_changes: []
-      - definition:
-          rule_type: default
         dest: Pack!
         feedback:
-        - Uh oh! That wasn't quite right. Have another go.
+        - Wrapper directory not present.
+        param_changes: []
+      - definition:
+          inputs:
+            x: 'myproject-0.1'
+          name: ChecksWrapperDirName
+          rule_type: atomic
+          subject: answer
+        dest: Pack!
+        feedback:
+        - Wrapper directory name is incorrect.
+        param_changes: []
+      # - dest: Pack!
+      #   feedback:
+      #   - An unexpected file present. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.
+      #   inputs: {}
+      #   name: HasAppleDoubleFile
+      #   param_changes: []
+      # - dest: Pack!
+      #   feedback:
+      #   - An unexpected file present.
+      #   inputs:
+      #     expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+      #   name: HasUnexpectedFile
+      #   param_changes: []
+      # - dest: Pack!
+      #   feedback:
+      #   - Archive does not contain all expected files
+      #   inputs:
+      #     expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+      #   name: MissingExpectedFile
+      #   param_changes: []
+      # - dest: Pack!
+      #   feedback:
+      #   - A file has incorrect contents. 
+      #   inputs:
+      #     file_list: ['hello.c', 'Makefile'] 
+      #   name: HasUnexpectedContent
+      #   param_changes: []
+      - definition:
+          rule_type: default
+        dest: END
+        feedback:
+        - Yay! you did it.
         param_changes: []
     sticky: false
-    widget_id: FileReadInput
+    widget_id: TarFileReadInput

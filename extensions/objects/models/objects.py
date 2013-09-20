@@ -18,7 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import base64
 import numbers
+from StringIO import StringIO
+import tarfile
 
 import feconf
 import jinja_utils
@@ -354,3 +357,21 @@ class Image(UnicodeString):
     icon_filename = ''
     view_html_filename = 'image_view'
     edit_html_filename = None
+
+
+class TarFileString(UnicodeString):
+    """A unicode string with the base64-encoded content of a tar file"""
+
+    description = 'A string with base64-encoded content of a tar file'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert raw is not None
+            assert isinstance(raw, basestring)
+            raw = base64.b64decode(raw)
+            tfile = tarfile.open(fileobj=StringIO(raw), mode='r:gz')
+            return tfile
+        except Exception:
+            raise TypeError('Not a valid tar file.')

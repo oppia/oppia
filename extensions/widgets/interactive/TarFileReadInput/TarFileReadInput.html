@@ -1,0 +1,55 @@
+<html ng-app="tarFileInputWidget">
+  <head>
+    <link rel="stylesheet" type="text/css"
+      href="/lib/static/bootstrap-2.3.1-r1/css/bootstrap.css" media="screen">
+
+    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="/lib/static/bootstrap-2.3.1-r1/js/bootstrap.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular.min.js"></script>
+    <script src="/third_party/static/angularjs-1.0.7/angular-sanitize.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.hintPlaceholder = JSON.parse('{{hint_placeholder|js_string}}');
+      GLOBALS.lowHint = JSON.parse('{{low_hint|js_string}}');
+      GLOBALS.highHint = JSON.parse('{{high_hint|js_string}}');
+    </script>
+  </head>
+
+  <body>
+    <div ng-controller="TarFileReadInput">
+        <ul class="nav nav-tabs" id="hints-tab">
+          <li class="active"><a href="#hint">Hints</a></li>
+          <li><a href="#low-hint">Low</a></li>
+          <li><a href="#high-hint">High</a></li>
+        </ul>
+         
+        <div class="tab-content">
+          <div class="tab-pane active" id="hint" ng-bind-html="hintPlaceholder"></div>
+          <div class="tab-pane" id="low-hint" ng-bind-html="lowHint"></div>
+          <div class="tab-pane" id="high-hint" ng-bind-html="highHint"></div>
+        </div>
+
+        <hr/>
+
+        <input onchange= "TarFileReadInput.prototype.submitAnswer(this)"
+               type="file" required>
+
+        <div id="processing-modal" class="modal hide" data-backdrop="false">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <p></p>
+          </div>
+        </div>
+    </div>
+    
+    <script>
+      $('#hints-tab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+      })
+    </script>
+    <script src="/extensions/widgets/interactive/TarFileReadInput/static/js/TarFileReadInput.js">
+    </script>
+  </body>
+</html>
