@@ -132,7 +132,6 @@ states:
         param_changes: []
       - definition:
           rule_type: default
-          subject: answer
         dest: Finding Helsinki
         feedback:
         - That is rather far away! Try zooming into Finland.

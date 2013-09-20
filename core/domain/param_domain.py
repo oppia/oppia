@@ -100,8 +100,12 @@ class ParamChange(object):
             param_change_dict['customization_args']
         )
 
+    def _get_value(self, context_params):
+        """Generates a single value for a parameter change."""
+        return self.generator.generate_value(
+            context_params, **self.customization_args)
+
     def get_normalized_value(self, obj_type, context_params):
         """Generates a single normalized value for a parameter change."""
-        raw_value = self.generator.generate_value(
-            context_params, **self.customization_args)
+        raw_value = self._get_value(context_params)
         return obj_services.get_object_class(obj_type).normalize(raw_value)

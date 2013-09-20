@@ -171,7 +171,7 @@ class BaseHandler(webapp2.RequestHandler):
         if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 if not self.PAGE_NAME_FOR_CSRF:
-                    raise Exception('No page name specified for this '
+                    raise Exception('No CSRF page name specified for this '
                                     'handler.')
 
                 csrf_token = self.request.get('csrf_token')

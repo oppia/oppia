@@ -15,10 +15,10 @@
     <div ng-controller="TextInput">
       <form ng-submit="submitAnswer(answer)">
 
-        <input ng-show="rows == 1" ng-model="answer"
+        <input ng-if="rows == 1" ng-model="$parent.answer"
                placeholder="<[placeholder]>" size="<[cols]>" required autofocus>
 
-        <textarea ng-show="rows != 1" ng-model="answer"
+        <textarea ng-if="rows != 1" ng-model="$parent.answer"
                   placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
         </textarea>
 

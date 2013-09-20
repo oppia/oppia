@@ -18,7 +18,7 @@
 
         <table>
         <tr ng-repeat="row in exploration_rows">
-           <td ng-repeat="exp in row" style="border: 1px solid #CCC; width: 200px;">
+           <td ng-repeat="exp in row track by $index" style="border: 1px solid #CCC; width: 200px;">
             <span class="oppia-gallery-block">
               <center>
                 <a href="/create/<[exp.id]>">
