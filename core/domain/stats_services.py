@@ -57,6 +57,13 @@ class EventHandler(object):
             exploration_id, state_id, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
+    @classmethod
+    def record_state_feedback_from_reader(
+            cls, exploration_id, state_id, history, feedback):
+        """Records user feedback for a particular state."""
+        stats_models.record_state_feedback_from_reader(
+            exploration_id, state_id, history, feedback)
+
 
 def get_exploration_visit_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""

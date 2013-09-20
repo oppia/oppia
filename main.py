@@ -124,6 +124,9 @@ urls = [
     get_redirect_route(
         r'/learn_random', reader.RandomExplorationPage,
         'random_exploration_page'),
+    get_redirect_route(
+        r'/learn/give-feedback/<exploration_id>/<state_id>', reader.ReaderFeedbackHandler,
+        'reader_feedback_handler'),
 
     get_redirect_route(
         r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,

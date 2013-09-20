@@ -43,6 +43,28 @@
 
   $scope.initializePage();
 
+  $scope.openFeedbackModal = function() {
+    $('#feedbackModal').modal();
+  };
+
+  $scope.submitFeedback = function(feedback) {
+    var requestMap = {
+      feedback: feedback,
+    };
+
+    $http.post(
+        '/learn/give-feedback/' + $scope.explorationId + '/' + $scope.stateId,
+        $scope.createRequest(requestMap),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function() {
+      $scope.feedback = '';
+      $('#feedbackModal').modal('hide');
+    }).error(function(data) {
+      warningsData.addWarning(
+        data.error || 'There was an error processing your input.');
+    });
+  };
+
   $scope.answerIsBeingProcessed = false;
 
   /**
