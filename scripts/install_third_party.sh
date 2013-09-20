@@ -81,6 +81,8 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   git clone git://github.com/replit/jsrepl.git
   cd jsrepl
   git submodule update --init --recursive
+  # Use a specific version of the JSRepl repository.
+  git checkout 13f89c2cab0ee9163e0077102478958a14afb781
 
   # Add a temporary backup file so that this script works on both Linux and Mac.
   TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`

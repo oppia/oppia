@@ -12,11 +12,12 @@
       <br>
       <br>
 
-      <div ng-repeat="response in responseLog">
-        <div ng-show="response"
-          class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
-          id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>"
-          ng-bind-html="response">
+      <div ng-repeat="response in responseLog track by $index">
+        <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>">
+          <div ng-show="response"
+               class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
+               ng-bind-html="response">
+          </div>
         </div>
       </div>
 
