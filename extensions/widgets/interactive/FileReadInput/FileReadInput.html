@@ -11,9 +11,9 @@
   <body>
     <div ng-controller="FileReadInput">
 
-        <!-- TODO(sll): Modify this so it doesn't use prototype. -->
-        <input onchange="FileReadInput.prototype.submitAnswer(this)"
+        <input onchange="angular.element(this).scope().submitAnswer(this)"
                type="file" required>
+
     </div>
 
     <script src="/extensions/widgets/interactive/FileReadInput/static/js/FileReadInput.js">

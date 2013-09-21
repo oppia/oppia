@@ -8,15 +8,16 @@ fileInputWidget.config(function($interpolateProvider) {
 
 function FileReadInput($scope) {
   $scope.answer = '';
-  FileReadInput.prototype.submitAnswer = function(element) {
-    var theFile = element.files[0];
+
+  $scope.submitAnswer = function(el) {
+    var theFile = el.files[0];
 
     if (theFile.size === 0) {
-      alert("Please choose a non-empty file.");
+      alert('Please choose a non-empty file.');
       return;
     }
     if (theFile.size >= 1000) {
-      alert("File too large. Please choose a file less than 2 kilobyte in size.");
+      alert('File too large. Please choose a file smaller than 1 kilobyte.');
       return;
     }
 
