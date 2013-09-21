@@ -478,10 +478,10 @@ textarea {
     box-shadow: 5px 5px 3px #CCCCCC;
     color: white;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
-    height: 100px;
-    left: 0px;
+    height: 90px;
+    left: 0;
     opacity: 0.75;
     position: fixed;
     top: 50%;
