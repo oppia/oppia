@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import param_domain
 from core.domain import stats_services
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -135,6 +136,83 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         exp_services.create_new(
             self.owner_id, 'A new title', 'A category', 'A new exploration_id')
         self.assertEqual(exp_services.count_explorations(), 2)
+
+
+class ExplorationParametersUnitTests(ExplorationServicesUnitTests):
+    """Test methods relating to exploration parameters."""
+
+    def test_get_init_params(self):
+        """Test the get_init_params() method."""
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'eid'))
+
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exploration.param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+        exploration.param_changes = [independent_pc, dependent_pc]
+        exp_services.save_exploration('committer_id', exploration)
+
+        new_params = exp_services.get_init_params('eid')
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+
+        exploration.param_changes = [dependent_pc, independent_pc]
+        exp_services.save_exploration('committer_id', exploration)
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        new_params = exp_services.get_init_params('eid')
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
+
+    def test_update_with_state_params(self):
+        """Test the update_with_state_params() method."""
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category', 'eid'))
+
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exploration.param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+        state = exploration.init_state
+        state.param_changes = [independent_pc, dependent_pc]
+        exp_services.save_state('committer_id', 'eid', state)
+        exp_services.save_exploration('committer_id', exploration)
+
+        reader_params = {}
+        new_params = exp_services.update_with_state_params(
+            'eid', exploration.init_state_id, reader_params)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+        self.assertEqual(reader_params, {})
+
+        state.param_changes = [dependent_pc]
+        exp_services.save_state('committer_id', 'eid', state)
+        exp_services.save_exploration('committer_id', exploration)
+
+        reader_params = {'a': 'secondValue'}
+        new_params = exp_services.update_with_state_params(
+            'eid', exploration.init_state_id, reader_params)
+        self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
+        self.assertEqual(reader_params, {'a': 'secondValue'})
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        reader_params = {}
+        new_params = exp_services.update_with_state_params(
+            'eid', exploration.init_state_id, reader_params)
+        self.assertEqual(new_params, {'b': ''})
+        self.assertEqual(reader_params, {})
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):

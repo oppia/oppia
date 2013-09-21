@@ -443,24 +443,29 @@ def get_init_params(exploration_id):
     """Returns an initial set of exploration parameters for a reader."""
     exploration = get_exploration_by_id(exploration_id)
 
-    reader_params = {}
+    # Note that the list of parameter changes is ordered. Parameter changes
+    # later in the list may depend on parameter changes that have been set
+    # earlier in the same list.
+    new_params = {}
     for pc in exploration.param_changes:
         obj_type = exploration.get_obj_type_for_param(pc.name)
-        reader_params[pc.name] = pc.get_normalized_value(obj_type, {})
-    return reader_params
+        new_params[pc.name] = pc.get_normalized_value(obj_type, new_params)
+    return new_params
 
 
 def update_with_state_params(exploration_id, state_id, reader_params):
     """Updates a reader's params using the params for the given state."""
     exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
+    new_params = copy.deepcopy(reader_params)
 
-    old_params = copy.deepcopy(reader_params)
-
+    # Note that the list of parameter changes is ordered. Parameter changes
+    # later in the list may depend on parameter changes that have been set
+    # earlier in the same list.
     for pc in state.param_changes:
         obj_type = exploration.get_obj_type_for_param(pc.name)
-        reader_params[pc.name] = pc.get_normalized_value(obj_type, old_params)
-    return reader_params
+        new_params[pc.name] = pc.get_normalized_value(obj_type, new_params)
+    return new_params
 
 
 # Operations on exploration snapshots.
