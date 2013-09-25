@@ -26,7 +26,15 @@ states:
   name: Unpack!
   param_changes: []
   widget:
-    customization_args: {}
+    customization_args:
+      hint_placeholder:
+        value: "<p>If you need help with this step, try clicking through these hints.</p><p>The \"low\" hint level is perfect if you're just confused as to what to do.</p> <p>The \"high\" level is great if you are unfamiliar with the commands and tools you'd use.</p>"
+      low_hint:
+        value: "<ul><li>Download the tarball.</li><li>Unpack it. </li><li>find and upload the ghello-0.4/ghello.c file</li></ul>"
+      medium_hint:
+        value: "<p>To unpack the tarball, you might want to use this command:</p><ul><li>tar xvzf ghello-0.4.tar.gz</li></ul>"
+      high_hint:
+        value: "<p>Download the tarball using your web-browser or wget command<p><ul><li>wget http://openhatch.org/missions/tar/ghello-0.4.tar.gz</li></ul><p>To unpack the tarball, you might want to use this command:</p><ul><li>tar xvzf ghello-0.4.tar.gz</li></ul>"
     handlers:
     - name: submit
       rule_specs:
@@ -47,14 +55,22 @@ states:
         - Uh oh! That wasn't quite right. Have another go.
         param_changes: []
     sticky: false
-    widget_id: FileReadInput
+    widget_id: FileReadInputWithHints
 - content:
   - type: text
     value: "<div><h1>Creating tarballs</h1><p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them. It is called 'myproject' and is at version 0.1, and it consists of 2 files which you can download here:</p><p><a href='http://openhatch.org/missions/tar/downloadfile/Makefile'>Makefile</a><br /><a href='http://openhatch.org/missions/tar/downloadfile/hello.c'>hello.c</a></p><p>Your mission is to upload a compressed tarball with these files inside, all within a directory called myproject-0.1.</p><p>After you make the tarball, upload it here:</p></div>"
   name: Pack!
   param_changes: []
   widget:
-    customization_args: {}
+    customization_args:
+      hint_placeholder:
+        value: "<p>If you need help with this step, try clicking through these hints.</p><p>The \"low\" hint level is perfect if you're just confused as to what to do.</p> <p>The \"high\" level is great if you are unfamiliar with the commands and tools you'd use.</p>"
+      low_hint:
+        value: "<ul><li>create a myproject-0.1 directory</li><li>download the files above and place them in the directory </li><li>in the parent directory, create a gzipped tarball of the myproject-0.1 directory</li><li>upload your tarball.</li></ul>"
+      medium_hint:
+        value: "<p>Some commands you might need to know:</p><ul><li>mkdir myproject-0.1</li><li>tar zcvf myproject-0.1.tar.gz myproject-0.1</li></ul>"
+      high_hint:
+        value: "<p>create a myproject-0.1 directory by using command:<p><ul><li>mkdir myproject-0.1</li></ul><p>Download the files to this directory</p><p>Change working directory to the parent directory using the command: </p><ul><li>cd ..</li></ul><p>Create a tarball named myproject-0.1.tar.gz using the command:</p><ul><li>tar zcvf myproject-0.1.tar.gz myproject-0.1</li></ul><p>Upload myproject-0.1.tar.gz file.</p>"
     handlers:
     - name: submit
       rule_specs:
@@ -77,33 +93,45 @@ states:
         feedback:
         - Wrapper directory name is incorrect.
         param_changes: []
-      # - dest: Pack!
-      #   feedback:
-      #   - An unexpected file present. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.
-      #   inputs: {}
-      #   name: HasAppleDoubleFile
-      #   param_changes: []
-      # - dest: Pack!
-      #   feedback:
-      #   - An unexpected file present.
-      #   inputs:
-      #     expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
-      #   name: HasUnexpectedFile
-      #   param_changes: []
-      # - dest: Pack!
-      #   feedback:
-      #   - Archive does not contain all expected files
-      #   inputs:
-      #     expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
-      #   name: MissingExpectedFile
-      #   param_changes: []
-      # - dest: Pack!
-      #   feedback:
-      #   - A file has incorrect contents. 
-      #   inputs:
-      #     file_list: ['hello.c', 'Makefile'] 
-      #   name: HasUnexpectedContent
-      #   param_changes: []
+      - definition:
+          inputs: {}
+          name: HasAppleDoubleFile
+          rule_type: atomic
+          subject: answer
+        dest: Pack!
+        feedback:
+        - An unexpected file present. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.
+        param_changes: []
+      - definition:
+          inputs:
+            expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+          name: HasUnexpectedFile
+          rule_type: atomic
+          subject: answer
+        dest: Pack!
+        feedback:
+        - An unexpected file present.
+        param_changes: []
+      - definition:
+          inputs:
+            expected_files: ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+          name: MissingExpectedFile
+          rule_type: atomic
+          subject: answer
+        dest: Pack!
+        feedback:
+        - Archive does not contain all expected files
+        param_changes: []
+      - definition:
+          inputs:
+            file_list: ['hello.c', 'Makefile'] 
+          name: HasUnexpectedContent
+          rule_type: atomic
+          subject: answer
+        dest: Pack!
+        feedback:
+        - A file has incorrect contents. 
+        param_changes: []
       - definition:
           rule_type: default
         dest: END
@@ -111,4 +139,4 @@ states:
         - Yay! you did it.
         param_changes: []
     sticky: false
-    widget_id: TarFileReadInput
+    widget_id: TarFileReadInputWithHints

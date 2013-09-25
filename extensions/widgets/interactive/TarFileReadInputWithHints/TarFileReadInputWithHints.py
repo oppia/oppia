@@ -3,7 +3,7 @@ from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 
-class TarFileReadInput(widget_domain.BaseWidget):
+class TarFileReadInputWithHints(widget_domain.BaseWidget):
     """Definition of a widget.
 
     Do NOT make any changes to this widget definition while the Oppia app is
@@ -21,7 +21,7 @@ class TarFileReadInput(widget_domain.BaseWidget):
 
     # A description of the widget.
     description = (
-        'A file input widget.'
+        'A tar file input widget.'
     )
 
     # Customization parameters and their descriptions, types and default
@@ -32,12 +32,7 @@ class TarFileReadInput(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
-            'value': ("<p>If you need help with this step, try clicking "
-            "through these hints.</p>"
-            "<p>The \"low\" hint level is perfect if you're just confused "
-            "as to what to do.</p>"
-            "<p>The \"high\" level is great if you are unfamiliar with the "
-            "commands and tools you'd use.</p>")
+            'value': ''
         },
         'obj_type': 'UnicodeString',
     }, {
@@ -46,9 +41,16 @@ class TarFileReadInput(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
-            'value': ('<ul><li>Download the tarball.</li><li>Unpack it.'
-                '</li><li>find and upload the ghello-0.4/ghello.c '
-                'file</li></ul>')
+            'value': ''
+        },
+        'obj_type': 'UnicodeString',
+    }, {
+        'name': 'medium_hint',
+        'description': 'The medium level hint',
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': ''
         },
         'obj_type': 'UnicodeString',
     }, {
@@ -57,9 +59,7 @@ class TarFileReadInput(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
-            'value': ('<p>To unpack the tarball, you might want to '
-                'use this command:</p>'
-                '<ul><li>tar xvzf ghello-0.4.tar.gz</li></ul>')
+            'value': ''
         },
         'obj_type': 'UnicodeString',
     }

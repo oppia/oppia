@@ -124,7 +124,7 @@ NONINTERACTIVE_PREFIX = 'noninteractive'
 # The total number of non-interactive widgets. Used as a sanity check.
 NONINTERACTIVE_WIDGET_COUNT = 1
 # The total number of interactive widgets. Used as a sanity check.
-INTERACTIVE_WIDGET_COUNT = 10
+INTERACTIVE_WIDGET_COUNT = 12
 
 # Static file url to path mapping
 PATH_MAP = {

@@ -1,25 +1,27 @@
-var tarFileInputWidget = angular.module('tarFileInputWidget', ['ngSanitize']);
+var fileInputWidget = angular.module('fileInputWidgetWithHints', ['ngSanitize']);
 
 // Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
-tarFileInputWidget.config(function($interpolateProvider) {
+fileInputWidget.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 });
 
-function TarFileReadInput($scope) {
+function FileReadInputWithHints($scope) {
   $scope.hintPlaceholder = GLOBALS.hintPlaceholder;
   $scope.lowHint = GLOBALS.lowHint;
+  $scope.mediumHint = GLOBALS.mediumHint;
   $scope.highHint = GLOBALS.highHint;
   $scope.answer = '';
-  TarFileReadInput.prototype.submitAnswer = function(element) {
-    var theFile = element.files[0];
-    
+
+  $scope.submitAnswer = function(el) {
+    var theFile = el.files[0];
+
     if (theFile.size === 0) {
-      alert("Please choose a non-empty file.");
+      alert('Please choose a non-empty file.');
       return;
     }
-    if (theFile.size >= 2000) {
-      alert("File too large. Please choose a file less than 2 kilobyte in size.");
+    if (theFile.size >= 1000) {
+      alert('File too large. Please choose a file smaller than 1 kilobyte.');
       return;
     }
 
@@ -37,6 +39,7 @@ function TarFileReadInput($scope) {
       type: 'POST',
       datatype: 'json',
       success: function(data) {
+        console.log(data);
         var answer = data['base64_file_content'];
         if (!answer) {
           alert("An error occurred while processing your input.");
@@ -51,5 +54,4 @@ function TarFileReadInput($scope) {
       }
     });
   };
-};
-
+}

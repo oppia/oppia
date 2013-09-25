@@ -1,0 +1,53 @@
+<html ng-app="tarFileInputWidgetWithHints">
+  <head>
+    <link rel="stylesheet" type="text/css"
+      href="/lib/static/bootstrap-2.3.1-r1/css/bootstrap.css" media="screen">
+
+    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="/lib/static/bootstrap-2.3.1-r1/js/bootstrap.js"></script>
+    <script src="/third_party/static/angularjs-1.2.0-rc.2/angular.min.js"></script>
+    <script src="/third_party/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js"></script>
+
+    <script>
+      var GLOBALS = {};
+      GLOBALS.hintPlaceholder = JSON.parse('{{hint_placeholder|js_string}}');
+      GLOBALS.lowHint = JSON.parse('{{low_hint|js_string}}');
+      GLOBALS.mediumHint = JSON.parse('{{medium_hint|js_string}}');
+      GLOBALS.highHint = JSON.parse('{{high_hint|js_string}}');
+    </script>
+  </head>
+
+  <body>
+    <div ng-controller="TarFileReadInputWithHints">
+
+      <ul class="nav nav-tabs" id="hints-tab">
+        <li class="active"><a data-toggle="tab" href="#hint">Hints</a></li>
+        <li><a data-toggle="tab" href="#low-hint">Low</a></li>
+         <li><a data-toggle="tab" href="#medium-hint">Medium</a></li>
+        <li><a data-toggle="tab" href="#high-hint">High</a></li>
+      </ul>
+       
+      <div class="tab-content">
+        <div class="tab-pane active" id="hint" ng-bind-html="hintPlaceholder"></div>
+        <div class="tab-pane" id="low-hint" ng-bind-html="lowHint"></div>
+        <div class="tab-pane" id="medium-hint" ng-bind-html="mediumHint"></div>
+        <div class="tab-pane" id="high-hint" ng-bind-html="highHint"></div>
+      </div>
+
+      <hr/>
+
+      <input onchange= "angular.element(this).scope().submitAnswer(this)"
+             type="file" required>
+
+      <div id="processing-modal" class="modal hide" data-backdrop="false">
+        <div class="modal-body">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <p></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/extensions/widgets/interactive/TarFileReadInputWithHints/static/js/TarFileReadInputWithHints.js">
+    </script>
+  </body>
+</html>
