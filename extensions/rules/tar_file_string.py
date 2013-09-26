@@ -92,10 +92,10 @@ class HasUnexpectedContent(base.TarFileStringRule):
             if member.isfile():
                 filename = member.name.split('/')[-1]
                 if filename in self.file_list:
-                    if (subject.extractfile(member).read()
-                            != utils.get_file_contents(
-                                os.path.join(
-                                    feconf.DATA_DIR, filename
-                                ))):
+                    subj_contents = subject.extractfile(member).read()
+                    expected_contents = utils.get_file_contents(
+                        os.path.join(feconf.DATA_DIR, filename)
+                    )
+                    if (subj_contents != expected_contents):
                         return True
         return False

@@ -12,23 +12,25 @@ function TarFileReadInputWithHints($scope) {
   $scope.mediumHint = GLOBALS.mediumHint;
   $scope.highHint = GLOBALS.highHint;
   $scope.answer = '';
-  
+  $scope.filename = '';
+
   $scope.submitAnswer = function(el) {
     var theFile = el.files[0];
-    
+
     if (theFile.size === 0) {
-      alert("Please choose a non-empty file.")
+      alert('Please choose a non-empty file.');
       return;
     }
-    if (theFile.size >= 200000) {
-      alert("File too large. Please choose a file less than 200 kilobyte in size.")
+    if (theFile.size >= 1000) {
+      alert('File too large. Please choose a file smaller than 1 kilobyte.');
       return;
     }
 
     var form = new FormData();
     form.append('file', theFile);
 
-    $('#processing-modal > .modal-body > p').html("Processing uploaded file: " + theFile.name);
+    $scope.filename = theFile.name;
+    $scope.$apply();
     $('#processing-modal').modal('show');
 
     $.ajax({
@@ -39,10 +41,10 @@ function TarFileReadInputWithHints($scope) {
       type: 'POST',
       datatype: 'json',
       success: function(data) {
-        console.log(data)
+        console.log(data);
         var answer = data['base64_file_content'];
         if (!answer) {
-          alert("An error occurred while processing your input.")
+          alert('An error occurred while processing your input.');
           return;
         }
         if (parent.location.pathname.indexOf('/learn') === 0) {
@@ -54,5 +56,4 @@ function TarFileReadInputWithHints($scope) {
       }
     });
   };
-};
-
+}

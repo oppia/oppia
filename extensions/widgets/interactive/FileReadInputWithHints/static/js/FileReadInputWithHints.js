@@ -12,6 +12,7 @@ function FileReadInputWithHints($scope) {
   $scope.mediumHint = GLOBALS.mediumHint;
   $scope.highHint = GLOBALS.highHint;
   $scope.answer = '';
+  $scope.filename = '';
 
   $scope.submitAnswer = function(el) {
     var theFile = el.files[0];
@@ -28,7 +29,8 @@ function FileReadInputWithHints($scope) {
     var form = new FormData();
     form.append('file', theFile);
 
-    $('#processing-modal > .modal-body > p').html("Processing uploaded file: " + theFile.name);
+    $scope.filename = theFile.name;
+    $scope.$apply();
     $('#processing-modal').modal('show');
 
     $.ajax({
@@ -42,7 +44,7 @@ function FileReadInputWithHints($scope) {
         console.log(data);
         var answer = data['base64_file_content'];
         if (!answer) {
-          alert("An error occurred while processing your input.");
+          alert('An error occurred while processing your input.');
           return;
         }
         if (parent.location.pathname.indexOf('/learn') === 0) {

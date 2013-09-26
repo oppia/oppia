@@ -34,7 +34,7 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.ChecksWrapperDirName('myproject-0.1')
 
-        file_name = 'bad-4.tar.gz'
+        file_name = 'wrong-wrapper-name.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
             os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
         self.assertTrue(rule.eval(encoded_content))
@@ -49,7 +49,7 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.ChecksWrapperDirPresence()
 
-        file_name = 'bad-1.tar.gz'
+        file_name = 'no-wrapper-dir.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
             os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
         self.assertTrue(rule.eval(encoded_content))
@@ -63,9 +63,10 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasUnexpectedFile(
-            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"])
+            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+        )
 
-        file_name = 'bad-5.tar.gz'
+        file_name = 'unexpected-file.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
             os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
         self.assertTrue(rule.eval(encoded_content))
@@ -79,9 +80,41 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasUnexpectedContent(
-            ['hello.c', 'Makefile'] )
+            ['hello.c', 'Makefile'])
 
-        file_name = 'bad-3.tar.gz'
+        file_name = 'incorrect-contents.tar.gz'
+        encoded_content = base64.b64encode(utils.get_file_contents(
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        self.assertTrue(rule.eval(encoded_content))
+
+        file_name = 'good.tar.gz'
+        encoded_content = base64.b64encode(utils.get_file_contents(
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        self.assertFalse(rule.eval(encoded_content))
+
+    def test_missing_expected_file_rule(self):
+
+        TEST_DATA_DIR = 'extensions/rules/testdata'
+        rule = tar_file_string.MissingExpectedFile(
+            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+        )
+
+        file_name = 'missing-expected-file.tar.gz'
+        encoded_content = base64.b64encode(utils.get_file_contents(
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        self.assertTrue(rule.eval(encoded_content))
+
+        file_name = 'good.tar.gz'
+        encoded_content = base64.b64encode(utils.get_file_contents(
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        self.assertFalse(rule.eval(encoded_content))
+
+    def test_apple_double_file_rule(self):
+
+        TEST_DATA_DIR = 'extensions/rules/testdata'
+        rule = tar_file_string.HasAppleDoubleFile()
+
+        file_name = 'apple-double.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
             os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
         self.assertTrue(rule.eval(encoded_content))

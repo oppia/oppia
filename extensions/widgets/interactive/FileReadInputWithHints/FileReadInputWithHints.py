@@ -62,8 +62,7 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
             'value': ''
         },
         'obj_type': 'UnicodeString',
-    }
-    ]
+    }]
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated input types. Interactive widgets
