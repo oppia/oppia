@@ -470,12 +470,14 @@ textarea {
 }
 
 .feedback-button {
+    transition-property: all;
+    transition-duration: 0.2s;
     align-content: center;
     background: green;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     bottom: 10px;
-    box-shadow: 5px 5px 3px #CCCCCC;
+    box-shadow: -5px 5px 3px #CCCCCC;
     color: white;
     cursor: pointer;
     font-size: 15px;
