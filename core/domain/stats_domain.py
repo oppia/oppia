@@ -60,6 +60,22 @@ class StateCounter(object):
         )
 
 
+class StateFeedbackFromReader(object):
+    """Domain object that keeps reader feedback associated with states.
+
+    All methods and properties in this file should be independent of the
+    specific storage model used.
+    """
+    def __init__(self, fl):
+        self.feedback_log = fl
+
+    @classmethod
+    def get(cls, exploration_id, state_id):
+        stFbRdrMdl = stats_models.StateFeedbackFromReaderModel.get_or_create(
+          exploration_id, state_id)
+        return cls(stFbRdrMdl.feedback_log)
+
+
 class StateRuleAnswerLog(object):
     """Domain object that stores answers which match different state rules.
 
