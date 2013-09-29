@@ -86,6 +86,8 @@ def get_state_stats_for_exploration(exploration_id):
     state_stats = {}
     for state_id in exploration.state_ids:
         state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
+        feedback_log = stats_domain.StateFeedbackFromReader.get(
+            exploration_id, state_id).feedback_log
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
@@ -112,6 +114,7 @@ def get_state_stats_for_exploration(exploration_id):
             'firstEntryCount': first_entry_count,
             'totalEntryCount': total_entry_count,
             'rule_stats': rule_stats,
+            'feedback_log': feedback_log,
             # Add information about resolved answers to the chart data.
             # TODO(sll): This should be made more generic and the chart logic
             # moved to the frontend.

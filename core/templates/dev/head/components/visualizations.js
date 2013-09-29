@@ -182,6 +182,26 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           }
           title.remove();
         }
+        if (stats.feedback_log.length > 0) {
+          var feedbackSpot = body.append('div')
+            .style('font-weight', 'bold')
+            .text('Feedback:');
+          var feedbackExplanation = 'This feedback comes directly from students when ' +
+              'they were at this state when they click the feedback button.';
+          feedbackSpot.append('img')
+              .attr('class', 'oppia-help')
+              .attr('src', '/images/help.png')
+              .attr('ui-jq', 'tooltip')
+              .attr('title', feedbackExplanation)
+              .style('margin-left', '5px');
+          feedbackSpot = feedbackSpot.append('ul');
+          for (feedback in stats.feedback_log) {
+            feedbackSpot.append('li')
+              .style('font-weight', 'normal')
+              .style('margin-left', '5px')
+              .text(stats.feedback_log[feedback].feedback);
+	  }
+        }
         var footer = modal.append('div')
           .attr('class', 'modal-footer');
         footer.append('a')

@@ -51,12 +51,12 @@ fi
 echo Checking whether Karma is installed in tools
 if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   echo Installing Karma
-  sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
+  $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
 
-  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
 # For this to work, you must first run
@@ -68,12 +68,12 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Checking whether coffeescript has been installed via node.js
   if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
     echo Installing CoffeeScript
-    sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
+    $TOOLS_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g coffee-script@1.2.0
   fi
   echo Checking whether uglify has been installed via node.js
   if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/uglify-js" ]; then
     echo Installing uglify
-    sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js
+    $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js
   fi
 
   echo Downloading jsrepl
@@ -104,10 +104,10 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 
-  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
 # Static resources.
