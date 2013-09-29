@@ -30,6 +30,8 @@ function FileReadInputWithHints($scope) {
     form.append('file', theFile);
 
     $scope.filename = theFile.name;
+    // The call to $scope.$apply() is needed because $scope.filename does not
+    // update automatically in the HTML template.
     $scope.$apply();
     $('#processing-modal').modal('show');
 

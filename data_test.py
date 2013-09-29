@@ -71,7 +71,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def is_alphanumeric_string(self, string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9]+$").match(string))
+        return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
