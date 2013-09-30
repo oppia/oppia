@@ -209,7 +209,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         for (var description in wHandlers[i].rules) {
           ruleDict[description] = wHandlers[i].rules[description].classifier;
         }
-        console.log(ruleDict);
         return ruleDict;
       }
     }

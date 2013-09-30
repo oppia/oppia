@@ -121,7 +121,7 @@ class FeedbackHandler(base.BaseHandler):
             feedback_bits = feedback.split('\n')
             return exp_services.export_content_to_html(
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
-                block_number, params)
+                block_number, params, escape_text_strings=False)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
                         new_state, block_number, state_has_changed,

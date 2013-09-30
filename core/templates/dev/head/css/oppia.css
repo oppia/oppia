@@ -191,6 +191,12 @@ textarea {
   opacity: 0.5;
 }
 
+.oppia-rte-inactive {
+  border: 1px solid #ddd;
+  background-color: #eee;
+  padding: 2px;
+}
+
 .oppia-help {
   height: 16px;
   width: 16px;

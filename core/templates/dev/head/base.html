@@ -117,7 +117,7 @@
   
         <div ng-cloak>
           <div class="oppia-alert-blocks">
-            <div ng-repeat="warning in (warningsData.warnings | limitTo:5)">
+            <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
               <p class="alert alert-block">
                 <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
                 <strong>Warning!</strong>

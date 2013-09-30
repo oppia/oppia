@@ -4,23 +4,25 @@
   </span>
 
   <ol start="1">
-    <li ng-repeat="item in localItems">
-      <span ng-hide="activeItem == $index">
-        <span ng-hide="largeInput">
+    <li ng-repeat="item in localItems track by $index">
+      <span ng-if="activeItem != $index">
+        <span ng-if="!largeInput">
           <[item.label]>
         </span>
-        <span ng-show="largeInput">
-          <textarea disabled="true"><[item.label]></textarea>
+        <div ng-if="largeInput" class="oppia-rte-inactive">
+          <span ng-bind-html="item.label"></span>
           <br>
-        </span>
+        </div>
 
         (<a ng-click="openItemEditor($index)">Edit</a> | <a ng-click="deleteItem($index)">Delete</a>)
       </span>
 
-      <span ng-show="activeItem == $index">
-        <input ng-hide="largeInput" type="text" ng-model="item.label">
-        <textarea ng-show="largeInput" ng-model="item.label">
-        </textarea>
+      <span ng-if="activeItem == $index">
+        <input ng-if="!largeInput" type="text" ng-model="item.label">
+        <div ng-if="largeInput">
+          <rich-text-editor rte-content="item.label">
+          </rich-text-editor>
+        </div>
         <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
         <button type="button" ng-click="deleteItem($index)">Delete</button>
       </span>

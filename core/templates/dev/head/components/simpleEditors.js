@@ -18,74 +18,38 @@
  * @author sll@google.com (Sean Lip)
  */
 
- // TODO(sll): Combine all of these into a single directive.
-
-oppia.directive('list', function(warningsData) {
-  // Directive that implements an editable list.
+oppia.directive('richTextEditor', function($sce, $compile) {
+  // Rich text editor directive.
   return {
     restrict: 'E',
-    scope: {items: '=', largeInput: '@'},
-    templateUrl: '/templates/list',
-    controller: function($scope, $attrs) {
-      $scope.largeInput = ($scope.largeInput || false);
-
-      // Reset the component each time the item list changes.
-      $scope.$watch('items', function(newValue, oldValue) {
-        // Maintain a local copy of 'items'. This is needed because it is not
-        // possible to modify 'item' directly when using "for item in items";
-        // we need a 'constant key'. So we represent each item as {label: ...}
-        // instead, and manipulate item.label.
-        $scope.localItems = [];
-        if ($scope.items) {
-          for (var i = 0; i < $scope.items.length; i++) {
-            $scope.localItems.push({'label': angular.copy($scope.items[i])});
+    scope: {rteContent: '='},
+    template: '<textarea rows="7" cols="60"></textarea>',
+    controller: function($scope, $element, $attrs) {
+      var rteNode = $element[0].firstChild;
+      $(rteNode).wysiwyg({
+        autoGrow: true,
+        autoSave: true,
+        events: {
+          save: function(event) {
+            var content = $(rteNode).wysiwyg('getContent');
+            if (content !== null && content !== undefined) {
+              $scope.rteContent = $sce.getTrustedHtml(content);
+              $scope.$apply();
+            }
           }
-        }
-        $scope.activeItem = null;
+        },
+        initialContent: $scope.rteContent
       });
 
-      $scope.openItemEditor = function(index) {
-        $scope.activeItem = index;
-      };
-
-      $scope.closeItemEditor = function() {
-        $scope.activeItem = null;
-      };
-
-      $scope.addItem = function() {
-        $scope.localItems.push({label: ''});
-        $scope.activeItem = $scope.localItems.length - 1;
-        if ($scope.items) {
-          $scope.items.push('');
-        } else {
-          $scope.items = [''];
-        }
-      };
-
-      $scope.replaceItem = function(index, newItem) {
-        if (!newItem) {
-          warningsData.addWarning('Please enter a non-empty item.');
-          return;
-        }
-        $scope.index = '';
-        $scope.replacementItem = '';
-        if (index < $scope.items.length && index >= 0) {
-          $scope.localItems[index] = {label: newItem};
-          $scope.items[index] = newItem;
-        }
-        $scope.closeItemEditor();
-      };
-
-      $scope.deleteItem = function(index) {
-        $scope.activeItem = null;
-        $scope.localItems.splice(index, 1);
-        $scope.items.splice(index, 1);
-      };
+      // Disable jquery.ui.dialog so that the link control works correctly.
+      $.fn.dialog = null;
     }
   };
 });
 
-oppia.directive('string', function (warningsData) {
+// TODO(sll): Combine all of these into a single directive.
+
+oppia.directive('string', function(warningsData) {
   // Editable string directive.
   return {
     restrict: 'E',
@@ -193,6 +157,71 @@ oppia.directive('int', function (warningsData) {
         $scope.localItem = {label: (newItem || 0)};
         $scope.item = newItem;
         $scope.closeItemEditor();
+      };
+    }
+  };
+});
+
+oppia.directive('list', function(warningsData) {
+  // Directive that implements an editable list.
+  return {
+    restrict: 'E',
+    scope: {items: '=', largeInput: '@'},
+    templateUrl: '/templates/list',
+    controller: function($scope, $attrs) {
+      $scope.largeInput = ($scope.largeInput || false);
+
+      // Reset the component each time the item list changes.
+      $scope.$watch('items', function(newValue, oldValue) {
+        // Maintain a local copy of 'items'. This is needed because it is not
+        // possible to modify 'item' directly when using "for item in items";
+        // we need a 'constant key'. So we represent each item as {label: ...}
+        // instead, and manipulate item.label.
+        $scope.localItems = [];
+        if ($scope.items) {
+          for (var i = 0; i < $scope.items.length; i++) {
+            $scope.localItems.push({'label': angular.copy($scope.items[i])});
+          }
+        }
+        $scope.activeItem = null;
+      });
+
+      $scope.openItemEditor = function(index) {
+        $scope.activeItem = index;
+      };
+
+      $scope.closeItemEditor = function() {
+        $scope.activeItem = null;
+      };
+
+      $scope.addItem = function() {
+        $scope.localItems.push({label: ''});
+        $scope.activeItem = $scope.localItems.length - 1;
+        if ($scope.items) {
+          $scope.items.push('');
+        } else {
+          $scope.items = [''];
+        }
+      };
+
+      $scope.replaceItem = function(index, newItem) {
+        if (!newItem) {
+          warningsData.addWarning('Please enter a non-empty item.');
+          return;
+        }
+        $scope.index = '';
+        $scope.replacementItem = '';
+        if (index < $scope.items.length && index >= 0) {
+          $scope.localItems[index] = {label: newItem};
+          $scope.items[index] = newItem;
+        }
+        $scope.closeItemEditor();
+      };
+
+      $scope.deleteItem = function(index) {
+        $scope.activeItem = null;
+        $scope.localItems.splice(index, 1);
+        $scope.items.splice(index, 1);
       };
     }
   };

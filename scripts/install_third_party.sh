@@ -129,6 +129,16 @@ if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
   rm select2-download.zip
 fi
 
+echo Checking whether jwysiwyg is installed in third_party
+if [ ! -d "$THIRD_PARTY_DIR/static/jwysiwyg-496497" ]; then
+  echo Installing jwysiwyg
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/jwysiwyg/jwysiwyg/archive/496497b0772067a0064b627c02893d989ccc7cc9.zip -O jwysiwyg-download.zip
+  unzip jwysiwyg-download.zip -d $THIRD_PARTY_DIR/static/
+  rm jwysiwyg-download.zip
+  mv $THIRD_PARTY_DIR/static/jwysiwyg-496497b0772067a0064b627c02893d989ccc7cc9 $THIRD_PARTY_DIR/static/jwysiwyg-496497
+fi
+
 echo Checking whether jquery is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
   echo Installing JQuery

@@ -177,9 +177,9 @@
 
     $scope.responseLog = $scope.responseLog || [];
     $scope.responseLog.push(
-        $sce.trustAsHtml(data.reader_response_html),
-        $sce.trustAsHtml(data.oppia_html)
-      );
+      $sce.trustAsHtml(data.reader_response_html),
+      data.oppia_html
+    );
 
     for (var i = 0; i < data.iframe_output.length; i++) {
       $scope.iframeOutput.push(data.iframe_output[i]);
