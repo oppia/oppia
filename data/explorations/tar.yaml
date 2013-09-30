@@ -100,7 +100,7 @@ states:
           subject: answer
         dest: Pack!
         feedback:
-        - An unexpected file present. You can read about how to remove it <a href="/wiki/Tar_hints_for_Mac_OS_X_users">on our wiki</a>.
+        - An unexpected file present. You can read about how to remove it <a href="http://openhatch.org/wiki/Tar_hints_for_Mac_OS_X_users">here</a>.
         param_changes: []
       - definition:
           inputs:
