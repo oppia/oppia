@@ -9,6 +9,7 @@ files = [
   'third_party/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-mocks.js',
   'third_party/static/angular-ui-0.4.0/build/*.js',
+  'third_party/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.js',
   'core/templates/dev/head/**/*.js',
   'core/templates/dev/head/**/*.html'
 ];

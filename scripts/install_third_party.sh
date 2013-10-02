@@ -120,6 +120,14 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
   rm angular-ui-download.zip
 fi
 
+echo Checking whether ui-bootstrap is installed in third_party
+if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
+  echo Installing UI Bootstrap
+  mkdir -p $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0
+  wget https://raw.github.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.6.0.js -O $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.js
+  wget https://raw.github.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.6.0.min.js -O $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.min.js
+fi
+
 echo Checking whether select2 is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
   echo Installing select2

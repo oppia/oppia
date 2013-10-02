@@ -29,6 +29,10 @@ describe('Gallery controller', function() {
       }
     };
 
+    beforeEach(function() {
+      module('ui.bootstrap');
+    });
+
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/gallery/data/').respond({

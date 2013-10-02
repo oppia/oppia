@@ -144,7 +144,7 @@ HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M'
 # The underscore is needed because spaces in names must be converted to
 # underscores when displayed as part of a URL or key. The other conventions
 # here are derived from the Wikipedia guidelines for naming articles.
-INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd' + chr(127)
+INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
 for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
 

@@ -88,7 +88,7 @@
 
         {% if user %}
           <p>
-            <a class="btn btn-large" ng-click="openNewExplorationModal()">
+            <a class="btn btn-large" ng-click="showCreateModal()">
               Create New Exploration
             </a>
           </p>
@@ -100,91 +100,84 @@
 
       </div>
     </div>
+  </div>
 
-
-    {% if user %}
-      <form novalidate name="createNewExplorationForm" ng-submit="createNewExploration()" class="oppia-form">
-        <div class="modal hide fade" id="newExplorationModal" ng-model="createModalShown">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-              &times;
-            </button>
-            <h3 id="customizeModalLabel">
-              Add New Exploration <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
-              title="This form allows you to add new explorations.
-              Enter the title of your exploration, as well as the Gallery page category it should fall under (e.g. languages, music).">
-            </h3>
-          </div>
-          <div class="modal-body">
-            <div>
-              Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
-            </div>
-
-            <div>
-              Category:
-              <select ng-model="newExplorationCategory" required
-                      ng-options="getCategoryName(category) for category in getCategoryList()">
-              </select>
-
-              <input ng-model="customExplorationCategory"
-                     ng-show="newExplorationCategory == '?'" type="text"
-                     ng-required="newExplorationCategory == '?'">
-            </div>
-
-            <br>
-
-            {% if allow_yaml_file_upload %}
-              <label>
-                (Optional) Upload an existing exploration (YAML file)?
-                <input type="checkbox" ng-model="includeYamlFile">
-              </label>
-              <div ng-show="includeYamlFile">
-                Upload file:
-                <input id="newFileInput" type="file" file-upload="true">
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="modal-footer">
-            <input type="submit" class="btn" value="Save"
-                   ng-disabled="createNewExplorationForm.$invalid">
-            <a class="btn" data-dismiss="modal" ng-click="closeNewExplorationModal()">Close</a>
-          </div>
-        </div>
-      </form>
-    {% endif %}
-
-    <div class="modal hide fade" id="embedModal" ng-model="embedModalShown">
+  <script type="text/ng-template" id="modals/galleryCreate">
+    <form novalidate name="createNewExplorationForm" ng-submit="ok(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-          &times;
-        </button>
-        <h3 id="embedModalLabel">Embed this exploration</h3>
+        <h3>
+          Add New Exploration
+          <img class="oppia-help" src="/images/help.png"
+               tooltip="This form allows you to add new explorations. Enter the title of your exploration, as well as the category it should fall under in the Gallery (e.g. languages, music)."
+               tooltip-placement="right"/>
+        </h3>
       </div>
 
       <div class="modal-body">
-        <p>
-          You can embed this exploration in a webpage by copying and pasting
-          the following code snippet into the webpage's HTML:
-        </p>
-        <code>
-          &lt;iframe src="<[root]>/learn/<[currentId]>?iframed=true" width="100%" height="400px" frameborder="0"&gt;
-          &lt;/iframe&gt;
-        </code>
+        <div>
+          Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
+        </div>
 
-        <br><br>
+        <div>
+          Category:
+          <select ng-model="newExplorationCategory" required
+                  ng-options="getCategoryName(category) for category in categories">
+          </select>
 
-        <p ng-show="isDemoServer()">
-          <strong style="color: red">Warning</strong>: This version of Oppia runs on a demo server that may go down at any time. If you want to link to Oppia explorations from a different webpage, we strongly suggest that you <a href="https://code.google.com/p/oppia/wiki/GettingStarted">set up your own server</a>. If you have permission to edit this exploration, you can also download it from this server by clicking the download icon in the top-right of the exploration editor page, and then upload that file to your own server.
-        </p>
+          <input ng-model="customExplorationCategory"
+                 ng-show="newExplorationCategory == '?'" type="text"
+                 ng-required="newExplorationCategory == '?'">
+        </div>
+
+        <br>
+
+        {% if allow_yaml_file_upload %}
+          <label>
+            (Optional) Upload an existing exploration (YAML file)?
+            <input type="checkbox" ng-model="includeYamlFile">
+          </label>
+          <div ng-if="includeYamlFile">
+            Upload file:
+            <input id="newFileInput" type="file" file-upload="true">
+          </div>
+        {% endif %}
       </div>
 
       <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Close</button>
+        <input type="submit" class="btn" value="Save"
+               ng-disabled="createNewExplorationForm.$invalid">
+        <button class="btn" ng-click="cancel()">Close</button>
       </div>
+    </form>
+  </script>
+
+  <script type="text/ng-template" id="modals/galleryEmbed">
+    <div class="modal-header">
+      <h3>Embed this exploration</h3>
     </div>
 
-  </div>
+    <div class="modal-body">
+      <p>
+        You can embed this exploration in a webpage by copying and pasting
+        the following code snippet into the webpage's HTML:
+      </p>
+      <code>
+        &lt;iframe src="<[root]>/learn/<[currentId]>?iframed=true" width="100%"
+        <br>
+        height="400px" frameborder="0"&gt;&lt;/iframe&gt;
+      </code>
+
+      <br>
+
+      <p ng-if="isDemoServer">
+        <strong style="color: red">Warning</strong>: This version of Oppia runs on a demo server that may go down at any time. If you want to link to Oppia explorations from a different webpage, we strongly suggest that you <a href="https://code.google.com/p/oppia/wiki/GettingStarted">set up your own server</a>. If you have permission to edit this exploration, you can also download it from this server by clicking the download icon in the top-right of the exploration editor page, and then upload that file to your own server.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="cancel()">Close</button>
+    </div>
+  </script>
 {% endblock %}
 
 {% block footer_js %}

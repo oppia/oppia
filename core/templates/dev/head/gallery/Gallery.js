@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Gallery($scope, $http, warningsData) {
+function Gallery($scope, $http, $modal, warningsData) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
   $scope.galleryUrl = '/gallery/data/';
@@ -37,21 +37,96 @@ function Gallery($scope, $http, warningsData) {
    * @param {string} id The id of the exploration to be embedded.
    */
   $scope.showEmbedModal = function(explorationId) {
-    $scope.currentId = explorationId;
-    $('#embedModal').modal();
-  };
-
-  $scope.openNewExplorationModal = function() {
-    $scope.newExplorationTitle = '';
-    $scope.newExplorationCategory = '';
-    $scope.customExplorationCategory = '';
-    $scope.includeYamlFile = false;
-    $('#newExplorationModal').modal();
-  };
-
-  $scope.closeNewExplorationModal = function() {
-    $('#newExplorationModal').modal('hide');
     warningsData.clear();
+
+    $modal.open({
+      templateUrl: 'modals/galleryEmbed',
+      backdrop: 'static',
+      resolve: {
+        currentId: function() {
+          return explorationId;
+        },
+        root: function() {
+          return $scope.root;
+        },
+        isDemoServer: $scope.isDemoServer
+      },
+      controller: function($scope, $modalInstance, currentId, root, isDemoServer) {
+        $scope.isDemoServer = isDemoServer;
+        $scope.root = root;
+        $scope.currentId = currentId;
+
+        $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+  };
+
+  $scope.showCreateModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/galleryCreate',
+      backdrop: 'static',
+      resolve: {
+        categories: function() {
+          return $scope.getCategoryList();
+        }
+      },
+      controller: function($scope, $modalInstance, categories) {
+        $scope.newExplorationTitle = '';
+        $scope.newExplorationCategory = '';
+        $scope.customExplorationCategory = '';
+        $scope.includeYamlFile = false;
+
+        $scope.categories = categories;
+
+        $scope.getCategoryName = function(category) {
+          return category === '?' ? 'Add New Category...' : category;
+        };
+
+        $scope.ok = function(title, newCategory, customCategory) {
+          if (!title) {
+            warningsData.addWarning('Please specify an exploration title.');
+            return;
+          }
+
+          if (newCategory === '?') {
+            newCategory = customCategory;
+          }
+
+          if (!newCategory) {
+            warningsData.addWarning('Please specify a category for this exploration.');
+            return;
+          }
+
+          $modalInstance.close({
+            title: title,
+            category: newCategory,
+            includeYamlFile: $scope.includeYamlFile,
+            yamlFile: $scope.file
+          });
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function(result) {
+      $scope.createNewExploration(
+        result.title,
+        result.category,
+        result.includeYamlFile,
+        result.yamlFile
+      );
+    }, function () {
+      console.log('Create modal dismissed.');
+    });
   };
 
   /*************************************
@@ -66,41 +141,21 @@ function Gallery($scope, $http, warningsData) {
     return categoryList;
   };
 
-  $scope.getCategoryName = function(category) {
-    return category === '?' ? 'Add New Category...' : category;
-  };
-
   /***************************************************
   * Methods representing 'create' and 'copy' actions.
   ***************************************************/
-  $scope.createNewExploration = function() {
-    if (!$scope.newExplorationTitle) {
-      warningsData.addWarning('Please specify an exploration title.');
-      return;
-    }
-
-    if (!$scope.newExplorationCategory ||
-        ($scope.newExplorationCategory === '?' && !$scope.customExplorationCategory)) {
-      warningsData.addWarning('Please specify a category for this exploration.');
-      return;
-    }
-
-    var title = $scope.newExplorationTitle;
-    var category = $scope.newExplorationCategory === '?' ?
-                   $scope.customExplorationCategory :
-                   $scope.newExplorationCategory;
+  $scope.createNewExploration = function(title, category, includeYamlFile, yamlFile) {
     category = $scope.normalizeWhitespace(category);
-
     if (!$scope.isValidEntityName(category, true)) {
       return;
     }
 
-    if ($scope.file && $scope.includeYamlFile) {
+    if (yamlFile && includeYamlFile) {
       // A yaml file was uploaded.
       var form = new FormData();
-      form.append('yaml', $scope.file);
-      form.append('category', category || '');
-      form.append('title', title || '');
+      form.append('yaml', yamlFile);
+      form.append('category', category);
+      form.append('title', title);
 
       $.ajax({
           url: '/create_new',
@@ -109,28 +164,20 @@ function Gallery($scope, $http, warningsData) {
           contentType: false,
           type: 'POST',
           success: function(data) {
-            $scope.newExplorationTitle = '';
-            $scope.newExplorationCategory = '';
-            $scope.newExplorationYaml = '';
             window.location = '/create/' + JSON.parse(data).explorationId;
           },
           error: function(data) {
             warningsData.addWarning(
                 JSON.parse(data.responseText).error ||
                 'Error communicating with server.');
-            $scope.$apply();
           }
       });
-      return;
     } else {
       $http.post(
           '/create_new',
-          $scope.createRequest({title: title || '', category: category || ''}),
+          $scope.createRequest({title: title, category: category}),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
               success(function(data) {
-                $scope.newExplorationTitle = '';
-                $scope.newExplorationCategory = '';
-                $scope.newExplorationYaml = '';
                 window.location = '/create/' + data.explorationId;
               }).error(function(data) {
                 warningsData.addWarning(data.error ? data.error :
@@ -138,7 +185,6 @@ function Gallery($scope, $http, warningsData) {
               });
     }
   };
-
 
   $scope.forkExploration = function(explorationId) {
     $http.post(
@@ -183,4 +229,4 @@ function Gallery($scope, $http, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', 'warningsData'];
+Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData'];
