@@ -89,19 +89,22 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     $scope.generateUnresolvedAnswersMap();
   };
 
-  if ($scope.stateId) {
-    var dataOrPromise = explorationData.getStateData($scope.stateId);
-    console.log(dataOrPromise);
-    if (dataOrPromise) {
-      if ('then' in dataOrPromise) {
-        dataOrPromise.then($scope.initInteractiveWidget);
+  $scope.$on('stateEditorInitialized', function(event, stateId) {
+    $scope.stateId = stateId;
+    if ($scope.stateId) {
+      var dataOrPromise = explorationData.getStateData($scope.stateId);
+      console.log(dataOrPromise);
+      if (dataOrPromise) {
+        if ('then' in dataOrPromise) {
+          dataOrPromise.then($scope.initInteractiveWidget);
+        } else {
+          $scope.initInteractiveWidget(dataOrPromise);
+        }
       } else {
-        $scope.initInteractiveWidget(dataOrPromise);
+        console.log('No state data exists for state ' + $scope.stateId);
       }
-    } else {
-      console.log('No state data exists for state ' + $scope.stateId);
     }
-  }
+  });
 
   $scope.getCustomizationArgs = function() {
     // Returns a dict mapping param names to customization args.

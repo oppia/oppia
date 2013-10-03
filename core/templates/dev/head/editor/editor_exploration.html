@@ -71,35 +71,33 @@
             </span>
           </h3>
 
-          <ul class="nav nav-tabs" id="editorViewTab">
-            <li class="active">
-              <a data-toggle="tab" href="#explorationMap">Exploration Details</a>
-            </li>
-            <li>
-              <a data-toggle="tab" href="#statsViewer">Exploration Stats</a>
-            </li>
-            <li ng-show="stateId">
-              <a data-toggle="tab" href="#stateEditor">State Editor</a>
-            </li>
-          </ul>
+          <div ng-hide="explorationTitle">
+            <br><br><br><br><br><br>
+            <center>
+              <img src="/images/loading.gif" alt="Loading..." width="50px">
+            </center>
+          </div>
 
-          <div class="tab-content">
-            <div class="tab-pane active" id="explorationMap">
-              {% include 'editor/views/editor_metadata.html' %}
-              <hr>
-              {% include 'editor/views/editor_viz.html' %}
-            </div>
+          <div ng-show="explorationTitle">
+            <tabset>
+              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
+                {% include 'editor/editor_metadata.html' %}
+                <hr>
+                {% include 'editor/editor_viz.html' %}
+              </tab>
 
-            <div class="tab-pane" id="statsViewer">
-              {% include 'editor/views/stats_viewer.html' %}
-            </div>
+              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
+                {% include 'editor/stats_viewer.html' %}
+              </tab>
 
-            <div class="tab-pane" id="stateEditor" ng-cloak>
-              <div ng-view ng-cloak></div>
-            </div>
+              <tab heading="State Editor" disabled="!doesStateIdExist()" active="guiTabActive" select="selectGuiTab()">
+                <div ng-controller="GuiEditor" ng-if="doesStateIdExist()">
+                  {% include 'editor/gui_editor.html' %}
+                </div>
+              </tab>
+            </tabset>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -152,9 +150,9 @@
     {{ include_js_file('editor/EditorExploration.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
-    {{ include_js_file('editor/views/GuiEditor.js') }}
+    {{ include_js_file('editor/GuiEditor.js') }}
     // These should come after the valueGeneratorEditor scripts.
-    {{ include_js_file('editor/views/InteractiveWidgetPreview.js') }}
+    {{ include_js_file('editor/InteractiveWidgetPreview.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
   </script>
 {% endblock footer_js %}

@@ -105,7 +105,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .attr('aria-hidden', 'true')
           .html('&times;')
           .on('click', function (d) {
-            modal.remove()
+            modal.remove();
           });
 
         header.append('h3')
@@ -145,9 +145,9 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         var title = body.append('div')
           .style('font-weight', 'bold')
           .text('Answers:');
-        var ruleList = body.append('ul')
-        for(rule in stats.rule_stats) {
-          if (stats.rule_stats[rule].answers.length == 0) {
+        var ruleList = body.append('ul');
+        for (var rule in stats.rule_stats) {
+          if (stats.rule_stats[rule].answers.length === 0) {
             continue;
           }
           showTitle = true;
@@ -155,7 +155,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .attr('text-anchor', 'start')
             .text(rule)
             .append('ul');
-          for (ans in stats.rule_stats[rule].answers) {
+          for (var ans in stats.rule_stats[rule].answers) {
             var answer = stats.rule_stats[rule].answers[ans][0];
             var count = stats.rule_stats[rule].answers[ans][1];
             answerList.append('li')
@@ -164,7 +164,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 .style('font-weight', 'normal')
                 .style('font-size', '12px')
                 .style('margin-left', '5px')
-                .attr('href', expId + '#/gui/' + stateId + '?scrollTo=rules')
+                .attr('href', expId + '#/gui/' + stateId + '#rules')
                 .text('Add a rule for this answer');
           }
         }
@@ -177,7 +177,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 .style('font-size', '12px')
                 .style('font-style', 'normal')
                 .style('margin-left', '5px')
-                .attr('href', expId + '#/gui/' + stateId + '?scrollTo=noninteractive')
+                .attr('href', expId + '#/gui/' + stateId + '#noninteractive')
                 .text('Edit non-interactive content');
           }
           title.remove();
@@ -195,12 +195,12 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               .attr('title', feedbackExplanation)
               .style('margin-left', '5px');
           feedbackSpot = feedbackSpot.append('ul');
-          for (feedback in stats.feedback_log) {
+          for (var feedback in stats.feedback_log) {
             feedbackSpot.append('li')
               .style('font-weight', 'normal')
               .style('margin-left', '5px')
               .text(stats.feedback_log[feedback].feedback);
-	  }
+          }
         }
         var footer = modal.append('div')
           .attr('class', 'modal-footer');
@@ -208,7 +208,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .attr('class', 'btn')
           .attr('data-dismiss', 'modal')
           .text('Close')
-          .on('click', function (d) {modal.remove() });
+          .on('click', function (d) {modal.remove(); });
       }
 
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
@@ -421,21 +421,24 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             .on('click', function (d) {
               if (d.hashId != END_DEST) {
                 explorationData.getStateData(d.hashId);
-                scope.$parent.$parent.stateId = d.hashId;
+                scope.$parent.stateId = d.hashId;
                 if (!stateStats) {
-                  $('#editorViewTab a[href="#stateEditor"]').tab('show');
+                  scope.$parent.location.path('/gui/' + d.hashId);
+                  // The scope.$apply() is required to trigger the location
+                  // path watcher in EditorExploration.
+                  scope.$apply();
                 } else {
                   var legendList = highlightStates['legend'].split(',');
                   var improvementType = "";
-                  for (index in legendList) {
-                    if (legendList[index].indexOf(highlightStates[d.hashId]) == 0) {
+                  for (var index in legendList) {
+                    if (legendList[index].indexOf(highlightStates[d.hashId]) === 0) {
                       improvementType = legendList[index].split(':')[1];
                       break;
                     }
                   }
                   addPopup(vis, explorationData.data.exploration_id, d.hashId, d.name, stateStats[d.hashId], improvementType);
                 }
-              };
+              }
             })
             .append('svg:title')
             .text(function(d) {

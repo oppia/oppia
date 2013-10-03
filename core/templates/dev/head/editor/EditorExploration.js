@@ -20,21 +20,9 @@
 
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
-var GUI_EDITOR_URL = '/gui';
-var STATS_VIEWER_URL = '/stats';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
 // TODO(sll): console.log is not supported in IE.
-
-oppia.config(['$routeProvider', function($routeProvider) {
-  $routeProvider.
-      when(GUI_EDITOR_URL + '/:stateId',
-           {templateUrl: '/editor_views/gui_editor', controller: GuiEditor}).
-      when(STATS_VIEWER_URL,
-           {templateUrl: '/editor_views/gui_editor', controller: StatsViewerTab}).
-      when('/', {templateUrl: '/editor_views/gui_editor', controller: ExplorationTab}).
-      otherwise({redirectTo: '/'});
-}]);
 
 // Receive events from the iframed widget repository.
 oppia.run(function($rootScope) {
@@ -43,57 +31,86 @@ oppia.run(function($rootScope) {
   });
 });
 
-oppia.run(function($rootScope, $location, $anchorScroll, $routeParams) {
-  //when the route is changed scroll to the proper element.
-  $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
-    // TODO(sfederwisch): Change trigger to when page finishes loading
-    setTimeout( function () {
-      $location.hash($routeParams.scrollTo);
-      $anchorScroll();
-    }, 2000);
-  });
-});
-
-
-function StatsViewerTab($scope, explorationData) {
-  // Changes the tab to the Stats Viewer view.
-  $('#editorViewTab a[href="#statsViewer"]').tab('show');
-  $scope.stateId = '';
-  explorationData.stateId = '';
-}
-
-function ExplorationTab($scope, explorationData) {
-  // Changes the tab to the Exploration Editor view.
-  $('#editorViewTab a[href="#explorationMap"]').tab('show');
-  $scope.stateId = '';
-  explorationData.stateId = '';
-}
-
-function EditorExploration($scope, $http, $location, $route, $routeParams,
+function EditorExploration($scope, $http, $location, $anchorScroll,
     $filter, explorationData, warningsData, activeInputData) {
+  $scope.doesStateIdExist = function() {
+    return Boolean($scope.stateId);
+  };
+
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
-  // Changes the location hash when the editorView tab is changed.
-  $('#editorViewTab a[data-toggle="tab"]').on('shown', function (e) {
-    warningsData.clear();
-    if (e.target.hash == '#stateEditor') {
-      explorationData.getStateData(explorationData.stateId);
-      $location.path(GUI_EDITOR_URL + '/' + explorationData.stateId);
-      $scope.$apply();
-      $scope.stateName = explorationData.data.states[explorationData.stateId].name;
-    } else if (e.target.hash == '#statsViewer') {
-      $location.path('stats');
+  $scope.mainTabActive = false;
+  $scope.statsTabActive = false;
+  $scope.guiTabActive = false;
+
+  $scope.location = $location;
+
+  var GUI_EDITOR_URL = '/gui';
+  var STATS_VIEWER_URL = '/stats';
+  var firstLoad = true;
+
+  $scope.selectMainTab = function() {
+    // This is needed so that if a state id is entered in the URL,
+    // the first tab does not get selected automatically, changing
+    // the location to '/'.
+    if (firstLoad) {
+      firstLoad = false;
+    } else {
+      $location.path('/');
+    }
+  };
+
+  $scope.selectStatsTab = function() {
+    $location.path('/stats');
+  };
+
+  $scope.selectGuiTab = function() {
+    $location.path('/gui/' + $scope.stateId);
+  };
+
+  $scope.$watch(function() {
+    return $location.path();
+  }, function(path) {
+    console.log('Path is now ' + path);
+
+    if (path.indexOf('/gui/') != -1) {
+      $scope.stateId = path.substring('/gui/'.length);
+      if (!$scope.stateId) {
+        $location.path('/');
+        return;
+      }
+      var promise = explorationData.getStateData($scope.stateId);
+      if (!promise) {
+        return;
+      }
+      promise.then(function(stateData) {
+        if (!stateData) {
+          // This state does not exist. Redirect to the exploration page.
+          $location.path('/');
+          return;
+        } else {
+          $scope.guiTabActive = true;
+          $scope.$broadcast('guiTabSelected', stateData);
+          // Scroll to the relevant element (if applicable).
+          // TODO(sfederwisch): Change the trigger to when page finishes
+          // loading.
+          setTimeout(function () {
+            $anchorScroll();
+          }, 2000);
+        }
+      });
+    } else if (path == STATS_VIEWER_URL) {
+      $location.hash('');
       explorationData.stateId = '';
       $scope.stateId = '';
-      $scope.$apply();
-    } else if (e.target.hash == '#explorationMap') {
-      $location.path('');
+      $scope.statsTabActive = true;
+    } else {
+      $location.path('/');
+      $location.hash('');
       explorationData.stateId = '';
       $scope.stateId = '';
-      // TODO(sll): If $apply() is not called, the $scope.stateId change does
-      // not propagate and the 'State Details' tab is still shown. Why?
-      $scope.$apply();
+      $scope.mainTabActive = true;
     }
   });
 
@@ -573,6 +590,5 @@ function EditorExploration($scope, $http, $location, $route, $routeParams,
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$location', '$route',
-    '$routeParams', '$filter', 'explorationData', 'warningsData', 'activeInputData'];
-ExplorationTab.$inject = ['$scope', 'explorationData'];
+EditorExploration.$inject = ['$scope', '$http', '$location', '$anchorScroll',
+    '$filter', 'explorationData', 'warningsData', 'activeInputData'];

@@ -18,33 +18,21 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
+function GuiEditor($scope, $http, $filter, $sce, explorationData,
                    warningsData, activeInputData) {
-  explorationData.getData().then(function(data) {
-    var promise = explorationData.getStateData($scope.$parent.stateId);
-    promise.then(function(data) {
-      if (!data) {
-        // This state does not exist. Redirect to the exploration page.
-        $('#editorViewTab a[href="#explorationMap"]').tab('show');
-      }
-      $scope.init(data);
-      $scope.updateMath();
-    });
-  });
 
-  $scope.$parent.stateId = $routeParams.stateId;
-
-  $scope.init = function(data) {
-    $scope.stateName = data.name;
-    $scope.content = data.content || [];
-    $scope.stateParamChanges = data.param_changes || [];
+  $scope.$on('guiTabSelected', function(event, stateData) {
+    $scope.stateName = stateData.name;
+    $scope.content = stateData.content || [];
+    $scope.stateParamChanges = stateData.param_changes || [];
     $scope.initAllWidgets();
 
-    console.log('Content updated.');
+    $scope.$broadcast('stateEditorInitialized', $scope.stateId);
+    // TODO(sll): Why isn't this working?
+    $scope.updateMath();
 
-    // Switch to the stateEditor tab when this controller is activated.
-    $('#editorViewTab a[href="#stateEditor"]').tab('show');
-  };
+    console.log('Content updated.');
+  });
 
   $scope.initAllWidgets = function(index) {
     for (var i = 0; i < $scope.content.length; i++) {
@@ -397,5 +385,5 @@ function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
 
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams', '$sce',
+GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce',
     'explorationData', 'warningsData', 'activeInputData'];

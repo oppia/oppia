@@ -25,19 +25,6 @@ from core.domain import value_generators_domain
 from core.platform import models
 (image_models,) = models.Registry.import_models([models.NAMES.image])
 import feconf
-import utils
-
-
-class EditorViewHandler(base.BaseHandler):
-    """Retrieves an editor view in the 'editor/views' directory."""
-
-    def get(self, view_type):
-        """Handles GET requests."""
-        try:
-            self.response.write(self.jinja2_env.get_template(
-                'editor/views/%s.html' % view_type).render({}))
-        except:
-            raise self.PageNotFoundException
 
 
 class TemplateHandler(base.BaseHandler):

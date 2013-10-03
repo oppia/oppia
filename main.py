@@ -86,9 +86,6 @@ urls = [
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
 
     get_redirect_route(
-        r'/editor_views/<view_type>', resources.EditorViewHandler,
-        'edit_view_handler'),
-    get_redirect_route(
         r'/templates/<template_type>', resources.TemplateHandler,
         'template_handler'),
     get_redirect_route(

@@ -5,7 +5,6 @@ files = [
   JASMINE_ADAPTER,
   'third_party/static/angularjs-1.2.0-rc.2/angular.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-resource.min.js',
-  'third_party/static/angularjs-1.2.0-rc.2/angular-route.min.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-mocks.js',
   'third_party/static/angular-ui-0.4.0/build/*.js',
