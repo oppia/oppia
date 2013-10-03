@@ -21,7 +21,7 @@
           {% endif %}
         </h3>
 
-        <div class="tabbable tabs-left" ui-if="categories">
+        <div class="tabbable tabs-left" ng-if="categories">
           <ul class="nav nav-tabs" id="navTabs">
             <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
               <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
@@ -39,7 +39,7 @@
                       <div>
                         <center>
                           <a href="/learn/<[exploration.id]>">
-                            <span ui-if="exploration.image_id">
+                            <span ng-if="exploration.image_id">
                               <img ng-src="/imagehandler/<[exploration.image_id]>"
                                    class="oppia-large-image">
                               <h5 class="oppia-gallery-title"><[exploration.title]></h5>
@@ -54,14 +54,14 @@
 
                         <center>
                           <div>
-                            <span ui-if="exploration.can_fork">
+                            <span ng-if="exploration.can_fork">
                               <a ng-click="forkExploration(exploration.id)">
                                 <i class="icon-share oppia-icon" title="Copy this exploration">
                                 </i>
                                 <span class="oppia-small-font">Copy</span>
                               </a> |
                             </span>
-                            <span ui-if="exploration.can_edit">
+                            <span ng-if="exploration.can_edit">
                               <a href="/create/<[exploration.id]>">
                                 <i class="icon-pencil" title="Edit this exploration"></i>
                                 <span class="oppia-small-font">Edit</span>

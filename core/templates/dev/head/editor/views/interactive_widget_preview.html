@@ -3,8 +3,8 @@
   <h4>
     Interactivity
     <img class="oppia-help" src="/images/help.png"
-         ui-jq="tooltip"
-         title="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity.">
+         tooltip="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity."
+         tooltip-placement="right">
   </h4>
 
   <[interactiveWidget.name]>
@@ -43,8 +43,8 @@
   <h4 id="rules">
     Answer classification rules
     <img class="oppia-help" src="/images/help.png"
-         ui-jq="tooltip"
-         title="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown.">
+         tooltip="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown."
+         tooltip-placement="right">
   </h4>
   <div ng-repeat="handler in interactiveWidget.handlers">
     <h5>When readers <[handler.name]>:</h5>
@@ -241,7 +241,7 @@
                   ng-required="addRuleActionDest != '?'"
                   ng-options="getDestName(id) for id in getAllDests()">
           </select>
-  
+
           <input ng-model="addRuleActionDestNew"
                  ng-show="addRuleActionDest == '?'" type="text" ng-required="addRuleActionDest == '?'">
         </div>
@@ -252,7 +252,7 @@
         <!-- TODO(yanamal): Add a section for parameter changes here. -->
       </div>
     </div>
-  
+
     <div class="modal-footer">
       <span ng-show="addRuleActionDescription">
         <button type="button"
@@ -270,7 +270,7 @@
           Cancel
         </button>
       </span>
-  
+
       <span ng-show="!addRuleActionDescription && addRuleActionIndex == null">
         <button type="button" class="btn" data-dismiss="modal">
           Cancel

@@ -9,7 +9,7 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
         <h3 class="oppia-page-title">
-          My Explorations 
+          My Explorations
         </h3>
 
         <center ng-hide="pageLoaded">
@@ -22,12 +22,12 @@
             <span class="oppia-gallery-block">
               <center>
                 <a href="/create/<[exp.id]>">
-                 <span ui-if="exp.image_id">
+                 <span ng-if="exp.image_id">
                     <img ng-src="/imagehandler/<[exp.image_id]>"
                          class="oppia-large-image">
                     <h5 class="oppia-gallery-title"><[exp.name]></h5>
                   </span>
-                  <span ng-hide="exp.image_id">
+                  <span ng-if="!exp.image_id">
                      <h4 class="oppia-gallery-title"><[exp.name]></h4>
                   </span>
                 </a>
@@ -49,11 +49,11 @@
                 <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
                    <[state.exp_name]>: <[state.state_name]>
                 </a>
-                <span ng-show="state.type == 'incomplete'"> 
+                <span ng-show="state.type == 'incomplete'">
                    may be confusing. Students often quit when they get to this state.
                 </span>
-                <span ng-show="state.type == 'default'"> 
-                   may need a bit more feedback. Students seem to keep hitting a no feedback state. 
+                <span ng-show="state.type == 'default'">
+                   may need a bit more feedback. Students seem to keep hitting a no feedback state.
                    <br> Common answers:
                    <ul>
                      <li ng-repeat="answer in state.top_default_answers">

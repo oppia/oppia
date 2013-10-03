@@ -7,8 +7,8 @@
   </a>
   Exploration Metadata
 
-  <img class="oppia-help" src="/images/help.png" ui-jq="tooltip"
-       title="Click '+' to open an editor for the exploration metadata, including its title and cover image.">
+  <img class="oppia-help" src="/images/help.png" tooltip="Click '+' to open an editor for the exploration metadata, including its title and cover image."
+       tooltip-placement="right">
 </h4>
 
 <div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
@@ -23,14 +23,14 @@
       <div>
         <strong>Cover image</strong> (for the <a href="/gallery">Gallery</a>):
 
-        <span ui-if="explorationImageId">
+        <span ng-if="explorationImageId">
           <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
           <button type="button" class="btn" ng-click="deleteExplorationImage()"
                   title="Delete this image">
             <i class="icon-trash"></i>
           </button>
         </span>
-        <div ui-if="!explorationImageId">
+        <div ng-if="!explorationImageId">
           <em>No image supplied.</em>
 
           <button type="button" ng-click="openAddExplorationImageForm()"
@@ -105,8 +105,8 @@
     <h4>
       Parameter initializations
       <img class="oppia-help" src="/images/help.png"
-           ui-jq="tooltip"
-           title="This allows you to initialize the values of a reader's parameters before the reader begins the exploration.">
+           tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
+           tooltip-placement="right">
     </h4>
 
     <param-change-editor param-changes="explorationParamChanges"

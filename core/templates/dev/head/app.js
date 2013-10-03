@@ -18,10 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// TODO(sll): The ['ui', 'ngSanitize'] dependencies are only needed for
-// editorExploration.js (possibly just the GuiEditor, in fact). Find a way to
-// make them load only for that page.
-var oppia = angular.module('oppia', ['ui', 'ngRoute', 'ngSanitize', 'ngResource', 'ui.bootstrap']);
+var oppia = angular.module(
+    'oppia', ['ui', 'ngRoute', 'ngSanitize', 'ngResource', 'ui.bootstrap']);
 
 // Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
 oppia.config(function($interpolateProvider) {

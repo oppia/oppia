@@ -39,8 +39,8 @@
         <h4>
           Parameter Changes
           <img class="oppia-help" src="/images/help.png"
-               ui-jq="tooltip"
-               title="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields.">
+               tooltip="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields."
+               tooltip-placement="right">
         </h4>
 
         <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
@@ -51,8 +51,8 @@
         <h4 id="noninteractive">
           Non-Interactive Content
           <img class="oppia-help" src="/images/help.png"
-               ui-jq="tooltip"
-               title="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input.">
+               tooltip="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input."
+               tooltip-placement="right">
         </h4>
         <div>
           <ul ng-model="content" class="oppia-state-text-list">

@@ -105,7 +105,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .attr('aria-hidden', 'true')
           .html('&times;')
           .on('click', function (d) {
-            modal.remove() 
+            modal.remove()
           });
 
         header.append('h3')
@@ -167,7 +167,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 .attr('href', expId + '#/gui/' + stateId + '?scrollTo=rules')
                 .text('Add a rule for this answer');
           }
-        }       
+        }
         if (!showTitle) {
           if (stats.totalEntryCount) {
             body.append('i')
@@ -239,7 +239,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .append('svg:path')
             .attr('d', 'M -5 0 L 12 6 L -5 12 z')
             .attr('fill', 'grey');
-     
+
        var gradient = vis.selectAll('defs').selectAll('linearGradient')
            .data(['nodeGradient'])
          .enter().append('svg:linearGradient')
@@ -423,7 +423,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 explorationData.getStateData(d.hashId);
                 scope.$parent.$parent.stateId = d.hashId;
                 if (!stateStats) {
-                  $('#editorViewTab a[href="#stateEditor"]').tab('show');     
+                  $('#editorViewTab a[href="#stateEditor"]').tab('show');
                 } else {
                   var legendList = highlightStates['legend'].split(',');
                   var improvementType = "";
