@@ -31,11 +31,12 @@ class StateCounter(object):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-    def __init__(self, fec, sec, rac, aac):
-        self.first_entry_count = fec
-        self.subsequent_entries_count = sec
-        self.resolved_answer_count = rac
-        self.active_answer_count = aac
+    def __init__(self, first_entry_count, subsequent_entries_count,
+                 resolved_answer_count, active_answer_count):
+        self.first_entry_count = first_entry_count
+        self.subsequent_entries_count = subsequent_entries_count
+        self.resolved_answer_count = resolved_answer_count
+        self.active_answer_count = active_answer_count
 
     @property
     def total_entry_count(self):
@@ -66,14 +67,15 @@ class StateFeedbackFromReader(object):
     All methods and properties in this file should be independent of the
     specific storage model used.
     """
-    def __init__(self, fl):
-        self.feedback_log = fl
+    def __init__(self, feedback_log):
+        self.feedback_log = feedback_log
 
     @classmethod
     def get(cls, exploration_id, state_id):
-        stFbRdrMdl = stats_models.StateFeedbackFromReaderModel.get_or_create(
-          exploration_id, state_id)
-        return cls(stFbRdrMdl.feedback_log)
+        state_feedback_model = (
+            stats_models.StateFeedbackFromReaderModel.get_or_create(
+                exploration_id, state_id))
+        return cls(state_feedback_model.feedback_log)
 
 
 class StateRuleAnswerLog(object):
