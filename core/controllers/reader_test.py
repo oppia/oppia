@@ -87,7 +87,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         def submit_and_compare(self, answer, expected_response):
             """Submits an answer and compares the output to a regex.
 
-            The expected_output will be interpreted as a regex string.
+            `expected_response` will be interpreted as a regex string.
             """
             response = self._submit_answer(answer)
             self.assertRegexpMatches(response['oppia_html'], expected_response)
@@ -96,7 +96,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def init_player(self, exploration_id, expected_title, expected_response):
         """Initializes a reader playthrough.
 
-        The expected_response will be interpreted as a regex string.
+        `expected_response` will be interpreted as a regex string.
         """
         exp_services.delete_demo(exploration_id)
         exp_services.load_demo(exploration_id)
