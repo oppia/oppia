@@ -141,6 +141,9 @@ textarea {
 .oppia-gallery-tile-play {
   float: right;
   opacity: 0;
+  -webkit-transform: scale(1.5, 1.5);
+  -moz-transform: scale(1.5, 1.5);
+  transform: scale(1.5, 1.5);
 }
 .oppia-gallery-tile-top:hover .oppia-gallery-tile-play {
   opacity: 0.5;
