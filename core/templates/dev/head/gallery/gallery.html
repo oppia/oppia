@@ -35,44 +35,40 @@
                 <div class="row-fluid">
 
                   <div class="oppia-gallery-block">
-                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-box">
-                      <div>
-                        <center>
-                          <a href="/learn/<[exploration.id]>">
-                            <span ng-if="exploration.image_id">
-                              <img ng-src="/imagehandler/<[exploration.image_id]>"
-                                   class="oppia-large-image">
-                              <h5 class="oppia-gallery-title"><[exploration.title]></h5>
+                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-tile">
+                      <div class="oppia-gallery-tile-top">
+                        <a href="/learn/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                          <div class="oppia-gallery-tile-description">
+                            <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                            <span class="oppia-gallery-tile-play">
+                              <i class="icon-play"></i>
                             </span>
-                            <span ng-hide="exploration.image_id">
-                              <center>
-                                <h4 class="oppia-gallery-title"><[exploration.title]></h4>
-                              </center>
-                            </span>
-                          </a>
-                        </center>
-
-                        <center>
-                          <div>
-                            <span ng-if="exploration.can_fork">
-                              <a ng-click="forkExploration(exploration.id)">
-                                <i class="icon-share oppia-icon" title="Copy this exploration">
-                                </i>
-                                <span class="oppia-small-font">Copy</span>
-                              </a> |
-                            </span>
-                            <span ng-if="exploration.can_edit">
-                              <a href="/create/<[exploration.id]>">
-                                <i class="icon-pencil" title="Edit this exploration"></i>
-                                <span class="oppia-small-font">Edit</span>
-                              </a> |
-                            </span>
-                            <a ng-click="showEmbedModal(exploration.id)">
-                              <i class="icon-share-alt" title="Embed this exploration"></i>
-                              <span class="oppia-small-font">Embed</span>
-                            </a>
                           </div>
-                        </center>
+                        </a>
+                      </div>
+
+                      <div class="oppia-gallery-tile-bottom">
+
+                        <div>
+                          <span ng-if="exploration.can_fork">
+                            <a href="" ng-click="forkExploration(exploration.id)">
+                              <i class="icon-share oppia-icon" title="Copy this exploration">
+                              </i>
+                              <span class="oppia-small-font">Copy</span>
+                            </a> |
+                          </span>
+                          <span ng-if="exploration.can_edit">
+                            <a href="/create/<[exploration.id]>">
+                              <i class="icon-pencil" title="Edit this exploration"></i>
+                              <span class="oppia-small-font">Edit</span>
+                            </a> |
+                          </span>
+                          <a ng-click="showEmbedModal(exploration.id)">
+                            <i class="icon-share-alt" title="Embed this exploration"></i>
+                            <span class="oppia-small-font">Embed</span>
+                          </a>
+                        </div>
+
                       </div>
                     </div>
                   </div>
