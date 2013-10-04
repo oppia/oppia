@@ -73,14 +73,14 @@ textarea {
 .oppia-gallery {
   background-color: #f6f6f6;
   border: 1px solid #bbb;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .oppia-gallery-menu {
   border-right: 1px solid #bbb;
   float: left;
   min-height: 300px;
-  padding: 0 15px;
+  padding: 10px 15px 0 15px;
   width: 150px;
 }
 .oppia-gallery-menu-title {
@@ -90,7 +90,9 @@ textarea {
 
 .oppia-gallery-tiles-container {
   background-color: white;
+  border-radius: 3px;
   min-height: 300px;
+  padding-top: 10px;
 }
 
 .oppia-gallery-tile {
