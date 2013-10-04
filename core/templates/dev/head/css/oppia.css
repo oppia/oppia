@@ -114,6 +114,9 @@ textarea {
 .oppia-gallery-tile-top:hover {
   background-color: #ddd;
 }
+.oppia-gallery-tile-bottom {
+  white-space: nowrap;
+}
 
 .oppia-gallery-tile-anchor:hover {
   text-decoration: none;
