@@ -130,3 +130,27 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         ).submit_and_compare(
             'ne', 'Hello, My Name. You have to pay a toll'
         )
+
+    def test_binary_search(self):
+        """Test the binary search (lazy magician) exploration."""
+        self.init_player(
+            '8', 'The Lazy Magician', 'how does he do it?'
+        ).submit_and_compare(
+            'Dont know', 'town square'
+        ).submit_and_compare(
+            0, 'Is it'
+        ).submit_and_compare(
+            2, 'Do you want to play again?'
+        ).submit_and_compare(
+            1, 'how do you think he does it?'
+        ).submit_and_compare(
+            'middle', 'worst case'
+        ).submit_and_compare(
+            0, 'try it out'
+        ).submit_and_compare(
+            10, 'best worst case'
+        ).submit_and_compare(
+            0, 'to be sure our strategy works in all cases'
+        ).submit_and_compare(
+            0, 'try to guess'
+        )

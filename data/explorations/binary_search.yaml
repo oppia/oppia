@@ -708,7 +708,8 @@ states:
     widget_id: Continue
 - content:
   - type: text
-    value: ''
+    value: 'This is placeholder for the missing text for this state, which tries to
+      explain the idea of the worst case to motivate choosing numbers in the middle.'
   name: Picking in the middle
   param_changes: []
   widget:
