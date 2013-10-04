@@ -23,17 +23,16 @@ import test_utils
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
-        exp_services.reload_demos()
 
     class ExplorationPlayer(object):
         """Simulates the frontend API for an exploration."""
-        def __init__(self, testapp, assertEqual, exploration_id):
+        def __init__(self, testapp, assertEqual, assertRegexpMatches,
+                     exploration_id):
             self.testapp = testapp
             self.assertEqual = assertEqual
+            self.assertRegexpMatches = assertRegexpMatches
             self.exploration_id = exploration_id
             self.last_block_number = 0
             self.last_params = {}
@@ -77,7 +76,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
             return response
 
-        def submit_answer(self, answer):
+        def _submit_answer(self, answer):
             """Action representing submission of an answer to the backend."""
             return self._interact({
                 'answer': answer, 'block_number': self.last_block_number,
@@ -85,36 +84,49 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
                 'state_history': self.state_history,
             })
 
-    def test_welcome_exploration(self):
-        """Test a reader's progression through the default exploration."""
-        player = self.ExplorationPlayer(self.testapp, self.assertEqual, '0')
+        def submit_and_compare(self, answer, expected_response):
+            """Submits an answer and compares the output to a regex.
+
+            The expected_output will be interpreted as a regex string.
+            """
+            response = self._submit_answer(answer)
+            self.assertRegexpMatches(response['oppia_html'], expected_response)
+            return self
+
+    def init_player(self, exploration_id, expected_title, expected_response):
+        """Initializes a reader playthrough.
+
+        The expected_response will be interpreted as a regex string.
+        """
+        exp_services.delete_demo(exploration_id)
+        exp_services.load_demo(exploration_id)
+
+        player = self.ExplorationPlayer(
+            self.testapp, self.assertEqual, self.assertRegexpMatches,
+            exploration_id)
 
         response = player.get_initial_response()
-        self.assertIn(
-            'do you know where the name \'Oppia\'', response['oppia_html'])
-        self.assertEqual(response['title'], 'Welcome to Oppia!')
+        self.assertRegexpMatches(response['oppia_html'], expected_response)
+        self.assertEqual(response['title'], expected_title)
+        return player
 
-        response = player.submit_answer('0')
-        self.assertIn(
-            'In fact, the word Oppia means \'learn\'.', response['oppia_html'])
+    def test_welcome_exploration(self):
+        """Test a reader's progression through the default exploration."""
+        self.init_player(
+            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\''
+        ).submit_and_compare(
+            '0', 'In fact, the word Oppia means \'learn\'.'
+        )
 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
-        player = self.ExplorationPlayer(self.testapp, self.assertEqual, '6')
-
-        response = player.get_initial_response()
-        self.assertIn(
-            'Hello, brave adventurer! What is your name?',
-            response['oppia_html'])
-        self.assertEqual(response['title'], 'Parametrized Adventure')
-
-        response = player.submit_answer('My Name')
-        self.assertIn('Hello, I\'m My Name!', response['oppia_html'])
-        self.assertIn('get a pretty red', response['oppia_html'])
-
-        response = player.submit_answer(0)
-        self.assertIn('fork in the road', response['oppia_html'])
-
-        response = player.submit_answer('ne')
-        self.assertIn(
-            'Hello, My Name. You have to pay a toll', response['oppia_html'])
+        self.init_player(
+            '6', 'Parametrized Adventure',
+            'Hello, brave adventurer! What is your name?'
+        ).submit_and_compare(
+            'My Name', 'Hello, I\'m My Name!.*get a pretty red'
+        ).submit_and_compare(
+            0, 'fork in the road'
+        ).submit_and_compare(
+            'ne', 'Hello, My Name. You have to pay a toll'
+        )
