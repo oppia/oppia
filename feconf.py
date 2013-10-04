@@ -67,6 +67,7 @@ DEMO_EXPLORATIONS = [
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
+    ('cities', 'World Cities', 'Geography'),
 ]
 
 # Whether to unconditionally log info messages.
