@@ -11,31 +11,33 @@
       <div class="oppia-gallery-frame">
 
         <h3 class="oppia-page-title">
-          <[getHeadingText()]>
-          {% if user %}
-            <div class="pull-right">
-              <button class="btn" ng-click="toggleExplorationView()">
-                <[getToggleText()]>
-              </button>
-            </div>
-          {% endif %}
+          Gallery
         </h3>
 
-        <div class="tabbable tabs-left" ng-if="categories">
-          <ul class="nav nav-tabs" id="navTabs">
-            <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
-              <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
-                <[category]>
-              </a>
-            </li>
-          </ul>
-          <div class="tab-content">
-            <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
-              <div class="container-fluid">
-                <div class="row-fluid">
+        <div class="oppia-gallery" ng-if="categories">
+          <div class="tabbable tabs-left">
 
-                  <div class="oppia-gallery-block">
+            <div class="oppia-gallery-menu">
+              <div class="oppia-gallery-menu-title">
+                <strong>Categories</strong>
+              </div>
+              <ul class="nav nav-pills nav-stacked" id="navTabs">
+                <li ng-repeat="(category, explorations) in categories"
+                    ng-class="{active: $index == 0}">
+                  <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
+                    <[category]>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="tab-content oppia-gallery-tiles-container">
+              <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                <div class="container-fluid">
+                  <div class="row-fluid">
+
                     <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-tile">
+
                       <div class="oppia-gallery-tile-top">
                         <a href="/learn/<[exploration.id]>" class="oppia-gallery-tile-anchor">
                           <div class="oppia-gallery-tile-description">
@@ -48,7 +50,6 @@
                       </div>
 
                       <div class="oppia-gallery-tile-bottom">
-
                         <div>
                           <span ng-if="exploration.can_fork">
                             <a href="" ng-click="forkExploration(exploration.id)">
@@ -63,19 +64,20 @@
                               <span class="oppia-small-font">Edit</span>
                             </a> |
                           </span>
-                          <a ng-click="showEmbedModal(exploration.id)">
+                          <a href="" ng-click="showEmbedModal(exploration.id)">
                             <i class="icon-share-alt" title="Embed this exploration"></i>
                             <span class="oppia-small-font">Embed</span>
                           </a>
                         </div>
-
                       </div>
-                    </div>
-                  </div>
 
+                    </div>
+
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
