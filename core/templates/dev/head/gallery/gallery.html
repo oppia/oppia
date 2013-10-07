@@ -101,7 +101,7 @@
   </div>
 
   <script type="text/ng-template" id="modals/galleryCreate">
-    <form novalidate name="createNewExplorationForm" ng-submit="ok(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
+    <form novalidate name="createNewExplorationForm" ng-submit="create(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
       <div class="modal-header">
         <h3>
           Add New Exploration
@@ -143,7 +143,7 @@
 
       <div class="modal-footer">
         <input type="submit" class="btn" value="Save"
-               ng-disabled="createNewExplorationForm.$invalid">
+               ng-disabled="createNewExplorationForm.$invalid"/>
         <button class="btn" ng-click="cancel()">Close</button>
       </div>
     </form>

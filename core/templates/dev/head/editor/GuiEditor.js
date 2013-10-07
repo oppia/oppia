@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $sce, explorationData,
+function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData) {
 
   $scope.$on('guiTabSelected', function(event, stateData) {
@@ -326,7 +326,16 @@ function GuiEditor($scope, $http, $filter, $sce, explorationData,
       return;
     }
 
-    $scope.saveWidget(arg.data.widget, arg.data.parentIndex);
+    var widget = arg.data.widget;
+    var index = arg.data.parentIndex;
+
+    $scope.content[index].value = JSON.stringify({
+      'id': widget.id,
+      'params': widget.params
+    });
+
+    $scope.initWidget(index);
+    $scope.saveStateContent();
   });
 
   $scope.getWidgetRepositoryUrl = function(parentIndex) {
@@ -342,32 +351,45 @@ function GuiEditor($scope, $http, $filter, $sce, explorationData,
     }
   };
 
-  $scope.customizeWidget = function(index) {
-    $scope.customizationParams = JSON.parse($scope.content[index].value).params;
-    $scope.customizeWidgetIndex = index;
-  };
+  $scope.showCustomizeNonInteractiveWidgetModal = function(index) {
+    warningsData.clear();
+    var widgetParams = JSON.parse($scope.content[index].value).params;
 
-  $scope.saveNonInteractiveWidgetParams = function() {
-    var index = $scope.customizeWidgetIndex;
-    var widget = JSON.parse($scope.content[index].value);
-    widget.params = $scope.customizationParams;
-    $scope.content[index].value = JSON.stringify(widget);
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/customizeNonInteractiveWidget',
+      backdrop: 'static',
+      resolve: {
+        widgetParams: function() {
+          return widgetParams;
+        }
+      },
+      controller: function($scope, $modalInstance, widgetParams) {
+        $scope.widgetParams = widgetParams;
 
-    $scope.initWidget(index);
-    $scope.saveStateContent();
+        $scope.save = function(widgetParams) {
+          $modalInstance.close({
+            widgetParams: widgetParams
+          });
+        };
 
-    $scope.customizationParams = null;
-    $scope.customizeWidgetIndex = null;
-  };
-
-  $scope.saveWidget = function(widget, index) {
-    $scope.content[index].value = JSON.stringify({
-      'id': widget.id,
-      'params': widget.params
+        $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
     });
 
-    $scope.initWidget(index);
-    $scope.saveStateContent();
+    modalInstance.result.then(function(result) {
+      var widgetValue = JSON.parse($scope.content[index].value);
+      widgetValue.params = result.widgetParams;
+      $scope.content[index].value = JSON.stringify(widgetValue);
+      console.log('Non-interactive customization modal saved.');
+
+      $scope.initWidget(index);
+      $scope.saveStateContent();
+    }, function() {
+      console.log('Non-interactive customization modal dismissed.');
+    });
   };
 
   $scope.deleteWidget = function(index) {
@@ -385,5 +407,5 @@ function GuiEditor($scope, $http, $filter, $sce, explorationData,
 
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce',
+GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData'];

@@ -87,7 +87,7 @@ function Gallery($scope, $http, $modal, warningsData) {
           return category === '?' ? 'Add New Category...' : category;
         };
 
-        $scope.ok = function(title, newCategory, customCategory) {
+        $scope.create = function(title, newCategory, customCategory) {
           if (!title) {
             warningsData.addWarning('Please specify an exploration title.');
             return;

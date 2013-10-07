@@ -477,7 +477,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               .style('fill', 'pink')
               .on('click', function (d) {
                 if (d.hashId != initStateId && d.hashId != END_DEST) {
-                  scope.$parent.openDeleteStateModal(d.hashId);
+                  scope.$parent.showDeleteStateModal(d.hashId);
                 }
               });
 

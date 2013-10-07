@@ -20,6 +20,7 @@
 
 var END_DEST = 'END';
 var QN_DEST_PREFIX = 'q-';
+var NONEXISTENT_STATE = '[none]';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
 // TODO(sll): console.log is not supported in IE.
@@ -31,8 +32,9 @@ oppia.run(function($rootScope) {
   });
 });
 
-function EditorExploration($scope, $http, $location, $anchorScroll,
+function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     $filter, explorationData, warningsData, activeInputData) {
+
   $scope.doesStateIdExist = function() {
     return Boolean($scope.stateId);
   };
@@ -548,24 +550,19 @@ function EditorExploration($scope, $http, $location, $anchorScroll,
   };
 
   $scope.getStateName = function(stateId) {
-    return stateId ? explorationData.data.states[stateId].name : '[none]';
+    return stateId ? explorationData.data.states[stateId].name : NONEXISTENT_STATE;
   };
-
-  $scope.openDeleteStateModal = function(stateId) {
-    $scope.deleteStateId = stateId;
-    $scope.$apply();
-    $('#deleteStateModal').modal('show');
-  };
-
-  $('#deleteStateModal').on('hidden', function() {
-    $scope.deleteStateId = '';
-  });
 
   // Deletes the state with id stateId. This action cannot be undone.
   $scope.deleteState = function(stateId) {
     if (stateId == $scope.initStateId) {
       warningsData.addWarning('Deleting the initial state of a question is not ' +
           'supported. Perhaps edit it instead?');
+      return;
+    }
+
+    if (stateId == NONEXISTENT_STATE) {
+      warningsData.addWarning('No state with id ' + stateId + ' exists.');
       return;
     }
 
@@ -585,10 +582,69 @@ function EditorExploration($scope, $http, $location, $anchorScroll,
       window.location = '/gallery/';
     });
   };
+
+  $scope.showDeleteExplorationModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/deleteExploration',
+      backdrop: 'static',
+      controller: function($scope, $modalInstance) {
+        $scope.delete = function() {
+          $modalInstance.close();
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function() {
+      $scope.deleteExploration();
+    }, function () {
+      console.log('Delete exploration modal dismissed.');
+    });
+  };
+
+  $scope.showDeleteStateModal = function(deleteStateId) {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/deleteState',
+      backdrop: 'static',
+      resolve: {
+        deleteStateName: function() {
+          return $scope.getStateName(deleteStateId);
+        }
+      },
+      controller: function($scope, $modalInstance, deleteStateName) {
+        $scope.deleteStateName = deleteStateName;
+
+        $scope.delete = function() {
+          $modalInstance.close({deleteStateId: deleteStateId});
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function(result) {
+      $scope.deleteState(result.deleteStateId);
+    }, function () {
+      console.log('Delete state modal dismissed.');
+    });
+  };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = ['$scope', '$http', '$location', '$anchorScroll',
-    '$filter', 'explorationData', 'warningsData', 'activeInputData'];
+EditorExploration.$inject = [
+  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter',
+  'explorationData', 'warningsData', 'activeInputData'
+];
