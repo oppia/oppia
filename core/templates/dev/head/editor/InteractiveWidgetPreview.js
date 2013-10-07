@@ -44,7 +44,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
-        $scope.interactiveWidget = widgetData.widget;
+       $scope.interactiveWidget = widgetData.widget;
         if ($scope.showPreview) {
           $scope.addContentToIframeWithId(
               'interactiveWidgetPreview', $scope.interactiveWidget.raw);
@@ -390,6 +390,23 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     }
     $scope.saveInteractiveWidget();
   });
+
+
+  window.addEventListener('message', function(evt) {
+    console.log('Resize event received for widget preview.');
+    console.log(evt.data);
+
+    if (evt.origin != window.location.protocol + '//' + window.location.host) {
+      return;
+    }
+
+    if (event.data.hasOwnProperty('widgetHeight')) {
+      // Change the height of the included iframe.
+      var height = parseInt(event.data.widgetHeight, 10);
+      var iframe = document.getElementById('interactiveWidgetPreview');
+      iframe.height = height + 'px';
+    }
+  }, false);
 
   $scope.saveInteractiveWidget = function() {
     var customizationArgs = $scope.getCustomizationArgs();

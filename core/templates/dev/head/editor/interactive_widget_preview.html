@@ -5,29 +5,27 @@
     <img class="oppia-help" src="/images/help.png"
          tooltip="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity."
          tooltip-placement="right">
-  </h4>
-
-  <[interactiveWidget.name]>
-
-  <span class="pull-right">
-    <span ng-hide="showPreview">
-      <button ng-click="setShowPreview(true)">Preview</button>
-    </span>
-    <span ng-hide="isEmpty(interactiveWidget.params)">
-      <button data-toggle="modal" data-target="#customizeWidgetModal">
-        Customize
+  
+    <span class="pull-right">
+      <span ng-hide="showPreview">
+        <button ng-click="setShowPreview(true)">Preview</button>
+      </span>
+      <span ng-hide="isEmpty(interactiveWidget.params)">
+        <button data-toggle="modal" data-target="#customizeWidgetModal">
+          Customize
+        </button>
+      </span>
+      <button data-toggle="modal" data-target="#interactiveWidgetModal">
+        Choose a different interaction
       </button>
     </span>
-    <button data-toggle="modal" data-target="#interactiveWidgetModal">
-      Choose a different interaction
-    </button>
-  </span>
+  </h4>
 
-  <br><br>
-
+  <h5><[interactiveWidget.name]></h5>
   <div ng-if="showPreview">
     <a class="pull-right" ng-click="setShowPreview(false)"><b>&times;</b></a>
-    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
+    <!-- This iframe is dynamically resized based on its content. -->
+    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="5px" seamless="seamless" class="oppia-widget-preview">
     </iframe>
   </div>
   <div style="margin-left:30px;">

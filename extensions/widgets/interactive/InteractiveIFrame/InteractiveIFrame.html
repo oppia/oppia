@@ -13,7 +13,7 @@
     <script src="/extensions/widgets/interactive/InteractiveIFrame/static/js/IFrame.js">
     </script>
   </head>
-  <body ng-controller="IFrame">
+  <body onload="onWidgetLoad()" ng-controller="IFrame">
     <iframe id="iframe" ng-src="<[childPageUrl]>" width="90%" height="400px"></iframe>
   </body>
 </html>

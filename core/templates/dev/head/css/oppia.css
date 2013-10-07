@@ -66,6 +66,10 @@ textarea {
   width: 90%;
 }
 
+.oppia-no-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
@@ -412,6 +416,10 @@ textarea {
   list-style-type: none;
 }
 
+.oppia-widget-preview {
+  border: 1px solid gray;
+}
+
 /* Graph styles */
 
 #oppia-state-graph-canvas {
@@ -534,7 +542,7 @@ textarea {
   }
 }
 
-.feedback-button {
+.oppia-feedback-button {
     transition-property: all;
     transition-duration: 0.2s;
     align-content: center;
@@ -553,21 +561,25 @@ textarea {
     position: fixed;
     top: 50%;
     width: 100px;
-    -moz-transform-origin: 25px 75px;
-    -moz-transform: rotate(-90deg);
-    -ms-transform-origin: 25px 75px;
-    -ms-transform: rotate(-90deg);
-    -o-transform-origin: 25px 75px;
-    -o-transform: rotate(-90deg);
-    -webkit-transform-origin: 25px 75px;
-    -webkit-transform: rotate(-90deg);
-}
 
-.feedback-button:hover {
+    -moz-transform-origin: 25px 75px;
+    -ms-transform-origin: 25px 75px;
+    -o-transform-origin: 25px 75px;
+    -webkit-transform-origin: 25px 75px;
+    transform-origin: 25px 75px;
+
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+.oppia-feedback-button:hover {
     opacity: 1;
     -moz-transform-origin: 35px 65px;
     -ms-transform-origin: 35px 65px;
     -o-transform-origin: 35px 65px;
     -webkit-transform-origin: 35px 65px;
+    transform-origin: 35px 65px;
 }
 

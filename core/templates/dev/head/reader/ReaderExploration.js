@@ -25,10 +25,28 @@
 
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
-      $scope.urlParams['iframed']);
+                    $scope.urlParams['iframed']);
+
+  $scope.showPage = !$scope.iframed;
+
+  $scope.getStyle = function() {
+    return $scope.showPage ? {} : {opacity: 0};
+  };
+
+  $scope.showContent = function() {
+    $scope.showPage = true;
+    $scope.$apply();
+  };
+
+  $scope.changeInputTemplateIframeHeight = function(height) {
+    var iframe = document.getElementById('inputTemplate');
+    iframe.height = height + 'px';
+  };
 
   // Initializes the story page using data from the server.
   $scope.initializePage = function() {
+    $scope.responseLog = [];
+    $scope.changeInputTemplateIframeHeight(50);
     $http.get($scope.explorationDataUrl)
         .success(function(data) {
           $scope.explorationTitle = data.title;
@@ -38,7 +56,6 @@
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
         });
-    $scope.responseLog = [];
   };
 
   $scope.initializePage();
@@ -227,7 +244,19 @@
   function receiveMessage(evt) {
     console.log('Event received.');
     console.log(evt.data);
-    if (evt.origin == window.location.protocol + '//' + window.location.host) {
+
+    if (evt.origin != window.location.protocol + '//' + window.location.host) {
+      return;
+    }
+
+    if (event.data.hasOwnProperty('widgetHeight')) {
+      // Change the height of the included iframe.
+      $scope.changeInputTemplateIframeHeight(
+        parseInt(event.data.widgetHeight, 10) + 2);
+    } else if (event.data == 'heightAdjustedExternally') {
+      $scope.showContent();
+    } else {
+      // Submit an answer to the server.
       $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }
   }

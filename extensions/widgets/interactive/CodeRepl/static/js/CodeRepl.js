@@ -6,6 +6,12 @@ repl.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 function CodeRepl($scope) {
   $scope.language = GLOBALS.language;
   $scope.placeholder = GLOBALS.placeholder;

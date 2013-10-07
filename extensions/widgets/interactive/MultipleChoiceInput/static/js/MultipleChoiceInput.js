@@ -9,6 +9,12 @@ mc.config(function($interpolateProvider) {
 function MultipleChoiceInput($scope) {
   $scope.choices = GLOBALS.choices;
 
+  window.onWidgetLoad = function() {
+    window.parent.postMessage(
+      {'widgetHeight': document.body.scrollHeight},
+      window.location.protocol + '//' + window.location.host);
+  };
+
   $scope.submitAnswer = function(answer) {
     if (!answer) {
       return;

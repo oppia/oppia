@@ -1,5 +1,5 @@
-<div ng-controller="ReaderExploration">
-  <div class="feedback-button" ng-click="openFeedbackModal()">
+<div ng-controller="ReaderExploration" ng-style="getStyle()">
+  <div class="oppia-feedback-button" ng-click="openFeedbackModal()">
     <center>
       <br><br><br>Feedback
     </center>
@@ -52,11 +52,26 @@
       </div>
 
       <div ng-hide="finished">
-        <!-- This iframe must always be contained within a div in which it is
-        the only element. For more information, please see the
-        ReaderExploration.js file. -->
+        <!-- This iframe must always be contained within a div in
+        which it is the only element. For more information, please
+        see the ReaderExploration.js file. -->
+
+        <!-- If the exploration is iframed, send data to the parent about the
+        iframe height.-->
+        <script>
+          window.onIframeLoad = function() {
+            if (window.parent != window) {
+              window.parent.postMessage(
+                  {'explorationHeight': document.body.scrollHeight},
+                  window.location.protocol + '//' + window.location.host
+              );
+            }
+          };
+        </script>
+
         <iframe id="inputTemplate" width="100%"
-                frameborder="0" height="2000px"></iframe>
+                seamless="seamless"
+                frameborder="0" onload="onIframeLoad()"></iframe>
       </div>
     </div>
   </div>
