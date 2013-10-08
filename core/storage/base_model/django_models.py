@@ -31,6 +31,10 @@ class BaseModel(models.Model):
 
     All model instances have an id property.
     """
+    # When this entity was first created.
+    created_on = models.DateTimeField(auto_now_add=True)
+    # When this entity was last updated.
+    last_updated = models.DateTimeField(auto_now=True)
 
     id = models.CharField(max_length=100, primary_key=True)
 

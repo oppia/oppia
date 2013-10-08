@@ -34,11 +34,6 @@ class StateCounterModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_ID].
     """
-    # When this entity was first created.
-    created = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = models.DateTimeField(auto_now=True)
-
     # Number of times the state was entered for the first time in a reader
     # session.
     first_entry_count = models.IntegerField(default=0)
@@ -79,11 +74,6 @@ class StateFeedbackFromReaderModel(base_models.BaseModel):
     The id/key for instances of this class has the form
         [EXPLORATION_ID].[STATE_ID]
     """
-    # When this entity was first created.
-    created = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = models.DateTimeField(auto_now=True)
-
     feedback_log = django_utils.JSONField(default=[], isdict=False, blank=True)
 
     @classmethod
@@ -108,11 +98,6 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     WARNING: Rule names and args that are used to construct the key here must
     be < 400 characters in length, since these are used as part of the key.
     """
-    # When this entity was first created.
-    created = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = models.DateTimeField(auto_now=True)
-
     # Log of answers that hit this rule and that have not been resolved. The
     # JSON blob represents a dict. The keys of this dict are the answers
     # encoded as HTML strings, and the values are integer counts representing

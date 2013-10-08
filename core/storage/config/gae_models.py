@@ -29,4 +29,4 @@ class ConfigPropertyModel(base_models.BaseModel):
     The id is the name of the property.
     """
     # The property value.
-    value = ndb.TextProperty()
+    value = ndb.TextProperty(indexed=False)

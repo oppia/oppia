@@ -27,6 +27,11 @@ from google.appengine.ext import ndb
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
+    # When this entity was first created.
+    created_on = ndb.DateTimeProperty(auto_now_add=True)
+    # When this entity was last updated.
+    last_updated = ndb.DateTimeProperty(auto_now=True)
+
     @property
     def id(self):
         """A unique id for this model instance."""

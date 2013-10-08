@@ -51,11 +51,7 @@ class StateModel(base_models.BaseModel):
             state_id, strict=strict, parent=exploration_key)
 
     # JSON representation of a state.
-    value = ndb.JsonProperty(required=True)
-    # When this entity was first created.
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
+    value = ndb.JsonProperty(required=True, indexed=False)
 
 
 class ExplorationModel(base_models.BaseModel):
@@ -82,18 +78,18 @@ class ExplorationModel(base_models.BaseModel):
     title = ndb.StringProperty(default='New exploration')
     # The list of state ids this exploration consists of. This list should not
     # be empty.
-    state_ids = ndb.StringProperty(repeated=True)
+    state_ids = ndb.StringProperty(repeated=True, indexed=False)
     # The dict of parameter specifications associated with this exploration.
     # Each specification is a dict whose keys are param names and whose values
     # are each dicts with a single key, 'obj_type', whose value is a string.
-    param_specs = ndb.JsonProperty(default={})
+    param_specs = ndb.JsonProperty(default={}, indexed=False)
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
-    param_changes = ndb.JsonProperty(repeated=True)
+    param_changes = ndb.JsonProperty(repeated=True, indexed=False)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
     # The id for the image to show as a preview of the exploration.
-    image_id = ndb.StringProperty()
+    image_id = ndb.StringProperty(indexed=False)
     # List of ids of users who can edit this exploration. If the exploration is
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.
@@ -182,14 +178,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     committer_id = ndb.StringProperty(required=True)
     # A brief commit message.
     # TODO(sll): Make this a required property?
-    commit_message = ndb.TextProperty()
-
-    # When this entity was first created.
-    created_on = ndb.DateTimeProperty(auto_now_add=True)
-    # When this entity was last updated.
-    # TODO(sll): Actually, it should never be updated; it should be read-only.
-    # Add a check for this.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
+    commit_message = ndb.TextProperty(indexed=False)
 
     @classmethod
     def get_metadata(cls, exploration_id, version_number):
@@ -259,7 +248,7 @@ class ExplorationSnapshotContentModel(base_models.BaseModel):
     # FORMAT_TYPE_FULL or FORMAT_TYPE_DIFF, respectively).
     format = ndb.StringProperty()
     # The snapshot content, as a JSON blob.
-    content = ndb.JsonProperty()
+    content = ndb.JsonProperty(indexed=False)
 
     @classmethod
     def get_snapshot_content(cls, exploration_id, version_number):
