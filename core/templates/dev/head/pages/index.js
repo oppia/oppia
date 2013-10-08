@@ -19,16 +19,16 @@
 window.addEventListener('message', function(evt) {
   if (evt.origin == 'https://oppiaserver.appspot.com' ||
       evt.origin == window.location.protocol + '//' + window.location.host) {
-    if (event.data.hasOwnProperty('explorationHeight')) {
-      console.log('Received iframe height from embedded oppia exploration: ' + event.data.explorationHeight);
+    if (evt.data.hasOwnProperty('explorationHeight')) {
+      console.log(
+          'Received iframe height from embedded oppia exploration: ' +
+          evt.data.explorationHeight);
 
       // Change the height of the included iframe.
       var iframe = document.getElementById('demoExploration');
-      iframe.height = parseInt(event.data.explorationHeight, 10) + 'px';
-
+      iframe.height = parseInt(evt.data.explorationHeight, 10) + 'px';
       var targetFrame = $('#demoExploration')[0];
       targetFrame.contentWindow.postMessage('heightAdjustedExternally', '*');
-
       setTimeout(function () {
         $('#buttons').show();
       }, 2000);

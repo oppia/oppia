@@ -249,11 +249,11 @@
       return;
     }
 
-    if (event.data.hasOwnProperty('widgetHeight')) {
+    if (evt.data.hasOwnProperty('widgetHeight')) {
       // Change the height of the included iframe.
       $scope.changeInputTemplateIframeHeight(
-        parseInt(event.data.widgetHeight, 10) + 2);
-    } else if (event.data == 'heightAdjustedExternally') {
+        parseInt(evt.data.widgetHeight, 10) + 2);
+    } else if (evt.data == 'heightAdjustedExternally') {
       $scope.showContent();
     } else {
       // Submit an answer to the server.
