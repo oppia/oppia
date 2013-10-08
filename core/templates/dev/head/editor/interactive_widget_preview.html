@@ -11,11 +11,11 @@
         <button ng-click="setShowPreview(true)">Preview</button>
       </span>
       <span ng-hide="isEmpty(interactiveWidget.params)">
-        <button data-toggle="modal" data-target="#customizeWidgetModal">
+        <button ng-click="showCustomizeInteractiveWidgetModal()">
           Customize
         </button>
       </span>
-      <button data-toggle="modal" data-target="#interactiveWidgetModal">
+      <button ng-click="showChooseInteractiveWidgetModal()">
         Choose a different interaction
       </button>
     </span>
@@ -156,54 +156,24 @@
     </div>
   </div>
 
-  <div class="modal hide fade" id="customizeWidgetModal">
+  <script type="text/ng-template" id="modals/chooseInteractiveWidget">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
+      <h3>Choose an Interactive Widget</h3>
     </div>
 
-    <div class="modal-body">
-      The following widget parameters can be customized:
-      <br><br>
-      <div ng-repeat="(key, paramDict) in interactiveWidget.params">
-        <strong><[key]></strong>
-        <value-generator-editor generator-id="paramDict.generator_id"
-                                init-args="paramDict.init_args"
-                                customization-args="paramDict.customization_args"
-                                obj-type="paramDict.obj_type">
-        </value-generator-editor>
-        <br>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal" ng-click="saveWidgetParams()">Save</button>
-    </div>
-  </div>
-
-  <div class="modal hide fade" id="interactiveWidgetModal" style="width: 900px; margin-left: -390px;">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="interactiveWidgetModalLabel">
-        Choose an Interactive Widget
-      </h3>
-    </div>
     <div class="modal-body">
       <iframe src="/widgetrepository?iframed=true&interactive=true"
               width="100%" height="400px" frameborder="0"
               id="interactiveWidgetRepository">
       </iframe>
     </div>
+
     <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal">
+      <button type="button" class="btn" ng-click="cancel()">
         Cancel
       </button>
     </div>
-  </div>
+  </script>
 
   <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
     <div class="modal-header">

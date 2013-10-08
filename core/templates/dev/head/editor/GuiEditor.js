@@ -351,12 +351,10 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
   };
 
-  $scope.showCustomizeNonInteractiveWidgetModal = function(index) {
-    warningsData.clear();
-    var widgetParams = JSON.parse($scope.content[index].value).params;
-
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/customizeNonInteractiveWidget',
+  $scope.getCustomizationModalInstance = function(widgetParams) {
+    // NB: This method is used for both interactive and noninteractive widgets.
+    return $modal.open({
+      templateUrl: 'modals/customizeWidget',
       backdrop: 'static',
       resolve: {
         widgetParams: function() {
@@ -378,6 +376,12 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
         };
       }
     });
+  };
+
+  $scope.showCustomizeNonInteractiveWidgetModal = function(index) {
+    warningsData.clear();
+    var widgetParams = JSON.parse($scope.content[index].value).params;
+    var modalInstance = $scope.getCustomizationModalInstance(widgetParams);
 
     modalInstance.result.then(function(result) {
       var widgetValue = JSON.parse($scope.content[index].value);

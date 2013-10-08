@@ -1,27 +1,26 @@
 <div ng-controller="ReaderExploration" ng-style="getStyle()">
-  <div class="oppia-feedback-button" ng-click="openFeedbackModal()">
+  <div class="oppia-feedback-button" ng-click="showFeedbackModal()">
     <center>
       <br><br><br>Feedback
     </center>
   </div>
-  <div class="modal hide fade" id="feedbackModal" ng-model="feedbackModalShown">
+
+  <script type="text/ng-template" id="modals/readerFeedback">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
       <h3>Give Feedback</h3>
     </div>
-
+  
     <div class="modal-body">
       <h4>Give feedback to the exploration creator</h4>
       <!-- TODO(sfederwisch): make this true<i> They will be given the exploration history already.</i><br />-->
       <textarea ng-model="feedback" rows="6" cols="200" placeholder="Put your feedback here"></textarea>
     </div>
+  
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal">Cancel</button>
-      <input type="submit" class="btn" value="Submit" ng-click="submitFeedback(feedback)"/>
+      <button class="btn" ng-click="submit(feedback)">Submit</button>
+      <button class="btn" ng-click="cancel()">Cancel</button>
     </div>
-  </div>
+  </script>
 
   <div class="oppia-content">
     <div class="oppia-exploration-header">

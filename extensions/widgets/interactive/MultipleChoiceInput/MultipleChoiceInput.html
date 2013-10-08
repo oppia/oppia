@@ -32,7 +32,7 @@
   <body onload="onWidgetLoad()">
     <div ng-controller="MultipleChoiceInput">
       <form ng-submit="submitAnswer(answer)">
-        <div ng-repeat="choice in choices">
+        <div ng-repeat="choice in choices track by $index">
           <label>
             <input type="radio" ng-model="$parent.answer"
                    name="choiceGroup" id="<[$index]>"

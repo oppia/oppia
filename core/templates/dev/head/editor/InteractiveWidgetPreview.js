@@ -18,7 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explorationData) {
+function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
+                                  explorationData) {
   $scope.showPreview = true;
 
   // Sets the 'showPreview' variable. The input is a boolean.
@@ -113,12 +114,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       customizationArgs[param] = $scope.interactiveWidget.params[param].customization_args;
     }
     return customizationArgs;
-  };
-
-  $scope.saveWidgetParams = function() {
-    $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, $scope.getCustomizationArgs(),
-        $scope.saveInteractiveWidget);
   };
 
   $scope.getStateNameForRule = function(stateId) {
@@ -362,36 +357,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
     return destId;
   };
 
-  $('#interactiveWidgetModal').on('hide', function() {
-    // Reload the iframe.
-    var F = $('#interactiveWidgetRepository');
-    F[0].src = F[0].src;
-  });
-
-  // Receive messages from the widget repository.
-  $scope.$on('message', function(event, arg) {
-    if (!arg.data.widgetType || arg.data.widgetType != 'interactive') {
-      return;
-    }
-
-    $scope.addContentToIframeWithId('interactiveWidgetPreview', arg.data.raw);
-    $('#interactiveWidgetModal').modal('hide');
-    if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
-      $scope.interactiveWidget = arg.data.widget;
-      $scope.interactiveRulesets = {'submit': [{
-        'description': 'Default',
-        'definition': {
-          'rule_type': 'default'
-        },
-        'dest': $scope.stateId,
-        'feedback': [],
-        'paramChanges': []
-      }]};
-    }
-    $scope.saveInteractiveWidget();
-  });
-
-
   window.addEventListener('message', function(evt) {
     console.log('Resize event received for widget preview.');
     console.log(evt.data);
@@ -436,6 +401,68 @@ function InteractiveWidgetPreview($scope, $http, $compile, warningsData, explora
       'sticky_interactive_widget': $scope.stickyInteractiveWidget
     });
   };
+
+  $scope.showCustomizeInteractiveWidgetModal = function(index) {
+    warningsData.clear();
+    var widgetParams = $scope.interactiveWidget.params;
+    var modalInstance = $scope.$parent.getCustomizationModalInstance(
+        widgetParams);
+
+    modalInstance.result.then(function(result) {
+      $scope.interactiveWidget.params = result.widgetParams;
+      $scope.generateWidgetPreview(
+          $scope.interactiveWidget.id, $scope.getCustomizationArgs(),
+          $scope.saveInteractiveWidget);
+      console.log('Interactive customization modal saved.');
+    }, function() {
+      console.log('Interactive customization modal dismissed.');
+    });
+  };
+
+  $scope.showChooseInteractiveWidgetModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/chooseInteractiveWidget',
+      backdrop: 'static',
+      resolve: {},
+      controller: function($scope, $modalInstance) {
+        // Receive messages from the exploration editor broadcast (these
+        // messages originate from the widget repository).
+        // TODO(sll): This results in a "Cannot read property '$$nextSibling'
+        // of null" error in the exploration editor $broadcast. This error does
+        // not seem to have any side effects, but we should try and fix it.
+        $scope.$on('message', function(event, arg) {
+          if (arg.data.widgetType && arg.data.widgetType == 'interactive') {
+            $modalInstance.close(arg);
+          }
+        });
+
+        $scope.cancel = function() {
+          warningsData.clear();
+          $modalInstance.dismiss('cancel');
+        };
+      }
+    });
+
+    modalInstance.result.then(function(arg) {
+      if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
+        $scope.interactiveWidget = arg.data.widget;
+        $scope.interactiveRulesets = {'submit': [{
+          'description': 'Default',
+          'definition': {'rule_type': 'default'},
+          'dest': $scope.stateId,
+          'feedback': [],
+          'paramChanges': []
+        }]};
+      }
+      $scope.saveInteractiveWidget();
+    }, function () {
+      console.log('Choose interactive widget modal dismissed.');
+    });
+  };
 }
 
-InteractiveWidgetPreview.$inject = ['$scope', '$http', '$compile', 'warningsData', 'explorationData'];
+InteractiveWidgetPreview.$inject = [
+  '$scope', '$http', '$compile', '$modal', 'warningsData', 'explorationData'
+];

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, warningsData) {
+ function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
@@ -60,8 +60,30 @@
 
   $scope.initializePage();
 
-  $scope.openFeedbackModal = function() {
-    $('#feedbackModal').modal();
+  $scope.showFeedbackModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/readerFeedback',
+      backdrop: 'static',
+      resolve: {},
+      controller: function($scope, $modalInstance) {
+        $scope.submit = function(feedback) {
+          $modalInstance.close({feedback: feedback});
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function(result) {
+      $scope.submitFeedback(result.feedback);
+    }, function () {
+      console.log('Reader feedback modal dismissed.');
+    });
   };
 
   $scope.submitFeedback = function(feedback) {
@@ -265,4 +287,6 @@
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ReaderExploration.$inject = ['$scope', '$http', '$sce', '$timeout', 'warningsData'];
+ReaderExploration.$inject = [
+  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData'
+];

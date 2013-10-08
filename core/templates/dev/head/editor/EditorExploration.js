@@ -27,8 +27,8 @@ var NONEXISTENT_STATE = '[none]';
 
 // Receive events from the iframed widget repository.
 oppia.run(function($rootScope) {
-  window.addEventListener('message', function(event) {
-    $rootScope.$broadcast('message', event);
+  window.addEventListener('message', function(evt) {
+    $rootScope.$broadcast('message', evt);
   });
 });
 
