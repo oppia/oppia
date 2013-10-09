@@ -90,126 +90,6 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         }
       });
 
-      function addPopup(vis, expId, stateId, stateName, stats, improvementType) {
-        var modal = d3.select(element[0]).append('div')
-          .attr('class', 'modal')
-          .attr('aria-hidden', 'false')
-          .attr('id','infoModal')
-          .style('top', '400px');
-        var header =  modal.append('div')
-          .attr('class', 'modal-header');
-        header.append('button')
-          .attr('class', 'close')
-          .attr('data-dismiss', 'modal')
-          .attr('aria-hidden', 'true')
-          .html('&times;')
-          .on('click', function (d) {
-            modal.remove();
-          });
-
-        header.append('h3')
-          .attr('class', 'customizeModalLabel')
-          .text('Statistics for ' + stateName);
-        var body = modal.append('div')
-          .attr('class', 'modal-body');
-        if (improvementType) {
-          var CONFUSING_EXPLANATION = 'Students often leave the page when they get ' +
-              'to this state -- this could mean the non-interactive content didn\'t ' +
-              'make sense, so they didn\'t know how to respond to it.';
-          var NEED_FEEDBACK_EXPLANATION = 'Students often return to this state ' +
-              'after giving an answer -- this could mean that the feedback they are ' +
-              'getting is insufficient to help them learn.';
-
-          var improvementExplanation = (
-              improvementType == 'May be confusing' ?
-              CONFUSING_EXPLANATION : NEED_FEEDBACK_EXPLANATION);
-
-          var improvementDiv = body.append('div')
-            .text("It looks like this state " + improvementType.toLowerCase());
-          improvementDiv.append('img')
-            .attr('class', 'oppia-help')
-            .attr('src', '/images/help.png')
-            .attr('ui-jq', 'tooltip')
-            .attr('title', improvementExplanation)
-            .style('margin-left', '5px');
-        }
-        body.append('div')
-          .style('font-weight', 'bold')
-          .text('Times hit:')
-          .append('span')
-            .style('font-weight', 'normal')
-            .style('margin-left', '5px')
-            .text(stats.totalEntryCount);
-        var showTitle = false;
-        var title = body.append('div')
-          .style('font-weight', 'bold')
-          .text('Answers:');
-        var ruleList = body.append('ul');
-        for (var rule in stats.rule_stats) {
-          if (stats.rule_stats[rule].answers.length === 0) {
-            continue;
-          }
-          showTitle = true;
-          var answerList = ruleList.append('li')
-            .attr('text-anchor', 'start')
-            .text(rule)
-            .append('ul');
-          for (var ans in stats.rule_stats[rule].answers) {
-            var answer = stats.rule_stats[rule].answers[ans][0];
-            var count = stats.rule_stats[rule].answers[ans][1];
-            answerList.append('li')
-              .text(answer + " (" + count  + " time" + (count > 1 ? "s" : "") + ")")
-              .append('a')
-                .style('font-weight', 'normal')
-                .style('font-size', '12px')
-                .style('margin-left', '5px')
-                .attr('href', expId + '#/gui/' + stateId + '#rules')
-                .text('Add a rule for this answer');
-          }
-        }
-        if (!showTitle) {
-          if (stats.totalEntryCount) {
-            body.append('i')
-              .text('No students gave answers')
-              .append('a')
-                .style('font-weight', 'normal')
-                .style('font-size', '12px')
-                .style('font-style', 'normal')
-                .style('margin-left', '5px')
-                .attr('href', expId + '#/gui/' + stateId + '#noninteractive')
-                .text('Edit non-interactive content');
-          }
-          title.remove();
-        }
-        if (stats.feedback_log.length > 0) {
-          var feedbackSpot = body.append('div')
-            .style('font-weight', 'bold')
-            .text('Feedback:');
-          var feedbackExplanation = 'This feedback comes directly from students when ' +
-              'they were at this state when they click the feedback button.';
-          feedbackSpot.append('img')
-              .attr('class', 'oppia-help')
-              .attr('src', '/images/help.png')
-              .attr('ui-jq', 'tooltip')
-              .attr('title', feedbackExplanation)
-              .style('margin-left', '5px');
-          feedbackSpot = feedbackSpot.append('ul');
-          for (var feedback in stats.feedback_log) {
-            feedbackSpot.append('li')
-              .style('font-weight', 'normal')
-              .style('margin-left', '5px')
-              .text(stats.feedback_log[feedback].feedback);
-          }
-        }
-        var footer = modal.append('div')
-          .attr('class', 'modal-footer');
-        footer.append('a')
-          .attr('class', 'btn')
-          .attr('data-dismiss', 'modal')
-          .text('Close')
-          .on('click', function (d) {modal.remove(); });
-      }
-
       function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
         height = 0;
         width = 0;
@@ -428,14 +308,14 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                   scope.$apply();
                 } else {
                   var legendList = highlightStates['legend'].split(',');
-                  var improvementType = "";
+                  var improvementType = '';
                   for (var index in legendList) {
                     if (legendList[index].indexOf(highlightStates[d.hashId]) === 0) {
                       improvementType = legendList[index].split(':')[1];
                       break;
                     }
                   }
-                  addPopup(vis, explorationData.data.exploration_id, d.hashId, d.name, stateStats[d.hashId], improvementType);
+                  scope.$parent.showStateStatsModal(d.hashId, improvementType);
                 }
               }
             })
