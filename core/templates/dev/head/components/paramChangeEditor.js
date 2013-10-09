@@ -175,6 +175,8 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           return;
         }
 
+        $scope.$broadcast('externalSave');
+
         // The tmpParamName from the selector is usually of the format
         // {id:param_name, text:param_name}, except when the user is creating
         // a new parameter, in which case it is {id:'new', text:param_name}.

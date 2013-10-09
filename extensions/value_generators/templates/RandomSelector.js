@@ -32,6 +32,10 @@ oppia.directive('randomSelector', function($compile, warningsData) {
       $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
         $scope.customizationArgs = $scope.$parent.customizationArgs;
       }, true);
+
+      $scope.$watch('customizationArgs', function(newValue, oldValue) {
+        $scope.$parent.customizationArgs = $scope.customizationArgs;
+      }, true);
     }
   };
 });

@@ -81,6 +81,14 @@ oppia.directive('string', function(warningsData) {
         $scope.item = newItem;
         $scope.closeItemEditor();
       };
+
+      $scope.$on('externalSave', function() {
+        if ($scope.active) {
+          $scope.replaceItem($scope.localItem.label);
+          // The $scope.$apply() call is needed to propagate the replaced item.
+          $scope.$apply();
+        }
+      });
     }
   };
 });
@@ -117,6 +125,14 @@ oppia.directive('real', function (warningsData) {
         $scope.item = newItem;
         $scope.closeItemEditor();
       };
+
+      $scope.$on('externalSave', function() {
+        if ($scope.active) {
+          $scope.replaceItem($scope.localItem.label);
+          // The $scope.$apply() call is needed to propagate the replaced item.
+          $scope.$apply();
+        }
+      });
     }
   };
 });
@@ -158,6 +174,14 @@ oppia.directive('int', function (warningsData) {
         $scope.item = newItem;
         $scope.closeItemEditor();
       };
+
+      $scope.$on('externalSave', function() {
+        if ($scope.active) {
+          $scope.replaceItem($scope.localItem.label);
+          // The $scope.$apply() call is needed to propagate the replaced item.
+          $scope.$apply();
+        }
+      });
     }
   };
 });
@@ -223,6 +247,15 @@ oppia.directive('list', function(warningsData) {
         $scope.localItems.splice(index, 1);
         $scope.items.splice(index, 1);
       };
+
+      $scope.$on('externalSave', function() {
+        if ($scope.activeItem !== null) {
+          $scope.replaceItem(
+              $scope.activeItem, $scope.localItems[$scope.activeItem].label);
+          // The $scope.$apply() call is needed to propagate the replaced item.
+          $scope.$apply();
+        }
+      });
     }
   };
 });

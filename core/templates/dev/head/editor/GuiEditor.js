@@ -365,6 +365,7 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
         $scope.widgetParams = widgetParams;
 
         $scope.save = function(widgetParams) {
+          $scope.$broadcast('externalSave');
           $modalInstance.close({
             widgetParams: widgetParams
           });
