@@ -93,6 +93,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
           return;
         } else {
           $scope.guiTabActive = true;
+          $scope.statsTabActive = false;
+          $scope.mainTabActive = false;
           $scope.$broadcast('guiTabSelected', stateData);
           // Scroll to the relevant element (if applicable).
           // TODO(sfederwisch): Change the trigger to when page finishes
@@ -107,13 +109,19 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
       explorationData.stateId = '';
       $scope.stateId = '';
       $scope.statsTabActive = true;
+      $scope.mainTabActive = false;
+      $scope.guiTabActive = false;
     } else {
       $location.path('/');
       $location.hash('');
       explorationData.stateId = '';
       $scope.stateId = '';
       $scope.mainTabActive = true;
+      $scope.guiTabActive = false;
+      $scope.statsTabActive = false;
     }
+
+    firstLoad = true;
   });
 
   /********************************************

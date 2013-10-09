@@ -35,7 +35,6 @@ oppia.directive('barChart', function() {
           legendPosition = 'none';
         }
         var options =  {
-          title: $attrs.chartTitle,
           colors: $scope.chartColors,
           isStacked: true,
           width: $attrs.width,

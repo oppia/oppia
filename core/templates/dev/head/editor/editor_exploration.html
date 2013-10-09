@@ -31,13 +31,13 @@
       <div class="modal-header">
         <h3>Delete Exploration</h3>
       </div>
-  
+
       <div class="modal-body">
         <p>
           Really delete this exploration? This action cannot be reversed.
         </p>
       </div>
-  
+
       <div class="modal-footer">
         <button class="btn" ng-click="delete()">Delete</button>
         <button class="btn" ng-click="cancel()">Close</button>
@@ -48,20 +48,20 @@
       <div class="modal-header">
         <h3>Delete State</h3>
       </div>
-  
+
       <div class="modal-body">
         <p>
           Are you sure you want to delete the state "<[deleteStateName]>"?
           <strong>This action cannot be reversed.</strong>
         </p>
       </div>
-  
+
       <div class="modal-footer">
         <button class="btn" ng-click="delete()">Delete</button>
         <button class="btn" ng-click="cancel()">Close</button>
       </div>
     </script>
-      
+
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
         <div class="span12">
@@ -146,6 +146,7 @@
     {{ include_js_file('editor/EditorExploration.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
+    {{ include_js_file('editor/StatsViewer.js') }}
     {{ include_js_file('editor/GuiEditor.js') }}
     // These should come after the valueGeneratorEditor scripts.
     {{ include_js_file('editor/InteractiveWidgetPreview.js') }}
