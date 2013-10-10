@@ -124,7 +124,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
             'x2': '100%',
             'y1': '0%',
             'y2': '0%'
-          })
+          });
         gradient.append('stop')
           .attr({'offset': '0%'})
           .style({'stop-color': nodeFill, 'stop-opacity': 1});
@@ -289,7 +289,7 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                 d.reachable === false ? 'pink' :
                 d.reachableFromEnd === false ? 'pink' :
                 'beige'
-              )
+              );
             },
             'fill-opacity': function(d) {
               return opacityMap ? opacityMap[d.hashId] : 0.5;

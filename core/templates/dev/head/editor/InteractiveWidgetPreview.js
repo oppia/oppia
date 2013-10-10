@@ -18,8 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
-                                  explorationData) {
+function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorationData) {
   $scope.showPreview = true;
 
   // Sets the 'showPreview' variable. The input is a boolean.
@@ -71,7 +70,7 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
 
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
-    // the corresponding action and the value has several keys:
+    // the corresponding handler name and the value has several keys:
     // - 'description' (the rule description string)
     // - 'inputs' (a list of parameters)
     // - 'name' (stuff needed to build the Python classifier code)
@@ -139,18 +138,6 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
     return allStates;
   };
 
-  $scope.getDestName = function(stateId) {
-    if (stateId === '?') {
-      return 'Add New State...';
-    } else if (stateId === END_DEST) {
-      return END_DEST;
-    } else if (stateId === $scope.stateId) {
-      return $scope.states[stateId].name + ' ⟳';
-    } else {
-      return $scope.states[stateId].name;
-    }
-  };
-
   // Returns a list of all states, as well as an 'Add New State' option.
   $scope.getAllDests = function() {
     var result = $scope.getAllStates();
@@ -158,51 +145,13 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
     return result;
   };
 
-  $scope.getExtendedChoiceArray = function(choices) {
-    var result = [];
-    for (var i = 0; i < choices.length; i++) {
-      result.push({id: i, val: choices[i]});
-    }
-    return result;
-  };
-
-  $scope.selectRule = function(description, name) {
-    $scope.deselectAllRules();
-    $scope.addRuleActionDescription = description;
-    $scope.addRuleActionName = name;
-    $scope.addRuleActionDest = explorationData.stateId;
-    $scope.addRuleActionDestNew = '';
-
-    // Finds the parameters and sets them in addRuleActionInputs.
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var copyOfRule = description;
-    while (true) {
-      if (!copyOfRule.match(pattern)) {
-        break;
-      }
-      var varName = copyOfRule.match(pattern)[1];
-      var varType = null;
-      if (copyOfRule.match(pattern)[2]) {
-        varType = copyOfRule.match(pattern)[2].substring(1);
-      }
-
-      if (varType == 'Set') {
-        $scope.addRuleActionInputs[varName] = [];
-      } else {
-        $scope.addRuleActionInputs[varName] = '';
-      }
-
-      copyOfRule = copyOfRule.replace(pattern, ' ');
-    }
-  };
-
-  $scope.getRules = function(action) {
-    if (!action || !$scope.interactiveWidget) {
+  $scope.getRules = function(handlerName) {
+    if (!handlerName || !$scope.interactiveWidget) {
       return;
     }
     var wHandlers = $scope.interactiveWidget.handlers;
     for (var i = 0; i < wHandlers.length; i++) {
-      if (wHandlers[i].name == action) {
+      if (wHandlers[i].name == handlerName) {
         ruleDict = {};
         for (var description in wHandlers[i].rules) {
           ruleDict[description] = wHandlers[i].rules[description].classifier;
@@ -213,97 +162,291 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
   };
 
   $scope.deselectAllRules = function() {
-    $scope.addRuleActionIndex = null;
-    $scope.addRuleActionDescription = null;
-    $scope.addRuleActionName = null;
-    $scope.addRuleActionInputs = {};
-    $scope.addRuleActionDest = null;
-    $scope.addRuleActionDestNew = '';
-    $scope.addRuleActionFeedback = [];
-    $scope.addRuleActionParamChanges = null;
+    $scope.tmpRule = {
+      index: null,
+      description: null,
+      name: null,
+      inputs: {},
+      dest: null,
+      destNew: '',
+      feedback: [],
+      paramChanges: null
+    };
   };
 
-  $scope.openAddRuleModal = function(action) {
-    $scope.addRuleModalTitle = 'Add Rule';
-    $scope.addRuleAction = action;
+  $scope.openAddRuleModal = function(handlerName) {
+    $scope.ruleModalHandlerName = handlerName;
     $scope.deselectAllRules();
+    $scope.showRuleEditorModal('Add Rule');
   };
 
-  $scope.openEditRuleModal = function(action, index) {
-    $scope.addRuleModalTitle = 'Edit Rule';
-    $scope.addRuleAction = action;
+  $scope.openEditRuleModal = function(handlerName, index) {
+    $scope.ruleModalHandlerName = handlerName;
 
-    $scope.addRuleActionIndex = index;
-    var rule = $scope.interactiveRulesets[action][index];
-    $scope.addRuleActionDescription = rule.description;
-    // TODO(sll): Generalize these to Boolean combinations of rules.
-    $scope.addRuleActionName = rule.definition.name;
-    $scope.addRuleActionInputs = rule.definition.inputs;
-    $scope.addRuleActionDest = rule.dest;
-    $scope.addRuleActionDestNew = '';
-    $scope.addRuleActionFeedback = rule.feedback;
-    $scope.addRuleActionParamChanges = rule.paramChanges;
+    var rule = $scope.interactiveRulesets[handlerName][index];
+    $scope.tmpRule = {
+      index: index,
+      description: rule.description,
+      // TODO(sll): Generalize these to Boolean combinations of rules.
+      name: rule.definition.name,
+      inputs: rule.definition.inputs,
+      dest: rule.dest,
+      destNew: '',
+      feedback: rule.feedback,
+      paramChanges: rule.paramChanges
+    };
+    $scope.showRuleEditorModal('Edit Rule');
   };
 
-  $scope.saveExtendedRule = function(action, extendedRule) {
-    if (!$scope.interactiveRulesets.hasOwnProperty(action)) {
-      $scope.interactiveRulesets[action] = [];
+  $scope.showRuleEditorModal = function(modalTitle) {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/ruleEditor',
+      backdrop: 'static',
+      resolve: {
+        modalTitle: function() {
+          return modalTitle;
+        },
+        tmpRule: function() {
+          return $scope.tmpRule;
+        },
+        handlerName: function() {
+          return $scope.ruleModalHandlerName;
+        },
+        existingRules: function() {
+          return $scope.getRules($scope.ruleModalHandlerName);
+        },
+        choices: function() {
+          return $scope.interactiveWidget.params.choices;
+        },
+        allDests: function() {
+          return $scope.getAllDests();
+        },
+        states: function() {
+          return $scope.states;
+        },
+        stateId: function() {
+          return $scope.stateId;
+        }
+      },
+      controller: function($scope, $modalInstance, modalTitle, tmpRule,
+            handlerName, existingRules, choices, allDests, states, stateId) {
+        $scope.modalTitle = modalTitle;
+        $scope.tmpRule = tmpRule;
+        $scope.handlerName = handlerName;
+        $scope.existingRules = existingRules;
+        // TODO(sll): Remove this special-casing.
+        $scope.choices = choices;
+        $scope.allDests = allDests;
+        $scope.states = states;
+        $scope.stateId = stateId;
+
+        $scope.resetTmpRule = function() {
+          $scope.tmpRule = {
+            index: null,
+            description: null,
+            name: null,
+            inputs: {},
+            dest: null,
+            destNew: '',
+            feedback: [],
+            paramChanges: null
+          };
+        };
+
+        $scope.getRuleDescriptionFragments = function(input, choices) {
+          if (!input) {
+            return '';
+          }
+          var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+          var index = 0;
+
+          var isMultipleChoice = (choices ? true : false);
+          var finalInput = input;
+          var iter = 0;
+          while (true) {
+            if (!input.match(pattern) || iter == 100) {
+              break;
+            }
+            iter++;
+
+            var varName = input.match(pattern)[1],
+                varType = null;
+            if (input.match(pattern)[2]) {
+              varType = input.match(pattern)[2].substring(1);
+            }
+      
+            var replacementHtml = '';
+            if (isMultipleChoice) {
+              replacementHtml = '<SELECT|' + varName + '>';
+            } else if (varType == 'Set') {
+              replacementHtml = '<LIST|' + varName + '>';
+            } else {
+              replacementHtml = '<INPUT|' + varName + '>';
+            }
+    
+            finalInput = finalInput.replace(pattern, replacementHtml);
+            input = input.replace(pattern, ' ');
+            index++;
+          }
+
+          var finalInputArray = finalInput.split('<');
+          var result = [];
+          for (var i = 0; i < finalInputArray.length; i++) {
+            var tmpVarName;
+            if (finalInputArray[i].indexOf('SELECT') === 0) {
+              finalInputArray[i] = finalInputArray[i].substr(7);
+              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
+              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
+              result.push({'type': 'select', 'varName': tmpVarName});
+            } else if (finalInputArray[i].indexOf('INPUT') === 0) {
+              finalInputArray[i] = finalInputArray[i].substr(6);
+              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
+              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
+              result.push({'type': 'input', 'varName': tmpVarName});
+            } else if (finalInputArray[i].indexOf('LIST') === 0) {
+              finalInputArray[i] = finalInputArray[i].substr(5);
+              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
+              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
+              result.push({'type': 'list', 'varName': tmpVarName});
+            }
+            
+            result.push({'type': 'html', 'text': finalInputArray[i]});
+          }
+          return result;
+        };
+
+        $scope.tmpRuleDescriptionFragments = [];
+        $scope.$watch('tmpRule.description', function(newValue) {
+          $scope.tmpRuleDescriptionFragments = $scope.getRuleDescriptionFragments(
+            newValue, choices);
+        });
+
+        $scope.getDestName = function(stateId) {
+          if (stateId === '?') {
+            return 'Add New State...';
+          } else if (stateId === END_DEST) {
+            return END_DEST;
+          } else if (stateId === $scope.stateId) {
+            return $scope.states[stateId].name + ' ⟳';
+          } else {
+            return $scope.states[stateId].name;
+          }
+        };
+
+        $scope.getExtendedChoiceArray = function(choices) {
+          var result = [];
+          for (var i = 0; i < choices.length; i++) {
+            result.push({id: i, val: choices[i]});
+          }
+          return result;
+        };
+
+        $scope.selectRule = function(description, name) {
+          $scope.tmpRule.description = description;
+          $scope.tmpRule.name = name;
+          $scope.tmpRule.dest = explorationData.stateId;
+          $scope.tmpRule.destNew = '';
+
+          // Finds the parameters and sets them in $scope.tmpRule.inputs.
+          var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+          var copyOfRule = description;
+          while (true) {
+            if (!copyOfRule.match(pattern)) {
+              break;
+            }
+            var varName = copyOfRule.match(pattern)[1];
+            var varType = null;
+            if (copyOfRule.match(pattern)[2]) {
+              varType = copyOfRule.match(pattern)[2].substring(1);
+            }
+
+            if (varType == 'Set') {
+              $scope.tmpRule.inputs[varName] = [];
+            } else {
+              $scope.tmpRule.inputs[varName] = '';
+            }
+
+            copyOfRule = copyOfRule.replace(pattern, ' ');
+          }
+        };
+
+        $scope.save = function() {
+          $modalInstance.close({tmpRule: tmpRule});
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function(result) {
+      $scope.saveRule(result.tmpRule);
+    }, function () {
+      console.log('Rule editor modal dismissed.');
+    });
+  };
+
+  $scope.saveExtendedRule = function(handlerName, extendedRule) {
+    if (!$scope.interactiveRulesets.hasOwnProperty(handlerName)) {
+      $scope.interactiveRulesets[handlerName] = [];
     }
 
-    var rules = $scope.interactiveRulesets[action];
-    if ($scope.addRuleActionIndex !== null) {
-      rules[$scope.addRuleActionIndex] = extendedRule;
+    var rules = $scope.interactiveRulesets[handlerName];
+    if ($scope.tmpRule.index !== null) {
+      rules[$scope.tmpRule.index] = extendedRule;
     } else {
       rules.splice(rules.length - 1, 0, extendedRule);
     }
 
-    $('#addRuleModal').modal('hide');
-
     $scope.saveInteractiveWidget();
   };
 
-  $scope.saveExtendedRuleWithNewDest = function(action, extendedRule, destId) {
+  $scope.saveExtendedRuleWithNewDest = function(handlerName, extendedRule, destId) {
     extendedRule['dest'] = destId;
-    $scope.saveExtendedRule(action, extendedRule);
+    $scope.saveExtendedRule(handlerName, extendedRule);
   };
 
-  $scope.saveRule = function(description, name, inputs, dest, newDest, feedback) {
-    if (description) {
+  $scope.saveRule = function(tmpRule) {
+    if (tmpRule.description) {
       var extendedRule = {
-        description: description,
+        description: tmpRule.description,
         definition: {
-          rule_type: description == 'Default' ? 'default' : 'atomic',
-          name: name,
-          inputs: inputs,
+          rule_type: tmpRule.description == 'Default' ? 'default' : 'atomic',
+          name: tmpRule.name,
+          inputs: tmpRule.inputs,
           subject: 'answer'
         },
-        dest: dest,
-        feedback: feedback
+        dest: tmpRule.dest,
+        feedback: tmpRule.feedback
       };
 
       // TODO(sll): Do more error-checking here.
-      if (dest === '?') {
+      if (tmpRule.dest === '?') {
         // The user has added a new state.
-        if (!newDest) {
+        if (!tmpRule.destNew) {
           warningsData.addWarning('Error: destination state is empty.');
-        } else if ($scope.convertDestToId(newDest, true)) {
+        } else if ($scope.convertDestToId(tmpRule.destNew, true)) {
           // The new state already exists.
-          extendedRule.dest = $scope.convertDestToId(newDest);
+          extendedRule.dest = $scope.convertDestToId(tmpRule.destNew);
         } else {
-          extendedRule.dest = newDest;
+          extendedRule.dest = tmpRule.destNew;
           // Adds the new state, then saves the rule.
           $scope.addState(
-              $scope.addRuleActionDestNew,
+              tmpRule.destNew,
               $scope.saveExtendedRuleWithNewDest.bind(
-                  null, $scope.addRuleAction, extendedRule));
+                  null, $scope.ruleModalHandlerName, extendedRule));
           return;
         }
       }
 
-      $scope.saveExtendedRule($scope.addRuleAction, extendedRule);
+      $scope.saveExtendedRule($scope.ruleModalHandlerName, extendedRule);
     }
 
-    $scope.addRuleAction = null;
+    $scope.ruleModalHandlerName = null;
     $scope.deselectAllRules();
   };
 
@@ -312,17 +455,17 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
     return ruleset[ruleset.length - 1];
   };
 
-  $scope.swapRules = function(action, index1, index2) {
-    $scope.tmpRule = $scope.interactiveRulesets[action][index1];
-    $scope.interactiveRulesets[action][index1] =
-        $scope.interactiveRulesets[action][index2];
-    $scope.interactiveRulesets[action][index2] = $scope.tmpRule;
+  $scope.swapRules = function(handlerName, index1, index2) {
+    $scope.tmpRule = $scope.interactiveRulesets[handlerName][index1];
+    $scope.interactiveRulesets[handlerName][index1] =
+        $scope.interactiveRulesets[handlerName][index2];
+    $scope.interactiveRulesets[handlerName][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();
   };
 
-  $scope.deleteRule = function(action, index) {
-    $scope.interactiveRulesets[action].splice(index, 1);
+  $scope.deleteRule = function(handlerName, index) {
+    $scope.interactiveRulesets[handlerName].splice(index, 1);
     $scope.saveInteractiveWidget();
   };
 
@@ -464,5 +607,5 @@ function InteractiveWidgetPreview($scope, $http, $compile, $modal, warningsData,
 }
 
 InteractiveWidgetPreview.$inject = [
-  '$scope', '$http', '$compile', '$modal', 'warningsData', 'explorationData'
+  '$scope', '$http', '$modal', 'warningsData', 'explorationData'
 ];

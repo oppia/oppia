@@ -77,7 +77,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     console.log('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
-      $anchorScroll();
       $scope.stateId = path.substring('/gui/'.length);
       if (!$scope.stateId) {
         $location.path('/');

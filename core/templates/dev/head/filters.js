@@ -56,62 +56,6 @@ oppia.filter('bracesToText', function() {
   };
 });
 
-// Filter that changes {{...}} tags into input fields.
-// Uses a multiple-choice selector if the input is multiple-choice.
-oppia.filter('bracesToInput', function() {
-  return function(input, choices) {
-    if (!input) {
-      return '';
-    }
-    var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var index = 0;
-
-    var isMultipleChoice = false;
-    if (choices) {
-      isMultipleChoice = true;
-    }
-
-    var finalInput = input;
-
-    var iter = 0;
-    while (true) {
-      if (!input.match(pattern) || iter == 100) {
-        break;
-      }
-      iter++;
-
-      var varName = input.match(pattern)[1];
-      var varType = null;
-      if (input.match(pattern)[2]) {
-        varType = input.match(pattern)[2].substring(1);
-      }
-
-      var tail = '>';
-      if (index === 0) {
-        tail = ' autofocus>';
-      }
-
-      var replacementHtml = '<input type="text" required ng-model="addRuleActionInputs.' +
-          varName + '"' + tail;
-      if (isMultipleChoice) {
-        replacementHtml =
-          '<select ng-model="addRuleActionInputs.' + varName +
-          '" ng-options="choice.id as choice.val for choice in ' +
-          'getExtendedChoiceArray(interactiveWidget.params.choices.value)"' +
-          tail + '</select>';
-      } else if (varType == 'Set') {
-        replacementHtml =
-          '<list items="addRuleActionInputs.' + varName + '">';
-      }
-
-      finalInput = finalInput.replace(pattern, replacementHtml);
-      input = input.replace(pattern, ' ');
-      index++;
-    }
-    return finalInput;
-  };
-});
-
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 oppia.filter('parameterizeRuleDescription', function() {
   return function(input, choices) {
