@@ -98,14 +98,16 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
           $scope.mainTabActive = false;
           $scope.$broadcast('guiTabSelected', stateData);
           // Scroll to the relevant element (if applicable).
-          // TODO(sfederwisch): Change the trigger to when page finishes
-          // loading.
+          // TODO(sfederwisch): Change the trigger so that there is exactly one
+          // scroll action that occurs when the page finishes loading.
           setTimeout(function () {
-            $anchorScroll();
+            if ($location.hash()) {
+              $anchorScroll();
+            }
             if (firstLoad) {
               firstLoad = false;
             }
-          }, 2000);
+          }, 1000);
         }
       });
     } else if (path == STATS_VIEWER_URL) {
