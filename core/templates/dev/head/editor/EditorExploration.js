@@ -77,6 +77,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     console.log('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
+      $anchorScroll();
       $scope.stateId = path.substring('/gui/'.length);
       if (!$scope.stateId) {
         $location.path('/');
@@ -101,6 +102,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
           // loading.
           setTimeout(function () {
             $anchorScroll();
+            if (firstLoad) {
+              firstLoad = false;
+            }
           }, 2000);
         }
       });
@@ -120,8 +124,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
       $scope.guiTabActive = false;
       $scope.statsTabActive = false;
     }
-
-    firstLoad = true;
   });
 
   /********************************************

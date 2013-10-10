@@ -30,11 +30,8 @@ oppia.directive('barChart', function() {
           return;
         }
         var data = google.visualization.arrayToDataTable(value);
-        var legendPosition = 'right';
-        if ($attrs.showLegend == 'false') {
-          legendPosition = 'none';
-        }
-        var options =  {
+        var legendPosition = ($attrs.showLegend == 'false' ? 'none' : 'right');
+        chart.draw(data, {
           colors: $scope.chartColors,
           isStacked: true,
           width: $attrs.width,
@@ -42,8 +39,7 @@ oppia.directive('barChart', function() {
           legend: {position: legendPosition},
           hAxis: {gridlines: {color: 'transparent'}},
           chartArea: {width: $attrs.chartAreaWidth, left:0}
-        };
-        chart.draw(data, options);
+        });
       });
     }
   };
@@ -94,70 +90,74 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
         height = 0;
         width = 0;
 
-        // Clear existing SVG elements on the graph visualization canvas.
+        // Clear all SVG elements on the canvas.
         d3.select(element[0]).selectAll('svg').remove();
 
-        var vis = d3.select(element[0]).append('svg:svg')
-            .attr('class', 'oppia-graph-viz')
-            .attr('width', 680);
+        var vis = d3.select(element[0]).append('svg:svg').attr({
+          'class': 'oppia-graph-viz',
+          'width': 680
+        });
 
-        // Update the links
-        var link = vis.selectAll('path.link')
-            .data(links);
+        // Update the links.
+        var link = vis.selectAll('path.link').data(links);
 
-        vis.append('svg:defs').selectAll('marker')
-            .data(['arrowhead'])
-          .enter().append('svg:marker')
-            .attr('id', String)
-            .attr('viewBox', '-5 -5 18 18')
-            .attr('refX', 10)
-            .attr('refY', 6)
-            .attr('markerWidth', 6)
-            .attr('markerHeight', 9)
-            .attr('orient', 'auto')
-          .append('svg:path')
-            .attr('d', 'M -5 0 L 12 6 L -5 12 z')
-            .attr('fill', 'grey');
+        vis.append('svg:defs').selectAll('marker').data(['arrowhead'])
+          .enter().append('svg:marker').attr({
+            'id': String,
+            'viewBox': '-5 -5 18 18',
+            'refX': 10,
+            'refY': 6,
+            'markerWidth': 6,
+            'markerHeight': 9,
+            'orient': 'auto'
+          })
+          .append('svg:path').attr({
+            'd': 'M -5 0 L 12 6 L -5 12 z',
+            'fill': 'grey'
+          });
 
-       var gradient = vis.selectAll('defs').selectAll('linearGradient')
-           .data(['nodeGradient'])
-         .enter().append('svg:linearGradient')
-           .attr('id', String)
-           .attr('x1', '0%')
-           .attr('x2', '100%')
-           .attr('y1', '0%')
-           .attr('y2', '0%');
-       gradient.append('stop')
-           .attr('offset', '0%')
-           .style('stop-color', nodeFill)
-           .style('stop-opacity', 1);
-       gradient.append('stop')
-           .attr('offset', '100%')
-           .style('stop-color', nodeFill)
-           .style('stop-opacity', 0.1);
+        var gradient = vis.selectAll('defs').selectAll('linearGradient')
+            .data(['nodeGradient'])
+          .enter().append('svg:linearGradient').attr({
+            'id': String,
+            'x1': '0%',
+            'x2': '100%',
+            'y1': '0%',
+            'y2': '0%'
+          })
+        gradient.append('stop')
+          .attr({'offset': '0%'})
+          .style({'stop-color': nodeFill, 'stop-opacity': 1});
+        gradient.append('stop')
+          .attr({'offset': '100%'})
+          .style({'stop-color': nodeFill, 'stop-opacity': 0.1});
 
         if (opacityMap || highlightStates) {
             var wth = 200;
             var x = 450;
             var legendHeight = 0;
             var legend = vis.append('svg:rect')
-              .attr('width', wth)
-              .attr('x', x)
-              .style('fill', 'transparent')
-              .style('stroke', 'black');
+              .attr({'width': wth, 'x': x})
+              .style({'fill': 'transparent', 'stroke': 'black'});
+
             if (opacityMap) {
-              vis.append('svg:rect')
-                .attr('width', wth - 20)
-                .attr('height', 20)
-                .attr('x', x + 10)
-                .attr('y', 10)
-                .style('stroke-width', 0.5)
-                .style('stroke', 'black')
-                .style('fill', 'url(#nodeGradient)');
-              vis.append('svg:text')
-                .text(opacityMap['legend'])
-                .attr('x', x + 10)
-                .attr('y', 50);
+              vis.append('svg:rect').attr({
+                'width': wth - 20,
+                'height': 20,
+                'x': x + 10,
+                'y': 10
+              })
+              .style({
+                'stroke-width': 0.5,
+                'stroke': 'black',
+                'fill': 'url(#nodeGradient)'
+              });
+
+              vis.append('svg:text').text(opacityMap['legend']).attr({
+                'x': x + 10,
+                'y': 50
+              });
+
               legendHeight += 70;
             }
             if (highlightStates) {
@@ -166,39 +166,38 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
                  legendHeight += 40;
                  var color = legendData[i].split(':')[0];
                  var desc = legendData[i].split(':')[1];
-                 var leg_y;
-                 if (opacityMap) {
-                   leg_y = 70;
-                 } else {
-                   leg_y = 10;
-                 }
-                 leg_y += (i * 40);
-                 vis.append('svg:rect')
-                  .attr('height', 30)
-                  .attr('width', 30)
-                  .attr('rx', 4)
-                  .attr('ry', 4)
-                  .attr('x', x + 10)
-                  .attr('y', leg_y)
-                  .style('stroke', color)
-                  .style('fill', 'transparent')
-                  .style('stroke-width', 3);
-                 vis.append('svg:text')
-                  .text(desc)
-                  .attr('x', x + 50)
-                  .attr('y', leg_y + 17);
+                 var leg_y = (opacityMap ? 70 : 10) + (i * 40);
+                 vis.append('svg:rect').attr({
+                    'height': 30,
+                    'width': 30,
+                    'rx': 4,
+                    'ry': 4,
+                    'x': x + 10,
+                    'y': leg_y
+                  })
+                  .style({
+                    'stroke': color,
+                    'fill': 'transparent',
+                    'stroke-width': 3
+                  });
+                vis.append('svg:text').text(desc).attr({
+                  'x': x + 50,
+                  'y': leg_y + 17
+                });
               }
             }
             legend.attr('height', legendHeight);
         }
-        var linkEnter = link.enter().append('svg:g')
-            .attr('class', 'link');
+        var linkEnter = link.enter().append('svg:g').attr('class', 'link');
 
         linkEnter.insert('svg:path', 'g')
-            .style('stroke-width', 3)
-            .style('stroke', '#b3b3b3')
-            .attr('class', 'link')
-            .attr('d', function(d) {
+          .style({'stroke-width': 3, 'stroke': '#b3b3b3'})
+          .attr({
+            'class': 'link',
+            'marker-end': function(d) {
+              return 'url(#arrowhead)';
+            },
+            'd': function(d) {
               var sourceWidth = getTextWidth(d.source.name);
               var targetWidth = getTextWidth(d.target.name);
 
@@ -243,131 +242,137 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
               // Draw a quadratic bezier curve.
               return 'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
                   ' ' + endx + ' ' + endy;
-            })
-            .attr('marker-end', function(d) {
-              return 'url(#arrowhead)';
-            });
+            }
+          });
 
         // Update the nodes
-        // TODO(sll): Put a blue border around the current node.
         var node = vis.selectAll('g.node')
             .data(nodes, function(d) { return d.id; });
 
-        var nodeEnter = node.enter().append('svg:g')
-            .attr('class', 'node');
+        var nodeEnter = node.enter().append('svg:g').attr('class', 'node');
 
         // Add nodes to the canvas.
         nodeEnter.append('svg:rect')
-            .attr('x', function(d) {
+          .attr({
+            'rx': 4,
+            'ry': 4,
+            'height': 40,
+            'width': function(d) {
+              return getTextWidth(d.name) + 2*NODE_PADDING_X;
+            },
+            'x': function(d) {
               width = width > d.x0 + 200 ? width: d.x0 + 200;
               return d.x0 - NODE_PADDING_X;
-            })
-            .attr('y', function(d) {
+            },
+            'y': function(d) {
               height = height > d.y0 + 100 ? height : d.y0 + 100;
               return d.y0;
-            })
-            .attr('ry', function(d) { return 4; })
-            .attr('rx', function(d) { return 4; })
-            .attr('width', function(d) {
-               return getTextWidth(d.name) + 2*NODE_PADDING_X; })
-            .attr('height', function(d) { return 40; })
-            .attr('class', function(d) {
-              return d.hashId != END_DEST ? 'clickable' : null; })
-            .style('stroke', function(d) {
+            },
+            'class': function(d) {
+              return d.hashId != END_DEST ? 'clickable' : null;
+            }
+          })
+          .style({
+            'stroke': function(d) {
               return (highlightStates? (
-                  d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC'
+                d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC'
               ) : 'black');
-            })
-            .style('stroke-width', function(d) {
+            },
+            'stroke-width': function(d) {
               return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
-            })
-            .style('fill', function(d) {
-              if (nodeFill) {
-                return nodeFill;
-              } else {
-                return (
-                  d.hashId == initStateId ? 'olive' :
-                  d.hashId == END_DEST ? 'green' :
-                  d.reachable === false ? 'pink' :
-                  d.reachableFromEnd === false ? 'pink' :
-                  'beige'
-                );
-              }
-            })
-            .style('fill-opacity', function(d) {
+            },
+            'fill': function(d) {
+              return (
+                nodeFill ? nodeFill :
+                d.hashId == initStateId ? 'olive' :
+                d.hashId == END_DEST ? 'green' :
+                d.reachable === false ? 'pink' :
+                d.reachableFromEnd === false ? 'pink' :
+                'beige'
+              )
+            },
+            'fill-opacity': function(d) {
               return opacityMap ? opacityMap[d.hashId] : 0.5;
-            })
-            .on('click', function (d) {
-              if (d.hashId != END_DEST) {
-                explorationData.getStateData(d.hashId);
+            }
+          })
+          .on('click', function(d) {
+            if (d.hashId != END_DEST) {
+              explorationData.getStateData(d.hashId);
+              scope.$parent.stateId = d.hashId;
+              if (!stateStats) {
                 scope.$parent.stateId = d.hashId;
-                if (!stateStats) {
-                  scope.$parent.location.path('/gui/' + d.hashId);
-                  // The scope.$apply() is required to trigger the location
-                  // path watcher in EditorExploration.
-                  scope.$apply();
-                } else {
-                  var legendList = highlightStates['legend'].split(',');
-                  var improvementType = '';
-                  for (var index in legendList) {
-                    if (legendList[index].indexOf(highlightStates[d.hashId]) === 0) {
-                      improvementType = legendList[index].split(':')[1];
-                      break;
-                    }
+                scope.$parent.selectGuiTab();
+                // The call to $apply() is needed in order to trigger the
+                // tab change event on the parent controller.
+                scope.$apply();
+              } else {
+                var legendList = highlightStates['legend'].split(',');
+                var improvementType = '';
+                for (var index in legendList) {
+                  if (legendList[index].indexOf(highlightStates[d.hashId]) === 0) {
+                    improvementType = legendList[index].split(':')[1];
+                    break;
                   }
-                  scope.$parent.showStateStatsModal(d.hashId, improvementType);
                 }
+                scope.$parent.showStateStatsModal(d.hashId, improvementType);
               }
-            })
-            .append('svg:title')
-            .text(function(d) {
-              var warning = '';
-              if (d.reachable === false) {
-                warning = 'Warning: this state is unreachable.';
-              } else if (d.reachableFromEnd === false) {
-                warning = 'Warning: there is no path from this state to the END state.';
-              }
+            }
+          })
+          .append('svg:title')
+          .text(function(d) {
+            var warning = '';
+            if (d.reachable === false) {
+              warning = 'Warning: this state is unreachable.';
+            } else if (d.reachableFromEnd === false) {
+              warning = 'Warning: there is no path from this state to the END state.';
+            }
 
-              var label = d.name;
-              if (warning) {
-                label += ' (' + warning + ')';
-              }
-              return label;
-            });
+            var label = d.name;
+            if (warning) {
+              label += ' (' + warning + ')';
+            }
+            return label;
+          });
 
-        nodeEnter.append('svg:text')
-            .attr('text-anchor', 'middle')
-            .attr('x', function(d) { return d.x0 + (getTextWidth(d.name) / 2); })
-            .attr('y', function(d) { return d.y0 + 25; })
-            .text(function(d) { return scope.truncate(d.name); });
+        nodeEnter.append('svg:text').text(
+          function(d) { return scope.truncate(d.name); }
+        ).attr({
+          'text-anchor': 'middle',
+          'x': function(d) { return d.x0 + (getTextWidth(d.name) / 2); },
+          'y': function(d) { return d.y0 + 25; }
+        });
 
         if (!forbidNodeDeletion) {
           // Add a 'delete node' handler.
-          nodeEnter.append('svg:rect')
-              .attr('y', function(d) { return d.y0; })
-              .attr('x', function(d) { return d.x0; })
-              .attr('height', 20)
-              .attr('width', 20)
-              .attr('opacity', 0) // comment out this line to see the delete target
-              .attr('transform', function(d) {
-                return 'translate(' + (getTextWidth(d.name) - 15) + ',' + (+0) + ')'; }
-              )
-              .attr('stroke-width', '0')
-              .style('fill', 'pink')
-              .on('click', function (d) {
-                if (d.hashId != initStateId && d.hashId != END_DEST) {
-                  scope.$parent.showDeleteStateModal(d.hashId);
-                }
-              });
+          nodeEnter.append('svg:rect').attr({
+            'height': 20,
+            'width': 20,
+            'opacity': 0, // comment out this line to see the delete target
+            'stroke-width': '0',
+            'x': function(d) { return d.x0; },
+            'y': function(d) { return d.y0; },
+            'transform': function(d) {
+              return 'translate(' + (getTextWidth(d.name) - 15) + ',' + (+0) + ')';
+            }
+          })
+          .style('fill', 'pink')
+          .on('click', function (d) {
+            if (d.hashId != initStateId && d.hashId != END_DEST) {
+              scope.$parent.showDeleteStateModal(d.hashId);
+            }
+          });
 
-          nodeEnter.append('svg:text')
-              .attr('text-anchor', 'right')
-              .attr('dx', function(d) { return d.x0 + getTextWidth(d.name) -10; })
-              .attr('dy', function(d) { return d.y0 + 10; })
-              .text(function(d) {
-                return (d.hashId != initStateId && d.hashId != END_DEST) ? 'x' : '';
-              });
+          nodeEnter.append('svg:text').attr({
+            'dx': function(d) { return d.x0 + getTextWidth(d.name) -10; },
+            'dy': function(d) { return d.y0 + 10; },
+            'text-anchor': 'right'
+          })
+          .text(function(d) {
+            return (d.hashId != initStateId && d.hashId != END_DEST) ? 'x' : '';
+          });
         }
+
+
       }
     }
   };
