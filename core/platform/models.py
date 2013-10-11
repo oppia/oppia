@@ -23,7 +23,7 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'config', 'exploration', 'file', 'statistics')
+    'base_model', 'config', 'exploration', 'file', 'statistics', 'users')
 
 
 class _Platform(object):
@@ -54,6 +54,9 @@ class _Django(_Platform):
             elif name == NAMES.statistics:
                 from core.storage.statistics import django_models as statistics_model
                 returned_models.append(statistics_model)
+            elif name == NAMES.users:
+                from core.storage.users import django_models as user_prefs_model
+                returned_models.append(user_prefs_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -98,6 +101,9 @@ class _Gae(_Platform):
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_model
                 returned_models.append(statistics_model)
+            elif name == NAMES.users:
+                from core.storage.users import gae_models as user_prefs_model
+                returned_models.append(user_prefs_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
 

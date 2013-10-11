@@ -39,6 +39,17 @@ function Profile($scope, $http, warningsData) {
     $scope.categoryList = profileData.category_list;
     $scope.pageLoaded = true;
   });
+
+  $scope.createUserName = function(username) {
+    $http.post(
+      '/profile/create_user_name',
+      $scope.createRequest({
+        username: username,
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    );
+
+  }
 }
 
 /**

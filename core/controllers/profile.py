@@ -21,6 +21,10 @@ from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
 user_services = models.Registry.import_user_services()
+(user_pref_services,) = models.Registry.import_models([
+    models.NAMES.users
+])
+
 
 
 class ProfilePage(base.BaseHandler):
@@ -61,3 +65,24 @@ class ProfileHandler(base.BaseHandler):
             'category_list': list(category_list)
         })
         self.render_json(self.values)
+
+
+class CreateUserNamePage(base.BaseHandler):
+    """The profile page."""
+
+    PAGE_NAME_FOR_CSRF = 'create_user_name'
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': 'profile',
+        })
+        self.render_template('profile/create_user_name.html')
+
+    @base.require_user
+    def post(self):
+      """Handles POST requests.""" 
+      username = self.payload.get('username');
+      user_settings = user_pref_services.set_username(self.user_id, username)
+
