@@ -1,43 +1,43 @@
 default_skin: conversation_v1
 param_changes: []
 param_specs:
-  previousNumber:
-    obj_type: UnicodeString
-  lowest:
-    obj_type: UnicodeString
-  highest:
-    obj_type: UnicodeString
-  guess:
-    obj_type: UnicodeString
-  precomputeHighest:
-    obj_type: UnicodeString
-  precomputeGuess:
-    obj_type: UnicodeString
-  precomputeLowest:
-    obj_type: UnicodeString
   MagicianNumber:
-    obj_type: UnicodeString
-  tries:
-    obj_type: UnicodeString
-  worstnum:
-    obj_type: UnicodeString
-  rangeSize:
-    obj_type: UnicodeString
-  middle:
     obj_type: UnicodeString
   OptimalityProxy:
     obj_type: UnicodeString
-  largestValidRange:
+  comparison:
     obj_type: UnicodeString
-  upperBound:
+  guess:
+    obj_type: UnicodeString
+  highest:
+    obj_type: UnicodeString
+  largestValidRange:
     obj_type: UnicodeString
   lowerBound:
     obj_type: UnicodeString
-  comparison:
+  lowest:
+    obj_type: UnicodeString
+  middle:
+    obj_type: UnicodeString
+  newHighest:
     obj_type: UnicodeString
   newLowest:
     obj_type: UnicodeString
-  newHighest:
+  precomputeGuess:
+    obj_type: UnicodeString
+  precomputeHighest:
+    obj_type: UnicodeString
+  precomputeLowest:
+    obj_type: UnicodeString
+  previousNumber:
+    obj_type: UnicodeString
+  rangeSize:
+    obj_type: UnicodeString
+  tries:
+    obj_type: UnicodeString
+  upperBound:
+    obj_type: UnicodeString
+  worstnum:
     obj_type: UnicodeString
 schema_version: 1
 states:
@@ -55,7 +55,7 @@ states:
       magician right in your town?<br><br>Apparently, this magician can guess, in
       just a few tries, what number anyone is thinking of. Even big numbers, like
       a thousand! If he''s cheating and reading minds, he''s gotta be stopped! And
-      if it''s not, you have to meet him and figure out what his secret is!<br><br>"So,
+      if he''s not, you have to meet him and figure out what his secret is!<br><br>"So,
       what do you think? how does he do it?"'
   name: Introduction
   param_changes: []
@@ -83,12 +83,14 @@ states:
         param_changes: []
       - definition:
           inputs:
-            x: middle
+            x: read
           name: Contains
           rule_type: atomic
           subject: answer
-        dest: Picking in the middle
-        feedback: []
+        dest: Town Square
+        feedback:
+        - '"You think he reads minds? But then couldn''t he use that for something
+          a bit more flashy than guessing numbers?.."'
         param_changes: []
       - definition:
           rule_type: default
@@ -923,15 +925,22 @@ states:
     widget_id: MultipleChoiceInput
 - content:
   - type: text
-    value: '"There''s gotta be a trick to make it go faster, though. It''s way too
-      slow if I just ask about each number one at a time. Then to guess 1000 numbers,
-      I would need 1000 tries! And the magician does it so much faster."<br><br>"So
-      we need to make one guess eliminate more than one number. Hmm, how do we do
-      that?"<br>'
+    value: '"Hmm, I guess it''s pretty easy to guess 3 numbers in 3 tries - just try
+      every number!"<br><br>"There''s gotta be a trick to make it go faster, though.
+      It''s way too slow if I just ask about each number one at a time. For example,
+      to guess 1000 numbers, I would need 1000 tries! And the magician does it so
+      much faster."<br><br>"So we need to make one guess eliminate more than one number.
+      Hmm, how can we do that in the 3-number-guessing case?"<br>'
   name: 3 case 3 tries
   param_changes: []
   widget:
-    customization_args: {}
+    customization_args:
+      columns:
+        value: 60
+      placeholder:
+        value: Type your answer here.
+      rows:
+        value: 1
     handlers:
     - name: submit
       rule_specs:
@@ -998,6 +1007,17 @@ states:
         feedback:
         - '"Oh! so if we guess ''2'' as our first try, then we know what number to
           guess on the second try, even if 2 wasn''t right!"'
+        param_changes: []
+      - definition:
+          inputs:
+            x: middle
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: After three case
+        feedback:
+        - '"I see! If we guess the number in the middle (which is 2 in our case, then
+          no matter what the magician answers, we''ll eliminate two numbers!"'
         param_changes: []
       - definition:
           rule_type: default

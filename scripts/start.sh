@@ -51,7 +51,7 @@ fi
 echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
-  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip
+  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -O webtest-download.zip --no-check-certificate
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
   mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/webtest-1.4.2
@@ -70,7 +70,7 @@ bash scripts/test.sh $@
 # TODO(sll): Do this in a new shell.
 (sleep 5; echo Opening browser window pointing to an end user interface; /opt/google/chrome/chrome http://localhost:8181/ )&
 echo Starting GAE development server
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
+python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=no .
 
 
 echo Done!
