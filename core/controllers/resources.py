@@ -81,6 +81,11 @@ class ImageUploadHandler(base.BaseHandler):
 
     def post(self):
         """Saves an image uploaded by a content creator."""
+        # This sets the payload so that an error response is rendered as JSON
+        # instead of HTML.
+        # TODO(sll): This is somewhat hacky; make it nicer.
+        self.payload = 'image_upload'
+
         raw = self.request.get('image')
         if raw:
             image_id = image_models.Image.create(raw)

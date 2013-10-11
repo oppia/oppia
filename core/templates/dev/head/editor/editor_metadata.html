@@ -19,39 +19,6 @@
         <br>
         <strong>Category</strong>: <input type="text" ng-model="explorationCategory" ng-model-onblur>
       </div>
-
-      <div>
-        <strong>Cover image</strong> (for the <a href="/gallery">Gallery</a>):
-
-        <span ng-if="explorationImageId">
-          <img class="oppia-small-image" ng-src="/imagehandler/<[explorationImageId]>">
-          <button type="button" class="btn" ng-click="deleteExplorationImage()"
-                  title="Delete this image">
-            <i class="icon-trash"></i>
-          </button>
-        </span>
-        <div ng-if="!explorationImageId">
-          <em>No image supplied.</em>
-
-          <button type="button" ng-click="openAddExplorationImageForm()"
-                  ng-hide="activeInputData.name == 'explorationMetadata.addNewImage'">
-            Add Image
-          </button>
-
-          <div ng-show="activeInputData.name == 'explorationMetadata.addNewImage'">
-            <form id="newImageForm">
-              <input type="file" id="newImage" name="newImage" image-upload="true">
-              <br><br>
-              <button type="button" ng-click="saveExplorationImage()">
-                Save
-              </button>
-              <button type="button" ng-click="closeAddExplorationImageForm()">
-                Cancel
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="span6">
@@ -94,7 +61,10 @@
 
   <div>
     <h4>Parameters used in this exploration</h4>
-    <ol>
+    <div ng-show="!paramSpecs.length">
+      <em>No parameters used.</em>
+    </div>
+    <ol ng-show="paramSpecs.length">
       <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
         <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
       </li>
@@ -103,7 +73,7 @@
     <br>
 
     <h4>
-      Parameter initializations
+      Parameters initialized at start of exploration
       <img class="oppia-help" src="/images/help.png"
            tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
            tooltip-placement="right">

@@ -162,7 +162,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
   explorationData.getData().then(function(data) {
     $scope.stateId = explorationData.stateId;
     $scope.states = data.states;
-    $scope.explorationImageId = data.image_id;
     $scope.explorationTitle = data.title;
     $scope.explorationCategory = data.category;
     $scope.explorationEditors = data.editors;
@@ -399,16 +398,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     activeInputData.name = 'explorationMetadata';
   };
 
-
-  $scope.openAddExplorationImageForm = function() {
-    activeInputData.name = 'explorationMetadata.addNewImage';
-  };
-
-  $scope.closeAddExplorationImageForm = function() {
-    activeInputData.name = 'explorationMetadata';
-  };
-
-
   $scope.addNewEditor = function(newEditorEmail) {
     activeInputData.name = 'explorationMetadata';
     $scope.explorationEditors.push(newEditorEmail);
@@ -440,20 +429,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
   $scope.makePublic = function() {
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
-  };
-
-  $scope.deleteExplorationImage = function() {
-    $scope.saveExplorationProperty(
-        'explorationImageId', 'image_id', null, $scope.explorationImageId);
-  };
-
-  $scope.saveExplorationImage = function() {
-    activeInputData.name = 'explorationMetadata';
-    $scope.saveImage(function(data) {
-      $scope.explorationImageId = data.image_id;
-      $scope.saveExplorationProperty(
-          'explorationImageId', 'image_id', $scope.explorationImageId, null);
-    });
   };
 
   $scope.saveExplorationParamChanges = function() {
@@ -488,7 +463,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
         $scope.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              if (frontendName == 'isPublic' || frontendName == 'explorationImageId') {
+              if (frontendName == 'isPublic') {
                 $scope[frontendName] = newValue;
               }
               console.log('PUT request succeeded');

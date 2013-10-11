@@ -258,8 +258,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # This checks if the response should be JSON or HTML.
         if self.payload is not None:
-            self.response.content_type = 'application/json'
-            self.response.write(json.dumps(values))
+            self.render_json(values)
         else:
             self.values.update(values)
             if error_code == 404:
