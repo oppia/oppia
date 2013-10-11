@@ -44,7 +44,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             json_response = self.testapp.get(
                 '/learn/%s/data' % self.exploration_id)
             self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(json_response.content_type, 'application/json')
+            self.assertEqual(
+                json_response.content_type, 'application/javascript')
 
             response = json.loads(json_response.body)
 
@@ -64,7 +65,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
                 str(url_path), {'payload': json.dumps(reader_payload)}
             )
             self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(json_response.content_type, 'application/json')
+            self.assertEqual(
+                json_response.content_type, 'application/javascript')
 
             response = json.loads(json_response.body)
 

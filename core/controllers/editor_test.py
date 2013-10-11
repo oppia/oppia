@@ -44,7 +44,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/create/0/data')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.content_type, 'application/javascript')
         editor_exploration_json = json.loads(response.body)
 
         self.assertEqual(editor_exploration_json['num_visits'], 0)
@@ -54,7 +54,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # multiple-choice answer, then submit 'blah'.
         response = self.testapp.get('/learn/0/data')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.content_type, 'application/javascript')
 
         exploration_json = json.loads(response.body)
         self.assertEqual(exploration_json['title'], 'Welcome to Oppia!')
@@ -82,7 +82,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/create/0/data')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
+        self.assertEqual(response.content_type, 'application/javascript')
         editor_exploration_json = json.loads(response.body)
 
         self.assertEqual(editor_exploration_json['num_visits'], 1)

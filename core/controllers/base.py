@@ -213,7 +213,9 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def render_json(self, values):
-        self.response.content_type = 'application/json'
+        self.response.content_type = 'application/javascript; charset=utf-8'
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['Content-Disposition'] = 'attachment'
         self.response.write(json.dumps(values))
 
         # Calculate the processing time of this request.

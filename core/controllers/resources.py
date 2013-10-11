@@ -18,7 +18,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
 import mimetypes
-import os
 
 from core.controllers import base
 from core.domain import value_generators_domain
