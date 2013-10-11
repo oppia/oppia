@@ -6,14 +6,10 @@
 
 {% block content %}
   <div class="oppia-content">
-
-    <br>
-
-    <iframe id="demoExploration" src="/learn/0?iframed=true" width="100%" height="700px"
-            frameborder="0"></iframe>
+    <oppia oppia-id="0" width="100%" id="demoExploration"></oppia>
 
     <hr>
-    <div class="row-fluid">
+    <div class="row-fluid" id="buttons" style="display: none;">
       <div class="span6">
         <center class="oppia-btn-container">
           <a class="btn oppia-btn" href="/gallery">Browse more explorations</a>
@@ -28,3 +24,10 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/index.js') }}
+  </script>
+{% endblock footer_js %}

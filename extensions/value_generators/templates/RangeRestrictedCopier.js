@@ -35,18 +35,28 @@ oppia.directive('rangeRestrictedCopier', function($compile, warningsData) {
         $scope.objType = $scope.$parent.objType;
       }, true);
 
-      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
-        $scope.customizationArgs = $scope.$parent.customizationArgs;
-        $scope.initArgs = $scope.$parent.initArgs;
+      $scope.checkCustomizationArgs = function() {
         if ($scope.customizationArgs !== undefined || oldValue !== undefined) {
           if ($scope.customizationArgs.value > $scope.initArgs.max_value ||
               $scope.customizationArgs.value < $scope.initArgs.min_value) {
+            warningsData.clear();
             warningsData.addWarning(
               'Value must be between ' + $scope.initArgs.max_value +
               ' and ' + $scope.initArgs.min_value + ', inclusive.');
             return;
           }
         }
+      };
+
+      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
+        $scope.customizationArgs = $scope.$parent.customizationArgs;
+        $scope.initArgs = $scope.$parent.initArgs;
+        $scope.checkCustomizationArgs();
+      }, true);
+
+      $scope.$watch('customizationArgs', function(newValue, oldValue) {
+        $scope.$parent.customizationArgs = $scope.customizationArgs;
+        $scope.checkCustomizationArgs();
       }, true);
     }
   };

@@ -32,23 +32,18 @@ class StateCounterModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_ID].
     """
-    # When this entity was first created.
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
-
     # Number of times the state was entered for the first time in a reader
     # session.
-    first_entry_count = ndb.IntegerProperty(default=0)
+    first_entry_count = ndb.IntegerProperty(default=0, indexed=False)
     # Number of times the state was entered for the second time or later in a
     # reader session.
-    subsequent_entries_count = ndb.IntegerProperty(default=0)
+    subsequent_entries_count = ndb.IntegerProperty(default=0, indexed=False)
     # Number of times an answer submitted for this state was subsequently
     # resolved by an exploration admin and removed from the answer logs.
-    resolved_answer_count = ndb.IntegerProperty(default=0)
+    resolved_answer_count = ndb.IntegerProperty(default=0, indexed=False)
     # Number of times an answer was entered for this state and was not
     # subsequently resolved by an exploration admin.
-    active_answer_count = ndb.IntegerProperty(default=0)
+    active_answer_count = ndb.IntegerProperty(default=0, indexed=False)
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id):
@@ -77,12 +72,7 @@ class StateFeedbackFromReaderModel(base_models.BaseModel):
     The id/key for instances of this class has the form
         [EXPLORATION_ID].[STATE_ID]
     """
-    # When this entity was first created.
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
-
-    feedback_log = ndb.JsonProperty(repeated=True)
+    feedback_log = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id):
@@ -106,18 +96,13 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     WARNING: Rule names and args that are used to construct the key here must
     be < 400 characters in length, since these are used as part of the key.
     """
-    # When this entity was first created.
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
-
     # Log of answers that hit this rule and that have not been resolved. The
     # JSON blob represents a dict. The keys of this dict are the answers
     # encoded as HTML strings, and the values are integer counts representing
     # how many times the answer has been entered.
     # WARNING: do not use default={} in JsonProperty, it does not work as you
     # expect.
-    answers = ndb.JsonProperty()
+    answers = ndb.JsonProperty(indexed=False)
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):

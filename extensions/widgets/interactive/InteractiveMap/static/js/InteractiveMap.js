@@ -6,6 +6,12 @@ im.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 function initialize() {
   var coords = GLOBALS.coords || [0, 0];
   var zoom_level = parseInt(GLOBALS.zoom, 10) || 0;

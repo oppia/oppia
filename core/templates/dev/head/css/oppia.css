@@ -66,24 +66,91 @@ textarea {
   width: 90%;
 }
 
+.oppia-no-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
-.oppia-gallery-box {
+.oppia-gallery {
+  background-color: #f6f6f6;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+}
+
+.oppia-gallery-menu {
+  border-right: 1px solid #bbb;
+  float: left;
+  min-height: 300px;
+  padding: 10px 15px 0 15px;
+  width: 150px;
+}
+.oppia-gallery-menu-title {
+  font-size: 120%;
+  padding: 12px 0;
+}
+
+.oppia-gallery-tiles-container {
+  background-color: white;
+  border-radius: 3px;
+  min-height: 300px;
+  padding-top: 10px;
+}
+
+.oppia-gallery-tile {
+  background-color: #f6f6f6;
   border: 1px solid #CCC;
   border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(100,100,100,0.5);
   display: block;
   float: left;
-  margin: 5px;
-  min-width: 160px;
-  padding: 2px 0;
+  margin: 7px;
+  min-width: 200px;
+  padding-bottom: 2px;
   width: 30%;
 }
 
-.oppia-gallery-title {
+.oppia-gallery-tile-top, .oppia-gallery-tile-bottom {
+  padding: 2px 10px;
+}
+.oppia-gallery-tile-top:hover {
+  background-color: #ddd;
+}
+.oppia-gallery-tile-bottom {
+  white-space: nowrap;
+}
+
+.oppia-gallery-tile-anchor:hover {
+  text-decoration: none;
+}
+
+.oppia-gallery-tile-description {
+  margin: 10px 0;
+}
+
+.oppia-gallery-tile-title {
   color: #888;
-  padding: 2px;
+  font-size: 120%;
+  font-weight: bold;
+}
+.oppia-gallery-tile-title:hover {
+  text-decoration: none;
+}
+.oppia-gallery-tile-top:hover .oppia-gallery-tile-title {
+  color: black;
+}
+
+.oppia-gallery-tile-play {
+  float: right;
+  opacity: 0;
+  -webkit-transform: scale(1.5, 1.5);
+  -moz-transform: scale(1.5, 1.5);
+  transform: scale(1.5, 1.5);
+}
+.oppia-gallery-tile-top:hover .oppia-gallery-tile-play {
+  opacity: 0.5;
 }
 
 .oppia-page-title {
@@ -176,10 +243,6 @@ textarea {
   margin: 10px;
   padding: 10px;
   width: 100%;
-}
-
-.oppia-gallery-block {
-  display: block;
 }
 
 .oppia-form-search {
@@ -353,6 +416,10 @@ textarea {
   list-style-type: none;
 }
 
+.oppia-widget-preview {
+  border: 1px solid gray;
+}
+
 /* Graph styles */
 
 #oppia-state-graph-canvas {
@@ -475,7 +542,7 @@ textarea {
   }
 }
 
-.feedback-button {
+.oppia-feedback-button {
     transition-property: all;
     transition-duration: 0.2s;
     align-content: center;
@@ -494,21 +561,25 @@ textarea {
     position: fixed;
     top: 50%;
     width: 100px;
-    -moz-transform-origin: 25px 75px;
-    -moz-transform: rotate(-90deg);
-    -ms-transform-origin: 25px 75px;
-    -ms-transform: rotate(-90deg);
-    -o-transform-origin: 25px 75px;
-    -o-transform: rotate(-90deg);
-    -webkit-transform-origin: 25px 75px;
-    -webkit-transform: rotate(-90deg);
-}
 
-.feedback-button:hover {
+    -moz-transform-origin: 25px 75px;
+    -ms-transform-origin: 25px 75px;
+    -o-transform-origin: 25px 75px;
+    -webkit-transform-origin: 25px 75px;
+    transform-origin: 25px 75px;
+
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+.oppia-feedback-button:hover {
     opacity: 1;
     -moz-transform-origin: 35px 65px;
     -ms-transform-origin: 35px 65px;
     -o-transform-origin: 35px 65px;
     -webkit-transform-origin: 35px 65px;
+    transform-origin: 35px 65px;
 }
 

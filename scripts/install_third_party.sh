@@ -118,6 +118,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
   wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
   unzip angular-ui-download.zip -d $THIRD_PARTY_DIR/static/
   rm angular-ui-download.zip
+  mv $THIRD_PARTY_DIR/static/angular-ui-OLDREPO-0.4.0 $THIRD_PARTY_DIR/static/angular-ui-0.4.0
 fi
 
 echo Checking whether ui-bootstrap is installed in third_party

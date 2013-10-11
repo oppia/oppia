@@ -11,75 +11,73 @@
       <div class="oppia-gallery-frame">
 
         <h3 class="oppia-page-title">
-          <[getHeadingText()]>
-          {% if user %}
-            <div class="pull-right">
-              <button class="btn" ng-click="toggleExplorationView()">
-                <[getToggleText()]>
-              </button>
-            </div>
-          {% endif %}
+          Gallery
         </h3>
 
-        <div class="tabbable tabs-left" ng-if="categories">
-          <ul class="nav nav-tabs" id="navTabs">
-            <li ng-repeat="(category, explorations) in categories" ng-class="{active: $index == 0}">
-              <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
-                <[category]>
-              </a>
-            </li>
-          </ul>
-          <div class="tab-content">
-            <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
-              <div class="container-fluid">
-                <div class="row-fluid">
+        <div class="oppia-gallery" ng-if="categories">
+          <div class="tabbable tabs-left">
 
-                  <div class="oppia-gallery-block">
-                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-box">
-                      <div>
-                        <center>
-                          <a href="/learn/<[exploration.id]>">
-                            <span ng-if="exploration.image_id">
-                              <img ng-src="/imagehandler/<[exploration.image_id]>"
-                                   class="oppia-large-image">
-                              <h5 class="oppia-gallery-title"><[exploration.title]></h5>
-                            </span>
-                            <span ng-hide="exploration.image_id">
-                              <center>
-                                <h4 class="oppia-gallery-title"><[exploration.title]></h4>
-                              </center>
-                            </span>
-                          </a>
-                        </center>
+            <div class="oppia-gallery-menu">
+              <div class="oppia-gallery-menu-title">
+                <strong>Categories</strong>
+              </div>
+              <ul class="nav nav-pills nav-stacked" id="navTabs">
+                <li ng-repeat="(category, explorations) in categories"
+                    ng-class="{active: $index == 0}">
+                  <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
+                    <[category]>
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-                        <center>
-                          <div>
-                            <span ng-if="exploration.can_fork">
-                              <a ng-click="forkExploration(exploration.id)">
-                                <i class="icon-share oppia-icon" title="Copy this exploration">
-                                </i>
-                                <span class="oppia-small-font">Copy</span>
-                              </a> |
+            <div class="tab-content oppia-gallery-tiles-container">
+              <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                <div class="container-fluid">
+                  <div class="row-fluid">
+
+                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-tile">
+
+                      <div class="oppia-gallery-tile-top">
+                        <a href="/learn/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                          <div class="oppia-gallery-tile-description">
+                            <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                            <span class="oppia-gallery-tile-play">
+                              <i class="icon-play-circle"></i>
                             </span>
-                            <span ng-if="exploration.can_edit">
-                              <a href="/create/<[exploration.id]>">
-                                <i class="icon-pencil" title="Edit this exploration"></i>
-                                <span class="oppia-small-font">Edit</span>
-                              </a> |
-                            </span>
-                            <a ng-click="showEmbedModal(exploration.id)">
-                              <i class="icon-share-alt" title="Embed this exploration"></i>
-                              <span class="oppia-small-font">Embed</span>
-                            </a>
                           </div>
-                        </center>
+                        </a>
                       </div>
-                    </div>
-                  </div>
 
+                      <div class="oppia-gallery-tile-bottom">
+                        <div>
+                          <span ng-if="exploration.can_fork">
+                            <a href="" ng-click="forkExploration(exploration.id)">
+                              <i class="icon-share oppia-icon" title="Copy this exploration">
+                              </i>
+                              <span class="oppia-small-font">Copy</span>
+                            </a> |
+                          </span>
+                          <span ng-if="exploration.can_edit">
+                            <a href="/create/<[exploration.id]>">
+                              <i class="icon-pencil" title="Edit this exploration"></i>
+                              <span class="oppia-small-font">Edit</span>
+                            </a> |
+                          </span>
+                          <a href="" ng-click="showEmbedModal(exploration.id)">
+                            <i class="icon-share-alt" title="Embed this exploration"></i>
+                            <span class="oppia-small-font">Embed</span>
+                          </a>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -103,7 +101,7 @@
   </div>
 
   <script type="text/ng-template" id="modals/galleryCreate">
-    <form novalidate name="createNewExplorationForm" ng-submit="ok(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
+    <form novalidate name="createNewExplorationForm" ng-submit="create(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
       <div class="modal-header">
         <h3>
           Add New Exploration
@@ -145,7 +143,7 @@
 
       <div class="modal-footer">
         <input type="submit" class="btn" value="Save"
-               ng-disabled="createNewExplorationForm.$invalid">
+               ng-disabled="createNewExplorationForm.$invalid"/>
         <button class="btn" ng-click="cancel()">Close</button>
       </div>
     </form>

@@ -35,10 +35,7 @@ oppia.directive('restrictedCopier', function($compile, warningsData) {
         $scope.objType = $scope.$parent.objType;
       }, true);
 
-      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
-        $scope.customizationArgs = $scope.$parent.customizationArgs;
-        $scope.initArgs = $scope.$parent.initArgs;
-
+      $scope.checkCustomizationArgs = function() {
         if ($scope.customizationArgs.parse_with_jinja === true) {
           // Do not try to do frontend validation of the input in this case.
           return;
@@ -53,12 +50,24 @@ oppia.directive('restrictedCopier', function($compile, warningsData) {
           }
 
           if (!isInList) {
+            warningsData.clear();
             warningsData.addWarning(
               'Value must be one of ' + $scope.initArgs.choices + '; received ' +
               $scope.customizationArgs.value);
             return;
           }
         }
+      };
+
+      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
+        $scope.customizationArgs = $scope.$parent.customizationArgs;
+        $scope.initArgs = $scope.$parent.initArgs;
+        $scope.checkCustomizationArgs();
+      }, true);
+
+      $scope.$watch('customizationArgs', function(newValue, oldValue) {
+        $scope.$parent.customizationArgs = $scope.customizationArgs;
+        $scope.checkCustomizationArgs();
       }, true);
     }
   };

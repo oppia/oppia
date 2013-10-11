@@ -100,13 +100,7 @@ def get_state_stats_for_exploration(exploration_id):
                     exploration_id, state.id, SUBMIT_HANDLER_NAME, str(rule))
                 rule_stats['.'.join([SUBMIT_HANDLER_NAME, str(rule)])] = {
                     'answers': answer_log.get_top_answers(10),
-                    # TODO(sll): This should be made more generic and the chart
-                    # logic moved to the frontend.
-                    'chartData': [
-                        ['', 'This rule', 'Other answers'],
-                        ['', answer_log.total_answer_count,
-                         total_entry_count - answer_log.total_answer_count]
-                    ]
+                    'rule_hits': answer_log.total_answer_count
                 }
 
         state_stats[state_id] = {

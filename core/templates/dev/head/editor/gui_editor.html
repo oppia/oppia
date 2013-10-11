@@ -134,7 +134,7 @@
                 <div ng-hide="item.value == ''">
                   <button type="button" ng-click="deleteWidget($index)">Change widget</button>
                   <span ng-show="hasCustomizableParams(item.value)">
-                    <button ng-click="customizeWidget($index)" data-toggle="modal" data-target="#customizeNonInteractiveWidgetModal">
+                    <button ng-click="showCustomizeNonInteractiveWidgetModal($index)">
                       Customize
                     </button>
                   </span>
@@ -158,22 +158,19 @@
 
         <br>
       </div>
-      {% include 'editor/views/interactive_widget_preview.html' %}
+      {% include 'editor/interactive_widget_preview.html' %}
     </div>
   </div>
 
-  <div class="modal hide fade" id="customizeNonInteractiveWidgetModal">
+  <script type="text/ng-template" id="modals/customizeWidget">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
+      <h3>Customize This Widget</h3>
     </div>
 
     <div class="modal-body">
       The following widget parameters can be customized:
       <br><br>
-      <div ng-repeat="(key, paramDict) in customizationParams">
+      <div ng-repeat="(key, paramDict) in widgetParams">
         <strong><[key]></strong>
         <value-generator-editor generator-id="paramDict.generator_id"
                                 init-args="paramDict.init_args"
@@ -185,8 +182,8 @@
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal" ng-click="saveNonInteractiveWidgetParams()">Save</button>
+      <input type="submit" class="btn" value="Save" ng-click="save(widgetParams)"/>
+      <button class="btn" ng-click="cancel()">Close</button>
     </div>
-  </div>
-
+  </script>
 </div>

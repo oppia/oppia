@@ -42,12 +42,12 @@ class ImageProperty(ndb.BlobProperty):
 class Image(base_models.BaseModel):
     """An image."""
     # The raw image blob.
-    raw = ImageProperty(required=True)
+    raw = ImageProperty(required=True, indexed=False)
     # Alt text.
-    alt_text = ndb.TextProperty()
+    alt_text = ndb.TextProperty(indexed=False)
     # The image file format. TODO(sll): auto-assign on put().
     format = ndb.StringProperty(
-        choices=feconf.ACCEPTED_IMAGE_FORMATS, default='png')
+        choices=feconf.ACCEPTED_IMAGE_FORMATS, default='png', indexed=False)
 
     @classmethod
     def create(cls, raw, alt_text=''):

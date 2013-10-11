@@ -35,46 +35,40 @@ class EditorTest(test_utils.GenericTestBase):
 class StatsIntegrationTest(test_utils.GenericTestBase):
     """Test statistics recording using the default exploration."""
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
+    def get_json_from_response(response):
+        """Convert a server response to a JSON object."""
 
     def test_state_stats_for_default_exploration(self):
-        exp_services.reload_demos()
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
 
         # Check, from the editor perspective, that no stats have been recorded.
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0/data')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
-        editor_exploration_json = json.loads(response.body)
-
-        self.assertEqual(editor_exploration_json['num_visits'], 0)
-        self.assertEqual(editor_exploration_json['num_completions'], 0)
+        editor_exploration_dict = self.parse_json_response(response)
+        self.assertEqual(editor_exploration_dict['num_visits'], 0)
+        self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # Switch to the reader perspective. First submit the first
         # multiple-choice answer, then submit 'blah'.
         response = self.testapp.get('/learn/0/data')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
+        exploration_dict = self.parse_json_response(response)
+        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
-        exploration_json = json.loads(response.body)
-        self.assertEqual(exploration_json['title'], 'Welcome to Oppia!')
-
-        state_id = exploration_json['state_id']
+        state_id = exploration_dict['state_id']
         response = self.testapp.post(str('/learn/0/%s' % state_id), {
             'payload': json.dumps({
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
-                'state_history': exploration_json['state_history'],
+                'state_history': exploration_dict['state_history'],
             })
         })
-        self.assertEqual(response.status_int, 200)
-
-        exploration_json = json.loads(response.body)
-        state_id = exploration_json['state_id']
+        exploration_dict = self.parse_json_response(response)
+        state_id = exploration_dict['state_id']
         response = self.testapp.post(str('/learn/0/%s' % state_id), {
             'payload': json.dumps({
                 'answer': 'blah', 'block_number': 0, 'handler': 'submit',
-                'state_history': exploration_json['state_history'],
+                'state_history': exploration_dict['state_history'],
             })
         })
 
@@ -82,10 +76,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0/data')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'application/json')
-        editor_exploration_json = json.loads(response.body)
-
+        editor_exploration_json = self.parse_json_response(response)
         self.assertEqual(editor_exploration_json['num_visits'], 1)
         self.assertEqual(editor_exploration_json['num_completions'], 0)
 

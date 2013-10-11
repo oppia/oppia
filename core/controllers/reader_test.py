@@ -17,23 +17,24 @@ __author__ = 'Sean Lip'
 import json
 
 from core.domain import exp_services
+import feconf
 import test_utils
 
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
-        exp_services.reload_demos()
 
     class ExplorationPlayer(object):
         """Simulates the frontend API for an exploration."""
-        def __init__(self, testapp, assertEqual, exploration_id):
+        def __init__(self, testapp, assertEqual, assertRegexpMatches,
+                     parse_json_response, exploration_id):
             self.testapp = testapp
             self.assertEqual = assertEqual
+            self.assertRegexpMatches = assertRegexpMatches
+            self.parse_json_response = parse_json_response
             self.exploration_id = exploration_id
             self.last_block_number = 0
             self.last_params = {}
@@ -44,18 +45,15 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             """Returns the result of an initial GET request to the server."""
             json_response = self.testapp.get(
                 '/learn/%s/data' % self.exploration_id)
-            self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(json_response.content_type, 'application/json')
+            reader_dict = self.parse_json_response(json_response)
 
-            response = json.loads(json_response.body)
-
-            self.last_block_number = response['block_number']
-            self.last_params = response['params']
-            self.last_state_id = response['state_id']
+            self.last_block_number = reader_dict['block_number']
+            self.last_params = reader_dict['params']
+            self.last_state_id = reader_dict['state_id']
             self.state_history = [self.last_state_id]
-            self.assertEqual(response['state_history'], self.state_history)
+            self.assertEqual(reader_dict['state_history'], self.state_history)
 
-            return response
+            return reader_dict
 
         def _interact(self, reader_payload):
             """Returns the result of subsequent feedback interactions."""
@@ -64,20 +62,17 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             json_response = self.testapp.post(
                 str(url_path), {'payload': json.dumps(reader_payload)}
             )
-            self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(json_response.content_type, 'application/json')
+            reader_dict = self.parse_json_response(json_response)
 
-            response = json.loads(json_response.body)
-
-            self.last_block_number = response['block_number']
-            self.last_params = response['params']
-            self.last_state_id = response['state_id']
+            self.last_block_number = reader_dict['block_number']
+            self.last_params = reader_dict['params']
+            self.last_state_id = reader_dict['state_id']
             self.state_history += [self.last_state_id]
-            self.assertEqual(response['state_history'], self.state_history)
+            self.assertEqual(reader_dict['state_history'], self.state_history)
 
-            return response
+            return reader_dict
 
-        def submit_answer(self, answer):
+        def _submit_answer(self, answer):
             """Action representing submission of an answer to the backend."""
             return self._interact({
                 'answer': answer, 'block_number': self.last_block_number,
@@ -85,36 +80,73 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
                 'state_history': self.state_history,
             })
 
+        def submit_and_compare(self, answer, expected_response):
+            """Submits an answer and compares the output to a regex.
+
+            `expected_response` will be interpreted as a regex string.
+            """
+            reader_dict = self._submit_answer(answer)
+            self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+            return self
+
+    def init_player(self, exploration_id, expected_title, expected_response):
+        """Initializes a reader playthrough.
+
+        `expected_response` will be interpreted as a regex string.
+        """
+        exp_services.delete_demo(exploration_id)
+        exp_services.load_demo(exploration_id)
+
+        player = self.ExplorationPlayer(
+            self.testapp, self.assertEqual, self.assertRegexpMatches,
+            self.parse_json_response, exploration_id)
+
+        reader_dict = player.get_initial_response()
+        self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+        self.assertEqual(reader_dict['title'], expected_title)
+        return player
+
     def test_welcome_exploration(self):
         """Test a reader's progression through the default exploration."""
-        player = self.ExplorationPlayer(self.testapp, self.assertEqual, '0')
-
-        response = player.get_initial_response()
-        self.assertIn(
-            'do you know where the name \'Oppia\'', response['oppia_html'])
-        self.assertEqual(response['title'], 'Welcome to Oppia!')
-
-        response = player.submit_answer('0')
-        self.assertIn(
-            'In fact, the word Oppia means \'learn\'.', response['oppia_html'])
+        self.init_player(
+            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\''
+        ).submit_and_compare(
+            '0', 'In fact, the word Oppia means \'learn\'.'
+        )
 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
-        player = self.ExplorationPlayer(self.testapp, self.assertEqual, '6')
+        self.init_player(
+            '6', 'Parametrized Adventure',
+            'Hello, brave adventurer! What is your name?'
+        ).submit_and_compare(
+            'My Name', 'Hello, I\'m My Name!.*get a pretty red'
+        ).submit_and_compare(
+            0, 'fork in the road'
+        ).submit_and_compare(
+            'ne', 'Hello, My Name. You have to pay a toll'
+        )
 
-        response = player.get_initial_response()
-        self.assertIn(
-            'Hello, brave adventurer! What is your name?',
-            response['oppia_html'])
-        self.assertEqual(response['title'], 'Parametrized Adventure')
-
-        response = player.submit_answer('My Name')
-        self.assertIn('Hello, I\'m My Name!', response['oppia_html'])
-        self.assertIn('get a pretty red', response['oppia_html'])
-
-        response = player.submit_answer(0)
-        self.assertIn('fork in the road', response['oppia_html'])
-
-        response = player.submit_answer('ne')
-        self.assertIn(
-            'Hello, My Name. You have to pay a toll', response['oppia_html'])
+    def test_binary_search(self):
+        """Test the binary search (lazy magician) exploration."""
+        self.init_player(
+            '8', 'The Lazy Magician', 'how does he do it?'
+        ).submit_and_compare(
+            'Dont know', 'town square'
+        ).submit_and_compare(
+            0, 'Is it'
+        ).submit_and_compare(
+            2, 'Do you want to play again?'
+        ).submit_and_compare(
+            1, 'how do you think he does it?'
+        ).submit_and_compare(
+            'middle', 'worst case'
+        ).submit_and_compare(
+            0, 'try it out'
+        ).submit_and_compare(
+            10, 'best worst case'
+        ).submit_and_compare(
+            0, 'to be sure our strategy works in all cases'
+        ).submit_and_compare(
+            0, 'try to guess'
+        )

@@ -18,17 +18,35 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, warningsData) {
+ function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
 
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
-      $scope.urlParams['iframed']);
+                    $scope.urlParams['iframed']);
+
+  $scope.showPage = !$scope.iframed;
+
+  $scope.getStyle = function() {
+    return $scope.showPage ? {} : {opacity: 0};
+  };
+
+  $scope.showContent = function() {
+    $scope.showPage = true;
+    $scope.$apply();
+  };
+
+  $scope.changeInputTemplateIframeHeight = function(height) {
+    var iframe = document.getElementById('inputTemplate');
+    iframe.height = height + 'px';
+  };
 
   // Initializes the story page using data from the server.
   $scope.initializePage = function() {
+    $scope.responseLog = [];
+    $scope.changeInputTemplateIframeHeight(50);
     $http.get($scope.explorationDataUrl)
         .success(function(data) {
           $scope.explorationTitle = data.title;
@@ -38,13 +56,34 @@
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
         });
-    $scope.responseLog = [];
   };
 
   $scope.initializePage();
 
-  $scope.openFeedbackModal = function() {
-    $('#feedbackModal').modal();
+  $scope.showFeedbackModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/readerFeedback',
+      backdrop: 'static',
+      resolve: {},
+      controller: function($scope, $modalInstance) {
+        $scope.submit = function(feedback) {
+          $modalInstance.close({feedback: feedback});
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function(result) {
+      $scope.submitFeedback(result.feedback);
+    }, function () {
+      console.log('Reader feedback modal dismissed.');
+    });
   };
 
   $scope.submitFeedback = function(feedback) {
@@ -227,7 +266,19 @@
   function receiveMessage(evt) {
     console.log('Event received.');
     console.log(evt.data);
-    if (evt.origin == window.location.protocol + '//' + window.location.host) {
+
+    if (evt.origin != window.location.protocol + '//' + window.location.host) {
+      return;
+    }
+
+    if (evt.data.hasOwnProperty('widgetHeight')) {
+      // Change the height of the included iframe.
+      $scope.changeInputTemplateIframeHeight(
+        parseInt(evt.data.widgetHeight, 10) + 2);
+    } else if (evt.data == 'heightAdjustedExternally') {
+      $scope.showContent();
+    } else {
+      // Submit an answer to the server.
       $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }
   }
@@ -236,4 +287,6 @@
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ReaderExploration.$inject = ['$scope', '$http', '$sce', '$timeout', 'warningsData'];
+ReaderExploration.$inject = [
+  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData'
+];

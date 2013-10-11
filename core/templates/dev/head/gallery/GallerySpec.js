@@ -46,26 +46,6 @@ describe('Gallery controller', function() {
       ctrl = $controller(Gallery, {$scope: scope, warningsData: null});
     }));
 
-    it('should show all explorations by default', function() {
-      expect(scope.showMyExplorations).toBe(false);
-
-      expect(scope.getToggleText()).toBe('Show editable explorations ▸');
-      expect(scope.getHeadingText()).toBe('All Explorations');
-      expect(scope.canViewExploration(geographyExploration)).toBe(true);
-      expect(scope.canViewExploration(myExploration)).toBe(true);
-    });
-
-    it('should update when the "show exploration" preference changes', function() {
-      expect(scope.showMyExplorations).toBe(false);
-
-      scope.toggleExplorationView();
-
-      expect(scope.getToggleText()).toBe('◂ Show all explorations');
-      expect(scope.getHeadingText()).toBe('Explorations you can edit');
-      expect(scope.canViewExploration(geographyExploration)).toBe(false);
-      expect(scope.canViewExploration(myExploration)).toBe(true);
-    });
-
     it('should create current URL', function() {
       expect(scope.currentUrl).toBe('http://localhost:9876/context.html');
     });

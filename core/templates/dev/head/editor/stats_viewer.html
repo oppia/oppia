@@ -1,0 +1,88 @@
+<div ng-controller="StatsViewer" ng-cloak>
+
+  <div ng-if="stats.numVisits > 0">
+    <h4>Exploration Completion Rate</h4>
+    <bar-chart chart-data="chartData" chart-colors="chartColors" width="500" height="100" chart-area-width=300></bar-chart>
+
+    <br>
+
+    <h4>Common student paths </h4>
+    <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats"></state-graph-viz>
+  </div>
+
+  <div ng-if="stats.numVisits == 0">
+    <em>
+      This exploration has not been viewed by readers yet, so there are no
+      statistics to display.
+    </em>
+  </div>
+
+  <script type="text/ng-template" id="modals/stateStats">
+    <div class="modal-header">
+      <h3>Statistics for <[stateName]></h3>
+    </div>
+
+    <div class="modal-body">
+      <div ng-if="improvementType == 'May be confusing'">
+        <i class="icon-warning-sign"></i>
+        <em>
+          This state may be confusing. Students often leave the exploration when encountering it.
+        </em>
+      </div>
+
+      <div ng-if="improvementType == 'Needs more feedback'">
+        <i class="icon-warning-sign"></i>
+        <em>
+          This state may need more feedback. Students often return to it after giving an answer.
+        </em>
+      </div>
+
+      <p>
+        <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
+      </p>
+
+      <div ng-if="stateStats.totalEntryCount">
+        <h5>Answers</h5>
+        <div ng-show="doesAnswerExist()">
+          <ul>
+            <li ng-repeat="(rule, ruleData) in stateStats.rule_stats" ng-show="stateStats.rule_stats[rule].answers.length > 0">
+              <[rule]>
+              <ul>
+                <li ng-repeat="answerData in ruleData.answers track by $index">
+                  <[answerData[0]]> (<[getNumTimesString(answerData[1])]>)
+                  <a ng-click="gotoStateEditor('rules')">
+                    Add a rule for this answer
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-hide="doesAnswerExist()">
+          <em>No students gave answers.</em>
+          <a ng-click="gotoStateEditor('noninteractive')">
+            Edit non-interactive content
+          </a>
+        </div>
+      </div>
+
+      <div ng-show="stateStats.feedback_log.length">
+        <h5>
+          Feedback
+          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
+        </h5>
+        <ul>
+          <li ng-repeat="item in stateStats.feedback_log track by $index">
+            <[item.feedback]>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="cancel()">Close</button>
+    </div>
+  </script>
+</div>

@@ -46,10 +46,6 @@ class StateModel(base_models.BaseModel):
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.
     value = django_utils.JSONField(default={}, isdict=True)
-    # When this entity was first created.
-    created = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    last_updated = models.DateTimeField(auto_now=True)
 
 
 class ExplorationModel(base_models.BaseModel):
@@ -189,13 +185,6 @@ class ExplorationSnapshotModel(base_models.BaseModel):
     # A brief commit message.
     # TODO(sll): Make this a required property?
     commit_message = models.CharField(max_length=500, blank=True)
-
-    # When this entity was first created.
-    created_on = models.DateTimeField(auto_now_add=True)
-    # When this entity was last updated.
-    # TODO(sll): Actually, it should never be updated; it should be read-only.
-    # Add a check for this.
-    last_updated = models.DateTimeField(auto_now=True)
 
     @classmethod
     def get_metadata(cls, exploration_id, version_number):

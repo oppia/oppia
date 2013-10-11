@@ -1,5 +1,13 @@
 <html ng-app="mc">
   <head>
+    <style>
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+      }
+    </style>
+
     <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
     <script src="/third_party/static/angularjs-1.2.0-rc.2/angular.min.js"></script>
 
@@ -21,10 +29,10 @@
     </script>
   </head>
 
-  <body>
+  <body onload="onWidgetLoad()">
     <div ng-controller="MultipleChoiceInput">
       <form ng-submit="submitAnswer(answer)">
-        <div ng-repeat="choice in choices">
+        <div ng-repeat="choice in choices track by $index">
           <label>
             <input type="radio" ng-model="$parent.answer"
                    name="choiceGroup" id="<[$index]>"
@@ -32,6 +40,8 @@
             <[choice]>
           </label>
         </div>
+
+        <br>
         
         <input type="submit" value="Submit">
       </form>

@@ -1,0 +1,217 @@
+default_skin: conversation_v1
+param_changes: []
+param_specs:
+  CityName:
+    obj_type: UnicodeString
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: This is a game of finding a city location.
+  name: Introduction
+  param_changes: []
+  widget:
+    customization_args:
+      buttonText:
+        value: Continue
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: PickCity
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: Continue
+- content:
+  - type: text
+    value: Let's find {{CityName}}?
+  name: PickCity
+  param_changes:
+  - customization_args:
+      list_of_values:
+      
+      - Abu Dhabi
+      
+      - Abuja
+      
+      - Accra
+      
+    generator_id: RandomSelector
+    name: CityName
+  widget:
+    customization_args:
+      choices:
+        value:
+        - OK.
+        - No, I want to try a different city.
+        - Exit. I know enough cities.
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: 1
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Let us pick another city.
+        param_changes: []
+      - definition:
+          inputs:
+            x: 2
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: END
+        feedback:
+        - OK, bye.
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Abu Dhabi
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: AbuDhabi
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Abuja
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Abuja
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Accra
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Accra
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: MultipleChoiceInput
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: AbuDhabi
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 24.466667
+            - 54.366667
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: AbuDhabi
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Abuja
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 9.066667
+            - 7.483333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Abuja
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Accra
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 5.55
+            - -0.2
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Accra
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+

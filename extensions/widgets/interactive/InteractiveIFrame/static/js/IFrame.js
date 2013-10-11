@@ -6,6 +6,12 @@ app.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 function IFrame($scope) {
   $scope.childPageUrl = GLOBALS.childPageUrl;
   $scope.childUrlArray = $scope.childPageUrl.split('/');

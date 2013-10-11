@@ -14,7 +14,7 @@
             src="/third_party/static/jsrepl/jsrepl.js" id="jsrepl-script">
     </script>
   </head>
-  <body>
+  <body onload="onWidgetLoad()">
     <div ng-controller="CodeRepl">
       <div>
         <em>Language: <[language]></em>

@@ -6,6 +6,12 @@ fileInputWidget.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 function FileReadInputWithHints($scope) {
   $scope.hintPlaceholder = GLOBALS.hintPlaceholder;
   $scope.lowHint = GLOBALS.lowHint;

@@ -87,7 +87,7 @@ function Gallery($scope, $http, $modal, warningsData) {
           return category === '?' ? 'Add New Category...' : category;
         };
 
-        $scope.ok = function(title, newCategory, customCategory) {
+        $scope.create = function(title, newCategory, customCategory) {
           if (!title) {
             warningsData.addWarning('Please specify an exploration title.');
             return;
@@ -203,24 +203,6 @@ function Gallery($scope, $http, $modal, warningsData) {
   /*********************************************************************
   * Variables and methods for storing and applying user preferences.
   *********************************************************************/
-
-  // Whether to show just explorations the user can edit, or all explorations.
-  $scope.showMyExplorations = false;
-
-  $scope.toggleExplorationView = function() {
-    $scope.showMyExplorations = !$scope.showMyExplorations;
-  };
-
-  $scope.getToggleText = function() {
-    return $scope.showMyExplorations ?
-        '◂ Show all explorations' : 'Show editable explorations ▸';
-  };
-
-  $scope.getHeadingText = function() {
-    return $scope.showMyExplorations ? 'Explorations you can edit' :
-        'All Explorations';
-  };
-
   $scope.canViewExploration = function(exploration) {
     return !$scope.showMyExplorations || exploration.is_owner || exploration.can_edit;
   };

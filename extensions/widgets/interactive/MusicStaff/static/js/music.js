@@ -3,6 +3,12 @@ var note01;
 var noteToGuess = GLOBALS.noteToGuess;
 var numberOfNotes = 0;
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 var pitches = {
   200: 'C4', 190: 'D4', 180: 'E4', 170: 'F4', 160: 'G4',
   150: 'A4', 140: 'B4', 130: 'C5', 120: 'D5', 110: 'E5',

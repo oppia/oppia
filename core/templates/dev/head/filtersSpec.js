@@ -4,7 +4,6 @@ describe('Testing filters', function() {
     'truncate',
     'round1',
     'bracesToText',
-    'bracesToInput',
     'parameterizeRuleDescription'
   ];
 

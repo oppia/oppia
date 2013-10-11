@@ -53,7 +53,9 @@ def get_rules_for_input_type(input_type):
         return []
 
     rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
-    rule_class_name = '%sRule' % input_type.__name__
+    if not isinstance(input_type, basestring):
+      input_type = input_type.__name__
+    rule_class_name = '%sRule' % input_type
     results = []
 
     for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):

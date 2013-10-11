@@ -8,7 +8,7 @@
     </script>
   </head>
 
-  <body>
+  <body onload="onWidgetLoad()">
     <div ng-controller="NumericInput">
       <form ng-submit="submitAnswer(answer)">
         <input type="number" ng-model="answer" placeholder="<[placeholder]>"

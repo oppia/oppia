@@ -8,7 +8,7 @@
     </script>
   </head>
 
-  <body>
+  <body onload="onWidgetLoad()">
     <div ng-controller="FileReadInput">
 
         <input onchange="angular.element(this).scope().submitAnswer(this)"

@@ -39,6 +39,7 @@ IDEA_CONTRIBUTORS = [
     'Alex Kauffmann',
     'Catherine Colman',
     'John Cox',
+    'John Orr',
     'Neil Fraser',
     'Pavel Simakov',
     'Peter Norvig',
@@ -51,7 +52,8 @@ IDEA_CONTRIBUTORS = [
 # add a new exploration and preserve the existing ids, add that exploration
 # to the end of the list.
 # Each item is represented as a tuple: (filename, title, category, image_name).
-# The fourth element is optional. Note that the filename omits the .yaml suffix.
+# The fourth element is optional. Note that the filename omits the .yaml
+# suffix.
 # The images are in /data/images.
 DEMO_EXPLORATIONS = [
     ('welcome', 'Welcome to Oppia!', 'Welcome'),
@@ -61,9 +63,11 @@ DEMO_EXPLORATIONS = [
     ('hola', '¡Hola!', 'Languages'),
     ('landmarks', 'Landmarks', 'Geography'),
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
-    ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem', 'Mathematics'),
+    ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem',
+     'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
+    ('cities', 'World Cities', 'Geography'),
 ]
 
 # Whether to unconditionally log info messages.
@@ -71,9 +75,10 @@ DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
-PLATFORM = 'gae' if (os.environ.get('SERVER_SOFTWARE')
-                     and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-                     or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+PLATFORM = 'gae' if (
+    os.environ.get('SERVER_SOFTWARE')
+    and (os.environ['SERVER_SOFTWARE'].startswith('Development')
+    or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
 
 
 # Whether we should serve the development or production experience.
@@ -114,7 +119,7 @@ DEFAULT_RULE_NAME = 'Default'
 
 ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
 
-# Set this to True to allow file uploads via YAML in the gallery and editor pages.
+# Whether to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
 
 # Prefixes for widget ids in the datastore.
@@ -150,3 +155,6 @@ for ind in range(32):
 
 # A sentinel value to indicate that no exploration snapshot should be saved.
 NULL_SNAPSHOT = {}
+
+# Prefix for data sent from the server to the client via JSON.
+XSSI_PREFIX = ')]}\'\n'

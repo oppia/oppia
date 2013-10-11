@@ -6,6 +6,12 @@ text.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
+window.onWidgetLoad = function() {
+  window.parent.postMessage(
+    {'widgetHeight': document.body.scrollHeight},
+    window.location.protocol + '//' + window.location.host);
+};
+
 function TextInput($scope) {
   $scope.placeholder = GLOBALS.placeholder;
   $scope.rows = GLOBALS.rows;

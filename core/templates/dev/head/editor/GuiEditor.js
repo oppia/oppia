@@ -18,33 +18,21 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
+function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData) {
-  explorationData.getData().then(function(data) {
-    var promise = explorationData.getStateData($scope.$parent.stateId);
-    promise.then(function(data) {
-      if (!data) {
-        // This state does not exist. Redirect to the exploration page.
-        $('#editorViewTab a[href="#explorationMap"]').tab('show');
-      }
-      $scope.init(data);
-      $scope.updateMath();
-    });
-  });
 
-  $scope.$parent.stateId = $routeParams.stateId;
-
-  $scope.init = function(data) {
-    $scope.stateName = data.name;
-    $scope.content = data.content || [];
-    $scope.stateParamChanges = data.param_changes || [];
+  $scope.$on('guiTabSelected', function(event, stateData) {
+    $scope.stateName = stateData.name;
+    $scope.content = stateData.content || [];
+    $scope.stateParamChanges = stateData.param_changes || [];
     $scope.initAllWidgets();
 
-    console.log('Content updated.');
+    $scope.$broadcast('stateEditorInitialized', $scope.stateId);
+    // TODO(sll): Why isn't this working?
+    $scope.updateMath();
 
-    // Switch to the stateEditor tab when this controller is activated.
-    $('#editorViewTab a[href="#stateEditor"]').tab('show');
-  };
+    console.log('Content updated.');
+  });
 
   $scope.initAllWidgets = function(index) {
     for (var i = 0; i < $scope.content.length; i++) {
@@ -338,7 +326,16 @@ function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
       return;
     }
 
-    $scope.saveWidget(arg.data.widget, arg.data.parentIndex);
+    var widget = arg.data.widget;
+    var index = arg.data.parentIndex;
+
+    $scope.content[index].value = JSON.stringify({
+      'id': widget.id,
+      'params': widget.params
+    });
+
+    $scope.initWidget(index);
+    $scope.saveStateContent();
   });
 
   $scope.getWidgetRepositoryUrl = function(parentIndex) {
@@ -354,32 +351,50 @@ function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
     }
   };
 
-  $scope.customizeWidget = function(index) {
-    $scope.customizationParams = JSON.parse($scope.content[index].value).params;
-    $scope.customizeWidgetIndex = index;
-  };
+  $scope.getCustomizationModalInstance = function(widgetParams) {
+    // NB: This method is used for both interactive and noninteractive widgets.
+    return $modal.open({
+      templateUrl: 'modals/customizeWidget',
+      backdrop: 'static',
+      resolve: {
+        widgetParams: function() {
+          return widgetParams;
+        }
+      },
+      controller: function($scope, $modalInstance, widgetParams) {
+        $scope.widgetParams = widgetParams;
 
-  $scope.saveNonInteractiveWidgetParams = function() {
-    var index = $scope.customizeWidgetIndex;
-    var widget = JSON.parse($scope.content[index].value);
-    widget.params = $scope.customizationParams;
-    $scope.content[index].value = JSON.stringify(widget);
+        $scope.save = function(widgetParams) {
+          $scope.$broadcast('externalSave');
+          $modalInstance.close({
+            widgetParams: widgetParams
+          });
+        };
 
-    $scope.initWidget(index);
-    $scope.saveStateContent();
-
-    $scope.customizationParams = null;
-    $scope.customizeWidgetIndex = null;
-  };
-
-  $scope.saveWidget = function(widget, index) {
-    $scope.content[index].value = JSON.stringify({
-      'id': widget.id,
-      'params': widget.params
+        $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
     });
+  };
 
-    $scope.initWidget(index);
-    $scope.saveStateContent();
+  $scope.showCustomizeNonInteractiveWidgetModal = function(index) {
+    warningsData.clear();
+    var widgetParams = JSON.parse($scope.content[index].value).params;
+    var modalInstance = $scope.getCustomizationModalInstance(widgetParams);
+
+    modalInstance.result.then(function(result) {
+      var widgetValue = JSON.parse($scope.content[index].value);
+      widgetValue.params = result.widgetParams;
+      $scope.content[index].value = JSON.stringify(widgetValue);
+      console.log('Non-interactive customization modal saved.');
+
+      $scope.initWidget(index);
+      $scope.saveStateContent();
+    }, function() {
+      console.log('Non-interactive customization modal dismissed.');
+    });
   };
 
   $scope.deleteWidget = function(index) {
@@ -397,5 +412,5 @@ function GuiEditor($scope, $http, $filter, $routeParams, $sce, explorationData,
 
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$filter', '$routeParams', '$sce',
+GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData'];

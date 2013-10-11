@@ -5,29 +5,27 @@
     <img class="oppia-help" src="/images/help.png"
          tooltip="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity."
          tooltip-placement="right">
-  </h4>
 
-  <[interactiveWidget.name]>
-
-  <span class="pull-right">
-    <span ng-hide="showPreview">
-      <button ng-click="setShowPreview(true)">Preview</button>
-    </span>
-    <span ng-hide="isEmpty(interactiveWidget.params)">
-      <button data-toggle="modal" data-target="#customizeWidgetModal">
-        Customize
+    <span class="pull-right">
+      <span ng-hide="showPreview">
+        <button ng-click="setShowPreview(true)">Preview</button>
+      </span>
+      <span ng-hide="isEmpty(interactiveWidget.params)">
+        <button ng-click="showCustomizeInteractiveWidgetModal()">
+          Customize
+        </button>
+      </span>
+      <button ng-click="showChooseInteractiveWidgetModal()">
+        Choose a different interaction
       </button>
     </span>
-    <button data-toggle="modal" data-target="#interactiveWidgetModal">
-      Choose a different interaction
-    </button>
-  </span>
+  </h4>
 
-  <br><br>
-
+  <h5><[interactiveWidget.name]></h5>
   <div ng-if="showPreview">
     <a class="pull-right" ng-click="setShowPreview(false)"><b>&times;</b></a>
-    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="300px">
+    <!-- This iframe is dynamically resized based on its content. -->
+    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="5px" seamless="seamless" class="oppia-widget-preview">
     </iframe>
   </div>
   <div style="margin-left:30px;">
@@ -59,8 +57,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <span class="oppia-editable-name" data-toggle="modal" data-target="#addRuleModal"
-                ng-click="openEditRuleModal(handler.name, $index)">
+          <span class="oppia-editable-name" ng-click="openEditRuleModal(handler.name, $index)">
             Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>
           </span>:
           <span ng-show="rule.dest == 'END' || rule.dest == stateId">
@@ -98,8 +95,7 @@
           •
         </td>
         <td style="width: 75%; vertical-align: top">
-          <span class="oppia-editable-name" data-toggle="modal"
-                data-target="#addRuleModal" ng-click="openAddRuleModal(handler.name)">
+          <span class="oppia-editable-name" ng-click="openAddRuleModal(handler.name)">
             Add new rule...
           </span>
         </td>
@@ -115,7 +111,7 @@
           </span>
         </td>
         <td style="width: 75%; vertical-align: top">
-          <span class="oppia-editable-name" data-toggle="modal" data-target="#addRuleModal"
+          <span class="oppia-editable-name"
                 ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">
             <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>
           </span>:
@@ -158,71 +154,34 @@
     </div>
   </div>
 
-  <div class="modal hide fade" id="customizeWidgetModal">
+  <script type="text/ng-template" id="modals/chooseInteractiveWidget">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="customizeWidgetModalLabel">Customize This Widget</h3>
+      <h3>Choose an Interactive Widget</h3>
     </div>
 
-    <div class="modal-body">
-      The following widget parameters can be customized:
-      <br><br>
-      <div ng-repeat="(key, paramDict) in interactiveWidget.params">
-        <strong><[key]></strong>
-        <value-generator-editor generator-id="paramDict.generator_id"
-                                init-args="paramDict.init_args"
-                                customization-args="paramDict.customization_args"
-                                obj-type="paramDict.obj_type">
-        </value-generator-editor>
-        <br>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal" ng-click="saveWidgetParams()">Save</button>
-    </div>
-  </div>
-
-  <div class="modal hide fade" id="interactiveWidgetModal" style="width: 900px; margin-left: -390px;">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-        &times;
-      </button>
-      <h3 id="interactiveWidgetModalLabel">
-        Choose an Interactive Widget
-      </h3>
-    </div>
     <div class="modal-body">
       <iframe src="/widgetrepository?iframed=true&interactive=true"
               width="100%" height="400px" frameborder="0"
               id="interactiveWidgetRepository">
       </iframe>
     </div>
+
     <div class="modal-footer">
-      <button type="button" class="btn" data-dismiss="modal">
+      <button type="button" class="btn" ng-click="cancel()">
         Cancel
       </button>
     </div>
-  </div>
+  </script>
 
-  <div class="modal hide fade" id="addRuleModal" ng-model="addRuleModalShown">
+
+  <script type="text/ng-template" id="modals/ruleEditor">
     <div class="modal-header">
-      <span ng-show="addRuleActionIndex">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-          &times;
-        </button>
-      </span>
-      <h3><[addRuleModalTitle]></h3>
+      <h3><[modalTitle]></h3>
     </div>
 
     <div class="modal-body">
-      <h4><[addRuleAction.type]></h4>
-
-      <div ng-hide="addRuleActionDescription">
-        <div ng-repeat="(description, name) in getRules(addRuleAction)"
-             class="oppia-rule">
+      <div ng-if="!tmpRule.description">
+        <div ng-repeat="(description, name) in existingRules" class="oppia-rule">
           <span ng-bind-html="description | bracesToText"></span>
           <button type="button" class="pull-right"
                   ng-click="selectRule(description, name)">
@@ -231,52 +190,63 @@
         </div>
       </div>
 
-      <div ng-show="addRuleActionDescription">
-        <span angular-html-bind="addRuleActionDescription | bracesToInput: interactiveWidget.params.choices"></span>
+      <div ng-if="tmpRule.description">
+        <span ng-if="tmpRule.description != 'Default'">
+          Answer
+        </span>
+        <span ng-repeat="item in tmpRuleDescriptionFragments track by $index">
+          <span ng-show="item.type == 'select'">
+            <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices.value)">
+            </select>
+          </span>
+          <span ng-show="item.type == 'input'">
+            <input type="text" required ng-model="tmpRule.inputs[item.varName]">
+          </span>
+          <span ng-show="item.type == 'list'">
+            <list items="tmpRule.inputs[item.varName]"></list>
+          </span>
+          <span ng-show="item.type == 'html'">
+            <[item.text]>
+          </span>
+        </span>
 
         <hr>
         <div>
           Destination:
-          <select ng-model="addRuleActionDest"
-                  ng-required="addRuleActionDest != '?'"
-                  ng-options="getDestName(id) for id in getAllDests()">
+          <select ng-model="tmpRule.dest" ng-required="tmpRule.dest != '?'"
+                  ng-options="getDestName(id) for id in allDests">
           </select>
 
-          <input ng-model="addRuleActionDestNew"
-                 ng-show="addRuleActionDest == '?'" type="text" ng-required="addRuleActionDest == '?'">
+          <input type="text" ng-model="tmpRule.destNew"
+                 ng-required="tmpRule.dest == '?'" ng-show="tmpRule.dest == '?'">
         </div>
         <div>
           <p>Feedback for the reader (chosen at random from the following):</p>
-          <list large-input="true" items="addRuleActionFeedback">
+          <list large-input="true" items="tmpRule.feedback">
         </div>
-        <!-- TODO(yanamal): Add a section for parameter changes here. -->
       </div>
     </div>
 
     <div class="modal-footer">
-      <span ng-show="addRuleActionDescription">
-        <button type="button"
-                ng-click="saveRule(addRuleActionDescription, addRuleActionName,
-                          addRuleActionInputs, addRuleActionDest, addRuleActionDestNew, addRuleActionFeedback)">
+      <span ng-show="tmpRule.description">
+        <button type="button" class="btn" ng-click="save()">
           Save
         </button>
       </span>
 
-      <!-- The 'addRuleActionIndex == null' clause is to ensure that the 'Cancel' action
-      returns to the 'previous' screen only when a new rule is being added. Otherwise, the modal
-      should just be dismissed. -->
-      <span ng-show="addRuleActionDescription && addRuleActionIndex == null">
-        <button type="button" class="btn" ng-click="deselectAllRules()">
-          Cancel
+      <!-- The next button is shown only when a new rule is being added. -->
+      <span ng-show="tmpRule.description && tmpRule.index == null">
+        <button type="button" class="btn" ng-click="resetTmpRule()">
+          Return to rule menu
         </button>
       </span>
 
-      <span ng-show="!addRuleActionDescription && addRuleActionIndex == null">
-        <button type="button" class="btn" data-dismiss="modal">
+      <span ng-show="!tmpRule.description && tmpRule.index == null">
+        <button type="button" class="btn" ng-click="cancel()">
           Cancel
         </button>
       </span>
     </div>
-  </div>
+  </script>
 
 </div>
