@@ -22,7 +22,7 @@ var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 
 // Global utility methods.
-function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
+function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
@@ -207,29 +207,26 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 
     warningsData.clear();
 
-    // The content creator has uploaded an image.
-    var form = new FormData();
-    form.append('image', image);
-
-    $.ajax({
-        url: '/imagehandler',
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        datatype: 'json',
-        success: function(data) {
-          if (data.image_id) {
-            $scope.$apply(successCallback(data));
-          }
-        },
-        error: function(data) {
-          warningsData.addWarning(
-            JSON.parse(data.responseText).error ||
-            'Error communicating with server.'
-          );
-          $scope.$apply();
-        }
+    $http({
+      method: 'POST',
+      url: '/imagehandler',
+      headers: {'Content-Type': false},
+      data: {image: image},
+      transformRequest: function(data) {
+        var formData = new FormData();
+        formData.append('image', data.image);
+        return formData;
+      }
+    }).
+    success(function(data) {
+      if (data.image_id) {
+        successCallback(data);
+      }
+    })
+    .error(function(data) {
+      warningsData.addWarning(
+        data.error || 'Error communicating with server.'
+      );
     });
   };
 
@@ -249,4 +246,4 @@ function Base($scope, $timeout, $rootScope, warningsData, activeInputData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$timeout', '$rootScope', 'warningsData', 'activeInputData'];
+Base.$inject = ['$scope', '$http', '$timeout', '$rootScope', 'warningsData', 'activeInputData'];
