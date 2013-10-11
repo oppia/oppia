@@ -85,8 +85,9 @@
         <br>
 
         {% if user %}
-          <p>
-            <a class="btn btn-large" ng-click="showCreateModal()">
+          <p ng-controller="CreateExplorationModal">
+            {% include 'modals/create_exploration_modal.html' %}
+            <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
               Create New Exploration
             </a>
           </p>
@@ -99,55 +100,6 @@
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/galleryCreate">
-    <form novalidate name="createNewExplorationForm" ng-submit="create(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
-      <div class="modal-header">
-        <h3>
-          Add New Exploration
-          <img class="oppia-help" src="/images/help.png"
-               tooltip="This form allows you to add new explorations. Enter the title of your exploration, as well as the category it should fall under in the Gallery (e.g. languages, music)."
-               tooltip-placement="right"/>
-        </h3>
-      </div>
-
-      <div class="modal-body">
-        <div>
-          Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
-        </div>
-
-        <div>
-          Category:
-          <select ng-model="newExplorationCategory" required
-                  ng-options="getCategoryName(category) for category in categories">
-          </select>
-
-          <input ng-model="customExplorationCategory"
-                 ng-show="newExplorationCategory == '?'" type="text"
-                 ng-required="newExplorationCategory == '?'">
-        </div>
-
-        <br>
-
-        {% if allow_yaml_file_upload %}
-          <label>
-            (Optional) Upload an existing exploration (YAML file)?
-            <input type="checkbox" ng-model="includeYamlFile">
-          </label>
-          <div ng-if="includeYamlFile">
-            Upload file:
-            <input id="newFileInput" type="file" file-upload="true">
-          </div>
-        {% endif %}
-      </div>
-
-      <div class="modal-footer">
-        <input type="submit" class="btn" value="Save"
-               ng-disabled="createNewExplorationForm.$invalid"/>
-        <button class="btn" ng-click="cancel()">Close</button>
-      </div>
-    </form>
-  </script>
 
   <script type="text/ng-template" id="modals/galleryEmbed">
     <div class="modal-header">
@@ -182,5 +134,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('gallery/Gallery.js') }}
+    {{ include_js_file('modals/createExplorationModal.js') }}
   </script>
 {% endblock footer_js %}

@@ -39,8 +39,17 @@
         <div ng-show="explorations.length == 0">
           <em>You don't have any explorations yet.</em>
         </div>
+
+        <br>
+        <div ng-controller="CreateExplorationModal">
+          {% include 'modals/create_exploration_modal.html' %}
+          <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
+            Create New Exploration
+          </a>
+        </div>
+
         <div ng-show="explorations.length > 0">
-          <h4>States that need a little help</h4>
+          <h4>States that may need a little help</h4>
           <small><em>sorted by priority score, higher scores indicate larger impact</em></small>
           <div ng-show="improvable.length > 0">
             <ol>
@@ -65,7 +74,7 @@
             </ol>
           </div>
           <div ng-show="improvable.length == 0">
-            <em>All your explorations are doing good!</em>
+            <em>All your explorations are doing well!</em>
           </div>
         </div>
       </div>
@@ -77,5 +86,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('/profile/Profile.js') }}
+    {{ include_js_file('modals/createExplorationModal.js') }}
   </script>
 {% endblock footer_js %}
