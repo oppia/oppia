@@ -60,16 +60,16 @@ EOF
 
 if [ $IS_COVERAGE_INSTALLED = 0 ]; then
   echo Installing coverage
-  sudo rm -rf $TOOLS_DIR/coverage
+  rm -rf $TOOLS_DIR/coverage || sudo rm -rf $TOOLS_DIR/coverage
   wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
   tar xvzf coverage.tar.gz -C $TOOLS_DIR
   rm coverage.tar.gz
   mv $TOOLS_DIR/coverage-3.6 $TOOLS_DIR/coverage
 
   cd $TOOLS_DIR/coverage
-  sudo python setup.py install
+  python setup.py install || sudo python setup.py install
   cd ../../../
-  sudo rm -rf $TOOLS_DIR/coverage
+  rm -rf $TOOLS_DIR/coverage || sudo rm -rf $TOOLS_DIR/coverage
 fi
 
 coverage run ./core/tests/gae_suite.py $@
