@@ -19,8 +19,9 @@ import webtest
 
 from core.domain import exp_services
 from core.domain import stats_services
-
 import feconf
+
+import json
 
 
 def empty_environ():
@@ -59,6 +60,15 @@ class TestBase(unittest.TestCase):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
         return None
+
+    def parse_json_response(self, json_response):
+        """Convert a JSON server response to an object (such as a dict)."""
+        self.assertEqual(json_response.status_int, 200)
+        self.assertEqual(
+            json_response.content_type, 'application/javascript')
+        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
+
+        return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
 
 class AppEngineTestBase(TestBase):

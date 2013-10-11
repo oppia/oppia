@@ -17,6 +17,7 @@ __author__ = 'Sean Lip'
 import json
 
 from core.domain import exp_services
+import feconf
 import test_utils
 
 
@@ -29,10 +30,11 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     class ExplorationPlayer(object):
         """Simulates the frontend API for an exploration."""
         def __init__(self, testapp, assertEqual, assertRegexpMatches,
-                     exploration_id):
+                     parse_json_response, exploration_id):
             self.testapp = testapp
             self.assertEqual = assertEqual
             self.assertRegexpMatches = assertRegexpMatches
+            self.parse_json_response = parse_json_response
             self.exploration_id = exploration_id
             self.last_block_number = 0
             self.last_params = {}
@@ -43,19 +45,15 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             """Returns the result of an initial GET request to the server."""
             json_response = self.testapp.get(
                 '/learn/%s/data' % self.exploration_id)
-            self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(
-                json_response.content_type, 'application/javascript')
+            reader_dict = self.parse_json_response(json_response)
 
-            response = json.loads(json_response.body)
-
-            self.last_block_number = response['block_number']
-            self.last_params = response['params']
-            self.last_state_id = response['state_id']
+            self.last_block_number = reader_dict['block_number']
+            self.last_params = reader_dict['params']
+            self.last_state_id = reader_dict['state_id']
             self.state_history = [self.last_state_id]
-            self.assertEqual(response['state_history'], self.state_history)
+            self.assertEqual(reader_dict['state_history'], self.state_history)
 
-            return response
+            return reader_dict
 
         def _interact(self, reader_payload):
             """Returns the result of subsequent feedback interactions."""
@@ -64,19 +62,15 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             json_response = self.testapp.post(
                 str(url_path), {'payload': json.dumps(reader_payload)}
             )
-            self.assertEqual(json_response.status_int, 200)
-            self.assertEqual(
-                json_response.content_type, 'application/javascript')
+            reader_dict = self.parse_json_response(json_response)
 
-            response = json.loads(json_response.body)
-
-            self.last_block_number = response['block_number']
-            self.last_params = response['params']
-            self.last_state_id = response['state_id']
+            self.last_block_number = reader_dict['block_number']
+            self.last_params = reader_dict['params']
+            self.last_state_id = reader_dict['state_id']
             self.state_history += [self.last_state_id]
-            self.assertEqual(response['state_history'], self.state_history)
+            self.assertEqual(reader_dict['state_history'], self.state_history)
 
-            return response
+            return reader_dict
 
         def _submit_answer(self, answer):
             """Action representing submission of an answer to the backend."""
@@ -91,8 +85,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
             `expected_response` will be interpreted as a regex string.
             """
-            response = self._submit_answer(answer)
-            self.assertRegexpMatches(response['oppia_html'], expected_response)
+            reader_dict = self._submit_answer(answer)
+            self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
             return self
 
     def init_player(self, exploration_id, expected_title, expected_response):
@@ -105,11 +99,11 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         player = self.ExplorationPlayer(
             self.testapp, self.assertEqual, self.assertRegexpMatches,
-            exploration_id)
+            self.parse_json_response, exploration_id)
 
-        response = player.get_initial_response()
-        self.assertRegexpMatches(response['oppia_html'], expected_response)
-        self.assertEqual(response['title'], expected_title)
+        reader_dict = player.get_initial_response()
+        self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+        self.assertEqual(reader_dict['title'], expected_title)
         return player
 
     def test_welcome_exploration(self):

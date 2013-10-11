@@ -216,7 +216,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.content_type = 'application/javascript; charset=utf-8'
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['Content-Disposition'] = 'attachment'
-        self.response.write(json.dumps(values))
+        json_output = json.dumps(values)
+        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
         # Calculate the processing time of this request.
         duration = datetime.datetime.utcnow() - self.start_time

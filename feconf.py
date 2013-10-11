@@ -155,3 +155,6 @@ for ind in range(32):
 
 # A sentinel value to indicate that no exploration snapshot should be saved.
 NULL_SNAPSHOT = {}
+
+# Prefix for data sent from the server to the client via JSON.
+XSSI_PREFIX = ')]}\'\n'
