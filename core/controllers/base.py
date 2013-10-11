@@ -34,6 +34,9 @@ from core.platform import models
 import feconf
 import jinja_utils
 user_services = models.Registry.import_user_services()
+(user_pref_services,) = models.Registry.import_models([
+    models.NAMES.users
+])
 
 import webapp2
 
@@ -79,6 +82,12 @@ def require_editor(handler):
         """
         if not self.user_id:
             self.redirect(user_services.create_login_url(self.request.uri))
+            return
+
+        user_settings_model = user_pref_services.UserSettingsModel.get_or_create(self.user_id)
+
+        if not user_settings_model.username:
+            self.redirect("../profile/create_user_name")
             return
 
         try:
