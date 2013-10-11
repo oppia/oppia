@@ -8,8 +8,6 @@
   {{ super() }}
   <link rel="stylesheet" type="text/css"
         href="/third_party/static/select2-3.4.1/select2.css" media="screen">
-  <link rel="stylesheet" type="text/css"
-        href="/third_party/static/yui2-2.9.0/yui2-2.9.0.css" media="screen">
 {% endblock header_css %}
 
 {% block header_js %}
@@ -140,7 +138,6 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
-  <script async src="/third_party/static/yui2-2.9.0/yui2-2.9.0.js"></script>
   <script>
     {{ include_js_file('services/explorationData.js') }}
     {{ include_js_file('editor/EditorExploration.js') }}
