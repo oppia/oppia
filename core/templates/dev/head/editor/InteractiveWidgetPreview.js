@@ -516,21 +516,6 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
     }
   }, false);
 
-  $scope.saveInteractiveWidget = function() {
-    var customizationArgs = $scope.getCustomizationArgs();
-    $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, customizationArgs, function() {
-          explorationData.saveStateData($scope.stateId, {
-            // The backend actually just saves the id of the widget.
-            'interactive_widget': $scope.interactiveWidget.id,
-            // TODO(sll): Rename this and other instances of interactive_params.
-            'interactive_params': customizationArgs,
-            'interactive_rulesets': $scope.interactiveRulesets
-          });
-          $scope.drawGraph();
-        });
-  };
-
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
     explorationData.saveStateData($scope.stateId, {
@@ -603,6 +588,32 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
     }, function () {
       console.log('Choose interactive widget modal dismissed.');
     });
+  };
+
+  $scope.saveInteractiveWidget = function() {
+    var customizationArgs = $scope.getCustomizationArgs();
+    $scope.generateWidgetPreview(
+        $scope.interactiveWidget.id, customizationArgs, function() {
+          explorationData.saveStateData($scope.stateId, {
+            // The backend actually just saves the id of the widget.
+            'interactive_widget': $scope.interactiveWidget.id,
+            // TODO(sll): Rename this and other instances of interactive_params.
+            'interactive_params': customizationArgs,
+            'interactive_rulesets': $scope.interactiveRulesets
+          });
+          $scope.updateStatesData();
+          $scope.drawGraph();
+        });
+  };
+
+  $scope.updateStatesData = function() {
+    // Updates $scope.states from $scope.interactiveRulesets.
+    var stateDict = $scope.states[$scope.stateId];
+    for (var i = 0; i < stateDict.widget.handlers.length; i++) {
+      var handlerName = stateDict.widget.handlers[i].name;
+      var ruleSpecs = $scope.interactiveRulesets[handlerName];
+      stateDict.widget.handlers[i].rule_specs = ruleSpecs;
+    }
   };
 }
 
