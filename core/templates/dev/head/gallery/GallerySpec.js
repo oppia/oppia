@@ -53,7 +53,7 @@ describe('Gallery controller', function() {
     it('should show correct categories', function() {
       $httpBackend.flush();
       expect(scope.categories.Geography[0].data.title).toBe('Landmarks');
-      expect(scope.getCategoryList()).toEqual(['Geography', 'Personal', '?']);
+      expect(scope.categoryList).toEqual(['Geography', 'Personal']);
     });
   });
 });

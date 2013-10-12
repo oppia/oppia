@@ -126,85 +126,14 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
       'information about LaTeX, see ' +
       'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
 
-  var editors = {};
-
-  $scope.initYui = function(index, initContent) {
-    var divId = 'yuiEditor' + index;
-
-    var myEditor = new YAHOO.widget.Editor(divId, {
-      height: '300px',
-      width: '522px',
-      handleSubmit: true,
-      animate: true,
-      toolbar: {
-        titlebar: 'Rich Text Editor',
-        buttons: [
-          {
-            group: 'textstyle', label: 'Font Style',
-            buttons: [
-              { type: 'push', label: 'Bold', value: 'bold' },
-              { type: 'push', label: 'Italic', value: 'italic' },
-              { type: 'push', label: 'Underline', value: 'underline' },
-              { type: 'separator' },
-              { type: 'select', label: 'Arial', value: 'fontname', disabled: true,
-                menu: [
-                  { text: 'Arial', checked: true },
-                  { text: 'Courier New' },
-                  { text: 'Lucida Console' },
-                  { text: 'Times New Roman' },
-                  { text: 'Verdana' }
-                ]
-              },
-              { type: 'spin', label: '13', value: 'fontsize', range: [ 9, 75 ], disabled: true },
-              { type: 'separator' },
-              { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-              { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
-            ]
-          }
-        ]
-      }
-    });
-    myEditor.render();
-
-    myEditor.on('windowRender', function() {
-      myEditor.setEditorHTML(
-        initContent || $scope.defaultTextContent
-      );
-    });
-
-    editors[index] = myEditor;
-  };
-
-  $scope.saveContent = function(index) {
-    if ($scope.content[index].type == 'text' && editors.hasOwnProperty(index)) {
-      editors[index].saveHTML();
-      $scope.content[index].value = editors[index].getEditorHTML();
-      $scope.saveStateContent();
-      editors[index].destroy();
-      delete editors[index];
-    }
+  $scope.saveTextContent = function() {
+    $scope.saveStateContent();
     activeInputData.name = '';
   };
 
   $scope.saveStateContent = function() {
     explorationData.saveStateData($scope.stateId, {'content': $scope.content});
   };
-
-  // Destroy and initialize the correct rich text editors.
-  $scope.$watch('activeInputData.name', function(newValue, oldValue) {
-    editors = {};
-
-    if (oldValue && oldValue.indexOf('content.') === 0) {
-      $scope.saveContent(oldValue.substring(8));
-    }
-
-    if (newValue && newValue.indexOf('content.') === 0) {
-      var index = parseInt(newValue.substring(8), 10);
-      if ($scope.content[index].type == 'text') {
-        $scope.initYui(index, $scope.content[index].value);
-      }
-    }
-  });
 
   $scope.getYoutubeVideoUrl = function(videoId) {
     return $sce.trustAsResourceUrl(

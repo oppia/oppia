@@ -28,7 +28,7 @@ user_services = models.Registry.import_user_services()
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
-    PAGE_NAME_FOR_CSRF = 'gallery'
+    PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
 
     def get(self):
         """Handles GET requests."""
@@ -78,7 +78,7 @@ class GalleryHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'gallery'
+    PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
 
     @base.require_user
     def post(self):
@@ -106,7 +106,7 @@ class NewExploration(base.BaseHandler):
 class ForkExploration(base.BaseHandler):
     """Forks an existing exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'gallery'
+    PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
 
     @base.require_user
     def post(self):

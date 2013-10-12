@@ -195,17 +195,17 @@
           Answer
         </span>
         <span ng-repeat="item in tmpRuleDescriptionFragments track by $index">
-          <span ng-show="item.type == 'select'">
+          <span ng-if="item.type == 'select'">
             <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices.value)">
             </select>
           </span>
-          <span ng-show="item.type == 'input'">
+          <span ng-if="item.type == 'input'">
             <input type="text" required ng-model="tmpRule.inputs[item.varName]">
           </span>
-          <span ng-show="item.type == 'list'">
+          <span ng-if="item.type == 'list'">
             <list items="tmpRule.inputs[item.varName]"></list>
           </span>
-          <span ng-show="item.type == 'html'">
+          <span ng-if="item.type == 'html'">
             <[item.text]>
           </span>
         </span>

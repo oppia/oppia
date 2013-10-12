@@ -59,29 +59,45 @@
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
 
               <span class="pull-right">
+
                 <span ng-show="item.type == 'text'">
-                  <a ng-show="activeInputData.name == 'content.' + $index" ng-click="saveContent($index)">Save</a>
-                  <a ng-hide="activeInputData.name == 'content.' + $index" ng-click="editContent($index)">Edit</a>
-                  |
+                  <span ng-hide="activeInputData.name == 'content.' + $index">
+                    <a ng-click="editContent($index)">Edit</a> |
+                  </span>
                 </span>
+
                 <span ng-show="$index != 0">
-                  <a ng-click="swapContent($index, $index - 1)"> ⇑ </a> |
+                  <span ng-show="activeInputData.name !== ''">
+                    <span class="oppia-grayed"> ⇑ </span> |
+                  </span>
+                  <span ng-hide="activeInputData.name !== ''">
+                    <a ng-click="swapContent($index, $index - 1)"> ⇑ </a> |
+                  </span>
                 </span>
+
                 <span ng-show="$index < content.length - 1">
-                  <a ng-click="swapContent($index, $index + 1)"> ⇓ </a> |
+                  <span ng-show="activeInputData.name !== ''">
+                    <span class="oppia-grayed"> ⇓ </span> |
+                  </span>
+                  <span ng-hide="activeInputData.name !== ''">
+                    <a ng-click="swapContent($index, $index + 1)"> ⇓ </a> |
+                  </span>
                 </span>
-                <a ng-click="deleteContent($index)">Delete</a>
+
+                <span ng-show="activeInputData.name !== ''">
+                  <span class="oppia-grayed"> Delete </span>
+                </span>
+                <span ng-hide="activeInputData.name !== ''">
+                  <a ng-click="deleteContent($index)">Delete</a>
+                </span>
+
               </span>
 
               <div ng-if="item.type == 'text'">
                 <div ng-show="activeInputData.name == 'content.' + $index">
-                  <!-- The display of this element is controlled manually, outside Angular JS. -->
-                  <div class="yui-skin-sam">
-                    <textarea name="yuiEditor<[$index]>" id="yuiEditor<[$index]>" cols="50" rows="10">
-                      <[content[$index]]>
-                    </textarea>
-                  </div>
-                  <button ng-click="saveContent($index)">Save</button>
+                  <rich-text-editor rte-content="content[$index].value">
+                  </rich-text-editor>
+                  <button ng-click="saveTextContent()">Save and close</button>
                 </div>
 
                 <div ng-hide="activeInputData.name == 'content.' + $index">

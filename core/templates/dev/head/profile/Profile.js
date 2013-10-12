@@ -36,6 +36,7 @@ function Profile($scope, $http, warningsData) {
         i++;
     }
     $scope.improvable = profileData.improvable;
+    $scope.categoryList = profileData.category_list;
     $scope.pageLoaded = true;
   });
 }

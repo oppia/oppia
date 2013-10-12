@@ -217,7 +217,8 @@
     $scope.responseLog = $scope.responseLog || [];
     $scope.responseLog.push(
       $sce.trustAsHtml(data.reader_response_html),
-      data.oppia_html
+      // The following line is needed to load img src tags.
+      $sce.trustAsHtml(data.oppia_html)
     );
 
     for (var i = 0; i < data.iframe_output.length; i++) {
