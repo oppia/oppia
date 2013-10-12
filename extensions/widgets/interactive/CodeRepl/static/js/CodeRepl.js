@@ -6,12 +6,6 @@ repl.config(function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 });
 
-window.onWidgetLoad = function() {
-  window.parent.postMessage(
-    {'widgetHeight': document.body.scrollHeight},
-    window.location.protocol + '//' + window.location.host);
-};
-
 function CodeRepl($scope) {
   $scope.language = GLOBALS.language;
   $scope.placeholder = GLOBALS.placeholder;
@@ -51,6 +45,10 @@ function CodeRepl($scope) {
 
   jsrepl.loadLanguage(GLOBALS.language, function () {
     // Initialization done. Allow submit.
+    window.parent.postMessage(
+        {'widgetHeight': document.body.scrollHeight},
+        window.location.protocol + '//' + window.location.host);
+
     document.getElementById('run_button').disabled = false;
   });
 
