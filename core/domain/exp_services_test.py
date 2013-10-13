@@ -509,7 +509,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 1)
-        self.assertEqual(exploration.states[0].name, 'Renamed state')
+        self.assertEqual(exploration.init_state.name, 'Renamed state')
 
         # Add a new state.
         exp_services.add_state(USER_ID, EXP_ID, 'State 2')
@@ -654,4 +654,4 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(eid)
-        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(len(exploration.state_ids), 1)

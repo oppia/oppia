@@ -111,9 +111,9 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_exploration.category, 'The category')
         self.assertEqual(retrieved_exploration.title, 'New exploration')
 
-        self.assertEqual(len(retrieved_exploration.states), 1)
-        retrieved_state = retrieved_exploration.states[0]
-        self.assertEqual(retrieved_state.id, state.id)
+        self.assertEqual(len(retrieved_exploration.state_ids), 1)
+        retrieved_state_id = retrieved_exploration.state_ids[0]
+        self.assertEqual(retrieved_state_id, state.id)
 
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(

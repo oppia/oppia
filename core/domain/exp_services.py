@@ -423,8 +423,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
 
-    for state in exploration.states:
-        delete_state_model(exploration_id, state.id)
+    for state_id in exploration.state_ids:
+        delete_state_model(exploration_id, state_id)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     exploration_model.delete()
@@ -501,7 +501,11 @@ def get_state_by_name(exploration_id, state_name, strict=True):
 
     # TODO(sll): This is too slow; improve it.
     state = None
-    for candidate_state in exploration.states:
+    for candidate_state_id in exploration.state_ids:
+        # TODO(sll): Do a projection query to get just the state name.
+        candidate_state = exp_domain.State.from_dict(
+            candidate_state_id, exp_models.StateModel.get(
+                exploration_id, candidate_state_id).value)
         if candidate_state.name == state_name:
             state = candidate_state
             break
