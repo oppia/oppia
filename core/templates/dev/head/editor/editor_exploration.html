@@ -4,15 +4,8 @@
   Editor View
 {% endblock subtitle %}
 
-{% block header_css %}
-  {{ super() }}
-  <link rel="stylesheet" type="text/css"
-        href="/third_party/static/select2-3.4.1/select2.css" media="screen">
-{% endblock header_css %}
-
 {% block header_js %}
   {{ super() }}
-  <script src="/third_party/static/select2-3.4.1/select2.js"></script>
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});

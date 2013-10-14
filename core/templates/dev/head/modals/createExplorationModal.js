@@ -33,25 +33,15 @@ function CreateExplorationModal($scope, $http, $modal, warningsData) {
       },
       controller: function($scope, $modalInstance, categoryList) {
         $scope.categoryList = categoryList;
-        $scope.categoryList.push('?');
 
         $scope.newExplorationTitle = '';
         $scope.newExplorationCategory = '';
-        $scope.customExplorationCategory = '';
         $scope.includeYamlFile = false;
 
-        $scope.getCategoryName = function(category) {
-          return category === '?' ? 'Add New Category...' : category;
-        };
-
-        $scope.create = function(title, newCategory, customCategory) {
+        $scope.create = function(title, newCategory) {
           if (!title) {
             warningsData.addWarning('Please specify an exploration title.');
             return;
-          }
-
-          if (newCategory === '?') {
-            newCategory = customCategory;
           }
 
           if (!newCategory) {

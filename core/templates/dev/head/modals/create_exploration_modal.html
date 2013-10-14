@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="modals/galleryCreate">
-  <form novalidate name="createNewExplorationForm" ng-submit="create(newExplorationTitle, newExplorationCategory, customExplorationCategory)" class="oppia-form">
+  <form novalidate name="createNewExplorationForm" ng-submit="create(newExplorationTitle, newExplorationCategory)" class="oppia-form">
     <div class="modal-header">
       <h3>
         Add New Exploration
@@ -16,13 +16,8 @@
 
       <div>
         Category:
-        <select ng-model="newExplorationCategory" required
-                ng-options="getCategoryName(category) for category in categoryList">
-        </select>
-
-        <input ng-model="customExplorationCategory"
-               ng-show="newExplorationCategory == '?'" type="text"
-               ng-required="newExplorationCategory == '?'">
+        <select2-dropdown item="newExplorationCategory" choices="categoryList" placeholder="Select a category" new-choice-regex="^[A-Z a-z]+$" width="300px">
+        </select2-dropdown>
       </div>
 
       <br>

@@ -18,6 +18,71 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.directive('select2Dropdown', function() {
+  // Directive for incorporating select2 dropdowns.
+  return {
+    restrict: 'E',
+    scope: {
+      choices: '=',
+      item: '=',
+      newChoiceRegex: '@',
+      placeholder: '@',
+      width: '@'
+    },
+    template: '<input type="hidden">',
+    controller: function($scope, $element, $attrs) {
+      $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
+
+      $scope.makeUnique = function(arr) {
+        var hashMap = {};
+        var result = [];
+        for (var i = 0; i < arr.length; i++) {
+          if (!hashMap.hasOwnProperty(arr[i])) {
+            result.push(arr[i]);
+            hashMap[arr[i]] = 1;
+          }
+        }
+        return result;
+      };
+
+      $scope.uniqueChoices = $scope.makeUnique($scope.choices);
+      $scope.select2Choices = [];
+      for (var i = 0; i < $scope.uniqueChoices.length; i++) {
+        $scope.select2Choices.push({
+          id: $scope.uniqueChoices[i],
+          text: $scope.uniqueChoices[i]
+        });
+      }
+
+      var select2Node = $element[0].firstChild;
+      $(select2Node).select2({
+        data: $scope.select2Choices,
+        placeholder: $scope.placeholder,
+        width: $scope.width || '250px',
+        createSearchChoice: function(term, data) {
+          if ($(data).filter(function() {
+            return this.text.localeCompare(term) === 0;
+          }).length === 0) {
+            return (
+              term.match($scope.newChoiceValidator) ?
+                  {id: term, text: term} : null
+            );
+          }
+        }
+      });
+
+      // Initialize the dropdown.
+      $(select2Node).select2('val', $scope.item);
+
+      // Update $scope.item when the selection changes.
+      $(select2Node).on('change', function(e) {
+        $scope.item = e.val;
+        $scope.$apply();
+      });
+    }
+  };
+});
+
 oppia.directive('richTextEditor', function($sce, $compile) {
   // Rich text editor directive.
   return {
