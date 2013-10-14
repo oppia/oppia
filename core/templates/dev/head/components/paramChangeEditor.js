@@ -39,12 +39,12 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       };
 
       var DEFAULT_TMP_PARAM_CHANGE = {
+        name: '[New parameter]',
         generator_id: 'Copier',
         customization_args: {
           value: '[New parameter value]',
           parse_with_jinja: false
-        },
-        select2Name: {id: '[New parameter]', text: '[New parameter]'}
+        }
       };
 
       // Reset and/or initialize variables for parameter change input.
@@ -63,31 +63,18 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         return '';
       };
 
-      // Controller for the box displaying parameter name options.
-      $scope.paramSelector = {
-        createSearchChoice: function(term, data) {
-          if ($(data).filter(function() {
-            return this.text.localeCompare(term) === 0;
-          }).length===0) {
-            return {id: 'new', text: term};
-          }
-        },
-        data: [],
-        formatNoMatches: function(term) {
-          return '(choose a parameter name)';
-        }
-      };
+      // Choices for the dropdown displaying parameter name options.
+      $scope.paramNameChoices = [];
 
-      // Initializes dropdown options for the parameter name selector. The
-      // select2 library expects the options to have 'id' and 'text' fields.
+      // Initializes dropdown options for the parameter name selector.
       $scope.initSelectorOptions = function() {
         var namedata = [];
         if ($scope.paramSpecs) {
           for (var paramName in $scope.paramSpecs) {
-            namedata.push({id: paramName, text: paramName});
+            namedata.push(paramName);
           }
         }
-        angular.extend($scope.paramSelector.data, namedata);
+        angular.extend($scope.paramNameChoices, namedata);
       };
 
       // Called when an 'add param change' action is triggered.
@@ -144,9 +131,9 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           param.generator_id, param.customization_args);
 
         $scope.tmpParamChange = {
+          name: param.name,
           generator_id: param.generator_id,
-          customization_args: newCustomizationArgs,
-          select2Name: {id: param.name, text: param.name}
+          customization_args: newCustomizationArgs
         };
       };
 
@@ -170,17 +157,14 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       };
 
       $scope.commitParamChange = function(index) {
-        if (!$scope.tmpParamChange.select2Name.text) {
+        if (!$scope.tmpParamChange.name) {
           warningsData.addWarning('Please specify a parameter name.');
           return;
         }
 
         $scope.$broadcast('externalSave');
 
-        // The tmpParamName from the selector is usually of the format
-        // {id:param_name, text:param_name}, except when the user is creating
-        // a new parameter, in which case it is {id:'new', text:param_name}.
-        var name = $scope.tmpParamChange.select2Name.text;
+        var name = $scope.tmpParamChange.name;
         var generator_id = $scope.tmpParamChange.generator_id;
         var customization_args = $scope.getCleanCustomizationArgs(
           generator_id, $scope.tmpParamChange.customization_args);

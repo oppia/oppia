@@ -36,7 +36,7 @@
 
     <div class="modal-footer">
       <input type="submit" class="btn" value="Save"
-             ng-disabled="createNewExplorationForm.$invalid"/>
+             ng-disabled="!newExplorationTitle || !newExplorationCategory"/>
       <button class="btn" ng-click="cancel()">Close</button>
     </div>
   </form>

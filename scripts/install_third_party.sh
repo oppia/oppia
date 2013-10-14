@@ -114,16 +114,6 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 fi
 
 # Static resources.
-echo Checking whether angular-ui is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
-  echo Installing Angular UI
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
-  unzip angular-ui-download.zip -d $THIRD_PARTY_DIR/static/
-  rm angular-ui-download.zip
-  mv $THIRD_PARTY_DIR/static/angular-ui-OLDREPO-0.4.0 $THIRD_PARTY_DIR/static/angular-ui-0.4.0
-fi
-
 echo Checking whether ui-bootstrap is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
   echo Installing UI Bootstrap
