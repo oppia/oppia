@@ -342,16 +342,11 @@ class Exploration(object):
         return self.state_ids[0]
 
     @property
-    def states(self):
-        """A list of states for this exploration."""
-        return [State.from_dict(
-            state_id, exp_models.StateModel.get(self.id, state_id).value
-        ) for state_id in self.state_ids]
-
-    @property
     def init_state(self):
         """The state which forms the start of this exploration."""
-        return self.states[0]
+        return State.from_dict(
+            self.init_state_id, exp_models.StateModel.get(
+                self.id, self.init_state_id).value)
 
     @property
     def param_specs_dict(self):
@@ -407,4 +402,9 @@ class Exploration(object):
     # Methods relating to states comprising this exploration.
     def has_state_named(self, state_name):
         """Whether the exploration contains a state with the given name."""
-        return any([state.name == state_name for state in self.states])
+        # TODO(sll): Do a projection query here to get just the state names.
+        states = [State.from_dict(
+            state_id, exp_models.StateModel.get(self.id, state_id).value
+        ) for state_id in self.state_ids]
+
+        return any([state.name == state_name for state in states])

@@ -1,9 +1,9 @@
 {% macro edit_parameter_form() -%}
   <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
     <b>Parameter name:</b>
-    <input ng-model="tmpParamChange.select2Name"
-           ui-select2="paramSelector"
-           placeholder="Parameter Name" style="width:300px" required>
+    <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose a parameter name" new-choice-regex="^[A-Za-z]+$" width="250px">
+    </select2-dropdown>
+
     <br>
 
     Generator:
@@ -30,23 +30,23 @@
         &times;
       </a>
       <span class="oppia-editable-name"
-          ng-hide="activeItem == $index"
+          ng-if="activeItem != $index"
           ng-click="startEditParamChange($index)">
         Change <b><[param.name]></b> to <b><[param.generator_id]>(<[getCustomizationArgsAsString(param.customization_args)]>)</b>
       </span>
 
-      <div ng-show="activeItem == $index">
+      <div ng-if="activeItem == $index">
         {{ edit_parameter_form() }}
       </div>
     </li>
   </ol>
 
-  <button type="button" ng-hide="activeItem != -1"
+  <button type="button" ng-if="activeItem == -1"
           ng-click="startAddParamChange()">
     Add Parameter Change
   </button>
 
-  <div ng-show="activeItem == NEW_PARAM_CHANGE_SENTINEL">
+  <div ng-if="activeItem == NEW_PARAM_CHANGE_SENTINEL">
     {{ edit_parameter_form() }}
   </div>
 </div>

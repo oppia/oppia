@@ -76,30 +76,33 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g uglify-js
   fi
 
-  echo Downloading jsrepl
-  cd $TOOLS_DIR
-  git clone git://github.com/replit/jsrepl.git
-  cd jsrepl
-  git submodule update --init --recursive
-  # Use a specific version of the JSRepl repository.
-  git checkout 13f89c2cab0ee9163e0077102478958a14afb781
+  if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
+    echo Downloading jsrepl
+    cd $TOOLS_DIR
+    git clone git://github.com/replit/jsrepl.git
+    cd jsrepl
+    git submodule update --init --recursive
+    # Use a specific version of the JSRepl repository.
+    git checkout 13f89c2cab0ee9163e0077102478958a14afb781
 
-  # Add a temporary backup file so that this script works on both Linux and Mac.
-  TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
+    # Add a temporary backup file so that this script works on both Linux and Mac.
+    TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
-  echo Compiling jsrepl
-  # Sed fixes some issues:
-  # - Reducing jvm memory requirement from 4G to 1G.
-  # - This version of node uses fs.exitsSync.
-  # - CoffeeScript is having trouble with octal representation.
-  sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
-  sed -e 's/path\.existsSync/fs\.existsSync/' |\
-  sed -e 's/0o755/493/' > $TMP_FILE
-  mv $TMP_FILE Cakefile
-  NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+    echo Compiling jsrepl
+    # Sed fixes some issues:
+    # - Reducing jvm memory requirement from 4G to 1G.
+    # - This version of node uses fs.exitsSync.
+    # - CoffeeScript is having trouble with octal representation.
+    sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
+    sed -e 's/path\.existsSync/fs\.existsSync/' |\
+    sed -e 's/0o755/493/' > $TMP_FILE
+    mv $TMP_FILE Cakefile
+    NODE_PATH=../node-0.10.1/lib/node_modules cake bake
 
-  # Return to the Oppia root folder.
-  cd ../../oppia
+    # Return to the Oppia root folder.
+    cd ../../oppia
+  fi
+
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
@@ -111,16 +114,6 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 fi
 
 # Static resources.
-echo Checking whether angular-ui is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/angular-ui-0.4.0" ]; then
-  echo Installing Angular UI
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/angular-ui/angular-ui/archive/v0.4.0.zip -O angular-ui-download.zip
-  unzip angular-ui-download.zip -d $THIRD_PARTY_DIR/static/
-  rm angular-ui-download.zip
-  mv $THIRD_PARTY_DIR/static/angular-ui-OLDREPO-0.4.0 $THIRD_PARTY_DIR/static/angular-ui-0.4.0
-fi
-
 echo Checking whether ui-bootstrap is installed in third_party
 if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
   echo Installing UI Bootstrap
@@ -194,12 +187,4 @@ if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   echo Installing d3.js
   mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/
   wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
-fi
-
-echo Checking whether YUI2 is installed in third_party
-if [ ! -d "$THIRD_PARTY_DIR/static/yui2-2.9.0" ]; then
-  echo Downloading YUI2 JavaScript and CSS files
-  mkdir -p $THIRD_PARTY_DIR/static/yui2-2.9.0
-  wget "http://yui.yahooapis.com/combo?2.9.0/build/yahoo-dom-event/yahoo-dom-event.js&2.9.0/build/container/container_core-min.js&2.9.0/build/menu/menu-min.js&2.9.0/build/element/element-min.js&2.9.0/build/button/button-min.js&2.9.0/build/editor/editor-min.js" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.js
-  wget "http://yui.yahooapis.com/combo?2.9.0/build/assets/skins/sam/skin.css" -O $THIRD_PARTY_DIR/static/yui2-2.9.0/yui2-2.9.0.css
 fi

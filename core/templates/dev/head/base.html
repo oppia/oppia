@@ -60,25 +60,17 @@
                       <li class="active">
                         <a href="">Learn</a>
                       </li>
-                    {% else %}
-                      {% if user %}
-                        <li {% if nav_mode == 'profile' or nav_mode == 'editor' %} class="active" {% endif %}>
-                          <a href="/profile">My Explorations</a>
-                        </li>
-                      {% endif %}
+                    {% elif nav_mode == 'editor' %}
+                      <li class="active">
+                        <a href="">Create</a>
+                      </li>
                     {% endif %}
                   </ul>
 
                   <ul class="nav pull-right">
-                    {% if nav_mode != 'feedback' %}
-                      <li>
-                        <a href="" ng-click="openFeedbackPage()">
-                          Give Feedback
-                        </a>
-                      </li>
-                    {% else %}
-                      <li class="active">
-                        <a href="">Give Feedback</a>
+                    {% if user %}
+                      <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
+                        <a href="/profile">My Explorations</a>
                       </li>
                     {% endif %}
                     {% if user %}
@@ -139,6 +131,9 @@
               </li>
               <li>
                 <a href="/terms">Terms</a>
+              </li>
+              <li>
+                <a href="/feedback">Contact us</a>
               </li>
             </ul>
           </div>

@@ -80,9 +80,30 @@
     });
 
     modalInstance.result.then(function(result) {
-      $scope.submitFeedback(result.feedback);
+      if (result.feedback) {
+        $scope.submitFeedback(result.feedback);
+        $scope.showFeedbackConfirmationModal();
+      } else {
+        warningsData.addWarning('No feedback was submitted.');
+      }
     }, function () {
       console.log('Reader feedback modal dismissed.');
+    });
+  };
+
+  $scope.showFeedbackConfirmationModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/readerFeedbackConfirmation',
+      backdrop: 'static',
+      resolve: {},
+      controller: function($scope, $modalInstance) {
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
     });
   };
 

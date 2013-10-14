@@ -61,10 +61,10 @@
 
   <div>
     <h4>Parameters used in this exploration</h4>
-    <div ng-show="!paramSpecs.length">
+    <div ng-show="isEmpty(paramSpecs)">
       <em>No parameters used.</em>
     </div>
-    <ol ng-show="paramSpecs.length">
+    <ol ng-show="!isEmpty(paramSpecs)">
       <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
         <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
       </li>

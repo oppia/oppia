@@ -60,7 +60,8 @@ function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData
   $scope.createRequest = function(requestObj) {
     return $.param({
       csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify(requestObj)
+      payload: JSON.stringify(requestObj),
+      source: document.URL
     }, true);
   };
 

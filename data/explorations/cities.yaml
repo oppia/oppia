@@ -36,7 +36,233 @@ states:
       
       - Abuja
       
-      - Accra
+      - Addis Ababa
+      
+      - Algiers
+      
+      - Amman
+      
+      - Amsterdam
+      
+      - Andorra la Vella
+      
+      - Ankara
+      
+      - Ashgabat
+      
+      - Asmara
+      
+      - Astana
+      
+      - Athens
+      
+      - Baghdad
+      
+      - Baku
+      
+      - Bandar Seri Begawan
+      
+      - Bangkok
+      
+      - Bangui
+      
+      - Beijing
+      
+      - Beirut
+      
+      - Belgrade
+      
+      - Berlin
+      
+      - Bern
+      
+      - Bishkek
+      
+      - Bratislava
+      
+      - Bucharest
+      
+      - Budapest
+      
+      - Cairo
+      
+      - City of Brussels
+      
+      - City of San Marino
+      
+      - Copenhagen
+      
+      - Damascus
+      
+      - Dhaka
+      
+      - Djibouti (city)
+      
+      - Doha
+      
+      - Dushanbe
+      
+      - Episkopi Cantonment
+      
+      - Hanoi
+      
+      - Hargeisa
+      
+      - Helsinki
+      
+      - Islamabad
+      
+      - Jerusalem
+      
+      - Juba
+      
+      - Kabul
+      
+      - Kampala
+      
+      - Kathmandu
+      
+      - Khartoum
+      
+      - Kiev
+      
+      - Kuala Lumpur
+      
+      - Kuwait City
+      
+      - Libreville
+      
+      - Ljubljana
+      
+      - Lomé
+      
+      - Luxembourg (city)
+      
+      - Majuro
+      
+      - Malabo
+      
+      - Malé
+      
+      - Manama
+      
+      - Manila
+      
+      - Melekeok
+      
+      - Minsk
+      
+      - Mogadishu
+      
+      - Monaco
+      
+      - Moscow
+      
+      - Muscat, Oman
+      
+      - N'Djamena
+      
+      - Naypyidaw
+      
+      - New Delhi
+      
+      - Niamey
+      
+      - Nicosia
+      
+      - Oslo
+      
+      - Palikir
+      
+      - Paris
+      
+      - Phnom Penh
+      
+      - Podgorica
+      
+      - Porto
+      
+      - Prague
+      
+      - Pristina
+      
+      - Pyongyang
+      
+      - Riga
+      
+      - Riyadh
+      
+      - Rome
+      
+      - Saipan
+      
+      - Sana'a
+      
+      - Sarajevo
+      
+      - São Tomé
+      
+      - Seoul
+      
+      - Skopje
+      
+      - Sofia
+      
+      - Sri Jayawardenepura Kotte
+      
+      - Stepanakert
+      
+      - Stockholm
+      
+      - Sukhumi
+      
+      - Taipei
+      
+      - Tallinn
+      
+      - Tarawa
+      
+      - Tashkent
+      
+      - Tbilisi
+      
+      - Tehran
+      
+      - Thimphu
+      
+      - Tirana
+      
+      - Tiraspol
+      
+      - Tokyo
+      
+      - Tripoli
+      
+      - Tskhinvali
+      
+      - Tunis
+      
+      - Ulan Bator
+      
+      - Vaduz
+      
+      - Valletta
+      
+      - Vatican City
+      
+      - Vienna
+      
+      - Vientiane
+      
+      - Vilnius
+      
+      - Warsaw
+      
+      - Yaoundé
+      
+      - Yerevan
+      
+      - Zagreb
       
     generator_id: RandomSelector
     name: CityName
@@ -93,13 +319,1144 @@ states:
       
       - definition:
           inputs:
-            x: Accra
+            x: Addis Ababa
           name: Equals
           rule_type: atomic
           subject: CityName
-        dest: Accra
+        dest: AddisAbaba
         feedback: []
         param_changes: []
+      
+      - definition:
+          inputs:
+            x: Algiers
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Algiers
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Amman
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Amman
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Amsterdam
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Amsterdam
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Andorra la Vella
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: AndorralaVella
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Ankara
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Ankara
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Ashgabat
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Ashgabat
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Asmara
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Asmara
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Astana
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Astana
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Athens
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Athens
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Baghdad
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Baghdad
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Baku
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Baku
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bandar Seri Begawan
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: BandarSeriBegawan
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bangkok
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bangkok
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bangui
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bangui
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Beijing
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Beijing
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Beirut
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Beirut
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Belgrade
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Belgrade
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Berlin
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Berlin
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bern
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bern
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bishkek
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bishkek
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bratislava
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bratislava
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Bucharest
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Bucharest
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Budapest
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Budapest
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Cairo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Cairo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: City of Brussels
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: CityofBrussels
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: City of San Marino
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: CityofSanMarino
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Copenhagen
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Copenhagen
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Damascus
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Damascus
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Dhaka
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Dhaka
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Djibouti (city)
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Djibouticity
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Doha
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Doha
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Dushanbe
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Dushanbe
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Episkopi Cantonment
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: EpiskopiCantonment
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Hanoi
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Hanoi
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Hargeisa
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Hargeisa
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Helsinki
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Helsinki
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Islamabad
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Islamabad
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Jerusalem
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Jerusalem
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Juba
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Juba
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kabul
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Kabul
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kampala
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Kampala
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kathmandu
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Kathmandu
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Khartoum
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Khartoum
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kiev
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Kiev
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kuala Lumpur
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: KualaLumpur
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Kuwait City
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: KuwaitCity
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Libreville
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Libreville
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Ljubljana
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Ljubljana
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Lomé
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: LomC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Luxembourg (city)
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Luxembourgcity
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Majuro
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Majuro
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Malabo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Malabo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Malé
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: MalC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Manama
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Manama
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Manila
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Manila
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Melekeok
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Melekeok
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Minsk
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Minsk
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Mogadishu
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Mogadishu
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Monaco
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Monaco
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Moscow
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Moscow
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Muscat, Oman
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: MuscatOman
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: N'Djamena
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: N27Djamena
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Naypyidaw
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Naypyidaw
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: New Delhi
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: NewDelhi
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Niamey
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Niamey
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Nicosia
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Nicosia
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Oslo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Oslo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Palikir
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Palikir
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Paris
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Paris
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Phnom Penh
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: PhnomPenh
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Podgorica
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Podgorica
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Porto
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: PortoNovo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Prague
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Prague
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Pristina
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Pristina
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Pyongyang
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Pyongyang
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Riga
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Riga
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Riyadh
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Riyadh
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Rome
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Rome
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Saipan
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Saipan
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Sana'a
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Sana27a
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Sarajevo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Sarajevo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: São Tomé
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: SC3A3oTomC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Seoul
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Seoul
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Skopje
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Skopje
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Sofia
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Sofia
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Sri Jayawardenepura Kotte
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: SriJayawardenepuraKotte
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Stepanakert
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Stepanakert
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Stockholm
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Stockholm
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Sukhumi
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Sukhumi
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Taipei
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Taipei
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tallinn
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tallinn
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tarawa
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tarawa
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tashkent
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tashkent
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tbilisi
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tbilisi
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tehran
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tehran
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Thimphu
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Thimphu
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tirana
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tirana
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tiraspol
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tiraspol
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tokyo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tokyo
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tripoli
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tripoli
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tskhinvali
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tskhinvali
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Tunis
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Tunis
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Ulan Bator
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: UlanBator
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Vaduz
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Vaduz
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Valletta
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Valletta
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Vatican City
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: VaticanCity
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Vienna
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Vienna
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Vientiane
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Vientiane
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Vilnius
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Vilnius
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Warsaw
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Warsaw
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Yaoundé
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: YaoundC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Yerevan
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Yerevan
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Zagreb
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Zagreb
+        feedback: []
+        param_changes: []
+      
     sticky: false
     widget_id: MultipleChoiceInput
 
@@ -123,8 +1480,8 @@ states:
           inputs:
             d: 3.0
             p:
-            - 24.466667
-            - 54.366667
+            - 24.467
+            - 54.367
           name: Within
           rule_type: atomic
           subject: answer
@@ -160,8 +1517,8 @@ states:
           inputs:
             d: 3.0
             p:
-            - 9.066667
-            - 7.483333
+            - 9.06667
+            - 7.48333
           name: Within
           rule_type: atomic
           subject: answer
@@ -180,7 +1537,7 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
-  name: Accra
+  name: AddisAbaba
   param_changes: []
   widget:
     customization_args:
@@ -197,8 +1554,8 @@ states:
           inputs:
             d: 3.0
             p:
-            - 5.55
-            - -0.2
+            - 9.03
+            - 38.74
           name: Within
           rule_type: atomic
           subject: answer
@@ -208,7 +1565,4188 @@ states:
         param_changes: []
       - definition:
           rule_type: default
-        dest: Accra
+        dest: AddisAbaba
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Algiers
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 36.767
+            - 3.217
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Algiers
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Amman
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 31.94972
+            - 35.93278
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Amman
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Amsterdam
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 52.37306
+            - 4.89222
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Amsterdam
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: AndorralaVella
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.5
+            - 1.5
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: AndorralaVella
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Ankara
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 39.867
+            - 32.867
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Ankara
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Ashgabat
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 37.933
+            - 58.367
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Ashgabat
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Asmara
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 15.333
+            - 38.933
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Asmara
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Astana
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 51.16667
+            - 71.43333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Astana
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Athens
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 37.967
+            - 23.717
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Athens
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Baghdad
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 33.33333
+            - 44.43333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Baghdad
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Baku
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 40.39528
+            - 49.88222
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Baku
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: BandarSeriBegawan
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 4.89028
+            - 114.94222
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: BandarSeriBegawan
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bangkok
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 13.75
+            - 100.467
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bangkok
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bangui
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 4.367
+            - 18.583
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bangui
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Beijing
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 39.91389
+            - 116.39167
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Beijing
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Beirut
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 33.88694
+            - 35.51306
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Beirut
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Belgrade
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 44.817
+            - 20.467
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Belgrade
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Berlin
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 52.517
+            - 13.383
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Berlin
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bern
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 46.95
+            - 7.45
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bern
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bishkek
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.87472
+            - 74.61222
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bishkek
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bratislava
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 48.14389
+            - 17.10972
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bratislava
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Bucharest
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 44.4325
+            - 26.10389
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Bucharest
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Budapest
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 47.47194
+            - 19.05028
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Budapest
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Cairo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 30.05
+            - 31.233
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Cairo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: CityofBrussels
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 50.85
+            - 4.35
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: CityofBrussels
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: CityofSanMarino
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 43.9346
+            - 12.4473
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: CityofSanMarino
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Copenhagen
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 55.67611
+            - 12.56833
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Copenhagen
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Damascus
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 33.51306
+            - 36.29194
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Damascus
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Dhaka
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 23.7
+            - 90.375
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Dhaka
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Djibouticity
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 11.58833
+            - 43.145
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Djibouticity
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Doha
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 25.28667
+            - 51.53333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Doha
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Dushanbe
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 38.53667
+            - 68.78
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Dushanbe
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: EpiskopiCantonment
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 34.667
+            - 32.85
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: EpiskopiCantonment
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Hanoi
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 21.03333
+            - 105.85
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Hanoi
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Hargeisa
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 10
+            - 44.5
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Hargeisa
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Helsinki
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 60.17083
+            - 24.9375
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Helsinki
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Islamabad
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 33.717
+            - 73.067
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Islamabad
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Jerusalem
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 31.783
+            - 35.217
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Jerusalem
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Juba
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 4.85
+            - 31.6
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Juba
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Kabul
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 34.533
+            - 69.167
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Kabul
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Kampala
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 0.31361
+            - 32.58111
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Kampala
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Kathmandu
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 27.7
+            - 85.333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Kathmandu
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Khartoum
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 15.633
+            - 32.533
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Khartoum
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Kiev
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 50.45
+            - 30.52333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Kiev
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: KualaLumpur
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 3.1475
+            - 101.69333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: KualaLumpur
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: KuwaitCity
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 29.36972
+            - 47.97833
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: KuwaitCity
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Libreville
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 0.39
+            - 9.45
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Libreville
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Ljubljana
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 46.05556
+            - 14.50833
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Ljubljana
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: LomC3A9
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 6.13778
+            - 1.2125
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: LomC3A9
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Luxembourgcity
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 49.61167
+            - 6.13
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Luxembourgcity
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Majuro
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 7.067
+            - 171.267
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Majuro
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Malabo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 3.7520639
+            - 8.7737
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Malabo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: MalC3A9
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 4.17528
+            - 73.50889
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: MalC3A9
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Manama
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 26.217
+            - 50.583
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Manama
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Manila
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 14.583
+            - 120.967
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Manila
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Melekeok
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 7.483
+            - 134.6
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Melekeok
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Minsk
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 53.9
+            - 27.567
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Minsk
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Mogadishu
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 2.033
+            - 45.35
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Mogadishu
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Monaco
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 43.717
+            - 7.417
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Monaco
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Moscow
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 55.75
+            - 37.617
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Moscow
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: MuscatOman
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 23.60861
+            - 58.59194
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: MuscatOman
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: N27Djamena
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 12.11306
+            - 15.04917
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: N27Djamena
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Naypyidaw
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 19.75
+            - 96.1
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Naypyidaw
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: NewDelhi
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 28.61389
+            - 77.20889
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: NewDelhi
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Niamey
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 13.52139
+            - 2.10528
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Niamey
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Nicosia
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 35.167
+            - 33.367
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Nicosia
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Oslo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 59.95
+            - 10.75
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Oslo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Palikir
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 6.91722
+            - 158.15889
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Palikir
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Paris
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 48.8567
+            - 2.3508
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Paris
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: PhnomPenh
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 11.55
+            - 104.917
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: PhnomPenh
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Podgorica
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.4410444
+            - 19.262825
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Podgorica
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: PortoNovo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 6.49722
+            - 2.605
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: PortoNovo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Prague
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 50.083
+            - 14.417
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Prague
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Pristina
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.667
+            - 21.167
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Pristina
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Pyongyang
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 39.01944
+            - 125.73806
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Pyongyang
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Riga
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 56.94889
+            - 24.10639
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Riga
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Riyadh
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 24.633
+            - 46.717
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Riyadh
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Rome
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 41.9
+            - 12.5
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Rome
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Saipan
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 15.18083
+            - 145.75583
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Saipan
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Sana27a
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 15.34833
+            - 44.20639
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Sana27a
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Sarajevo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 43.86667
+            - 18.41667
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Sarajevo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: SC3A3oTomC3A9
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 0.33611
+            - 6.68139
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: SC3A3oTomC3A9
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Seoul
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 37.5665361
+            - 126.9779694
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Seoul
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Skopje
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42
+            - 21.433
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Skopje
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Sofia
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.7
+            - 23.333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Sofia
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: SriJayawardenepuraKotte
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 6.91083
+            - 79.88778
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: SriJayawardenepuraKotte
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Stepanakert
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 39.81528
+            - 46.75194
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Stepanakert
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Stockholm
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 59.32944
+            - 18.06861
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Stockholm
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Sukhumi
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 43.00333
+            - 41.01528
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Sukhumi
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Taipei
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 25.033
+            - 121.633
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Taipei
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tallinn
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 59.43722
+            - 24.74528
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tallinn
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tarawa
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 1.433
+            - 173
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tarawa
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tashkent
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 41.267
+            - 69.217
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tashkent
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tbilisi
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 41.71667
+            - 44.78333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tbilisi
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tehran
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 35.69611
+            - 51.42306
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tehran
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Thimphu
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 27.46667
+            - 89.64167
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Thimphu
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tirana
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 41.33
+            - 19.82
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tirana
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tiraspol
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 46.85
+            - 29.633
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tiraspol
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tokyo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 35.6895056
+            - 139.6917
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tokyo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tripoli
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 32.90222
+            - 13.18583
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tripoli
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tskhinvali
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 42.23333
+            - 43.96667
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tskhinvali
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Tunis
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 36.8
+            - 10.183
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Tunis
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: UlanBator
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 47.917
+            - 106.917
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: UlanBator
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Vaduz
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 47.141
+            - 9.521
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Vaduz
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Valletta
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 35.89778
+            - 14.5125
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Valletta
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: VaticanCity
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 41.9033
+            - 12.4533
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: VaticanCity
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Vienna
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 48.20889
+            - 16.3725
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Vienna
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Vientiane
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 17.96667
+            - 102.6
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Vientiane
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Vilnius
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 54.683
+            - 25.283
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Vilnius
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Warsaw
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 52.233
+            - 21.017
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Warsaw
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: YaoundC3A9
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 3.867
+            - 11.517
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: YaoundC3A9
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Yerevan
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 40.183333
+            - 44.516667
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Yerevan
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
+  name: Zagreb
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 0
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 45.81667
+            - 15.98333
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Zagreb
         feedback: []
         param_changes: []
     sticky: true

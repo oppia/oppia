@@ -26,6 +26,8 @@ user_services = models.Registry.import_user_services()
 class ProfilePage(base.BaseHandler):
     """The profile page."""
 
+    PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
+
     @base.require_user
     def get(self):
         """Handles GET requests."""
@@ -46,6 +48,9 @@ class ProfileHandler(base.BaseHandler):
         else:
             exps = exp_services.get_editable_explorations(self.user_id)
 
+        # Make each entry of the category list unique.
+        category_list = list(set([exp.category for exp in exps]))
+
         self.values.update({
             'explorations': [{
                 'id': exp.id,
@@ -54,5 +59,6 @@ class ProfileHandler(base.BaseHandler):
             } for exp in exps],
             'improvable': stats_services.get_top_improvable_states(
                 [exp.id for exp in exps], 10),
+            'category_list': list(category_list)
         })
         self.render_json(self.values)
