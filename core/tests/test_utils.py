@@ -18,6 +18,7 @@ import unittest
 import webtest
 
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import stats_services
 import feconf
 
@@ -54,6 +55,7 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         exp_services.delete_all_explorations()
+        fs_domain.delete_all_files()
         stats_services.delete_all_stats()
 
     def shortDescription(self):
