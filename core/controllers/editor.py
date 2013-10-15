@@ -255,6 +255,6 @@ class ExplorationDownloadHandler(base.BaseHandler):
 
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.yaml' % filename)
+            'attachment; filename=%s.zip' % filename)
 
-        self.response.write(exp_services.export_to_yaml(exploration_id))
+        self.response.write(exp_services.export_to_zip_file(exploration_id))

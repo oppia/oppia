@@ -16,6 +16,9 @@
 
 __author__ = 'Sean Lip'
 
+import StringIO
+import zipfile
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -297,16 +300,7 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 class ExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations and states."""
 
-    def test_export_to_yaml(self):
-        """Test the export_to_yaml() method."""
-        exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                self.owner_id, 'A title', 'A category',
-                'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
-        yaml_content = exp_services.export_to_yaml(exploration.id)
-        self.assertEqual(
-            yaml_content,
+    SAMPLE_YAML_CONTENT = (
 """default_skin: conversation_v1
 param_changes: []
 param_specs: {}
@@ -343,6 +337,30 @@ states:
     sticky: false
     widget_id: Continue
 """)
+
+    def test_export_to_yaml(self):
+        """Test the export_to_yaml() method."""
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        yaml_content = exp_services.export_to_yaml(exploration.id)
+        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
+
+    def test_export_to_zip_file(self):
+        """Test the export_to_zip_file() method."""
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        zip_file_output = exp_services.export_to_zip_file(exploration.id)
+        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+
+        self.assertEqual(zf.namelist(), ['A title.yaml'])
+        self.assertEqual(
+            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
     def test_export_state_to_dict(self):
         """Test the export_state_to_dict() method."""

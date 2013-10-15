@@ -29,6 +29,8 @@ import copy
 import json
 import logging
 import os
+import StringIO
+import zipfile
 
 from core.domain import exp_domain
 from core.domain import obj_services
@@ -285,6 +287,20 @@ def export_to_yaml(exploration_id):
             for state_id in exploration.state_ids],
         'schema_version': CURRENT_EXPLORATION_SCHEMA_VERSION
     })
+
+
+def export_to_zip_file(exploration_id):
+    """Returns a ZIP archive of the exploration."""
+    yaml_repr = export_to_yaml(exploration_id)
+    exploration = get_exploration_by_id(exploration_id)
+
+    o = StringIO.StringIO()
+    with zipfile.ZipFile(o, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr('%s.yaml' % exploration.title, yaml_repr)
+        # TODO(sll): Also add asset files to a separate directory named
+        # assets/.
+
+    return o.getvalue()
 
 
 # Repository SAVE and DELETE methods.
