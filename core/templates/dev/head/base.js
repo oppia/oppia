@@ -32,8 +32,7 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData) {
     if (window.parent != window) {
       console.log('Exploration body loaded; posting message to parent.');
       window.parent.postMessage(
-        {'explorationHeight': document.body.scrollHeight},
-         window.location.protocol + '//' + window.location.host
+        {'explorationHeight': document.body.scrollHeight}, '*'
       );
 
       $scope.$broadcast('pageLoaded', null);
