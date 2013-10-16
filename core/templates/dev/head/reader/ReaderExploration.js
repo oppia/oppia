@@ -33,10 +33,11 @@
     return $scope.showPage ? {} : {opacity: 0};
   };
 
-  $scope.showContent = function() {
+  $scope.$on('pageLoaded', function(event, data) {
+    // Show content when the page is loaded.
     $scope.showPage = true;
     $scope.$apply();
-  };
+  });
 
   $scope.changeInputTemplateIframeHeight = function(height) {
     var iframe = document.getElementById('inputTemplate');
@@ -283,9 +284,7 @@
     }
   };
 
-  window.addEventListener('message', receiveMessage, false);
-
-  function receiveMessage(evt) {
+  window.addEventListener('message', function(evt) {
     console.log('Event received.');
     console.log(evt.data);
 
@@ -297,13 +296,11 @@
       // Change the height of the included iframe.
       $scope.changeInputTemplateIframeHeight(
         parseInt(evt.data.widgetHeight, 10) + 2);
-    } else if (evt.data == 'heightAdjustedExternally') {
-      $scope.showContent();
     } else {
       // Submit an answer to the server.
       $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
     }
-  }
+  }, false);
 }
 
 /**

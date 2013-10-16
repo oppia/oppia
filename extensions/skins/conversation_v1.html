@@ -86,17 +86,13 @@
         iframe height.-->
         <script>
           window.onIframeLoad = function() {
-            if (window.parent != window) {
-              window.parent.postMessage(
-                  {'explorationHeight': document.body.scrollHeight},
-                  window.location.protocol + '//' + window.location.host
-              );
+            if (window.onBodyLoad) {
+              window.onBodyLoad();
             }
           };
         </script>
 
-        <iframe id="inputTemplate" width="100%"
-                seamless="seamless"
+        <iframe id="inputTemplate" width="100%" seamless="seamless"
                 frameborder="0" onload="onIframeLoad()"></iframe>
       </div>
     </div>
