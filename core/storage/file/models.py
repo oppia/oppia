@@ -21,4 +21,6 @@ __author__ = 'Tarashish Mishra'
 from core.storage.file import django_models
 
 FileDataModel = django_models.FileDataModel
+FileDataHistoryModel = django_models.FileDataHistoryModel
 FileMetadataModel = django_models.FileMetadataModel
+FileMetadataHistoryModel = django_models.FileMetadataHistoryModel

@@ -62,3 +62,22 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fs.listdir('eid', '/assets/abc'), [])
         self.assertEqual(fs.listdir('eid', 'fake_dir'), [])
         self.assertEqual(fs.listdir('fake_eid', 'assets'), [])
+
+    def test_versioning(self):
+        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
+        fs.put('eid', 'assets/abc.png', 'file_contents')
+        self.assertEqual(fs.get('eid', 'assets/abc.png'), 'file_contents')
+        file_stream = fs.open('eid', 'assets/abc.png')
+        self.assertEqual(file_stream.version, 1)
+        self.assertEqual(file_stream.metadata.size, len('file_contents'))
+
+        fs.put('eid', 'assets/abc.png', 'file_contents_2')
+        self.assertEqual(fs.get('eid', 'assets/abc.png'), 'file_contents_2')
+        file_stream = fs.open('eid', 'assets/abc.png')
+        self.assertEqual(file_stream.version, 2)
+        self.assertEqual(file_stream.metadata.size, len('file_contents_2'))
+
+        self.assertEqual(fs.get('eid', 'assets/abc.png', 1), 'file_contents')
+        old_file_stream = fs.open('eid', 'assets/abc.png', 1)
+        self.assertEqual(old_file_stream.version, 1)
+        self.assertEqual(old_file_stream.metadata.size, len('file_contents'))

@@ -35,6 +35,8 @@ class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     # When this entity was last updated.
     last_updated = models.DateTimeField(auto_now=True)
+    # Whether the current version of the file is deleted.
+    deleted = models.BooleanField(default=False)
 
     id = models.CharField(max_length=100, primary_key=True)
 
@@ -125,6 +127,9 @@ class BaseModel(models.Model):
                 entity = cls.objects.get(id=entity_id, **kwarg)
             except cls.DoesNotExist:
                 entity = None
+
+        if entity and entity.deleted:
+            entity = None
 
         if strict and not entity:
             raise cls.EntityNotFoundError(

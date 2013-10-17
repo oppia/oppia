@@ -828,6 +828,8 @@ def fork_exploration(exploration_id, user_id):
 
 def load_demo(exploration_id):
     """Loads a demo exploration."""
+    # TODO(sll): Speed this method up. It is too slow.
+
     if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
