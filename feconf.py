@@ -63,7 +63,7 @@ DEMO_EXPLORATIONS = [
     ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('binary_search.yaml', 'The Lazy Magician', 'Mathematics'),
+    ('binary_search.zip', 'The Lazy Magician', 'Mathematics'),
     ('tar.yaml', 'Missions - Tar', 'Open Source Tools'),
     ('cities.yaml', 'World Cities', 'Geography'),
 ]
