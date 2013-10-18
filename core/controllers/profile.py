@@ -20,9 +20,8 @@ from core.controllers import base
 from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
-from core.domain import users_services
-user_services = models.Registry.import_user_services()
-
+from core.domain import user_services
+current_user_services = models.Registry.import_current_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -45,7 +44,7 @@ class ProfileHandler(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        if user_services.is_current_user_admin(self.request):
+        if current_user_services.is_current_user_admin(self.request):
             exps = exp_services.get_all_explorations()
         else:
             exps = exp_services.get_editable_explorations(self.user_id)
@@ -65,8 +64,8 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CreateUserNamePage(base.BaseHandler):
-    """The profile page."""
+class CreateUsernamePage(base.BaseHandler):
+    """The page which prompts for username."""
 
     PAGE_NAME_FOR_CSRF = 'create_user_name'
 
@@ -82,5 +81,7 @@ class CreateUserNamePage(base.BaseHandler):
     def post(self):
       """Handles POST requests.""" 
       username = self.payload.get('username');
-      user_settings = users_services.set_username(self.user_id, username)
-
+      if not user_services.is_username_taken(username):
+          user_services.set_username(self.user_id, username)
+      else:
+          raise Exception("The username \"%s\" is already taken, please pick a different one." % username)

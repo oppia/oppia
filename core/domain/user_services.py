@@ -14,34 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for Oppia users."""
+"""Services for user data."""
 
 __author__ = 'Stephanie Federwisch'
 
-import logging
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-from core import django_utils
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
-from django.db import models
+def set_username(user_id, username):
+    """Sets the username for a given user."""
+    user_settings = user_models.UserSettingsModel.get_or_create(user_id)
+    user_settings.username = username
+    user_settings.put()
 
 
-class UserSettingsModel(base_models.BaseModel):
-    """A settings and preferences for a particular user.
+def get_username(user_id):
+    """Gets the username for a given user."""
+    user_settings = user_models.UserSettingsModel.get_or_create(user_id)
+    return user_settings.username if user_settings.username else None
 
-    The id/key of instances of this class has the form
-        [USER_ID].
-    """
-    # Identifiable username for UI purposes
-    username = models.StringProperty()
 
-    @classmethod
-    def get_or_create(cls, user_id):
-        instance_id = user_id
-        user_prefs = cls.get(instance_id, strict=False)
-        if not user_prefs:
-            user_prefs = cls(id=instance_id)
-        return user_prefs
-
+def is_username_taken(username):
+    return user_models.UserSettingsModel.is_username_taken(username)
+   

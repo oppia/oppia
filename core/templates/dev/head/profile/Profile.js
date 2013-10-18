@@ -40,15 +40,17 @@ function Profile($scope, $http, warningsData) {
     $scope.pageLoaded = true;
   });
 
-  $scope.createUserName = function(username) {
+  $scope.createUsername = function(username) {
     $http.post(
       '/profile/create_user_name',
       $scope.createRequest({
         username: username,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).error(function(data) {
+        warningsData.addWarning(data.error);
+      }
     );
-
   }
 }
 

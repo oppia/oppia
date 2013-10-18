@@ -155,3 +155,6 @@ NULL_SNAPSHOT = {}
 
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = ')]}\'\n'
+
+# Whether or not to require users to have usernames in order to edit
+REQUIRE_USERS_TO_SET_USERNAMES = False

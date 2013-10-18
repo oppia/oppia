@@ -22,7 +22,7 @@ from core.domain import param_domain
 from core.domain import stats_services
 from core.domain import value_generators_domain
 from core.platform import models
-user_services = models.Registry.import_user_services()
+current_user_services = models.Registry.import_current_user_services()
 import utils
 
 import jinja2
@@ -178,7 +178,7 @@ class ExplorationHandler(base.BaseHandler):
         """Deletes the given exploration."""
         exp_services.delete_exploration(
             self.user_id, exploration_id,
-            force_deletion=user_services.is_current_user_admin(self.request))
+            force_deletion=current_user_services.is_current_user_admin(self.request))
 
 
 class StateHandler(base.BaseHandler):

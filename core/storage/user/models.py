@@ -18,6 +18,6 @@
 
 __author__ = 'Stephanie Federwisch'
 
-from core.storage.users import django_models
+from core.storage.user import django_models
 
 UserSettingsModel = django_models.UserSettingsModel

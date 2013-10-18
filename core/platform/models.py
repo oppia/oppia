@@ -23,7 +23,7 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'config', 'exploration', 'file', 'statistics', 'users')
+    'base_model', 'config', 'exploration', 'file', 'statistics', 'user')
 
 
 class _Platform(object):
@@ -54,9 +54,9 @@ class _Django(_Platform):
             elif name == NAMES.statistics:
                 from core.storage.statistics import django_models as statistics_model
                 returned_models.append(statistics_model)
-            elif name == NAMES.users:
-                from core.storage.users import django_models as user_prefs_model
-                returned_models.append(user_prefs_model)
+            elif name == NAMES.user:
+                from core.storage.user import django_models as user_model
+                returned_models.append(user_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -68,9 +68,9 @@ class _Django(_Platform):
         return django_transaction_services
 
     @classmethod
-    def import_user_services(cls):
-        from core.platform.users import django_user_services
-        return django_user_services
+    def import_current_user_services(cls):
+        from core.platform.users import django_current_user_services
+        return django_current_user_services
 
     @classmethod
     def import_memcache_services(cls):
@@ -101,9 +101,9 @@ class _Gae(_Platform):
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_model
                 returned_models.append(statistics_model)
-            elif name == NAMES.users:
-                from core.storage.users import gae_models as user_prefs_model
-                returned_models.append(user_prefs_model)
+            elif name == NAMES.user:
+                from core.storage.user import gae_models as user_model
+                returned_models.append(user_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -115,9 +115,9 @@ class _Gae(_Platform):
         return gae_transaction_services
 
     @classmethod
-    def import_user_services(cls):
-        from core.platform.users import gae_user_services
-        return gae_user_services
+    def import_current_user_services(cls):
+        from core.platform.users import gae_current_user_services
+        return gae_current_user_services
 
     @classmethod
     def import_memcache_services(cls):
@@ -142,8 +142,8 @@ class Registry(object):
         return cls._get().import_models(model_names)
 
     @classmethod
-    def import_user_services(cls):
-        return cls._get().import_user_services()
+    def import_current_user_services(cls):
+        return cls._get().import_current_user_services()
 
     @classmethod
     def import_transaction_services(cls):
