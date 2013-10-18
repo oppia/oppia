@@ -26,7 +26,7 @@ def set_username(user_id, username):
     """Sets the username for a given user."""
     user_settings = user_models.UserSettingsModel.get_or_create(user_id)
     user_settings.username = username
-    user_settings.normalized_username = username.lower()
+    user_settings.normalized_username = normalize(username)
     user_settings.put()
 
 
@@ -37,7 +37,8 @@ def get_username(user_id):
 
 
 def is_username_taken(username):
-    """Normalizes the username and checks if that is taken.
-       Normalizing is lowercasing at this point."""
-    return user_models.UserSettingsModel.is_username_taken(username.lower())
+    """Normalizes the username and checks if that is taken."""
+    return user_models.UserSettingsModel.is_normalized_username_taken(normalize(username))
    
+def normalize(username):
+    return username.lower()
