@@ -36,6 +36,9 @@ class UserSettingsModel(base_models.BaseModel):
     # Identifiable username to display in the UI
     username = ndb.StringProperty(indexed=True)
 
+    # Normalized username
+    normalized_username = ndb.StringProperty(indexed=True)
+
     @classmethod
     def get_or_create(cls, user_id):
         user_settings = cls.get(user_id, strict=False)
@@ -46,5 +49,5 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def is_username_taken(cls, username):
         """Returns whether or a given username is taken."""
-        return bool(cls.get_all().filter(cls.username == username).get())
+        return bool(cls.get_all().filter(cls.normalized_username == username).get())
 

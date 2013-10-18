@@ -41,3 +41,9 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         username = 'newUsername'
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
+
+    def test_is_username_taken_different_case(self):
+        user_id = 'someUser'
+        username = 'camelCase'
+        user_services.set_username(user_id, username)
+        self.assertTrue(user_services.is_username_taken(username.lower()))

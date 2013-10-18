@@ -16,6 +16,9 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
+import feconf
+import re
+
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import stats_services
@@ -81,6 +84,8 @@ class CreateUsernamePage(base.BaseHandler):
     def post(self):
       """Handles POST requests.""" 
       username = self.payload.get('username');
+      if not re.match(feconf.ALPHANUMERIC_REGEX, username):
+          raise Exception("Usernames can only have alphanumeric characters.")
       if not user_services.is_username_taken(username):
           user_services.set_username(self.user_id, username)
       else:

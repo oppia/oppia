@@ -158,3 +158,6 @@ XSSI_PREFIX = ')]}\'\n'
 
 # Whether or not to require users to have usernames in order to edit
 REQUIRE_USERS_TO_SET_USERNAMES = False
+
+# A regular expression for alphanumeric characters
+ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
