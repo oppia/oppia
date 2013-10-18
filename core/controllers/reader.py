@@ -70,7 +70,8 @@ class ExplorationHandler(base.BaseHandler):
 
         init_state = exploration.init_state
         init_html, init_widgets = exp_services.export_content_to_html(
-            init_state.content, 0, reader_params, escape_text_strings=False)
+            exploration_id, init_state.content, 0, reader_params,
+            escape_text_strings=False)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
@@ -113,13 +114,14 @@ class FeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_answer_submitted(
             exploration_id, old_state_id, handler, str(rule), recorded_answer)
 
-    def _get_feedback(self, feedback, block_number, params):
+    def _get_feedback(self, exploration_id, feedback, block_number, params):
         """Gets the HTML and iframes with Oppia's feedback."""
         if not feedback:
             return '', []
         else:
             feedback_bits = feedback.split('\n')
             return exp_services.export_content_to_html(
+                exploration_id,
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
                 block_number, params, escape_text_strings=False)
 
@@ -137,8 +139,8 @@ class FeedbackHandler(base.BaseHandler):
             if state_has_changed:
                 # Append the content for the new state.
                 state_html, state_widgets = exp_services.export_content_to_html(
-                    new_state.content, block_number, new_params,
-                    escape_text_strings=False)
+                    exploration_id, new_state.content, block_number,
+                    new_params, escape_text_strings=False)
 
                 if html_output and state_html:
                     html_output += '<br>'
@@ -217,7 +219,7 @@ class FeedbackHandler(base.BaseHandler):
 
         # Add Oppia's feedback to the response HTML.
         html_output, iframe_output = self._get_feedback(
-            feedback, block_number, old_params)
+            exploration_id, feedback, block_number, old_params)
 
         # Add the content for the new state to the response HTML.
         finished = (new_state_id == feconf.END_DEST)

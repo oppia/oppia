@@ -49,7 +49,7 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
   return 1
 fi
 
-export TOOLS_DIR=../tools
+export TOOLS_DIR=../oppia_tools
 export THIRD_PARTY_DIR=third_party
 
 mkdir -p $TOOLS_DIR

@@ -51,15 +51,13 @@ IDEA_CONTRIBUTORS = [
 # is based on the index of the exploration in this list, so if you want to
 # add a new exploration and preserve the existing ids, add that exploration
 # to the end of the list.
-# Each item is represented as a tuple: (filename, title, category, image_name).
-# The fourth element is optional. Note that the filename omits the .yaml
-# suffix.
-# The images are in /data/images.
+# Each item is represented as a tuple: (filename, title, category).
+# Note that the filename omits the .yaml suffix.
 DEMO_EXPLORATIONS = [
     ('welcome', 'Welcome to Oppia!', 'Welcome'),
-    ('pitch', 'Pitch Perfect', 'Music', 'pitch.png'),
-    ('counting', 'Three Balls', 'Mathematics', 'counting.png'),
-    ('boot_verbs', 'Boot Verbs', 'Languages', 'boot_verbs.png'),
+    ('pitch', 'Pitch Perfect', 'Music'),
+    ('counting', 'Three Balls', 'Mathematics'),
+    ('boot_verbs', 'Boot Verbs', 'Languages'),
     ('hola', '¡Hola!', 'Languages'),
     ('landmarks', 'Landmarks', 'Geography'),
     ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
@@ -96,7 +94,6 @@ DATA_DIR = 'data/files/'
 
 # The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
-SAMPLE_IMAGES_DIR = 'data/images'
 WIDGETS_DIR = 'extensions/widgets'
 RULES_DIR = 'extensions/rules'
 INTERACTIVE_WIDGETS_DIR = 'extensions/widgets/interactive'

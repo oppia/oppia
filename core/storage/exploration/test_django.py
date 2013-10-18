@@ -90,7 +90,6 @@ class ExplorationModelUnitTests(unittest.TestCase):
             exploration.is_public = 'true'
             exploration.put('user_id', {})
         exploration.is_public = True
-        exploration.image_id = 'A string'
         exploration.editor_ids = ['A user id']
 
         # Put and retrieve the exploration.
@@ -105,5 +104,4 @@ class ExplorationModelUnitTests(unittest.TestCase):
         self.assertEqual(
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
         self.assertEqual(retrieved_exploration.is_public, True)
-        self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])

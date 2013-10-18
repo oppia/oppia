@@ -18,6 +18,9 @@
 
 __author__ = 'Tarashish Mishra'
 
-from core.storage.image import django_models
+from core.storage.file import django_models
 
-Image = django_models.Image
+FileDataModel = django_models.FileDataModel
+FileDataHistoryModel = django_models.FileDataHistoryModel
+FileMetadataModel = django_models.FileMetadataModel
+FileMetadataHistoryModel = django_models.FileMetadataHistoryModel

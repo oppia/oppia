@@ -63,7 +63,6 @@ class GalleryHandler(base.BaseHandler):
                 'can_edit': exploration.id in editable_exploration_ids,
                 'can_fork': self.user_id and exploration.is_demo,
                 'id': exploration.id,
-                'image_id': exploration.image_id,
                 'is_owner': (user_services.is_current_user_admin(self.request) or
                              exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,

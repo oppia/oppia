@@ -20,9 +20,7 @@ __author__ = 'Sean Lip'
 
 import logging
 
-from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
-
+import core.storage.base_model.models as base_models
 from core import django_utils
 
 from django.db import models

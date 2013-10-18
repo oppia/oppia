@@ -98,8 +98,6 @@ class ExplorationModel(base_models.BaseModel):
     # Whether this exploration is publicly viewable.
     is_public = models.BooleanField(default=False)
 
-    # The id for the image to show as a preview of the exploration.
-    image_id = models.CharField(blank=True, max_length=100, null=True)
     # List of ids of users who can edit this exploration. If the exploration is
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.

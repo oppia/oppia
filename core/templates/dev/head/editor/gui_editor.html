@@ -119,7 +119,7 @@
                     <span class="oppia-loading" id="uploadImageLoading"></span>
                   </div>
                   <div ng-switch-default>
-                    <img class="oppia-small-image" ng-src="/imagehandler/<[item.value]>"></img>
+                    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationId]>/<[item.value]>"></img>
                     <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
                   </div>
                 </ng-switch>

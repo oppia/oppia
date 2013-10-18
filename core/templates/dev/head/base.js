@@ -22,9 +22,22 @@ var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 
 // Global utility methods.
-function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData) {
+function Base($scope, $http, $rootScope, warningsData, activeInputData) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
+
+  // If the exploration is iframed, send data to its parent about its height so
+  // that the parent can be resized as necessary.
+  window.onBodyLoad = function() {
+    if (window.parent != window) {
+      console.log('Exploration body loaded; posting message to parent.');
+      window.parent.postMessage(
+        {'explorationHeight': document.body.scrollHeight}, '*'
+      );
+
+      $scope.$broadcast('pageLoaded', null);
+    }
+  };
 
   /**
    * Returns whether the current URL corresponds to the demo playground server.
@@ -45,11 +58,6 @@ function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData
   $scope.updateMath = function() {
     console.log('Updating math expressions.');
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-  };
-
-  // Opens the feedback page in a new window.
-  $scope.openFeedbackPage = function() {
-    window.open('/feedback/');
   };
 
   /**
@@ -197,40 +205,6 @@ function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData
     return false;
   };
 
-  $scope.saveImage = function(successCallback) {
-    $('#newImageForm')[0].reset();
-    image = $scope.image;
-
-    if (!image || !image.type.match('image.*')) {
-      warningsData.addWarning('This file is not recognized as an image.');
-      return;
-    }
-
-    warningsData.clear();
-
-    $http({
-      method: 'POST',
-      url: '/imagehandler',
-      headers: {'Content-Type': false},
-      data: {image: image},
-      transformRequest: function(data) {
-        var formData = new FormData();
-        formData.append('image', data.image);
-        return formData;
-      }
-    }).
-    success(function(data) {
-      if (data.image_id) {
-        successCallback(data);
-      }
-    })
-    .error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.'
-      );
-    });
-  };
-
   $scope.setActiveImage = function(image) {
     $scope.image = image;
   };
@@ -247,4 +221,4 @@ function Base($scope, $http, $timeout, $rootScope, warningsData, activeInputData
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$http', '$timeout', '$rootScope', 'warningsData', 'activeInputData'];
+Base.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'activeInputData'];

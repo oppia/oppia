@@ -16,14 +16,18 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import base64
+import datetime
+import hashlib
+import imghdr
 import logging
 import mimetypes
 
 from core.controllers import base
+from core.domain import fs_domain
 from core.domain import value_generators_domain
-from core.platform import models
-(image_models,) = models.Registry.import_models([models.NAMES.image])
 import feconf
+import utils
 
 
 class TemplateHandler(base.BaseHandler):
@@ -56,20 +60,23 @@ class ValueGeneratorHandler(base.BaseHandler):
 class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
-    def get(self, image_id):
+    def get(self, exploration_id, image_id):
         """Returns an image.
 
         Args:
-            image_id: string representing the image id.
+            exploration_id: the id of the exploration.
+            image_id: string representing the image filepath.
         """
         try:
-            image = image_models.Image.get(image_id)
-
+            format = image_id[(image_id.rfind('.') + 1) :]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = (
-                str('image/%s' % image.format))
-            self.response.write(image.raw)
+            self.response.headers['Content-Type'] = str('image/%s' % format)
+
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.DatastoreBackedFileSystem())
+            raw = fs.get(exploration_id, 'assets/%s' % image_id)
+            self.response.write(raw)
         except:
             raise self.PageNotFoundException
 
@@ -79,19 +86,47 @@ class ImageUploadHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def post(self):
+    def _get_random_filename(self, banned_filenames):
+        """Generates a random filename not in the given list."""
+        count = 0
+
+        while True:
+            count += 1
+            random_prefix = base64.urlsafe_b64encode(hashlib.sha1(
+                str(utils.get_random_int(127 * 127))).digest())[:12]
+            date_str = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+            candidate_filename = '%s:%s' % (random_prefix, date_str)
+            if candidate_filename not in banned_filenames:
+                return candidate_filename
+            if count >= 10:
+                raise Exception('Unable to generate new filename.')
+
+    @base.require_editor
+    def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
         # This sets the payload so that an error response is rendered as JSON
         # instead of HTML.
-        # TODO(sll): This is somewhat hacky; make it nicer.
+        # TODO(sll): This is hacky and needs to be cleaned up.
         self.payload = 'image_upload'
 
         raw = self.request.get('image')
-        if raw:
-            image_id = image_models.Image.create(raw)
-            self.render_json({'image_id': image_id})
-        else:
+        if not raw:
             raise self.InvalidInputException('No image supplied')
+
+        format = imghdr.what(None, h=raw)
+        if format not in feconf.ACCEPTED_IMAGE_FORMATS:
+            allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
+            raise Exception('Image file not recognized: it should be in '
+                            'one of the following formats: %s.' %
+                            allowed_formats)
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
+        dir_list = fs.listdir(exploration_id, 'assets')
+        new_filename = self._get_random_filename(dir_list)
+
+        image_id = '%s.%s' % (new_filename, format)
+        fs.put(exploration_id, 'assets/%s' % image_id, raw)
+        self.render_json({'image_id': image_id})
 
 
 class StaticFileHandler(base.BaseHandler):

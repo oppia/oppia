@@ -26,6 +26,6 @@ class JavaScriptTests(test_utils.GenericTestBase):
 
     def test_with_karma(self):
         return_code = subprocess.call([
-             '../tools/node-0.10.1/bin/karma', 'start',
+             '../oppia_tools/node-0.10.1/bin/karma', 'start',
              'core/tests/karma.conf.js'])
         self.assertEqual(return_code, 0)

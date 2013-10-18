@@ -31,6 +31,8 @@ class BaseModel(ndb.Model):
     created_on = ndb.DateTimeProperty(auto_now_add=True)
     # When this entity was last updated.
     last_updated = ndb.DateTimeProperty(auto_now=True)
+    # Whether the current version of the file is deleted.
+    deleted = ndb.BooleanProperty(indexed=True, default=False)
 
     @property
     def id(self):
@@ -58,15 +60,18 @@ class BaseModel(ndb.Model):
           parent: key of the parent, if applicable.
 
         Returns:
-          None, if strict == False and no entity with the given id exists in
-          the datastore. Otherwise, the entity instance that corresponds to
-          the given id.
+          None, if strict == False and no undeleted entity with the given id
+          exists in the datastore. Otherwise, the entity instance that
+          corresponds to the given id.
 
         Raises:
         - base_models.BaseModel.EntityNotFoundError: if strict == True and
-            no entity with the given id exists in the datastore.
+            no undeleted entity with the given id exists in the datastore.
         """
         entity = cls.get_by_id(entity_id, parent=parent)
+        if entity and entity.deleted:
+            entity = None
+
         if strict and not entity:
             raise cls.EntityNotFoundError(
                 'Entity for class %s with id %s not found' %
@@ -110,6 +115,7 @@ class BaseModel(ndb.Model):
         MAX_RETRIES = 10
         RAND_RANGE = 127 * 127
         ID_LENGTH = 12
+        # TODO(sll): Pull this logic out into utils.
         for i in range(MAX_RETRIES):
             new_id = base64.urlsafe_b64encode(hashlib.sha1(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE))

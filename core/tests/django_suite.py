@@ -85,6 +85,8 @@ _PARSER.add_argument(
     help='whether to omit tests that are flagged as slow',
     action='store_true')
 
+OPPIA_TOOLS_DIR = os.path.join(os.getcwd(), '..', 'oppia_tools')
+
 
 def create_test_suites(parsed_args):
     """Creates test suites. If test_dir is None, runs all tests."""
@@ -128,7 +130,7 @@ def main():
 
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
-        os.path.join(os.getcwd(), '../tools/webtest-1.4.2')))
+        os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2')))
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 

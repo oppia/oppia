@@ -27,11 +27,13 @@ window.addEventListener('message', function(evt) {
       // Change the height of the included iframe.
       var iframe = document.getElementById('demoExploration');
       iframe.height = parseInt(evt.data.explorationHeight, 10) + 'px';
-      var targetFrame = $('#demoExploration')[0];
-      targetFrame.contentWindow.postMessage('heightAdjustedExternally', '*');
+
+      // NB: We cannot send a message back to the included iframe because
+      // of cross-domain security issues.
+
       setTimeout(function () {
         $('#buttons').show();
-      }, 2000);
+      }, 1000);
     }
   }
 }, false);

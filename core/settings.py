@@ -122,7 +122,7 @@ INSTALLED_APPS = (
     'django_nose',
     'core.storage.base_model',
     'core.storage.config',
-    'core.storage.image',
+    'core.storage.file',
     'core.storage.exploration',
     'core.storage.statistics',
     # Uncomment the next line to enable the admin:

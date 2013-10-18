@@ -35,9 +35,6 @@ class EditorTest(test_utils.GenericTestBase):
 class StatsIntegrationTest(test_utils.GenericTestBase):
     """Test statistics recording using the default exploration."""
 
-    def get_json_from_response(response):
-        """Convert a server response to a JSON object."""
-
     def test_state_stats_for_default_exploration(self):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
@@ -81,3 +78,5 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(editor_exploration_json['num_completions'], 0)
 
         # TODO(sll): Add more checks here.
+
+        self.logout()

@@ -20,7 +20,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 ME=$(whoami)
 
-echo Checking if node.js is installed in tools
+echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
@@ -48,7 +48,7 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   rm node-download.tgz
 fi
 
-echo Checking whether Karma is installed in tools
+echo Checking whether Karma is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   echo Installing Karma
   $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
@@ -114,7 +114,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 fi
 
 # Static resources.
-echo Checking whether ui-bootstrap is installed in third_party
+echo Checking whether ui-bootstrap is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
   echo Installing UI Bootstrap
   mkdir -p $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0
@@ -122,7 +122,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
   wget https://raw.github.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.6.0.min.js -O $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.min.js
 fi
 
-echo Checking whether select2 is installed in third_party
+echo Checking whether select2 is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
   echo Installing select2
   mkdir -p $THIRD_PARTY_DIR/static/
@@ -131,7 +131,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
   rm select2-download.zip
 fi
 
-echo Checking whether jwysiwyg is installed in third_party
+echo Checking whether jwysiwyg is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/jwysiwyg-496497" ]; then
   echo Installing jwysiwyg
   mkdir -p $THIRD_PARTY_DIR/static/
@@ -141,7 +141,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jwysiwyg-496497" ]; then
   mv $THIRD_PARTY_DIR/static/jwysiwyg-496497b0772067a0064b627c02893d989ccc7cc9 $THIRD_PARTY_DIR/static/jwysiwyg-496497
 fi
 
-echo Checking whether jquery is installed in third_party
+echo Checking whether jquery is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
   echo Installing JQuery
   mkdir -p $THIRD_PARTY_DIR/static/jquery-2.0.3/
@@ -150,14 +150,14 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
   wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.map -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.map
 fi
 
-echo Checking whether jqueryui is installed in third_party
+echo Checking whether jqueryui is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
   echo Installing JQueryUI
   mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
   wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.10.3/jquery-ui.min.js
 fi
 
-echo Checking whether angularjs is installed in third_party
+echo Checking whether angularjs is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2" ]; then
   echo Installing AngularJS and angular-sanitize
   mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/
@@ -182,7 +182,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2" ]; then
   wget http://code.angularjs.org/1.2.0-rc.2/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-scenario.js
 fi
 
-echo Checking whether d3.js is installed in third_party
+echo Checking whether d3.js is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   echo Installing d3.js
   mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/

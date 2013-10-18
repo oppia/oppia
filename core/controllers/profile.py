@@ -54,7 +54,6 @@ class ProfileHandler(base.BaseHandler):
         self.values.update({
             'explorations': [{
                 'id': exp.id,
-                'image_id': exp.image_id,
                 'name': exp.title,
             } for exp in exps],
             'improvable': stats_services.get_top_improvable_states(
