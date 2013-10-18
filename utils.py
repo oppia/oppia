@@ -20,6 +20,7 @@ import os
 import random
 import unicodedata
 import yaml
+import zipfile
 
 import feconf
 
@@ -54,10 +55,50 @@ def get_file_contents(filepath, raw_bytes=False):
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
-def get_sample_exploration_yaml(filename):
-    """Gets the content of [filename].yaml in the sample explorations folder."""
-    return get_file_contents(
-        os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, '%s.yaml' % filename))
+def get_demo_exploration_components(demo_filename):
+    """Gets the content of `demo_filename` in the sample explorations folder.
+
+    Args:
+      demo_filename: the filename for the content of an exploration in
+        SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or 'tar.zip'.
+
+    Returns:
+      a 2-tuple, the first element of which is a yaml string, and the second
+      element of which is a list of (filepath, content) 2-tuples. The filepath
+      includes the assets/ prefix.
+
+    Raises:
+      Exception: if the following condition doesn't hold: "There is exactly one
+        file not in assets/, and this file has a .yaml suffix".
+    """
+    demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_filename)
+
+    if demo_filename.endswith('yaml'):
+        file_contents = get_file_contents(demo_filepath)
+        return file_contents, []
+    elif demo_filename.endswith('zip'):
+        zf = zipfile.ZipFile(demo_filepath, 'r')
+        yaml_file = None
+        assets_list = []
+        for filepath in zf.namelist():
+            if filepath.startswith('assets/'):
+                assets_list.append((filepath, zf.read(filepath)))
+            else:
+                if yaml_file is not None:
+                    raise Exception('More than one non-asset file specified for %s'
+                                    % demo_filename)
+                elif not filepath.endswith('.yaml'):
+                    raise Exception('The file not in assets/ should have a .yaml '
+                                    'suffix')
+                else:
+                    yaml_file = zf.read(filepath)
+
+        if yaml_file is None:
+            raise Exception('No yaml file specifed for %s' % demo_filename)
+
+        return yaml_file, assets_list
+    else:
+        raise Exception('Unrecognized file type: %s' % filepath)
 
 
 def get_comma_sep_string_from_list(items):
