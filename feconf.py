@@ -54,18 +54,18 @@ IDEA_CONTRIBUTORS = [
 # Each item is represented as a tuple: (filename, title, category).
 # Note that the filename omits the .yaml suffix.
 DEMO_EXPLORATIONS = [
-    ('welcome', 'Welcome to Oppia!', 'Welcome'),
-    ('pitch', 'Pitch Perfect', 'Music'),
-    ('counting', 'Three Balls', 'Mathematics'),
-    ('boot_verbs', 'Boot Verbs', 'Languages'),
-    ('hola', '¡Hola!', 'Languages'),
-    ('landmarks', 'Landmarks', 'Geography'),
-    ('adventure', 'Parametrized Adventure', 'Interactive Fiction'),
-    ('root_linear_coefficient_theorem', 'Root Linear Coefficient Theorem',
+    ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
+    ('pitch.yaml', 'Pitch Perfect', 'Music'),
+    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
+    ('hola.yaml', '¡Hola!', 'Languages'),
+    ('landmarks.yaml', 'Landmarks', 'Geography'),
+    ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
+    ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('tar', 'Missions - Tar', 'Open Source Tools'),
-    ('cities', 'World Cities', 'Geography'),
+    ('binary_search.yaml', 'The Lazy Magician', 'Mathematics'),
+    ('tar.yaml', 'Missions - Tar', 'Open Source Tools'),
+    ('cities.yaml', 'World Cities', 'Geography'),
 ]
 
 # Whether to unconditionally log info messages.

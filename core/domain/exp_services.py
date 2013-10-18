@@ -817,16 +817,25 @@ def create_from_yaml(
     return exploration_id
 
 
-def fork_exploration(exploration_id, user_id):
+def fork_exploration(old_exploration_id, user_id):
     """Forks an exploration and returns the new exploration's id."""
-    exploration = get_exploration_by_id(exploration_id)
-    if not exploration.is_forkable_by(user_id):
+    old_exploration = get_exploration_by_id(old_exploration_id)
+    if not old_exploration.is_forkable_by(user_id):
         raise Exception('You cannot copy this exploration.')
 
-    return create_from_yaml(
-        export_to_yaml(exploration_id), user_id,
-        'Copy of %s' % exploration.title, exploration.category
+    new_exploration_id = create_from_yaml(
+        export_to_yaml(old_exploration_id), user_id,
+        'Copy of %s' % old_exploration.title, old_exploration.category
     )
+
+    # Duplicate the assets of the old exploration.
+    fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
+    dir_list = fs.listdir(old_exploration_id, 'assets')
+    for filepath in dir_list:
+        file_content = fs.get(old_exploration_id, filepath)
+        fs.put(new_exploration_id, filepath, file_content)
+
+    return new_exploration_id
 
 
 def load_demo(exploration_id):
@@ -843,10 +852,16 @@ def load_demo(exploration_id):
     else:
         raise Exception('Invalid demo exploration: %s' % exploration)
 
-    yaml_content = utils.get_sample_exploration_yaml(exp_filename)
+    yaml_content, assets_list = utils.get_demo_exploration_components(
+        exp_filename)
     exploration_id = create_from_yaml(
         yaml_content, ADMIN_COMMITTER_ID, title, category,
         exploration_id=exploration_id)
+
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.DatastoreBackedFileSystem())
+        fs.put(exploration_id, asset_filename, asset_content)
 
     exploration = get_exploration_by_id(exploration_id)
     exploration.is_public = True
