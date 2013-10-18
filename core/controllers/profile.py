@@ -20,10 +20,8 @@ from core.controllers import base
 from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
+from core.domain import users_services
 user_services = models.Registry.import_user_services()
-(user_pref_services,) = models.Registry.import_models([
-    models.NAMES.users
-])
 
 
 
@@ -84,5 +82,5 @@ class CreateUserNamePage(base.BaseHandler):
     def post(self):
       """Handles POST requests.""" 
       username = self.payload.get('username');
-      user_settings = user_pref_services.set_username(self.user_id, username)
+      user_settings = users_services.set_username(self.user_id, username)
 

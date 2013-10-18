@@ -45,19 +45,3 @@ class UserSettingsModel(base_models.BaseModel):
             user_prefs = cls(id=instance_id)
         return user_prefs
 
-
-def set_username(user_id, username):
-    """Sets a username for the given user."""
-    user_prefs = UserSettingsModel.get_or_create(user_id)
-    # check some uniqueness constraint
-    user_prefs.username = username
-    user_prefs.put()
-
-def get_username(user_id):
-    """Returns the username for a given user."""
-    user_prefs = UserSettingsModel.get_or_create(user_id)
-    if user_prefs.username:
-       return username
-    else:
-       return ""
-

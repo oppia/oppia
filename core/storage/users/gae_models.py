@@ -49,19 +49,3 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns a list of explorations viewable by the given user_id."""
         return len(cls.get_all().filter(cls.username == username).fetch(QUERY_LIMIT)) == 0
 
-
-def set_username(user_id, username):
-    """Sets the username for a given user."""
-    user_prefs = UserSettingsModel.get_or_create(user_id)
-    if not UserSettingsModel.is_unique(username):
-        logging.info("THIS IS NOT UNIQUE")
-    user_prefs.username = username
-    user_prefs.put()
-
-def get_username(user_id):
-    """Gets the username for a given user."""
-    user_prefs = UserSettingsModel.get_or_create(user_id)
-    if user_prefs.username:
-       return username
-    else:
-       return ""
