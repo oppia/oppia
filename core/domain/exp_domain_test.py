@@ -34,7 +34,6 @@ class FakeExploration(exp_domain.Exploration):
         self.state_ids = []
         self.parameters = []
         self.is_public = False
-        self.image_id = 'image_id'
         self.editor_ids = [owner_id] if owner_id else []
 
     def put(self):

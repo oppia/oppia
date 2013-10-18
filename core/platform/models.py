@@ -23,7 +23,7 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'config', 'exploration', 'file', 'image', 'statistics')
+    'base_model', 'config', 'exploration', 'file', 'statistics')
 
 
 class _Platform(object):
@@ -51,9 +51,6 @@ class _Django(_Platform):
             elif name == NAMES.file:
                 from core.storage.file import django_models as file_model
                 returned_models.append(file_model)
-            elif name == NAMES.image:
-                from core.storage.image import django_models as image_model
-                returned_models.append(image_model)
             elif name == NAMES.statistics:
                 from core.storage.statistics import django_models as statistics_model
                 returned_models.append(statistics_model)
@@ -98,9 +95,6 @@ class _Gae(_Platform):
             elif name == NAMES.file:
                 from core.storage.file import gae_models as file_model
                 returned_models.append(file_model)
-            elif name == NAMES.image:
-                from core.storage.image import gae_models as image_model
-                returned_models.append(image_model)
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_model
                 returned_models.append(statistics_model)

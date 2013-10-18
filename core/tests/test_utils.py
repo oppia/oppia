@@ -63,9 +63,11 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
-    def parse_json_response(self, json_response):
+    def parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
-        self.assertEqual(json_response.status_int, 200)
+        if not expect_errors:
+            self.assertEqual(json_response.status_int, 200)
+
         self.assertEqual(
             json_response.content_type, 'application/javascript')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
@@ -82,6 +84,8 @@ class AppEngineTestBase(TestBase):
         os.environ['USER_IS_ADMIN'] = '1' if is_admin else '0'
 
     def logout(self):
+        # TODO(sll): Move this to the tearDown() method of the generic test
+        # base?
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         del os.environ['USER_IS_ADMIN']

@@ -170,7 +170,12 @@ class DatastoreBackedFileSystem(object):
         return bool(metadata)
 
     def listdir(self, exploration_id, dir_name):
-        """Lists all files in a directory. `dir_name` should not start with '/'.
+        """Lists all files in a directory.
+
+        Args:
+            exploration_id: The id of the exploration.
+            dir_name: The directory whose files should be listed. This should
+                not start with '/' or end with '/'.
 
         Returns:
             List of str. This is a lexicographically-sorted list of filenames,

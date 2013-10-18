@@ -28,7 +28,6 @@ import cgi
 import copy
 import json
 import logging
-import os
 import StringIO
 import zipfile
 
@@ -44,14 +43,14 @@ import feconf
 import jinja_utils
 memcache_services = models.Registry.import_memcache_services()
 transaction_services = models.Registry.import_transaction_services()
-(exp_models, image_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.image])
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
 
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 ADMIN_COMMITTER_ID = 'admin'
+ALLOWED_CONTENT_TYPES = ['text', 'image', 'video']
 
 # The current version of the exploration schema. If any backward-incompatible
 # changes are made to the exploration schema in the YAML definitions, this
@@ -204,16 +203,18 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     return state_dict
 
 
-def export_content_to_html(content_array, block_number, params=None,
-                           escape_text_strings=True):
+def export_content_to_html(exploration_id, content_array, block_number,
+                           params=None, escape_text_strings=True):
     """Takes a Content array and transforms it into HTML.
 
     Args:
+        exploration_id: the id of the exploration
         content_array: an array, each of whose members is of type Content. This
             object has two keys: type and value. The 'type' is one of the
             following:
                 - 'text'; then the value is a text string
-                - 'image'; then the value is an image ID
+                - 'image'; then the value is the path to an image in the
+                    exploration's filesystem, omitting the /assets prefix
                 - 'video'; then the value is a video ID
                 - 'widget'; then the value is a JSON-encoded dict with keys
                     'id' and 'params', from which the raw widget HTML can be
@@ -237,7 +238,7 @@ def export_content_to_html(content_array, block_number, params=None,
 
     html, widget_array = '', []
     for content in content_array:
-        if content.type in ['text', 'image', 'video']:
+        if content.type in ALLOWED_CONTENT_TYPES:
             value = (jinja_utils.parse_string(content.value, params)
                      if content.type == 'text' else content.value)
 
@@ -247,6 +248,7 @@ def export_content_to_html(content_array, block_number, params=None,
             html += JINJA_ENV.get_template('reader/content.html').render({
                 'type': content.type,
                 'value': value,
+                'exploration_id': exploration_id,
             })
         elif content.type == 'widget':
             # Ignore empty widget specifications.
@@ -316,8 +318,7 @@ def save_exploration(committer_id, exploration):
         property something I would be happy with being overwritten?". Thus, the
         following properties are excluded for explorations:
 
-            ['category', 'default_skin', 'editor_ids', 'image_id', 'is_public',
-             'title']
+            ['category', 'default_skin', 'editor_ids', 'is_public', 'title']
 
         The exploration id will be used to name the object in the history log,
         so it does not need to be saved within the returned dict.
@@ -352,7 +353,6 @@ def save_exploration(committer_id, exploration):
             'param_specs': exploration.param_specs_dict,
             'param_changes': exploration.param_change_dicts,
             'is_public': exploration.is_public,
-            'image_id': exploration.image_id,
             'editor_ids': exploration.editor_ids,
             'default_skin': exploration.default_skin,
             'version': exploration_model.version,
@@ -402,7 +402,7 @@ def save_state(committer_id, exploration_id, state):
 
 def create_new(
     user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME, image_id=None):
+        init_state_name=feconf.DEFAULT_STATE_NAME):
     """Creates and saves a new exploration; returns its id."""
     # Generate a new exploration id, if one wasn't passed in.
     exploration_id = (exploration_id or
@@ -414,7 +414,7 @@ def create_new(
 
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
-        image_id=image_id, state_ids=[state_id], editor_ids=[user_id])
+        state_ids=[state_id], editor_ids=[user_id])
     exploration_model.put(user_id, {})
 
     return exploration_model.id
@@ -738,8 +738,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 # Creation and deletion methods.
 def create_from_yaml(
-    yaml_content, user_id, title, category, exploration_id=None,
-        image_id=None):
+    yaml_content, user_id, title, category, exploration_id=None):
     """Creates an exploration from a YAML text string."""
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
@@ -752,7 +751,7 @@ def create_from_yaml(
 
     exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name, image_id=image_id)
+        init_state_name=init_state_name)
 
     try:
         exploration_param_specs = {
@@ -837,23 +836,13 @@ def load_demo(exploration_id):
 
     if len(exploration) == 3:
         (exp_filename, title, category) = exploration
-        image_filename = None
-    elif len(exploration) == 4:
-        (exp_filename, title, category, image_filename) = exploration
     else:
         raise Exception('Invalid demo exploration: %s' % exploration)
-
-    image_id = None
-    if image_filename:
-        image_filepath = os.path.join(
-            feconf.SAMPLE_IMAGES_DIR, image_filename)
-        image_id = image_models.Image.create(utils.get_file_contents(
-            image_filepath, raw_bytes=True))
 
     yaml_content = utils.get_sample_exploration_yaml(exp_filename)
     exploration_id = create_from_yaml(
         yaml_content, ADMIN_COMMITTER_ID, title, category,
-        exploration_id=exploration_id, image_id=image_id)
+        exploration_id=exploration_id)
 
     exploration = get_exploration_by_id(exploration_id)
     exploration.is_public = True
@@ -906,7 +895,6 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         """Checks that a state content list specification is valid."""
         CONTENT_ITEM_SCHEMA = [
             ('type', basestring), ('value', basestring)]
-        ALLOWED_CONTENT_TYPES = ['text', 'image', 'video']
 
         for content_item in state_content_list:
             utils.verify_dict_keys_and_types(content_item, CONTENT_ITEM_SCHEMA)

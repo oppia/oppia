@@ -88,8 +88,6 @@ class ExplorationModel(base_models.BaseModel):
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
     # Whether this exploration is publicly viewable.
     is_public = ndb.BooleanProperty(default=False)
-    # The id for the image to show as a preview of the exploration.
-    image_id = ndb.StringProperty(indexed=False)
     # List of ids of users who can edit this exploration. If the exploration is
     # a demo exploration, the list is empty. Otherwise, the first element is
     # the original creator of the exploration.

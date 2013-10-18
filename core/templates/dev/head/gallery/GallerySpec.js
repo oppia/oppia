@@ -10,7 +10,6 @@ describe('Gallery controller', function() {
         category: 'Geography',
         editors: [],
         id: '5',
-        image_id: null,
         is_public: true,
         title: 'Landmarks'
       }
@@ -23,7 +22,6 @@ describe('Gallery controller', function() {
         category: 'Personal',
         editors: [],
         id: '6',
-        image_id: null,
         is_public: true,
         title: 'My Exploration'
       }

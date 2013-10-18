@@ -89,10 +89,10 @@ urls = [
         r'/templates/<template_type>', resources.TemplateHandler,
         'template_handler'),
     get_redirect_route(
-        r'/imagehandler', resources.ImageUploadHandler,
+        r'/imagehandler/<exploration_id>', resources.ImageUploadHandler,
         'image_upload_handler'),
     get_redirect_route(
-        r'/imagehandler/<image_id>', resources.ImageHandler,
+        r'/imagehandler/<exploration_id>/<image_id>', resources.ImageHandler,
         'image_handler'),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',

@@ -17,12 +17,13 @@ __author__ = 'Sean Lip'
 import json
 
 from core.domain import exp_services
-import feconf
 import test_utils
 
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
+
+    TAGS = [test_utils.TestTags.SLOW_TEST]
 
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()

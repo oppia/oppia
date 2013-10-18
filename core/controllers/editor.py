@@ -73,7 +73,6 @@ class ExplorationHandler(base.BaseHandler):
             'exploration_id': exploration_id,
             'init_state_id': exploration.init_state_id,
             'is_public': exploration.is_public,
-            'image_id': exploration.image_id,
             'category': exploration.category,
             'title': exploration.title,
             'editors': exploration.editor_ids,
@@ -137,7 +136,6 @@ class ExplorationHandler(base.BaseHandler):
         is_public = self.payload.get('is_public')
         category = self.payload.get('category')
         title = self.payload.get('title')
-        image_id = self.payload.get('image_id')
         editors = self.payload.get('editors')
         param_specs = self.payload.get('param_specs')
         param_changes = self.payload.get('param_changes')
@@ -148,8 +146,6 @@ class ExplorationHandler(base.BaseHandler):
             exploration.category = category
         if title:
             exploration.title = title
-        if 'image_id' in self.payload:
-            exploration.image_id = None if image_id == 'null' else image_id
         if editors:
             if (exploration.editor_ids and
                     self.user_id == exploration.editor_ids[0]):

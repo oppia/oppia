@@ -205,40 +205,6 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData) {
     return false;
   };
 
-  $scope.saveImage = function(successCallback) {
-    $('#newImageForm')[0].reset();
-    image = $scope.image;
-
-    if (!image || !image.type.match('image.*')) {
-      warningsData.addWarning('This file is not recognized as an image.');
-      return;
-    }
-
-    warningsData.clear();
-
-    $http({
-      method: 'POST',
-      url: '/imagehandler',
-      headers: {'Content-Type': false},
-      data: {image: image},
-      transformRequest: function(data) {
-        var formData = new FormData();
-        formData.append('image', data.image);
-        return formData;
-      }
-    }).
-    success(function(data) {
-      if (data.image_id) {
-        successCallback(data);
-      }
-    })
-    .error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.'
-      );
-    });
-  };
-
   $scope.setActiveImage = function(image) {
     $scope.image = image;
   };

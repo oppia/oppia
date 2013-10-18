@@ -297,7 +297,6 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in exploration_model.param_changes]
         self.is_public = exploration_model.is_public
-        self.image_id = exploration_model.image_id
         self.editor_ids = exploration_model.editor_ids
         self.default_skin = exploration_model.default_skin
         self.version = exploration_model.version

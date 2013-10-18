@@ -24,7 +24,6 @@ import test_utils
 
 if feconf.PLATFORM == 'gae':
     import core.storage.exploration.gae_models as exp_models
-    import core.storage.image.gae_models as image_models
     from google.appengine.ext import db
 
 
@@ -93,14 +92,6 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
             exploration.is_public = 'true'
         exploration.is_public = True
 
-        # The 'image_id' property must be a string.
-        image = image_models.Image(id='The image')
-        with self.assertRaises(db.BadValueError):
-            exploration.image_id = image
-        with self.assertRaises(db.BadValueError):
-            exploration.image_id = image.key
-        exploration.image_id = 'A string'
-
         exploration.editor_ids = ['A user id']
 
         # Put and retrieve the exploration.
@@ -120,7 +111,6 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
 
         self.assertEqual(retrieved_exploration.is_public, True)
-        self.assertEqual(retrieved_exploration.image_id, 'A string')
         self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])
 
 
