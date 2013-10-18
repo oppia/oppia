@@ -42,7 +42,7 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
                         msg='There must be at least one demo exploration.')
 
         derived_exploration_filenames = [
-            ('%s.yaml' % item[0]) for item in feconf.DEMO_EXPLORATIONS]
+            item[0] for item in feconf.DEMO_EXPLORATIONS]
         self.assertItemsEqual(exploration_files, derived_exploration_filenames,
                               msg='Files in data/explorations do not match '
                                   'the demo explorations in feconf.py.')
@@ -53,13 +53,13 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
                 os.path.isfile(filepath), msg='%s is not a file.' % filepath)
 
             # Convert each exploration into a dict, and verify it.
-            with open(filepath) as f:
-                exploration_yaml = f.read().decode('utf-8')
-                exploration_dict = utils.dict_from_yaml(exploration_yaml)
-                try:
-                    exp_services.verify_exploration_dict(exploration_dict)
-                except Exception as e:
-                    raise Exception('%s: %s' % (filepath, e))
+            exploration_yaml, unused_assets = (
+                utils.get_demo_exploration_components(filename))
+            exploration_dict = utils.dict_from_yaml(exploration_yaml)
+            try:
+                exp_services.verify_exploration_dict(exploration_dict)
+            except Exception as e:
+                raise Exception('%s: %s' % (filepath, e))
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):

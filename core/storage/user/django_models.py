@@ -37,6 +37,9 @@ class UserSettingsModel(base_models.BaseModel):
     # Identifiable username to display in the UI
     username = models.StringProperty()
 
+    # Normalized username
+    normalized_username = models.StringProperty()
+
     @classmethod
     def get_or_create(cls, user_id):
         user_prefs = cls.get(user_id, strict=False)
@@ -45,6 +48,6 @@ class UserSettingsModel(base_models.BaseModel):
         return user_prefs
 
     @classmethod
-    def is_username_taken(cls, username):
+    def is_normalized_username_taken(cls, username):
         """Returns whether or a given username is taken."""
-        return len(cls.objects.filter(username=username)) > 0
+        return len(cls.objects.filter(normalized_username=username)) > 0

@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
 import re
 
 from core.domain import obj_services
@@ -46,7 +47,7 @@ class ParamChange(object):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
-        if not re.compile('^[a-zA-Z0-9]+$').match(name):
+        if not re.match(feconf.ALPHANUMERIC_REGEX, name):
             raise ValueError(
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
