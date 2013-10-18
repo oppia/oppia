@@ -329,7 +329,7 @@ class Exploration(object):
                     % (c, self.title))
 
         for param_name in self.param_specs:
-            if not re.compile('^[a-zA-Z0-9]+$').match(param_name):
+            if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
                 raise ValueError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
                     'accepted.')
