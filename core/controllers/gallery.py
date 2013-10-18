@@ -22,7 +22,7 @@ import feconf
 from core.controllers import base
 from core.domain import exp_services
 from core.platform import models
-user_services = models.Registry.import_user_services()
+current_user_services = models.Registry.import_current_user_services()
 
 
 class GalleryPage(base.BaseHandler):
@@ -43,7 +43,7 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if user_services.is_current_user_admin(self.request):
+        if current_user_services.is_current_user_admin(self.request):
             explorations = exp_services.get_all_explorations()
             editable_exploration_ids = [e.id for e in explorations]
         elif self.user_id:
@@ -63,7 +63,7 @@ class GalleryHandler(base.BaseHandler):
                 'can_edit': exploration.id in editable_exploration_ids,
                 'can_fork': self.user_id and exploration.is_demo,
                 'id': exploration.id,
-                'is_owner': (user_services.is_current_user_admin(self.request) or
+                'is_owner': (current_user_services.is_current_user_admin(self.request) or
                              exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,
             })
