@@ -65,7 +65,7 @@ sys.path.append(root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 139
+EXPECTED_TEST_COUNT = 140
 
 
 _PARSER = argparse.ArgumentParser()
@@ -81,6 +81,8 @@ _PARSER.add_argument(
     '--omit_slow_tests',
     help='whether to omit tests that are flagged as slow',
     action='store_true')
+
+OPPIA_TOOLS_DIR = os.path.join(os.getcwd(), '..', 'oppia_tools')
 
 
 def create_test_suites(parsed_args):
@@ -125,14 +127,13 @@ def main():
 
     # TODO(sll): Check whether the following dirs exist.
     sys.path.insert(0, os.path.join(
-        os.getcwd(), '..', 'tools', 'google_appengine_1.7.7',
-        'google_appengine'))
+        OPPIA_TOOLS_DIR, 'google_appengine_1.7.7', 'google_appengine'))
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
-        os.path.join(os.getcwd(), '../tools/webtest-1.4.2')))
+        os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2')))
     sys.path.append(os.path.abspath(os.path.join(
-        os.getcwd(),
-        '../tools/google_appengine_1.7.7/google_appengine/lib/webob_0_9')
+        OPPIA_TOOLS_DIR, 'google_appengine_1.7.7', 'google_appengine', 'lib',
+        'webob_0_9')
     ))
 
     import dev_appserver

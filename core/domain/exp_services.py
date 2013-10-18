@@ -32,6 +32,7 @@ import StringIO
 import zipfile
 
 from core.domain import exp_domain
+from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
@@ -299,8 +300,11 @@ def export_to_zip_file(exploration_id):
     o = StringIO.StringIO()
     with zipfile.ZipFile(o, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr('%s.yaml' % exploration.title, yaml_repr)
-        # TODO(sll): Also add asset files to a separate directory named
-        # assets/.
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
+        dir_list = fs.listdir(exploration_id, 'assets')
+        for filepath in dir_list:
+            zf.writestr(filepath, fs.get(exploration_id, filepath))
 
     return o.getvalue()
 
