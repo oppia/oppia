@@ -23,9 +23,10 @@ import logging
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-from google.appengine.ext import ndb
+from core import django_utils
 
-QUERY_LIMIT = 100
+from django.db import models
+
 
 class UserSettingsModel(base_models.BaseModel):
     """A settings and preferences for a particular user.
@@ -33,19 +34,17 @@ class UserSettingsModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [USER_ID].
     """
-    # Identifiable username for UI purposes
-    username = ndb.StringProperty()
+    # Identifiable username to display in the UI
+    username = models.StringProperty()
 
     @classmethod
     def get_or_create(cls, user_id):
-        instance_id = user_id
-        user_prefs = cls.get(instance_id, strict=False)
+        user_prefs = cls.get(user_id, strict=False)
         if not user_prefs:
-            user_prefs = cls(id=instance_id)
+            user_prefs = cls(id=user_id)
         return user_prefs
 
     @classmethod
-    def is_unique(cls, username):
-        """Returns a list of explorations viewable by the given user_id."""
-        return len(cls.get_all().filter(cls.username == username).fetch(QUERY_LIMIT)) == 0
-
+    def is_username_taken(cls, username):
+        """Returns whether or a given username is taken."""
+        return len(cls.objects.filter(username=username)) > 0

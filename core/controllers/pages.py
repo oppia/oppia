@@ -20,7 +20,7 @@ import feconf
 from core.controllers import base
 from core.domain import exp_services
 from core.platform import models
-user_services = models.Registry.import_user_services()
+current_user_services = models.Registry.import_current_user_services()
 import utils
 
 
@@ -34,7 +34,7 @@ class MainPage(base.BaseHandler):
             exp_services.load_demo('0')
 
         self.values.update({
-            'gallery_login_url': user_services.create_login_url('/gallery'),
+            'gallery_login_url': current_user_services.create_login_url('/gallery'),
         })
         self.render_template('pages/index.html')
 

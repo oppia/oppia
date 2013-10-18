@@ -33,9 +33,9 @@ from core.domain import exp_services
 from core.platform import models
 import feconf
 import jinja_utils
-user_services = models.Registry.import_user_services()
-(user_pref_services,) = models.Registry.import_models([
-    models.NAMES.users
+current_user_services = models.Registry.import_current_user_services()
+(user_services,) = models.Registry.import_models([
+    models.NAMES.user
 ])
 
 import webapp2
@@ -53,7 +53,7 @@ def require_user(handler):
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in."""
         if not self.user_id:
-            self.redirect(user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(self.request.uri))
             return
         return handler(self, **kwargs)
 
@@ -81,21 +81,22 @@ def require_editor(handler):
                 the right credentials.
         """
         if not self.user_id:
-            self.redirect(user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(self.request.uri))
             return
 
-        user_settings_model = user_pref_services.UserSettingsModel.get_or_create(self.user_id)
+        if feconf.REQUIRE_USERS_TO_SET_USERNAMES:
+            user_settings_model = user_services.UserSettingsModel.get_or_create(self.user_id)
 
-        if not user_settings_model.username:
-            self.redirect("../profile/create_user_name")
-            return
+            if not user_settings_model.username:
+                self.redirect("/profile/create_user_name")
+                return
 
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 
-        if (not user_services.is_current_user_admin(self.request) and
+        if (not current_user_services.is_current_user_admin(self.request) and
                 not exploration.is_editable_by(self.user_id)):
             raise self.UnauthorizedUserException(
                 '%s does not have the credentials to edit this exploration.',
@@ -117,9 +118,9 @@ def require_admin(handler):
     def test_admin(self, **kwargs):
         """Checks if the user is logged in and is an admin."""
         if not self.user_id:
-            self.redirect(user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(self.request.uri))
             return
-        if not user_services.is_current_user_admin(self.request):
+        if not current_user_services.is_current_user_admin(self.request):
             raise self.UnauthorizedUserException(
                 '%s is not an admin of this application', self.user_id)
         return handler(self, **kwargs)
@@ -159,16 +160,16 @@ class BaseHandler(webapp2.RequestHandler):
             'DEV_MODE': feconf.DEV_MODE,
         }
 
-        self.user = user_services.get_current_user(self.request)
+        self.user = current_user_services.get_current_user(self.request)
         self.user_id = self.user.email() if self.user else None
         if self.user_id:
             self.values['logout_url'] = (
-                user_services.create_logout_url(self.request.uri))
+                current_user_services.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
-            self.values['is_admin'] = user_services.is_current_user_admin(
+            self.values['is_admin'] = current_user_services.is_current_user_admin(
                 self.request)
         else:
-            self.values['login_url'] = user_services.create_login_url(
+            self.values['login_url'] = current_user_services.create_login_url(
                 self.request.uri)
 
         if self.request.get('payload'):
@@ -287,7 +288,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if isinstance(exception, self.NotLoggedInException):
-            self.redirect(user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

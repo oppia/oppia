@@ -21,7 +21,7 @@ import collections
 from core.controllers import base
 from core.domain import widget_domain
 from core.platform import models
-user_services = models.Registry.import_user_services()
+current_user_services = models.Registry.import_current_user_services()
 import feconf
 
 
@@ -36,7 +36,7 @@ class WidgetRepositoryPage(base.BaseHandler):
             self.values['interactive'] = True
         if 'parent_index' in self.request.GET.keys():
             self.values['parent_index'] = self.request.get('parent_index')
-        if user_services.is_current_user_admin(self.request):
+        if current_user_services.is_current_user_admin(self.request):
             self.values['admin'] = True
         self.render_template('editor/widget_repository.html')
 
