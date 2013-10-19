@@ -23,7 +23,7 @@ import test_utils
 
 
 class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
-    """Tests for the datastore-backed file system."""
+    """Tests for the datastore-backed exploration file system."""
 
     def test_get_and_put(self):
         fs = fs_domain.AbstractFileSystem(
@@ -99,3 +99,14 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.ExplorationFileSystem('eid2'))
         with self.assertRaisesRegexp(AttributeError, '\'NoneType\' object'):
             fs2.get('assets/abc.png')
+
+
+class DiskBackedFileSystemTests(test_utils.GenericTestBase):
+    """Tests for the disk-backed file system."""
+
+    def test_get(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.DiskBackedFileSystem('core/tests/data'))
+        self.assertTrue(fs.get('img.png'))
+        with self.assertRaisesRegexp(IOError, 'No such file or directory'):
+            fs.get('non_existent_file.png')

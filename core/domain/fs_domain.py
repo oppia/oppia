@@ -25,12 +25,13 @@ from core.platform import models
     models.NAMES.file
 ])
 transaction_services = models.Registry.import_transaction_services()
+import utils
 
 
 class FileMetadata(object):
     """A class representing the metadata of a file."""
     def __init__(self, metadata):
-        self._size = metadata.size
+        self._size = metadata.size if (metadata is not None) else None
 
     @property
     def size(self):
@@ -196,6 +197,35 @@ class ExplorationFileSystem(object):
             if filepath.startswith(prefix):
                 result.add('/'.join(filepath.split('/')[2:]))
         return sorted(list(result))
+
+
+class DiskBackedFileSystem(object):
+    """Implementation for a disk-backed file system.
+
+    This implementation ignores versioning and is used only for tests.
+    """
+
+    def __init__(self, root):
+        self._root = os.path.join(os.getcwd(), root)
+
+    def isfile(self, filepath):
+        """Checks if a file exists."""
+        return os.path.isfile(os.path.join(self._root, filepath))
+
+    def get(self, filepath, version=None):
+        """Returns a bytestring with the file content, but no metadata."""
+        content = utils.get_file_contents(
+            os.path.join(self._root, filepath), raw_bytes=True)
+        return FileStreamWithMetadata(content, None, None)
+
+    def put(self, filepath, raw_bytes):
+        raise NotImplementedError
+
+    def delete(self, filepath):
+        raise NotImplementedError
+
+    def listdir(self, dir_name):
+        raise NotImplementedError
 
 
 class AbstractFileSystem(object):

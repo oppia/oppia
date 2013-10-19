@@ -65,7 +65,7 @@ sys.path.append(root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 147
+EXPECTED_TEST_COUNT = 148
 
 
 _PARSER = argparse.ArgumentParser()

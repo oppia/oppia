@@ -23,8 +23,6 @@ import unicodedata
 import yaml
 import zipfile
 
-import feconf
-
 # Sentinel value for schema verification, indicating that a value can take any
 # type.
 ANY_TYPE = 1
