@@ -282,6 +282,29 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('A exploration_id')
 
+    def test_fork_exploration(self):
+        """Test forking an exploration with assets."""
+        exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.owner_id, 'A title', 'A category',
+                'A different exploration_id'))
+        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration.id))
+        fs.put('assets/abc.png', raw_image)
+
+        new_eid = exp_services.fork_exploration(exploration.id, self.owner_id)
+        new_fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(new_eid))
+        new_exploration = exp_services.get_exploration_by_id(new_eid)
+
+        self.assertEqual(new_exploration.title, 'Copy of A title')
+        self.assertEqual(new_exploration.category, 'A category')
+        self.assertEqual(new_fs.get('assets/abc.png'), raw_image)
+
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
@@ -375,8 +398,9 @@ states:
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        fs.put(exploration.id, 'assets/abc.png', raw_image)
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration.id))
+        fs.put('assets/abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(exploration.id)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))

@@ -22,62 +22,80 @@ from core.domain import fs_domain
 import test_utils
 
 
-class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
+class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the datastore-backed file system."""
 
     def test_get_and_put(self):
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        fs.put('eid', 'assets/abc.png', 'file_contents')
-        self.assertEqual(fs.get('eid', 'assets/abc.png'), 'file_contents')
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+        fs.put('assets/abc.png', 'file_contents')
+        self.assertEqual(fs.get('assets/abc.png'), 'file_contents')
 
     def test_delete(self):
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        self.assertFalse(fs.isfile('eid', 'assets/abc.png'))
-        fs.put('eid', 'assets/abc.png', 'file_contents')
-        self.assertTrue(fs.isfile('eid', 'assets/abc.png'))
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+        self.assertFalse(fs.isfile('assets/abc.png'))
+        fs.put('assets/abc.png', 'file_contents')
+        self.assertTrue(fs.isfile('assets/abc.png'))
 
-        fs.delete('eid', 'assets/abc.png')
-        self.assertFalse(fs.isfile('eid', 'assets/abc.png'))
+        fs.delete('assets/abc.png')
+        self.assertFalse(fs.isfile('assets/abc.png'))
         with self.assertRaisesRegexp(AttributeError, '\'NoneType\' object'):
-            fs.get('eid', 'assets/abc.png')
+            fs.get('assets/abc.png')
 
         # Nothing happens when one tries to delete a file that does not exist.
-        fs.delete('eid', 'fake_file.png')
+        fs.delete('fake_file.png')
 
     def test_listdir(self):
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        fs.put('eid', 'assets/abc.png', 'file_contents')
-        fs.put('eid', 'assets/abcd.png', 'file_contents_2')
-        fs.put('eid', 'assets/abc/abcd.png', 'file_contents_3')
-        fs.put('eid', 'assets/bcd/bcde.png', 'file_contents_4')
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+        fs.put('assets/abc.png', 'file_contents')
+        fs.put('assets/abcd.png', 'file_contents_2')
+        fs.put('assets/abc/abcd.png', 'file_contents_3')
+        fs.put('assets/bcd/bcde.png', 'file_contents_4')
 
         self.assertEqual(
-            fs.listdir('eid', 'assets'),
+            fs.listdir('assets'),
             ['assets/abc.png', 'assets/abc/abcd.png', 'assets/abcd.png',
              'assets/bcd/bcde.png'])
 
         self.assertEqual(
-            fs.listdir('eid', 'assets/abc'), ['assets/abc/abcd.png'])
+            fs.listdir('assets/abc'), ['assets/abc/abcd.png'])
 
-        self.assertEqual(fs.listdir('eid', '/assets/abc'), [])
-        self.assertEqual(fs.listdir('eid', 'fake_dir'), [])
-        self.assertEqual(fs.listdir('fake_eid', 'assets'), [])
+        self.assertEqual(fs.listdir('/assets/abc'), [])
+        self.assertEqual(fs.listdir('fake_dir'), [])
+
+        new_fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid2'))
+        self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        fs.put('eid', 'assets/abc.png', 'file_contents')
-        self.assertEqual(fs.get('eid', 'assets/abc.png'), 'file_contents')
-        file_stream = fs.open('eid', 'assets/abc.png')
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+        fs.put('assets/abc.png', 'file_contents')
+        self.assertEqual(fs.get('assets/abc.png'), 'file_contents')
+        file_stream = fs.open('assets/abc.png')
         self.assertEqual(file_stream.version, 1)
         self.assertEqual(file_stream.metadata.size, len('file_contents'))
 
-        fs.put('eid', 'assets/abc.png', 'file_contents_2')
-        self.assertEqual(fs.get('eid', 'assets/abc.png'), 'file_contents_2')
-        file_stream = fs.open('eid', 'assets/abc.png')
+        fs.put('assets/abc.png', 'file_contents_2')
+        self.assertEqual(fs.get('assets/abc.png'), 'file_contents_2')
+        file_stream = fs.open('assets/abc.png')
         self.assertEqual(file_stream.version, 2)
         self.assertEqual(file_stream.metadata.size, len('file_contents_2'))
 
-        self.assertEqual(fs.get('eid', 'assets/abc.png', 1), 'file_contents')
-        old_file_stream = fs.open('eid', 'assets/abc.png', 1)
+        self.assertEqual(fs.get('assets/abc.png', 1), 'file_contents')
+        old_file_stream = fs.open('assets/abc.png', 1)
         self.assertEqual(old_file_stream.version, 1)
         self.assertEqual(old_file_stream.metadata.size, len('file_contents'))
+
+    def test_independence_of_file_systems(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+        fs.put('assets/abc.png', 'file_contents')
+        self.assertEqual(fs.get('assets/abc.png'), 'file_contents')
+
+        fs2 = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid2'))
+        with self.assertRaisesRegexp(AttributeError, '\'NoneType\' object'):
+            fs2.get('assets/abc.png')

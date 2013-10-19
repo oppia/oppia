@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models relating to files and their metadata."""
+"""Models relating to the per-exploration file system."""
 
 __author__ = 'Sean Lip'
 

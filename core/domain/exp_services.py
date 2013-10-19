@@ -302,10 +302,11 @@ def export_to_zip_file(exploration_id):
     with zipfile.ZipFile(o, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr('%s.yaml' % exploration.title, yaml_repr)
 
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        dir_list = fs.listdir(exploration_id, 'assets')
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        dir_list = fs.listdir('assets')
         for filepath in dir_list:
-            zf.writestr(filepath, fs.get(exploration_id, filepath))
+            zf.writestr(filepath, fs.get(filepath))
 
     return o.getvalue()
 
@@ -830,11 +831,15 @@ def fork_exploration(old_exploration_id, user_id):
     )
 
     # Duplicate the assets of the old exploration.
-    fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-    dir_list = fs.listdir(old_exploration_id, 'assets')
+    old_fs = fs_domain.AbstractFileSystem(
+        fs_domain.ExplorationFileSystem(old_exploration_id))
+    new_fs = fs_domain.AbstractFileSystem(
+        fs_domain.ExplorationFileSystem(new_exploration_id))
+
+    dir_list = old_fs.listdir('assets')
     for filepath in dir_list:
-        file_content = fs.get(old_exploration_id, filepath)
-        fs.put(new_exploration_id, filepath, file_content)
+        file_content = old_fs.get(filepath)
+        new_fs.put(filepath, file_content)
 
     return new_exploration_id
 
@@ -883,8 +888,8 @@ def load_demo(exploration_id):
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem())
-        fs.put(exploration_id, asset_filename, asset_content)
+            fs_domain.ExplorationFileSystem(exploration_id))
+        fs.put(asset_filename, asset_content)
 
     exploration = get_exploration_by_id(exploration_id)
     exploration.is_public = True

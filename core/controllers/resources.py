@@ -74,8 +74,8 @@ class ImageHandler(base.BaseHandler):
             self.response.headers['Content-Type'] = str('image/%s' % format)
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem())
-            raw = fs.get(exploration_id, 'assets/%s' % image_id)
+                fs_domain.ExplorationFileSystem(exploration_id))
+            raw = fs.get('assets/%s' % image_id)
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
@@ -120,12 +120,12 @@ class ImageUploadHandler(base.BaseHandler):
                             'one of the following formats: %s.' %
                             allowed_formats)
 
-        fs = fs_domain.AbstractFileSystem(fs_domain.DatastoreBackedFileSystem())
-        dir_list = fs.listdir(exploration_id, 'assets')
-        new_filename = self._get_random_filename(dir_list)
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        dir_list = fs.listdir('assets')
+        image_id = '%s.%s' % (self._get_random_filename(dir_list), format)
+        fs.put('assets/%s' % image_id, raw)
 
-        image_id = '%s.%s' % (new_filename, format)
-        fs.put(exploration_id, 'assets/%s' % image_id, raw)
         self.render_json({'image_id': image_id})
 
 

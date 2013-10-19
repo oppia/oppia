@@ -61,8 +61,8 @@ class FileStreamWithMetadata(object):
         return self._version
 
 
-class DatastoreBackedFileSystem(object):
-    """A read-write file system backed by a datastore.
+class ExplorationFileSystem(object):
+    """A datastore-backed read-write file system for a single exploration.
 
     The conceptual intention is for each exploration to have its own asset
     folder. An asset has no meaning outside its exploration, so the assets in
@@ -79,41 +79,45 @@ class DatastoreBackedFileSystem(object):
     context.
     """
 
-    DEFAULT_VERSION_NUMBER = 1
+    _DEFAULT_VERSION_NUMBER = 1
 
-    def _get_file_metadata(self, exploration_id, filepath, version):
+    def __init__(self, exploration_id):
+        self._exploration_id = exploration_id
+
+    def _get_file_metadata(self, filepath, version):
         """Return the desired file metadata."""
         if version is None:
-            return file_models.FileMetadataModel.get(exploration_id, filepath)
+            return file_models.FileMetadataModel.get(
+                self._exploration_id, filepath)
         else:
             return file_models.FileMetadataHistoryModel.get(
-                exploration_id, filepath, version)
+                self._exploration_id, filepath, version)
 
-    def _get_file_data(self, exploration_id, filepath, version):
+    def _get_file_data(self, filepath, version):
         """Return the desired file data."""
         if version is None:
-            return file_models.FileDataModel.get(exploration_id, filepath)
+            return file_models.FileDataModel.get(self._exploration_id, filepath)
         else:
             return file_models.FileDataHistoryModel.get(
-                exploration_id, filepath, version)
+                self._exploration_id, filepath, version)
 
-    def _create_file(self, exploration_id, filepath, version, raw_bytes):
+    def _create_file(self, filepath, version, raw_bytes):
         """Create or update a file."""
         metadata = file_models.FileMetadataModel.create(
-            exploration_id, filepath)
+            self._exploration_id, filepath)
         metadata.size = len(raw_bytes)
         metadata.version = version
 
         metadata_history = file_models.FileMetadataHistoryModel.create(
-            exploration_id, filepath, version)
+            self._exploration_id, filepath, version)
         metadata_history.size = len(raw_bytes)
 
-        data = file_models.FileDataModel.create(exploration_id, filepath)
+        data = file_models.FileDataModel.create(self._exploration_id, filepath)
         data.content = raw_bytes
         data.version = version
 
         data_history = file_models.FileDataHistoryModel.create(
-            exploration_id, filepath, version)
+            self._exploration_id, filepath, version)
         data_history.content = raw_bytes
 
         data.put()
@@ -121,59 +125,58 @@ class DatastoreBackedFileSystem(object):
         metadata.put()
         metadata_history.put()
 
-    def get(self, exploration_id, filepath, version=None):
+    def get(self, filepath, version=None):
         """Gets a file as an unencoded stream of raw bytes.
 
         If `version` is not supplied, the latest version is retrieved.
         """
-        metadata = self._get_file_metadata(exploration_id, filepath, version)
+        metadata = self._get_file_metadata(filepath, version)
         if metadata:
-            data = self._get_file_data(exploration_id, filepath, version)
+            data = self._get_file_data(filepath, version)
             if data:
                 if version is None:
                     version = data.version
                 return FileStreamWithMetadata(data.content, version, metadata)
 
-    def put(self, exploration_id, filepath, raw_bytes):
+    def put(self, filepath, raw_bytes):
         """Saves a raw bytestring as a file in the database.
 
         Calling this method creates a new version of the file.
         """
 
-        def _put_in_transaction(exploration_id, filepath, raw_bytes):
-            metadata = self._get_file_metadata(exploration_id, filepath, None)
+        def _put_in_transaction(filepath, raw_bytes):
+            metadata = self._get_file_metadata(filepath, None)
 
             new_version = (metadata.version + 1 if metadata else
-                           self.DEFAULT_VERSION_NUMBER)
+                           self._DEFAULT_VERSION_NUMBER)
 
-            self._create_file(exploration_id, filepath, new_version, raw_bytes)
+            self._create_file(filepath, new_version, raw_bytes)
 
         transaction_services.run_in_transaction(
-            _put_in_transaction, exploration_id, filepath, raw_bytes)
+            _put_in_transaction, filepath, raw_bytes)
 
-    def delete(self, exploration_id, filepath):
+    def delete(self, filepath):
         """Marks the current version of a file as deleted."""
 
-        metadata = self._get_file_metadata(exploration_id, filepath, None)
+        metadata = self._get_file_metadata(filepath, None)
         if metadata:
             metadata.deleted = True
             metadata.put()
 
-        data = self._get_file_data(exploration_id, filepath, None)
+        data = self._get_file_data(filepath, None)
         if data:
             data.deleted = True
             data.put()
 
-    def isfile(self, exploration_id, filepath):
+    def isfile(self, filepath):
         """Checks the existence of a file."""
-        metadata = self._get_file_metadata(exploration_id, filepath, None)
+        metadata = self._get_file_metadata(filepath, None)
         return bool(metadata)
 
-    def listdir(self, exploration_id, dir_name):
+    def listdir(self, dir_name):
         """Lists all files in a directory.
 
         Args:
-            exploration_id: The id of the exploration.
             dir_name: The directory whose files should be listed. This should
                 not start with '/' or end with '/'.
 
@@ -184,7 +187,7 @@ class DatastoreBackedFileSystem(object):
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
-        prefix = '%s/' % os.path.join('/', exploration_id, dir_name)
+        prefix = '%s/' % os.path.join('/', self._exploration_id, dir_name)
 
         result = set()
         metadata_models = file_models.FileMetadataModel.get_undeleted()
@@ -201,29 +204,29 @@ class AbstractFileSystem(object):
     def __init__(self, impl):
         self._impl = impl
 
-    def isfile(self, exploration_id, filepath):
+    def isfile(self, filepath):
         """Checks if a file exists. Similar to os.path.isfile(...)."""
-        return self._impl.isfile(exploration_id, filepath)
+        return self._impl.isfile(filepath)
 
-    def open(self, exploration_id, filepath, version=None):
+    def open(self, filepath, version=None):
         """Returns a stream with the file content. Similar to open(...)."""
-        return self._impl.get(exploration_id, filepath, version=version)
+        return self._impl.get(filepath, version=version)
 
-    def get(self, exploration_id, filepath, version=None):
+    def get(self, filepath, version=None):
         """Returns a bytestring with the file content, but no metadata."""
-        return self._impl.get(exploration_id, filepath, version=version).read()
+        return self._impl.get(filepath, version=version).read()
 
-    def put(self, exploration_id, filepath, raw_bytes):
+    def put(self, filepath, raw_bytes):
         """Replaces the contents of the file with the given bytestring."""
-        self._impl.put(exploration_id, filepath, raw_bytes)
+        self._impl.put(filepath, raw_bytes)
 
-    def delete(self, exploration_id, filepath):
+    def delete(self, filepath):
         """Deletes a file and the metadata associated with it."""
-        self._impl.delete(exploration_id, filepath)
+        self._impl.delete(filepath)
 
-    def listdir(self, exploration_id, dir_name):
+    def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...)."""
-        return self._impl.listdir(exploration_id, dir_name)
+        return self._impl.listdir(dir_name)
 
 
 def delete_all_files():
