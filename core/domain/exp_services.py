@@ -28,6 +28,7 @@ import cgi
 import copy
 import json
 import logging
+import os
 import StringIO
 import zipfile
 
@@ -838,6 +839,30 @@ def fork_exploration(old_exploration_id, user_id):
     return new_exploration_id
 
 
+def get_demo_exploration_components(demo_filename):
+    """Gets the content of `demo_filename` in the sample explorations folder.
+
+    Args:
+      demo_filename: the filename for the content of an exploration in
+        SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or 'tar.zip'.
+
+    Returns:
+      a 2-tuple, the first element of which is a yaml string, and the second
+      element of which is a list of (filepath, content) 2-tuples. The filepath
+      includes the assets/ prefix.
+    """
+    demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_filename)
+
+    if demo_filename.endswith('yaml'):
+        file_contents = utils.get_file_contents(demo_filepath)
+        return file_contents, []
+    elif demo_filename.endswith('zip'):
+        file_contents = utils.get_file_contents(demo_filepath, raw_bytes=True)
+        return utils.get_exploration_components_from_zip(file_contents)
+    else:
+        raise Exception('Unrecognized file type: %s' % filepath)
+
+
 def load_demo(exploration_id):
     """Loads a demo exploration."""
     # TODO(sll): Speed this method up. It is too slow.
@@ -852,8 +877,7 @@ def load_demo(exploration_id):
     else:
         raise Exception('Invalid demo exploration: %s' % exploration)
 
-    yaml_content, assets_list = utils.get_demo_exploration_components(
-        exp_filename)
+    yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     exploration_id = create_from_yaml(
         yaml_content, ADMIN_COMMITTER_ID, title, category,
         exploration_id=exploration_id)

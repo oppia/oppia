@@ -53,8 +53,11 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
                 os.path.isfile(filepath), msg='%s is not a file.' % filepath)
 
             # Convert each exploration into a dict, and verify it.
+            # TODO(sll): Verify the assets, e.g. check that there are no
+            # superfluous assets and that every asset that is expected by the
+            # exploration exists.
             exploration_yaml, unused_assets = (
-                utils.get_demo_exploration_components(filename))
+                exp_services.get_demo_exploration_components(filename))
             exploration_dict = utils.dict_from_yaml(exploration_yaml)
             try:
                 exp_services.verify_exploration_dict(exploration_dict)
