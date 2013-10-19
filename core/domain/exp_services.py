@@ -839,28 +839,27 @@ def fork_exploration(old_exploration_id, user_id):
     return new_exploration_id
 
 
-def get_demo_exploration_components(demo_filename):
-    """Gets the content of `demo_filename` in the sample explorations folder.
+def get_demo_exploration_components(demo_path):
+    """Gets the content of `demo_path` in the sample explorations folder.
 
     Args:
-      demo_filename: the filename for the content of an exploration in
-        SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or 'tar.zip'.
+      demo_path: the file or folder path for the content of an exploration
+        in SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or 'tar/'.
 
     Returns:
       a 2-tuple, the first element of which is a yaml string, and the second
       element of which is a list of (filepath, content) 2-tuples. The filepath
       includes the assets/ prefix.
     """
-    demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_filename)
+    demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_path)
 
-    if demo_filename.endswith('yaml'):
+    if demo_filepath.endswith('yaml'):
         file_contents = utils.get_file_contents(demo_filepath)
         return file_contents, []
-    elif demo_filename.endswith('zip'):
-        file_contents = utils.get_file_contents(demo_filepath, raw_bytes=True)
-        return utils.get_exploration_components_from_zip(file_contents)
+    elif os.path.isdir(demo_filepath):
+        return utils.get_exploration_components_from_dir(demo_filepath)
     else:
-        raise Exception('Unrecognized file type: %s' % filepath)
+        raise Exception('Unrecognized file path: %s' % demo_path)
 
 
 def load_demo(exploration_id):

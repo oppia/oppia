@@ -35,34 +35,39 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
 
     def test_default_explorations_are_valid(self):
         """Test the default explorations."""
-        exploration_files = os.listdir(
+        exploration_data_paths = os.listdir(
             os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR))
 
         self.assertTrue(feconf.DEMO_EXPLORATIONS,
                         msg='There must be at least one demo exploration.')
 
-        derived_exploration_filenames = [
-            item[0] for item in feconf.DEMO_EXPLORATIONS]
-        self.assertItemsEqual(exploration_files, derived_exploration_filenames,
+        derived_paths = [item[0] for item in feconf.DEMO_EXPLORATIONS]
+        self.assertItemsEqual(exploration_data_paths, derived_paths,
                               msg='Files in data/explorations do not match '
                                   'the demo explorations in feconf.py.')
 
-        for filename in exploration_files:
-            filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)
-            self.assertTrue(
-                os.path.isfile(filepath), msg='%s is not a file.' % filepath)
+        for data_path in exploration_data_paths:
+            full_path = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, data_path)
+            if full_path.endswith('yaml'):
+                self.assertTrue(
+                    os.path.isfile(full_path), msg='%s is not a file.'
+                    % full_path)
+            else:
+                self.assertTrue(
+                    os.path.isdir(full_path), msg='%s is not a directory.'
+                    % full_path)
 
             # Convert each exploration into a dict, and verify it.
             # TODO(sll): Verify the assets, e.g. check that there are no
             # superfluous assets and that every asset that is expected by the
             # exploration exists.
             exploration_yaml, unused_assets = (
-                exp_services.get_demo_exploration_components(filename))
+                exp_services.get_demo_exploration_components(data_path))
             exploration_dict = utils.dict_from_yaml(exploration_yaml)
             try:
                 exp_services.verify_exploration_dict(exploration_dict)
             except Exception as e:
-                raise Exception('%s: %s' % (filepath, e))
+                raise Exception('%s: %s' % (full_path, e))
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):

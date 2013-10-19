@@ -51,8 +51,9 @@ IDEA_CONTRIBUTORS = [
 # is based on the index of the exploration in this list, so if you want to
 # add a new exploration and preserve the existing ids, add that exploration
 # to the end of the list.
-# Each item is represented as a tuple: (filename, title, category).
-# Note that the filename omits the .yaml suffix.
+# Each item is represented as a tuple: (filepath, title, category). If the
+# filepath is a yaml file it should end with '.yaml', otherwise it should
+# be the path to the directory without a trailing '/'.
 DEMO_EXPLORATIONS = [
     ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
     ('pitch.yaml', 'Pitch Perfect', 'Music'),
@@ -63,7 +64,7 @@ DEMO_EXPLORATIONS = [
     ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('binary_search.zip', 'The Lazy Magician', 'Mathematics'),
+    ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar.yaml', 'Missions - Tar', 'Open Source Tools'),
     ('cities.yaml', 'World Cities', 'Geography'),
 ]

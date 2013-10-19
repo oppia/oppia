@@ -56,6 +56,58 @@ def get_file_contents(filepath, raw_bytes=False):
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
+def get_exploration_components_from_dir(dir_path):
+    """Gets the (yaml, assets) from the contents of an exploration data dir.
+
+    Args:
+      dir_path: a full path to the exploration root directory.
+
+    Returns:
+      a 2-tuple, the first element of which is a yaml string, and the second
+      element of which is a list of (filepath, content) 2-tuples. The filepath
+      includes the assets/ prefix.
+
+    Raises:
+      Exception: if the following condition doesn't hold: "There is exactly one
+        file not in assets/, and this file has a .yaml suffix".
+    """
+    yaml_content = None
+    assets_list = []
+
+    dir_path_array = dir_path.split('/')
+    while dir_path_array[-1] == '':
+        dir_path_array = dir_path_array[:-1]
+    dir_path_length = len(dir_path_array)
+
+    for root, dirs, files in os.walk(dir_path):
+        for directory in dirs:
+            if root == dir_path and directory != 'assets':
+                raise Exception(
+                    'The only directory in %s should be assets/' % dir_path)
+
+        for filename in files:
+            filepath = os.path.join(root, filename)
+            if root == dir_path:
+                if yaml_content is not None:
+                    raise Exception('More than one non-asset file specified '
+                                    'for %s' % dir_path)
+                elif not filepath.endswith('.yaml'):
+                    raise Exception('The exploration data file should have a '
+                                    '.yaml suffix')
+                else:
+                    yaml_content = get_file_contents(filepath)
+            else:
+                filepath_array = filepath.split('/')
+                filename = '/'.join(filepath_array[dir_path_length:])
+                assets_list.append((filename, get_file_contents(
+                    filepath, raw_bytes=True)))
+
+    if yaml_content is None:
+        raise Exception('No yaml file specifed for %s' % dir_path)
+
+    return yaml_content, assets_list
+
+
 def get_exploration_components_from_zip(zip_file_contents):
     """Gets the (yaml, assets) from the contents of an exploration zip file.
 
@@ -76,25 +128,25 @@ def get_exploration_components_from_zip(zip_file_contents):
     o.write(zip_file_contents)
 
     zf = zipfile.ZipFile(o, 'r')
-    yaml_file = None
+    yaml_content = None
     assets_list = []
     for filepath in zf.namelist():
         if filepath.startswith('assets/'):
             assets_list.append((filepath, zf.read(filepath)))
         else:
-            if yaml_file is not None:
-                raise Exception('More than one non-asset file specified for %s'
-                                % demo_filename)
+            if yaml_content is not None:
+                raise Exception(
+                    'More than one non-asset file specified for zip file')
             elif not filepath.endswith('.yaml'):
-                raise Exception('The file not in assets/ should have a .yaml '
-                                'suffix')
+                raise Exception(
+                    'The file not in assets/ should have a .yaml suffix')
             else:
-                yaml_file = zf.read(filepath)
+                yaml_content = zf.read(filepath)
 
-    if yaml_file is None:
-        raise Exception('No yaml file specifed for %s' % demo_filename)
+    if yaml_content is None:
+        raise Exception('No yaml file specified in zip file contents')
 
-    return yaml_file, assets_list
+    return yaml_content, assets_list
 
 
 def get_comma_sep_string_from_list(items):
@@ -120,12 +172,12 @@ def yaml_from_dict(dictionary):
     return yaml.safe_dump(dictionary, default_flow_style=False)
 
 
-def dict_from_yaml(yaml_file):
-    """Gets the dict representation of a YAML file."""
+def dict_from_yaml(yaml_str):
+    """Gets the dict representation of a YAML string."""
     try:
-        yaml_dict = yaml.safe_load(yaml_file)
-        assert isinstance(yaml_dict, dict)
-        return yaml_dict
+        retrieved_dict = yaml.safe_load(yaml_str)
+        assert isinstance(retrieved_dict, dict)
+        return retrieved_dict
     except yaml.YAMLError as e:
         raise InvalidInputException(e)
 
