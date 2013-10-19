@@ -304,9 +304,9 @@ def export_to_zip_file(exploration_id):
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('assets')
+        dir_list = fs.listdir('')
         for filepath in dir_list:
-            zf.writestr(filepath, fs.get(filepath))
+            zf.writestr('assets/%s' % filepath, fs.get(filepath))
 
     return o.getvalue()
 
@@ -728,6 +728,8 @@ def classify(exploration_id, state_id, handler_name, answer, params):
     ).get_handler_by_name(handler_name)
 
     handler = next(h for h in state.widget.handlers if h.name == handler_name)
+    fs = fs_domain.AbstractFileSystem(
+        fs_domain.ExplorationFileSystem(exploration_id))
 
     if generic_handler.input_type is None:
         return handler.rule_specs[0]
@@ -735,7 +737,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
         for rule_spec in handler.rule_specs:
             if rule_domain.evaluate_rule(
                     rule_spec.definition, exploration.param_specs,
-                    generic_handler.input_type, params, answer):
+                    generic_handler.input_type, params, answer, fs):
                 return rule_spec
 
         raise Exception(
@@ -836,7 +838,7 @@ def fork_exploration(old_exploration_id, user_id):
     new_fs = fs_domain.AbstractFileSystem(
         fs_domain.ExplorationFileSystem(new_exploration_id))
 
-    dir_list = old_fs.listdir('assets')
+    dir_list = old_fs.listdir('')
     for filepath in dir_list:
         file_content = old_fs.get(filepath)
         new_fs.put(filepath, file_content)
@@ -854,7 +856,7 @@ def get_demo_exploration_components(demo_path):
     Returns:
       a 2-tuple, the first element of which is a yaml string, and the second
       element of which is a list of (filepath, content) 2-tuples. The filepath
-      includes the assets/ prefix.
+      does not include the assets/ prefix.
     """
     demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_path)
 

@@ -294,7 +294,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration.id))
-        fs.put('assets/abc.png', raw_image)
+        fs.put('abc.png', raw_image)
 
         new_eid = exp_services.fork_exploration(exploration.id, self.owner_id)
         new_fs = fs_domain.AbstractFileSystem(
@@ -303,7 +303,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(new_exploration.title, 'Copy of A title')
         self.assertEqual(new_exploration.category, 'A category')
-        self.assertEqual(new_fs.get('assets/abc.png'), raw_image)
+        self.assertEqual(new_fs.get('abc.png'), raw_image)
 
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
@@ -400,7 +400,7 @@ states:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration.id))
-        fs.put('assets/abc.png', raw_image)
+        fs.put('abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(exploration.id)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))

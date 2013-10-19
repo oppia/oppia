@@ -19,12 +19,8 @@
 __author__ = 'Tarashish Mishra'
 
 import base64
-import os
 
 from extensions.rules import base
-
-import feconf
-import utils
 
 
 class Equals(base.UnicodeStringRule):
@@ -60,5 +56,4 @@ class MatchesBase64EncodedFile(base.UnicodeStringRule):
     {{filepath|UnicodeString}}"""
 
     def _evaluate(self, subject):
-        return base64.b64decode(subject) == utils.get_file_contents(
-            os.path.join(feconf.DATA_DIR, self.filepath), raw_bytes=True)
+        return base64.b64decode(subject) == self.fs.get(self.filepath)

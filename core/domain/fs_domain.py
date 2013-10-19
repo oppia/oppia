@@ -89,36 +89,38 @@ class ExplorationFileSystem(object):
         """Return the desired file metadata."""
         if version is None:
             return file_models.FileMetadataModel.get(
-                self._exploration_id, filepath)
+                self._exploration_id, 'assets/%s' % filepath)
         else:
             return file_models.FileMetadataHistoryModel.get(
-                self._exploration_id, filepath, version)
+                self._exploration_id, 'assets/%s' % filepath, version)
 
     def _get_file_data(self, filepath, version):
         """Return the desired file data."""
         if version is None:
-            return file_models.FileDataModel.get(self._exploration_id, filepath)
+            return file_models.FileDataModel.get(
+                self._exploration_id, 'assets/%s' % filepath)
         else:
             return file_models.FileDataHistoryModel.get(
-                self._exploration_id, filepath, version)
+                self._exploration_id, 'assets/%s' % filepath, version)
 
     def _create_file(self, filepath, version, raw_bytes):
         """Create or update a file."""
         metadata = file_models.FileMetadataModel.create(
-            self._exploration_id, filepath)
+            self._exploration_id, 'assets/%s' % filepath)
         metadata.size = len(raw_bytes)
         metadata.version = version
 
         metadata_history = file_models.FileMetadataHistoryModel.create(
-            self._exploration_id, filepath, version)
+            self._exploration_id, 'assets/%s' % filepath, version)
         metadata_history.size = len(raw_bytes)
 
-        data = file_models.FileDataModel.create(self._exploration_id, filepath)
+        data = file_models.FileDataModel.create(
+            self._exploration_id, 'assets/%s' % filepath)
         data.content = raw_bytes
         data.version = version
 
         data_history = file_models.FileDataHistoryModel.create(
-            self._exploration_id, filepath, version)
+            self._exploration_id, 'assets/%s' % filepath, version)
         data_history.content = raw_bytes
 
         data.put()
@@ -188,14 +190,17 @@ class ExplorationFileSystem(object):
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
-        prefix = '%s/' % os.path.join('/', self._exploration_id, dir_name)
+        prefix = '%s' % os.path.join(
+            '/', self._exploration_id, 'assets', dir_name)
+        if not prefix.endswith('/'):
+            prefix += '/'
 
         result = set()
         metadata_models = file_models.FileMetadataModel.get_undeleted()
         for metadata_model in metadata_models:
             filepath = metadata_model.id
             if filepath.startswith(prefix):
-                result.add('/'.join(filepath.split('/')[2:]))
+                result.add('/'.join(filepath.split('/')[3:]))
         return sorted(list(result))
 
 
@@ -206,6 +211,11 @@ class DiskBackedFileSystem(object):
     """
 
     def __init__(self, root):
+        """Constructor for this class.
+
+        Args:
+            root: the path to append to the oppia/ directory.
+        """
         self._root = os.path.join(os.getcwd(), root)
 
     def isfile(self, filepath):

@@ -75,7 +75,7 @@ class ImageHandler(base.BaseHandler):
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(exploration_id))
-            raw = fs.get('assets/%s' % image_id)
+            raw = fs.get(image_id)
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
@@ -122,9 +122,9 @@ class ImageUploadHandler(base.BaseHandler):
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('assets')
+        dir_list = fs.listdir('')
         image_id = '%s.%s' % (self._get_random_filename(dir_list), format)
-        fs.put('assets/%s' % image_id, raw)
+        fs.put(image_id, raw)
 
         self.render_json({'image_id': image_id})
 

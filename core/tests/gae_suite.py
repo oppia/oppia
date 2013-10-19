@@ -94,9 +94,9 @@ def create_test_suites(parsed_args):
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
     if parsed_args.test_target and '/' in parsed_args.test_target:
-        raise Exception('The delimiter in test_target should be a slash (/)')
-    if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_target should be a dot (.)')
+    if parsed_args.test_path and '.' in parsed_args.test_path:
+        raise Exception('The delimiter in test_path should be a slash (/)')
 
     if parsed_args.test_target:
         return [loader.loadTestsFromName(parsed_args.test_target)]

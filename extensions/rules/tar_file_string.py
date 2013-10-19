@@ -18,11 +18,7 @@
 
 __author__ = 'Tarashish Mishra'
 
-import os
-
 from extensions.rules import base
-import feconf
-import utils
 
 
 class ChecksWrapperDirName(base.TarFileStringRule):
@@ -93,9 +89,7 @@ class HasUnexpectedContent(base.TarFileStringRule):
                 filename = member.name.split('/')[-1]
                 if filename in self.file_list:
                     subj_contents = subject.extractfile(member).read()
-                    expected_contents = utils.get_file_contents(
-                        os.path.join(feconf.DATA_DIR, filename)
-                    )
+                    expected_contents = self.fs.get(filename).decode('utf-8')
                     if subj_contents != expected_contents:
                         return True
         return False

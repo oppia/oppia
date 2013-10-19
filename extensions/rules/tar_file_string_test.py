@@ -22,6 +22,7 @@ import base64
 import os
 import unittest
 
+from core.domain import fs_domain
 from extensions.rules import tar_file_string
 import utils
 
@@ -79,17 +80,22 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
     def test_unexpected_content_rule(self):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.DiskBackedFileSystem(TEST_DATA_DIR))
+
+        EXPLORATION_DATA_DIR = 'data/explorations/tar/assets'
+        exp_fs = fs_domain.AbstractFileSystem(
+            fs_domain.DiskBackedFileSystem(EXPLORATION_DATA_DIR))
+
         rule = tar_file_string.HasUnexpectedContent(
-            ['hello.c', 'Makefile'])
+            ['hello.c', 'Makefile']).set_fs(exp_fs)
 
         file_name = 'incorrect-contents.tar.gz'
-        encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        encoded_content = base64.b64encode(fs.get(file_name))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
-        encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+        encoded_content = base64.b64encode(fs.get(file_name))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_missing_expected_file_rule(self):

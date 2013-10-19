@@ -63,7 +63,7 @@ def get_exploration_components_from_dir(dir_path):
     Returns:
       a 2-tuple, the first element of which is a yaml string, and the second
       element of which is a list of (filepath, content) 2-tuples. The filepath
-      includes the assets/ prefix.
+      does not include the assets/ prefix.
 
     Raises:
       Exception: if the following condition doesn't hold: "There is exactly one
@@ -96,7 +96,8 @@ def get_exploration_components_from_dir(dir_path):
                     yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
-                filename = '/'.join(filepath_array[dir_path_length:])
+                # The additional offset is to remove the 'assets/' prefix.
+                filename = '/'.join(filepath_array[dir_path_length + 1:])
                 assets_list.append((filename, get_file_contents(
                     filepath, raw_bytes=True)))
 
@@ -116,7 +117,7 @@ def get_exploration_components_from_zip(zip_file_contents):
     Returns:
       a 2-tuple, the first element of which is a yaml string, and the second
       element of which is a list of (filepath, content) 2-tuples. The filepath
-      includes the assets/ prefix.
+      does not include the assets/ prefix.
 
     Raises:
       Exception: if the following condition doesn't hold: "There is exactly one
@@ -130,7 +131,8 @@ def get_exploration_components_from_zip(zip_file_contents):
     assets_list = []
     for filepath in zf.namelist():
         if filepath.startswith('assets/'):
-            assets_list.append((filepath, zf.read(filepath)))
+            assets_list.append('/'.join(filepath.split('/')[1:]),
+                               zf.read(filepath))
         else:
             if yaml_content is not None:
                 raise Exception(

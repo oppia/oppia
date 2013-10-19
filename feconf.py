@@ -53,7 +53,7 @@ IDEA_CONTRIBUTORS = [
 # to the end of the list.
 # Each item is represented as a tuple: (filepath, title, category). If the
 # filepath is a yaml file it should end with '.yaml', otherwise it should
-# be the path to the directory without a trailing '/'.
+# be the path to the directory WITHOUT a trailing '/'.
 DEMO_EXPLORATIONS = [
     ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
     ('pitch.yaml', 'Pitch Perfect', 'Music'),
@@ -65,7 +65,7 @@ DEMO_EXPLORATIONS = [
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('tar.yaml', 'Missions - Tar', 'Open Source Tools'),
+    ('tar', 'Missions - Tar', 'Open Source Tools'),
     ('cities.yaml', 'World Cities', 'Geography'),
 ]
 
@@ -90,9 +90,6 @@ elif PLATFORM == 'django':
 # The directory containing data files for tests.
 TESTS_DATA_DIR = 'core/tests/data'
 
-# The directory containing data files for explorations
-DATA_DIR = 'data/files/'
-
 # The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 WIDGETS_DIR = 'extensions/widgets'
@@ -116,9 +113,6 @@ DEFAULT_STATE_NAME = '(untitled state)'
 DEFAULT_RULE_NAME = 'Default'
 
 ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
-
-# Whether to allow file uploads via YAML in the gallery and editor pages.
-ALLOW_YAML_FILE_UPLOAD = False
 
 # Prefixes for widget ids in the datastore.
 INTERACTIVE_PREFIX = 'interactive'
@@ -150,15 +144,14 @@ HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M'
 INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
 for ind in range(32):
     INVALID_NAME_CHARS += chr(ind)
-
+# Prefix for data sent from the server to the client via JSON.
+XSSI_PREFIX = ')]}\'\n'
+# A regular expression for alphanumeric characters
+ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # A sentinel value to indicate that no exploration snapshot should be saved.
 NULL_SNAPSHOT = {}
 
-# Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
-
+# Whether to allow file uploads via YAML in the gallery and editor pages.
+ALLOW_YAML_FILE_UPLOAD = False
 # Whether or not to require users to have usernames in order to edit
 REQUIRE_USERS_TO_SET_USERNAMES = False
-
-# A regular expression for alphanumeric characters
-ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'

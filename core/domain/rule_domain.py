@@ -109,6 +109,7 @@ class Rule(object):
     description = ''
 
     _PARAMS = None
+    _fs = None
 
     @property
     def params(self):
@@ -136,8 +137,24 @@ class Rule(object):
         """Returns a boolean indicating the truth value of the evaluation."""
         raise NotImplementedError
 
+    def set_fs(self, fs):
+        """Set an abstract file system to use with this rule."""
+        self._fs = fs
+        return self
+
+    @property
+    def fs(self):
+        return self._fs
+
     def eval(self, subject):
-        """Public evaluation method."""
+        """Public evaluation method.
+
+        Args:
+            subject: the thing to be evaluated.
+
+        Returns:
+            bool: the result of the evaluation.
+        """
         return self._evaluate(self.subject_type.normalize(subject))
 
 
@@ -221,7 +238,8 @@ def get_rule_description(definition, param_specs, answer_type):
         raise Exception('Unrecognized rule type %s' % definition['rule_type'])
 
 
-def evaluate_rule(definition, param_specs, answer_type, context_params, answer):
+def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
+                  fs):
     """Evaluates a rule definition using context_params. Returns a boolean."""
 
     if 'rule_type' not in definition:
@@ -257,7 +275,9 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer):
         else:
             subject = context_params[subject_name]
 
-        return rule(*param_list).eval(subject)
+        constructed_rule = rule(*param_list)
+        constructed_rule.set_fs(fs)
+        return constructed_rule.eval(subject)
 
     elif definition['rule_type'] == AND_RULE_TYPE:
         for child_dict in definition['children']:

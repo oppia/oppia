@@ -19,12 +19,10 @@
 __author__ = 'Tarashish Mishra'
 
 import base64
-import os
 import unittest
 
+from core.domain import fs_domain
 from extensions.rules import unicode_string
-import feconf
-import utils
 
 
 class UnicodeStringRuleUnitTests(unittest.TestCase):
@@ -56,16 +54,14 @@ class UnicodeStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(unicode_string.Contains('ol').eval('hello world'))
 
     def test_matches_base64encoded_file_rule(self):
-        DATA_DIR_BACKUP = feconf.DATA_DIR
         TEST_DATA_DIR = 'extensions/rules/testdata'
-        feconf.DATA_DIR = TEST_DATA_DIR
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.DiskBackedFileSystem(TEST_DATA_DIR))
 
         file_names = ['test.c', 'test.png', 'test.tar.gz']
 
         for file_name in file_names:
-            encoded_content = base64.b64encode(utils.get_file_contents(
-                os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
-            rule = unicode_string.MatchesBase64EncodedFile(file_name)
+            encoded_content = base64.b64encode(fs.get(file_name))
+            rule = unicode_string.MatchesBase64EncodedFile(
+                file_name).set_fs(fs)
             self.assertTrue(rule.eval(encoded_content))
-
-        feconf.DATA_DIR = DATA_DIR_BACKUP
