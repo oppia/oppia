@@ -47,7 +47,7 @@ class UserSettingsModel(base_models.BaseModel):
         return user_settings
 
     @classmethod
-    def is_normalized_username_taken(cls, username):
-        """Returns whether or a given username is taken."""
-        return bool(cls.get_all().filter(cls.normalized_username == username).get())
-
+    def is_normalized_username_taken(cls, normalized_username):
+        """Returns whether or a given normalized_username is taken."""
+        return bool(cls.get_all().filter(
+            cls.normalized_username == normalized_username).get())
