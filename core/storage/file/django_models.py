@@ -18,11 +18,13 @@
 
 __author__ = 'Sean Lip'
 
+import base64
 import os
 
 import core.storage.base_model.models as base_models
 
 from django.db import models
+
 
 QUERY_LIMIT = 1000
 
@@ -105,9 +107,7 @@ class FileMetadataHistoryModel(base_models.BaseModel):
 class FileDataModel(base_models.BaseModel):
     """File data model, keyed by absolute file name."""
     # The contents of the file.
-    # TODO(sunu0000): This is probably too short. Can it be replaced with an
-    # unbounded-length field? Do we need to use something like ContentFile?
-    content = models.TextField(max_length=5000)
+    content = models.TextField()
     # The current version of the file.
     version = models.IntegerField()
 
@@ -130,8 +130,17 @@ class FileDataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, strict=False):
-        return super(FileDataModel, cls).get(
+        result = super(FileDataModel, cls).get(
             cls._construct_id(exploration_id, filepath), strict=strict)
+        if result is not None:
+            result.content = base64.decodestring(result.content)
+        return result
+
+    def put(self):
+        # Django does not accept raw byte strings, so we need to encode them.
+        # Internally, it stores strings as unicode.
+        self.content = base64.encodestring(self.content)
+        super(FileDataModel, self).put()
 
 
 class FileDataHistoryModel(base_models.BaseModel):
@@ -141,9 +150,7 @@ class FileDataHistoryModel(base_models.BaseModel):
     version.
     """
     # The contents of the file.
-    # TODO(sunu0000): This is probably too short. Can it be replaced with an
-    # unbounded-length field? Do we need to use something like ContentFile?
-    content = models.TextField(max_length=5000)
+    content = models.TextField()
 
     def get_new_id(cls, entity_name):
         raise NotImplementedError
@@ -166,6 +173,15 @@ class FileDataHistoryModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, version, strict=False):
-        return super(FileDataHistoryModel, cls).get(
+        result = super(FileDataHistoryModel, cls).get(
             cls._construct_id(exploration_id, filepath, version),
             strict=strict)
+        if result is not None:
+            result.content = base64.decodestring(result.content)
+        return result
+
+    def put(self):
+        # Django does not accept raw byte strings, so we need to encode them.
+        # Internally, it stores strings as unicode.
+        self.content = base64.encodestring(self.content)
+        super(FileDataHistoryModel, self).put()

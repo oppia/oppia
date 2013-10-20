@@ -18,12 +18,7 @@
 
 __author__ = 'Stephanie Federwisch'
 
-import logging
-
-from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
-
-from core import django_utils
+import core.storage.base_model.models as base_models
 
 from django.db import models
 
@@ -35,10 +30,10 @@ class UserSettingsModel(base_models.BaseModel):
         [USER_ID].
     """
     # Identifiable username to display in the UI
-    username = models.StringProperty()
+    username = models.CharField(max_length=100)
 
     # Normalized username
-    normalized_username = models.StringProperty()
+    normalized_username = models.CharField(max_length=100)
 
     @classmethod
     def get_or_create(cls, user_id):

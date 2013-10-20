@@ -310,13 +310,21 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
 
-    def test_loading_and_deletion_of_demo_explorations(self):
-        """Test loading and deletion of the demo explorations."""
+    def test_loading_and_deletion_of_some_demo_explorations(self):
+        """Test loading and deletion of some demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)
 
-        exp_services.load_demos()
+        # Load an exploration from yaml.
+        exp_services.load_demo('4')
+        self.assertEqual(exp_services.count_explorations(), 1)
+        # Load an exploration from a folder.
+        exp_services.load_demo('9')
+        self.assertEqual(exp_services.count_explorations(), 2)
+
         self.assertEqual(
-            exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))
+            exp_services.get_exploration_by_id('4').title, u'¡Hola!')
+        self.assertEqual(
+            exp_services.get_exploration_by_id('9').title, 'Missions - Tar')
 
         exp_services.delete_demos()
         self.assertEqual(exp_services.count_explorations(), 0)
