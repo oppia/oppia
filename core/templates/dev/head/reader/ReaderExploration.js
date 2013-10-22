@@ -141,29 +141,28 @@
   $scope.reloadInteractiveIframe = function(content) {
     var iframe = document.getElementById('inputTemplate');
     if (!iframe) {
-      console.log('No iframe found.');
+      console.log('Error: No interactive iframe found.');
       return;
     }
 
-    var el = document.getElementsByTagName("iframe")[0];
-    attrs = el.attributes;
-    var parentNode = el.parentNode;
-    parentNode.removeChild(el);
+    var attrs = iframe.attributes;
+    var parentNode = iframe.parentNode;
+    parentNode.removeChild(iframe);
 
-    iframe = document.createElement('iframe');
+    var newIframe = document.createElement('iframe');
     for (var i = 0; i < attrs.length; i++) {
       var attrib = attrs[i];
       if (attrib.specified) {
-        iframe.setAttribute(attrib.name, attrib.value);
+        newIframe.setAttribute(attrib.name, attrib.value);
       }
     }
-    parentNode.appendChild(iframe);
+    parentNode.appendChild(newIframe);
 
-    if (iframe.contentDocument) {
-      doc = iframe.contentDocument;
-    } else {
-      doc = iframe.contentWindow ? iframe.contentWindow.document : iframe.document;
-    }
+    var doc = (
+      newIframe.contentDocument ? newIframe.contentDocument :
+      newIframe.contentWindow ? newIframe.contentWindow.document :
+      iframe.document
+    );
 
     doc.open();
     doc.writeln(content);
