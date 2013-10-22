@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData) {
+ function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData, messengerService) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
@@ -282,6 +282,11 @@
           {'scrollTop': document.getElementById('response').offsetTop},
           'slow', 'swing');
     }
+
+    if ($scope.finished) {
+      messengerService.sendMessage(
+        messengerService.EXPLORATION_COMPLETED, null);
+    }
   };
 
   window.addEventListener('message', function(evt) {
@@ -307,5 +312,5 @@
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData'
+  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService'
 ];

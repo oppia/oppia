@@ -27,7 +27,17 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/scripts/oppia-player-0.0.0.js"></script>
   <script>
-    {{ include_js_file('pages/index.js') }}
+    window.OPPIA_PLAYER.onHeightChange = function(newHeight) {
+      console.log('onHeightChange event triggered.');
+
+      var iframe = document.getElementById('demoExploration');
+      iframe.height = parseInt(newHeight, 10) + 'px';
+    
+      setTimeout(function () {
+        $('#buttons').show();
+      }, 1000);
+    };
   </script>
 {% endblock footer_js %}
