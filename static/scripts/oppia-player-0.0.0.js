@@ -55,11 +55,8 @@ window.addEventListener('message', function(evt) {
   }
 }, false);
 
-var currSource = window.location.protocol + '//' + window.location.host;
-
 function reloadOppiaTags() {
-
-var oppiaList = document.getElementsByTagName('oppia');
+  var oppiaList = document.getElementsByTagName('oppia');
   for (var i = 0; i < oppiaList.length; i++) {
     var oppiaNode = oppiaList[i];
   
@@ -73,10 +70,12 @@ var oppiaList = document.getElementsByTagName('oppia');
 
     var iframe = document.createElement('iframe');
     iframe.setAttribute('id', oppiaNode.getAttribute('id'));
+    var currLoc = window.location.protocol + '//' + window.location.host;
     iframe.setAttribute(
       'src',
-      (oppiaNode.getAttribute('src') || currSource) +
-          '/learn/' + oppiaNode.getAttribute('oppia-id') + '?iframed=true');
+      (oppiaNode.getAttribute('src') || currLoc) +
+          '/learn/' + oppiaNode.getAttribute('oppia-id') + '?iframed=true' +
+          '#' + OPPIA_EMBED_GLOBALS.version);
     iframe.setAttribute('seamless', 'seamless');
     iframe.setAttribute(
       'height', oppiaNode.getAttribute('height') || '700px');

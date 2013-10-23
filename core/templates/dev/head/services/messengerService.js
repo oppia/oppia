@@ -51,8 +51,8 @@ oppia.factory('messengerService', function() {
       // Only send a message if the oppia window is iframed.
       if (window.parent != window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        var version = window.parent.OPPIA_EMBED_GLOBALS.version;
-        if (version == '0.0.0') {
+        var versionHash = window.location.hash;
+        if (versionHash == '#0.0.0') {
           console.log('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
