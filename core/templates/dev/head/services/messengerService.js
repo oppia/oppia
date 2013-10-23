@@ -51,8 +51,18 @@ oppia.factory('messengerService', function() {
       // Only send a message if the oppia window is iframed.
       if (window.parent != window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        var versionHash = window.location.hash;
-        if (versionHash == '#0.0.0') {
+        var idAndVersionHash = window.location.hash.substring(1);
+        if (idAndVersionHash.indexOf('&') === -1) {
+          console.log(
+              'Embedding error: Invalid id/version hash: ' + idAndVersionHash);
+        }
+
+        var separatorLocation = idAndVersionHash.indexOf('&');
+
+        var sourceTagId = idAndVersionHash.substring(0, separatorLocation);
+        var version = idAndVersionHash.substring(separatorLocation + 1);
+
+        if (version == '0.0.0') {
           console.log('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
@@ -61,7 +71,8 @@ oppia.factory('messengerService', function() {
           }
 
           window.parent.postMessage(
-            {title: messageTitle, payload: payload}, '*');
+            {title: messageTitle, payload: payload, sourceTagId: sourceTagId},
+            '*');
         }
       }
     }
