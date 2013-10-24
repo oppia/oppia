@@ -501,14 +501,13 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
   };
 
   window.addEventListener('message', function(evt) {
-    console.log('Resize event received for widget preview.');
-    console.log(evt.data);
-
     if (evt.origin != window.location.protocol + '//' + window.location.host) {
       return;
     }
 
     if (event.data.hasOwnProperty('widgetHeight')) {
+      console.log('Resize event received for widget preview.');
+      console.log(evt.data);
       // Change the height of the included iframe.
       var height = parseInt(event.data.widgetHeight, 10);
       var iframe = document.getElementById('interactiveWidgetPreview');
@@ -559,8 +558,12 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
         // messages originate from the widget repository).
         // TODO(sll): This results in a "Cannot read property '$$nextSibling'
         // of null" error in the exploration editor $broadcast. This error does
-        // not seem to have any side effects, but we should try and fix it.
-        $scope.$on('message', function(event, arg) {
+        // not seem to have any side effects, but we should try and fix it. Is
+        // it because it is being triggered when a postMessage call happens?
+        $scope.$on('message', function(evt, arg) {
+          if (arg.origin != window.location.protocol + '//' + window.location.host) {
+            return;
+          }
           if (arg.data.widgetType && arg.data.widgetType == 'interactive') {
             $modalInstance.close(arg);
           }

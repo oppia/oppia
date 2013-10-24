@@ -70,6 +70,8 @@ oppia.factory('messengerService', function() {
             console.log('Error validating payload: ' + payload);
           }
 
+          // The targetOrigin needs to be * because any page can iframe an
+          // exploration.
           window.parent.postMessage(
             {title: messageTitle, payload: payload, sourceTagId: sourceTagId},
             '*');

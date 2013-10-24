@@ -46,7 +46,8 @@ class ExplorationPage(base.BaseHandler):
             'iframed': iframed,
             'nav_mode': READER_MODE,
         })
-        self.render_template('reader/reader_exploration.html')
+        self.render_template(
+            'reader/reader_exploration.html', iframe_restriction=None)
 
 
 class ExplorationHandler(base.BaseHandler):

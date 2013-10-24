@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
+__author__ = 'Stephanie Federwisch'
 
 from core.domain import user_services
 
 import test_utils
 
 
-class EventHandlerUnitTests(test_utils.GenericTestBase):
-    """Test the event handler methods."""
+class UserServicesUnitTests(test_utils.GenericTestBase):
+    """Test the user services methods."""
 
     def test_set_and_get_username(self):
         user_id = 'someUser'

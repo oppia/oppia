@@ -224,8 +224,10 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
         json_output = json.dumps(values)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
@@ -236,7 +238,7 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
         counters.JSON_RESPONSE_COUNT.inc()
 
-    def render_template(self, filename, values=None):
+    def render_template(self, filename, values=None, iframe_restriction='DENY'):
         if values is None:
             values = self.values
 
@@ -250,6 +252,17 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+
+        if iframe_restriction is not None:
+            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
+                self.response.headers['X-Frame-Options'] = iframe_restriction
+            else:
+                raise Exception(
+                    'Invalid X-Frame-Options: %s' % iframe_restriction)
+
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
         self.response.write(self.jinja2_env.get_template(

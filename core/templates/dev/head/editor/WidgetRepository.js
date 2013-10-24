@@ -48,7 +48,8 @@ function WidgetRepository($scope, $http, activeInputData) {
       }
     }
 
-    window.parent.postMessage(data, '*');
+    window.parent.postMessage(
+      data, window.location.protocol + '//' + window.location.host);
   };
 
   $scope.previewWidget = function(category, index) {

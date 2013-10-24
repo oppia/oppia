@@ -28,6 +28,9 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
 
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
+  // TODO(sll): This is wrong; it should only happen for the reader app.
+  // Otherwise the iframed widget repository also causes a sent message and
+  // broadcast.
   window.onBodyLoad = function() {
     messengerService.sendMessage(
       messengerService.HEIGHT_CHANGE, document.body.scrollHeight);

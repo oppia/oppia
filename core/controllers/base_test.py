@@ -43,3 +43,18 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # TODO(sll): Set a self.payload attr in the BaseHandler for
         #     POST, PUT and DELETE. Something needs to regulate what
         #     the fields in the payload should be.
+
+    def test_requests_for_invalid_paths(self):
+        """Test that requests for invalid paths result in a 404 error."""
+
+        response = self.testapp.get('/gallery/extra', expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.get('/gallery/data/extra', expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.post('/gallery/extra', {}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.put('/gallery/extra', {}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)

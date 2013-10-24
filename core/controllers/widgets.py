@@ -38,7 +38,8 @@ class WidgetRepositoryPage(base.BaseHandler):
             self.values['parent_index'] = self.request.get('parent_index')
         if current_user_services.is_current_user_admin(self.request):
             self.values['admin'] = True
-        self.render_template('editor/widget_repository.html')
+        self.render_template(
+            'editor/widget_repository.html', iframe_restriction='SAMEORIGIN')
 
 
 class WidgetRepositoryHandler(base.BaseHandler):

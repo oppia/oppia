@@ -27,9 +27,9 @@ class FileReadHandler(base.BaseHandler):
 
     def post(self):
         raw_file_content = self.request.get('file')
-
         encoded_content = base64.b64encode(raw_file_content)
 
+        # TODO(sll): Get this to use the standard render_json() method.
         self.response.headers['Content-Type'] = 'application/json'
         response = {
             'base64_file_content': encoded_content,
