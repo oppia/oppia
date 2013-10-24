@@ -147,8 +147,8 @@ class ExplorationHandler(base.BaseHandler):
         if title:
             exploration.title = title
         if editors:
-            if (exploration.editor_ids and
-                    self.user_id == exploration.editor_ids[0]):
+            if (self.is_admin or (exploration.editor_ids and
+                                  self.user_id == exploration.editor_ids[0])):
                 exploration.editor_ids = []
                 for email in editors:
                     exploration.add_editor(email)

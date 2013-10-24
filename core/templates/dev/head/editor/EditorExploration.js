@@ -160,6 +160,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
   // Initializes the exploration page using data from the backend.
   explorationData.getData().then(function(data) {
+    $scope.currentUserIsAdmin = data.is_admin;
     $scope.stateId = explorationData.stateId;
     $scope.states = data.states;
     $scope.explorationTitle = data.title;
@@ -220,6 +221,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     explorationFullyLoaded = true;
   });
+
+  $scope.canEditEditorList = function() {
+    return ($scope.currentUser == $scope.explorationEditors[0] ||
+            $scope.currentUserIsAdmin);
+  };
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
     // Do not save on the initial data load.
