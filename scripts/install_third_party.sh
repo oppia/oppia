@@ -59,10 +59,6 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
-# For this to work, you must first run
-#
-#     sudo apt-get install cakephp-scripts
-#
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Checking whether coffeescript has been installed via node.js
@@ -91,16 +87,19 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     echo Compiling jsrepl
     # Sed fixes some issues:
     # - Reducing jvm memory requirement from 4G to 1G.
-    # - This version of node uses fs.exitsSync.
+    # - This version of node uses fs.existsSync.
     # - CoffeeScript is having trouble with octal representation.
+    # - Use our installed version of uglifyjs.
     sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
     sed -e 's/path\.existsSync/fs\.existsSync/' |\
-    sed -e 's/0o755/493/' > $TMP_FILE
+    sed -e 's/0o755/493/' |\
+    sed -e 's,uglifyjs,$NODE_PATH/uglify-js/bin/uglifyjs,' > $TMP_FILE
     mv $TMP_FILE Cakefile
-    NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+    export NODE_PATH=$TOOLS_DIR/node-0.10.1/lib/node_modules
+    $TOOLS_DIR/node-0.10.1/bin/cake bake
 
     # Return to the Oppia root folder.
-    cd ../../oppia
+    cd $OPPIA_DIR
   fi
 
   # Move the build directory to the static resources folder.
