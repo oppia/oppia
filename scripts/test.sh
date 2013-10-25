@@ -68,7 +68,7 @@ if [ $IS_COVERAGE_INSTALLED = 0 ]; then
 
   cd $TOOLS_DIR/coverage
   python setup.py install || sudo python setup.py install
-  cd ../../../
+  cd $OPPIA_DIR
   rm -rf $TOOLS_DIR/coverage || sudo rm -rf $TOOLS_DIR/coverage
 fi
 
