@@ -16,8 +16,8 @@
 
 ##########################################################################
 
-# INSTRUCTIONS:                                                          
-#                                                                        
+# INSTRUCTIONS:
+#
 # Run this script from the oppia root folder:
 #   bash scripts/test.sh
 # The root folder MUST be named 'oppia'.

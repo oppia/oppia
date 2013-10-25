@@ -223,8 +223,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
   });
 
   $scope.canEditEditorList = function() {
-    return ($scope.currentUser == $scope.explorationEditors[0] ||
-            $scope.currentUserIsAdmin);
+    return (
+        $scope.explorationEditors && (
+            $scope.currentUser == $scope.explorationEditors[0] ||
+            $scope.currentUserIsAdmin
+        )
+    );
   };
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
