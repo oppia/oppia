@@ -190,3 +190,21 @@ if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/
   wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
 fi
+
+echo Checking whether bleach is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/bleach-1.2.2" ]; then
+  echo Installing bleach
+  mkdir -p $THIRD_PARTY_DIR/bleach-1.2.2
+  wget https://github.com/jsocol/bleach/archive/v1.2.2.zip -O bleach-download.zip
+  unzip bleach-download.zip -d $THIRD_PARTY_DIR/
+  rm bleach-download.zip
+fi
+
+echo Checking whether html5lib is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/html5lib-python-0.95" ]; then
+  echo Installing html5lib
+  mkdir -p $THIRD_PARTY_DIR/html5lib-python-0.95
+  wget https://github.com/html5lib/html5lib-python/archive/0.95.zip -O html5lib-download.zip
+  unzip html5lib-download.zip -d $THIRD_PARTY_DIR/
+  rm html5lib-download.zip
+fi

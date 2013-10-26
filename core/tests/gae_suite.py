@@ -65,7 +65,7 @@ sys.path.append(root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 149
+EXPECTED_TEST_COUNT = 152
 
 
 _PARSER = argparse.ArgumentParser()
@@ -135,6 +135,10 @@ def main():
         OPPIA_TOOLS_DIR, 'google_appengine_1.7.7', 'google_appengine', 'lib',
         'webob_0_9')
     ))
+    sys.path.append(os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'bleach-1.2.2')))
+    sys.path.append(os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'html5lib-python-0.95')))
 
     import dev_appserver
     dev_appserver.fix_sys_path()

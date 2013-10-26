@@ -94,11 +94,14 @@ oppia.directive('richTextEditor', function($sce) {
       $(rteNode).wysiwyg({
         autoGrow: true,
         autoSave: true,
+        controls: {
+          insertImage: {visible: false}
+        },
         events: {
           save: function(event) {
             var content = $(rteNode).wysiwyg('getContent');
             if (content !== null && content !== undefined) {
-              $scope.rteContent = $sce.getTrustedHtml(content);
+              $scope.rteContent = content;
               $scope.$apply();
             }
           }

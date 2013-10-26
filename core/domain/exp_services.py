@@ -34,6 +34,7 @@ import zipfile
 
 from core.domain import exp_domain
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
@@ -625,7 +626,8 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         for rule_ind in range(len(ruleset)):
             rule = ruleset[rule_ind]
             state_rule = exp_domain.RuleSpec(
-                rule.get('definition'), rule.get('dest'), rule.get('feedback'),
+                rule.get('definition'), rule.get('dest'),
+                html_cleaner.clean(rule.get('feedback')),
                 rule.get('param_changes')                
             )
 
@@ -664,7 +666,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
 
     if content:
         state.content = [
-            exp_domain.Content(item['type'], item['value'])
+            exp_domain.Content(item['type'], html_cleaner.clean(item['value']))
             for item in content
         ]
 
