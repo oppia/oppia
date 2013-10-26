@@ -83,7 +83,7 @@ oppia.directive('select2Dropdown', function() {
   };
 });
 
-oppia.directive('richTextEditor', function($sce, $compile) {
+oppia.directive('richTextEditor', function($sce) {
   // Rich text editor directive.
   return {
     restrict: 'E',

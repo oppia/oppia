@@ -154,6 +154,9 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
   echo Installing JQueryUI
   mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
   wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.10.3/jquery-ui.min.js
+  wget http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip -O jquery-ui-themes.zip
+  unzip jquery-ui-themes.zip -d $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
+  rm jquery-ui-themes.zip
 fi
 
 echo Checking whether angularjs is installed in $THIRD_PARTY_DIR
