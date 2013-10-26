@@ -28,7 +28,7 @@ OPPIA_CUSTOM_TAGS = {
 
 ALLOWED_TAGS = [
     'a', 'b', 'blockquote', 'br', 'code', 'div', 'em', 'hr', 'i', 'li', 'ol',
-    'span', 'strong', 'table', 'tbody', 'td', 'tr', 'ul'
+    'span', 'strong', 'table', 'tbody', 'td', 'tr', 'u', 'ul'
 ]
 
 TAG_WHITELIST = ALLOWED_TAGS + OPPIA_CUSTOM_TAGS.keys()

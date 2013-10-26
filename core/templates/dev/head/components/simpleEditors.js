@@ -95,7 +95,17 @@ oppia.directive('richTextEditor', function($sce) {
         autoGrow: true,
         autoSave: true,
         controls: {
-          insertImage: {visible: false}
+          h1: {visible: false},
+          h2: {visible: false},
+          h3: {visible: false},
+          insertImage: {visible: false},
+          justifyCenter: {visible: false},
+          justifyFull: {visible: false},
+          justifyLeft: {visible: false},
+          justifyRight: {visible: false},
+          strikeThrough: {visible: false},
+          subscript: {visible: false},
+          superscript: {visible: false}
         },
         events: {
           save: function(event) {
