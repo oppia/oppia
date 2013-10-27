@@ -345,9 +345,9 @@ class CsrfTokenManager(object):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (2 hours).
-    CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
+    _CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
     # Default user id for non-logged-in users.
-    USER_ID_DEFAULT = 'non_logged_in_user'
+    _USER_ID_DEFAULT = 'non_logged_in_user'
 
     @classmethod
     def init_csrf_secret(cls):
@@ -370,7 +370,7 @@ class CsrfTokenManager(object):
         # name, hash of the time issued and plain text of the time issued.
 
         if user_id is None:
-            user_id = cls.USER_ID_DEFAULT
+            user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
         issued_on = long(issued_on)
@@ -388,10 +388,14 @@ class CsrfTokenManager(object):
         return token
 
     @classmethod
+    def _get_current_time(cls):
+        return time.time()
+
+    @classmethod
     def create_csrf_token(cls, user_id, page_name):
         if not page_name:
             raise Exception('Cannot create CSRF token if page name is empty.')
-        return cls._create_token(user_id, page_name, time.time())
+        return cls._create_token(user_id, page_name, cls._get_current_time())
 
     @classmethod
     def is_csrf_token_valid(cls, user_id, page_name, token):
@@ -402,8 +406,8 @@ class CsrfTokenManager(object):
                 return False
 
             issued_on = long(parts[0])
-            age = time.time() - issued_on
-            if age > cls.CSRF_TOKEN_AGE_SECS:
+            age = cls._get_current_time() - issued_on
+            if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
 
             authentic_token = cls._create_token(user_id, page_name, issued_on)
