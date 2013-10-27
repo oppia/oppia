@@ -1,5 +1,16 @@
-<script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
-<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js">
+</script>
+<script>
+  window.jQuery || document.write(
+  	  '<script src="/third_party/static/jquery-2.0.3/jquery.min.js">\x3C/script>');
+</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script>
+  window.jQuery.ui || document.write(
+  	  '<script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js">\x3C/script>');
+</script>
+
 <script src="/lib/static/bootstrap-2.3.1-r1/js/bootstrap.js"></script>
 
 {% if DEV_MODE %}
