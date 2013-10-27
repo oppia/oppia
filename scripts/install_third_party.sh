@@ -48,17 +48,6 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   rm node-download.tgz
 fi
 
-echo Checking whether Karma is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
-  echo Installing Karma
-  $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
-
-  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
-fi
-
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Checking whether coffeescript has been installed via node.js

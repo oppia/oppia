@@ -19,7 +19,7 @@
 # INSTRUCTIONS:
 #
 # Run this script from the oppia root folder:
-#   bash scripts/test.sh
+#   bash scripts/run_js_tests.sh
 # The root folder MUST be named 'oppia'.
 # It runs tests.
 
@@ -38,16 +38,22 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
 
-echo Checking whether coverage is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
-  echo Installing coverage
-  rm -rf $TOOLS_DIR/coverage || sudo rm -rf $TOOLS_DIR/coverage
-  wget http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
-  tar xvzf coverage.tar.gz -C $TOOLS_DIR
-  rm coverage.tar.gz
+# Install third party dependencies
+# TODO(sll): Make this work with fewer third-party dependencies.
+bash scripts/install_third_party.sh
+
+echo Checking whether Karma is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
+  echo Installing Karma
+  $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
+
+  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
+  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
-python $COVERAGE_HOME/coverage run ./core/tests/gae_suite.py $@
-python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/pyshared/*" --show-missing
+
+$TOOLS_DIR/node-0.10.1/bin/karma start core/tests/karma.conf.js
 
 echo Done!
