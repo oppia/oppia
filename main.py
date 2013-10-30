@@ -97,6 +97,9 @@ urls = [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
+    get_redirect_route(
+        r'/rte_assets/<asset_file_path>',
+        resources.RteAssetHandler, 'rte_asset_handler'),
 
     get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(

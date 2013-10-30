@@ -42,6 +42,20 @@ class TemplateHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
+class RteAssetHandler(base.BaseHandler):
+    """Retrieves an asset for the rich text editor."""
+
+    def get(self, asset_file_path):
+        """Handles GET requests."""
+        try:
+            # TODO(sll): Must redo this.
+            self.response.write(utils.get_file_contents(
+                'core/templates/dev/head/components/rte_assets/%s' %
+                asset_file_path, raw_bytes=True))
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+
 class ValueGeneratorHandler(base.BaseHandler):
     """Retrieves the HTML template for a value generator editor."""
 
