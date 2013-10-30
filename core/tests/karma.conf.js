@@ -3,6 +3,7 @@ basePath = '../../';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
+  'third_party/static/jquery-2.0.3/jquery.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-resource.min.js',
   'third_party/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js',
@@ -30,5 +31,5 @@ junitReporter = {
 
 reporters = ['progress'];
 
-// Exit after running tests.
-singleRun = true;
+// Continue running in the background after running tests.
+singleRun = false;
