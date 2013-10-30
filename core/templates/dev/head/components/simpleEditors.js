@@ -83,47 +83,185 @@ oppia.directive('select2Dropdown', function() {
   };
 });
 
-oppia.directive('richTextEditor', function($sce) {
+oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData) {
   // Rich text editor directive.
+
   return {
     restrict: 'E',
-    scope: {rteContent: '='},
+    scope: {htmlContent: '='},
     template: '<textarea rows="7" cols="60"></textarea>',
     controller: function($scope, $element, $attrs) {
       var rteNode = $element[0].firstChild;
-      $(rteNode).wysiwyg({
-        autoGrow: true,
-        autoSave: true,
-        controls: {
-          h1: {visible: false},
-          h2: {visible: false},
-          h3: {visible: false},
-          insertImage: {visible: false},
-          justifyCenter: {visible: false},
-          justifyFull: {visible: false},
-          justifyLeft: {visible: false},
-          justifyRight: {visible: false},
-          strikeThrough: {visible: false},
-          subscript: {visible: false},
-          superscript: {visible: false}
-        },
-        events: {
-          save: function(event) {
-            var content = $(rteNode).wysiwyg('getContent');
-            if (content !== null && content !== undefined) {
-              $scope.rteContent = content;
-              $scope.$apply();
+
+      var NONINTERACTIVE_WIDGETS = [{
+        name: 'image',
+        tooltip: 'Insert image',
+        iconUrl: '/rte_assets/picture.png'
+      }, {
+        name: 'video',
+        tooltip: 'Insert video',
+        iconUrl: '/rte_assets/film.png'
+      }, {
+        name: 'hints',
+        tooltip: 'Insert hints',
+        iconUrl: '/rte_assets/hints.png'
+      }];
+
+      function createRteElement(Wysiwyg, widgetDefinition) {
+        var el = document.createElement('img');
+        el.className += 'oppia-noninteractive-' + widgetDefinition.name;
+        el.src = widgetDefinition.iconUrl;
+        el.ondblclick = (function(_elt) {
+          return function(evt) {
+            var newThing = document.createElement('span');
+            newThing.className = 'insertionPoint';
+            _elt.parentNode.replaceChild(newThing, _elt);
+            $scope.getRteCustomizationModal(Wysiwyg, widgetDefinition);
+          };
+        })(el);
+        return el;
+      }
+
+      // Replace <oppia-noninteractive> tags with <img> tags.
+      $scope.convertHtmlToRte = function(html) {
+        var elt = $('<div>' + html + '</div>');
+
+        var CURR_WIDGET_DEFN = null;
+
+        function getReplacingFn() {
+          // TODO(sll): The 'null' should be Wysiwyg. Can we make Wysiwyg a
+          // global object?
+          return createRteElement(null, CURR_WIDGET_DEFN);
+        }
+
+        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
+          CURR_WIDGET_DEFN = NONINTERACTIVE_WIDGETS[i];
+          elt.find('oppia-noninteractive-' + NONINTERACTIVE_WIDGETS[i].name)
+             .replaceWith(getReplacingFn);
+        }
+        return elt.html();
+      };
+
+      // Replace <img> tags with <oppia-noninteractive> tags.
+      $scope.convertRteToHtml = function(rte) {
+        var elt = $('<div>' + rte + '</div>');
+
+        function getReplacingFn(index, replacedElt) {
+          return $('<' + this.className + '/>').get(0);
+        }
+
+        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
+          elt.find('img.oppia-noninteractive-' + NONINTERACTIVE_WIDGETS[i].name)
+             .replaceWith(getReplacingFn);
+        }
+
+        return elt.html();
+      };
+ 
+      $scope.getRteCustomizationModal = function(Wysiwyg, widgetDefinition) {
+        var modalInstance = $modal.open({
+          templateUrl: 'modals/customizeWidget',
+          backdrop: 'static',
+          resolve: {
+            widgetDefinition: function() {
+              return widgetDefinition;
             }
+          },
+          controller: function($scope, $modalInstance, widgetDefinition) {
+            $scope.widgetParams = widgetDefinition.params || {};
+            $scope.widgetDefinition = widgetDefinition;
+
+            $scope.save = function(widgetParams) {
+              $modalInstance.close({
+                widgetParams: widgetParams,
+                widgetDefinition: $scope.widgetDefinition
+              });
+            };
+
+            $scope.cancel = function () {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
           }
-        },
-        initialContent: $scope.rteContent
+        });
+
+        modalInstance.result.then(function(result) {
+          var el = createRteElement(Wysiwyg, result.widgetDefinition);
+          var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
+          insertionPoint.parentNode.replaceChild(el, insertionPoint);
+          $(rteNode).wysiwyg('save');
+        }, function () {
+          console.log('Modal customizer dismissed.');
+        });
+
+        return modalInstance;
+      };
+
+      function getExecFunction(widgetDefinition) {
+        return function() {
+          var Wysiwyg = this;
+          Wysiwyg.insertHtml('<span class="insertionPoint"></span>');
+          $scope.getRteCustomizationModal(Wysiwyg, widgetDefinition);
+        };
+      }
+
+      $scope.rteContent = $scope.convertHtmlToRte($scope.htmlContent);
+
+      $http.get('/templates/rte').then(function(response) {
+        $scope.initRte(response.data);
       });
 
-      // Disable jquery.ui.dialog so that the link control works correctly.
-      $.fn.dialog = null;
+      $scope.initRte = function(initialHtml) {
+        $(rteNode).wysiwyg({
+          autoGrow: true,
+          autoSave: true,
+          controls: {
+            h1: {visible: false},
+            h2: {visible: false},
+            h3: {visible: false},
+            insertImage: {visible: false},
+            justifyCenter: {visible: false},
+            justifyFull: {visible: false},
+            justifyLeft: {visible: false},
+            justifyRight: {visible: false},
+            strikeThrough: {visible: false},
+            subscript: {visible: false},
+            superscript: {visible: false}
+          },
+          debug: true,
+          events: {
+            save: function(event) {
+              var content = $(rteNode).wysiwyg('getContent');
+              if (content !== null && content !== undefined) {
+                $scope.modifiedContent = content;
+                $scope.htmlContent = $scope.convertRteToHtml(content);
+              }
+            }
+          },
+          html: initialHtml,
+          initialContent: $scope.rteContent,
+          initialMinHeight: '200px',
+          resizeOptions: true
+        });
+
+        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
+          $(rteNode).wysiwyg('addControl', NONINTERACTIVE_WIDGETS[i].name, {
+            groupIndex: 7,
+            icon: NONINTERACTIVE_WIDGETS[i].iconUrl,
+            tooltip: NONINTERACTIVE_WIDGETS[i].tooltip,
+            tags: [],
+            visible: true,
+            exec: getExecFunction(NONINTERACTIVE_WIDGETS[i])
+          });
+        }
+
+        // Disable jquery.ui.dialog so that the link control works correctly.
+        $.fn.dialog = null;
+      };
     }
   };
 });
+
 
 // TODO(sll): Combine all of these into a single directive.
 

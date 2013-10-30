@@ -95,7 +95,7 @@
 
               <div ng-if="item.type == 'text'">
                 <div ng-show="activeInputData.name == 'content.' + $index">
-                  <rich-text-editor rte-content="content[$index].value">
+                  <rich-text-editor html-content="content[$index].value">
                   </rich-text-editor>
                   <button ng-click="saveTextContent()">Save and close</button>
                 </div>
