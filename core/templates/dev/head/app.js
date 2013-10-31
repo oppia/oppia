@@ -26,3 +26,32 @@ oppia.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 });
+
+// Service for HTML serialization and escaping.
+oppia.factory('oppiaHtmlEscaper', function() {
+  var htmlEscaper = {
+    objToEscapedJson: function(obj) {
+      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
+    },
+    escapedJsonToObj: function(json) {
+      return JSON.parse(this.escapedStrToUnescapedStr(json));
+    },
+    unescapedStrToEscapedStr: function(str) {
+      return String(str)
+                  .replace(/&/g, '&amp;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+    },
+    escapedStrToUnescapedStr: function(value) {
+      return String(value)
+                  .replace(/&quot;/g, '"')
+                  .replace(/&#39;/g, "'")
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>')
+                  .replace(/&amp;/g, '&');
+    }
+  };
+  return htmlEscaper;
+});

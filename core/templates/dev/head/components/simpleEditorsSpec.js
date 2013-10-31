@@ -84,9 +84,10 @@ describe('RTE directive', function() {
       ['<div>abc</div>', '<div>abc</div>'],
       ['<div>abc</div><br>', '<div>abc</div><br>'],
       ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
-      // TODO(sll): This needs to be changed to carry along the attributes.
       ['<oppia-noninteractive-image></oppia-noninteractive-image>',
-       '<img src="/rte_assets/picture.png" class="oppia-noninteractive-image">']
+       '<img src="/rte_assets/picture.png" class="oppia-noninteractive-image">'],
+      ['<oppia-noninteractive-hints hint_placeholder="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}"></oppia-noninteractive-hints>',
+       '<img hint_placeholder="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}" src="/rte_assets/hints.png" class="oppia-noninteractive-hints">']
     ];
 
     var rteControllerScope = elm.scope();
