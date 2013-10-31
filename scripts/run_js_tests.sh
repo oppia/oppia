@@ -53,6 +53,8 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
   chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
+export NODEJS_HOME=$TOOLS_DIR/node-0.10.1/bin/
+export PATH=$PATH:$NODEJS_HOME
 
 $TOOLS_DIR/node-0.10.1/bin/karma start core/tests/karma.conf.js
 
