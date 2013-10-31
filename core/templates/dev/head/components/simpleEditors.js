@@ -92,22 +92,26 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData) {
     template: '<textarea rows="7" cols="60"></textarea>',
     controller: function($scope, $element, $attrs) {
       var rteNode = $element[0].firstChild;
+      var Wysiwyg = null;
 
       var NONINTERACTIVE_WIDGETS = [{
         name: 'image',
+        backendName: 'Image',
         tooltip: 'Insert image',
         iconUrl: '/rte_assets/picture.png'
       }, {
         name: 'video',
+        backendName: 'Video',
         tooltip: 'Insert video',
         iconUrl: '/rte_assets/film.png'
       }, {
         name: 'hints',
+        backendName: 'Hints',
         tooltip: 'Insert hints',
         iconUrl: '/rte_assets/hints.png'
       }];
 
-      function createRteElement(Wysiwyg, widgetDefinition) {
+      function createRteElement(widgetDefinition) {
         var el = document.createElement('img');
         el.className += 'oppia-noninteractive-' + widgetDefinition.name;
         el.src = widgetDefinition.iconUrl;
@@ -116,7 +120,7 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData) {
             var newThing = document.createElement('span');
             newThing.className = 'insertionPoint';
             _elt.parentNode.replaceChild(newThing, _elt);
-            $scope.getRteCustomizationModal(Wysiwyg, widgetDefinition);
+            $scope.getRteCustomizationModal(widgetDefinition);
           };
         })(el);
         return el;
@@ -129,9 +133,7 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData) {
         var CURR_WIDGET_DEFN = null;
 
         function getReplacingFn() {
-          // TODO(sll): The 'null' should be Wysiwyg. Can we make Wysiwyg a
-          // global object?
-          return createRteElement(null, CURR_WIDGET_DEFN);
+          return createRteElement(CURR_WIDGET_DEFN);
         }
 
         for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
@@ -157,51 +159,72 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData) {
 
         return elt.html();
       };
+
+      $scope.createRequest = function(requestObj) {
+        return $.param({
+          csrf_token: GLOBALS.csrf_token,
+          payload: JSON.stringify(requestObj),
+          source: document.URL
+        }, true);
+      };
  
-      $scope.getRteCustomizationModal = function(Wysiwyg, widgetDefinition) {
-        var modalInstance = $modal.open({
-          templateUrl: 'modals/customizeWidget',
-          backdrop: 'static',
-          resolve: {
-            widgetDefinition: function() {
-              return widgetDefinition;
+      $scope.getRteCustomizationModal = function(widgetDefinition) {
+        return $http.post(
+            '/widgets/noninteractive/' + widgetDefinition.backendName,
+            $scope.createRequest({
+              customization_args: {}
+            }),
+            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        ).then(function(response) {
+          widgetDefinition.params = response.data.widget.params;
+
+          var modalInstance = $modal.open({
+            templateUrl: 'modals/customizeWidget',
+            backdrop: 'static',
+            resolve: {
+              widgetDefinition: function() {
+                return widgetDefinition;
+              }
+            },
+            controller: function($scope, $modalInstance, widgetDefinition) {
+              $scope.widgetParams = widgetDefinition.params || {};
+              $scope.widgetDefinition = widgetDefinition;
+              console.log($scope.widgetParams);
+              console.log($scope.widgetDefinition);
+  
+              $scope.save = function(widgetParams) {
+                $modalInstance.close({
+                  widgetParams: widgetParams,
+                  widgetDefinition: $scope.widgetDefinition
+                });
+              };
+  
+              $scope.cancel = function () {
+                $modalInstance.dismiss('cancel');
+                warningsData.clear();
+              };
             }
-          },
-          controller: function($scope, $modalInstance, widgetDefinition) {
-            $scope.widgetParams = widgetDefinition.params || {};
-            $scope.widgetDefinition = widgetDefinition;
-
-            $scope.save = function(widgetParams) {
-              $modalInstance.close({
-                widgetParams: widgetParams,
-                widgetDefinition: $scope.widgetDefinition
-              });
-            };
-
-            $scope.cancel = function () {
-              $modalInstance.dismiss('cancel');
-              warningsData.clear();
-            };
-          }
+          });
+  
+          modalInstance.result.then(function(result) {
+            var el = createRteElement(result.widgetDefinition);
+            var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
+            insertionPoint.parentNode.replaceChild(el, insertionPoint);
+            $(rteNode).wysiwyg('save');
+          }, function () {
+            console.log('Modal customizer dismissed.');
+          });
+  
+          return modalInstance;
         });
-
-        modalInstance.result.then(function(result) {
-          var el = createRteElement(Wysiwyg, result.widgetDefinition);
-          var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
-          insertionPoint.parentNode.replaceChild(el, insertionPoint);
-          $(rteNode).wysiwyg('save');
-        }, function () {
-          console.log('Modal customizer dismissed.');
-        });
-
-        return modalInstance;
       };
 
       function getExecFunction(widgetDefinition) {
         return function() {
-          var Wysiwyg = this;
-          Wysiwyg.insertHtml('<span class="insertionPoint"></span>');
-          $scope.getRteCustomizationModal(Wysiwyg, widgetDefinition);
+          Wysiwyg = this;
+          $(rteNode).wysiwyg(
+            'insertHtml', '<span class="insertionPoint"></span>');
+          $scope.getRteCustomizationModal(widgetDefinition);
         };
       }
 

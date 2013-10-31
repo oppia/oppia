@@ -119,7 +119,7 @@ INTERACTIVE_PREFIX = 'interactive'
 NONINTERACTIVE_PREFIX = 'noninteractive'
 
 # The total number of non-interactive widgets. Used as a sanity check.
-NONINTERACTIVE_WIDGET_COUNT = 1
+NONINTERACTIVE_WIDGET_COUNT = 4
 # The total number of interactive widgets. Used as a sanity check.
 INTERACTIVE_WIDGET_COUNT = 12
 
