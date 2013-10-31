@@ -140,9 +140,9 @@ states:
       
       - Majuro
       
-      - Malabo
-      
       - Malé
+      
+      - Malabo
       
       - Manama
       
@@ -194,15 +194,17 @@ states:
       
       - Rome
       
+      - São Tomé
+      
       - Saipan
       
       - Sana'a
       
       - Sarajevo
       
-      - São Tomé
-      
       - Seoul
+      
+      - Singapore
       
       - Skopje
       
@@ -839,21 +841,21 @@ states:
       
       - definition:
           inputs:
-            x: Malabo
-          name: Equals
-          rule_type: atomic
-          subject: CityName
-        dest: Malabo
-        feedback: []
-        param_changes: []
-      
-      - definition:
-          inputs:
             x: Malé
           name: Equals
           rule_type: atomic
           subject: CityName
         dest: MalC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Malabo
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Malabo
         feedback: []
         param_changes: []
       
@@ -1109,6 +1111,16 @@ states:
       
       - definition:
           inputs:
+            x: São Tomé
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: SC3A3oTomC3A9
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
             x: Saipan
           name: Equals
           rule_type: atomic
@@ -1139,21 +1151,21 @@ states:
       
       - definition:
           inputs:
-            x: São Tomé
-          name: Equals
-          rule_type: atomic
-          subject: CityName
-        dest: SC3A3oTomC3A9
-        feedback: []
-        param_changes: []
-      
-      - definition:
-          inputs:
             x: Seoul
           name: Equals
           rule_type: atomic
           subject: CityName
         dest: Seoul
+        feedback: []
+        param_changes: []
+      
+      - definition:
+          inputs:
+            x: Singapore
+          name: Equals
+          rule_type: atomic
+          subject: CityName
+        dest: Singapore
         feedback: []
         param_changes: []
       
@@ -1472,7 +1484,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1509,7 +1521,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1546,7 +1558,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1583,7 +1595,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1620,7 +1632,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1657,7 +1669,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1694,7 +1706,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1731,7 +1743,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1768,7 +1780,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1805,7 +1817,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1842,7 +1854,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1879,7 +1891,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1916,7 +1928,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1953,7 +1965,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -1990,7 +2002,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2027,7 +2039,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2064,7 +2076,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2101,7 +2113,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2138,7 +2150,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2175,7 +2187,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2212,7 +2224,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2249,7 +2261,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2286,7 +2298,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2323,7 +2335,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2360,7 +2372,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2397,7 +2409,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2434,7 +2446,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2471,7 +2483,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2508,7 +2520,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2545,7 +2557,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2582,7 +2594,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2619,7 +2631,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2656,7 +2668,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2693,7 +2705,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2730,7 +2742,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2767,7 +2779,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2804,7 +2816,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2841,7 +2853,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2878,7 +2890,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2915,7 +2927,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2952,7 +2964,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -2989,7 +3001,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3026,7 +3038,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3063,7 +3075,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3100,7 +3112,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3137,7 +3149,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3174,7 +3186,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3211,7 +3223,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3248,7 +3260,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3285,7 +3297,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3322,7 +3334,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3359,7 +3371,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3396,7 +3408,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3433,7 +3445,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3461,43 +3473,6 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
-  name: Malabo
-  param_changes: []
-  widget:
-    customization_args:
-      latitude:
-        value: 0
-      longitude:
-        value: 0
-      zoom:
-        value: 0
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            d: 3.0
-            p:
-            - 3.7520639
-            - 8.7737
-          name: Within
-          rule_type: atomic
-          subject: answer
-        dest: PickCity
-        feedback:
-        - Yes, that's where {{CityName}} is!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Malabo
-        feedback: []
-        param_changes: []
-    sticky: true
-    widget_id: InteractiveMap
-
-- content:
-  - type: text
-    value: Find {{CityName}}.
   name: MalC3A9
   param_changes: []
   widget:
@@ -3507,7 +3482,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3535,6 +3510,43 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
+  name: Malabo
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 3
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 3.7520639
+            - 8.7737
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Malabo
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
   name: Manama
   param_changes: []
   widget:
@@ -3544,7 +3556,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3581,7 +3593,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3618,7 +3630,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3655,7 +3667,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3692,7 +3704,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3729,7 +3741,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3766,7 +3778,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3803,7 +3815,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3840,7 +3852,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3877,7 +3889,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3914,7 +3926,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3951,7 +3963,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -3988,7 +4000,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4025,7 +4037,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4062,7 +4074,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4099,7 +4111,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4136,7 +4148,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4173,7 +4185,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4210,7 +4222,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4247,7 +4259,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4284,7 +4296,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4321,7 +4333,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4358,7 +4370,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4395,7 +4407,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4432,7 +4444,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4460,6 +4472,43 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
+  name: SC3A3oTomC3A9
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 3
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 0.33611
+            - 6.68139
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: SC3A3oTomC3A9
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
   name: Saipan
   param_changes: []
   widget:
@@ -4469,7 +4518,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4506,7 +4555,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4543,7 +4592,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4571,43 +4620,6 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
-  name: SC3A3oTomC3A9
-  param_changes: []
-  widget:
-    customization_args:
-      latitude:
-        value: 0
-      longitude:
-        value: 0
-      zoom:
-        value: 0
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            d: 3.0
-            p:
-            - 0.33611
-            - 6.68139
-          name: Within
-          rule_type: atomic
-          subject: answer
-        dest: PickCity
-        feedback:
-        - Yes, that's where {{CityName}} is!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: SC3A3oTomC3A9
-        feedback: []
-        param_changes: []
-    sticky: true
-    widget_id: InteractiveMap
-
-- content:
-  - type: text
-    value: Find {{CityName}}.
   name: Seoul
   param_changes: []
   widget:
@@ -4617,7 +4629,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4645,6 +4657,43 @@ states:
 - content:
   - type: text
     value: Find {{CityName}}.
+  name: Singapore
+  param_changes: []
+  widget:
+    customization_args:
+      latitude:
+        value: 0
+      longitude:
+        value: 0
+      zoom:
+        value: 3
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            d: 3.0
+            p:
+            - 1.3
+            - 103.8
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: PickCity
+        feedback:
+        - Yes, that's where {{CityName}} is!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: Singapore
+        feedback: []
+        param_changes: []
+    sticky: true
+    widget_id: InteractiveMap
+
+- content:
+  - type: text
+    value: Find {{CityName}}.
   name: Skopje
   param_changes: []
   widget:
@@ -4654,7 +4703,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4691,7 +4740,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4728,7 +4777,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4765,7 +4814,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4802,7 +4851,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4839,7 +4888,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4876,7 +4925,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4913,7 +4962,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4950,7 +4999,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -4987,7 +5036,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5024,7 +5073,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5061,7 +5110,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5098,7 +5147,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5135,7 +5184,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5172,7 +5221,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5209,7 +5258,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5246,7 +5295,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5283,7 +5332,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5320,7 +5369,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5357,7 +5406,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5394,7 +5443,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5431,7 +5480,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5468,7 +5517,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5505,7 +5554,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5542,7 +5591,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5579,7 +5628,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5616,7 +5665,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5653,7 +5702,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5690,7 +5739,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
@@ -5727,7 +5776,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:

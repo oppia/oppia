@@ -31,6 +31,7 @@
 
 var _http = require('http');
 var _fs = require('fs');
+var _zlib = require('zlib');
 
 var host = 'http://en.wikipedia.org';
 
@@ -38,10 +39,14 @@ var forPage = function(path, handler) {
     _http.request(
         host + path,
         function(res) {
+            var stream = res.headers['content-encoding'] == 'gzip' ?
+                res.pipe(_zlib.createGunzip()) : res;
             var data = '';
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) { data += chunk; });
-            res.on('end', function() { handler(data); });
+            stream.setEncoding('utf8');
+            stream.on('data', function (chunk) { data += chunk; });
+            stream.on('end', function() {
+                handler(data);
+            });
         }).end();
 };
 

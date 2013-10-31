@@ -92,7 +92,7 @@ states:
       longitude:
         value: 0
       zoom:
-        value: 0
+        value: 3
     handlers:
     - name: submit
       rule_specs:
