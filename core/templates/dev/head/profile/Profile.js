@@ -18,7 +18,7 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function Profile($scope, $http, warningsData) {
+function Profile($scope, $http, warningsData, requestCreator) {
   $scope.profileUrl = '/profile/data/';
   $scope.pageLoaded = false;
 
@@ -43,7 +43,7 @@ function Profile($scope, $http, warningsData) {
   $scope.createUsername = function(username) {
     $http.post(
       '/profile/create_user_name',
-      $scope.createRequest({
+      requestCreator.createRequest({
         username: username,
         returnUrl: $scope.getUrlParams().returnURL,
       }),
@@ -61,4 +61,4 @@ function Profile($scope, $http, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Profile.$inject = ['$scope', '$http', 'warningsData'];
+Profile.$inject = ['$scope', '$http', 'warningsData', 'requestCreator'];

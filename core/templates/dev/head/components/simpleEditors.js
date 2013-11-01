@@ -83,7 +83,7 @@ oppia.directive('select2Dropdown', function() {
   };
 });
 
-oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData, oppiaHtmlEscaper) {
+oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData, oppiaHtmlEscaper, requestCreator) {
   // Rich text editor directive.
 
   return {
@@ -170,18 +170,10 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
         return elt.html();
       };
 
-      $scope.createRequest = function(requestObj) {
-        return $.param({
-          csrf_token: GLOBALS.csrf_token,
-          payload: JSON.stringify(requestObj),
-          source: document.URL
-        }, true);
-      };
-
       $scope.getRteCustomizationModal = function(widgetDefinition, customizationArgs) {
         return $http.post(
             '/widgets/noninteractive/' + widgetDefinition.backendName,
-            $scope.createRequest({
+            requestCreator.createRequest({
               customization_args: customizationArgs
             }),
             {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorationData) {
+function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorationData, requestCreator) {
   $scope.showPreview = true;
 
   // Sets the 'showPreview' variable. The input is a boolean.
@@ -39,7 +39,7 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
         '/widgets/interactive/' + widgetId,
-        $scope.createRequest({
+        requestCreator.createRequest({
           customization_args: customizationArgs
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
@@ -621,5 +621,5 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
 }
 
 InteractiveWidgetPreview.$inject = [
-  '$scope', '$http', '$modal', 'warningsData', 'explorationData'
+  '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'requestCreator'
 ];

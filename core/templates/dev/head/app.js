@@ -55,3 +55,21 @@ oppia.factory('oppiaHtmlEscaper', function() {
   };
   return htmlEscaper;
 });
+
+// Service for converting requests to a form that can be sent to the server.
+oppia.factory('requestCreator', function() {
+  return {
+    /**
+     * Creates a request object that can be sent to the server.
+     * @param {object} requestObj The object to be sent to the server. It will
+          be JSON-stringified and stored under 'payload'.
+     */
+    createRequest: function(requestObj) {
+      return $.param({
+        csrf_token: GLOBALS.csrf_token,
+        payload: JSON.stringify(requestObj),
+        source: document.URL
+      }, true);
+    }
+  };
+});
