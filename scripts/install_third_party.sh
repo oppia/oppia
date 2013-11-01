@@ -18,8 +18,6 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
-ME=$(whoami)
-
 echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
