@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData, messengerService) {
+ function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
@@ -115,7 +115,7 @@
 
     $http.post(
         '/learn/give-feedback/' + $scope.explorationId + '/' + $scope.stateId,
-        $scope.createRequest(requestMap),
+        requestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {
       $scope.feedback = '';
@@ -213,7 +213,7 @@
 
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        $scope.createRequest(requestMap),
+        requestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
@@ -311,5 +311,5 @@
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService'
+  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'requestCreator'
 ];

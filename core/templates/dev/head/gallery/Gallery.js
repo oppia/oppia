@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Gallery($scope, $http, $modal, warningsData) {
+function Gallery($scope, $http, $modal, warningsData, requestCreator) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
   $scope.galleryUrl = '/gallery/data/';
@@ -69,7 +69,7 @@ function Gallery($scope, $http, $modal, warningsData) {
   $scope.forkExploration = function(explorationId) {
     $http.post(
         '/fork',
-        $scope.createRequest({exploration_id: explorationId}),
+        requestCreator.createRequest({exploration_id: explorationId}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               window.location = '/create/' + data.explorationId;
@@ -90,4 +90,4 @@ function Gallery($scope, $http, $modal, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData'];
+Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData', 'requestCreator'];

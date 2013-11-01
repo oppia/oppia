@@ -33,7 +33,7 @@ oppia.run(function($rootScope) {
 });
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
-    $filter, explorationData, warningsData, activeInputData) {
+    $filter, explorationData, warningsData, activeInputData, requestCreator) {
 
   $scope.doesStateIdExist = function() {
     return Boolean($scope.stateId);
@@ -380,7 +380,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     $scope.paramSpecs[name] = {obj_type: type};
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           param_specs: $scope.paramSpecs,
           version: explorationData.data.version
         }),
@@ -414,7 +414,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           editors: $scope.explorationEditors,
           version: explorationData.data.version
         }),
@@ -470,7 +470,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest(requestParameters),
+        requestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               if (frontendName == 'isPublic') {
@@ -523,7 +523,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.post(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           state_name: newStateName,
           version: explorationData.data.version
         }),
@@ -642,5 +642,5 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
  */
 EditorExploration.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter',
-  'explorationData', 'warningsData', 'activeInputData'
+  'explorationData', 'warningsData', 'activeInputData', 'requestCreator'
 ];

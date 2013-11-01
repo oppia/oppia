@@ -19,7 +19,7 @@
  */
 
 function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
-                   warningsData, activeInputData) {
+                   warningsData, activeInputData, requestCreator) {
 
   $scope.$on('guiTabSelected', function(event, stateData) {
     $scope.stateName = stateData.name;
@@ -52,7 +52,7 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
     $http.post(
       '/widgets/noninteractive/' + widget.id + '?parent_index=' + index,
-      $scope.createRequest({
+      requestCreator.createRequest({
         customization_args: customization_args,
         state_params: $scope.stateParamChanges
       }),
@@ -370,4 +370,4 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
 }
 
 GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
-    'explorationData', 'warningsData', 'activeInputData'];
+    'explorationData', 'warningsData', 'activeInputData', 'requestCreator'];
