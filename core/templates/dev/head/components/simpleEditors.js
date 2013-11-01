@@ -83,7 +83,7 @@ oppia.directive('select2Dropdown', function() {
   };
 });
 
-oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, oppiaHtmlEscaper) {
+oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData, oppiaHtmlEscaper) {
   // Rich text editor directive.
 
   return {
@@ -94,27 +94,30 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, op
       var rteNode = $element[0].firstChild;
       var Wysiwyg = null;
 
-      var NONINTERACTIVE_WIDGETS = [{
+      $scope._NONINTERACTIVE_WIDGETS = [{
         name: 'image',
         backendName: 'Image',
         tooltip: 'Insert image',
+        iconDataUrl: '',
         iconUrl: '/rte_assets/picture.png'
       }, {
         name: 'video',
         backendName: 'Video',
         tooltip: 'Insert video',
+        iconDataUrl: '',
         iconUrl: '/rte_assets/film.png'
       }, {
         name: 'hints',
         backendName: 'Hints',
         tooltip: 'Insert hints',
+        iconDataUrl: '',
         iconUrl: '/rte_assets/hints.png'
       }];
 
-      function createRteElement(widgetDefinition, customizationArgs) {
+      $scope.createRteElement = function(widgetDefinition, customizationArgs) {
         var el = document.createElement('img');
         el.className += 'oppia-noninteractive-' + widgetDefinition.name;
-        el.src = widgetDefinition.iconUrl;
+        el.src = widgetDefinition.iconDataUrl;
         for (paramName in customizationArgs) {
           var args = customizationArgs[paramName];
           el.setAttribute(paramName, oppiaHtmlEscaper.objToEscapedJson(args));
@@ -132,23 +135,18 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, op
       $scope.convertHtmlToRte = function(html) {
         var elt = $('<div>' + html + '</div>');
 
-        var CURR_WIDGET_DEFN = null;
+        $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+          elt.find('oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
+            var customizationArgs = {};
+            for (var i = 0; i < this.attributes.length; i++) {
+              var attr = this.attributes[i];
+              customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
+                attr.value);
+            }
+            return $scope.createRteElement(widgetDefn, customizationArgs);
+          });
+        });
 
-        function getReplacingFn() {
-          var customizationArgs = {};
-          for (var i = 0; i < this.attributes.length; i++) {
-            var attr = this.attributes[i];
-            customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
-              attr.value);
-          }
-          return createRteElement(CURR_WIDGET_DEFN, customizationArgs);
-        }
-
-        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
-          CURR_WIDGET_DEFN = NONINTERACTIVE_WIDGETS[i];
-          elt.find('oppia-noninteractive-' + NONINTERACTIVE_WIDGETS[i].name)
-             .replaceWith(getReplacingFn);
-        }
         return elt.html();
       };
 
@@ -156,21 +154,18 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, op
       $scope.convertRteToHtml = function(rte) {
         var elt = $('<div>' + rte + '</div>');
 
-        function getReplacingFn() {
-          var jQueryElt = $('<' + this.className + '/>');
-          for (var i = 0; i < this.attributes.length; i++) {
-            var attr = this.attributes[i];
-            if (attr.name !== 'class' && attr.name !== 'src') {
-              jQueryElt.attr(attr.name, attr.value);
+        $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+          elt.find('img.oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
+            var jQueryElt = $('<' + this.className + '/>');
+            for (var i = 0; i < this.attributes.length; i++) {
+              var attr = this.attributes[i];
+              if (attr.name !== 'class' && attr.name !== 'src') {
+                jQueryElt.attr(attr.name, attr.value);
+              }
             }
-          }
-          return jQueryElt.get(0);
-        }
-
-        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
-          elt.find('img.oppia-noninteractive-' + NONINTERACTIVE_WIDGETS[i].name)
-             .replaceWith(getReplacingFn);
-        }
+            return jQueryElt.get(0);
+          });
+        });
 
         return elt.html();
       };
@@ -225,7 +220,7 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, op
           });
 
           modalInstance.result.then(function(result) {
-            var el = createRteElement(result.widgetDefinition, result.customizationArgs);
+            var el = $scope.createRteElement(result.widgetDefinition, result.customizationArgs);
             var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
             insertionPoint.parentNode.replaceChild(el, insertionPoint);
             $(rteNode).wysiwyg('save');
@@ -290,16 +285,42 @@ oppia.directive('richTextEditor', function($sce, $modal, $http, warningsData, op
           resizeOptions: true
         });
 
-        for (var i = 0; i < NONINTERACTIVE_WIDGETS.length; i++) {
-          $(rteNode).wysiwyg('addControl', NONINTERACTIVE_WIDGETS[i].name, {
+        $scope._addRteControl = function(widgetDefinition) {
+          $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
             groupIndex: 7,
-            icon: NONINTERACTIVE_WIDGETS[i].iconUrl,
-            tooltip: NONINTERACTIVE_WIDGETS[i].tooltip,
+            icon: widgetDefinition.iconDataUrl,
+            tooltip: widgetDefinition.tooltip,
             tags: [],
             visible: true,
-            exec: getExecFunction(NONINTERACTIVE_WIDGETS[i])
+            exec: getExecFunction(widgetDefinition)
           });
+        };
+
+        $scope._updateWidgetDefinition = function(widgetDefinition) {
+          if (widgetDefinition.iconDataUrl) {
+            var deferred = $q.defer();
+            deferred.resolve(widgetDefinition);
+            return deferred.promise;
+          } else {
+            return $http.get(widgetDefinition.iconUrl).then(function(response) {
+              widgetDefinition.iconDataUrl = response.data;
+              return widgetDefinition;
+            });
+          }
+        };
+
+        $scope.updatePromises = [];
+        for (var i = 0; i < $scope._NONINTERACTIVE_WIDGETS.length; i++) {
+          $scope.updatePromises.push($scope._updateWidgetDefinition(
+              $scope._NONINTERACTIVE_WIDGETS[i]));
         }
+
+        $scope.updateAllPromise = $q.all($scope.updatePromises).then(function(values) {
+          console.log(values);
+          values.forEach(function(widgetDefinition) {
+            $scope._addRteControl(widgetDefinition);
+          });
+        });
 
         // Disable jquery.ui.dialog so that the link control works correctly.
         $.fn.dialog = null;

@@ -85,12 +85,21 @@ describe('RTE directive', function() {
       ['<div>abc</div><br>', '<div>abc</div><br>'],
       ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
       ['<oppia-noninteractive-image></oppia-noninteractive-image>',
-       '<img src="/rte_assets/picture.png" class="oppia-noninteractive-image">'],
-      ['<oppia-noninteractive-hints hint_placeholder="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}"></oppia-noninteractive-hints>',
-       '<img hint_placeholder="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}" src="/rte_assets/hints.png" class="oppia-noninteractive-hints">']
+       '<img src="data:123" class="oppia-noninteractive-image">'],
+      ['<oppia-noninteractive-image image_id="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}"></oppia-noninteractive-image>',
+       '<img image_id="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}" src="data:123" class="oppia-noninteractive-image">']
     ];
 
     var rteControllerScope = elm.scope();
+
+    rteControllerScope._NONINTERACTIVE_WIDGETS = [{
+      name: 'image',
+      backendName: 'Image',
+      tooltip: 'Insert image',
+      iconDataUrl: 'data:123',
+      iconUrl: '/rte_assets/picture.png'
+    }];
+
     for (var i = 0; i < testData.length; i++) {
       expect(rteControllerScope.convertHtmlToRte(testData[i][0]))
           .toEqual(testData[i][1]);

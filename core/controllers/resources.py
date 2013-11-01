@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
+import urllib
 import utils
 
 
@@ -46,12 +47,14 @@ class RteAssetHandler(base.BaseHandler):
     """Retrieves an asset for the rich text editor."""
 
     def get(self, asset_file_path):
-        """Handles GET requests."""
+        """Handles GET requests. Returns the image as a data URL."""
         try:
-            # TODO(sll): Must redo this.
-            self.response.write(utils.get_file_contents(
-                'core/templates/dev/head/components/rte_assets/%s' %
-                asset_file_path, raw_bytes=True))
+            # TODO(sll): Should the location be changed?
+            file_contents = utils.get_file_contents(
+                'core/templates/dev/head/components/rte_assets/%s'
+                % asset_file_path, raw_bytes=True)
+            self.response.write('data:image/png;base64,%s' % urllib.quote(
+                file_contents.encode('base64')))
         except Exception as e:
             raise self.PageNotFoundException(e)
 

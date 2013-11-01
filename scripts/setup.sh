@@ -52,6 +52,7 @@ fi
 export OPPIA_DIR=`pwd`
 export TOOLS_DIR=`pwd`/../oppia_tools
 export THIRD_PARTY_DIR=third_party
+export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
