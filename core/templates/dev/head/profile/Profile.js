@@ -45,8 +45,12 @@ function Profile($scope, $http, warningsData) {
       '/profile/create_user_name',
       $scope.createRequest({
         username: username,
+        returnUrl: $scope.getUrlParams().returnURL,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+        window.location = $scope.getUrlParams().returnUrl;
+      }
     ).error(function(data) {
         warningsData.addWarning(data.error);
       }

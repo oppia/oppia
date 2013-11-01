@@ -83,7 +83,8 @@ class CreateUsernamePage(base.BaseHandler):
     @base.require_user
     def post(self):
       """Handles POST requests.""" 
-      username = self.payload.get('username');
+      username = self.payload.get('username')
+      returnUrl = str(self.payload.get('returnUrl'))
       if not re.match(feconf.ALPHANUMERIC_REGEX, username):
           raise Exception("Usernames can only have alphanumeric characters.")
       if not user_services.is_username_taken(username):

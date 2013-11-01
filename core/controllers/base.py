@@ -88,7 +88,7 @@ def require_editor(handler):
             user_settings_model = user_services.UserSettingsModel.get_or_create(self.user_id)
 
             if not user_settings_model.username:
-                self.redirect("/profile/create_user_name")
+                self.redirect("/profile/create_user_name?returnUrl=" + self.request.url)
                 return
 
         try:
