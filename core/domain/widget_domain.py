@@ -301,6 +301,12 @@ class BaseWidget(object):
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
 
+        # Add RTE toolbar information for noninteractive widgets.
+        if self.type == feconf.NONINTERACTIVE_PREFIX:
+            result['frontend_name'] = self.frontend_name
+            result['tooltip'] = self.tooltip
+            result['icon_data_url'] = self.icon_data_url
+
         return result
 
     def get_handler_by_name(self, handler_name):
@@ -335,17 +341,12 @@ class Registry(object):
     @classmethod
     def _refresh_widgets_of_type(cls, widget_type):
         registry_dict = cls.WIDGET_TYPE_MAPPING[widget_type][0]
-        widget_dir = cls.WIDGET_TYPE_MAPPING[widget_type][1]
-
         registry_dict.clear()
 
         # Assemble all extensions/widgets/[WIDGET_TYPE]/[WIDGET_ID] paths.
-        ALL_WIDGET_PATHS = []
-        full_dir = os.path.join(os.getcwd(), widget_dir)
-        ALL_WIDGET_PATHS += [
-            os.path.join(os.getcwd(), full_dir, widget_id)
-            for widget_id in os.listdir(full_dir)
-            if os.path.isdir(os.path.join(full_dir, widget_id))
+        ALL_WIDGET_PATHS = [
+            defn['dir'] for (widget, defn) in
+            feconf.ALLOWED_WIDGETS[widget_type].iteritems()
         ]
 
         # Crawl the directories and add new widget instances to the registries.

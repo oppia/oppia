@@ -58,29 +58,27 @@ describe('List directive', function() {
 
 
 describe('RTE directive', function() {
-  var elm, scope, template, $httpBackend;
+  var elm, scope, $httpBackend;
 
-  var INTERNAL_RTE_CONTENT_PATH = 'core/templates/dev/head/components/rte.html';
-
-  beforeEach(module('oppia', INTERNAL_RTE_CONTENT_PATH));
-
-  beforeEach(inject(function($rootScope, $compile, $templateCache, _$httpBackend_) {
-    template = $templateCache.get(INTERNAL_RTE_CONTENT_PATH);
-    $templateCache.put('/templates/rte', template);
-
+  beforeEach(module('oppia'));
+  beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
     $httpBackend = _$httpBackend_;
-    $httpBackend.whenGET('/templates/rte').respond(template);
-    $httpBackend.expectGET('/templates/rte');
-    $httpBackend.whenGET('/rte_assets/picture.png').respond('');
-    $httpBackend.whenGET('/rte_assets/film.png').respond('');
-    $httpBackend.whenGET('/rte_assets/hints.png').respond('');
-    $httpBackend.expectGET('/rte_assets/picture.png');
-    $httpBackend.expectGET('/rte_assets/film.png');
-    $httpBackend.expectGET('/rte_assets/hints.png');
+    $httpBackend.whenGET('/widgetrepository/data/noninteractive').respond({
+      data: {
+        widgets: {
+          'Basic Input': [{
+            frontend_name: 'image',
+            name: 'Image',
+            tooltip: 'Insert image',
+            icon_data_url: 'data:123'
+          }]
+        }
+      }
+    });
+    $httpBackend.expectGET('/widgetrepository/data/noninteractive');
 
-    elm = angular.element('<rich-text-editor></rich-text-editor>');
+    elm = $compile('<rich-text-editor></rich-text-editor>')($rootScope);
     scope = $rootScope;
-    $compile(elm)(scope);
     scope.$digest();
   }));
 
@@ -98,12 +96,12 @@ describe('RTE directive', function() {
 
     var rteControllerScope = elm.scope();
 
+    // TODO(sll): Why isn't this being auto-populated?
     rteControllerScope._NONINTERACTIVE_WIDGETS = [{
-      name: 'image',
-      backendName: 'Image',
-      tooltip: 'Insert image',
-      iconDataUrl: 'data:123',
-      iconUrl: '/rte_assets/picture.png'
+        name: 'image',
+        backendName: 'Image',
+        tooltip: 'Insert image',
+        iconDataUrl: 'data:123'
     }];
 
     for (var i = 0; i < testData.length; i++) {

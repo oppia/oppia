@@ -62,3 +62,16 @@ class Hints(widget_domain.BaseWidget):
         },
         'obj_type': 'UnicodeString',
     }]
+
+    frontend_name = 'hints'
+    tooltip = 'Insert hints'
+    icon_data_url = (
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1%2BjfqA'
+        'AAABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXH'
+        'JZTwAAADoSURBVBgZBcExblNBGAbA2ceegTRBuIKO%0AgiihSZNTcC5LUHAihNJR0kGKC'
+        'DcYJY6D3/77MdOinTvzAgCw8ysThIvn/VojIyMjIyPP%2BbS1sUQI%0AV2s95pBDDvmbP'
+        '/mdkft83tpYguZq5Jh/OeaYh%2Byzy8hTHvNlaxNNczm%2Bla9OTlar1UdA/%2BC2A4tr'
+        '%0ARCnD3jS8BB1obq2Gk6GU6QbQAS4BUaYSQAf4bhhKKTFdAzrAOwAxEUAH%2BKEM01SY'
+        '3gM6wBsEAQB0%0AgJ%2BmaZoC3gI6iPYaAIBJsiRmHU0AALOeFC3aK2cWAACUXe7%2BAw'
+        'O0lc9eTHYTAAAAAElFTkSuQmCC%0A'
+    )

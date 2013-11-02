@@ -155,3 +155,53 @@ NULL_SNAPSHOT = {}
 ALLOW_YAML_FILE_UPLOAD = False
 # Whether or not to require users to have usernames in order to edit
 REQUIRE_USERS_TO_SET_USERNAMES = False
+
+# Ids and locations of the permitted noninteractive widgets.
+ALLOWED_WIDGETS = {
+    NONINTERACTIVE_PREFIX: {
+        'Image': {
+            'dir': 'extensions/widgets/noninteractive/Image'
+        },
+        'Hints': {
+            'dir': 'extensions/widgets/noninteractive/Hints'
+        },
+        'Video': {
+            'dir': 'extensions/widgets/noninteractive/Video'
+        },
+    },
+    INTERACTIVE_PREFIX: {
+        'Continue': {
+            'dir': 'extensions/widgets/interactive/Continue'
+        },
+        'MultipleChoiceInput': {
+            'dir': 'extensions/widgets/interactive/MultipleChoiceInput'
+        },
+        'NumericInput': {
+            'dir': 'extensions/widgets/interactive/NumericInput'
+        },
+        'TextInput': {
+            'dir': 'extensions/widgets/interactive/TextInput'
+        },
+        'InteractiveMap': {
+            'dir': 'extensions/widgets/interactive/InteractiveMap'
+        },
+        'FileReadInput': {
+            'dir': 'extensions/widgets/interactive/FileReadInput'
+        },
+        'MusicStaff': {
+            'dir': 'extensions/widgets/interactive/MusicStaff'
+        },
+        'SetInput': {
+            'dir': 'extensions/widgets/interactive/SetInput'
+        },
+        'FileReadInputWithHints': {
+            'dir': 'extensions/widgets/interactive/FileReadInputWithHints'
+        },
+        'TarFileReadInputWithHints': {
+            'dir': 'extensions/widgets/interactive/TarFileReadInputWithHints'
+        },
+        'CodeRepl': {
+            'dir': 'extensions/widgets/interactive/CodeRepl'
+        },
+    }
+}

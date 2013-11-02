@@ -22,10 +22,10 @@ import os
 import re
 import string
 
-import feconf
 from core.domain import exp_services
 from core.domain import obj_services
 from core.domain import widget_domain
+import feconf
 import test_utils
 import utils
 
@@ -81,26 +81,55 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
-    def test_default_widgets_are_valid(self):
-        """Test the default widgets."""
+    def test_allowed_widgets(self):
+        """Do sanity checks on the ALLOWED_WIDGETS dict in feconf.py."""
+        widget_registries = [
+            feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX],
+            feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]
+        ]
+
+        for registry in widget_registries:
+            for (widget_name, definition) in registry.iteritems():
+                contents = os.listdir(
+                    os.path.join(os.getcwd(), definition['dir']))
+                self.assertIn('%s.py' % widget_name, contents)
+
+    def test_widget_counts(self):
+        """Test that the correct number of widgets are loaded."""
         widget_domain.Registry.refresh()
 
         self.assertEqual(
             len(widget_domain.Registry.interactive_widgets),
-            feconf.INTERACTIVE_WIDGET_COUNT
+            len(feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX])
         )
         self.assertEqual(
             len(widget_domain.Registry.noninteractive_widgets),
-            feconf.NONINTERACTIVE_WIDGET_COUNT
+            len(feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX])
         )
 
+    def test_image_data_urls_for_noninteractive_widgets(self):
+        """Test the data urls for the noninteractive widget editor icons."""
+        widget_domain.Registry.refresh()
+
+        widget_list = widget_domain.Registry.noninteractive_widgets
+        allowed_widgets = feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]
+        for widget_name in allowed_widgets:
+            image_filepath = os.path.join(
+                os.getcwd(), allowed_widgets[widget_name]['dir'],
+                '%s.png' % widget_name)
+            self.assertEqual(
+                utils.convert_png_to_data_url(image_filepath),
+                widget_list[widget_name].icon_data_url
+            )
+
+    def test_default_widgets_are_valid(self):
+        """Test the default widgets."""
         bindings = widget_domain.Registry.interactive_widgets
 
-        widget_ids = os.listdir(os.path.join(feconf.INTERACTIVE_WIDGETS_DIR))
         # TODO(sll): These tests ought to include non-interactive widgets as
         # well.
 
-        for widget_id in widget_ids:
+        for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
             # Check that the widget_id name is valid.
             self.assertTrue(self.is_camel_cased(widget_id))
 
