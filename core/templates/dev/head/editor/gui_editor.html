@@ -59,38 +59,9 @@
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
 
               <span class="pull-right">
-
-                <span ng-show="item.type == 'text'">
-                  <span ng-hide="activeInputData.name == 'content.' + $index">
-                    <a ng-click="editContent($index)">Edit</a> |
-                  </span>
+                <span ng-hide="activeInputData.name == 'content.' + $index">
+                  <a ng-click="editContent($index)">Edit</a>
                 </span>
-
-                <span ng-show="$index != 0">
-                  <span ng-show="activeInputData.name !== ''">
-                    <span class="oppia-grayed"> ⇑ </span> |
-                  </span>
-                  <span ng-hide="activeInputData.name !== ''">
-                    <a ng-click="swapContent($index, $index - 1)"> ⇑ </a> |
-                  </span>
-                </span>
-
-                <span ng-show="$index < content.length - 1">
-                  <span ng-show="activeInputData.name !== ''">
-                    <span class="oppia-grayed"> ⇓ </span> |
-                  </span>
-                  <span ng-hide="activeInputData.name !== ''">
-                    <a ng-click="swapContent($index, $index + 1)"> ⇓ </a> |
-                  </span>
-                </span>
-
-                <span ng-show="activeInputData.name !== ''">
-                  <span class="oppia-grayed"> Delete </span>
-                </span>
-                <span ng-hide="activeInputData.name !== ''">
-                  <a ng-click="deleteContent($index)">Delete</a>
-                </span>
-
               </span>
 
               <div ng-if="item.type == 'text'">
@@ -104,7 +75,7 @@
                   <span ng-show="item.value == ''" class="oppia-placeholder">
                     <[defaultTextContent]>
                   </span>
-                  <span ng-bind-html="item.value"></span>
+                  <span angular-html-bind="item.value"></span>
                 </div>
               </div>
 
@@ -160,13 +131,6 @@
 
             </li>
           </ul>
-
-          <center class="oppia-add-content-box">
-            <button ng-click="addContent('text')">Add rich text</button>
-            <button ng-click="addContent('image')">Add image</button>
-            <button ng-click="addContent('video')">Add video</button>
-            <button ng-click="addContent('widget')">Add widget</button>
-          </center>
 
           <br>
           <br>

@@ -92,7 +92,9 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
     template: '<textarea rows="7" cols="60"></textarea>',
     controller: function($scope, $element, $attrs) {
       var rteNode = $element[0].firstChild;
-      var Wysiwyg = null;
+      // A pointer to the editorDoc in the RTE iframe. Populated when the RTE is
+      // initialized.
+      $scope.editorDoc = null;
 
       $scope._NONINTERACTIVE_WIDGETS = [{
         name: 'image',
@@ -114,25 +116,30 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
         iconUrl: '/rte_assets/hints.png'
       }];
 
-      $scope.createRteElement = function(widgetDefinition, customizationArgs) {
-        var el = document.createElement('img');
-        el.className += 'oppia-noninteractive-' + widgetDefinition.name;
-        el.src = widgetDefinition.iconDataUrl;
+      $scope._createRteElement = function(widgetDefinition, customizationArgs) {
+        var el = $('<img/>');
+        el.attr('src', widgetDefinition.iconDataUrl);
+        el.addClass('oppia-noninteractive-' + widgetDefinition.name);
+
         for (paramName in customizationArgs) {
-          var args = customizationArgs[paramName];
-          el.setAttribute(paramName, oppiaHtmlEscaper.objToEscapedJson(args));
+          var escapedArgs = oppiaHtmlEscaper.objToEscapedJson(
+              customizationArgs[paramName]);
+          el.attr(paramName, escapedArgs);
         }
-        el.ondblclick = (function(_elt) {
-          return function(evt) {
-            _elt.className += ' insertionPoint';
-            $scope.getRteCustomizationModal(widgetDefinition, customizationArgs);
-          };
-        })(el);
-        return el;
+
+        var domNode = el.get(0);
+        // This dblclick handler is stripped in the initial HTML --> RTE conversion,
+        // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
+        domNode.ondblclick = function() {
+          el.addClass('insertionPoint');
+          $scope.getRteCustomizationModal(widgetDefinition, customizationArgs);
+        };
+
+        return domNode;
       }
 
       // Replace <oppia-noninteractive> tags with <img> tags.
-      $scope.convertHtmlToRte = function(html) {
+      $scope._convertHtmlToRte = function(html) {
         var elt = $('<div>' + html + '</div>');
 
         $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
@@ -143,7 +150,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
                 attr.value);
             }
-            return $scope.createRteElement(widgetDefn, customizationArgs);
+            return $scope._createRteElement(widgetDefn, customizationArgs);
           });
         });
 
@@ -151,7 +158,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
       };
 
       // Replace <img> tags with <oppia-noninteractive> tags.
-      $scope.convertRteToHtml = function(rte) {
+      $scope._convertRteToHtml = function(rte) {
         var elt = $('<div>' + rte + '</div>');
 
         $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
@@ -212,12 +219,12 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
           });
 
           modalInstance.result.then(function(result) {
-            var el = $scope.createRteElement(result.widgetDefinition, result.customizationArgs);
-            var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
+            var el = $scope._createRteElement(result.widgetDefinition, result.customizationArgs);
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
             insertionPoint.parentNode.replaceChild(el, insertionPoint);
             $(rteNode).wysiwyg('save');
           }, function () {
-            var insertionPoint = Wysiwyg.editorDoc.querySelector('.insertionPoint');
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
             insertionPoint.className = insertionPoint.className.replace(
                 /\binsertionPoint\b/, '');
             console.log('Modal customizer dismissed.');
@@ -227,96 +234,109 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
         });
       };
 
-      function getExecFunction(widgetDefinition) {
-        return function() {
-          if (Wysiwyg === null) {
-            Wysiwyg = this;
-          }
-          $(rteNode).wysiwyg(
-            'insertHtml', '<span class="insertionPoint"></span>');
-          $scope.getRteCustomizationModal(widgetDefinition, {});
-        };
-      }
-
-      $scope.rteContent = $scope.convertHtmlToRte($scope.htmlContent);
-
-      $http.get('/templates/rte').then(function(response) {
-        $scope.initRte(response.data);
-      });
-
-      $scope.initRte = function(initialHtml) {
-        $(rteNode).wysiwyg({
-          autoGrow: true,
-          autoSave: true,
-          controls: {
-            h1: {visible: false},
-            h2: {visible: false},
-            h3: {visible: false},
-            insertImage: {visible: false},
-            justifyCenter: {visible: false},
-            justifyFull: {visible: false},
-            justifyLeft: {visible: false},
-            justifyRight: {visible: false},
-            strikeThrough: {visible: false},
-            subscript: {visible: false},
-            superscript: {visible: false}
-          },
-          debug: true,
-          events: {
-            save: function(event) {
-              var content = $(rteNode).wysiwyg('getContent');
-              if (content !== null && content !== undefined) {
-                $scope.modifiedContent = content;
-                $scope.htmlContent = $scope.convertRteToHtml(content);
-              }
-            }
-          },
-          html: initialHtml,
-          initialContent: $scope.rteContent,
-          initialMinHeight: '200px',
-          resizeOptions: true
-        });
-
-        $scope._addRteControl = function(widgetDefinition) {
-          $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
-            groupIndex: 7,
-            icon: widgetDefinition.iconDataUrl,
-            tooltip: widgetDefinition.tooltip,
-            tags: [],
-            visible: true,
-            exec: getExecFunction(widgetDefinition)
+      $scope._updateWidgetDefinition = function(widgetDefinition) {
+        if (widgetDefinition.iconDataUrl) {
+          var deferred = $q.defer();
+          deferred.resolve(widgetDefinition);
+          return deferred.promise;
+        } else {
+          return $http.get(widgetDefinition.iconUrl).then(function(response) {
+            widgetDefinition.iconDataUrl = response.data;
+            return widgetDefinition;
           });
-        };
+        }
+      };
 
-        $scope._updateWidgetDefinition = function(widgetDefinition) {
-          if (widgetDefinition.iconDataUrl) {
-            var deferred = $q.defer();
-            deferred.resolve(widgetDefinition);
-            return deferred.promise;
-          } else {
-            return $http.get(widgetDefinition.iconUrl).then(function(response) {
-              widgetDefinition.iconDataUrl = response.data;
-              return widgetDefinition;
-            });
-          }
-        };
-
+      $scope.init = function() {
         $scope.updatePromises = [];
         for (var i = 0; i < $scope._NONINTERACTIVE_WIDGETS.length; i++) {
           $scope.updatePromises.push($scope._updateWidgetDefinition(
               $scope._NONINTERACTIVE_WIDGETS[i]));
         }
+  
+        $q.all($scope.updatePromises).then(function(values) {
+          $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
 
-        $scope.updateAllPromise = $q.all($scope.updatePromises).then(function(values) {
-          console.log(values);
-          values.forEach(function(widgetDefinition) {
-            $scope._addRteControl(widgetDefinition);
+          $http.get('/templates/rte').then(function(response) {
+            var initialHtml = response.data;
+  
+            $(rteNode).wysiwyg({
+              autoGrow: true,
+              autoSave: true,
+              controls: {
+                h1: {visible: false},
+                h2: {visible: false},
+                h3: {visible: false},
+                insertImage: {visible: false},
+                justifyCenter: {visible: false},
+                justifyFull: {visible: false},
+                justifyLeft: {visible: false},
+                justifyRight: {visible: false},
+                strikeThrough: {visible: false},
+                subscript: {visible: false},
+                superscript: {visible: false}
+              },
+              debug: true,
+              events: {
+                save: function(event) {
+                  var content = $(rteNode).wysiwyg('getContent');
+                  if (content !== null && content !== undefined) {
+                    $scope.modifiedContent = content;
+                    $scope.htmlContent = $scope._convertRteToHtml(content);
+                  }
+                }
+              },
+              html: initialHtml,
+              initialContent: $scope.rteContent,
+              initialMinHeight: '200px',
+              resizeOptions: true
+            });
+  
+            // Add the non-interactive widget controls to the RTE.  
+            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+              $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
+                groupIndex: 7,
+                icon: widgetDefinition.iconDataUrl,
+                tooltip: widgetDefinition.tooltip,
+                tags: [],
+                visible: true,
+                exec: function() {
+                  $(rteNode).wysiwyg(
+                      'insertHtml', '<span class="insertionPoint"></span>');
+                  $scope.getRteCustomizationModal(widgetDefinition, {});
+                }
+              });
+            });
+
+            $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
+
+            // Add dblclick handlers to the various nodes.
+            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+              var elts = $scope.editorDoc.querySelectorAll(
+                  '.oppia-noninteractive-' + widgetDefinition.name);
+              for (var i = 0; i < elts.length; i++) {
+                elts[i].ondblclick = function() {
+                  this.className += ' insertionPoint';
+                  var customizationArgs = {};
+                  for (var i = 0; i < this.attributes.length; i++) {
+                    var attr = this.attributes[i];
+                    if (attr.name !== 'src' && attr.name !== 'class') {
+                      customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
+                          attr.value);
+                    }
+                  }
+                  $scope.getRteCustomizationModal(widgetDefinition, customizationArgs);
+                }
+              }
+            });
+  
+            // Disable jquery.ui.dialog so that the link control works correctly.
+            $.fn.dialog = null;
           });
         });
-
-        // Disable jquery.ui.dialog so that the link control works correctly.
-        $.fn.dialog = null;
       };
+
+      $scope.init();
     }
   };
 });

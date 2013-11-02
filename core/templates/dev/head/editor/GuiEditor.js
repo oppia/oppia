@@ -127,6 +127,9 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
       'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
 
   $scope.saveTextContent = function() {
+    // This seems to be needed in order to ensure that the latest values from
+    // the RTE are captured.
+    $scope.$apply();
     $scope.saveStateContent();
     activeInputData.name = '';
   };
@@ -205,29 +208,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
       warningsData.addWarning('Unknown content type ' + contentType + '.');
       return;
     }
-    $scope.saveStateContent();
-  };
-
-  $scope.deleteContent = function(index) {
-    activeInputData.clear();
-    $scope.content.splice(index, 1);
-    $scope.saveStateContent();
-    $scope.initAllWidgets();
-  };
-
-  $scope.swapContent = function(index1, index2) {
-    activeInputData.clear();
-    if (index1 < 0 || index1 >= $scope.content.length) {
-      warningsData.addWarning('Content element ' + index1 + ' does not exist.');
-    }
-    if (index2 < 0 || index2 >= $scope.content.length) {
-      warningsData.addWarning('Content element ' + index2 + ' does not exist.');
-    }
-
-    var tmpContent = $scope.content[index1];
-    $scope.content[index1] = $scope.content[index2];
-    $scope.content[index2] = tmpContent;
-
     $scope.saveStateContent();
   };
 

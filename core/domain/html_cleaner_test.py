@@ -83,11 +83,11 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
 
     def test_oppia_custom_tags(self):
         TEST_DATA = [(
-            '<oppia-noninteractive-image image-id="1"/>',
-            '<oppia-noninteractive-image image-id="1"></oppia-noninteractive-image>'
+            '<oppia-noninteractive-image image_id="1"/>',
+            '<oppia-noninteractive-image image_id="1"></oppia-noninteractive-image>'
         ), (
-            '<oppia-noninteractive-image image-id="1"></oppia-noninteractive-image>',
-            '<oppia-noninteractive-image image-id="1"></oppia-noninteractive-image>'
+            '<oppia-noninteractive-image image_id="1"></oppia-noninteractive-image>',
+            '<oppia-noninteractive-image image_id="1"></oppia-noninteractive-image>'
         ), (
             '<oppia-fake-tag></oppia-fake-tag>',
             ''

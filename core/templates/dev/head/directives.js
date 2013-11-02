@@ -19,15 +19,21 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// HTML bind directive that trusts the value it is given and also evaluates
+// custom directive tags in the provided value.
 oppia.directive('angularHtmlBind', function($compile) {
-  return function(scope, elm, attrs) {
-    scope.$watch(attrs.angularHtmlBind, function(newValue, oldValue) {
-      if (newValue !== oldValue) {
+  return {
+    restrict: 'A',
+    scope: {
+      varToBind: '=angularHtmlBind'
+    },
+    link: function(scope, elm, attrs) {
+      scope.$watch('varToBind', function(newValue, oldValue) {
         elm.html(newValue);
         $compile(elm.contents())(scope);
-      }
-    });
-  };
+      });
+    }
+  }
 });
 
 oppia.directive('imageUpload', function($exceptionHandler) {
