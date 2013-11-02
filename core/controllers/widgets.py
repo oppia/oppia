@@ -101,3 +101,24 @@ class WidgetHandler(base.BaseHandler):
                 response['parent_index'] = parent_index
 
         self.render_json(response)
+
+
+class WidgetTemplateHandler(base.BaseHandler):
+    """Retrieves the HTML template for a widget."""
+
+    # TODO(sll): This should be broken into separate methods for the
+    # editor and reader views. Currently it only handles the editor
+    # view.
+
+    def get(self, widget_type, widget_id):
+        """Handles GET requests."""
+        try:
+            widget = widget_domain.Registry.get_widget_by_id(
+                widget_type, widget_id)
+
+            # TODO(sll): The first arg should be the widget's customization args.
+            # TODO(sll): preview_mode should probably be False.
+            self.response.write(widget.get_raw_code(
+                {}, {}, preview_mode=True))
+        except:
+            raise self.PageNotFoundException

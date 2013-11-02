@@ -20,9 +20,10 @@ __author__ = 'Sean Lip'
 
 import bleach
 
+# TODO(sll): Get this directly from the widget definitions.
 OPPIA_CUSTOM_TAGS = {
-    'oppia-noninteractive-image': ['image-id'],
-    'oppia-noninteractive-video': ['video-id'],
+    'oppia-noninteractive-image': ['image_id'],
+    'oppia-noninteractive-video': ['video_id'],
     'oppia-noninteractive-hints': []
 }
 

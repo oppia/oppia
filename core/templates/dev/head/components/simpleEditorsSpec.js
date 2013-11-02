@@ -71,6 +71,12 @@ describe('RTE directive', function() {
     $httpBackend = _$httpBackend_;
     $httpBackend.whenGET('/templates/rte').respond(template);
     $httpBackend.expectGET('/templates/rte');
+    $httpBackend.whenGET('/rte_assets/picture.png').respond('');
+    $httpBackend.whenGET('/rte_assets/film.png').respond('');
+    $httpBackend.whenGET('/rte_assets/hints.png').respond('');
+    $httpBackend.expectGET('/rte_assets/picture.png');
+    $httpBackend.expectGET('/rte_assets/film.png');
+    $httpBackend.expectGET('/rte_assets/hints.png');
 
     elm = angular.element('<rich-text-editor></rich-text-editor>');
     scope = $rootScope;
@@ -85,9 +91,9 @@ describe('RTE directive', function() {
       ['<div>abc</div><br>', '<div>abc</div><br>'],
       ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
       ['<oppia-noninteractive-image></oppia-noninteractive-image>',
-       '<img src="data:123" class="oppia-noninteractive-image">'],
+       '<img class="oppia-noninteractive-image" src="data:123">'],
       ['<oppia-noninteractive-image image_id="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}"></oppia-noninteractive-image>',
-       '<img image_id="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}" src="data:123" class="oppia-noninteractive-image">']
+       '<img image_id="{&amp;quot;value&amp;quot;:&amp;quot;T&amp;quot;}" class="oppia-noninteractive-image" src="data:123">']
     ];
 
     var rteControllerScope = elm.scope();
@@ -101,9 +107,9 @@ describe('RTE directive', function() {
     }];
 
     for (var i = 0; i < testData.length; i++) {
-      expect(rteControllerScope.convertHtmlToRte(testData[i][0]))
+      expect(rteControllerScope._convertHtmlToRte(testData[i][0]))
           .toEqual(testData[i][1]);
-      expect(rteControllerScope.convertRteToHtml(testData[i][1]))
+      expect(rteControllerScope._convertRteToHtml(testData[i][1]))
           .toEqual(testData[i][0]);
     }
   }));

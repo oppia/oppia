@@ -154,6 +154,9 @@ urls = [
     get_redirect_route(
         r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
         'widget_handler'),
+    get_redirect_route(
+        r'/widgettemplate/<widget_type>/<widget_id>', widgets.WidgetTemplateHandler,
+        'widget_template_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
