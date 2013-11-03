@@ -156,12 +156,9 @@ ALLOW_YAML_FILE_UPLOAD = False
 # Whether or not to require users to have usernames in order to edit
 REQUIRE_USERS_TO_SET_USERNAMES = False
 
-# Ids and locations of the permitted noninteractive widgets.
+# Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {
-        'Image': {
-            'dir': 'extensions/widgets/noninteractive/Image'
-        },
         'Hints': {
             'dir': 'extensions/widgets/noninteractive/Hints'
         },

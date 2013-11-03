@@ -25,7 +25,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.stateName = stateData.name;
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
-    $scope.initAllWidgets();
 
     $scope.$broadcast('stateEditorInitialized', $scope.stateId);
     // TODO(sll): Why isn't this working?
@@ -33,35 +32,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
     console.log('Content updated.');
   });
-
-  $scope.initAllWidgets = function(index) {
-    for (var i = 0; i < $scope.content.length; i++) {
-      if ($scope.content[i].type == 'widget' && $scope.content[i].value) {
-        $scope.initWidget(i);
-      }
-    }
-  };
-
-  $scope.initWidget = function(index) {
-    var widget = JSON.parse($scope.content[index].value);
-
-    var customization_args = {};
-    for (var param in widget.params) {
-      customization_args[param] = widget.params[param].customization_args;
-    }
-
-    $http.post(
-      '/widgets/noninteractive/' + widget.id + '?parent_index=' + index,
-      requestCreator.createRequest({
-        customization_args: customization_args,
-        state_params: $scope.stateParamChanges
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(widgetData) {
-      $scope.addContentToIframeWithId(
-          'widgetPreview' + widgetData.parent_index, widgetData.widget.raw);
-    });
-  };
 
   $scope.getIncomingStates = function(stateId) {
     var incomingStates = {},
@@ -140,18 +110,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     explorationData.saveStateData($scope.stateId, {'content': $scope.content});
   };
 
-  $scope.addContent = function(contentType) {
-    if (contentType == 'text') {
-      $scope.content.push({type: 'text', value: ''});
-    } else if (contentType == 'image') {
-      $scope.content.push({type: 'image', value: ''});
-    } else {
-      warningsData.addWarning('Unknown content type ' + contentType + '.');
-      return;
-    }
-    $scope.saveStateContent();
-  };
-
   $scope.editContent = function(index) {
     activeInputData.name = 'content.' + index;
   };
@@ -192,26 +150,8 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     });
   };
 
-  // Receive messages from the widget repository.
-  $scope.$on('message', function(event, arg) {
-    if (!arg.data.widgetType || arg.data.widgetType != 'noninteractive') {
-      return;
-    }
-
-    var widget = arg.data.widget;
-    var index = arg.data.parentIndex;
-
-    $scope.content[index].value = JSON.stringify({
-      'id': widget.id,
-      'params': widget.params
-    });
-
-    $scope.initWidget(index);
-    $scope.saveStateContent();
-  });
-
   $scope.getCustomizationModalInstance = function(widgetParams) {
-    // NB: This method is used for both interactive and noninteractive widgets.
+    // NB: This method is used for interactive widgets.
     return $modal.open({
       templateUrl: 'modals/customizeWidget',
       backdrop: 'static',
@@ -239,13 +179,11 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope.saveStateParamChanges = function() {
-    console.log($scope.stateParamChanges);
-
     explorationData.saveStateData(
       $scope.stateId,
-      {'param_changes': $scope.stateParamChanges});
+      {'param_changes': $scope.stateParamChanges}
+    );
   };
-
 }
 
 GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
