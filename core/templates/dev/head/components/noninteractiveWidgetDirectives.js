@@ -13,14 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives that are not associated with reusable components.
- * NB: Reusable component directives should go in the components/ folder.
+ * @fileoverview Directives supporting non-interactive widgets.
  *
  * @author sll@google.com (Sean Lip)
  */
-
- // TODO(sll): These are for the editor view. Make a separate file for the
- // reader view.
 
 oppia.directive('oppiaNoninteractiveImage', function($compile) {
   return {
@@ -30,10 +26,38 @@ oppia.directive('oppiaNoninteractiveImage', function($compile) {
   };
 });
 
-oppia.directive('oppiaNoninteractiveVideo', function($compile) {
+oppia.directive('oppiaNoninteractiveVideo', function($sce, oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {},
-    templateUrl: '/widgettemplate/noninteractive/Video'
+    scope: {
+      video_id: '@'
+    },
+    templateUrl: '/widgettemplate/noninteractive/Video',
+    controller: function($scope, $attrs) {
+      $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoId).value;
+      $scope.videoUrl = $sce.trustAsResourceUrl(
+          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0'
+      );
+    }
+  };
+});
+
+oppia.directive('oppiaNoninteractiveHints', function(oppiaHtmlEscaper) {
+  return {
+    restrict: 'E',
+    scope: {
+      low_hint: '@',
+      medium_hint: '@',
+      high_hint: '@',
+      hint_placholder: '@'
+    },
+    templateUrl: '/widgettemplate/noninteractive/Hints',
+    controller: function($scope, $attrs) {
+      $scope.lowHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.lowHint).value;
+      $scope.mediumHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.mediumHint).value;
+      $scope.highHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.highHint).value;
+      $scope.hintPlaceholder = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.hintPlaceholder).value;
+    }
   };
 });

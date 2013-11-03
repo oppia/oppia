@@ -174,7 +174,7 @@
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [$sce.trustAsHtml(data.oppia_html)];
+    $scope.responseLog = [data.oppia_html];
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
@@ -237,9 +237,7 @@
 
     $scope.responseLog = $scope.responseLog || [];
     $scope.responseLog.push(
-      $sce.trustAsHtml(data.reader_response_html),
-      // The following line is needed to load img src tags.
-      $sce.trustAsHtml(data.oppia_html)
+      data.reader_response_html, data.oppia_html
     );
 
     for (var i = 0; i < data.iframe_output.length; i++) {

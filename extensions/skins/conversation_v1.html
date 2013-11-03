@@ -62,10 +62,8 @@
       <br>
 
       <div ng-repeat="response in responseLog track by $index">
-        <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>">
-          <div ng-show="response"
-               class="ng-class: $last && 'oppia-response' || 'oppia-conversation-log'"
-               ng-bind-html="response">
+        <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>" class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[$last]]>">
+          <div angular-html-bind="response">
           </div>
         </div>
       </div>

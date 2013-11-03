@@ -24,7 +24,9 @@ import bleach
 OPPIA_CUSTOM_TAGS = {
     'oppia-noninteractive-image': ['image_id'],
     'oppia-noninteractive-video': ['video_id'],
-    'oppia-noninteractive-hints': []
+    'oppia-noninteractive-hints': [
+        'low_hint', 'medium_hint', 'high_hint', 'hint_placeholder'
+    ]
 }
 
 ALLOWED_TAGS = [

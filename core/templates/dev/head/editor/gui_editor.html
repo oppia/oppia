@@ -89,44 +89,7 @@
                     </form>
                     <span class="oppia-loading" id="uploadImageLoading"></span>
                   </div>
-                  <div ng-switch-default>
-                    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationId]>/<[item.value]>"></img>
-                    <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
-                  </div>
                 </ng-switch>
-              </div>
-
-              <div ng-if="item.type == 'video'">
-                <div ng-if="item.value == ''" class="oppia-placeholder">
-                  <form novalidate name="addVideoContent" ng-submit="hideVideoInputDialog(newVideoLink, $index)">
-                    Add a Youtube video link:
-                    <input type="text" ng-model="newVideoLink" id="newVideoLink" required>
-                    <input type="submit" value="Save" ng-disabled="addVideoContent.$invalid">
-                  </form>
-                </div>
-                <div ng-if="item.value != ''">
-                  <iframe width="100" height="56"
-                          ng-src="<[getYoutubeVideoUrl(item.value)]>"
-                          frameborder="0" allowfullscreen>
-                  </iframe>
-                  <span ng-click="deleteVideo($index)" class="oppia-thumbnail">&times;</span>
-                </div>
-              </div>
-
-              <div ng-if="item.type == 'widget'">
-                <div ng-show="item.value == ''">
-                  <iframe ng-src="<[getWidgetRepositoryUrl($index)]>" width="100%" height="400px" frameborder="0"></iframe>
-                </div>
-
-                <div ng-hide="item.value == ''">
-                  <button type="button" ng-click="deleteWidget($index)">Change widget</button>
-                  <span ng-show="hasCustomizableParams(item.value)">
-                    <button ng-click="showCustomizeNonInteractiveWidgetModal($index)">
-                      Customize
-                    </button>
-                  </span>
-                  <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
-                </div>
               </div>
 
             </li>

@@ -119,6 +119,7 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     activeInputData.clear();
   };
 
+  // TODO(sll): Replace this with a link to code.google.com documentation.
   $scope.defaultTextContent = (
       'Click \'Edit\' to enter text here. Text enclosed in dollar signs ' +
       'will be displayed as $LaTeX$. To write a non-LaTeXed dollar sign, ' +
@@ -129,6 +130,7 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
   $scope.saveTextContent = function() {
     // This seems to be needed in order to ensure that the latest values from
     // the RTE are captured.
+    // TODO(sll): Do we need to update math?
     $scope.$apply();
     $scope.saveStateContent();
     activeInputData.name = '';
@@ -138,72 +140,11 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     explorationData.saveStateData($scope.stateId, {'content': $scope.content});
   };
 
-  $scope.getYoutubeVideoUrl = function(videoId) {
-    return $sce.trustAsResourceUrl(
-      '//www.youtube.com/embed/' + videoId + '?rel=0');
-  };
-
-  $scope.hideVideoInputDialog = function(videoLink, index) {
-    if (videoLink) {
-      // The content creator has added a new video link. Extract its ID.
-      if (videoLink.indexOf('http://') === 0)
-        videoLink = videoLink.substring(7);
-      if (videoLink.indexOf('https://') === 0)
-        videoLink = videoLink.substring(8);
-      if (videoLink.indexOf('www.') === 0)
-        videoLink = videoLink.substring(4);
-
-      // Note that the second group of each regex must be the videoId in order
-      // for the following code to work.
-      // TODO(sll): Check these regexes carefully (or simplify the logic).
-      var videoRegexp1 = new RegExp(
-          '^youtube\.com\/watch\\?(.*&)?v=([A-Za-z0-9-_]+)(&.*)?$');
-      var videoRegexp2 = new RegExp(
-          '^(you)tube\.com\/embed\/([A-Za-z0-9-_]+)/?$');
-      var videoRegexp3 = new RegExp('^(you)tu\.be\/([A-Za-z0-9-_]+)/?$');
-
-      var videoId = (videoRegexp1.exec(videoLink) ||
-                     videoRegexp2.exec(videoLink) ||
-                     videoRegexp3.exec(videoLink));
-      if (!videoId) {
-        warningsData.addWarning(
-            'Could not parse this video link. Please use a YouTube video.');
-        return;
-      }
-
-      // The following validation method is the one described in
-      // stackoverflow.com/questions/2742813/how-to-validate-youtube-video-ids
-      // It does not work at the moment, so it is temporarily disabled and replaced
-      // with the two lines below it.
-      /*
-      $http.get('https://gdata.youtube.com/feeds/api/videos/' + videoId[2], '').
-          success(function(data) {
-            $scope.content[index].value = videoId[2];
-            $scope.saveStateContent();
-          }).error(function(data) {
-            warningsData.addWarning('This is not a valid YouTube video id.');
-          });
-      */
-      $scope.content[index].value = videoId[2];
-      $scope.saveStateContent();
-    }
-    activeInputData.clear();
-  };
-
-  $scope.deleteVideo = function(index) {
-    $scope.content[index].value = '';
-    $scope.saveStateContent();
-  };
-
   $scope.addContent = function(contentType) {
     if (contentType == 'text') {
       $scope.content.push({type: 'text', value: ''});
     } else if (contentType == 'image') {
       $scope.content.push({type: 'image', value: ''});
-    } else if (contentType == 'video') {
-      $scope.content.push({type: 'video', value: ''});
-    } else if (contentType == 'widget') {
-      $scope.content.push({type: 'widget', value: ''});
     } else {
       warningsData.addWarning('Unknown content type ' + contentType + '.');
       return;
@@ -251,12 +192,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     });
   };
 
-  $scope.deleteImage = function(index) {
-    // TODO(sll): Send a delete request to the backend datastore.
-    $scope.content[index].value = '';
-    $scope.saveStateContent();
-  };
-
   // Receive messages from the widget repository.
   $scope.$on('message', function(event, arg) {
     if (!arg.data.widgetType || arg.data.widgetType != 'noninteractive') {
@@ -274,19 +209,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.initWidget(index);
     $scope.saveStateContent();
   });
-
-  $scope.getWidgetRepositoryUrl = function(parentIndex) {
-    return $sce.trustAsResourceUrl(
-      '/widgetrepository?iframed=true&interactive=false&parent_index=' + parentIndex);
-  };
-
-  $scope.hasCustomizableParams = function(widgetValue) {
-    if (widgetValue) {
-      return Boolean(JSON.parse(widgetValue).params);
-    } else {
-      return false;
-    }
-  };
 
   $scope.getCustomizationModalInstance = function(widgetParams) {
     // NB: This method is used for both interactive and noninteractive widgets.
@@ -314,29 +236,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
         };
       }
     });
-  };
-
-  $scope.showCustomizeNonInteractiveWidgetModal = function(index) {
-    warningsData.clear();
-    var widgetParams = JSON.parse($scope.content[index].value).params;
-    var modalInstance = $scope.getCustomizationModalInstance(widgetParams);
-
-    modalInstance.result.then(function(result) {
-      var widgetValue = JSON.parse($scope.content[index].value);
-      widgetValue.params = result.widgetParams;
-      $scope.content[index].value = JSON.stringify(widgetValue);
-      console.log('Non-interactive customization modal saved.');
-
-      $scope.initWidget(index);
-      $scope.saveStateContent();
-    }, function() {
-      console.log('Non-interactive customization modal dismissed.');
-    });
-  };
-
-  $scope.deleteWidget = function(index) {
-    $scope.content[index].value = '';
-    $scope.saveStateContent();
   };
 
   $scope.saveStateParamChanges = function() {
