@@ -29,7 +29,10 @@ class Hints(widget_domain.BaseWidget):
         'name': 'hint_placeholder',
         'description': 'The placeholder for the text for hint box.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -38,7 +41,10 @@ class Hints(widget_domain.BaseWidget):
         'name': 'low_hint',
         'description': 'The low level hint.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -47,7 +53,10 @@ class Hints(widget_domain.BaseWidget):
         'name': 'medium_hint',
         'description': 'The medium level hint',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -56,7 +65,10 @@ class Hints(widget_domain.BaseWidget):
         'name': 'high_hint',
         'description': 'The high level hint',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },

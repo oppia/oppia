@@ -86,9 +86,11 @@ oppia.directive('select2Dropdown', function() {
 oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData, oppiaHtmlEscaper, requestCreator) {
   return {
     restrict: 'E',
-    scope: {htmlContent: '='},
+    scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
     template: '<textarea rows="7" cols="60"></textarea>',
     controller: function($scope, $element, $attrs) {
+      $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
+
       var rteNode = $element[0].firstChild;
       // A pointer to the editorDoc in the RTE iframe. Populated when the RTE is
       // initialized.
@@ -214,7 +216,14 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
 
       $scope.init = function() {
         $http.get('/widgetrepository/data/noninteractive').then(function(response) {
-          $scope._NONINTERACTIVE_WIDGETS = response.data.widgets['Basic Input'];
+          // TODO(sll): Remove the need for $http.get() if $scope.disallowOppiaWidgets
+          // is true.
+          if ($scope.disallowOppiaWidgets) {
+            $scope._NONINTERACTIVE_WIDGETS = [];
+          } else {
+            $scope._NONINTERACTIVE_WIDGETS = response.data.widgets['Basic Input'];
+          }
+
           $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
             widgetDefn.backendName = widgetDefn.name;
             widgetDefn.name = widgetDefn.frontend_name;
@@ -243,8 +252,8 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               save: function(event) {
                 var content = $(rteNode).wysiwyg('getContent');
                 if (content !== null && content !== undefined) {
-                  $scope.modifiedContent = content;
                   $scope.htmlContent = $scope._convertRteToHtml(content);
+                  $scope.$apply();
                 }
               }
             },
@@ -309,9 +318,11 @@ oppia.directive('string', function(warningsData) {
   // Editable string directive.
   return {
     restrict: 'E',
-    scope: {item: '='},
+    scope: {item: '=', largeInput: '@'},
     templateUrl: '/templates/string',
     controller: function ($scope, $attrs) {
+      $scope.largeInput = ($scope.largeInput || false);
+
       // Reset the component each time the item changes.
       $scope.$watch('item', function(newValue, oldValue) {
         // Maintain a local copy of 'item'.
