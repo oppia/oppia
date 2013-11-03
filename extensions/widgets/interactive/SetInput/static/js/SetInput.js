@@ -21,6 +21,9 @@ function SetInput($scope) {
     }
     $scope.answer.push(newElement);
     $scope.newElement = '';
+    window.parent.postMessage(
+      {'widgetHeight': document.body.scrollHeight + 30},
+      window.location.protocol + '//' + window.location.host);
   };
 
   $scope.deleteElement = function(index) {

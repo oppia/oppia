@@ -60,13 +60,12 @@ DEMO_EXPLORATIONS = [
     ('counting.yaml', 'Three Balls', 'Mathematics'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', '¡Hola!', 'Languages'),
-    ('landmarks.yaml', 'Landmarks', 'Geography'),
+    ('cities.yaml', 'World Cities', 'Geography'),
     ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
-    ('cities.yaml', 'World Cities', 'Geography'),
 ]
 
 # Whether to unconditionally log info messages.

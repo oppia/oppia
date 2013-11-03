@@ -31,12 +31,12 @@ OPPIA_CUSTOM_TAGS = {
 
 ALLOWED_TAGS = [
     'a', 'b', 'blockquote', 'br', 'code', 'div', 'em', 'hr', 'i', 'li', 'ol',
-    'span', 'strong', 'table', 'tbody', 'td', 'tr', 'u', 'ul'
+    'p', 'span', 'strong', 'table', 'tbody', 'td', 'tr', 'u', 'ul'
 ]
 
 TAG_WHITELIST = ALLOWED_TAGS + OPPIA_CUSTOM_TAGS.keys()
 ATTRS_WHITELIST = {
-    'a': ['href', 'title'],
+    'a': ['href', 'title', 'target'],
     'table': ['border'],
 }
 ATTRS_WHITELIST.update(OPPIA_CUSTOM_TAGS)

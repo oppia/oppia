@@ -108,8 +108,7 @@ states:
   - type: text
     value: 'OK, you found {{guess}} ways to do this. I''d be interested in seeing
       what you came up with; could you list the different ways?&nbsp;Write them as
-      three-character words, like this:<br><br><span style="font-size: 13px; line-height:
-      1.22;">&nbsp; &nbsp; &nbsp;RBY<br></span><br>This means: put the red ball on
+      three-character words, like this:<br><br><span>&nbsp; &nbsp; &nbsp;RBY<br></span><br>This means: put the red ball on
       the left, the blue ball in the middle, and the yellow ball on the right. Can
       you list all the ways you found?<br><br>&nbsp; &nbsp;&nbsp;'
   name: Not 6
@@ -501,10 +500,8 @@ states:
       at the 3-ball case.<br><br>--------------------------------------------------------------------------------------------<br><br>First
       you pick the ball on the left. This could be red, blue or yellow. There are
       three cases to consider:<br><br>If the first ball is red, then there are two
-      balls left to arrange in the other two slots. And there are F2 ways to do this.<br><span
-      style="font-size: 13px; line-height: 1.22;">If the first ball is blue, then
-      there are two balls left to ... hey, this is the same thing, it''s just F2.</span><br><span
-      style="font-size: 13px; line-height: 1.22;">And, if the first ball is yellow,
+      balls left to arrange in the other two slots. And there are F2 ways to do this.<br><span>If the first ball is blue, then
+      there are two balls left to ... hey, this is the same thing, it''s just F2.</span><br><span>And, if the first ball is yellow,
       then ... yada, yada, F2.</span><br><br>So the total number of ways to arrange
       3 balls, F3, is equal to 3 * F2. And all this works out correctly, because F2
       = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,
