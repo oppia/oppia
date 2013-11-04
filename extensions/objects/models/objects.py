@@ -375,3 +375,15 @@ class TarFileString(UnicodeString):
             return tfile
         except Exception:
             raise TypeError('Not a valid tar file.')
+
+
+class Filepath(UnicodeString):
+    """A string representing a filepath."""
+
+    description = 'A string that represents a filepath'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        # The path will be prefixed with "[exploration_id]/assets".
+        raw = super(Filepath, cls).normalize(raw)

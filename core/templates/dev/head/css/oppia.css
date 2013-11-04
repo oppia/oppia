@@ -376,6 +376,7 @@ textarea {
 }
 .oppia-editable-name:hover {
   background: #efefef;
+  cursor: pointer;
 }
 .oppia-editable-name:hover::after {
   content: ' ✎';

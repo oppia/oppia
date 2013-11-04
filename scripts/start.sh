@@ -28,7 +28,7 @@ then
   echo ""
   echo "  Please run me using bash: "
   echo ""
-  echo "     bash scripts/$0"
+  echo "     bash $0"
   echo ""
   return 1
 fi

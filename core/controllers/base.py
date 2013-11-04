@@ -88,7 +88,7 @@ def require_editor(handler):
             user_settings_model = user_services.UserSettingsModel.get_or_create(self.user_id)
 
             if not user_settings_model.username:
-                self.redirect("/profile/create_user_name")
+                self.redirect("/profile/create_user_name?returnUrl=" + self.request.url)
                 return
 
         try:
@@ -162,15 +162,18 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = self.user.email() if self.user else None
+        self.is_admin = False
         if self.user_id:
             self.values['logout_url'] = (
                 current_user_services.create_logout_url(self.request.uri))
             self.values['user'] = self.user.nickname()
-            self.values['is_admin'] = current_user_services.is_current_user_admin(
+            self.is_admin = current_user_services.is_current_user_admin(
                 self.request)
         else:
             self.values['login_url'] = current_user_services.create_login_url(
                 self.request.uri)
+
+        self.values['is_admin'] = self.is_admin
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
@@ -224,8 +227,10 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_json(self, values):
         self.response.content_type = 'application/javascript; charset=utf-8'
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['Content-Disposition'] = 'attachment'
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
         json_output = json.dumps(values)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
@@ -236,7 +241,7 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
         counters.JSON_RESPONSE_COUNT.inc()
 
-    def render_template(self, filename, values=None):
+    def render_template(self, filename, values=None, iframe_restriction='DENY'):
         if values is None:
             values = self.values
 
@@ -250,6 +255,17 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+
+        if iframe_restriction is not None:
+            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
+                self.response.headers['X-Frame-Options'] = iframe_restriction
+            else:
+                raise Exception(
+                    'Invalid X-Frame-Options: %s' % iframe_restriction)
+
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
         self.response.write(self.jinja2_env.get_template(
@@ -329,9 +345,9 @@ class CsrfTokenManager(object):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (2 hours).
-    CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
+    _CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
     # Default user id for non-logged-in users.
-    USER_ID_DEFAULT = 'non_logged_in_user'
+    _USER_ID_DEFAULT = 'non_logged_in_user'
 
     @classmethod
     def init_csrf_secret(cls):
@@ -354,7 +370,7 @@ class CsrfTokenManager(object):
         # name, hash of the time issued and plain text of the time issued.
 
         if user_id is None:
-            user_id = cls.USER_ID_DEFAULT
+            user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
         issued_on = long(issued_on)
@@ -372,10 +388,14 @@ class CsrfTokenManager(object):
         return token
 
     @classmethod
+    def _get_current_time(cls):
+        return time.time()
+
+    @classmethod
     def create_csrf_token(cls, user_id, page_name):
         if not page_name:
             raise Exception('Cannot create CSRF token if page name is empty.')
-        return cls._create_token(user_id, page_name, time.time())
+        return cls._create_token(user_id, page_name, cls._get_current_time())
 
     @classmethod
     def is_csrf_token_valid(cls, user_id, page_name, token):
@@ -386,8 +406,8 @@ class CsrfTokenManager(object):
                 return False
 
             issued_on = long(parts[0])
-            age = time.time() - issued_on
-            if age > cls.CSRF_TOKEN_AGE_SECS:
+            age = cls._get_current_time() - issued_on
+            if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
 
             authentic_token = cls._create_token(user_id, page_name, issued_on)

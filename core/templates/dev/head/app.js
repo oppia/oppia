@@ -26,3 +26,58 @@ oppia.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 });
+
+// Service for HTML serialization and escaping.
+oppia.factory('oppiaHtmlEscaper', function() {
+  var htmlEscaper = {
+    objToEscapedJson: function(obj) {
+      if (!obj) {
+        console.log('Error: empty obj was passed to JSON escaper.');
+        return '';
+      }
+      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
+    },
+    escapedJsonToObj: function(json) {
+      if (!json) {
+        console.log('Error: empty string was passed to JSON decoder.');
+        return '';
+      }
+      return JSON.parse(this.escapedStrToUnescapedStr(json));
+    },
+    unescapedStrToEscapedStr: function(str) {
+      return String(str)
+                  .replace(/&/g, '&amp;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+    },
+    escapedStrToUnescapedStr: function(value) {
+      return String(value)
+                  .replace(/&quot;/g, '"')
+                  .replace(/&#39;/g, "'")
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>')
+                  .replace(/&amp;/g, '&');
+    }
+  };
+  return htmlEscaper;
+});
+
+// Service for converting requests to a form that can be sent to the server.
+oppia.factory('requestCreator', function() {
+  return {
+    /**
+     * Creates a request object that can be sent to the server.
+     * @param {object} requestObj The object to be sent to the server. It will
+          be JSON-stringified and stored under 'payload'.
+     */
+    createRequest: function(requestObj) {
+      return $.param({
+        csrf_token: GLOBALS.csrf_token,
+        payload: JSON.stringify(requestObj),
+        source: document.URL
+      }, true);
+    }
+  };
+});

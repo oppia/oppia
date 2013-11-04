@@ -39,6 +39,7 @@ def get_username(user_id):
 def is_username_taken(username):
     """Normalizes the username and checks if that is taken."""
     return user_models.UserSettingsModel.is_normalized_username_taken(normalize(username))
-   
+
+
 def normalize(username):
     return username.lower()

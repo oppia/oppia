@@ -14,8 +14,11 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import re
+import types
 
+from core.controllers import base
 import main
 import test_utils
 
@@ -43,3 +46,105 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # TODO(sll): Set a self.payload attr in the BaseHandler for
         #     POST, PUT and DELETE. Something needs to regulate what
         #     the fields in the payload should be.
+
+    def test_requests_for_invalid_paths(self):
+        """Test that requests for invalid paths result in a 404 error."""
+
+        response = self.testapp.get('/gallery/extra', expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.get('/gallery/data/extra', expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.post('/gallery/extra', {}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.put('/gallery/extra', {}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+
+class CsrfTokenManagerTest(test_utils.GenericTestBase):
+
+    def test_create_and_validate_token(self):
+        uid = 'user_id'
+        page = 'page_name'
+
+        token = base.CsrfTokenManager.create_csrf_token(uid, page)
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(uid, page, token))
+
+        self.assertFalse(
+            base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
+        self.assertFalse(
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'wrong_page', token))
+        self.assertFalse(
+            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
+        self.assertFalse(
+            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new/token'))
+
+    def test_nondefault_csrf_secret_is_used(self):
+        self.assertEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
+        base.CsrfTokenManager.create_csrf_token('uid', 'page')
+        self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
+
+    def test_token_expiry(self):
+        # This can be any value.
+        ORIG_TIME = 100.0
+
+        TWO_HOURS_IN_SECS = 2 * 60 * 60
+        PADDING = 1
+        current_time = ORIG_TIME
+
+        # Create a fake copy of the CsrfTokenManager class so that its
+        # _get_current_time() method can be swapped out without affecting the
+        # original class.
+        FakeCsrfTokenManager = copy.deepcopy(base.CsrfTokenManager)
+
+        def _get_current_time(cls):
+            return current_time
+
+        setattr(
+            FakeCsrfTokenManager,
+            _get_current_time.__name__,
+            types.MethodType(_get_current_time, FakeCsrfTokenManager)
+        )
+
+        # Create a token and check that it expires correctly.
+        token = FakeCsrfTokenManager.create_csrf_token('uid', 'page')
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+
+        current_time = ORIG_TIME + 1
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+
+        current_time = ORIG_TIME + TWO_HOURS_IN_SECS - PADDING
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+
+        current_time = ORIG_TIME + TWO_HOURS_IN_SECS + PADDING
+        self.assertFalse(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+
+        # Check that the expiry of one token does not cause the other to
+        # expire.
+        current_time = ORIG_TIME
+        token1 = FakeCsrfTokenManager.create_csrf_token('uid', 'page1')
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+
+        current_time = ORIG_TIME + 100
+        token2 = FakeCsrfTokenManager.create_csrf_token('uid', 'page2')
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+
+        current_time = ORIG_TIME + TWO_HOURS_IN_SECS + PADDING
+        self.assertFalse(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+        self.assertTrue(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+
+        current_time = ORIG_TIME + 100 + TWO_HOURS_IN_SECS + PADDING
+        self.assertFalse(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+        self.assertFalse(
+            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))

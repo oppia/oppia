@@ -26,9 +26,12 @@
         <h4>States that point to this one</h4>
         <ul>
           <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-            <a href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+            <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
               <[incomingState.name]>
             </a>
+            <span ng-if="stateId == incomingStateId">
+              <[incomingState.name]>
+            </span>
             (<[incomingState.rules | commaSeparatedList]>)
           </li>
         </ul>
@@ -59,43 +62,14 @@
             <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
 
               <span class="pull-right">
-
-                <span ng-show="item.type == 'text'">
-                  <span ng-hide="activeInputData.name == 'content.' + $index">
-                    <a ng-click="editContent($index)">Edit</a> |
-                  </span>
+                <span ng-hide="activeInputData.name == 'content.' + $index">
+                  <a href="#" onclick="return false;" ng-click="editContent($index)">Edit</a>
                 </span>
-
-                <span ng-show="$index != 0">
-                  <span ng-show="activeInputData.name !== ''">
-                    <span class="oppia-grayed"> ⇑ </span> |
-                  </span>
-                  <span ng-hide="activeInputData.name !== ''">
-                    <a ng-click="swapContent($index, $index - 1)"> ⇑ </a> |
-                  </span>
-                </span>
-
-                <span ng-show="$index < content.length - 1">
-                  <span ng-show="activeInputData.name !== ''">
-                    <span class="oppia-grayed"> ⇓ </span> |
-                  </span>
-                  <span ng-hide="activeInputData.name !== ''">
-                    <a ng-click="swapContent($index, $index + 1)"> ⇓ </a> |
-                  </span>
-                </span>
-
-                <span ng-show="activeInputData.name !== ''">
-                  <span class="oppia-grayed"> Delete </span>
-                </span>
-                <span ng-hide="activeInputData.name !== ''">
-                  <a ng-click="deleteContent($index)">Delete</a>
-                </span>
-
               </span>
 
               <div ng-if="item.type == 'text'">
                 <div ng-show="activeInputData.name == 'content.' + $index">
-                  <rich-text-editor rte-content="content[$index].value">
+                  <rich-text-editor html-content="content[$index].value">
                   </rich-text-editor>
                   <button ng-click="saveTextContent()">Save and close</button>
                 </div>
@@ -104,7 +78,7 @@
                   <span ng-show="item.value == ''" class="oppia-placeholder">
                     <[defaultTextContent]>
                   </span>
-                  <span ng-bind-html="item.value"></span>
+                  <span angular-html-bind="item.value"></span>
                 </div>
               </div>
 
@@ -118,55 +92,11 @@
                     </form>
                     <span class="oppia-loading" id="uploadImageLoading"></span>
                   </div>
-                  <div ng-switch-default>
-                    <img class="oppia-small-image" ng-src="/imagehandler/<[explorationId]>/<[item.value]>"></img>
-                    <span ng-click="deleteImage($index)" class="oppia-thumbnail">&times;</span>
-                  </div>
                 </ng-switch>
-              </div>
-
-              <div ng-if="item.type == 'video'">
-                <div ng-if="item.value == ''" class="oppia-placeholder">
-                  <form novalidate name="addVideoContent" ng-submit="hideVideoInputDialog(newVideoLink, $index)">
-                    Add a Youtube video link:
-                    <input type="text" ng-model="newVideoLink" id="newVideoLink" required>
-                    <input type="submit" value="Save" ng-disabled="addVideoContent.$invalid">
-                  </form>
-                </div>
-                <div ng-if="item.value != ''">
-                  <iframe width="100" height="56"
-                          ng-src="<[getYoutubeVideoUrl(item.value)]>"
-                          frameborder="0" allowfullscreen>
-                  </iframe>
-                  <span ng-click="deleteVideo($index)" class="oppia-thumbnail">&times;</span>
-                </div>
-              </div>
-
-              <div ng-if="item.type == 'widget'">
-                <div ng-show="item.value == ''">
-                  <iframe ng-src="<[getWidgetRepositoryUrl($index)]>" width="100%" height="400px" frameborder="0"></iframe>
-                </div>
-
-                <div ng-hide="item.value == ''">
-                  <button type="button" ng-click="deleteWidget($index)">Change widget</button>
-                  <span ng-show="hasCustomizableParams(item.value)">
-                    <button ng-click="showCustomizeNonInteractiveWidgetModal($index)">
-                      Customize
-                    </button>
-                  </span>
-                  <iframe id="widgetPreview<[$index]>" width="100%" frameborder="0"></iframe>
-                </div>
               </div>
 
             </li>
           </ul>
-
-          <center class="oppia-add-content-box">
-            <button ng-click="addContent('text')">Add rich text</button>
-            <button ng-click="addContent('image')">Add image</button>
-            <button ng-click="addContent('video')">Add video</button>
-            <button ng-click="addContent('widget')">Add widget</button>
-          </center>
 
           <br>
           <br>

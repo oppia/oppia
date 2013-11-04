@@ -20,6 +20,7 @@ import os
 import random
 import StringIO
 import unicodedata
+import urllib
 import yaml
 import zipfile
 
@@ -238,3 +239,13 @@ def verify_dict_keys_and_types(adict, dict_schema):
             raise Exception('Value \'%s\' for key \'%s\' is not of type %s '
                             ' in:\n\n %s' %
                             (adict[item[0]], item[0], item[1], adict))
+
+
+def convert_png_to_data_url(filepath):
+    """Converts the png file at filepath to a data URL.
+
+    This method is currently used only in tests for the non-interactive widgets.
+    """
+    file_contents = get_file_contents(filepath, raw_bytes=True)
+    return 'data:image/png;base64,%s' % urllib.quote(
+        file_contents.encode('base64'))

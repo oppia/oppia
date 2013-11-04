@@ -33,7 +33,7 @@ oppia.run(function($rootScope) {
 });
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
-    $filter, explorationData, warningsData, activeInputData) {
+    $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
 
   $scope.doesStateIdExist = function() {
     return Boolean($scope.stateId);
@@ -155,11 +155,16 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   $scope.explorationId = pathnameArray[2];
+  // The exploration id needs to be attached to the root scope in order for
+  // the file picker widget to work. (Note that an alternative approach might
+  // also be to replicate this URL-based calculation in the file picker widget.)
+  $rootScope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
 
   // Initializes the exploration page using data from the backend.
   explorationData.getData().then(function(data) {
+    $scope.currentUserIsAdmin = data.is_admin;
     $scope.stateId = explorationData.stateId;
     $scope.states = data.states;
     $scope.explorationTitle = data.title;
@@ -220,6 +225,15 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     explorationFullyLoaded = true;
   });
+
+  $scope.canEditEditorList = function() {
+    return (
+        $scope.explorationEditors && (
+            $scope.currentUser == $scope.explorationEditors[0] ||
+            $scope.currentUserIsAdmin
+        )
+    );
+  };
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
     // Do not save on the initial data load.
@@ -370,7 +384,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     $scope.paramSpecs[name] = {obj_type: type};
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           param_specs: $scope.paramSpecs,
           version: explorationData.data.version
         }),
@@ -404,7 +418,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           editors: $scope.explorationEditors,
           version: explorationData.data.version
         }),
@@ -460,7 +474,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.put(
         $scope.explorationDataUrl,
-        $scope.createRequest(requestParameters),
+        requestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               if (frontendName == 'isPublic') {
@@ -513,7 +527,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
     $http.post(
         $scope.explorationDataUrl,
-        $scope.createRequest({
+        requestCreator.createRequest({
           state_name: newStateName,
           version: explorationData.data.version
         }),
@@ -631,6 +645,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = [
-  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter',
-  'explorationData', 'warningsData', 'activeInputData'
+  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter', '$rootScope',
+  'explorationData', 'warningsData', 'activeInputData', 'requestCreator'
 ];

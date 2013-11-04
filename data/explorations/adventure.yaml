@@ -34,9 +34,8 @@ states:
     widget_id: TextInput
 - content:
   - type: text
-    value: 'You are standing at a fork in the road. The main road goes to the <span
-      style="font-weight: bold;">northeast</span>, while a smaller path winds to the
-      <span style="font-weight: bold;">northwest</span>.'
+    value: 'You are standing at a fork in the road. The main road goes to the <b>northeast</b>, while a smaller path winds to the
+      <b>northwest</b>.'
   name: Fork
   param_changes: []
   widget:
@@ -111,7 +110,7 @@ states:
   - type: text
     value: 'You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
       {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
-      is a path leading back to the <span style="font-weight: bold;">southwest</span>.</div>'
+      is a path leading back to the <b>southwest</b>.</div>'
   name: Troll
   param_changes: []
   widget:
@@ -225,9 +224,7 @@ states:
     widget_id: TextInput
 - content:
   - type: text
-    value: 'You are at a clearing. There are lots of pretty <span style="font-weight:
-      bold;">flowers</span> here.<div>There is a path leading back to the <span style="font-weight:
-      bold;">southeast</span>.</div>'
+    value: 'You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There is a path leading back to the <b>southeast</b>.</div>'
   name: Clearing
   param_changes: []
   widget:
@@ -286,7 +283,7 @@ states:
 - content:
   - type: text
     value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
-      also get a pretty red <span style="font-weight: bold;">towel</span>.</div></div><div><br></div>You
+      also get a pretty red <b>towel</b>.</div></div><div><br></div>You
       are standing in a small courtyard. To the north is a gate, with a sign:<div>"This
       way to adventure!"</div>'
   name: Road
@@ -334,7 +331,7 @@ states:
     widget_id: MultipleChoiceInput
 - content:
   - type: text
-    value: 'You pick a pretty bouquet of <span style="font-weight: bold;">flowers</span>.'
+    value: 'You pick a pretty bouquet of <b>flowers</b>.'
   name: picking
   param_changes:
   - customization_args:
@@ -355,7 +352,7 @@ states:
     widget_id: Continue
 - content:
   - type: text
-    value: '<span style="line-height: 1.22;">"Guess how many coins I''m holding!"</span><br>'
+    value: '<span>"Guess how many coins I''m holding!"</span><br>'
   name: Rainbow
   param_changes: []
   widget:
@@ -423,7 +420,7 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: 'He gives you the <span style="font-weight: bold;">coins</span> and uses
+    value: 'He gives you the <b>coins</b> and uses
       his magic to return you back to the troll.'
   name: get coins
   param_changes:

@@ -127,8 +127,7 @@ states:
     value: 'You arrive at the town square. There''s a magician standing here, and
       a small crowd of locals surrounding him.&nbsp;<br><br>"{{previousNumber}}!"
       he exclaims dramatically, pointing his wand at one of the locals. The crowd''s
-      collective gaze shifts from the magician to the local.<br><br><span style="line-height:
-      1.22;">"That''s right!" says the local, and the crowd oohs and aahs in appreciation
+      collective gaze shifts from the magician to the local.<br><br><span>"That''s right!" says the local, and the crowd oohs and aahs in appreciation
       of the Magician''s number-guessing powers.<br></span><br>...<br><br>"You there!"
       the magician points to you<br>"Think of a number between 1 and 85!"'
   name: Town Square
@@ -513,7 +512,7 @@ states:
     widget_id: TextInput
 - content:
   - type: text
-    value: '"OK, I''m thinking of a number between 1 and 100!<br>make a guess and
+    value: '"OK, I''m thinking of a number between 1 and 100!<br>Make a guess and
       I''ll tell you if it''s bigger or smaller!<br>See if you can get it in 7 guesses!"'
   name: Player Guess Setup
   param_changes:
@@ -663,7 +662,9 @@ states:
         param_changes: []
     sticky: false
     widget_id: Continue
-- content: []
+- content:
+  - type: text
+    value: ''
   name: PlayerGuessing
   param_changes:
   - customization_args:
@@ -1060,14 +1061,12 @@ states:
     sticky: false
     widget_id: TextInput
 - content:
-  - type: image
-    value: elimination.png
   - type: text
-    value: '"So, no matter which number the magician is thinking of, if we guess 2
+    value: '<oppia-noninteractive-image src="elimination.png"></oppia-noninteractive-image><p>"So, no matter which number the magician is thinking of, if we guess 2
       on our first try, we can eliminate two numbers! Then for the second try (if
       we even need it), we know exactly what number to guess!"<br><br>"So maybe we
       don''t save TOO much time by being able to guess a number between 1-3 in just
-      two tries... but I wonder what we could do with one more try?"'
+      two tries... but I wonder what we could do with one more try?"</p>'
   name: After three case
   param_changes: []
   widget:
@@ -1290,11 +1289,7 @@ states:
       guesses, and I knew exactly what my first guess should be to do this. After
       I made the first guess, I would have two guesses left. And we already know something
       we can do with two guesses!"<br>"So let''s pretend that after my first guess,
-      we see the same two-guess case that we saw before:"'
-  - type: text
-    value: Picture goes here
-  - type: text
-    value: '"This must mean that our first guess, and the information the magician
+      we see the same two-guess case that we saw before:" INSERT PICTURE HERE "This must mean that our first guess, and the information the magician
       gave us in response, narrowed down our possibilities to numbers between 1 and
       3."<br><br>"What could his response have been?"'
   name: Reduce 3 guesses to 2
@@ -1384,17 +1379,14 @@ states:
     value: '"Alright! So what do we know so far?"<br><br>"We are trying to guess a
       number in 3 tries. And we decided that on our first try, we should guess the
       number 4."<br><br>"If the magician says his number is less than 4, we already
-      know what to do, and we can definitely guess that number in 2 more tries!"'
-  - type: text
-    value: Picture of partial binary search tree w/root at 4.
-  - type: text
-    value: '"OK, now suppose we guessed 4 but the magician told us his number was
+      know what to do, and we can definitely guess that number in 2 more tries!"<p>
+      Picture of partial binary search tree w/root at 4.</p><p>"OK, now suppose we guessed 4 but the magician told us his number was
       bigger than that!"<br><br>"Now we have two tries left, and we know that the
       number is between 5 and SOMETHING... and we''re trying to figure out what that
       SOMETHING can be, so that we can still do this in two tries."<br><br>"I have
       a feeling that we can do almost the same thing as in our ''between 1 and 3''
       case, just... shifted."<br><br>"What do you think our SOMETHING limit should
-      be?"'
+      be?"</p>'
   name: What if it was bigger than 4
   param_changes: []
   widget:
@@ -1457,9 +1449,7 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: Picture of full binary search tree with 7 nodes here
-  - type: text
-    value: '"Wow! having three tries means that we can guess any number from 1 to
+    value: '<p>Picture of full binary search tree with 7 nodes here</p>"Wow! having three tries means that we can guess any number from 1 to
       7! That''s a lot better than what we could do with 2 tries!"<br><br>"In fact,
       the extra try more than doubled our range! On the first guess, we split our
       range into two, and then no matter what the magician answers, we only have to
@@ -1825,7 +1815,9 @@ states:
         param_changes: []
     sticky: false
     widget_id: Continue
-- content: []
+- content:
+  - type: text
+    value: ''
   name: worst case smaller
   param_changes:
   - customization_args:
@@ -1977,7 +1969,9 @@ states:
         param_changes: []
     sticky: false
     widget_id: NumericInput
-- content: []
+- content:
+  - type: text
+    value: ''
   name: worst case bigger
   param_changes:
   - customization_args:
@@ -2132,7 +2126,7 @@ states:
 - content:
   - type: text
     value: '"OK, now you try it out.<br>Pretend we''re guessing a number from 1 to
-      10. You pick what number to guess, and I''ll say what the worst case woud be."'
+      10. You pick what number to guess, and I''ll say what the worst case would be."'
   name: Middle try it out
   param_changes: []
   widget:

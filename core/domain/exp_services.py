@@ -26,7 +26,6 @@ __author__ = 'Sean Lip'
 
 import cgi
 import copy
-import json
 import logging
 import os
 import StringIO
@@ -34,6 +33,7 @@ import zipfile
 
 from core.domain import exp_domain
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
@@ -52,7 +52,7 @@ import utils
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 ADMIN_COMMITTER_ID = 'admin'
-ALLOWED_CONTENT_TYPES = ['text', 'image', 'video']
+ALLOWED_CONTENT_TYPES = ['text']
 
 # The current version of the exploration schema. If any backward-incompatible
 # changes are made to the exploration schema in the YAML definitions, this
@@ -205,23 +205,16 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     return state_dict
 
 
-def export_content_to_html(exploration_id, content_array, block_number,
-                           params=None, escape_text_strings=True):
+def export_content_to_html(exploration_id, content_array, params=None,
+                           escape_text_strings=True):
     """Takes a Content array and transforms it into HTML.
 
     Args:
         exploration_id: the id of the exploration
         content_array: an array, each of whose members is of type Content. This
-            object has two keys: type and value. The 'type' is one of the
-            following:
-                - 'text'; then the value is a text string
-                - 'image'; then the value is the path to an image in the
-                    exploration's filesystem, omitting the /assets prefix
-                - 'video'; then the value is a video ID
-                - 'widget'; then the value is a JSON-encoded dict with keys
-                    'id' and 'params', from which the raw widget HTML can be
-                    constructed
-        block_number: the number of content blocks preceding this one.
+            object has two keys: type and value. Currently we expect the array
+            to contain exactly one entry with type 'text'. The value is an
+            HTML string.
         params: any parameters used for templatizing text strings.
         escape_text_strings: True if values supplied with content of type 'text'
             should be escaped after Jinja evaluation; False otherwise.
@@ -236,46 +229,18 @@ def export_content_to_html(exploration_id, content_array, block_number,
     if params is None:
         params = {}
 
-    JINJA_ENV = jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
-
-    html, widget_array = '', []
+    html = ''
     for content in content_array:
         if content.type in ALLOWED_CONTENT_TYPES:
-            value = (jinja_utils.parse_string(content.value, params)
-                     if content.type == 'text' else content.value)
-
+            value = jinja_utils.parse_string(content.value, params)
             if escape_text_strings:
                 value = cgi.escape(value)
 
-            html += JINJA_ENV.get_template('reader/content.html').render({
-                'type': content.type,
-                'value': value,
-                'exploration_id': exploration_id,
-            })
-        elif content.type == 'widget':
-            # Ignore empty widget specifications.
-            if not content.value:
-                continue
-
-            widget_dict = json.loads(content.value)
-            widget = widget_domain.Registry.get_widget_by_id(
-                feconf.NONINTERACTIVE_PREFIX, widget_dict['id'])
-            widget_array_len = len(widget_array)
-            html += JINJA_ENV.get_template('reader/content.html').render({
-                'blockIndex': block_number,
-                'index': widget_array_len,
-                'type': content.type,
-            })
-            widget_array.append({
-                'blockIndex': block_number,
-                'index': widget_array_len,
-                'raw': widget.get_raw_code(
-                    widget_dict['customization_args'], params),
-            })
+            html += '<div>%s</div>' % value
         else:
             raise utils.InvalidInputException(
                 'Invalid content type %s', content.type)
-    return html, widget_array
+    return html
 
 
 def export_to_yaml(exploration_id):
@@ -415,7 +380,8 @@ def create_new(
                       exp_models.ExplorationModel.get_new_id(title))
 
     state_id = exp_models.StateModel.get_new_id(init_state_name)
-    new_state = exp_domain.State(state_id, init_state_name, [], [], None)
+    new_state = exp_domain.State(
+        state_id, init_state_name, [exp_domain.Content('text', '')], [], None)
     save_state(user_id, exploration_id, new_state)
 
     exploration_model = exp_models.ExplorationModel(
@@ -551,7 +517,8 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
         raise ValueError('Duplicate state name %s' % state_name)
 
     state_id = state_id or exp_models.StateModel.get_new_id(state_name)
-    new_state = exp_domain.State(state_id, state_name, [], [], None)
+    new_state = exp_domain.State(
+        state_id, state_name, [exp_domain.Content('text', '')], [], None)
 
     def _add_state_transaction(committer_id, exploration_id, new_state):
         exploration_memcache_key = _get_exploration_memcache_key(
@@ -570,7 +537,36 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
 def update_state(committer_id, exploration_id, state_id, new_state_name,
                  param_changes, interactive_widget, interactive_params,
                  interactive_rulesets, sticky_interactive_widget, content):
-    """Updates the given state, and commits changes."""
+    """Updates the given state, and commits changes.
+
+    Args:
+    - committer_id: str. Email address of the user who is performing the update
+        action.
+    - exploration_id: str. The id of the exploration.
+    - state_id: str. The id of the state being updated.
+    - new_state_name: str or None. If present, the new name for the state.
+    - param_changes: list of dicts with keys ('name', 'generator_id',
+        'customization_args'), or None. If present, represents parameter
+        changes that should be applied when a reader enters the state.
+    - interactive_widget: str or None. If present, the name of the interactive
+        widget for this state.
+    - interactive_params: dict or None. If present, the customization_args used
+        to render the interactive widget for this state.
+    - interactive_rulesets: dict or None. If present, it represents the rule
+        specifications for this state.
+    - sticky_interactive_widget: bool or None. If present, the setting for
+        whether the interactive widget for this state should be preserved when
+        the reader navigates to another state that uses the same interactive
+        widget. For example, we might want a textarea containing user-entered
+        code to retain that code in a state transition, rather than being
+        overwritten with a brand-new textarea.
+    - content: None, or a list of dicts, where each dict has keys ('type',
+        'value'). Currently we expect this list to have exactly one element
+        with type 'text'. If present, this list represents the non-interactive
+        content for the state.
+    """
+    # TODO(sll): Add more documentation for interactive_rulesets, above.
+
     exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
 
@@ -624,8 +620,14 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         # parameter changes, if necessary.
         for rule_ind in range(len(ruleset)):
             rule = ruleset[rule_ind]
+            if isinstance(rule.get('feedback'), basestring):
+                raise Exception(
+                    'Rule feedback should be a list; received the string %s' %
+                    rule.get('feedback'))
             state_rule = exp_domain.RuleSpec(
-                rule.get('definition'), rule.get('dest'), rule.get('feedback'),
+                rule.get('definition'), rule.get('dest'),
+                [html_cleaner.clean(feedback) for feedback
+                                              in rule.get('feedback')],
                 rule.get('param_changes')                
             )
 
@@ -664,7 +666,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
 
     if content:
         state.content = [
-            exp_domain.Content(item['type'], item['value'])
+            exp_domain.Content(item['type'], html_cleaner.clean(item['value']))
             for item in content
         ]
 
@@ -775,7 +777,8 @@ def create_from_yaml(
             state = get_state_by_name(exploration_id, sdict['name'])
 
             state.content = [
-                exp_domain.Content(item['type'], item['value'])
+                exp_domain.Content(
+                    item['type'], html_cleaner.clean(item['value']))
                 for item in sdict['content']
             ]
 
@@ -796,7 +799,8 @@ def create_from_yaml(
                     'definition': rule_spec['definition'],
                     'dest': convert_state_name_to_id(
                         exploration_id, rule_spec['dest']),
-                    'feedback': rule_spec['feedback'],
+                    'feedback': [html_cleaner.clean(feedback)
+                                 for feedback in rule_spec['feedback']],
                     'param_changes': rule_spec.get('param_changes', []),
                 } for rule_spec in handler['rule_specs']],
             }) for handler in wdict['handlers']]
@@ -944,6 +948,11 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         """Checks that a state content list specification is valid."""
         CONTENT_ITEM_SCHEMA = [
             ('type', basestring), ('value', basestring)]
+
+        if len(state_content_list) != 1:
+            raise Exception(
+                'Each state content list should contain exactly one element. %s'
+                % state_content_list)
 
         for content_item in state_content_list:
             utils.verify_dict_keys_and_types(content_item, CONTENT_ITEM_SCHEMA)

@@ -5,11 +5,10 @@ schema_version: 1
 states:
 - content:
   - type: text
-    value: '<div>Hi, welcome to Oppia!</div><div><br></div><div><span style="line-height:
-      1.22;">Oppia is a tool that helps you create interactive learning explorations
+    value: '<div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a tool that helps you create interactive learning explorations
       that can be continually improved over time. You can find more information at&nbsp;<a
       href="http://code.google.com/p/oppia/">http://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
-      first,<span style="line-height: 1.22;">&nbsp;do you know where the name ''Oppia''
+      first,<span>&nbsp;do you know where the name ''Oppia''
       comes from?</span></div>'
   name: Welcome!
   param_changes: []
@@ -87,7 +86,7 @@ states:
     value: You might want to build something more complicated than that, though. The
       good news is that you can integrate your own interactive questions into Oppia!<div><br>Where
       would people say the word 'Oppia'? Well, in Finland, and probably in its capital,
-      Helsinki. Can you find Helsinki on a map of the world?</div><ol> </ol>
+      Helsinki. Can you find Helsinki on a map of the world?</div>
   name: Finding Helsinki
   param_changes: []
   widget:

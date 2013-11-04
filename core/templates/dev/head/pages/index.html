@@ -6,7 +6,7 @@
 
 {% block content %}
   <div class="oppia-content">
-    <oppia oppia-id="0" width="100%" id="demoExploration"></oppia>
+    <oppia oppia-id="0"></oppia>
 
     <hr>
     <div class="row-fluid" id="buttons" style="display: none;">
@@ -27,7 +27,14 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/scripts/oppia-player-0.0.0.js"></script>
   <script>
-    {{ include_js_file('pages/index.js') }}
+    window.OPPIA_PLAYER.onHeightChangePostHook = function(newHeight, iframeNode) {    
+      console.log(
+          'Custom onHeightChangePostHook event triggered on ' + iframeNode + '.');
+      setTimeout(function () {
+        $('#buttons').show();
+      }, 1000);
+    };
   </script>
 {% endblock footer_js %}

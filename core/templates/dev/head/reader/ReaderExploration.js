@@ -18,9 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData) {
+ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
+  // The following is needed for image displaying to work.
+  $rootScope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
 
   $scope.urlParams = $scope.getUrlParams();
@@ -115,7 +117,7 @@
 
     $http.post(
         '/learn/give-feedback/' + $scope.explorationId + '/' + $scope.stateId,
-        $scope.createRequest(requestMap),
+        requestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {
       $scope.feedback = '';
@@ -141,29 +143,28 @@
   $scope.reloadInteractiveIframe = function(content) {
     var iframe = document.getElementById('inputTemplate');
     if (!iframe) {
-      console.log('No iframe found.');
+      console.log('Error: No interactive iframe found.');
       return;
     }
 
-    var el = document.getElementsByTagName("iframe")[0];
-    attrs = el.attributes;
-    var parentNode = el.parentNode;
-    parentNode.removeChild(el);
+    var attrs = iframe.attributes;
+    var parentNode = iframe.parentNode;
+    parentNode.removeChild(iframe);
 
-    iframe = document.createElement('iframe');
+    var newIframe = document.createElement('iframe');
     for (var i = 0; i < attrs.length; i++) {
       var attrib = attrs[i];
       if (attrib.specified) {
-        iframe.setAttribute(attrib.name, attrib.value);
+        newIframe.setAttribute(attrib.name, attrib.value);
       }
     }
-    parentNode.appendChild(iframe);
+    parentNode.appendChild(newIframe);
 
-    if (iframe.contentDocument) {
-      doc = iframe.contentDocument;
-    } else {
-      doc = iframe.contentWindow ? iframe.contentWindow.document : iframe.document;
-    }
+    var doc = (
+      newIframe.contentDocument ? newIframe.contentDocument :
+      newIframe.contentWindow ? newIframe.contentWindow.document :
+      iframe.document
+    );
 
     doc.open();
     doc.writeln(content);
@@ -175,11 +176,10 @@
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [$sce.trustAsHtml(data.oppia_html)];
+    $scope.responseLog = [data.oppia_html];
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
-    $scope.iframeOutput = data.iframe_output;
     $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.reloadInteractiveIframe($scope.inputTemplate);
@@ -188,13 +188,6 @@
     // The call to $apply() is needed before updateMath() is called.
     $scope.$apply();
     $scope.updateMath();
-
-    for (var i = 0; i < $scope.iframeOutput.length; i++) {
-      $scope.addContentToIframeWithId(
-        'widgetCompiled' + $scope.iframeOutput[i].blockIndex +
-            '-' + $scope.iframeOutput[i].index,
-        $scope.iframeOutput[i].raw);
-    }
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -214,7 +207,7 @@
 
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        $scope.createRequest(requestMap),
+        requestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
@@ -238,14 +231,8 @@
 
     $scope.responseLog = $scope.responseLog || [];
     $scope.responseLog.push(
-      $sce.trustAsHtml(data.reader_response_html),
-      // The following line is needed to load img src tags.
-      $sce.trustAsHtml(data.oppia_html)
+      data.reader_response_html, data.oppia_html
     );
-
-    for (var i = 0; i < data.iframe_output.length; i++) {
-      $scope.iframeOutput.push(data.iframe_output[i]);
-    }
 
     // We need to generate the HTML (with the iframe) before populating it.
     if ($scope.inputTemplate) {
@@ -258,14 +245,6 @@
     // The call to $apply() is needed before updateMath() is called.
     $scope.$apply();
     $scope.updateMath();
-
-    // TODO(sll): Can this be done without forcing a reload of all the existing iframes?
-    for (var j = 0; j < $scope.iframeOutput.length; j++) {
-      $scope.addContentToIframeWithId(
-        'widgetCompiled' + $scope.iframeOutput[j].blockIndex +
-            '-' + $scope.iframeOutput[j].index,
-        $scope.iframeOutput[j].raw);
-    }
 
     if (data.reader_response_iframe) {
       // The previous user response needs to be rendered in a custom html with
@@ -281,6 +260,11 @@
       $('html, body, iframe').animate(
           {'scrollTop': document.getElementById('response').offsetTop},
           'slow', 'swing');
+    }
+
+    if ($scope.finished) {
+      messengerService.sendMessage(
+        messengerService.EXPLORATION_COMPLETED, null);
     }
   };
 
@@ -307,5 +291,5 @@
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData'
+  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'requestCreator'
 ];

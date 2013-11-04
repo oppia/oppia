@@ -22,21 +22,20 @@ var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 
 // Global utility methods.
-function Base($scope, $http, $rootScope, warningsData, activeInputData) {
+function Base($scope, $http, $rootScope, warningsData, activeInputData, messengerService) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
+  // TODO(sll): This is wrong; it should only happen for the reader app.
+  // Otherwise the iframed widget repository also causes a sent message and
+  // broadcast.
   window.onBodyLoad = function() {
-    if (window.parent != window) {
-      console.log('Exploration body loaded; posting message to parent.');
-      window.parent.postMessage(
-        {'explorationHeight': document.body.scrollHeight}, '*'
-      );
+    messengerService.sendMessage(
+      messengerService.HEIGHT_CHANGE, document.body.scrollHeight);
 
-      $scope.$broadcast('pageLoaded', null);
-    }
+    $scope.$broadcast('pageLoaded', null);
   };
 
   /**
@@ -58,19 +57,6 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData) {
   $scope.updateMath = function() {
     console.log('Updating math expressions.');
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-  };
-
-  /**
-   * Creates a request object that can be sent to the server.
-   * @param {object} requestObj The object to be sent to the server. It will
-        be JSON-stringified and stored under 'payload'.
-   */
-  $scope.createRequest = function(requestObj) {
-    return $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify(requestObj),
-      source: document.URL
-    }, true);
   };
 
   /**
@@ -221,4 +207,4 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'activeInputData'];
+Base.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'activeInputData', 'messengerService'];

@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import os
+import sys
 
 appstats_CALC_RPC_COSTS = True
 
@@ -24,3 +26,17 @@ def webapp_add_wsgi_middleware(app):
     from google.appengine.ext.appstats import recording
     app = recording.appstats_wsgi_middleware(app)
     return app
+
+
+# Root path of the app.
+ROOT_PATH = os.path.dirname(__file__)
+
+THIRD_PARTY_LIBS = [
+    os.path.join(ROOT_PATH, 'third_party/bleach-1.2.2'),
+    os.path.join(ROOT_PATH, 'third_party/html5lib-python-0.95')
+]
+
+for lib_path in THIRD_PARTY_LIBS:
+    if not os.path.isdir(lib_path):
+        raise Exception('Invalid path for third_party library: %s' % lib_path)
+    sys.path.insert(0, lib_path)

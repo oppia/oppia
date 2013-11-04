@@ -30,6 +30,11 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
+- url: /scripts
+  static_dir: static/scripts
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css

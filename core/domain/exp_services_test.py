@@ -339,7 +339,9 @@ param_changes: []
 param_specs: {}
 schema_version: 1
 states:
-- content: []
+- content:
+  - type: text
+    value: ''
   name: (untitled state)
   param_changes: []
   widget:
@@ -354,7 +356,9 @@ states:
         param_changes: []
     sticky: false
     widget_id: Continue
-- content: []
+- content:
+  - type: text
+    value: ''
   name: New state
   param_changes: []
   widget:
@@ -432,7 +436,10 @@ states:
         expected_dict = {
             'id': new_state.id,
             'name': u'New state',
-            'content': [],
+            'content': [{
+                'type': 'text',
+                'value': u''
+            }],
             'param_changes': [],
             'widget': {
                 'widget_id': u'Continue',

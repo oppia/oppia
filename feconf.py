@@ -60,13 +60,12 @@ DEMO_EXPLORATIONS = [
     ('counting.yaml', 'Three Balls', 'Mathematics'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', '¡Hola!', 'Languages'),
-    ('landmarks.yaml', 'Landmarks', 'Geography'),
+    ('cities.yaml', 'World Cities', 'Geography'),
     ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
-    ('cities.yaml', 'World Cities', 'Geography'),
 ]
 
 # Whether to unconditionally log info messages.
@@ -119,7 +118,7 @@ INTERACTIVE_PREFIX = 'interactive'
 NONINTERACTIVE_PREFIX = 'noninteractive'
 
 # The total number of non-interactive widgets. Used as a sanity check.
-NONINTERACTIVE_WIDGET_COUNT = 1
+NONINTERACTIVE_WIDGET_COUNT = 4
 # The total number of interactive widgets. Used as a sanity check.
 INTERACTIVE_WIDGET_COUNT = 12
 
@@ -155,3 +154,50 @@ NULL_SNAPSHOT = {}
 ALLOW_YAML_FILE_UPLOAD = False
 # Whether or not to require users to have usernames in order to edit
 REQUIRE_USERS_TO_SET_USERNAMES = False
+
+# Ids and locations of the permitted widgets.
+ALLOWED_WIDGETS = {
+    NONINTERACTIVE_PREFIX: {
+        'Hints': {
+            'dir': 'extensions/widgets/noninteractive/Hints'
+        },
+        'Image': {
+            'dir': 'extensions/widgets/noninteractive/Image'
+        },
+        'Video': {
+            'dir': 'extensions/widgets/noninteractive/Video'
+        },
+    },
+    INTERACTIVE_PREFIX: {
+        'Continue': {
+            'dir': 'extensions/widgets/interactive/Continue'
+        },
+        'MultipleChoiceInput': {
+            'dir': 'extensions/widgets/interactive/MultipleChoiceInput'
+        },
+        'NumericInput': {
+            'dir': 'extensions/widgets/interactive/NumericInput'
+        },
+        'TextInput': {
+            'dir': 'extensions/widgets/interactive/TextInput'
+        },
+        'InteractiveMap': {
+            'dir': 'extensions/widgets/interactive/InteractiveMap'
+        },
+        'MusicStaff': {
+            'dir': 'extensions/widgets/interactive/MusicStaff'
+        },
+        'SetInput': {
+            'dir': 'extensions/widgets/interactive/SetInput'
+        },
+        'FileReadInput': {
+            'dir': 'extensions/widgets/interactive/FileReadInput'
+        },
+        'TarFileReadInput': {
+            'dir': 'extensions/widgets/interactive/TarFileReadInput'
+        },
+        'CodeRepl': {
+            'dir': 'extensions/widgets/interactive/CodeRepl'
+        },
+    }
+}

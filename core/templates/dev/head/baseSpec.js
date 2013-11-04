@@ -6,7 +6,8 @@ describe('Base controller', function() {
     beforeEach(inject(function($rootScope, $controller) {
       scope = $rootScope.$new();
       ctrl = $controller(Base, {
-        $scope: scope, warningsData: null, activeInputData: null});
+        $scope: scope, warningsData: null, activeInputData: null,
+        messengerService: null});
     }));
 
     it('should check that the current URL is not the demo server', function() {

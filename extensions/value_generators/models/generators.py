@@ -29,6 +29,9 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
+    def __init__(self, *args, **kwargs):
+        super(Copier, self).__init__()
+
     def generate_value(self, context_params, value, parse_with_jinja=False):
         """Returns a copy of the input value.
 

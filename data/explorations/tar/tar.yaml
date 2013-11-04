@@ -22,19 +22,29 @@ states:
     widget_id: Continue
 - content:
   - type: text
-    value: "<div><h1>Unpacking tarballs</h1><p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href='http://openhatch.org/missions/tar/ghello-0.4.tar.gz'>ghello-0.4.tar.gz</a>. (Note that the tarball is following convention by using a directory that holds all of the files from that tarball.)</p><p>Your mission is to to upload ghello-0.4/ghello.c.</p><p>After you extract that file, upload it here:</p></div>"
+    value: "<div><h1>Unpacking tarballs</h1><p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href='http://openhatch.org/missions/tar/ghello-0.4.tar.gz'>ghello-0.4.tar.gz</a>. (Note that the tarball is following convention by using a directory that holds all of the files from that tarball.)</p><p>Your mission is to to upload ghello-0.4/ghello.c.</p><p>After you extract that file, upload it here:</p></div>
+      <oppia-noninteractive-hints high_hint-with-value=\"\
+      &amp;quot;Download the tarball using your web-browser or wget command.&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;wget\
+      \ http://openhatch.org/missions/tar/ghello-0.4.tar.gz&amp;lt;br&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;To\
+      \ unpack the tarball, you might want to use this command:&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;tar\
+      \ xvzf ghello-0.4.tar.gz&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      \ hint_placeholder-with-value=\"&amp;quot;&amp;lt;div&amp;gt;If you need help\
+      \ with this step, try clicking through these hints.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;The\
+      \ \\&amp;quot;low\\&amp;quot; hint level is perfect if you&amp;#39;re just confused\
+      \ as to what to do.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;The\
+      \ high level is great if you are unfamiliar with the commands and tools you&amp;#39;d\
+      \ use.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp; &amp;amp;nbsp;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      \ low_hint-with-value=\"&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;Download\
+      \ the tarball.&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;Unpack it.&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;Find\
+      \ and upload the ghello-0.4/ghello.c file.&amp;lt;br&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;quot;\"\
+      \ medium_hint-with-value=\"&amp;quot;To unpack the tarball, you might want to\
+      \ use this command:&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;tar&amp;amp;nbsp;xvzf\
+      \ ghello-0.4.tar.gz&amp;lt;br&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      ></oppia-noninteractive-hints>"
   name: Unpack!
   param_changes: []
   widget:
-    customization_args:
-      hint_placeholder:
-        value: "<p>If you need help with this step, try clicking through these hints.</p><p>The \"low\" hint level is perfect if you're just confused as to what to do.</p> <p>The \"high\" level is great if you are unfamiliar with the commands and tools you'd use.</p>"
-      low_hint:
-        value: "<ul><li>Download the tarball.</li><li>Unpack it. </li><li>find and upload the ghello-0.4/ghello.c file</li></ul>"
-      medium_hint:
-        value: "<p>To unpack the tarball, you might want to use this command:</p><ul><li>tar xvzf ghello-0.4.tar.gz</li></ul>"
-      high_hint:
-        value: "<p>Download the tarball using your web-browser or wget command<p><ul><li>wget http://openhatch.org/missions/tar/ghello-0.4.tar.gz</li></ul><p>To unpack the tarball, you might want to use this command:</p><ul><li>tar xvzf ghello-0.4.tar.gz</li></ul>"
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -55,22 +65,39 @@ states:
         - Uh oh! That wasn't quite right. Have another go.
         param_changes: []
     sticky: false
-    widget_id: FileReadInputWithHints
+    widget_id: FileReadInput
 - content:
   - type: text
-    value: "<div><h1>Creating tarballs</h1><p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them. It is called 'myproject' and is at version 0.1, and it consists of 2 files which you can download here:</p><p><a href='http://openhatch.org/missions/tar/downloadfile/Makefile'>Makefile</a><br /><a href='http://openhatch.org/missions/tar/downloadfile/hello.c'>hello.c</a></p><p>Your mission is to upload a compressed tarball with these files inside, all within a directory called myproject-0.1.</p><p>After you make the tarball, upload it here:</p></div>"
+    value: "<div><h1>Creating tarballs</h1><p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them. It is called 'myproject' and is at version 0.1, and it consists of 2 files which you can download here:</p><p><a href='http://openhatch.org/missions/tar/downloadfile/Makefile'>Makefile</a><br /><a href='http://openhatch.org/missions/tar/downloadfile/hello.c'>hello.c</a></p><p>Your mission is to upload a compressed tarball with these files inside, all within a directory called myproject-0.1.</p><p>After you make the tarball, upload it here:</p></div>
+      <oppia-noninteractive-hints high_hint-with-value=\"\
+      &amp;quot;&amp;lt;div&amp;gt;Create a myproject-0.1 directory by using command:&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;mkdir\
+      \ myproject-0.1&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;Download the files to this\
+      \ directory.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;Change\
+      \ the working directory to the parent directory using the command:&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;cd\
+      \ ..&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;Create\
+      \ a tarball named myproject-0.1.tar.gz using the command:&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;tar\
+      \ zcvf myproject-0.1.tar.gz myproject-0.1&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;Finally,\
+      \ upload the myproject-0.1.tar.gz file.&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      \ hint_placeholder-with-value=\"&amp;quot;&amp;lt;div&amp;gt;If you need help\
+      \ with this step, try clicking through these hints.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;The\
+      \ \\&amp;quot;low\\&amp;quot; hint level is perfect if you&amp;#39;re just confused\
+      \ as to what to do.&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;The\
+      \ \\&amp;quot;high\\&amp;quot; level is great if you are unfamiliar with the\
+      \ commands and tools you&amp;#39;d use.&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      \ low_hint-with-value=\"&amp;quot;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;Create\
+      \ a myproject-0.1 directory.&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;Download the\
+      \ files above and place them in the directory.&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;In\
+      \ the parent directory, create a gzipped tarball of the myproject-0.1 directory.&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;Upload\
+      \ your tarball.&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      \ medium_hint-with-value=\"&amp;quot;&amp;lt;div&amp;gt;Some commands you might\
+      \ need to know:&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;mkddir\
+      \ myproject-0.1&amp;lt;/li&amp;gt;&amp;lt;li&amp;gt;tar zcvf myproject-0.1.tar.gz\
+      \ myproject-0.1&amp;lt;/li&amp;gt;&amp;lt;/ul&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;\"\
+      ></oppia-noninteractive-hints>"
   name: Pack!
   param_changes: []
   widget:
-    customization_args:
-      hint_placeholder:
-        value: "<p>If you need help with this step, try clicking through these hints.</p><p>The \"low\" hint level is perfect if you're just confused as to what to do.</p> <p>The \"high\" level is great if you are unfamiliar with the commands and tools you'd use.</p>"
-      low_hint:
-        value: "<ul><li>create a myproject-0.1 directory</li><li>download the files above and place them in the directory </li><li>in the parent directory, create a gzipped tarball of the myproject-0.1 directory</li><li>upload your tarball.</li></ul>"
-      medium_hint:
-        value: "<p>Some commands you might need to know:</p><ul><li>mkdir myproject-0.1</li><li>tar zcvf myproject-0.1.tar.gz myproject-0.1</li></ul>"
-      high_hint:
-        value: "<p>create a myproject-0.1 directory by using command:<p><ul><li>mkdir myproject-0.1</li></ul><p>Download the files to this directory</p><p>Change working directory to the parent directory using the command: </p><ul><li>cd ..</li></ul><p>Create a tarball named myproject-0.1.tar.gz using the command:</p><ul><li>tar zcvf myproject-0.1.tar.gz myproject-0.1</li></ul><p>Upload myproject-0.1.tar.gz file.</p>"
+    customization_args: {}
     handlers:
     - name: submit
       rule_specs:
@@ -124,7 +151,7 @@ states:
         param_changes: []
       - definition:
           inputs:
-            file_list: ['hello.c', 'Makefile'] 
+            file_list: ['hello.c', 'Makefile']
           name: HasUnexpectedContent
           rule_type: atomic
           subject: answer
@@ -139,4 +166,4 @@ states:
         - Yay! you did it.
         param_changes: []
     sticky: false
-    widget_id: TarFileReadInputWithHints
+    widget_id: TarFileReadInput

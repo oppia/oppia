@@ -18,8 +18,6 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
-ME=$(whoami)
-
 echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
@@ -48,21 +46,6 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   rm node-download.tgz
 fi
 
-echo Checking whether Karma is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
-  echo Installing Karma
-  $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install -g karma@0.8.7
-
-  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
-fi
-
-# For this to work, you must first run
-#
-#     sudo apt-get install cakephp-scripts
-#
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Checking whether coffeescript has been installed via node.js
@@ -91,16 +74,19 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     echo Compiling jsrepl
     # Sed fixes some issues:
     # - Reducing jvm memory requirement from 4G to 1G.
-    # - This version of node uses fs.exitsSync.
+    # - This version of node uses fs.existsSync.
     # - CoffeeScript is having trouble with octal representation.
+    # - Use our installed version of uglifyjs.
     sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
     sed -e 's/path\.existsSync/fs\.existsSync/' |\
-    sed -e 's/0o755/493/' > $TMP_FILE
+    sed -e 's/0o755/493/' |\
+    sed -e 's,uglifyjs,$NODE_PATH/uglify-js/bin/uglifyjs,' > $TMP_FILE
     mv $TMP_FILE Cakefile
-    NODE_PATH=../node-0.10.1/lib/node_modules cake bake
+    export NODE_PATH=$TOOLS_DIR/node-0.10.1/lib/node_modules
+    $TOOLS_DIR/node-0.10.1/bin/cake bake
 
     # Return to the Oppia root folder.
-    cd ../../oppia
+    cd $OPPIA_DIR
   fi
 
   # Move the build directory to the static resources folder.
@@ -155,31 +141,34 @@ if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
   echo Installing JQueryUI
   mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
   wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.10.3/jquery-ui.min.js
+  wget http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip -O jquery-ui-themes.zip
+  unzip jquery-ui-themes.zip -d $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
+  rm jquery-ui-themes.zip
 fi
 
 echo Checking whether angularjs is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2" ]; then
+if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3" ]; then
   echo Installing AngularJS and angular-sanitize
-  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular.min.js.map
+  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.min.js.map
 
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-resource.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-resource.min.js.map
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.min.js.map
 
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-route.min.js.map
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.min.js.map
 
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-sanitize.min.js.map  
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js.map  
 
   # Files for tests.
-  wget http://code.angularjs.org/1.2.0-rc.2/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-mocks.js
-  wget http://code.angularjs.org/1.2.0-rc.2/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.2/angular-scenario.js
+  wget http://code.angularjs.org/1.2.0-rc.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-mocks.js
+  wget http://code.angularjs.org/1.2.0-rc.3/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-scenario.js
 fi
 
 echo Checking whether d3.js is installed in $THIRD_PARTY_DIR
@@ -187,4 +176,22 @@ if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   echo Installing d3.js
   mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/
   wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
+fi
+
+echo Checking whether bleach is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/bleach-1.2.2" ]; then
+  echo Installing bleach
+  mkdir -p $THIRD_PARTY_DIR/bleach-1.2.2
+  wget https://github.com/jsocol/bleach/archive/v1.2.2.zip -O bleach-download.zip
+  unzip bleach-download.zip -d $THIRD_PARTY_DIR/
+  rm bleach-download.zip
+fi
+
+echo Checking whether html5lib is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/html5lib-python-0.95" ]; then
+  echo Installing html5lib
+  mkdir -p $THIRD_PARTY_DIR/html5lib-python-0.95
+  wget https://github.com/html5lib/html5lib-python/archive/0.95.zip -O html5lib-download.zip
+  unzip html5lib-download.zip -d $THIRD_PARTY_DIR/
+  rm html5lib-download.zip
 fi

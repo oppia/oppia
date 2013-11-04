@@ -1,9 +1,8 @@
 from core.domain import widget_domain
-from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 
-class FileReadInputWithHints(widget_domain.BaseWidget):
+class Hints(widget_domain.BaseWidget):
     """Definition of a widget.
 
     Do NOT make any changes to this widget definition while the Oppia app is
@@ -14,14 +13,14 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
     """
 
     # The human-readable name of the widget.
-    name = 'File input with hints'
+    name = 'Hints'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'
 
     # A description of the widget.
     description = (
-        'A file input widget.'
+        'Hints widget.'
     )
 
     # Customization parameters and their descriptions, types and default
@@ -30,7 +29,10 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
         'name': 'hint_placeholder',
         'description': 'The placeholder for the text for hint box.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -39,7 +41,10 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
         'name': 'low_hint',
         'description': 'The low level hint.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -48,7 +53,10 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
         'name': 'medium_hint',
         'description': 'The medium level hint',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
@@ -57,17 +65,25 @@ class FileReadInputWithHints(widget_domain.BaseWidget):
         'name': 'high_hint',
         'description': 'The high level hint',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True,
+            'large_input': True,
+        },
         'customization_args': {
             'value': ''
         },
         'obj_type': 'UnicodeString',
     }]
 
-    # Actions that the reader can perform on this widget which trigger a
-    # feedback interaction, and the associated input types. Interactive widgets
-    # must have at least one of these. This attribute name MUST be prefixed by
-    # '_'.
-    _handlers = [{
-        'name': 'submit', 'input_type': objects.UnicodeString
-    }]
+    frontend_name = 'hints'
+    tooltip = 'Insert hints'
+    icon_data_url = (
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1%2BjfqA'
+        'AAABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXH'
+        'JZTwAAADoSURBVBgZBcExblNBGAbA2ceegTRBuIKO%0AgiihSZNTcC5LUHAihNJR0kGKC'
+        'DcYJY6D3/77MdOinTvzAgCw8ysThIvn/VojIyMjIyPP%2BbS1sUQI%0AV2s95pBDDvmbP'
+        '/mdkft83tpYguZq5Jh/OeaYh%2Byzy8hTHvNlaxNNczm%2Bla9OTlar1UdA/%2BC2A4tr'
+        '%0ARCnD3jS8BB1obq2Gk6GU6QbQAS4BUaYSQAf4bhhKKTFdAzrAOwAxEUAH%2BKEM01SY'
+        '3gM6wBsEAQB0%0AgJ%2BmaZoC3gI6iPYaAIBJsiRmHU0AALOeFC3aK2cWAACUXe7%2BAw'
+        'O0lc9eTHYTAAAAAElFTkSuQmCC%0A'
+    )

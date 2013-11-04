@@ -7,8 +7,6 @@ states:
   - type: text
     value: Do you remember FOIL? &nbsp;It goes something like this:<br>$(a + b)(c
       + d) = ac + ad + bc + bd$.<br>
-  - type: text
-    value: ''
   name: Start
   param_changes: []
   widget:
@@ -127,16 +125,8 @@ states:
     widget_id: MultipleChoiceInput
 - content:
   - type: text
-    value: '<span style="color: rgb(51, 51, 51); font-family: Helvetica, Arial, sans-serif;
-      font-size: 14px; line-height: 20px;">Again, consider the expression:</span><br
-      style="color: rgb(51, 51, 51); font-family: Helvetica, Arial, sans-serif; font-size:
-      14px; line-height: 20px;"><span style="color: rgb(51, 51, 51); font-family:
-      Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px;">$(x - a_1)(x
-      - a_2)(x - a_3)...(x - a_n)$</span><br style="color: rgb(51, 51, 51); font-family:
-      Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px;"><br style="color:
-      rgb(51, 51, 51); font-family: Helvetica, Arial, sans-serif; font-size: 14px;
-      line-height: 20px;"><span style="color: rgb(51, 51, 51); font-family: Helvetica,
-      Arial, sans-serif; font-size: 14px; line-height: 20px;">What is the absolute
+    value: '<span>Again, consider the expression:</span><br><span>$(x - a_1)(x
+      - a_2)(x - a_3)...(x - a_n)$</span><br><br><span>What is the absolute
       value of the linear term (the $x^1$ term)?</span><br>'
   name: Particular coefficients (part 2)
   param_changes: []
@@ -173,8 +163,7 @@ states:
     widget_id: MultipleChoiceInput
 - content:
   - type: text
-    value: '<span style="color: rgb(51, 51, 51); font-family: Helvetica, Arial, sans-serif;
-      font-size: 14px; line-height: 20px;">Here''s that expression again:<br>$(x -
+    value: '<span>Here''s that expression again:<br>$(x -
       a_1)(x - a_2)(x - a_3)...(x - a_n)$<br></span><br>If $n$ is even, what''s the
       sign of the constant term? &nbsp;How about the linear term?<br>Likewise, if
       $n$ is odd, what''s the sign of the constant term? &nbsp;What''s the sign of

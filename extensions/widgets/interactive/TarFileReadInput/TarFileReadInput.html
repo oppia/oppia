@@ -1,0 +1,30 @@
+<html ng-app="tarFileInputWidget">
+  <head>
+    <link rel="stylesheet" type="text/css"
+       href="/lib/static/bootstrap-2.3.1-r1/css/bootstrap.css" media="screen">
+
+    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="/lib/static/bootstrap-2.3.1-r1/js/bootstrap.js"></script>
+    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
+    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js">
+    </script>
+  </head>
+
+  <body onload="onWidgetLoad()">
+    <div ng-controller="TarFileReadInput">
+
+      <input onchange= "angular.element(this).scope().submitAnswer(this)"
+             type="file" required>
+
+      <div id="processing-modal" class="modal hide" data-backdrop="false">
+        <div class="modal-body">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <p>Processing uploaded file: <[filename]></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/extensions/widgets/interactive/TarFileReadInput/static/js/TarFileReadInput.js">
+    </script>
+  </body>
+</html>
