@@ -96,15 +96,50 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
       // initialized.
       $scope.editorDoc = null;
 
+      $scope._createAttrsFromCustomizationArgs = function(customizationArgs) {
+        var attrList = [];
+        for (var paramName in customizationArgs) {
+          for (var argName in customizationArgs[paramName]) {
+            attrList.push({
+              'name': paramName + '-with-' + argName,
+              'value': oppiaHtmlEscaper.objToEscapedJson(
+                  customizationArgs[paramName][argName])
+            });
+          }
+        }
+        return attrList;
+      };
+
+      $scope._createCustomizationArgsFromAttrs = function(attrs) {
+        var customizationArgs = {};
+        for (var i = 0; i < attrs.length; i++) {
+          var attr = attrs[i];
+          if (attr.name == 'class' || attr.name == 'src') {
+            continue;
+          }
+          var separatorLocation = attr.name.indexOf('-with-');
+          if (separatorLocation === -1) {
+            console.log('Error: invalid customization attribute ' + attr.name);
+          }
+          var paramName = attr.name.substring(0, separatorLocation);
+          var argName = attr.name.substring(separatorLocation + 6);
+          if (!customizationArgs.hasOwnProperty(paramName)) {
+            customizationArgs[paramName] = {};
+          }
+          customizationArgs[paramName][argName] = (
+              oppiaHtmlEscaper.escapedJsonToObj(attr.value));
+        }
+        return customizationArgs;
+      };
+
       $scope._createRteElement = function(widgetDefinition, customizationArgs) {
         var el = $('<img/>');
         el.attr('src', widgetDefinition.iconDataUrl);
         el.addClass('oppia-noninteractive-' + widgetDefinition.name);
 
-        for (var paramName in customizationArgs) {
-          var escapedArgs = oppiaHtmlEscaper.objToEscapedJson(
-              customizationArgs[paramName]);
-          el.attr(paramName, escapedArgs);
+        var attrList = $scope._createAttrsFromCustomizationArgs(customizationArgs);
+        for (var i = 0; i < attrList.length; i++) {
+          el.attr(attrList[i].name, attrList[i].value);
         }
 
         var domNode = el.get(0);
@@ -124,13 +159,8 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
 
         $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
           elt.find('oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
-            var customizationArgs = {};
-            for (var i = 0; i < this.attributes.length; i++) {
-              var attr = this.attributes[i];
-              customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
-                attr.value);
-            }
-            return $scope._createRteElement(widgetDefn, customizationArgs);
+            return $scope._createRteElement(
+                widgetDefn, $scope._createCustomizationArgsFromAttrs(this.attributes));
           });
         });
 
@@ -214,6 +244,18 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
         });
       };
 
+      $scope._saveContent = function() {
+        var content = $(rteNode).wysiwyg('getContent');
+        if (content !== null && content !== undefined) {
+          $scope.htmlContent = $scope._convertRteToHtml(content);
+          $scope.$apply();
+        }
+      };
+
+      $scope.$on('externalSave', function() {
+        $scope._saveContent();
+      });
+
       $scope.init = function() {
         $http.get('/widgetrepository/data/noninteractive').then(function(response) {
           // TODO(sll): Remove the need for $http.get() if $scope.disallowOppiaWidgets
@@ -250,11 +292,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
             debug: true,
             events: {
               save: function(event) {
-                var content = $(rteNode).wysiwyg('getContent');
-                if (content !== null && content !== undefined) {
-                  $scope.htmlContent = $scope._convertRteToHtml(content);
-                  $scope.$apply();
-                }
+                $scope._saveContent();
               }
             },
             initialContent: $scope.rteContent,
@@ -288,15 +326,10 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
             elts.forEach(function(elt) {
               elt.ondblclick = function() {
                 this.className += ' insertionPoint';
-                var customizationArgs = {};
-                for (var i = 0; i < this.attributes.length; i++) {
-                  var attr = this.attributes[i];
-                  if (attr.name !== 'src' && attr.name !== 'class') {
-                    customizationArgs[attr.name] = oppiaHtmlEscaper.escapedJsonToObj(
-                        attr.value);
-                  }
-                }
-                $scope.getRteCustomizationModal(widgetDefinition, customizationArgs);
+                $scope.getRteCustomizationModal(
+                    widgetDefinition,
+                    $scope._createCustomizationArgsFromAttrs(this.attributes)
+                );
               };
             });
           });

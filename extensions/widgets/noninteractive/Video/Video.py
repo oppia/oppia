@@ -29,7 +29,9 @@ class Video(widget_domain.BaseWidget):
         'name': 'video_id',
         'description': 'The id for this video.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'disallow_parse_with_jinja': True
+        },
         'customization_args': {
             'value': ''
         },

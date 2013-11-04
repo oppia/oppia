@@ -16,6 +16,10 @@
  * @fileoverview Directives supporting non-interactive widgets.
  *
  * @author sll@google.com (Sean Lip)
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by 'With',
+ * followed by the name of the arg.
  */
 
 oppia.directive('oppiaNoninteractiveImage', function($compile) {
@@ -30,11 +34,11 @@ oppia.directive('oppiaNoninteractiveVideo', function($sce, oppiaHtmlEscaper) {
   return {
     restrict: 'E',
     scope: {
-      video_id: '@'
+      videoIdWithValue: '@'
     },
     templateUrl: '/widgettemplate/noninteractive/Video',
     controller: function($scope, $attrs) {
-      $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoId).value;
+      $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
       $scope.videoUrl = $sce.trustAsResourceUrl(
           'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0'
       );
@@ -46,18 +50,18 @@ oppia.directive('oppiaNoninteractiveHints', function(oppiaHtmlEscaper) {
   return {
     restrict: 'E',
     scope: {
-      low_hint: '@',
-      medium_hint: '@',
-      high_hint: '@',
-      hint_placholder: '@'
+      lowHintWithValue: '@',
+      mediumHintWithValue: '@',
+      highHintWithValue: '@',
+      hintPlaceholderWithValue: '@'
     },
     templateUrl: '/widgettemplate/noninteractive/Hints',
     controller: function($scope, $attrs) {
-      $scope.lowHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.lowHint).value;
-      $scope.mediumHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.mediumHint).value;
-      $scope.highHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.highHint).value;
+      $scope.lowHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.lowHintWithValue);
+      $scope.mediumHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.mediumHintWithValue);
+      $scope.highHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.highHintWithValue);
       $scope.hintPlaceholder = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.hintPlaceholder).value;
+          $attrs.hintPlaceholderWithValue);
     }
   };
 });

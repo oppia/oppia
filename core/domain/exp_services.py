@@ -777,7 +777,8 @@ def create_from_yaml(
             state = get_state_by_name(exploration_id, sdict['name'])
 
             state.content = [
-                exp_domain.Content(item['type'], item['value'])
+                exp_domain.Content(
+                    item['type'], html_cleaner.clean(item['value']))
                 for item in sdict['content']
             ]
 
@@ -798,7 +799,8 @@ def create_from_yaml(
                     'definition': rule_spec['definition'],
                     'dest': convert_state_name_to_id(
                         exploration_id, rule_spec['dest']),
-                    'feedback': rule_spec['feedback'],
+                    'feedback': [html_cleaner.clean(feedback)
+                                 for feedback in rule_spec['feedback']],
                     'param_changes': rule_spec.get('param_changes', []),
                 } for rule_spec in handler['rule_specs']],
             }) for handler in wdict['handlers']]

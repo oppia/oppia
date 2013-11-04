@@ -181,20 +181,17 @@ ALLOWED_WIDGETS = {
         'InteractiveMap': {
             'dir': 'extensions/widgets/interactive/InteractiveMap'
         },
-        'FileReadInput': {
-            'dir': 'extensions/widgets/interactive/FileReadInput'
-        },
         'MusicStaff': {
             'dir': 'extensions/widgets/interactive/MusicStaff'
         },
         'SetInput': {
             'dir': 'extensions/widgets/interactive/SetInput'
         },
-        'FileReadInputWithHints': {
-            'dir': 'extensions/widgets/interactive/FileReadInputWithHints'
+        'FileReadInput': {
+            'dir': 'extensions/widgets/interactive/FileReadInput'
         },
-        'TarFileReadInputWithHints': {
-            'dir': 'extensions/widgets/interactive/TarFileReadInputWithHints'
+        'TarFileReadInput': {
+            'dir': 'extensions/widgets/interactive/TarFileReadInput'
         },
         'CodeRepl': {
             'dir': 'extensions/widgets/interactive/CodeRepl'

@@ -22,10 +22,11 @@ import bleach
 
 # TODO(sll): Get this directly from the widget definitions.
 OPPIA_CUSTOM_TAGS = {
-    'oppia-noninteractive-image': ['image_id'],
-    'oppia-noninteractive-video': ['video_id'],
+    'oppia-noninteractive-image': ['image_id-with-value'],
+    'oppia-noninteractive-video': ['video_id-with-value'],
     'oppia-noninteractive-hints': [
-        'low_hint', 'medium_hint', 'high_hint', 'hint_placeholder'
+        'low_hint-with-value', 'medium_hint-with-value',
+        'high_hint-with-value', 'hint_placeholder-with-value'
     ]
 }
 
