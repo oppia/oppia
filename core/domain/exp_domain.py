@@ -45,7 +45,7 @@ class Content(object):
         return cls(content_dict['type'], content_dict['value'])
 
     def __init__(self, content_type, value=''):
-        if content_type not in ['text', 'image', 'video', 'widget']:
+        if content_type not in ['text']:
             raise ValueError('Invalid content type: %s' % content_type)
         self.type = content_type
         # TODO(sll): Generalize this so the value can be a dict (for a widget).

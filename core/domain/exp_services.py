@@ -380,7 +380,8 @@ def create_new(
                       exp_models.ExplorationModel.get_new_id(title))
 
     state_id = exp_models.StateModel.get_new_id(init_state_name)
-    new_state = exp_domain.State(state_id, init_state_name, [], [], None)
+    new_state = exp_domain.State(
+        state_id, init_state_name, [exp_domain.Content('text', '')], [], None)
     save_state(user_id, exploration_id, new_state)
 
     exploration_model = exp_models.ExplorationModel(
@@ -516,7 +517,8 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
         raise ValueError('Duplicate state name %s' % state_name)
 
     state_id = state_id or exp_models.StateModel.get_new_id(state_name)
-    new_state = exp_domain.State(state_id, state_name, [], [], None)
+    new_state = exp_domain.State(
+        state_id, state_name, [exp_domain.Content('text', '')], [], None)
 
     def _add_state_transaction(committer_id, exploration_id, new_state):
         exploration_memcache_key = _get_exploration_memcache_key(
