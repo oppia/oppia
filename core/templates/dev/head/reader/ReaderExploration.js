@@ -178,7 +178,6 @@
     $scope.params = data.params;
     $scope.stateId = data.state_id;
     $scope.title = data.title;
-    $scope.iframeOutput = data.iframe_output;
     $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.reloadInteractiveIframe($scope.inputTemplate);
@@ -187,13 +186,6 @@
     // The call to $apply() is needed before updateMath() is called.
     $scope.$apply();
     $scope.updateMath();
-
-    for (var i = 0; i < $scope.iframeOutput.length; i++) {
-      $scope.addContentToIframeWithId(
-        'widgetCompiled' + $scope.iframeOutput[i].blockIndex +
-            '-' + $scope.iframeOutput[i].index,
-        $scope.iframeOutput[i].raw);
-    }
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -240,10 +232,6 @@
       data.reader_response_html, data.oppia_html
     );
 
-    for (var i = 0; i < data.iframe_output.length; i++) {
-      $scope.iframeOutput.push(data.iframe_output[i]);
-    }
-
     // We need to generate the HTML (with the iframe) before populating it.
     if ($scope.inputTemplate) {
       // A non-empty interactive_html means that the previous widget
@@ -255,14 +243,6 @@
     // The call to $apply() is needed before updateMath() is called.
     $scope.$apply();
     $scope.updateMath();
-
-    // TODO(sll): Can this be done without forcing a reload of all the existing iframes?
-    for (var j = 0; j < $scope.iframeOutput.length; j++) {
-      $scope.addContentToIframeWithId(
-        'widgetCompiled' + $scope.iframeOutput[j].blockIndex +
-            '-' + $scope.iframeOutput[j].index,
-        $scope.iframeOutput[j].raw);
-    }
 
     if (data.reader_response_iframe) {
       // The previous user response needs to be rendered in a custom html with

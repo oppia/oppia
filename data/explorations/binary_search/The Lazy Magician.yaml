@@ -1260,11 +1260,7 @@ states:
       guesses, and I knew exactly what my first guess should be to do this. After
       I made the first guess, I would have two guesses left. And we already know something
       we can do with two guesses!"<br>"So let''s pretend that after my first guess,
-      we see the same two-guess case that we saw before:"'
-  - type: text
-    value: Picture goes here
-  - type: text
-    value: '"This must mean that our first guess, and the information the magician
+      we see the same two-guess case that we saw before:" INSERT PICTURE HERE "This must mean that our first guess, and the information the magician
       gave us in response, narrowed down our possibilities to numbers between 1 and
       3."<br><br>"What could his response have been?"'
   name: Reduce 3 guesses to 2

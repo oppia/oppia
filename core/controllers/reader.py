@@ -70,8 +70,8 @@ class ExplorationHandler(base.BaseHandler):
         )
 
         init_state = exploration.init_state
-        init_html, init_widgets = exp_services.export_content_to_html(
-            exploration_id, init_state.content, 0, reader_params,
+        init_html = exp_services.export_content_to_html(
+            exploration_id, init_state.content, reader_params,
             escape_text_strings=False)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
@@ -88,7 +88,6 @@ class ExplorationHandler(base.BaseHandler):
             'state_history': [exploration.init_state_id],
             'state_id': exploration.init_state_id,
             'title': exploration.title,
-            'iframe_output': init_widgets,
         })
         self.render_json(self.values)
 
@@ -115,23 +114,22 @@ class FeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_answer_submitted(
             exploration_id, old_state_id, handler, str(rule), recorded_answer)
 
-    def _get_feedback(self, exploration_id, feedback, block_number, params):
+    def _get_feedback(self, exploration_id, feedback, params):
         """Gets the HTML and iframes with Oppia's feedback."""
         if not feedback:
-            return '', []
+            return ''
         else:
             feedback_bits = feedback.split('\n')
             return exp_services.export_content_to_html(
                 exploration_id,
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
-                block_number, params, escape_text_strings=False)
+                params, escape_text_strings=False)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
-                        new_state, block_number, state_has_changed,
-                        html_output, iframe_output):
+                        new_state, state_has_changed, html_output):
         """Appends content for the new state to the output variables."""
         if finished:
-            return {}, html_output, iframe_output, ''
+            return {}, html_output, ''
         else:
             # Populate new parameters.
             new_params = exp_services.update_with_state_params(
@@ -139,15 +137,14 @@ class FeedbackHandler(base.BaseHandler):
 
             if state_has_changed:
                 # Append the content for the new state.
-                state_html, state_widgets = exp_services.export_content_to_html(
-                    exploration_id, new_state.content, block_number,
-                    new_params, escape_text_strings=False)
+                state_html = exp_services.export_content_to_html(
+                    exploration_id, new_state.content, new_params,
+                    escape_text_strings=False)
 
                 if html_output and state_html:
                     html_output += '<br>'
 
                 html_output += state_html
-                iframe_output += state_widgets
 
             interactive_html = '' if sticky else (
                 widget_domain.Registry.get_widget_by_id(
@@ -155,7 +152,7 @@ class FeedbackHandler(base.BaseHandler):
                 ).get_raw_code(new_state.widget.customization_args, new_params)
             )
 
-            return (new_params, html_output, iframe_output, interactive_html)
+            return (new_params, html_output, interactive_html)
 
     def post(self, exploration_id, state_id):
         """Handles feedback interactions with readers."""
@@ -219,23 +216,21 @@ class FeedbackHandler(base.BaseHandler):
         values['reader_response_iframe'] = reader_response_iframe
 
         # Add Oppia's feedback to the response HTML.
-        html_output, iframe_output = self._get_feedback(
-            exploration_id, feedback, block_number, old_params)
+        html_output = self._get_feedback(exploration_id, feedback, old_params)
 
         # Add the content for the new state to the response HTML.
         finished = (new_state_id == feconf.END_DEST)
         state_has_changed = (old_state.id != new_state_id)
-        new_params, html_output, iframe_output, interactive_html = (
+        new_params, html_output, interactive_html = (
             self._append_content(
                 exploration_id, sticky, finished, old_params, new_state,
-                block_number, state_has_changed, html_output, iframe_output))
+                state_has_changed, html_output))
 
         values.update({
             'interactive_html': interactive_html,
             'exploration_id': exploration_id,
             'state_id': new_state_id,
             'oppia_html': html_output,
-            'iframe_output': iframe_output,
             'block_number': block_number,
             'params': new_params,
             'finished': finished,
