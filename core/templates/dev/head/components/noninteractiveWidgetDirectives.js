@@ -22,11 +22,20 @@
  * followed by the name of the arg.
  */
 
-oppia.directive('oppiaNoninteractiveImage', function($compile) {
+oppia.directive('oppiaNoninteractiveImage', function($rootScope, $sce, oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {},
-    template: '<span>IMAGE</span>'
+    scope: {
+      filepathWithValue: '@'
+    },
+    templateUrl: '/widgettemplate/noninteractive/Image',
+    controller: function($scope, $attrs) {
+      $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
+      $scope.imageUrl = $sce.trustAsResourceUrl(
+          '/imagehandler/' + $rootScope.explorationId + '/' +
+          encodeURIComponent($scope.filepath)
+      );
+    }
   };
 });
 

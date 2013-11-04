@@ -560,3 +560,42 @@ oppia.directive('list', function(warningsData) {
     }
   };
 });
+
+oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
+  // Editable filepath directive. This can only be used in the context of an
+  // exploration.
+  return {
+    restrict: 'E',
+    scope: {item: '='},
+    templateUrl: '/templates/filepath',
+    controller: function ($scope, $attrs) {
+      $scope.localItem = {label: $scope.item || ''};
+
+      $scope.explorationId = $rootScope.explorationId;
+
+      if (!$scope.explorationId) {
+        console.log('Error: File picker widget called without being given an exploration.');
+        // TODO(sll): Send an error to the backend.
+        return;
+      }
+
+      $scope.$watch('localItem.label', function(newValue, oldValue) {
+        if (newValue) {
+          warningsData.clear();
+          $scope.localItem = {label: newValue};
+          $scope.item = newValue;
+        }
+      });
+
+      $scope.getPreviewUrl = function(filepath) {
+        var encodedFilepath = window.encodeURIComponent(filepath);
+        return $sce.trustAsResourceUrl(
+            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+      };
+
+      $http.get('/create/resource_list/' + $scope.explorationId).success(function(data) {
+        $scope.filepaths = data.filepaths;
+      });
+    }
+  };
+});

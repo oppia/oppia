@@ -33,7 +33,7 @@ oppia.run(function($rootScope) {
 });
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
-    $filter, explorationData, warningsData, activeInputData, requestCreator) {
+    $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
 
   $scope.doesStateIdExist = function() {
     return Boolean($scope.stateId);
@@ -155,6 +155,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
 
   // The pathname should be: .../create/{exploration_id}[/{state_id}]
   $scope.explorationId = pathnameArray[2];
+  // The exploration id needs to be attached to the root scope in order for
+  // the file picker widget to work. (Note that an alternative approach might
+  // also be to replicate this URL-based calculation in the file picker widget.)
+  $rootScope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
 
@@ -641,6 +645,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = [
-  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter',
+  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter', '$rootScope',
   'explorationData', 'warningsData', 'activeInputData', 'requestCreator'
 ];

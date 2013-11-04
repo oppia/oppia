@@ -22,6 +22,7 @@ import hashlib
 import imghdr
 import logging
 import mimetypes
+import urllib
 
 from core.controllers import base
 from core.domain import fs_domain
@@ -60,22 +61,24 @@ class ValueGeneratorHandler(base.BaseHandler):
 class ImageHandler(base.BaseHandler):
     """Handles image retrievals."""
 
-    def get(self, exploration_id, image_id):
+    def get(self, exploration_id, encoded_filepath):
         """Returns an image.
 
         Args:
             exploration_id: the id of the exploration.
-            image_id: string representing the image filepath.
+            encoded_filepath: a string representing the image filepath. This
+              string is encoded in the frontend using encodeURIComponent().
         """
         try:
-            format = image_id[(image_id.rfind('.') + 1) :]
+            filepath = urllib.unquote(encoded_filepath)
+            format = filepath[(filepath.rfind('.') + 1) :]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
             self.response.headers['Content-Type'] = str('image/%s' % format)
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(exploration_id))
-            raw = fs.get(image_id)
+            raw = fs.get(filepath)
             self.response.write(raw)
         except:
             raise self.PageNotFoundException

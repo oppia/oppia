@@ -31,9 +31,17 @@ oppia.config(function($interpolateProvider) {
 oppia.factory('oppiaHtmlEscaper', function() {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {
+      if (!obj) {
+        console.log('Error: empty obj was passed to JSON escaper.');
+        return '';
+      }
       return this.unescapedStrToEscapedStr(JSON.stringify(obj));
     },
     escapedJsonToObj: function(json) {
+      if (!json) {
+        console.log('Error: empty string was passed to JSON decoder.');
+        return '';
+      }
       return JSON.parse(this.escapedStrToUnescapedStr(json));
     },
     unescapedStrToEscapedStr: function(str) {

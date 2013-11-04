@@ -26,14 +26,14 @@ class Image(widget_domain.BaseWidget):
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
-        'name': 'image_id',
-        'description': 'The id for this image.',
+        'name': 'filepath',
+        'description': 'The filepath for this image.',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'Filepath',
     }]
 
     frontend_name = 'image'

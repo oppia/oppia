@@ -22,7 +22,7 @@ import bleach
 
 # TODO(sll): Get this directly from the widget definitions.
 OPPIA_CUSTOM_TAGS = {
-    'oppia-noninteractive-image': ['image_id-with-value'],
+    'oppia-noninteractive-image': ['filepath-with-value'],
     'oppia-noninteractive-video': ['video_id-with-value'],
     'oppia-noninteractive-hints': [
         'low_hint-with-value', 'medium_hint-with-value',

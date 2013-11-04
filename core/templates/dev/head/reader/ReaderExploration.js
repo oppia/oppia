@@ -18,9 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
+ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
+  // The following is needed for image displaying to work.
+  $rootScope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
 
   $scope.urlParams = $scope.getUrlParams();
@@ -289,5 +291,5 @@
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'requestCreator'
+  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'requestCreator'
 ];

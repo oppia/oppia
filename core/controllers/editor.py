@@ -18,6 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import stats_services
 from core.domain import value_generators_domain
@@ -254,3 +255,16 @@ class ExplorationDownloadHandler(base.BaseHandler):
             'attachment; filename=%s.zip' % filename)
 
         self.response.write(exp_services.export_to_zip_file(exploration_id))
+
+
+class ExplorationResourcesHandler(base.BaseHandler):
+    """Manages assets associated with an exploration."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        dir_list = fs.listdir('')
+
+        self.render_json({'filepaths': dir_list})

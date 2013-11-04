@@ -161,6 +161,9 @@ ALLOWED_WIDGETS = {
         'Hints': {
             'dir': 'extensions/widgets/noninteractive/Hints'
         },
+        'Image': {
+            'dir': 'extensions/widgets/noninteractive/Image'
+        },
         'Video': {
             'dir': 'extensions/widgets/noninteractive/Video'
         },

@@ -1,0 +1,16 @@
+<div>
+  <div ng-if="!explorationId">
+    Warning: The file picker does not work outside the context of an exploration.
+  </div>
+  <div ng-if="explorationId">
+    <div ng-repeat="filepath in filepaths track by $index">
+      <label>
+        <input type="radio" ng-model="localItem.label"
+               name="choiceGroup" id="<[filepath]>"
+               value="<[filepath]>">
+        <[filepath]>
+      </label>
+    </div>
+    <img ng-src="<[getPreviewUrl(localItem.label)]>"/>
+  </div>
+</div>

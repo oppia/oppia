@@ -92,7 +92,7 @@ urls = [
         r'/imagehandler/<exploration_id>', resources.ImageUploadHandler,
         'image_upload_handler'),
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<image_id>', resources.ImageHandler,
+        r'/imagehandler/<exploration_id>/<encoded_filepath>', resources.ImageHandler,
         'image_handler'),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
@@ -141,6 +141,9 @@ urls = [
     get_redirect_route(
         r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
         'state_handler'),
+    get_redirect_route(
+        r'/create/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
+        'exploration_resources_handler'),
 
     get_redirect_route(
         r'/widgetrepository', widgets.WidgetRepositoryPage,

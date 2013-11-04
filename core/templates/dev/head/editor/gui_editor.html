@@ -26,9 +26,12 @@
         <h4>States that point to this one</h4>
         <ul>
           <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-            <a href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+            <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
               <[incomingState.name]>
             </a>
+            <span ng-if="stateId == incomingStateId">
+              <[incomingState.name]>
+            </span>
             (<[incomingState.rules | commaSeparatedList]>)
           </li>
         </ul>
@@ -60,7 +63,7 @@
 
               <span class="pull-right">
                 <span ng-hide="activeInputData.name == 'content.' + $index">
-                  <a ng-click="editContent($index)">Edit</a>
+                  <a href="#" onclick="return false;" ng-click="editContent($index)">Edit</a>
                 </span>
               </span>
 
