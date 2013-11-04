@@ -620,9 +620,14 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         # parameter changes, if necessary.
         for rule_ind in range(len(ruleset)):
             rule = ruleset[rule_ind]
+            if isinstance(rule.get('feedback'), basestring):
+                raise Exception(
+                    'Rule feedback should be a list; received the string %s' %
+                    rule.get('feedback'))
             state_rule = exp_domain.RuleSpec(
                 rule.get('definition'), rule.get('dest'),
-                html_cleaner.clean(rule.get('feedback')),
+                [html_cleaner.clean(feedback) for feedback
+                                              in rule.get('feedback')],
                 rule.get('param_changes')                
             )
 

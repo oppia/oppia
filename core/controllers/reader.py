@@ -115,7 +115,7 @@ class FeedbackHandler(base.BaseHandler):
             exploration_id, old_state_id, handler, str(rule), recorded_answer)
 
     def _get_feedback(self, exploration_id, feedback, params):
-        """Gets the HTML and iframes with Oppia's feedback."""
+        """Gets the HTML with Oppia's feedback."""
         if not feedback:
             return ''
         else:

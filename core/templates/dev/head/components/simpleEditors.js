@@ -501,6 +501,7 @@ oppia.directive('list', function(warningsData) {
         // possible to modify 'item' directly when using "for item in items";
         // we need a 'constant key'. So we represent each item as {label: ...}
         // instead, and manipulate item.label.
+        // TODO(sll): Check that $scope.items is a list.
         $scope.localItems = [];
         if ($scope.items) {
           for (var i = 0; i < $scope.items.length; i++) {
