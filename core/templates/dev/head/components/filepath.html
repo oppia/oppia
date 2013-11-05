@@ -3,14 +3,30 @@
     Warning: The file picker does not work outside the context of an exploration.
   </div>
   <div ng-if="explorationId">
-    <div ng-repeat="filepath in filepaths track by $index">
-      <label>
-        <input type="radio" ng-model="localItem.label"
-               name="choiceGroup" id="<[filepath]>"
-               value="<[filepath]>">
-        <[filepath]>
-      </label>
+    <div ng-show="!imageUploaderIsActive">
+      <div ng-repeat="filepath in filepaths track by $index">
+        <label>
+          <input type="radio" ng-model="localItem.label"
+                 name="choiceGroup" id="<[filepath]>"
+                 value="<[filepath]>">
+          <[filepath]>
+        </label>
+      </div>
+      <img ng-src="<[getPreviewUrl(localItem.label)]>"/>
+
+      <br><br>
+      <button ng-click="openImageUploader()">Upload an image</button>
     </div>
-    <img ng-src="<[getPreviewUrl(localItem.label)]>"/>
+
+    <div ng-show="imageUploaderIsActive">
+      <em>Upload an image</em>
+      <br><br>
+      <input type="file" id="newImage">
+      <br>
+      Choose a filename: <input type="text" ng-model="newImageFilename">
+      <br>
+      <button type="button" ng-click="uploadNewImage(newImageFilename)" ng-disabled="!newImageFilename">Save</button>
+      <button type="button" ng-click="closeImageUploader()">Cancel</button>
+    </div>
   </div>
 </div>

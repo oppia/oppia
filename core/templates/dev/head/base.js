@@ -191,14 +191,6 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
     return false;
   };
 
-  $scope.setActiveImage = function(image) {
-    $scope.image = image;
-  };
-
-  $scope.setActiveFile = function(file) {
-    $scope.file = file;
-  };
-
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
   };

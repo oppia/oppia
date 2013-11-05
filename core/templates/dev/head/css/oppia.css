@@ -407,14 +407,10 @@ textarea {
   color: gray;
 }
 
-.oppia-state-text-item {
+.oppia-state-content-item {
   border: 1px solid black;
   min-height: 20px;
   padding: 5px;
-}
-.oppia-state-text-list {
-  border-collapse: collapse;
-  list-style-type: none;
 }
 
 .oppia-widget-preview {

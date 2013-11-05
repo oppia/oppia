@@ -114,42 +114,6 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     activeInputData.name = 'content.' + index;
   };
 
-  $scope.saveStateContentImage = function(index) {
-    activeInputData.clear();
-    $('#newImageForm')[0].reset();
-    image = $scope.image;
-
-    if (!image || !image.type.match('image.*')) {
-      warningsData.addWarning('This file is not recognized as an image.');
-      return;
-    }
-
-    warningsData.clear();
-
-    $http({
-      method: 'POST',
-      url: '/imagehandler/' + $scope.explorationId,
-      headers: {'Content-Type': false},
-      data: {image: image},
-      transformRequest: function(data) {
-        var formData = new FormData();
-        formData.append('image', data.image);
-        return formData;
-      }
-    }).
-    success(function(data) {
-      if (data.image_id) {
-        $scope.content[index].value = data.image_id;
-        $scope.saveStateContent();
-      }
-    })
-    .error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.'
-      );
-    });
-  };
-
   $scope.getCustomizationModalInstance = function(widgetParams) {
     // NB: This method is used for interactive widgets.
     return $modal.open({

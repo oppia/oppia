@@ -570,6 +570,7 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
     templateUrl: '/templates/filepath',
     controller: function ($scope, $attrs) {
       $scope.localItem = {label: $scope.item || ''};
+      $scope.imageUploaderIsActive = false;
 
       $scope.explorationId = $rootScope.explorationId;
 
@@ -591,6 +592,69 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
         var encodedFilepath = window.encodeURIComponent(filepath);
         return $sce.trustAsResourceUrl(
             '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+      };
+
+      $scope.openImageUploader = function() {
+        $scope.imageUploaderIsActive = true;
+      };
+
+      $scope.closeImageUploader = function() {
+        $scope.imageUploaderIsActive = false;
+      };
+
+      $scope.uploadNewImage = function(filename) {
+        var input = angular.element(document.getElementById('newImage'));
+
+        var file = document.getElementById('newImage').files[0];
+        if (!file || !file.size) {
+          warningsData.addWarning('Empty file detected.');
+          return;
+        }
+        if (!file.type.match('image.*')) {
+          warningsData.addWarning('This file is not recognized as an image.');
+          return;
+        }
+
+        if (!filename) {
+          warningsData.addWarning('Filename must not be empty.');
+          return;
+        }
+
+        warningsData.clear();
+
+        var form = new FormData();
+        form.append('image', file);
+        form.append('filename', filename);
+
+        var request = $.ajax({
+          url: '/imagehandler/' + $scope.explorationId,
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          dataFilter: function(data, type) {
+            // Remove the XSSI prefix.
+            var transformedData = data.substring(5);
+            return JSON.parse(transformedData);
+          },
+          dataType: 'text'
+        }).done(function(data) {
+          var inputElement = $('#newImage');
+          inputElement.wrap('<form>').closest('form').get(0).reset();
+          inputElement.unwrap();
+          $scope.filepaths.push(data.filepath);
+          $scope.closeImageUploader();
+          $scope.localItem.label = data.filepath;
+          $scope.$apply();
+        }).fail(function(data) {
+          console.log(data);
+          // Remove the XSSI prefix.
+          var transformedData = data.responseText.substring(5);
+          var parsedResponse = JSON.parse(transformedData);
+          warningsData.addWarning(
+              parsedResponse.error || 'Error communicating with server.');
+          $scope.$apply();
+        });
       };
 
       $http.get('/create/resource_list/' + $scope.explorationId).success(function(data) {

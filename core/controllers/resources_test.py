@@ -41,13 +41,14 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             raw_image = f.read()
         response = self.testapp.post(
             '/imagehandler/0',
+            {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-        image_id = self.parse_json_response(response)['image_id']
+        filepath = self.parse_json_response(response)['filepath']
 
         self.logout()
 
-        response = self.testapp.get(str('/imagehandler/0/%s' % image_id))
+        response = self.testapp.get(str('/imagehandler/0/%s' % filepath))
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 
@@ -61,6 +62,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         # Upload an empty image.
         response = self.testapp.post(
             '/imagehandler/0',
+            {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', ''),),
             expect_errors=True
         )
@@ -82,6 +84,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         # Upload an empty image.
         response = self.testapp.post(
             '/imagehandler/0',
+            {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', 'bad_image'),),
             expect_errors=True
         )
@@ -113,3 +116,25 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             expect_errors=True
         )
         self.assertEqual(response.status_int, 302)
+
+    def test_bad_filenames_are_detected(self):
+        # TODO(sll): Add more tests here.
+        self._initialize()
+
+        self.login('editor@example.com', is_admin=True)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        response = self.testapp.post(
+            '/imagehandler/0',
+            {'filename': 'test/a.png'},
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expect_errors=True
+        )
+        self.assertEqual(response.status_int, 400)
+        parsed_response = self.parse_json_response(
+            response, expect_errors=True)
+        self.assertEqual(parsed_response['code'], 400)
+        self.assertIn('Filenames should not include', parsed_response['error'])
+
+        self.logout()

@@ -89,21 +89,6 @@ class ImageUploadHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _get_random_filename(self, banned_filenames):
-        """Generates a random filename not in the given list."""
-        count = 0
-
-        while True:
-            count += 1
-            random_prefix = base64.urlsafe_b64encode(hashlib.sha1(
-                str(utils.get_random_int(127 * 127))).digest())[:12]
-            date_str = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-            candidate_filename = '%s:%s' % (random_prefix, date_str)
-            if candidate_filename not in banned_filenames:
-                return candidate_filename
-            if count >= 10:
-                raise Exception('Unable to generate new filename.')
-
     @base.require_editor
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
@@ -113,6 +98,7 @@ class ImageUploadHandler(base.BaseHandler):
         self.payload = 'image_upload'
 
         raw = self.request.get('image')
+        filename = self.request.get('filename')
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
@@ -123,13 +109,34 @@ class ImageUploadHandler(base.BaseHandler):
                             'one of the following formats: %s.' %
                             allowed_formats)
 
+        if not filename:
+            raise self.InvalidInputException('No filename supplied')
+        if '/' in filename or '..' in filename:
+            raise self.InvalidInputException(
+                'Filenames should not include slashes (/) or consecutive dot '
+                'characters.')
+        if '.' in filename:
+            dot_index = filename.rfind('.')
+            primary_name = filename[:dot_index]
+            extension = filename[dot_index+1:]
+            if extension != format:
+                raise self.InvalidInputException(
+                    'Expected a filename ending in .%s; received %s' %
+                    (format, filename))
+        else:
+            primary_name = filename
+
+        filepath = '%s.%s' % (primary_name, format)
+
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('')
-        image_id = '%s.%s' % (self._get_random_filename(dir_list), format)
-        fs.put(image_id, raw)
+        if fs.isfile(filepath):
+            raise self.InvalidInputException(
+                'A file with the name %s already exists. Please choose a '
+                'different name.' % filepath)
+        fs.put(filepath, raw)
 
-        self.render_json({'image_id': image_id})
+        self.render_json({'filepath': filepath})
 
 
 class StaticFileHandler(base.BaseHandler):

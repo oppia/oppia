@@ -4,11 +4,11 @@
       <form ng-submit="saveStateName()">
         <h3>
           <span class="oppia-editable-name"
-                ng-hide="activeInputData.name == 'stateName'"
+                ng-if="activeInputData.name != 'stateName'"
                 ng-click="initializeNewActiveInput('stateName')">
             <[stateName]>
           </span>
-          <span ng-show="activeInputData.name == 'stateName'">
+          <span ng-if="activeInputData.name == 'stateName'">
             <input type="text" ng-model="stateName">
             <input type="submit" value="Save">
           </span>
@@ -57,49 +57,28 @@
                tooltip="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input."
                tooltip-placement="right">
         </h4>
-        <div>
-          <ul ng-model="content" class="oppia-state-text-list">
-            <li ng-repeat="item in content" class="oppia-state-text-item" ng-class="'item-' + $index">
 
-              <span class="pull-right">
-                <span ng-hide="activeInputData.name == 'content.' + $index">
-                  <a href="#" onclick="return false;" ng-click="editContent($index)">Edit</a>
-                </span>
-              </span>
+        <div ng-repeat="item in content" class="oppia-state-content-item">
+          <span class="pull-right">
+            <span ng-if="activeInputData.name != 'content.' + $index">
+              <a href="#" onclick="return false;" ng-click="editContent($index)">
+                Edit
+              </a>
+            </span>
+          </span>
 
-              <div ng-if="item.type == 'text'">
-                <div ng-show="activeInputData.name == 'content.' + $index">
-                  <rich-text-editor html-content="content[$index].value">
-                  </rich-text-editor>
-                  <button ng-click="saveTextContent()">Save and close</button>
-                </div>
+          <div ng-if="activeInputData.name == 'content.' + $index">
+            <rich-text-editor html-content="content[$index].value">
+            </rich-text-editor>
+            <button ng-click="saveTextContent()">Save and close</button>
+          </div>
 
-                <div ng-hide="activeInputData.name == 'content.' + $index">
-                  <span ng-show="item.value == ''" class="oppia-placeholder">
-                    <[defaultTextContent]>
-                  </span>
-                  <span angular-html-bind="item.value"></span>
-                </div>
-              </div>
-
-              <div ng-if="item.type == 'image'">
-                <ng-switch on="item.value == ''">
-                  <div ng-switch-when="true" class="oppia-placeholder">
-                    <form id="newImageForm">
-                      Upload an image:
-                      <input type="file" id="newImage" name="newImage" image-upload="true">
-                      <button type="button" ng-click="saveStateContentImage($index)">Save</button>
-                    </form>
-                    <span class="oppia-loading" id="uploadImageLoading"></span>
-                  </div>
-                </ng-switch>
-              </div>
-
-            </li>
-          </ul>
-
-          <br>
-          <br>
+           <div ng-if="activeInputData.name != 'content.' + $index">
+            <span ng-if="item.value == ''" class="oppia-placeholder">
+              <[defaultTextContent]>
+            </span>
+            <span angular-html-bind="item.value"></span>
+          </div>
         </div>
 
         <br>

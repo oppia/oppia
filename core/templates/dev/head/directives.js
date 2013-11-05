@@ -33,49 +33,9 @@ oppia.directive('angularHtmlBind', function($compile) {
         $compile(elm.contents())(scope);
       });
     }
-  }
-});
-
-oppia.directive('imageUpload', function($exceptionHandler) {
-  return {
-    compile: function(tplElm, tplAttr) {
-      return function(scope, elm, attr) {
-        var input = angular.element(elm[0]);
-
-        // evaluate the expression when file changed (user selects a file)
-        input.bind('change', function() {
-          try {
-            scope.$eval(attr.openFiles, {$files: input[0].files});
-            scope.setActiveImage(input[0].files[0]);
-          } catch (e) {
-            $exceptionHandler(e);
-          }
-        });
-      };
-    }
   };
 });
 
-// File upload for gallery page.
-oppia.directive('fileUpload', function($exceptionHandler) {
-  return {
-    compile: function(tplElm, tplAttr) {
-      return function(scope, elm, attr) {
-        var input = angular.element(elm[0]);
-
-        // evaluate the expression when file changed (user selects a file)
-        input.bind('change', function() {
-          try {
-            scope.$eval(attr.openFiles, {$files: input[0].files});
-            scope.$parent.setActiveFile(input[0].files[0]);
-          } catch (e) {
-            $exceptionHandler(e);
-          }
-        });
-      };
-    }
-  };
-});
 
 // override the default input to update on blur
 oppia.directive('ngModelOnblur', function() {
