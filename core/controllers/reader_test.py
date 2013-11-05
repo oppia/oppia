@@ -113,6 +113,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\''
         ).submit_and_compare(
             '0', 'In fact, the word Oppia means \'learn\'.'
+        ).submit_and_compare(
+            'Finish', 'Check your spelling!'
+        ).submit_and_compare(
+            'Finnish', 'Yes! Oppia is the Finnish word for learn.'
         )
 
     def test_parametrized_adventure(self):
