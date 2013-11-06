@@ -166,11 +166,6 @@ textarea {
   width: 80%;
 }
 
-.oppia-exploration {
-  padding: 5px;
-  width: 98%;
-}
-
 .oppia-iframe-container {
   -webkit-overflow-scrolling: touch;
 }
@@ -223,6 +218,12 @@ textarea {
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
   border: 1px solid black;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: px;
+  border-radius: 5px;
+  -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   font-size: 1.2em;
   margin: 0 25% 0 25%;
   opacity: 1;
@@ -243,10 +244,6 @@ textarea {
   margin: 10px;
   padding: 10px;
   width: 100%;
-}
-
-.oppia-form-search {
-  padding-right: 20px;
 }
 
 .oppia-grayed {
@@ -288,7 +285,6 @@ textarea {
   text-align: center;
   width: 80%;
 }
-
 .oppia-exploration-header a {
   font-size: 200%;
   text-decoration: none;
@@ -328,38 +324,9 @@ textarea {
   width: 15px;
 }
 
-#oppia-popup {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  left: 300px;
-  padding: 20px;
-  position: fixed;
-  top: 300px;
-  width: 500px;
-  z-index: 9002;
-}
-
 .oppia-warning {
   background: #F9EDBE;
   width: 80%;
-}
-
-.oppia-butterbar {
-  background: #F9EDBE;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  border: 1px solid #F0C36D;
-  -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  left: 500px;
-  margin: -20px auto 0 auto;
-  padding: 0 16px;
-  position: fixed;
-  text-align: center;
-  top: 100px;
 }
 
 .oppia-conversation-log {
@@ -382,75 +349,20 @@ textarea {
   content: ' ✎';
 }
 
-.oppia-add-content-box {
-  border: 1px dashed silver;
-  color: silver;
-  font-size: 150%;
-  margin: 0 auto -30px auto;
-  padding: 10px 0;
-  text-align: center;
-  width: 94%;
-}
-.oppia-small-image {
-  height: 50px;
-}
-.oppia-large-image {
-  width: 80px;
-}
-
-.oppia-thumbnail {
-  position: relative;
-  top: -50px;
-}
-
 .oppia-placeholder {
   color: gray;
 }
 
-.oppia-state-content-item {
-  border: 1px solid black;
+.oppia-state-content {
+  border: 1px solid #aaa;
   min-height: 20px;
   padding: 5px;
 }
 
 .oppia-widget-preview {
-  border: 1px solid gray;
+  border: 1px solid #ccc;
+  margin: 0 0 2px 0;
 }
-
-/* Graph styles */
-
-#oppia-state-graph-canvas {
-  padding-top: 40px;
-  position: absolute;
-}
-.oppia-state-graph-vertex-delete {
-  font-size: 1em;
-  position: absolute;
-  right: 5px;
-  top: 1px;
-}
-.oppia-state-graph-vertex-delete:hover {
-  background-color: red;
-  cursor: move;
-}
-.oppia-state-graph-vertex-info {
-  font-size: 1em;
-  padding: 4px;
-}
-.oppia-state-graph-vertex-info-editable:hover {
-  background-color: #8F8661;
-  cursor: move;
-}
-
-
-/* Category editor styles */
-
-.oppia-category-block {
-  border: 1px solid #efefef;
-  min-height: 40px;
-  width: 80%;
-}
-
 
 /* Styles for the state graph vizualization. */
 
@@ -488,41 +400,11 @@ textarea {
   cursor: pointer;
 }
 
-
-/* Styles for the indented tree visualization. */
-
-.oppia-tree-viz path.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-
-.oppia-tree-viz text {
-  font: 15px sans-serif;
-  pointer-events: none;
-}
-
-.oppia-tree-viz text.shadow {
-  stroke: #fff;
-  stroke-width: 3px;
-  stroke-opacity: .8;
-}
-
-.oppia-tree-viz .node rect {
-  cursor: pointer;
-  fill: #fff;
-  fill-opacity: .5;
-  stroke: #3182bd;
-  stroke-width: 1.5px;
-}
-
-
 /* Styles for interactive widgets. */
 
 .oppia-rule {
   height: 30px;
 }
-
 
 /* Styles for the statistics page. */
 
@@ -530,7 +412,6 @@ textarea {
   border: 1px solid black;
   padding: 10px;
 }
-
 
 @media screen and (max-width: 460px) {
   .pull-right {
@@ -579,4 +460,3 @@ textarea {
     -webkit-transform-origin: 35px 65px;
     transform-origin: 35px 65px;
 }
-

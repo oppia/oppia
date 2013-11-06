@@ -490,10 +490,14 @@ oppia.directive('list', function(warningsData) {
   // Directive that implements an editable list.
   return {
     restrict: 'E',
-    scope: {items: '=', largeInput: '@'},
+    scope: {items: '=', largeInput: '@', addItemText: '@'},
     templateUrl: '/templates/list',
     controller: function($scope, $attrs) {
       $scope.largeInput = ($scope.largeInput || false);
+
+      $scope.getAddItemText = function() {
+        return ($scope.addItemText || 'Add List Element');
+      };
 
       // Reset the component each time the item list changes.
       $scope.$watch('items', function(newValue, oldValue) {
@@ -573,6 +577,13 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
       $scope.imageUploaderIsActive = false;
 
       $scope.explorationId = $rootScope.explorationId;
+
+      $scope.hasExplorationId = function() {
+        if ($scope.explorationId === null || $scope.explorationId === undefined) {
+          return false;
+        }
+        return true;
+      };
 
       if (!$scope.explorationId) {
         console.log('Error: File picker widget called without being given an exploration.');

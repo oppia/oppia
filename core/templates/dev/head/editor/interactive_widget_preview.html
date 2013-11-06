@@ -1,51 +1,43 @@
 <div ng-controller="InteractiveWidgetPreview" class="oppia-iframe-container">
 
-  <h4>
-    Interactivity
-    <img class="oppia-help" src="/images/help.png"
-         tooltip="This allows the reader to answer questions and learn by doing. The reader's input can then be evaluated using the rules below. Click 'Preview' to display a preview of the interactivity."
-         tooltip-placement="right">
+  <div class="oppia-widget-preview">
+    <!-- This iframe is dynamically resized based on its content. -->
+    <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
+    </iframe>
+  </div>
+
+  <div>
+    <label>
+      <input type="checkbox" ng-model="stickyInteractiveWidget"
+             ng-click="saveStickyInteractiveWidget()">
+      Use the previous state's widget if possible.
+      <img class="oppia-help" src="/images/help.png"
+           tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
+           tooltip-placement="right">
+    </label>
 
     <span class="pull-right">
-      <span ng-hide="showPreview">
-        <button ng-click="setShowPreview(true)">Preview</button>
-      </span>
-      <span ng-hide="isEmpty(interactiveWidget.params)">
+      <button ng-click="showChooseInteractiveWidgetModal()">
+        Pick interaction type
+      </button>
+      <span ng-if="!isEmpty(interactiveWidget.params)">
         <button ng-click="showCustomizeInteractiveWidgetModal()">
           Customize
         </button>
       </span>
-      <button ng-click="showChooseInteractiveWidgetModal()">
-        Choose a different interaction
-      </button>
     </span>
-  </h4>
-
-  <h5><[interactiveWidget.name]></h5>
-  <div ng-if="showPreview">
-    <a class="pull-right" href="#" onclick="return false;" ng-click="setShowPreview(false)"><b>&times;</b></a>
-    <!-- This iframe is dynamically resized based on its content. -->
-    <iframe id="interactiveWidgetPreview" frameborder="1" width="100%" height="5px" seamless="seamless" class="oppia-widget-preview">
-    </iframe>
-  </div>
-  <div style="margin-left:30px;">
-    <label>
-      <input type="checkbox" ng-model="stickyInteractiveWidget"
-             ng-click="saveStickyInteractiveWidget()">
-      Do not reload if the previous state uses the same widget.
-    </label>
   </div>
 
-  <br><br>
+  <br>
 
-  <h4 id="rules">
-    Answer classification rules
-    <img class="oppia-help" src="/images/help.png"
-         tooltip="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown."
-         tooltip-placement="right">
-  </h4>
+  <h4 id="rules">Answer classification rules</h4>
+
   <div ng-repeat="handler in interactiveWidget.handlers">
-    <h5>When readers <[handler.name]>:</h5>
+    <h5>When readers <[handler.name]>:
+      <img class="oppia-help" src="/images/help.png"
+           tooltip="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown."
+           tooltip-placement="right">
+    </h5>
     <table style="width: 100%">
       <tr ng-repeat="rule in interactiveRulesets[handler.name]" ng-hide="$last">
         <td style="width: 5%; vertical-align: top">
@@ -222,7 +214,7 @@
         </div>
         <div>
           <p>Feedback for the reader (chosen at random from the following):</p>
-          <list large-input="true" items="tmpRule.feedback">
+          <list large-input="true" items="tmpRule.feedback" add-item-text="Add feedback message"></list>
         </div>
       </div>
     </div>

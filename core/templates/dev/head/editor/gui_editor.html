@@ -52,38 +52,41 @@
         <br>
 
         <h4 id="noninteractive">
-          Non-Interactive Content
+          Content
           <img class="oppia-help" src="/images/help.png"
                tooltip="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input."
                tooltip-placement="right">
         </h4>
 
-        <div ng-repeat="item in content" class="oppia-state-content-item">
-          <span class="pull-right">
-            <span ng-if="activeInputData.name != 'content.' + $index">
-              <a href="#" onclick="return false;" ng-click="editContent($index)">
-                Edit
-              </a>
+        <div>
+          <div ng-repeat="item in content" class="oppia-state-content">
+            <span class="pull-right">
+              <span ng-if="activeInputData.name != 'content.' + $index">
+                <a href="#" onclick="return false;" ng-click="editContent($index)">
+                  Edit
+                </a>
+              </span>
             </span>
-          </span>
-
-          <div ng-if="activeInputData.name == 'content.' + $index">
-            <rich-text-editor html-content="content[$index].value">
-            </rich-text-editor>
-            <button ng-click="saveTextContent()">Save and close</button>
+  
+            <div ng-if="activeInputData.name == 'content.' + $index">
+              <rich-text-editor html-content="content[$index].value">
+              </rich-text-editor>
+              <button ng-click="saveTextContent()">Save and close</button>
+            </div>
+  
+             <div ng-if="activeInputData.name != 'content.' + $index">
+              <span ng-if="item.value == ''" class="oppia-placeholder">
+                <[defaultTextContent]>
+              </span>
+              <span angular-html-bind="item.value"></span>
+            </div>
           </div>
 
-           <div ng-if="activeInputData.name != 'content.' + $index">
-            <span ng-if="item.value == ''" class="oppia-placeholder">
-              <[defaultTextContent]>
-            </span>
-            <span angular-html-bind="item.value"></span>
-          </div>
+          <br>
+
+          {% include 'editor/interactive_widget_preview.html' %}
         </div>
-
-        <br>
       </div>
-      {% include 'editor/interactive_widget_preview.html' %}
     </div>
   </div>
 

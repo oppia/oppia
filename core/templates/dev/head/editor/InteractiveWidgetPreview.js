@@ -19,18 +19,6 @@
  */
 
 function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorationData, requestCreator) {
-  $scope.showPreview = true;
-
-  // Sets the 'showPreview' variable. The input is a boolean.
-  $scope.setShowPreview = function(input) {
-    $scope.showPreview = input;
-    $scope.$apply();
-    if (input) {
-      $scope.addContentToIframeWithId(
-          'interactiveWidgetPreview', $scope.interactiveWidget.raw);
-    }
-  };
-
   // Tests whether an object is a JavaScript array.
   $scope.isArray = function(obj) {
     return toString.call(obj) === '[object Array]';
@@ -44,16 +32,13 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(widgetData) {
-       $scope.interactiveWidget = widgetData.widget;
-        if ($scope.showPreview) {
-          $scope.addContentToIframeWithId(
-              'interactiveWidgetPreview', $scope.interactiveWidget.raw);
-        }
-        if (successCallback) {
-          successCallback();
-        }
+      $scope.interactiveWidget = widgetData.widget;
+      $scope.addContentToIframeWithId(
+          'interactiveWidgetPreview', $scope.interactiveWidget.raw);
+      if (successCallback) {
+        successCallback();
       }
-    ).error(function(errorData) {
+    }).error(function(errorData) {
       warningsData.addWarning(errorData.error);
     });
   };
@@ -509,7 +494,7 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
       console.log('Resize event received for widget preview.');
       console.log(evt.data);
       // Change the height of the included iframe.
-      var height = parseInt(event.data.widgetHeight, 10);
+      var height = parseInt(event.data.widgetHeight, 10) + 2;
       var iframe = document.getElementById('interactiveWidgetPreview');
       iframe.height = height + 'px';
     }

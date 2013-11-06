@@ -50,7 +50,7 @@
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">
                   <[answerData[0]]> (<[getNumTimesString(answerData[1])]>)
-                  <a ng-click="gotoStateEditor('rules')">
+                  <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
                     Add a rule for this answer
                   </a>
                 </li>
@@ -59,15 +59,15 @@
           </ul>
         </div>
 
-        <div ng-hide="doesAnswerExist()">
+        <div ng-if="!doesAnswerExist()">
           <em>No students gave answers.</em>
-          <a ng-click="gotoStateEditor('noninteractive')">
+          <a href="#" onclick="return false;" ng-click="gotoStateEditor('noninteractive')">
             Edit non-interactive content
           </a>
         </div>
       </div>
 
-      <div ng-show="stateStats.feedback_log.length">
+      <div ng-if="stateStats.feedback_log.length">
         <h5>
           Feedback
           <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">

@@ -1,8 +1,8 @@
 <div>
-  <div ng-if="!explorationId">
+  <div ng-if="!hasExplorationId()">
     Warning: The file picker does not work outside the context of an exploration.
   </div>
-  <div ng-if="explorationId">
+  <div ng-if="hasExplorationId()">
     <div ng-show="!imageUploaderIsActive">
       <div ng-repeat="filepath in filepaths track by $index">
         <label>
@@ -15,7 +15,7 @@
       <img ng-src="<[getPreviewUrl(localItem.label)]>"/>
 
       <br><br>
-      <button ng-click="openImageUploader()">Upload an image</button>
+      <button ng-click="openImageUploader()">Upload a new image</button>
     </div>
 
     <div ng-show="imageUploaderIsActive">
