@@ -43,20 +43,20 @@ schema_version: 1
 states:
 - content:
   - type: text
-    value: '"So, anyway, he just keeps getting it right and how is that possible,
-      I ask you?"<br>You nod along distractedly.&nbsp;<br>She''s leading you briskly
-      along a sunny path toward the next town, running excitedly, sometimes in circles,
-      sometimes just up the road and back toward you.<br><span style="line-height:
-      1.22;"><br>"He''s gotta be cheating. He''s probably in cahoots with... everybody
-      in the village! and he tells them what numbers to think of. We need to go and
-      figure this out!"</span><br>From experience, you know that she means it. She
-      <i>has to</i> figure everything out or she just won''t be able to rest. And
-      really, how *can* you rest when you know there''s a possibility of a cheating
-      magician right in your town?<br><br>Apparently, this magician can guess, in
-      just a few tries, what number anyone is thinking of. Even big numbers, like
-      a thousand! If he''s cheating and reading minds, he''s gotta be stopped! And
-      if he''s not, you have to meet him and figure out what his secret is!<br><br>"So,
-      what do you think? how does he do it?"'
+    value: "\"So, anyway, he just keeps getting it right and how is that possible,\
+      \ I ask you?\"<br>You nod along distractedly.\_<br>She's leading you briskly\
+      \ along a sunny path toward the next town, running excitedly, sometimes in circles,\
+      \ sometimes just up the road and back toward you.<br><span><br>\"He's gotta\
+      \ be cheating. He's probably in cahoots with... everybody in the village! and\
+      \ he tells them what numbers to think of. We need to go and figure this out!\"\
+      </span><br>From experience, you know that she means it. She <i>has to</i> figure\
+      \ everything out or she just won't be able to rest. And really, how *can* you\
+      \ rest when you know there's a possibility of a cheating magician right in your\
+      \ town?<br><br>Apparently, this magician can guess, in just a few tries, what\
+      \ number anyone is thinking of. Even big numbers, like a thousand! If he's cheating\
+      \ and reading minds, he's gotta be stopped! And if he's not, you have to meet\
+      \ him and figure out what his secret is!<br><br>\"So, what do you think? how\
+      \ does he do it?\""
   name: Introduction
   param_changes: []
   widget:
@@ -93,20 +93,44 @@ states:
           a bit more flashy than guessing numbers?.."'
         param_changes: []
       - definition:
+          inputs:
+            x: mind
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Town Square
+        feedback:
+        - <span>"You think he reads minds? But then couldn't he use that for something
+          a bit more flashy than guessing numbers?.."</span>
+        param_changes: []
+      - definition:
+          inputs:
+            x: magic
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Town Square
+        feedback:
+        - '"You think the magician is using... magic?"'
+        param_changes: []
+      - definition:
           rule_type: default
         dest: Town Square
-        feedback: []
+        feedback:
+        - '"I''ve got a theory or two, but we should watch him first to figure out
+          what he does."'
         param_changes: []
     sticky: false
     widget_id: TextInput
 - content:
   - type: text
-    value: 'You arrive at the town square. There''s a magician standing here, and
-      a small crowd of locals surrounding him.&nbsp;<br><br>"{{previousNumber}}!"
-      he exclaims dramatically, pointing his wand at one of the locals. The crowd''s
-      collective gaze shifts from the magician to the local.<br><br><span>"That''s right!" says the local, and the crowd oohs and aahs in appreciation
-      of the Magician''s number-guessing powers.<br></span><br>...<br><br>"You there!"
-      the magician points to you<br>"Think of a number between 1 and 85!"'
+    value: "You arrive at the town square. There's a magician standing here, and a\
+      \ small crowd of locals surrounding him.\_<br><br>\"{{previousNumber}}!\" he\
+      \ exclaims dramatically, pointing his wand at one of the locals. The crowd's\
+      \ collective gaze shifts from the magician to the local.<br><br><span>\"That's\
+      \ right!\" says the local, and the crowd oohs and aahs in appreciation of the\
+      \ Magician's number-guessing powers.<br></span><br>...<br><br>\"You there!\"\
+      \ the magician points to you<br>\"Think of a number between 1 and 85!\""
   name: Town Square
   param_changes:
   - customization_args:
@@ -349,7 +373,7 @@ states:
       choices:
         value:
         - Let's play again
-        - No, I've got enough data for now
+        - No, not right now. I need to confer with my colleague.
         - This time, I want to try guessing!
     handlers:
     - name: submit
@@ -769,10 +793,11 @@ states:
 - content:
   - type: text
     value: '"I like starting with really simple cases. Sometimes it turns out it''s
-      obvious how to get to the more complex ones from there!"<br><br>"The simplest
+      obvious how to get to the more complex ones from there!"<div><br>"The simplest
       thing would be if I had to guess a number from 1 to 1. Then I know the answer
-      in one try - it''s 1!"<br><br>"OK, the next simplest thing is if I had a number
-      between 1 and 2. How many tries would I need?.."'
+      in one try - it''s 1!"<div><br><div><oppia-noninteractive-image filepath-with-value="&amp;quot;magician-1.png&amp;quot;"></oppia-noninteractive-image><br><br></div><div>"The
+      next simplest thing is if I had a number between 1 and 2. How many tries would
+      I need?.."<br></div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;magician-2.png&amp;quot;"></oppia-noninteractive-image><br><br><br></div></div></div>'
   name: Degenerate Case
   param_changes: []
   widget:
@@ -1033,11 +1058,12 @@ states:
     widget_id: TextInput
 - content:
   - type: text
-    value: '<oppia-noninteractive-image src="elimination.png"></oppia-noninteractive-image><p>"So, no matter which number the magician is thinking of, if we guess 2
-      on our first try, we can eliminate two numbers! Then for the second try (if
-      we even need it), we know exactly what number to guess!"<br><br>"So maybe we
-      don''t save TOO much time by being able to guess a number between 1-3 in just
-      two tries... but I wonder what we could do with one more try?"</p>'
+    value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;elimination.png&amp;quot;"></oppia-noninteractive-image><br></p><p>"So,
+      no matter which number the magician is thinking of, if we guess 2 on our first
+      try, we can eliminate two numbers! Then for the second try (if we even need
+      it), we know exactly what number to guess!"<br><br>"So maybe we don't save TOO
+      much time by being able to guess a number between 1-3 in just two tries... but
+      I wonder what we could do with one more try?"</p>
   name: After three case
   param_changes: []
   widget:
@@ -1260,9 +1286,10 @@ states:
       guesses, and I knew exactly what my first guess should be to do this. After
       I made the first guess, I would have two guesses left. And we already know something
       we can do with two guesses!"<br>"So let''s pretend that after my first guess,
-      we see the same two-guess case that we saw before:" INSERT PICTURE HERE "This must mean that our first guess, and the information the magician
-      gave us in response, narrowed down our possibilities to numbers between 1 and
-      3."<br><br>"What could his response have been?"'
+      we see the same two-guess case that we saw before:" INSERT PICTURE HERE "This
+      must mean that our first guess, and the information the magician gave us in
+      response, narrowed down our possibilities to numbers between 1 and 3."<br><br>"What
+      could his response have been?"'
   name: Reduce 3 guesses to 2
   param_changes: []
   widget:
@@ -1351,13 +1378,13 @@ states:
       number in 3 tries. And we decided that on our first try, we should guess the
       number 4."<br><br>"If the magician says his number is less than 4, we already
       know what to do, and we can definitely guess that number in 2 more tries!"<p>
-      Picture of partial binary search tree w/root at 4.</p><p>"OK, now suppose we guessed 4 but the magician told us his number was
-      bigger than that!"<br><br>"Now we have two tries left, and we know that the
-      number is between 5 and SOMETHING... and we''re trying to figure out what that
-      SOMETHING can be, so that we can still do this in two tries."<br><br>"I have
-      a feeling that we can do almost the same thing as in our ''between 1 and 3''
-      case, just... shifted."<br><br>"What do you think our SOMETHING limit should
-      be?"</p>'
+      Picture of partial binary search tree w/root at 4.</p><p>"OK, now suppose we
+      guessed 4 but the magician told us his number was bigger than that!"<br><br>"Now
+      we have two tries left, and we know that the number is between 5 and SOMETHING...
+      and we''re trying to figure out what that SOMETHING can be, so that we can still
+      do this in two tries."<br><br>"I have a feeling that we can do almost the same
+      thing as in our ''between 1 and 3'' case, just... shifted."<br><br>"What do
+      you think our SOMETHING limit should be?"</p>'
   name: What if it was bigger than 4
   param_changes: []
   widget:
@@ -1420,13 +1447,14 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '<p>Picture of full binary search tree with 7 nodes here</p>"Wow! having three tries means that we can guess any number from 1 to
-      7! That''s a lot better than what we could do with 2 tries!"<br><br>"In fact,
-      the extra try more than doubled our range! On the first guess, we split our
-      range into two, and then no matter what the magician answers, we only have to
-      deal with <b>half</b> the remaining numbers."<br><br>I think we can <b>generalize</b>
-      this - the idea of halving the range can apply in general, to any range of numbers!"<br><br>"What
-      do you think?"'
+    value: <p>Picture of full binary search tree with 7 nodes here</p>"Wow! having
+      three tries means that we can guess any number from 1 to 7! That's a lot better
+      than what we could do with 2 tries!"<br><br>"In fact, the extra try more than
+      doubled our range! On the first guess, we split our range into two, and then
+      no matter what the magician answers, we only have to deal with <b>half</b> the
+      remaining numbers."<br><br>I think we can <b>generalize</b> this - the idea
+      of halving the range can apply in general, to any range of numbers!"<br><br>"What
+      do you think?"
   name: Three tries explanation
   param_changes: []
   widget:
@@ -1752,19 +1780,19 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '"Wow, that''s pretty good!" - says the Magician. "You figured out my trick!"<br><br>You
-      suddenly realize that he''s been watching you practice.<br><br>"So I guess you
-      weren''t really cheating!" - says your friend<br>"You just knew what the best
-      questions to as were to get the answer really quickly!"<br><br>"That''s right!
-      I''m actually pretty lazy. So when people ask me to guess a number from 1 to
-      1000 I really don''t feel like going through 1000 numbers! So I figured out
-      what I can do so I don''t have to do too much! See?"<br>He shows you his hand.
-      It''s covered in ink scribblings.<br><br>"Just like we did!"<br><br>"That''s
-      right! &nbsp;I call these little notes <b>algorithms</b>. Hey, you guys are
-      pretty clever - maybe you can help me figure out another one! You see, I really
-      want to travel to a Far Away land, but I really don''t want to travel more than
-      I have to. So I was thinking..."<br><br>The three of you walk off along a winding
-      path, planning your next adventure...<br><br>'
+    value: "\"Wow, that's pretty good!\" - says the Magician. \"You figured out my\
+      \ trick!\"<br><br>You suddenly realize that he's been watching you practice.<br><br>\"\
+      So I guess you weren't really cheating!\" - says your friend<br>\"You just knew\
+      \ what the best questions to as were to get the answer really quickly!\"<br><br>\"\
+      That's right! I'm actually pretty lazy. So when people ask me to guess a number\
+      \ from 1 to 1000 I really don't feel like going through 1000 numbers! So I figured\
+      \ out what I can do so I don't have to do too much! See?\"<br>He shows you his\
+      \ hand. It's covered in ink scribblings.<br><br>\"Just like we did!\"<br><br>\"\
+      That's right! \_I call these little notes <b>algorithms</b>. Hey, you guys are\
+      \ pretty clever - maybe you can help me figure out another one! You see, I really\
+      \ want to travel to a Far Away land, but I really don't want to travel more\
+      \ than I have to. So I was thinking...\"<br><br>The three of you walk off along\
+      \ a winding path, planning your next adventure...<br><br>"
   name: Worst Case Finished
   param_changes:
   - customization_args:
