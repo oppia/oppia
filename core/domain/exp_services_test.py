@@ -355,7 +355,7 @@ states:
         feedback: []
         param_changes: []
     sticky: false
-    widget_id: Continue
+    widget_id: TextInput
 - content:
   - type: text
     value: ''
@@ -372,7 +372,7 @@ states:
         feedback: []
         param_changes: []
     sticky: false
-    widget_id: Continue
+    widget_id: TextInput
 """)
 
     def test_export_to_yaml(self):
@@ -442,7 +442,7 @@ states:
             }],
             'param_changes': [],
             'widget': {
-                'widget_id': u'Continue',
+                'widget_id': u'TextInput',
                 'customization_args': {},
                 'sticky': False,
                 'handlers': [{

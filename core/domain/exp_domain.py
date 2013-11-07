@@ -215,7 +215,7 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, state_id):
-        return cls('Continue', {},
+        return cls(feconf.DEFAULT_WIDGET_ID, {},
                    [AnswerHandlerInstance.get_default_handler(state_id)])
 
 

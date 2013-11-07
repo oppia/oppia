@@ -105,6 +105,9 @@ VALUE_GENERATORS_DIR = 'extensions/value_generators'
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
+# The default widget used for a new state.
+DEFAULT_WIDGET_ID = 'TextInput'
+
 # Default name for a state.
 DEFAULT_STATE_NAME = '(untitled state)'
 
