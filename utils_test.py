@@ -90,3 +90,16 @@ class UtilsTests(test_utils.GenericTestBase):
         d = ['a', 'b', {'c': 'd'}]
         utils.recursively_remove_key(d, 'c')
         self.assertEqual(d, ['a', 'b', {}])
+
+    def test_camelcase_to_hyphenated(self):
+        """Test camelcase_to_hyphenated method."""
+        test_cases = [
+            ('AbcDef', 'abc-def'),
+            ('Abc', 'abc'),
+            ('abc_def', 'abc_def'),
+            ('Abc012Def345', 'abc012-def345'),
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.camelcase_to_hyphenated(test_case[0]), test_case[1])

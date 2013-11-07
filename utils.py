@@ -18,6 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 import os
 import random
+import re
 import StringIO
 import unicodedata
 import urllib
@@ -249,3 +250,8 @@ def convert_png_to_data_url(filepath):
     file_contents = get_file_contents(filepath, raw_bytes=True)
     return 'data:image/png;base64,%s' % urllib.quote(
         file_contents.encode('base64'))
+
+
+def camelcase_to_hyphenated(camelcase_str):
+    s = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
+    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s).lower()
