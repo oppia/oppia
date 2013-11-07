@@ -66,6 +66,15 @@ textarea {
   width: 90%;
 }
 
+/*
+  This is needed for proper display of tabs. See
+
+  https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
+*/
+.nav, .pagination, .carousel a {
+  cursor: pointer;
+}
+
 .oppia-no-scroll::-webkit-scrollbar {
   display: none;
 }
