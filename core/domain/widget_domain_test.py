@@ -73,6 +73,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(parameterized_widget_dict['params'], {
             'noteToGuess': {
                 'value': 'F4',
+                'description': 'The note that the reader should guess.',
                 'obj_type': 'UnicodeString',
                 'generator_id': 'RestrictedCopier',
                 'init_args': {

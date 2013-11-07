@@ -283,6 +283,7 @@ class BaseWidget(object):
             param_dict[param.name] = {
                 'value': param_instances[param.name],
                 'generator_id': param.generator.__name__,
+                'description': param.description,
                 'init_args': param.init_args,
                 'customization_args': (
                     customization_args[param.name]

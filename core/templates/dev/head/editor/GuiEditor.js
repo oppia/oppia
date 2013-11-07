@@ -114,18 +114,38 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
     activeInputData.name = 'content.' + index;
   };
 
-  $scope.getCustomizationModalInstance = function(widgetParams) {
+  $scope.getCustomizationModalInstance = function(widgetId, widgetParams) {
     // NB: This method is used for interactive widgets.
     return $modal.open({
       templateUrl: 'modals/customizeWidget',
       backdrop: 'static',
       resolve: {
+        widgetId: function() {
+          return widgetId;
+        },
         widgetParams: function() {
           return widgetParams;
         }
       },
-      controller: function($scope, $modalInstance, widgetParams) {
+      controller: function($scope, $http, $modalInstance, widgetId, widgetParams, warningsData, requestCreator) {
+        $scope.widgetId = widgetId;
         $scope.widgetParams = widgetParams;
+
+        $http.post(
+            '/widgets/interactive/' + widgetId,
+            requestCreator.createRequest({
+              'customization_args': {}
+            }),
+            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+                success(function(data) {
+                  $scope.paramDescriptions = {};
+                  for (var paramName in data.widget.params) {
+                    $scope.paramDescriptions[paramName] = data.widget.params[paramName].description;
+                  }
+                }).error(function(data) {
+                  warningsData.addWarning(
+                      'Error: Failed to obtain widget parameter descriptions.');
+                });
 
         $scope.save = function(widgetParams) {
           $scope.$broadcast('externalSave');

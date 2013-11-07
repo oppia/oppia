@@ -27,7 +27,7 @@ class Hints(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'hint_placeholder',
-        'description': 'The placeholder for the text for hint box.',
+        'description': 'The placeholder for the hint box.',
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True,
@@ -51,7 +51,7 @@ class Hints(widget_domain.BaseWidget):
         'obj_type': 'UnicodeString',
     }, {
         'name': 'medium_hint',
-        'description': 'The medium level hint',
+        'description': 'The medium level hint.',
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True,
@@ -63,7 +63,7 @@ class Hints(widget_domain.BaseWidget):
         'obj_type': 'UnicodeString',
     }, {
         'name': 'high_hint',
-        'description': 'The high level hint',
+        'description': 'The high level hint.',
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True,

@@ -241,6 +241,9 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(self.is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
 
+                # Check that the parmaeter description is non-empty.
+                self.assertTrue(param['description'])
+
                 # TODO(sll): Check that the generator is a subclass of
                 # BaseValueGenerator.
 

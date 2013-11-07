@@ -27,7 +27,7 @@ class Video(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'video_id',
-        'description': 'The id for this video.',
+        'description': 'The YouTube id for this video.',
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True

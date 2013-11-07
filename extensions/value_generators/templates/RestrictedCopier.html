@@ -13,7 +13,10 @@ or enter a value (make sure to check the Jinja box if necessary):
   <string item="customizationArgs.value"></string>
 </span>
 
-<label ng-show="objType == 'UnicodeString'">
-  <em>Parse with Jinja?</em>
+<label ng-if="objType == 'UnicodeString' && !initArgs.disallow_parse_with_jinja">
+  <em>Apply parameter evaluation?</em>
   <input type="checkbox" ng-model="customizationArgs.parse_with_jinja">
+  <img class="oppia-help" src="/images/help.png"
+       tooltip="Only select this option if you want strings of the form {{PARAM_NAME}} to be evaluated using the reader's state parameters."
+       tooltip-placement="right">
 </label>

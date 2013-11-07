@@ -518,7 +518,7 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
     warningsData.clear();
     var widgetParams = $scope.interactiveWidget.params;
     var modalInstance = $scope.$parent.getCustomizationModalInstance(
-        widgetParams);
+        $scope.interactiveWidget.id, widgetParams);
 
     modalInstance.result.then(function(result) {
       $scope.interactiveWidget.params = result.widgetParams;

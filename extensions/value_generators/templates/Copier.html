@@ -1,7 +1,5 @@
 <table>
   <tr>
-    <td><em>Value: </em></td>
-    <td></td>
     <td>
       <span ng-if="objType == 'UnicodeString' && !initArgs.large_input">
         <string item="customizationArgs.value"></string>
@@ -26,6 +24,9 @@
 </table>
 
 <label ng-if="objType == 'UnicodeString' && !initArgs.disallow_parse_with_jinja">
-  <em>Parse with Jinja?</em>
+  <em>Apply parameter evaluation?</em>
   <input type="checkbox" ng-model="customizationArgs.parse_with_jinja">
+  <img class="oppia-help" src="/images/help.png"
+       tooltip="Only select this option if you want strings of the form {{PARAM_NAME}} to be evaluated using the reader's state parameters."
+       tooltip-placement="right">
 </label>

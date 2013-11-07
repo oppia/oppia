@@ -210,6 +210,23 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               $scope.widgetParams = widgetParams || {};
               $scope.widgetDefinition = widgetDefinition;
 
+              $http.post(
+                  '/widgets/noninteractive/' + $scope.widgetDefinition.backendName,
+                  requestCreator.createRequest({
+                    'customization_args': {}
+                  }),
+                  {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+                      success(function(data) {
+                        $scope.paramDescriptions = {};
+                        for (var paramName in data.widget.params) {
+                          $scope.paramDescriptions[paramName] = (
+                              data.widget.params[paramName].description);
+                        }
+                      }).error(function(data) {
+                        warningsData.addWarning(
+                            'Error: Failed to obtain widget parameter descriptions.');
+                      });
+      
               $scope.save = function(widgetParams) {
                 var customizationArgs = {};
                 for (var paramName in widgetParams) {
