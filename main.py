@@ -108,8 +108,8 @@ urls = [
     get_redirect_route(
         r'/profile/data', profile.ProfileHandler, 'profile_handler'),
     get_redirect_route(
-        r'/profile/create_user_name', profile.CreateUsernamePage,
-        'create_user_name_page'),
+        r'/profile/editor_prerequisites', profile.EditorPrerequisitesPage,
+        'editor_prerequisites_page'),
 
     get_redirect_route(
         r'/learn/<exploration_id>', reader.ExplorationPage,

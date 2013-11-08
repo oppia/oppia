@@ -22,6 +22,7 @@ import re
 import StringIO
 import unicodedata
 import urllib
+import urlparse
 import yaml
 import zipfile
 
@@ -255,3 +256,15 @@ def convert_png_to_data_url(filepath):
 def camelcase_to_hyphenated(camelcase_str):
     s = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
     return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s).lower()
+
+
+def set_url_query_parameter(url, param_name, param_value):
+    """Set or replace a query parameter, and return the modified URL."""
+    scheme, netloc, path, query_string, fragment = urlparse.urlsplit(url)
+    query_params = urlparse.parse_qs(query_string)
+
+    query_params[param_name] = [param_value]
+    new_query_string = urllib.urlencode(query_params, doseq=True)
+
+    return urlparse.urlunsplit(
+        (scheme, netloc, path, new_query_string, fragment))

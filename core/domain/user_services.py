@@ -43,3 +43,10 @@ def is_username_taken(username):
 
 def normalize(username):
     return username.lower()
+
+
+def mark_agreed_to_terms(user_id):
+    """Records that the user has agreed to the license terms."""
+    user_settings = user_models.UserSettingsModel.get_or_create(user_id)
+    user_settings.agreed_to_terms = True
+    user_settings.put()

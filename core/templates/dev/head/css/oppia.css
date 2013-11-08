@@ -238,6 +238,18 @@ textarea {
   font-size: 1.0em;
 }
 
+.oppia-editor-prerequisites-form {
+  background: #eee;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.oppia-license {
+  border: 1px solid black;
+  padding: 0 30px 0 30px;
+  margin-bottom: 10px;
+}
+
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
   border: 1px solid black;
