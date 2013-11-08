@@ -32,6 +32,20 @@ h3 {
   line-height: 1.1;
 }
 
+.editor h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.editor h4 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.editor form {
+  margin: 0;
+}
+
 p {
   color: #444;
   line-height: 1.5;

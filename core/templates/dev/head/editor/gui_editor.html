@@ -1,27 +1,31 @@
-<div class="container-fluid">
+<div class="container-fluid editor">
   <div class="row-fluid">
-    <div class="span5">
-      <form ng-submit="saveStateName()">
-        <h3>
-          <span class="oppia-editable-name"
-                ng-if="activeInputData.name != 'stateName'"
-                ng-click="initializeNewActiveInput('stateName')">
-            <[stateName]>
-          </span>
-          <span ng-if="activeInputData.name == 'stateName'">
-            <input type="text" ng-model="stateName">
-            <input type="submit" value="Save">
-          </span>
-        </h3>
-      </form>
-    </div>
+    <span class="span7"></span>
+    <span class="span5">
+      <div>
+        <form ng-submit="saveStateName()">
+          <h3>
+            <span class="oppia-editable-name"
+                  ng-if="activeInputData.name != 'stateName'"
+                  ng-click="initializeNewActiveInput('stateName')">
+              <[stateName]>
+            </span>
+            <span ng-if="activeInputData.name == 'stateName'">
+              <input type="text" ng-model="stateName">
+              <input type="submit" value="Save">
+            </span>
+          </h3>
+        </form>
+      </div>
+    </span>
   </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid editor">
   <div class="row-fluid">
-    <div class="span10">
-      <div id="editorWindow" ng-show="stateId">
+    <div id="editorWindow" ng-show="stateId">
+      <span class="span7"></span>
+      <span class="span5">
 
         <h4>States that point to this one</h4>
         <ul>
@@ -48,8 +52,10 @@
 
         <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
         </param-change-editor>
+      </span>
+      <br>
 
-        <br>
+      <span class="span10">
 
         <h4 id="noninteractive">
           Content
@@ -86,7 +92,7 @@
 
           {% include 'editor/interactive_widget_preview.html' %}
         </div>
-      </div>
+      </span>
     </div>
   </div>
 
