@@ -1,7 +1,7 @@
-<div class="container-fluid editor">
+<div class="container-fluid oppia-editor">
   <div class="row-fluid">
     <span class="span7"></span>
-    <span class="span5">
+    <div class="span5">
       <div>
         <form ng-submit="saveStateName()">
           <h3>
@@ -17,51 +17,52 @@
           </h3>
         </form>
       </div>
-    </span>
+    </div>
   </div>
 </div>
 
-<div class="container-fluid editor">
+<div class="container-fluid oppia-editor">
   <div class="row-fluid">
     <div id="editorWindow" ng-show="stateId">
       <span class="span7"></span>
-      <span class="span5">
+      <div class="span5">
+        <div>
+          <h4>States that point to this one</h4>
+          <ul>
+            <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
+              <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+                <[incomingState.name]>
+              </a>
+              <span ng-if="stateId == incomingStateId">
+                <[incomingState.name]>
+              </span>
+              (<[incomingState.rules | commaSeparatedList]>)
+            </li>
+          </ul>
+          <span ng-show="isEmpty(getIncomingStates(stateId))">
+            <em>No incoming states.</em>
+          </span>
 
-        <h4>States that point to this one</h4>
-        <ul>
-          <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-            <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
-              <[incomingState.name]>
-            </a>
-            <span ng-if="stateId == incomingStateId">
-              <[incomingState.name]>
-            </span>
-            (<[incomingState.rules | commaSeparatedList]>)
-          </li>
-        </ul>
-        <span ng-show="isEmpty(getIncomingStates(stateId))">
-          <em>No incoming states.</em>
-        </span>
+          <h4>
+            Parameter Changes
+            <img class="oppia-help" src="/images/help.png"
+                tooltip="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields."
+                tooltip-placement="right">
+          </h4>
 
-        <h4>
-          Parameter Changes
-          <img class="oppia-help" src="/images/help.png"
-               tooltip="This allows you to change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields."
-               tooltip-placement="right">
-        </h4>
+          <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
+          </param-change-editor>
+        </div>
+      </div>
 
-        <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
-        </param-change-editor>
-      </span>
-      <br>
+      <div><div class="span12"></div></div>
 
-      <span class="span10">
-
+      <div><div class="span10">
         <h4 id="noninteractive">
           Content
           <img class="oppia-help" src="/images/help.png"
-               tooltip="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input."
-               tooltip-placement="right">
+              tooltip="You can add non-interactive content here. It will be displayed to the reader before he/she is asked to provide input."
+              tooltip-placement="right">
         </h4>
 
         <div>
@@ -80,19 +81,17 @@
               <button ng-click="saveTextContent()">Save and close</button>
             </div>
   
-             <div ng-if="activeInputData.name != 'content.' + $index">
+            <div ng-if="activeInputData.name != 'content.' + $index">
               <span ng-if="item.value == ''" class="oppia-placeholder">
                 <[defaultTextContent]>
               </span>
               <span angular-html-bind="item.value"></span>
             </div>
           </div>
-
-          <br>
-
-          {% include 'editor/interactive_widget_preview.html' %}
         </div>
-      </span>
+      </div></div>
+      <div><div class="span12"></div></div>
+      {% include 'editor/interactive_widget_preview.html' %}
     </div>
   </div>
 
