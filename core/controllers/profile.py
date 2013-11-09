@@ -67,10 +67,10 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CreateUsernamePage(base.BaseHandler):
-    """The page which prompts for username."""
+class EditorPrerequisitesPage(base.BaseHandler):
+    """The page which prompts for username and acceptance of terms."""
 
-    PAGE_NAME_FOR_CSRF = 'create_user_name'
+    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
 
     @base.require_user
     def get(self):
@@ -78,16 +78,35 @@ class CreateUsernamePage(base.BaseHandler):
         self.values.update({
             'nav_mode': 'profile',
         })
-        self.render_template('profile/create_user_name.html')
+        self.render_template('profile/editor_prerequisites.html')
 
     @base.require_user
     def post(self):
-      """Handles POST requests.""" 
-      username = self.payload.get('username')
-      returnUrl = str(self.payload.get('returnUrl'))
-      if not re.match(feconf.ALPHANUMERIC_REGEX, username):
-          raise Exception("Usernames can only have alphanumeric characters.")
-      if not user_services.is_username_taken(username):
-          user_services.set_username(self.user_id, username)
-      else:
-          raise Exception("The username \"%s\" is already taken, please pick a different one." % username)
+        """Handles POST requests.""" 
+        username = self.payload.get('username')
+        agreed_to_terms = self.payload.get('agreed_to_terms')
+
+        if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
+            if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
+                raise Exception(
+                    'In order to edit explorations on this site, you will '
+                    'need to accept the license terms.')
+            else:
+                user_services.mark_agreed_to_terms(self.user_id)
+
+        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
+            if user_services.get_username(self.user_id):
+                self.render_json({})
+                return
+
+            if not username:
+                raise Exception('No username supplied.')
+            if not re.match(feconf.ALPHANUMERIC_REGEX, username):
+                raise Exception(
+                    'Usernames can only have alphanumeric characters.')
+            if not user_services.is_username_taken(username):
+                user_services.set_username(self.user_id, username)
+            else:
+                raise Exception(
+                    'Sorry, the username \"%s\" is already taken! Please pick '
+                    'a different one.' % username)

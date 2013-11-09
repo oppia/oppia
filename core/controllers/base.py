@@ -34,9 +34,10 @@ from core.platform import models
 import feconf
 import jinja_utils
 current_user_services = models.Registry.import_current_user_services()
-(user_services,) = models.Registry.import_models([
+(user_models,) = models.Registry.import_models([
     models.NAMES.user
 ])
+import utils
 
 import webapp2
 
@@ -84,12 +85,35 @@ def require_editor(handler):
             self.redirect(current_user_services.create_login_url(self.request.uri))
             return
 
-        if feconf.REQUIRE_USERS_TO_SET_USERNAMES:
-            user_settings_model = user_services.UserSettingsModel.get_or_create(self.user_id)
+        user_settings_model = None
+        redirect_url = '/profile/editor_prerequisites'
+        must_redirect = False
+
+        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
+            if user_settings_model is None:
+                user_settings_model = user_models.UserSettingsModel.get_or_create(
+                    self.user_id)
 
             if not user_settings_model.username:
-                self.redirect("/profile/create_user_name?returnUrl=" + self.request.url)
-                return
+                must_redirect = True
+                redirect_url = utils.set_url_query_parameter(
+                    redirect_url, 'has_username', 'false')
+
+        if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
+            if user_settings_model is None:
+                user_settings_model = user_models.UserSettingsModel.get_or_create(
+                    self.user_id)
+
+            if not user_settings_model.agreed_to_terms:
+                must_redirect = True
+                redirect_url = utils.set_url_query_parameter(
+                    redirect_url, 'agreed_to_terms', 'false')
+
+        if must_redirect:
+            redirect_url = utils.set_url_query_parameter(
+                redirect_url, 'return_url', self.request.uri)
+            self.redirect(redirect_url)
+            return
 
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)

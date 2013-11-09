@@ -18,8 +18,6 @@
 
 __author__ = 'Stephanie Federwisch'
 
-import logging
-
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -38,6 +36,9 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Normalized username
     normalized_username = ndb.StringProperty(indexed=True)
+
+    # Whether the user has agreed to the terms of the site.
+    agreed_to_terms = ndb.BooleanProperty(default=False)
 
     @classmethod
     def get_or_create(cls, user_id):
