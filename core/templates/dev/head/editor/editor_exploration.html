@@ -91,19 +91,20 @@
 
           <h3>
             <[explorationTitle]>
-            <span ng-show="isPublic" class="label label-info">
+            <span ng-if="isPublic" class="label label-info">
               Published
             </span>
           </h3>
 
-          <div ng-hide="explorationTitle">
+          <div ng-if="!explorationTitle">
             <br><br><br><br><br><br>
             <center>
               <img src="/images/loading.gif" alt="Loading..." width="50px">
             </center>
           </div>
 
-          <div ng-show="explorationTitle">
+          <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
+          <div ng-show="!!explorationTitle">
             <tabset>
               <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
                 {% include 'editor/editor_metadata.html' %}

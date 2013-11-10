@@ -20,6 +20,72 @@ from core.domain import exp_services
 import test_utils
 
 
+class ReaderPermissionsTest(test_utils.GenericTestBase):
+    """Test permissions for readers to view explorations."""
+
+    def setUp(self):
+        """Before each individual test, create a dummy exploration."""
+        super(ReaderPermissionsTest, self).setUp()
+
+        self.exploration_id = 'eid'
+        self.first_editor = 'editor@example.com'
+        self.exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                self.first_editor, 'A title', 'A category',
+                self.exploration_id))
+
+        exp_services.save_exploration(self.first_editor, self.exploration)
+
+    def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
+        response = self.testapp.get(
+            '/learn/%s' % self.exploration_id, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+    def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
+        self.login('person@example.com', is_admin=False)
+        response = self.testapp.get(
+            '/learn/%s' % self.exploration_id, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+        self.logout()
+
+    def test_unpublished_explorations_are_invisible_to_other_editors(self):
+        another_editor = 'another@example.com'
+
+        another_exploration = exp_services.get_exploration_by_id(
+            exp_services.create_new(
+                another_editor, 'A title', 'A category', 'eid2'))
+        exp_services.save_exploration(another_editor, another_exploration)
+
+        self.login(another_editor, is_admin=False)
+        response = self.testapp.get(
+            '/learn/%s' % self.exploration_id, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+        self.logout()
+
+    def test_unpublished_explorations_are_visible_to_their_editors(self):
+        self.login('editor@example.com', is_admin=False)
+        response = self.testapp.get('/learn/%s' % self.exploration_id)
+        self.assertEqual(response.status_int, 200)
+        self.assertIn('This is a preview', response.body)
+        self.logout()
+
+    def test_unpublished_explorations_are_visible_to_admins(self):
+        self.login('admin@example.com', is_admin=True)
+        response = self.testapp.get('/learn/%s' % self.exploration_id)
+        self.assertEqual(response.status_int, 200)
+        self.assertIn('This is a preview', response.body)
+        self.logout()
+
+    def test_published_explorations_are_visible_to_anyone(self):
+        self.exploration.is_public = True
+        exp_services.save_exploration(self.first_editor, self.exploration)
+
+        response = self.testapp.get(
+            '/learn/%s' % self.exploration_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.assertNotIn('This is a preview', response.body)
+
+
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 

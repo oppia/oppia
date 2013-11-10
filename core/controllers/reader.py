@@ -38,12 +38,18 @@ class ExplorationPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        # An unpublished exploration can only be viewed by admins and the
+        # editors of that explorations.
+        if not exploration.is_public:
+            if not (self.is_admin or self.user_id in exploration.editor_ids):
+                raise self.PageNotFoundException
+
         iframed = (self.request.get('iframed') == 'true')
 
         self.values.update({
-            'content': skins_services.get_skin_html(
-                exploration.default_skin),
+            'content': skins_services.get_skin_html(exploration.default_skin),
             'iframed': iframed,
+            'is_public': exploration.is_public,
             'nav_mode': READER_MODE,
         })
         self.render_template(
