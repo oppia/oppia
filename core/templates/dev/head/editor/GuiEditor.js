@@ -21,6 +21,26 @@
 function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, requestCreator) {
 
+  $scope.incomingStatesShown = false;
+  $scope.parameterChangesShown = false;
+
+  $scope.showIncomingStates = function() {
+    $scope.incomingStatesShown = true;
+  };
+
+  $scope.hideIncomingStates = function() {
+    $scope.incomingStatesShown = false;
+  };
+
+  $scope.showParameterChanges = function() {
+    $scope.parameterChangesShown = true;
+  };
+
+  $scope.hideParameterChanges = function() {
+    // Save first?
+    $scope.parameterChangesShown = false;
+  };
+
   $scope.$on('guiTabSelected', function(event, stateData) {
     $scope.stateName = stateData.name;
     $scope.content = stateData.content || [];

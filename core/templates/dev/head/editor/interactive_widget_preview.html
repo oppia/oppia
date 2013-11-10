@@ -1,25 +1,29 @@
 <div ng-controller="InteractiveWidgetPreview" class="oppia-iframe-container">
-  <div><div class="span10">
-    <div class="oppia-widget-preview">
-      <!-- This iframe is dynamically resized based on its content. -->
-      <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
-      </iframe>
+  <div>
+    <div class="span10">
+      <div class="oppia-widget-preview">
+        <!-- This iframe is dynamically resized based on its content. -->
+        <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
+        </iframe>
+      </div>
+  
+      <div>
+        <label>
+          <input type="checkbox" ng-model="stickyInteractiveWidget"
+                ng-click="saveStickyInteractiveWidget()">
+          Use the previous state's widget if possible.
+          <img class="oppia-help" src="/images/help.png"
+              tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
+              tooltip-placement="right">
+        </label>
+      </div>
     </div>
-
-    <div>
-      <label>
-        <input type="checkbox" ng-model="stickyInteractiveWidget"
-              ng-click="saveStickyInteractiveWidget()">
-        Use the previous state's widget if possible.
-        <img class="oppia-help" src="/images/help.png"
-            tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
-            tooltip-placement="right">
-      </label>
-
+    <div class="span2">  
       <span class="pull-right">
         <button ng-click="showChooseInteractiveWidgetModal()">
-          Pick interaction type
+          Pick new interaction
         </button>
+        <br><br>
         <span ng-if="!isEmpty(interactiveWidget.params)">
           <button ng-click="showCustomizeInteractiveWidgetModal()">
             Customize
@@ -27,13 +31,13 @@
         </span>
       </span>
     </div>
-  </div></div>
+  </div>
 
   <div><div class="span12"></div></div>
 
   <div>
-    <span class="span2"></span>
-    <div class="span10">
+    <span class="span1"></span>
+    <div class="span11">
       <h4 id="rules">Answer classification rules</h4>
 
       <div ng-repeat="handler in interactiveWidget.handlers">
