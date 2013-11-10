@@ -74,7 +74,7 @@ describe('RTE directive', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
     $httpBackend = _$httpBackend_;
-    $httpBackend.whenGET('/widgetrepository/data/noninteractive').respond({
+    $httpBackend.expectGET('/widgetrepository/data/noninteractive').respond({
       data: {
         widgets: {
           'Basic Input': [{
@@ -86,7 +86,6 @@ describe('RTE directive', function() {
         }
       }
     });
-    $httpBackend.expectGET('/widgetrepository/data/noninteractive');
 
     elm = $compile('<rich-text-editor></rich-text-editor>')($rootScope);
     scope = $rootScope;

@@ -103,3 +103,25 @@ class UtilsTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 utils.camelcase_to_hyphenated(test_case[0]), test_case[1])
+
+    def test_set_url_query_parameter(self):
+        """Test set_url_query_parameter method."""
+        self.assertEqual(
+            utils.set_url_query_parameter('http://www.test.com', 'a', 'b'),
+            'http://www.test.com?a=b'
+        )
+
+        self.assertEqual(
+            utils.set_url_query_parameter('http://www.test.com?a=b', 'c', 'd'),
+            'http://www.test.com?a=b&c=d'
+        )
+
+        self.assertEqual(
+            utils.set_url_query_parameter(
+                'http://test.com?a=b', 'redirectUrl', 'http://redirect.com'),
+            'http://test.com?a=b&redirectUrl=http%3A%2F%2Fredirect.com'
+        )
+
+        with self.assertRaisesRegexp(
+                Exception, 'URL query parameter name must be a string'):
+            utils.set_url_query_parameter('http://test.com?a=b', None, 'value')

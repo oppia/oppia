@@ -88,7 +88,7 @@ class EditorPrerequisitesPage(base.BaseHandler):
 
         if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
             if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
-                raise Exception(
+                raise self.InvalidInputException(
                     'In order to edit explorations on this site, you will '
                     'need to accept the license terms.')
             else:
@@ -100,13 +100,13 @@ class EditorPrerequisitesPage(base.BaseHandler):
                 return
 
             if not username:
-                raise Exception('No username supplied.')
+                raise self.InvalidInputException('No username supplied.')
             if not re.match(feconf.ALPHANUMERIC_REGEX, username):
-                raise Exception(
+                raise self.InvalidInputException(
                     'Usernames can only have alphanumeric characters.')
             if not user_services.is_username_taken(username):
                 user_services.set_username(self.user_id, username)
             else:
-                raise Exception(
+                raise self.InvalidInputException(
                     'Sorry, the username \"%s\" is already taken! Please pick '
                     'a different one.' % username)

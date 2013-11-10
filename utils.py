@@ -260,6 +260,11 @@ def camelcase_to_hyphenated(camelcase_str):
 
 def set_url_query_parameter(url, param_name, param_value):
     """Set or replace a query parameter, and return the modified URL."""
+    if not isinstance(param_name, basestring):
+        raise Exception(
+            'URL query parameter name must be a string, received %s'
+            % param_name)
+
     scheme, netloc, path, query_string, fragment = urlparse.urlsplit(url)
     query_params = urlparse.parse_qs(query_string)
 

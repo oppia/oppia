@@ -20,6 +20,7 @@ import webtest
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import stats_services
+from core.domain import user_services
 import feconf
 
 import json
@@ -57,6 +58,7 @@ class TestBase(unittest.TestCase):
         exp_services.delete_all_explorations()
         fs_domain.delete_all_files()
         stats_services.delete_all_stats()
+        user_services.delete_all_user_settings()
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""

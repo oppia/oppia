@@ -20,7 +20,7 @@
 
 function EditorPrerequisites($scope, $http, warningsData, requestCreator) {
   $scope.urlParams = $scope.getUrlParams();
-  $scope.hasUsername = $scope.urlParams.has_username ? false : true;
+  $scope.hasUsername = $scope.urlParams.has_username ? true : false;
 
   $scope.submitPrerequisitesForm = function(agreedToTerms, username) {
     if (!agreedToTerms) {
