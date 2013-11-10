@@ -18,9 +18,11 @@ import unittest
 import webtest
 
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import stats_services
-from core.domain import user_services
+from core.platform import models
+(file_models, user_models) = models.Registry.import_models([
+    models.NAMES.file, models.NAMES.user
+])
 import feconf
 
 import json
@@ -51,14 +53,38 @@ class TestBase(unittest.TestCase):
 
     TAGS = []
 
+    def _delete_all_explorations(self):
+        explorations = exp_services.get_all_explorations()
+        for exploration in explorations:
+            exp_services.delete_exploration(
+                None, exploration.id, force_deletion=True)
+
+    def _delete_all_files(self):
+        for file_data in file_models.FileDataModel.get_all():
+            file_data.delete()
+        for file_data_history in file_models.FileDataHistoryModel.get_all():
+            file_data_history.delete()
+        for file_metadata in file_models.FileMetadataModel.get_all():
+            file_metadata.delete()
+        for file_metadata_history in file_models.FileMetadataHistoryModel.get_all():
+            file_metadata_history.delete()
+
+    def _delete_all_stats(self):
+        stats_services._delete_all_stats()
+
+    def _delete_all_user_settings(self):
+        all_user_settings = user_models.UserSettingsModel.get_all()
+        for user_setting in all_user_settings:
+            user_setting.delete()
+
     def setUp(self):
         self.testapp = webtest.TestApp(main.app)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
-        exp_services.delete_all_explorations()
-        fs_domain.delete_all_files()
-        stats_services.delete_all_stats()
-        user_services.delete_all_user_settings()
+        self._delete_all_explorations()
+        self._delete_all_files()
+        self._delete_all_stats()
+        self._delete_all_user_settings()
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""

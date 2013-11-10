@@ -267,15 +267,3 @@ class AbstractFileSystem(object):
     def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...)."""
         return self._impl.listdir(dir_name)
-
-
-def delete_all_files():
-    """Deletes all files, file metadata and their histories."""
-    for file_data in file_models.FileDataModel.get_all():
-        file_data.delete()
-    for file_data_history in file_models.FileDataHistoryModel.get_all():
-        file_data_history.delete()
-    for file_metadata in file_models.FileMetadataModel.get_all():
-        file_metadata.delete()
-    for file_metadata_history in file_models.FileMetadataHistoryModel.get_all():
-        file_metadata_history.delete()

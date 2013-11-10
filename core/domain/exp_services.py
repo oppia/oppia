@@ -933,13 +933,6 @@ def reload_demos():
     load_demos()
 
 
-def delete_all_explorations():
-    """Deletes all explorations."""
-    explorations = get_all_explorations()
-    for exploration in explorations:
-        delete_exploration(None, exploration.id, force_deletion=True)
-
-
 # Verification methods.
 def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
     """Verifies a state dictionary that came from a YAML file."""

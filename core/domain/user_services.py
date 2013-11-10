@@ -50,10 +50,3 @@ def mark_agreed_to_terms(user_id):
     user_settings = user_models.UserSettingsModel.get_or_create(user_id)
     user_settings.agreed_to_terms = True
     user_settings.put()
-
-
-def delete_all_user_settings():
-    """Deletes all user settings. Used only for tests."""
-    all_user_settings = user_models.UserSettingsModel.get_all()
-    for user_setting in all_user_settings:
-        user_setting.delete()
