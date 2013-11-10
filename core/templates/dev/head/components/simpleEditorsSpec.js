@@ -30,7 +30,7 @@ describe('List directive', function() {
     expect(listControllerScope.largeInput).toBeUndefined();
   }));
 
-  it('should add a new item to the list', inject(function($rootScope, $compile) {
+  it('should have a new item by default', inject(function($rootScope, $compile) {
     scope = $rootScope;
     scope.val = [];
 
@@ -38,8 +38,19 @@ describe('List directive', function() {
     scope.$apply();
 
     var listControllerScope = elm.scope();
-    listControllerScope.addItem();
     expect(listControllerScope.items).toEqual(['']);
+  }));
+
+  it('should add a new item when asked', inject(function($rootScope, $compile) {
+    scope = $rootScope;
+    scope.val = ['abc', 'def'];
+
+    elm = $compile('<list items="val"></list>')($rootScope);
+    scope.$apply();
+
+    var listControllerScope = elm.scope();
+    listControllerScope.addItem();
+    expect(listControllerScope.items).toEqual(['abc', 'def', '']);
   }));
 
   it('should replace a list item', inject(function($rootScope, $compile) {

@@ -529,7 +529,11 @@ oppia.directive('list', function(warningsData) {
             $scope.localItems.push({'label': angular.copy($scope.items[i])});
           }
         }
-        $scope.activeItem = null;
+        if ($scope.localItems.length === 0) {
+          $scope.addItem();
+        } else {
+          $scope.activeItem = null;
+        }
       });
 
       $scope.openItemEditor = function(index) {
