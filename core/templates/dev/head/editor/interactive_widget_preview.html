@@ -57,7 +57,7 @@
               </span>
             </td>
             <td style="width: 75%; vertical-align: top">
-              <span class="oppia-editable-name" ng-click="openEditRuleModal(handler.name, $index)">
+              <span>
                 Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>
               </span>:
               <span ng-show="rule.dest == 'END' || rule.dest == stateId">
@@ -70,7 +70,10 @@
               </span>
               <span ng-bind-html="rule.feedback|truncate"></span>)
             </td>
-            <td style="width: 20%; vertical-align: top">
+            <td style="width: 15%; vertical-align: top">
+              <span>
+                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handler.name, $index)">Edit</a> |
+              </span>
               <span ng-show="$index != 0">
                 <a href="#" onclick="return false;" ng-click="swapRules(handler.name, $index, $index - 1)">⇑</a>
               </span>
@@ -99,7 +102,7 @@
                 Add new rule...
               </span>
             </td>
-            <td style="width: 20%; vertical-align: top"></td>
+            <td style="width: 15%; vertical-align: top"></td>
           </tr>
           <tr>
             <td style="width: 5%; vertical-align: top">
@@ -111,8 +114,7 @@
               </span>
             </td>
             <td style="width: 75%; vertical-align: top">
-              <span class="oppia-editable-name"
-                    ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">
+              <span>
                 <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>
               </span>:
               <span ng-show="getDefaultRule(handler.name).dest == 'END' || getDefaultRule(handler.name).dest == stateId">
@@ -125,7 +127,10 @@
               </span>
               <span ng-bind-html="getDefaultRule(handler.name).feedback|truncate"></span>)
             </td>
-            <td style="width: 20%; vertical-align: top">
+            <td style="width: 15%; vertical-align: top">
+              <span>
+                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">Edit</a> |
+              </span>
               <span class="oppia-grayed"> ⇑ </span>
               |
               <span class="oppia-grayed"> ⇓ </span>
