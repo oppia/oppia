@@ -62,9 +62,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     // - 'dest' (the destination for this rule)
     // - 'feedback' (any feedback given for this rule)
     // - 'paramChanges' (parameter changes associated with this rule)
-    $scope.interactiveRulesets = {};
+    $scope.widgetHandlers = {};
     for (var i = 0; i < data.widget.handlers.length; i++) {
-      $scope.interactiveRulesets[data.widget.handlers[i].name] = (
+      $scope.widgetHandlers[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
     $scope.stickyInteractiveWidget = data.widget.sticky;
@@ -168,7 +168,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   $scope.openEditRuleModal = function(handlerName, index) {
     $scope.ruleModalHandlerName = handlerName;
 
-    var rule = $scope.interactiveRulesets[handlerName][index];
+    var rule = $scope.widgetHandlers[handlerName][index];
     $scope.tmpRule = {
       index: index,
       description: rule.description,
@@ -376,11 +376,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.saveExtendedRule = function(handlerName, extendedRule) {
-    if (!$scope.interactiveRulesets.hasOwnProperty(handlerName)) {
-      $scope.interactiveRulesets[handlerName] = [];
+    if (!$scope.widgetHandlers.hasOwnProperty(handlerName)) {
+      $scope.widgetHandlers[handlerName] = [];
     }
 
-    var rules = $scope.interactiveRulesets[handlerName];
+    var rules = $scope.widgetHandlers[handlerName];
     if ($scope.tmpRule.index !== null) {
       rules[$scope.tmpRule.index] = extendedRule;
     } else {
@@ -436,21 +436,21 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.getDefaultRule = function(handlerName) {
-    var ruleset = $scope.interactiveRulesets[handlerName];
+    var ruleset = $scope.widgetHandlers[handlerName];
     return ruleset[ruleset.length - 1];
   };
 
   $scope.swapRules = function(handlerName, index1, index2) {
-    $scope.tmpRule = $scope.interactiveRulesets[handlerName][index1];
-    $scope.interactiveRulesets[handlerName][index1] =
-        $scope.interactiveRulesets[handlerName][index2];
-    $scope.interactiveRulesets[handlerName][index2] = $scope.tmpRule;
+    $scope.tmpRule = $scope.widgetHandlers[handlerName][index1];
+    $scope.widgetHandlers[handlerName][index1] =
+        $scope.widgetHandlers[handlerName][index2];
+    $scope.widgetHandlers[handlerName][index2] = $scope.tmpRule;
 
     $scope.saveInteractiveWidget();
   };
 
   $scope.deleteRule = function(handlerName, index) {
-    $scope.interactiveRulesets[handlerName].splice(index, 1);
+    $scope.widgetHandlers[handlerName].splice(index, 1);
     $scope.saveInteractiveWidget();
   };
 
@@ -510,7 +510,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.saveStickyInteractiveWidget = function() {
     explorationData.saveStateData($scope.stateId, {
-      'sticky_interactive_widget': $scope.stickyInteractiveWidget
+      'widget_sticky': $scope.stickyInteractiveWidget
     });
   };
 
@@ -564,7 +564,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     modalInstance.result.then(function(arg) {
       if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
         $scope.interactiveWidget = arg.data.widget;
-        $scope.interactiveRulesets = {'submit': [{
+        $scope.widgetHandlers = {'submit': [{
           'description': 'Default',
           'definition': {'rule_type': 'default'},
           'dest': $scope.stateId,
@@ -583,11 +583,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.generateWidgetPreview(
         $scope.interactiveWidget.id, customizationArgs, function() {
           explorationData.saveStateData($scope.stateId, {
-            // The backend actually just saves the id of the widget.
-            'interactive_widget': $scope.interactiveWidget.id,
-            // TODO(sll): Rename this and other instances of interactive_params.
-            'interactive_params': customizationArgs,
-            'interactive_rulesets': $scope.interactiveRulesets
+            'widget_id': $scope.interactiveWidget.id,
+            'widget_customization_args': customizationArgs,
+            'widget_handlers': $scope.widgetHandlers
           });
           $scope.updateStatesData();
           $scope.drawGraph();
@@ -595,11 +593,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.updateStatesData = function() {
-    // Updates $scope.states from $scope.interactiveRulesets.
+    // Updates $scope.states from $scope.widgetHandlers.
     var stateDict = $scope.states[$scope.stateId];
     for (var i = 0; i < stateDict.widget.handlers.length; i++) {
       var handlerName = stateDict.widget.handlers[i].name;
-      var ruleSpecs = $scope.interactiveRulesets[handlerName];
+      var ruleSpecs = $scope.widgetHandlers[handlerName];
       stateDict.widget.handlers[i].rule_specs = ruleSpecs;
     }
   };

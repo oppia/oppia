@@ -23,10 +23,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   // Valid state properties that can be saved.
   var validStateProperties = [
     'content',
-    'interactive_widget',
-    'interactive_params',
-    'interactive_rulesets',
-    'sticky_interactive_widget',
+    'widget_id',
+    'widget_customization_args',
+    'widget_handlers',
+    'widget_sticky',
     'param_changes',
     'resolved_answers',
     'state_name'

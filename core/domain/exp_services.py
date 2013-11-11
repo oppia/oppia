@@ -568,8 +568,8 @@ def add_state(committer_id, exploration_id, state_name, state_id=None):
 
 
 def update_state(committer_id, exploration_id, state_id, new_state_name,
-                 param_changes, interactive_widget, interactive_params,
-                 interactive_rulesets, sticky_interactive_widget, content):
+                 param_changes, widget_id, widget_customization_args,
+                 widget_handlers, widget_sticky, content):
     """Updates the given state, and commits changes.
 
     Args:
@@ -581,24 +581,25 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
     - param_changes: list of dicts with keys ('name', 'generator_id',
         'customization_args'), or None. If present, represents parameter
         changes that should be applied when a reader enters the state.
-    - interactive_widget: str or None. If present, the name of the interactive
-        widget for this state.
-    - interactive_params: dict or None. If present, the customization_args used
-        to render the interactive widget for this state.
-    - interactive_rulesets: dict or None. If present, it represents the rule
-        specifications for this state.
-    - sticky_interactive_widget: bool or None. If present, the setting for
-        whether the interactive widget for this state should be preserved when
-        the reader navigates to another state that uses the same interactive
-        widget. For example, we might want a textarea containing user-entered
-        code to retain that code in a state transition, rather than being
-        overwritten with a brand-new textarea.
+    - widget_id: str or None. If present, the id of the interactive widget for
+        this state.
+    - widget_customization_args: dict or None. If present, the
+        customization_args used to render the interactive widget for this
+        state.
+    - widget_handlers: dict or None. If present, it represents the handler and
+        rule specifications for this state.
+    - widget_sticky: bool or None. If present, the setting for whether the
+        interactive widget for this state should be preserved when the reader
+        navigates to another state that uses the same interactive widget. For
+        example, we might want a textarea containing user-entered code to
+        retain that code in a state transition, rather than being overwritten
+        with a brand-new textarea.
     - content: None, or a list of dicts, where each dict has keys ('type',
         'value'). Currently we expect this list to have exactly one element
         with type 'text'. If present, this list represents the non-interactive
         content for the state.
     """
-    # TODO(sll): Add more documentation for interactive_rulesets, above.
+    # TODO(sll): Add more documentation for widget_handlers, above.
 
     exploration = get_exploration_by_id(exploration_id)
     state = get_state_by_id(exploration_id, state_id)
@@ -626,21 +627,21 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 param_change['name'], param_change['generator_id'],
                 param_change['customization_args']))
 
-    if interactive_widget:
-        state.widget.widget_id = interactive_widget
+    if widget_id:
+        state.widget.widget_id = widget_id
 
-    if interactive_params is not None:
-        state.widget.customization_args = interactive_params
+    if widget_customization_args is not None:
+        state.widget.customization_args = widget_customization_args
 
-    if sticky_interactive_widget is not None:
-        if not isinstance(sticky_interactive_widget, bool):
+    if widget_sticky is not None:
+        if not isinstance(widget_sticky, bool):
             raise Exception(
-                'Expected sticky_interactive_widget to be a boolean, '
-                'received %s' % sticky_interactive_widget)
-        state.widget.sticky = sticky_interactive_widget
+                'Expected widget_sticky to be a boolean, received %s' %
+                widget_sticky)
+        state.widget.sticky = widget_sticky
 
-    if interactive_rulesets:
-        ruleset = interactive_rulesets['submit']
+    if widget_handlers:
+        ruleset = widget_handlers['submit']
         utils.recursively_remove_key(ruleset, u'$$hashKey')
 
         state.widget.handlers = [

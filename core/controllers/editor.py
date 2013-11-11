@@ -212,17 +212,17 @@ class StateHandler(base.BaseHandler):
 
         state_name = self.payload.get('state_name')
         param_changes = self.payload.get('param_changes')
-        interactive_widget = self.payload.get('interactive_widget')
-        interactive_params = self.payload.get('interactive_params')
-        interactive_rulesets = self.payload.get('interactive_rulesets')
-        sticky_interactive_widget = self.payload.get(
-            'sticky_interactive_widget')
+        widget_id = self.payload.get('widget_id')
+        widget_customization_args = self.payload.get(
+            'widget_customization_args')
+        widget_handlers = self.payload.get('widget_handlers')
+        widget_sticky = self.payload.get('widget_sticky')
         content = self.payload.get('content')
 
         exp_services.update_state(
             self.user_id, exploration_id, state_id, state_name, param_changes,
-            interactive_widget, interactive_params, interactive_rulesets,
-            sticky_interactive_widget, content
+            widget_id, widget_customization_args, widget_handlers,
+            widget_sticky, content
         )
 
         exploration = exp_services.get_exploration_by_id(exploration_id)

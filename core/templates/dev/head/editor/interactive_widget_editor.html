@@ -47,7 +47,7 @@
               tooltip-placement="right">
         </h5>
         <table style="width: 100%">
-          <tr ng-repeat="rule in interactiveRulesets[handler.name]" ng-hide="$last">
+          <tr ng-repeat="rule in widgetHandlers[handler.name]" ng-hide="$last">
             <td style="width: 5%; vertical-align: top">
               <span ng-show="rule.feedback.length || !isCurrentStateId(rule.dest)">
                 •
@@ -56,7 +56,7 @@
                 <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
               </span>
             </td>
-            <td style="width: 75%; vertical-align: top">
+            <td style="width: 70%; vertical-align: top">
               <span>
                 Answer <[rule | parameterizeRuleDescription: interactiveWidget.params.choices]>
               </span>:
@@ -70,6 +70,7 @@
               </span>
               <span ng-bind-html="rule.feedback|truncate"></span>)
             </td>
+            <td style="width: 5%; vertical-align: top"></td>
             <td style="width: 15%; vertical-align: top">
               <span>
                 <a href="#" onclick="return false;" ng-click="openEditRuleModal(handler.name, $index)">Edit</a> |
@@ -81,10 +82,10 @@
                 <span class="oppia-grayed">⇑</span>
               </span>
 
-              <span ng-show="$index < interactiveRulesets[handler.name].length - 2">
+              <span ng-show="$index < widgetHandlers[handler.name].length - 2">
                 | <a href="#" onclick="return false;" ng-click="swapRules(handler.name, $index, $index + 1)">⇓</a>
               </span>
-              <span ng-hide="$index < interactiveRulesets[handler.name].length - 2">
+              <span ng-hide="$index < widgetHandlers[handler.name].length - 2">
                 | <span class="oppia-grayed">⇓</span>
               </span>
 
@@ -97,23 +98,24 @@
             <td style="width: 5%; vertical-align: top">
               •
             </td>
-            <td style="width: 75%; vertical-align: top">
+            <td style="width: 70%; vertical-align: top">
               <span>
                 <a href="#" onclick="return false;" ng-click="openAddRuleModal(handler.name)">Add new rule...</a>
               </span>
             </td>
+            <td style="width: 5%; vertical-align: top"></td>
             <td style="width: 15%; vertical-align: top"></td>
           </tr>
           <tr>
             <td style="width: 5%; vertical-align: top">
-              <span ng-show="interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].feedback.length || !isCurrentStateId(interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].dest)">
+              <span ng-show="widgetHandlers[handler.name][widgetHandlers[handler.name].length - 1].feedback.length || !isCurrentStateId(widgetHandlers[handler.name][widgetHandlers[handler.name].length - 1].dest)">
                 •
               </span>
-              <span ng-hide="interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].feedback.length || !isCurrentStateId(interactiveRulesets[handler.name][interactiveRulesets[handler.name].length - 1].dest)">
+              <span ng-hide="widgetHandlers[handler.name][widgetHandlers[handler.name].length - 1].feedback.length || !isCurrentStateId(widgetHandlers[handler.name][widgetHandlers[handler.name].length - 1].dest)">
                 <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
               </span>
             </td>
-            <td style="width: 75%; vertical-align: top">
+            <td style="width: 70%; vertical-align: top">
               <span>
                 <[getDefaultRule(handler.name) | parameterizeRuleDescription: interactiveWidget.params.choices]>
               </span>:
@@ -127,9 +129,10 @@
               </span>
               <span ng-bind-html="getDefaultRule(handler.name).feedback|truncate"></span>)
             </td>
+            <td style="width: 5%; vertical-align: top"></td>
             <td style="width: 15%; vertical-align: top">
               <span>
-                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handler.name, interactiveRulesets[handler.name].length - 1)">Edit</a> |
+                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handler.name, widgetHandlers[handler.name].length - 1)">Edit</a> |
               </span>
               <span class="oppia-grayed"> ⇑ </span>
               |

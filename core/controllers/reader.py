@@ -88,7 +88,6 @@ class ExplorationHandler(base.BaseHandler):
         self.values.update({
             'block_number': 0,
             'interactive_html': interactive_html,
-            'interactive_params': init_state.widget.customization_args,
             'oppia_html': init_html,
             'params': reader_params,
             'state_history': [exploration.init_state_id],
