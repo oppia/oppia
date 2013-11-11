@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the interactive widget preview in the GuiEditor.
+ * @fileoverview Controllers for the interactive widget preview in the state editor.
  *
  * @author sll@google.com (Sean Lip)
  */

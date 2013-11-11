@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
+function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, requestCreator) {
 
   $scope.incomingStatesShown = false;
@@ -190,5 +190,5 @@ function GuiEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 }
 
-GuiEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
+StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData', 'requestCreator'];

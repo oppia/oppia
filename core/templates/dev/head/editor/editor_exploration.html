@@ -150,8 +150,8 @@
               </tab>
 
               <tab heading="State Editor" disabled="!doesStateIdExist()" active="guiTabActive" select="selectGuiTab()">
-                <div ng-controller="GuiEditor" ng-if="doesStateIdExist()">
-                  {% include 'editor/gui_editor.html' %}
+                <div ng-controller="StateEditor" ng-if="doesStateIdExist()">
+                  {% include 'editor/state_editor.html' %}
                 </div>
               </tab>
             </tabset>
@@ -171,7 +171,7 @@
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('editor/StatsViewer.js') }}
-    {{ include_js_file('editor/GuiEditor.js') }}
+    {{ include_js_file('editor/StateEditor.js') }}
     // These should come after the valueGeneratorEditor scripts.
     {{ include_js_file('editor/InteractiveWidgetPreview.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
