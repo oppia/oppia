@@ -1,12 +1,16 @@
 <div class="container-fluid oppia-editor">
   <div class="row-fluid">
-    <div>
+    <div class="span10">
       <div class="pull-right">
-        <button ng-if="!incomingStatesShown" ng-click="showIncomingStates()">Show incoming states</button>
-        <button ng-if="incomingStatesShown" ng-click="hideIncomingStates()">Hide incoming states</button>
+        <button ng-click="toggleIncomingStates()">
+          <span ng-if="!incomingStatesShown">Show incoming states</span>
+          <span ng-if="incomingStatesShown">Hide incoming states</span>
+        </button>
 
-        <button ng-if="!parameterChangesShown" ng-click="showParameterChanges()">Show parameter changes</button>
-        <button ng-if="parameterChangesShown" ng-click="hideParameterChanges()">Hide parameter changes</button>
+        <button ng-click="toggleParameterChanges()">
+          <span ng-if="!parameterChangesShown">Show parameter changes</span>
+          <span ng-if="parameterChangesShown">Hide parameter changes</span>
+        </button>
       </div>
 
       <form ng-submit="saveStateName()">
@@ -22,7 +26,6 @@
           </span>
         </h3>
       </form>
-
     </div>
   </div>
 </div>
@@ -68,32 +71,30 @@
 
       <div><div class="span10">
         <div>
-          <div ng-repeat="item in content" class="oppia-state-content">
-            <span class="pull-right">
-              <span ng-if="activeInputData.name != 'content.' + $index">
-                <a href="#" onclick="return false;" ng-click="editContent($index)">
-                  Edit
-                </a>
-              </span>
+          <div class="oppia-state-content">
+            <span class="pull-right" ng-if="activeInputData.name != 'content'">
+              <a href="#" onclick="return false;" ng-click="editContent()">
+                Edit
+              </a>
             </span>
-  
-            <div ng-if="activeInputData.name == 'content.' + $index">
-              <rich-text-editor html-content="content[$index].value">
-              </rich-text-editor>
-              <button ng-click="saveTextContent()">Save and close</button>
-            </div>
-  
-            <div ng-if="activeInputData.name != 'content.' + $index">
-              <span ng-if="item.value == ''" class="oppia-placeholder">
+            <div ng-if="activeInputData.name != 'content'">
+              <span ng-if="content[0].value == ''" class="oppia-placeholder">
                 <[defaultTextContent]>
               </span>
-              <span angular-html-bind="item.value"></span>
+              <span angular-html-bind="content[0].value"></span>
+            </div>
+  
+            <div ng-if="activeInputData.name == 'content'">
+              <rich-text-editor html-content="content[0].value"></rich-text-editor>
+              <button ng-click="saveTextContent()">Save and close</button>
             </div>
           </div>
         </div>
       </div></div>
+
       <div><div class="span12"></div></div>
-      {% include 'editor/interactive_widget_preview.html' %}
+
+      {% include 'editor/interactive_widget_editor.html' %}
     </div>
   </div>
 

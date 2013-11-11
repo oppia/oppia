@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the interactive widget preview in the state editor.
+ * @fileoverview Controllers for a state's interactive widget editor.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorationData, requestCreator) {
+function InteractiveWidgetEditor($scope, $http, $modal, warningsData, explorationData, requestCreator) {
   // Tests whether an object is a JavaScript array.
   $scope.isArray = function(obj) {
     return toString.call(obj) === '[object Array]';
@@ -605,6 +605,6 @@ function InteractiveWidgetPreview($scope, $http, $modal, warningsData, explorati
   };
 }
 
-InteractiveWidgetPreview.$inject = [
+InteractiveWidgetEditor.$inject = [
   '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'requestCreator'
 ];

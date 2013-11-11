@@ -24,21 +24,13 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   $scope.incomingStatesShown = false;
   $scope.parameterChangesShown = false;
 
-  $scope.showIncomingStates = function() {
-    $scope.incomingStatesShown = true;
+  $scope.toggleIncomingStates = function() {
+    $scope.incomingStatesShown = !$scope.incomingStatesShown;
   };
 
-  $scope.hideIncomingStates = function() {
-    $scope.incomingStatesShown = false;
-  };
-
-  $scope.showParameterChanges = function() {
-    $scope.parameterChangesShown = true;
-  };
-
-  $scope.hideParameterChanges = function() {
-    // Save first?
-    $scope.parameterChangesShown = false;
+  $scope.toggleParameterChanges = function() {
+    // TODO(sll): When the zippy is closed, should we save first?
+    $scope.parameterChangesShown = !$scope.parameterChangesShown;
   };
 
   $scope.$on('guiTabSelected', function(event, stateData) {
@@ -130,8 +122,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     explorationData.saveStateData($scope.stateId, {'content': $scope.content});
   };
 
-  $scope.editContent = function(index) {
-    activeInputData.name = 'content.' + index;
+  $scope.editContent = function() {
+    activeInputData.name = 'content';
   };
 
   $scope.getCustomizationModalInstance = function(widgetId, widgetParams) {
