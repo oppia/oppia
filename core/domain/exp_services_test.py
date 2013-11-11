@@ -38,7 +38,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
     def setUp(self):
-        """Loads the default widgets and creates dummy users."""
+        """Creates dummy users."""
         super(ExplorationServicesUnitTests, self).setUp()
 
         self.owner_id = 'owner@example.com'

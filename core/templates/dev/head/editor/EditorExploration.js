@@ -583,6 +583,31 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     });
   };
 
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: function($scope, $modalInstance) {
+        $scope.publish = function() {
+          $modalInstance.close();
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
+    });
+
+    modalInstance.result.then(function() {
+      $scope.makePublic();
+    }, function () {
+      console.log('Publish exploration modal dismissed.');
+    });
+  };
+
   $scope.showDeleteExplorationModal = function() {
     warningsData.clear();
 

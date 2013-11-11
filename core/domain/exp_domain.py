@@ -391,7 +391,7 @@ class Exploration(object):
 
     def is_deletable_by(self, user_id):
         """Whether the given user has rights to delete this exploration."""
-        return self.is_owned_by(user_id)
+        return False if self.is_public else self.is_owned_by(user_id)
 
     def add_editor(self, editor_id):
         """Adds a new editor. Does not commit changes."""

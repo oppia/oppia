@@ -181,7 +181,7 @@ class ExplorationHandler(base.BaseHandler):
         can_delete = (current_user_services.is_current_user_admin(self.request)
                       or exploration.is_deletable_by(self.user_id))
         if not can_delete:
-            raise Exception(
+            raise self.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
                 (self.user_id, exploration_id))
 

@@ -18,6 +18,37 @@
   </div>
 
   <div ng-controller="EditorExploration" ng-cloak>
+    <script type="text/ng-template" id="modals/publishExploration">
+      <div class="modal-header">
+        <h3>Publish Exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Congratulations, you are about to publish an exploration! This will
+          enable it to be played by anyone, and you will also be able to view
+          statistics on readers' attempts at the exploration. Thank you for
+          your contribution to the Oppia community, and for helping students
+          to learn!
+        </p>
+
+        <p>
+          Once you publish an exploration, you cannot unpublish it. Deletion
+          of a published exploration may only occur with the approval of the
+          site moderators.
+        </p>
+
+        <p>
+          Would you like to publish this exploration?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn" ng-click="publish()">Publish</button>
+        <button class="btn" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/deleteExploration">
       <div class="modal-header">
         <h3>Delete Exploration</h3>
@@ -59,7 +90,7 @@
 
           <span class="pull-right" style="margin: 10px 50px 0 0">
 
-            <button ng-hide="isPublic" type="button" ng-click="makePublic()">
+            <button ng-hide="isPublic" type="button" ng-click="showPublishExplorationModal()">
               Publish
             </button>
             <img class="oppia-help" src="/images/help.png" ng-hide="isPublic"
@@ -80,13 +111,15 @@
               <i class="icon-download-alt"></i>
             </a>
 
-            &nbsp;&nbsp;&nbsp;
+            <span ng-if="currentUserIsAdmin || !isPublic">
+              &nbsp;&nbsp;&nbsp;
 
-            <button type="button" class="btn btn-danger"
-                    ng-click="showDeleteExplorationModal()"
-                    title="Delete this exploration">
-              <i class="icon-trash" title="Delete Exploration"></i>
-            </button>
+              <button type="button" class="btn btn-danger"
+                      ng-click="showDeleteExplorationModal()"
+                      title="Delete this exploration">
+                <i class="icon-trash" title="Delete Exploration"></i>
+              </button>
+            </span>
           </span>
 
           <h3>

@@ -80,3 +80,77 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # TODO(sll): Add more checks here.
 
         self.logout()
+
+
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
+class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        """Creates dummy users."""
+        super(ExplorationDeletionRightsTest, self).setUp()
+        self.owner_id = 'owner@example.com'
+        self.editor_id = 'editor@example.com'
+        self.viewer_id = 'viewer@example.com'
+        self.admin_id = 'admin@example.com'
+
+    def test_deletion_rights_for_unpublished_exploration(self):
+        """Test rights management for deletion of unpublished explorations."""
+        UNPUBLISHED_EXP_ID = 'unpublished_eid'
+        exp_services.create_new(
+            self.owner_id, 'A title', 'A category', UNPUBLISHED_EXP_ID)
+
+        exploration = exp_services.get_exploration_by_id(UNPUBLISHED_EXP_ID)
+        exploration.editor_ids.append(self.editor_id)
+        exp_services.save_exploration(self.owner_id, exploration)
+
+        self.login(self.editor_id, is_admin=False)
+        response = self.testapp.delete(
+            '/create/%s/data' % UNPUBLISHED_EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.viewer_id, is_admin=False)
+        response = self.testapp.delete(
+            '/create/%s/data' % UNPUBLISHED_EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.owner_id, is_admin=False)
+        response = self.testapp.delete('/create/%s/data' % UNPUBLISHED_EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_deletion_rights_for_published_exploration(self):
+        """Test rights management for deletion of published explorations."""
+        PUBLISHED_EXP_ID = 'published_eid'
+        exp_services.create_new(
+            self.owner_id, 'A title', 'A category', PUBLISHED_EXP_ID)
+
+        exploration = exp_services.get_exploration_by_id(PUBLISHED_EXP_ID)
+        exploration.editor_ids.append(self.editor_id)
+        exploration.is_public = True
+        exp_services.save_exploration(self.owner_id, exploration)
+
+        self.login(self.editor_id, is_admin=False)
+        response = self.testapp.delete(
+            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.viewer_id, is_admin=False)
+        response = self.testapp.delete(
+            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.owner_id, is_admin=False)
+        response = self.testapp.delete(
+            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.admin_id, is_admin=True)
+        response = self.testapp.delete('/create/%s/data' % PUBLISHED_EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
