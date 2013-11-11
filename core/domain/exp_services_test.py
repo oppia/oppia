@@ -26,7 +26,9 @@ from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import stats_services
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, exp_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration
+])
 import feconf
 import test_utils
 import utils
@@ -262,8 +264,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Check that no new exploration was created.
         self.assertEqual(exp_services.count_explorations(), 2)
 
-    def test_creation_and_deletion_and_retrieval_of_explorations(self):
-        """Test the create_new(), delete() and get() methods."""
+    def test_creation_and_retrieval_of_explorations(self):
+        """Test the create_new() and get() methods."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id('fake_eid')
 
@@ -278,9 +280,46 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
 
-        exp_services.delete_exploration(self.owner_id, 'A exploration_id')
+    def test_soft_deletion_of_explorations(self):
+        """Test that soft deletion of explorations works correctly."""
+        # TODO(sll): Add tests for deletion of states and version snapshots.
+
+        EXP_ID = 'eid'
+        exp_services.create_new(self.owner_id, 'A title', 'A category', EXP_ID)
+
+        exp_services.delete_exploration(self.owner_id, EXP_ID)
         with self.assertRaises(Exception):
-            exp_services.get_exploration_by_id('A exploration_id')
+            exp_services.get_exploration_by_id(EXP_ID)
+
+        # The deleted exploration does not show up in any queries.
+        self.assertEqual(exp_services.get_all_explorations(), [])
+
+        # But the models still exist in the backend.
+        self.assertIn(
+            EXP_ID,
+            [exp.id for exp in exp_models.ExplorationModel.get_all(
+                include_deleted_entities=True)]
+        )
+
+    def test_hard_deletion_of_explorations(self):
+        """Test that hard deletion of explorations works correctly."""
+        EXP_ID = 'eid'
+        exp_services.create_new(self.owner_id, 'A title', 'A category', EXP_ID)
+
+        exp_services.delete_exploration(
+            self.owner_id, EXP_ID, force_deletion=True)
+        with self.assertRaises(Exception):
+            exp_services.get_exploration_by_id(EXP_ID)
+
+        # The deleted exploration does not show up in any queries.
+        self.assertEqual(exp_services.get_all_explorations(), [])
+
+        # The exploration model has been purged from the backend.
+        self.assertNotIn(
+            EXP_ID,
+            [exp.id for exp in exp_models.ExplorationModel.get_all(
+                include_deleted_entities=True)]
+        )
 
     def test_fork_exploration(self):
         """Test forking an exploration with assets."""

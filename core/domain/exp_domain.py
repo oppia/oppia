@@ -48,7 +48,6 @@ class Content(object):
         if content_type not in ['text']:
             raise ValueError('Invalid content type: %s' % content_type)
         self.type = content_type
-        # TODO(sll): Generalize this so the value can be a dict (for a widget).
         self.value = value
 
 

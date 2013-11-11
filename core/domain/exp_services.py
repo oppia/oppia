@@ -334,7 +334,8 @@ def save_exploration(committer_id, exploration):
             versionable_dict = export_to_versionable_dict(exploration)
 
         # Create a snapshot for the version history.
-        exploration_model.put(committer_id, properties_dict, versionable_dict)
+        exploration_model.put(
+            committer_id, properties_dict, snapshot=versionable_dict)
 
     transaction_services.run_in_transaction(
         _save_exploration_transaction, committer_id, exploration)
@@ -392,38 +393,70 @@ def create_new(
     return exploration_model.id
 
 
-def delete_state_model(exploration_id, state_id):
-    """Directly deletes a state model."""
+def delete_state_model(exploration_id, state_id, force_deletion=False):
+    """Marks a state model as deleted and removes it from memcache.
+
+    IMPORTANT: Callers of this function should ensure that committer_id has
+    permissions to delete this state, prior to calling this function.
+
+    If force_deletion is True the state is fully deleted and is unrecoverable.
+    Otherwise, the state is marked as deleted, but the corresponding model is
+    still retained in the datastore. This last option is the preferred one.
+    """
+    state_model = exp_models.StateModel.get(exploration_id, state_id)
+    if force_deletion:
+        state_model.delete()
+    else:
+        state_model.deleted = True
+        state_model.put()
+
     state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
     memcache_services.delete(state_memcache_key)
-    state_model = exp_models.StateModel.get(exploration_id, state_id)
-    state_model.delete()
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
-    """Deletes the exploration with the given exploration_id."""
-    exploration = get_exploration_by_id(exploration_id)
-    if not force_deletion and not exploration.is_deletable_by(committer_id):
-        raise Exception(
-            'User %s does not have permissions to delete exploration %s' %
-            (committer_id, exploration_id))
+    """Deletes the exploration with the given exploration_id.
 
+    IMPORTANT: Callers of this function should ensure that committer_id has
+    permissions to delete this exploration, prior to calling this function.
+
+    If force_deletion is True the exploration and its history are fully deleted
+    and are unrecoverable. Otherwise, the exploration and all its history are
+    marked as deleted, but the corresponding models are still retained in the
+    datastore. This last option is the preferred one.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+
+    # This must come after the exploration is retrieved. Otherwise the memcache
+    # key will be reinstated.
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
 
     for state_id in exploration.state_ids:
-        delete_state_model(exploration_id, state_id)
+        delete_state_model(
+            exploration_id, state_id, force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_model.delete()
+    if force_deletion:
+        exploration_model.delete()
+    else:
+        exploration_model.put(committer_id, {'deleted': True})
 
     for snapshot in exp_models.ExplorationSnapshotModel.get_all():
         if snapshot.exploration_id == exploration_id:
-            snapshot.delete()
+            if force_deletion:
+                snapshot.delete()
+            else:
+                snapshot.deleted = True
+                snapshot.put()
 
     for snapshot in exp_models.ExplorationSnapshotContentModel.get_all():
         if snapshot.exploration_id == exploration_id:
-            snapshot.delete()
+            if force_deletion:
+                snapshot.delete()
+            else:
+                snapshot.deleted = True
+                snapshot.put()
 
 
 # Operations involving exploration parameters.
@@ -912,7 +945,8 @@ def delete_demo(exploration_id):
         logging.info('Exploration with id %s was not deleted, because it '
                      'does not exist.' % exploration_id)
     else:
-        delete_exploration(ADMIN_COMMITTER_ID, exploration_id)
+        delete_exploration(
+            ADMIN_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
 def load_demos():

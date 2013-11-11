@@ -177,9 +177,15 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-        exp_services.delete_exploration(
-            self.user_id, exploration_id,
-            force_deletion=current_user_services.is_current_user_admin(self.request))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        can_delete = (current_user_services.is_current_user_admin(self.request)
+                      or exploration.is_deletable_by(self.user_id))
+        if not can_delete:
+            raise Exception(
+                'User %s does not have permissions to delete exploration %s' %
+                (self.user_id, exploration_id))
+
+        exp_services.delete_exploration(self.user_id, exploration_id)
 
 
 class StateHandler(base.BaseHandler):

@@ -20,8 +20,8 @@ import webtest
 from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
-(file_models, user_models) = models.Registry.import_models([
-    models.NAMES.file, models.NAMES.user
+(exp_models, file_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.file, models.NAMES.user
 ])
 import feconf
 
@@ -57,7 +57,7 @@ class TestBase(unittest.TestCase):
         explorations = exp_services.get_all_explorations()
         for exploration in explorations:
             exp_services.delete_exploration(
-                None, exploration.id, force_deletion=True)
+                'admin', exploration.id, force_deletion=True)
 
     def _delete_all_files(self):
         for file_data in file_models.FileDataModel.get_all():

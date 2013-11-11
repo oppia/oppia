@@ -72,7 +72,7 @@ class BaseModel(ndb.Model):
         if entity and entity.deleted:
             entity = None
 
-        if strict and not entity:
+        if strict and entity is None:
             raise cls.EntityNotFoundError(
                 'Entity for class %s with id %s not found' %
                 (cls.__name__, entity_id))
@@ -85,9 +85,16 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).key.delete()
 
     @classmethod
-    def get_all(cls):
-        """Returns a filterable iterable of all entities of this class."""
-        return cls.query()
+    def get_all(cls, include_deleted_entities=False):
+        """Returns a filterable iterable of all entities of this class.
+
+        If include_deleted_entities is True then entities that have been marked
+        deleted are returned as well.
+        """
+        query = cls.query()
+        if include_deleted_entities != True:
+            query = query.filter(cls.deleted == False)
+        return query
 
     @classmethod
     def get_new_id(cls, entity_name):

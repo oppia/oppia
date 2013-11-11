@@ -135,7 +135,8 @@ class ExplorationModel(base_models.BaseModel):
         """Deletes the exploration."""
         super(ExplorationModel, self).delete()
 
-    def put(self, committer_id, properties, snapshot=None, commit_message=''):
+    def put(self, committer_id, properties_dict, snapshot=None,
+            commit_message=''):
         """Updates the exploration using the properties dict, then saves it.
 
         If snapshot is not null, increments the exploration version and saves
@@ -144,12 +145,15 @@ class ExplorationModel(base_models.BaseModel):
         if not isinstance(committer_id, basestring):
             raise Exception('Invalid committer id: %s' % committer_id)
 
-        if properties is None:
-            properties = {}
+        if properties_dict is None:
+            properties_dict = {}
 
-        for key in self.attr_list():
-            if key in properties:
-                setattr(self, key, properties[key])
+        for key in properties_dict:
+            if key in self.attr_list():
+                setattr(self, key, properties_dict[key])
+            else:
+                raise Exception(
+                    'Invalid key for exploration properties dict: %s' % key)
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1

@@ -88,9 +88,12 @@ class BaseModel(models.Model):
         return obj_dict
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls, include_deleted_entities=False):
         """Returns a filterable iterable of all entities of this class."""
-        return cls.objects.all()
+        query = cls.objects.all()
+        if include_deleted_entities != True:
+            query = query.filter(deleted=False)
+        return query
 
     @classmethod
     def get_new_id(cls, entity_name):

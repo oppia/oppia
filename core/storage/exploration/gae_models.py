@@ -113,23 +113,27 @@ class ExplorationModel(base_models.BaseModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def put(self, committer_id, properties, snapshot=None, commit_message=''):
+    def put(self, committer_id, properties_dict, snapshot=None,
+            commit_message=''):
         """Updates the exploration using the properties dict, then saves it.
 
-        If snapshot is not null, increments the exploration version and saves
+        If snapshot is not None, increments the exploration version and saves
         a serialized copy or a diff in the history log.
         """
         if not isinstance(committer_id, basestring):
             raise Exception('Invalid committer id: %s' % committer_id)
 
-        if properties is None:
-            properties = {}
+        if properties_dict is None:
+            properties_dict = {}
 
         # In NDB, self._properties returns the list of ndb properties of a
         # model.
-        for key in self._properties:
-            if key in properties:
-                setattr(self, key, properties[key])
+        for key in properties_dict:
+            if key in self._properties:
+                setattr(self, key, properties_dict[key])
+            else:
+                raise Exception(
+                    'Invalid key for exploration properties dict: %s' % key)
 
         # Do validation.
         try:
