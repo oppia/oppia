@@ -39,6 +39,72 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     return Boolean($scope.stateId);
   };
 
+  /**************************************************
+  * Methods affecting the saving of state content.
+  **************************************************/
+  $scope.stateLockedForEditing = false;
+
+  // Temporary buffer for changes made to the state.
+  $scope.stateChangeList = [];
+  // Stack for storing undone changes. The last element is the most recently
+  // undone change.
+  $scope.undoneChangeStack = [];
+
+  // TODO(sll): Implement undo, redo functionality. Show a message on each step
+  // saying what the step is doing.
+  // TODO(sll): Allow the user to view the list of changes made so far, as well
+  // as the list of changes in the undo stack.
+
+  $scope.addStateChange = function(backendName, frontendNames, newValue, oldValue) {
+    $scope.stateChangeList.push({
+      backendName: backendName,
+      frontendNames: frontendNames,
+      newValue: newValue,
+      oldValue: oldValue
+    });
+    $scope.undoneChangeStack = [];
+
+    console.log($scope.stateChangeList);
+  };
+
+  $scope.saveStateChanges = function() {
+    var finalChangeList = {};
+    for (var i = 0; i < $scope.stateChangeList.length; i++) {
+      finalChangeList[$scope.stateChangeList[i].backendName] = (
+          $scope.stateChangeList[i].newValue);
+    }
+    // Reload the exploration page, including drawing the graph.
+    // TODO(sll): This takes a long time. Can we shorten it?
+    explorationData.saveStateData($scope.stateId, finalChangeList, function() {
+      $scope.stateChangeList = [];
+      $scope.initExplorationPage();
+    });
+  };
+
+  $scope.cancelStateChanges = function() {
+    // TODO(sll): Replace this with a modal dialog that does not have the word
+    // 'Cancel' as one of the options.
+    var confirmCancel = confirm('Do you want to discard your changes?');
+    if (confirmCancel) {
+      // Clear both change lists.
+      $scope.stateChangeList = [];
+      $scope.undoneChangeStack = [];
+
+      // Reload the local state data variables.
+      $scope.initStateData();
+    }
+  };
+
+  $scope.isStateLockedForEditing = function() {
+    return $scope.stateChangeList.length > 0;
+  };
+
+  $scope.displaySaveReminderWarning = function() {
+    warningsData.addWarning(
+        'You need to save your changes before continuing.');
+  };
+
+
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
@@ -71,9 +137,27 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     $location.path('/gui/' + $scope.stateId);
   };
 
+  $scope.forceNextLocationChange = false;
+
   $scope.$watch(function() {
     return $location.path();
-  }, function(path) {
+  }, function(newPath, oldPath) {
+    if ($scope.isStateLockedForEditing()) {
+      // If a location change is made while a state is being edited, revert to
+      // the old path.
+      if (!$scope.forceNextLocationChange) {
+        // This ensures that we don't get into an infinite loop with the
+        // location path changes.
+        $scope.forceNextLocationChange = true;
+        $scope.displaySaveReminderWarning();
+        $location.path(oldPath);
+      } else {
+        $scope.forceNextLocationChange = false;
+      }
+      return;
+    }
+
+    var path = newPath;
     console.log('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
@@ -82,33 +166,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
         $location.path('/');
         return;
       }
-      var promise = explorationData.getStateData($scope.stateId);
-      if (!promise) {
-        return;
-      }
-      promise.then(function(stateData) {
-        if (!stateData) {
-          // This state does not exist. Redirect to the exploration page.
-          $location.path('/');
-          return;
-        } else {
-          $scope.guiTabActive = true;
-          $scope.statsTabActive = false;
-          $scope.mainTabActive = false;
-          $scope.$broadcast('guiTabSelected', stateData);
-          // Scroll to the relevant element (if applicable).
-          // TODO(sfederwisch): Change the trigger so that there is exactly one
-          // scroll action that occurs when the page finishes loading.
-          setTimeout(function () {
-            if ($location.hash()) {
-              $anchorScroll();
-            }
-            if (firstLoad) {
-              firstLoad = false;
-            }
-          }, 1000);
-        }
-      });
+      $scope.initStateData();
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
       explorationData.stateId = '';
@@ -126,6 +184,36 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
       $scope.statsTabActive = false;
     }
   });
+
+  $scope.initStateData = function() {
+    var promise = explorationData.getStateData($scope.stateId);
+    if (!promise) {
+      return;
+    }
+    promise.then(function(stateData) {
+      if (!stateData) {
+        // This state does not exist. Redirect to the exploration page.
+        $location.path('/');
+        return;
+      } else {
+        $scope.guiTabActive = true;
+        $scope.statsTabActive = false;
+        $scope.mainTabActive = false;
+        $scope.$broadcast('guiTabSelected', stateData);
+        // Scroll to the relevant element (if applicable).
+        // TODO(sfederwisch): Change the trigger so that there is exactly one
+        // scroll action that occurs when the page finishes loading.
+        setTimeout(function () {
+          if ($location.hash()) {
+            $anchorScroll();
+          }
+          if (firstLoad) {
+            firstLoad = false;
+          }
+        }, 1000);
+      }
+    });
+  };
 
   /********************************************
   * Methods affecting the graph visualization.
@@ -162,69 +250,74 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
 
-  // Initializes the exploration page using data from the backend.
-  explorationData.getData().then(function(data) {
-    $scope.currentUserIsAdmin = data.is_admin;
-    $scope.stateId = explorationData.stateId;
-    $scope.states = data.states;
-    $scope.explorationTitle = data.title;
-    $scope.explorationCategory = data.category;
-    $scope.explorationEditors = data.editors;
-    $scope.initStateId = data.init_state_id;
-    $scope.isPublic = data.is_public;
-    $scope.currentUser = data.user;
-    $scope.paramSpecs = data.param_specs || {};
-    $scope.explorationParamChanges = data.param_changes || [];
-
-    $scope.explorationSnapshots = [];
-    for (var i = 0; i < data.snapshots.length; i++) {
-      $scope.explorationSnapshots.push({
-        'committerId': data.snapshots[i].committer_id,
-        'createdOn': data.snapshots[i].created_on,
-        'commitMessage': data.snapshots[i].commit_message,
-        'versionNumber': data.snapshots[i].version_number
-      });
-    }
-
-    $scope.stats = {
-      'numVisits': data.num_visits,
-      'numCompletions': data.num_completions,
-      'stateStats': data.state_stats,
-      'imp': data.imp
-    };
-
-    $scope.chartData = [
-      ['', 'Completions', 'Non-completions'],
-      ['', data.num_completions, data.num_visits - data.num_completions]
-    ];
-    $scope.chartColors = ['green', 'firebrick'];
-    $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
-
-    $scope.statsGraphOpacities = {};
-    $scope.statsGraphOpacities['legend'] = 'Students entering state';
-    for (var stateId in $scope.states) {
-      var visits = $scope.stats.stateStats[stateId].firstEntryCount;
-      $scope.statsGraphOpacities[stateId] = Math.max(
-          visits / $scope.stats.numVisits, 0.05);
-    }
-    $scope.statsGraphOpacities[END_DEST] = Math.max(
-        $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
-
-    $scope.highlightStates = {};
-    $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
-    for (var j = 0; j < data.imp.length; j++) {
-      if (data.imp[j].type == 'default') {
-        $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
+  // Initializes the exploration page using data from the backend. Called on
+  // page load.
+  $scope.initExplorationPage = function() {
+    explorationData.getData().then(function(data) {
+      $scope.currentUserIsAdmin = data.is_admin;
+      $scope.stateId = explorationData.stateId;
+      $scope.states = data.states;
+      $scope.explorationTitle = data.title;
+      $scope.explorationCategory = data.category;
+      $scope.explorationEditors = data.editors;
+      $scope.initStateId = data.init_state_id;
+      $scope.isPublic = data.is_public;
+      $scope.currentUser = data.user;
+      $scope.paramSpecs = data.param_specs || {};
+      $scope.explorationParamChanges = data.param_changes || [];
+  
+      $scope.explorationSnapshots = [];
+      for (var i = 0; i < data.snapshots.length; i++) {
+        $scope.explorationSnapshots.push({
+          'committerId': data.snapshots[i].committer_id,
+          'createdOn': data.snapshots[i].created_on,
+          'commitMessage': data.snapshots[i].commit_message,
+          'versionNumber': data.snapshots[i].version_number
+        });
       }
-      if (data.imp[j].type == 'incomplete') {
-        $scope.highlightStates[data.imp[j].state_id] = 'brown';
+  
+      $scope.stats = {
+        'numVisits': data.num_visits,
+        'numCompletions': data.num_completions,
+        'stateStats': data.state_stats,
+        'imp': data.imp
+      };
+  
+      $scope.chartData = [
+        ['', 'Completions', 'Non-completions'],
+        ['', data.num_completions, data.num_visits - data.num_completions]
+      ];
+      $scope.chartColors = ['green', 'firebrick'];
+      $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
+  
+      $scope.statsGraphOpacities = {};
+      $scope.statsGraphOpacities['legend'] = 'Students entering state';
+      for (var stateId in $scope.states) {
+        var visits = $scope.stats.stateStats[stateId].firstEntryCount;
+        $scope.statsGraphOpacities[stateId] = Math.max(
+            visits / $scope.stats.numVisits, 0.05);
       }
-    }
+      $scope.statsGraphOpacities[END_DEST] = Math.max(
+          $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
+  
+      $scope.highlightStates = {};
+      $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
+      for (var j = 0; j < data.imp.length; j++) {
+        if (data.imp[j].type == 'default') {
+          $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
+        }
+        if (data.imp[j].type == 'incomplete') {
+          $scope.highlightStates[data.imp[j].state_id] = 'brown';
+        }
+      }
+  
+      $scope.drawGraph();
+  
+      explorationFullyLoaded = true;
+    });
+  };
 
-    $scope.drawGraph();
-
-    explorationFullyLoaded = true;
-  });
+  $scope.initExplorationPage();
 
   $scope.canEditEditorList = function() {
     return (
@@ -499,9 +592,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     // the effects of the old change. But, for now, each case is handled
     // specially.
     console.log('Current Active Input: ' + activeInputData.name);
-    if (activeInputData.name == 'stateName') {
-      $scope.saveStateName();
-    }
 
     var inputArray = newActiveInput.split('.');
 

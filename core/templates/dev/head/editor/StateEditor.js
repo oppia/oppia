@@ -82,23 +82,32 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     return incomingStates;
   };
 
-  $scope.saveStateName = function() {
-    $scope.stateName = $scope.normalizeWhitespace($scope.stateName);
-    if (!$scope.isValidEntityName($scope.stateName, true))
+  // This should only be non-empty when the state name editor is open.
+  $scope.stateNameMemento = '';
+
+  $scope.openStateNameEditor = function() {
+    $scope.stateNameMemento = $scope.stateName;
+  };
+
+  $scope.saveStateName = function(stateName) {
+    stateName = $scope.normalizeWhitespace(stateName);
+    if (!$scope.isValidEntityName(stateName, true))
       return;
     if ($scope.isDuplicateInput(
-            $scope.states, 'name', $scope.stateId, $scope.stateName)) {
+            $scope.states, 'name', $scope.stateId, stateName)) {
       warningsData.addWarning(
-          'The name \'' + $scope.stateName + '\' is already in use.');
+          'The name \'' + stateName + '\' is already in use.');
       return;
     }
 
-    $scope.states[$scope.stateId].name = $scope.stateName;
-    $scope.drawGraph();
-
-    explorationData.saveStateData(
-        $scope.stateId, {'state_name': $scope.stateName});
-    activeInputData.clear();
+    $scope.addStateChange(
+        'state_name',
+        ['stateName', 'states.' + $scope.stateId + '.name'],
+        stateName,
+        $scope.stateNameMemento
+    );
+    $scope.stateName = stateName;
+    $scope.stateNameMemento = '';
   };
 
   // TODO(sll): Replace this with a link to code.google.com documentation.
@@ -109,21 +118,25 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       'information about LaTeX, see ' +
       'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
 
-  $scope.saveTextContent = function() {
-    // This seems to be needed in order to ensure that the latest values from
-    // the RTE are captured.
-    // TODO(sll): Do we need to update math?
-    $scope.$apply();
-    $scope.saveStateContent();
-    activeInputData.name = '';
-  };
-
-  $scope.saveStateContent = function() {
-    explorationData.saveStateData($scope.stateId, {'content': $scope.content});
-  };
+  // This should only be non-empty when the content editor is open.
+  $scope.contentMemento = '';
 
   $scope.editContent = function() {
-    activeInputData.name = 'content';
+    $scope.contentMemento = angular.copy($scope.content);
+  };
+
+  $scope.saveTextContent = function() {
+    // The $apply() call seems to be needed in order to ensure that the latest
+    // values from the RTE are captured.
+    // TODO(sll): Do we need to update math?
+    $scope.$apply();
+    $scope.addStateChange(
+        'content',
+        ['content'],
+        angular.copy($scope.content),
+        angular.copy($scope.contentMemento)
+    );
+    $scope.contentMemento = '';
   };
 
   $scope.getCustomizationModalInstance = function(widgetId, widgetParams) {

@@ -93,6 +93,10 @@ textarea {
   display: none;
 }
 
+.oppia-save-state-button {
+  font-weight: bold;
+}
+
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }

@@ -74,11 +74,11 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     if (explorationData.data && 'states' in explorationData.data &&
         stateId in explorationData.data.states) {
       var deferred = $q.defer();
-      deferred.resolve(explorationData.data.states[stateId]);
+      deferred.resolve(angular.copy(explorationData.data.states[stateId]));
       return deferred.promise;
     } else {
       return explorationData.getData().then(function(response) {
-        return explorationData.data.states[stateId];
+        return angular.copy(explorationData.data.states[stateId]);
       });
     }
   };
@@ -100,7 +100,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
   // Saves data for a given state to the backend, and, on a success callback,
   // updates the data for that state in the frontend.
-  explorationData.saveStateData = function(stateId, propertyValueMap) {
+  explorationData.saveStateData = function(stateId, propertyValueMap, successCallback) {
     for (var property in propertyValueMap) {
       if (validStateProperties.indexOf(property) < 0) {
         warningsData.addWarning('Invalid property name: ' + property);
@@ -124,6 +124,9 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       console.log('Changes to this state were saved successfully.');
       explorationData.data.version = data.version;
       explorationData.data['states'][stateId] = data.stateData;
+      if (successCallback) {
+        successCallback();
+      }
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });

@@ -139,13 +139,13 @@
           <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
           <div ng-show="!!explorationTitle">
             <tabset>
-              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
+              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()" disabled="isStateLockedForEditing()">
                 {% include 'editor/editor_metadata.html' %}
                 <hr>
                 {% include 'editor/editor_viz.html' %}
               </tab>
 
-              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
+              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()" disabled="isStateLockedForEditing()">
                 {% include 'editor/stats_viewer.html' %}
               </tab>
 
