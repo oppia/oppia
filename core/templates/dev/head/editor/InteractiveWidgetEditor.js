@@ -67,7 +67,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       $scope.widgetHandlers[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
-    $scope.stickyInteractiveWidget = data.widget.sticky;
+    $scope.widgetSticky = data.widget.sticky;
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
 
     $scope.unresolvedAnswers = data.unresolved_answers;
@@ -508,9 +508,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.saveStickyInteractiveWidget = function() {
+  $scope.saveWidgetSticky = function() {
     explorationData.saveStateData($scope.stateId, {
-      'widget_sticky': $scope.stickyInteractiveWidget
+      'widget_sticky': $scope.widgetSticky
     });
   };
 
@@ -564,13 +564,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     modalInstance.result.then(function(arg) {
       if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
         $scope.interactiveWidget = arg.data.widget;
-        $scope.widgetHandlers = {'submit': [{
-          'description': 'Default',
-          'definition': {'rule_type': 'default'},
-          'dest': $scope.stateId,
-          'feedback': [],
-          'paramChanges': []
-        }]};
+        // Preserve the old default rule.
+        $scope.widgetHandlers['submit'] = [
+            $scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]
+        ];
       }
       $scope.saveInteractiveWidget();
     }, function () {
