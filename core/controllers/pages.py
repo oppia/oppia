@@ -36,7 +36,7 @@ class MainPage(base.BaseHandler):
         self.values.update({
             'gallery_login_url': current_user_services.create_login_url('/gallery'),
         })
-        self.render_template('pages/index.html')
+        self.render_template('pages/splash.html')
 
 
 class AboutPage(base.BaseHandler):
