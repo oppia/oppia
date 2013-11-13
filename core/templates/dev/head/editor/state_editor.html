@@ -21,7 +21,7 @@
         </span>
         <span ng-if="!!stateNameMemento">
           <input type="text" ng-model="stateName">
-          <button ng-click="saveStateName(stateName)">Save</button>
+          <button ng-click="saveStateName(stateName)">Close</button>
         </span>
       </h3>
     </div>
@@ -90,7 +90,7 @@
   
             <div ng-if="!!contentMemento">
               <rich-text-editor html-content="content[0].value"></rich-text-editor>
-              <button ng-click="saveTextContent()">Save and close</button>
+              <button ng-click="saveTextContent()">Close</button>
             </div>
           </div>
         </div>

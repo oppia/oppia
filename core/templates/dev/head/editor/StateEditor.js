@@ -91,8 +91,9 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.saveStateName = function(stateName) {
     stateName = $scope.normalizeWhitespace(stateName);
-    if (!$scope.isValidEntityName(stateName, true))
+    if (!$scope.isValidEntityName(stateName, true)) {
       return;
+    }
     if ($scope.isDuplicateInput(
             $scope.states, 'name', $scope.stateId, stateName)) {
       warningsData.addWarning(
@@ -100,13 +101,16 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       return;
     }
 
-    $scope.addStateChange(
-        'state_name',
-        ['stateName', 'states.' + $scope.stateId + '.name'],
-        stateName,
-        $scope.stateNameMemento
-    );
-    $scope.stateName = stateName;
+    if ($scope.stateNameMemento !== stateName) {
+      $scope.addStateChange(
+          'state_name',
+          ['stateName', 'states.' + $scope.stateId + '.name'],
+          stateName,
+          $scope.stateNameMemento
+      );
+      $scope.stateName = stateName;
+    }
+
     $scope.stateNameMemento = '';
   };
 
@@ -126,16 +130,18 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope.saveTextContent = function() {
-    // The $apply() call seems to be needed in order to ensure that the latest
-    // values from the RTE are captured.
-    // TODO(sll): Do we need to update math?
     $scope.$apply();
-    $scope.addStateChange(
-        'content',
-        ['content'],
-        angular.copy($scope.content),
-        angular.copy($scope.contentMemento)
-    );
+    if ($scope.contentMemento !== $scope.content) {
+      // The $apply() call seems to be needed in order to ensure that the latest
+      // values from the RTE are captured.
+      // TODO(sll): Do we need to update math?
+      $scope.addStateChange(
+          'content',
+          ['content'],
+          angular.copy($scope.content),
+          angular.copy($scope.contentMemento)
+      );
+    }
     $scope.contentMemento = '';
   };
 

@@ -285,6 +285,10 @@ textarea {
   width: 100%;
 }
 
+.oppia-lightly-grayed {
+  color: #888;
+}
+
 .oppia-grayed {
   color: gray;
   opacity: 0.5;

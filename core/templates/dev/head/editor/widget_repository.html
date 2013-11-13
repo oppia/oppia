@@ -27,8 +27,8 @@
             <div class="accordion-group" ng-repeat="widget in widgetList">
               <div style="margin: 10px">
                 <span class="pull-right">
-                  <a ng-click="previewWidget(category, $index)">Preview</a> |
-                  <a ng-click="selectWidget(category, $index)">Use</a>
+                  <a href="#" onclick="return false;" ng-click="previewWidget(category, $index)">Preview</a> |
+                  <a href="#" onclick="return false;" ng-click="selectWidget(category, $index)">Use</a>
                 </span>
                 <h5><[widget.name]></h5>
                 <i><[widget.description]></i>

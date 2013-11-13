@@ -2,11 +2,11 @@
   <span ng-if="!active">
     <span ng-if="!largeInput">
       <[localItem.label]>
-      (<a ng-click="openItemEditor()">Edit</a>)
+      (<a href="#" onclick="return false;" ng-click="openItemEditor()">Edit</a>)
     </span>
     <div ng-if="largeInput">
       <span class="oppia-rte-inactive" ng-bind-html="localItem.label"></span>
-      (<a ng-click="openItemEditor()">Edit</a>)
+      (<a href="#" onclick="return false;" ng-click="openItemEditor()">Edit</a>)
     </div>
   </span>
   <span ng-if="active">
