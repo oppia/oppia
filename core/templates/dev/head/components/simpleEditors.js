@@ -202,36 +202,25 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               widgetDefinition: function() {
                 return widgetDefinition;
               },
-              widgetParams: function() {
+              widgetParamSpecs: function() {
                 return response.data.widget.params;
+              },
+              widgetCustomizationArgs: function() {
+                return response.data.widget.customization_args;
               }
             },
-            controller: function($scope, $modalInstance, widgetDefinition, widgetParams) {
-              $scope.widgetParams = widgetParams || {};
+            controller: function($scope, $modalInstance, widgetDefinition, widgetParamSpecs, widgetCustomizationArgs) {
+              $scope.widgetParamSpecs = widgetParamSpecs || {};
+              $scope.widgetCustomizationArgs = widgetCustomizationArgs;
               $scope.widgetDefinition = widgetDefinition;
 
-              $http.post(
-                  '/widgets/noninteractive/' + $scope.widgetDefinition.backendName,
-                  requestCreator.createRequest({
-                    'customization_args': {}
-                  }),
-                  {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-                      success(function(data) {
-                        $scope.paramDescriptions = {};
-                        for (var paramName in data.widget.params) {
-                          $scope.paramDescriptions[paramName] = (
-                              data.widget.params[paramName].description);
-                        }
-                      }).error(function(data) {
-                        warningsData.addWarning(
-                            'Error: Failed to obtain widget parameter descriptions.');
-                      });
-      
-              $scope.save = function(widgetParams) {
-                var customizationArgs = {};
-                for (var paramName in widgetParams) {
-                  customizationArgs[paramName] = widgetParams[paramName].customization_args;
-                }
+              $scope.paramDescriptions = {};
+              for (var paramName in $scope.widgetParamSpecs) {
+                $scope.paramDescriptions[paramName] = (
+                    $scope.widgetParamSpecs[paramName].description);
+              }
+
+              $scope.save = function(customizationArgs) {
                 $modalInstance.close({
                   customizationArgs: customizationArgs,
                   widgetDefinition: $scope.widgetDefinition

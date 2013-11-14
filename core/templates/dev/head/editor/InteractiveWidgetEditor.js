@@ -19,22 +19,27 @@
  */
 
 function InteractiveWidgetEditor($scope, $http, $modal, warningsData, explorationData, requestCreator) {
-  // Tests whether an object is a JavaScript array.
-  $scope.isArray = function(obj) {
-    return toString.call(obj) === '[object Array]';
-  };
+  // The id of the widget preview iframe.
+  $scope.previewIframeId = 'interactiveWidgetPreview';
+
+  // Variables storing specifications for the widget parameters and possible
+  // rules.
+  $scope.widgetParamSpecs = {};
+  $scope.widgetHandlerSpecs = [];
 
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
         '/widgets/interactive/' + widgetId,
-        requestCreator.createRequest({
-          customization_args: customizationArgs
-        }),
+        requestCreator.createRequest({customization_args: customizationArgs}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(widgetData) {
-      $scope.interactiveWidget = widgetData.widget;
-      $scope.addContentToIframeWithId(
-          'interactiveWidgetPreview', $scope.interactiveWidget.raw);
+    ).success(function(data) {
+      $scope.widgetHandlerSpecs = data.widget.handlers;
+      $scope.widgetParamSpecs = data.widget.params;
+
+      $scope.widgetId = data.widget.id;
+      $scope.widgetCustomizationArgs = data.widget.customization_args;
+
+      $scope.addContentToIframeWithId($scope.previewIframeId, data.widget.raw);
       if (successCallback) {
         successCallback();
       }
@@ -60,7 +65,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     // - 'inputs' (a list of parameters)
     // - 'name' (stuff needed to build the Python classifier code)
     // - 'dest' (the destination for this rule)
-    // - 'feedback' (any feedback given for this rule)
+    // - 'feedback' (list of feedback given for this rule)
     // - 'paramChanges' (parameter changes associated with this rule)
     $scope.widgetHandlers = {};
     for (var i = 0; i < data.widget.handlers.length; i++) {
@@ -68,17 +73,16 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           data.widget.handlers[i].rule_specs);
     }
     $scope.widgetSticky = data.widget.sticky;
-    $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
-
     $scope.unresolvedAnswers = data.unresolved_answers;
+
+    $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.$on('stateEditorInitialized', function(event, stateId) {
+  $scope.$on('stateEditorInitialized', function(evt, stateId) {
     $scope.stateId = stateId;
     if ($scope.stateId) {
       var dataOrPromise = explorationData.getStateData($scope.stateId);
-      console.log(dataOrPromise);
       if (dataOrPromise) {
         if ('then' in dataOrPromise) {
           dataOrPromise.then($scope.initInteractiveWidget);
@@ -91,55 +95,39 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     }
   });
 
-  $scope.getCustomizationArgs = function() {
-    // Returns a dict mapping param names to customization args.
-    var customizationArgs = {};
-    for (var param in $scope.interactiveWidget.params) {
-      customizationArgs[param] = $scope.interactiveWidget.params[param].customization_args;
-    }
-    return customizationArgs;
-  };
-
   $scope.getStateNameForRule = function(stateId) {
-    if (stateId === $scope.stateId) {
-      return '⟳';
-    } else if (stateId === END_DEST) {
-      return END_DEST;
-    } else {
-      return $scope.states[stateId].name;
-    }
+    return (
+        stateId === $scope.stateId  ? '⟳' :
+        stateId === END_DEST        ? END_DEST :
+        $scope.states[stateId].name
+    );
   };
 
-  $scope.isCurrentStateId = function(stateId) {
+  $scope.matchesCurrentStateId = function(stateId) {
     return stateId === $scope.stateId;
   };
 
-  $scope.getAllStates = function() {
+  // Returns a list of all states, as well as 'END' and 'Add New State' options.
+  $scope.getAllDests = function() {
     var allStates = [];
     for (var state in $scope.states) {
       allStates.push(state);
     }
+
     allStates.push(END_DEST);
+    allStates.push('?');
     return allStates;
   };
 
-  // Returns a list of all states, as well as an 'Add New State' option.
-  $scope.getAllDests = function() {
-    var result = $scope.getAllStates();
-    result.push('?');
-    return result;
-  };
-
   $scope.getRules = function(handlerName) {
-    if (!handlerName || !$scope.interactiveWidget) {
+    if (!handlerName || !$scope.widgetId) {
       return;
     }
-    var wHandlers = $scope.interactiveWidget.handlers;
-    for (var i = 0; i < wHandlers.length; i++) {
-      if (wHandlers[i].name == handlerName) {
+    for (var i = 0; i < $scope.widgetHandlerSpecs.length; i++) {
+      if ($scope.widgetHandlerSpecs[i].name == handlerName) {
         ruleDict = {};
-        for (var description in wHandlers[i].rules) {
-          ruleDict[description] = wHandlers[i].rules[description].classifier;
+        for (var description in $scope.widgetHandlerSpecs[i].rules) {
+          ruleDict[description] = $scope.widgetHandlerSpecs[i].rules[description].classifier;
         }
         return ruleDict;
       }
@@ -172,7 +160,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.tmpRule = {
       index: index,
       description: rule.description,
-      // TODO(sll): Generalize these to Boolean combinations of rules.
+      // TODO(sll): Generalize the rule definition to allow Boolean combinations
+      // of rules.
       name: rule.definition.name,
       inputs: rule.definition.inputs,
       dest: rule.dest,
@@ -202,8 +191,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         existingRules: function() {
           return $scope.getRules($scope.ruleModalHandlerName);
         },
-        choices: function() {
-          return $scope.interactiveWidget.params.choices;
+        widgetCustomizationArgs: function() {
+          return $scope.widgetCustomizationArgs;
         },
         allDests: function() {
           return $scope.getAllDests();
@@ -216,13 +205,12 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         }
       },
       controller: function($scope, $modalInstance, modalTitle, tmpRule,
-            handlerName, existingRules, choices, allDests, states, stateId) {
+            handlerName, existingRules, widgetCustomizationArgs, allDests, states, stateId) {
         $scope.modalTitle = modalTitle;
         $scope.tmpRule = tmpRule;
         $scope.handlerName = handlerName;
         $scope.existingRules = existingRules;
-        // TODO(sll): Remove this special-casing.
-        $scope.choices = choices;
+        $scope.widgetCustomizationArgs = widgetCustomizationArgs;
         $scope.allDests = allDests;
         $scope.states = states;
         $scope.stateId = stateId;
@@ -240,14 +228,13 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           };
         };
 
-        $scope.getRuleDescriptionFragments = function(input, choices) {
+        $scope.getRuleDescriptionFragments = function(input, isMultipleChoice) {
           if (!input) {
             return '';
           }
           var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
           var index = 0;
 
-          var isMultipleChoice = (choices ? true : false);
           var finalInput = input;
           var iter = 0;
           while (true) {
@@ -304,20 +291,19 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
         $scope.tmpRuleDescriptionFragments = [];
         $scope.$watch('tmpRule.description', function(newValue) {
+          // TODO(sll): Remove this special-casing.
+          var isMultipleChoice = Boolean($scope.widgetCustomizationArgs.choices);
           $scope.tmpRuleDescriptionFragments = $scope.getRuleDescriptionFragments(
-            newValue, choices);
+              newValue, isMultipleChoice);
         });
 
         $scope.getDestName = function(stateId) {
-          if (stateId === '?') {
-            return 'Add New State...';
-          } else if (stateId === END_DEST) {
-            return END_DEST;
-          } else if (stateId === $scope.stateId) {
-            return $scope.states[stateId].name + ' ⟳';
-          } else {
-            return $scope.states[stateId].name;
-          }
+          return (
+              stateId === '?'            ? 'Add New State...' :
+              stateId === END_DEST       ? END_DEST :
+              stateId === $scope.stateId ? $scope.states[stateId].name + ' ⟳' :
+              $scope.states[stateId].name
+          );
         };
 
         $scope.getExtendedChoiceArray = function(choices) {
@@ -467,7 +453,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       found = true;
       destId = END_DEST;
     } else {
-      // Find the id in states.
+      // Look for the id in states.
       for (var id in $scope.states) {
         if ($scope.states[id].name == destName) {
           found = true;
@@ -495,7 +481,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       console.log(evt.data);
       // Change the height of the included iframe.
       var height = parseInt(event.data.widgetHeight, 10) + 2;
-      var iframe = document.getElementById('interactiveWidgetPreview');
+      var iframe = document.getElementById($scope.previewIframeId);
       iframe.height = height + 'px';
     }
   }, false);
@@ -508,22 +494,66 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.saveWidgetSticky = function() {
-    explorationData.saveStateData($scope.stateId, {
-      'widget_sticky': $scope.widgetSticky
+  $scope.$watch('widgetSticky', function(newValue, oldValue) {
+    if (newValue !== undefined) {
+      explorationData.saveStateData($scope.stateId, {
+        'widget_sticky': $scope.widgetSticky
+      });
+    }
+  });
+
+  $scope.getCustomizationModalInstance = function(widgetId, widgetCustomizationArgs) {
+    // NB: This method is used for interactive widgets.
+    return $modal.open({
+      templateUrl: 'modals/customizeWidget',
+      backdrop: 'static',
+      resolve: {
+        widgetId: function() {
+          return widgetId;
+        },
+        widgetParamSpecs: function() {
+          return $scope.widgetParamSpecs;
+        },
+        widgetCustomizationArgs: function() {
+          return widgetCustomizationArgs;
+        }
+      },
+      controller: function($scope, $http, $modalInstance, widgetId, widgetParamSpecs,
+          widgetCustomizationArgs, warningsData, requestCreator) {
+
+        $scope.widgetId = widgetId;
+        $scope.widgetParamSpecs = widgetParamSpecs;
+        $scope.widgetCustomizationArgs = widgetCustomizationArgs;
+
+        $scope.paramDescriptions = {};
+        for (var paramName in $scope.widgetParamSpecs) {
+          $scope.paramDescriptions[paramName] = $scope.widgetParamSpecs[paramName].description;
+        }
+
+        $scope.save = function(widgetCustomizationArgs) {
+          $scope.$broadcast('externalSave');
+          $modalInstance.close({
+            widgetCustomizationArgs: widgetCustomizationArgs
+          });
+        };
+
+        $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }
     });
   };
 
   $scope.showCustomizeInteractiveWidgetModal = function(index) {
     warningsData.clear();
-    var widgetParams = $scope.interactiveWidget.params;
-    var modalInstance = $scope.$parent.getCustomizationModalInstance(
-        $scope.interactiveWidget.id, widgetParams);
+    var modalInstance = $scope.getCustomizationModalInstance(
+        $scope.widgetId, $scope.widgetCustomizationArgs);
 
     modalInstance.result.then(function(result) {
-      $scope.interactiveWidget.params = result.widgetParams;
+      $scope.widgetCustomizationArgs = result.widgetCustomizationArgs;
       $scope.generateWidgetPreview(
-          $scope.interactiveWidget.id, $scope.getCustomizationArgs(),
+          $scope.widgetId, $scope.widgetCustomizationArgs,
           $scope.saveInteractiveWidget);
       console.log('Interactive customization modal saved.');
     }, function() {
@@ -562,12 +592,13 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     });
 
     modalInstance.result.then(function(arg) {
-      if (!$scope.interactiveWidget || $scope.interactiveWidget.id != arg.data.widget.id) {
-        $scope.interactiveWidget = arg.data.widget;
+      if (!$scope.widgetId || $scope.widgetId != arg.data.widget.id) {
+        $scope.widgetId = arg.data.widget.id;
+        $scope.widgetCustomizationArgs = arg.data.widget.customization_args;
         // Preserve the old default rule.
-        $scope.widgetHandlers['submit'] = [
-            $scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]
-        ];
+        $scope.widgetHandlers = {
+          'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
+        };
       }
       $scope.saveInteractiveWidget();
     }, function () {
@@ -576,12 +607,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.saveInteractiveWidget = function() {
-    var customizationArgs = $scope.getCustomizationArgs();
     $scope.generateWidgetPreview(
-        $scope.interactiveWidget.id, customizationArgs, function() {
+        $scope.widgetId, $scope.widgetCustomizationArgs, function() {
           explorationData.saveStateData($scope.stateId, {
-            'widget_id': $scope.interactiveWidget.id,
-            'widget_customization_args': customizationArgs,
+            'widget_id': $scope.widgetId,
+            'widget_customization_args': $scope.widgetCustomizationArgs,
             'widget_handlers': $scope.widgetHandlers
           });
           $scope.updateStatesData();
@@ -594,8 +624,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     var stateDict = $scope.states[$scope.stateId];
     for (var i = 0; i < stateDict.widget.handlers.length; i++) {
       var handlerName = stateDict.widget.handlers[i].name;
-      var ruleSpecs = $scope.widgetHandlers[handlerName];
-      stateDict.widget.handlers[i].rule_specs = ruleSpecs;
+      stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
     }
   };
 }

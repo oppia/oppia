@@ -279,19 +279,26 @@ class BaseWidget(object):
             customization_args, context_params, preview_mode=preview_mode)
 
         param_dict = {}
+        customization_args_dict = {}
         for param in self.params:
+            param_customization_args = (
+                customization_args[param.name]
+                if param.name in customization_args
+                else param.customization_args)
+
             param_dict[param.name] = {
                 'value': param_instances[param.name],
                 'generator_id': param.generator.__name__,
                 'description': param.description,
                 'init_args': param.init_args,
-                'customization_args': (
-                    customization_args[param.name]
-                    if param.name in customization_args
-                    else param.customization_args),
+                'customization_args': param_customization_args,
                 'obj_type': param.obj_type,
             }
+
+            customization_args_dict[param.name] = param_customization_args
+
         result['params'] = param_dict
+        result['customization_args'] = customization_args_dict
 
         # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:

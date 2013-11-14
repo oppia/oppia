@@ -87,20 +87,10 @@ class WidgetHandler(base.BaseHandler):
         widget = widget_domain.Registry.get_widget_by_id(
             widget_type, widget_id)
 
-        response = {
+        self.render_json({
             'widget': widget.get_widget_instance_dict(
                 customization_args, {}, preview_mode=True),
-        }
-
-        if widget_type == feconf.NONINTERACTIVE_PREFIX:
-            parent_index = self.request.get('parent_index')
-            if parent_index is None:
-                raise Exception(
-                    'Non-interactive widgets require a parent_index.')
-            else:
-                response['parent_index'] = parent_index
-
-        self.render_json(response)
+        })
 
 
 class WidgetTemplateHandler(base.BaseHandler):

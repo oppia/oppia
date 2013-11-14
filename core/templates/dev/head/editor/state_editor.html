@@ -110,19 +110,19 @@
     <div class="modal-body">
       The following widget parameters can be customized:
       <br><br>
-      <div ng-repeat="(key, paramDict) in widgetParams">
-        <strong><[paramDescriptions[key]]></strong>
-        <value-generator-editor generator-id="paramDict.generator_id"
-                                init-args="paramDict.init_args"
-                                customization-args="paramDict.customization_args"
-                                obj-type="paramDict.obj_type">
+      <div ng-repeat="(paramName, paramSpecDict) in widgetParamSpecs">
+        <strong><[paramDescriptions[paramName]]></strong>
+        <value-generator-editor generator-id="paramSpecDict.generator_id"
+                                init-args="paramSpecDict.init_args"
+                                customization-args="widgetCustomizationArgs[paramName]"
+                                obj-type="paramSpecDict.obj_type">
         </value-generator-editor>
         <br>
       </div>
     </div>
 
     <div class="modal-footer">
-      <input type="submit" class="btn" value="Save" ng-click="save(widgetParams)"/>
+      <input type="submit" class="btn" value="Save" ng-click="save(widgetCustomizationArgs)"/>
       <button class="btn" ng-click="cancel()">Close</button>
     </div>
   </script>

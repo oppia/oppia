@@ -65,7 +65,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'id', 'name', 'category', 'description', 'params',
-            'handlers', 'raw'])
+            'handlers', 'raw', 'customization_args'])
         self.assertEqual(parameterized_widget_dict['id'], MUSIC_STAFF_ID)
         self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');',
                       parameterized_widget_dict['raw'])
@@ -85,5 +85,11 @@ class WidgetUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'value': 'F4',
                 }
+            }
+        })
+
+        self.assertEqual(parameterized_widget_dict['customization_args'], {
+            'noteToGuess': {
+                'value': 'F4',
             }
         })
