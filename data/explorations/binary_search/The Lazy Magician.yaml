@@ -1,5 +1,11 @@
 default_skin: conversation_v1
-param_changes: []
+param_changes:
+- customization_args:
+    list_of_values:
+    - ''
+    - '0'
+  generator_id: RandomSelector
+  name: redux
 param_specs:
   MagicianNumber:
     obj_type: UnicodeString
@@ -32,6 +38,8 @@ param_specs:
   previousNumber:
     obj_type: UnicodeString
   rangeSize:
+    obj_type: UnicodeString
+  redux:
     obj_type: UnicodeString
   tries:
     obj_type: UnicodeString
@@ -443,9 +451,15 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '"So, how do you think he does it?" asks your friend.'
+    value: <div>{{"'So, how do you think he does it?' asks your friend." if 1==(redux|int)
+      else "Ah, so where were we again?"}}</div>
   name: Discussion Start
-  param_changes: []
+  param_changes:
+  - customization_args:
+      parse_with_jinja: true
+      value: '{{(redux|int)+1}}'
+    generator_id: Copier
+    name: redux
   widget:
     customization_args:
       columns:
@@ -459,24 +473,6 @@ states:
       rule_specs:
       - definition:
           inputs:
-            x: half
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Ranges
-        feedback: []
-        param_changes: []
-      - definition:
-          inputs:
-            x: halves
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Ranges
-        feedback: []
-        param_changes: []
-      - definition:
-          inputs:
             x: middle
           name: Contains
           rule_type: atomic
@@ -486,11 +482,29 @@ states:
         param_changes: []
       - definition:
           inputs:
+            x: half
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
+        feedback: []
+        param_changes: []
+      - definition:
+          inputs:
             x: divide
           name: Contains
           rule_type: atomic
           subject: answer
         dest: Picking in the middle
+        feedback: []
+        param_changes: []
+      - definition:
+          inputs:
+            x: halves
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
         feedback: []
         param_changes: []
       - definition:
@@ -579,16 +593,17 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '"The trick to keeping track of the range is that you only have to remember
-      two numbers - the lowest and highest possible number. But these numbers are
-      <b>variable</b> - one of them changes every time you make a guess."<br><br>"So
-      if we''re guessing a number between 1 and 10, then at first we know that the
-      number is <b>greater than</b> 0, and <b>smaller than</b> 11. Or we can just
-      say it''s 0-11"<br><br>"Then, suppose we guess 5, and the Magician says it''s
-      bigger than that."<br><br>"Now we just have to remember that it''s <b>greater
-      than</b> 5, but <b>smaller than</b> 11. In other words, the range is 5-11 "<br><br>"Now
-      suppose after that, we guess 7; and the Magician says it''s smaller than that!"<br><br>"What
-      is the range now? put it in the same format as ''0-11'' or ''5-11'' from before."'
+    value: '"The trick to keeping track of all the possible numbers that are left
+      is that you only have to remember two numbers - the lowest and highest possible
+      number. But these numbers are <b>variable</b> - one of them changes every time
+      you make a guess."<br><br>"So if we''re guessing a number between 1 and 10,
+      then at first we know that the number is <b>greater than</b> 0, and <b>smaller
+      than</b> 11. Or we can just say it''s 0-11"<br><br>"Then, suppose we guess 5,
+      and the Magician says it''s bigger than that."<br><br>"Now we just have to remember
+      that it''s <b>greater than</b> 5, but <b>smaller than</b> 11. In other words,
+      the range is 5-11 "<br><br>"Now suppose after that, we guess 7; and the Magician
+      says it''s smaller than that!"<br><br>"What is the range now? put it in the
+      same format as ''0-11'' or ''5-11'' from before."'
   name: Ranges
   param_changes: []
   widget:
@@ -735,8 +750,15 @@ states:
     widget_id: Continue
 - content:
   - type: text
-    value: This is placeholder for the missing text for this state, which tries to
-      explain the idea of the worst case to motivate choosing numbers in the middle.
+    value: "<div>We don't know what number the magician picked (That's the whole point\
+      \ of trying to guess it!), so if we want to come up with a strategy that'll\
+      \ work in <b>all</b> the cases, we can just think about what happens in the\
+      \ <b>worst</b> case. And come up with a strategy where we always do <u>the <b>best</b>\
+      \ thing for the <b>worst</b> case</u>.<br></div><div><div><br></div><div>For\
+      \ example!\_</div><div><br></div><div>Suppose that I'm trying to guess a number\
+      \ from 1 to 10, and I guess '7'.\_</div><div>Then the magician would answer\
+      \ that the real number is either <u>less than</u> 7, <u>greater than</u> 7,\
+      \ or <u>is</u> 7. What would be the worst of those cases for me?</div></div>"
   name: Picking in the middle
   param_changes: []
   widget:
@@ -1253,10 +1275,11 @@ states:
           subject: answer
         dest: Doubling range concept
         feedback:
-        - '"OK, but what if the magician says that his number is greater than {{answer}}?
+        - '"But what if the magician says that his number is greater than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between {{[answer|int]|sum(start=1)}} and 6. That''s {{[6|int]|sum(start=-answer)}}
-          possible options! I don''t think we could do that in 2 tries."'
+          possible options! I don''t think we could do that in 2 tries."<div>"No,
+          we have to guess something else for numbers between 1 and 6..."</div>'
         param_changes: []
       - definition:
           inputs:
@@ -1266,11 +1289,12 @@ states:
           subject: answer
         dest: Doubling range concept
         feedback:
-        - '"OK, but what if the magician says that his number is smaller than {{answer}}?
+        - '"But what if the magician says that his number is smaller than {{answer}}?
           Then we would only have two tries left, but we would have to guess a number
           between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
           possible options! I don''t think we could do that in 2 tries. We can do
-          between 1 and 3 in 2 tries though..."'
+          between 1 and 3 in 2 tries though."<div><div>"What number could we guess
+          between 1 and 6 that might bring us back to the ''between 1 and 3'' case?"</div></div><div><br></div>'
         param_changes: []
       - definition:
           rule_type: default
@@ -1461,10 +1485,13 @@ states:
     customization_args:
       choices:
         value:
-        - I'm not sure what you mean yet. Tell me more!
+        - I'm not sure what you mean yet. How do we split the numbers in half, and
+          why is that always the best thing to do?
         - I think I understand! Let me try guessing!
         - Hmm, that's interesting. Let's watch the magician some more - is that what
           he does, too?
+        - What do you mean by "range"?
+        - Wait, but what happens if we have 4 tries?
     handlers:
     - name: submit
       rule_specs:
@@ -1494,6 +1521,25 @@ states:
           subject: answer
         dest: Magician or Player guess
         feedback: []
+        param_changes: []
+      - definition:
+          inputs:
+            x: 3
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
+        feedback: []
+        param_changes: []
+      - definition:
+          inputs:
+            x: 4
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: 4 tries abstract
+        feedback:
+        - Excellent question!
         param_changes: []
       - definition:
           rule_type: default
@@ -1747,7 +1793,8 @@ states:
           Suppose I say that the number is smaller than that. Then we know that the
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"</div>'
         param_changes: []
       - definition:
           inputs:
@@ -1762,7 +1809,8 @@ states:
           Suppose I say that the number is bigger than that. Then we know that the
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"<br></div>'
         param_changes: []
       - definition:
           rule_type: default
@@ -1937,7 +1985,8 @@ states:
           Suppose I say that the number is smaller than that. Then we know that the
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"<br></div>'
         param_changes: []
       - definition:
           inputs:
@@ -1952,7 +2001,8 @@ states:
           Suppose I say that the number is bigger than that. Then we know that the
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"<br></div>'
         param_changes: []
       - definition:
           rule_type: default
@@ -2091,7 +2141,8 @@ states:
           Suppose I say that the number is smaller than that. Then we know that the
           number has to be bigger than {{lowest}} but smaller than {{answer}}. But
           that still leaves a range of {{answer|int-lowest|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"<br></div>'
         param_changes: []
       - definition:
           inputs:
@@ -2106,7 +2157,8 @@ states:
           Suppose I say that the number is bigger than that. Then we know that the
           number has to be bigger than {{answer}} but smaller than {{highest}}. But
           that still leaves a range of {{highest|int-answer|int-2}} numbers! I think
-          that''s too many, we can do better."'
+          that''s too many."<div>"We should always pick numbers in the middle of the
+          possible range, remember?"<br></div>'
         param_changes: []
       - definition:
           rule_type: default
@@ -2157,6 +2209,7 @@ states:
         param_changes: []
       - definition:
           rule_type: default
+          subject: answer
         dest: Middle try it out
         feedback:
         - 'If it''s less than {{(answer|int)+1}}, then the number is between 1 and
@@ -2191,9 +2244,9 @@ states:
     customization_args:
       choices:
         value:
-        - Alright, that makes sense! let me try that out!
-        - That kind of makes sense. But what are we getting the middle of, and how
-          do we keep track of these limits?
+        - I think I get it now! let me try the whole game out!
+        - That kind of makes sense. But what happens after I guess in the middle the
+          first time? What do I find "the middle" of after that?
     handlers:
     - name: submit
       rule_specs:
@@ -2345,6 +2398,53 @@ states:
         feedback:
         - '"No, that''s not right... the number doesn''t have to be bigger than that
           based on the information we have."'
+        param_changes: []
+    sticky: false
+    widget_id: NumericInput
+- content:
+  - type: text
+    value: '<div><br></div><div>It works almost the same as when we added the third
+      try!</div><div>When we had only two tries, we could guess any number from 1
+      to 3.</div><div>(two-deep tree picture)</div><div>With 3 tries, and the trick
+      of asking "Is it 4?" first, we added 4 more numbers, so we could guess from
+      1 to 7.</div><div>Picture: (3-deep tree redux)</div><div>If we have 4 tries,
+      we can use the same trick:</div><div>Picture of 4-deep binary tree (with one
+      half and top grayed out, no numbers drawn in those)</div><div>You can write
+      in all the numbers from left to right (or just count them up!).<br></div><div>So,
+      how many is that?</div>'
+  name: 4 tries abstract
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: 15.0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Picking in the middle
+        feedback:
+        - "That's right! In fact, every time we add another guess, we can <b>double</b>\
+          \ our range of numbers, plus one more!\_<div>1 try = 1 number range</div><div>2\
+          \ tries = 3 number range</div><div>3 tries = 7 number range</div><div>4\
+          \ tries = 15 number range</div><div>etc.</div><div><br></div><div>So that's\
+          \ how you <b>maximize</b> your <u>range</u> if you know how many guesses\
+          \ you have!</div><div><br></div><div>But that's kind of backwards from how\
+          \ the game works - we should think about how to <b>minimize</b> the <u>number\
+          \ of guesses</u> when we know what our starting range is.</div>"
+        param_changes: []
+      - definition:
+          rule_type: default
+          subject: answer
+        dest: 4 tries abstract
+        feedback:
+        - "No, that's not right.\_"
+        - 'Think of it this way: We already know that the left half of the picture
+          is 7 numbers. The right half is the same. And there''s one more at the top!
+          So how many is that?'
         param_changes: []
     sticky: false
     widget_id: NumericInput
