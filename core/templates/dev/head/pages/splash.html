@@ -49,8 +49,21 @@
                 transform: rotateY( 270deg ) translateZ( 550px );
       }
 
-      .oppia-pull-right {
-        float: right;
+      .oppia-left-button,
+      .oppia-right-button {
+        background: rgba(200, 200, 255, 0.3);
+        height: 40%;
+        position: absolute;
+        top: 30%;
+        width: 10%;
+      }
+
+      .oppia-left-button {
+        left: -5%;
+      }
+
+      .oppia-right-button {
+        right: -5%;
       }
 
       /* Try not to edit stuff above this line (unless you know what
@@ -167,16 +180,10 @@
             </p>
           </div>
         </div>
+
+        <button class="oppia-left-button" ng-click="moveBackward()">&lt;</button>
+        <button class="oppia-right-button" ng-click="moveForward()">&gt;</button>
       </div>
-
-      <br>
-
-      <!-- For now, these are just simple controls that enable the
-      carousel to turn. I plan to modify them to be more fancy later. -->
-      <p>
-        <button ng-click="moveBackward()">Previous</button>
-        <button class="oppia-pull-right" ng-click="moveForward()">Next</button>
-      </p>
 
       <!-- This button can be restyled using the .oppia-explore-button CSS rule above. -->
       <center>
@@ -186,8 +193,7 @@
 
     <!-- Try not to edit stuff above this line (unless you know what
          you're doing!) -->
-  
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js">
+    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js">
     </script>
   
     <script>
