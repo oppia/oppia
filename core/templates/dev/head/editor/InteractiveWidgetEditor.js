@@ -72,6 +72,14 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       $scope.widgetHandlers[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
+    // When a change to widgetSticky is made and then cancelled, the
+    // cancellation itself causes the watch on widgetSticky to fire, which
+    // erroneously triggers a save update. The next two lines are therefore
+    // added to fully clear widgetSticky so that the line after it does not
+    // trigger a save update. (The call to $apply() is needed for this to
+    // work.)
+    $scope.widgetSticky = undefined;
+    $scope.$apply();
     $scope.widgetSticky = data.widget.sticky;
     $scope.unresolvedAnswers = data.unresolved_answers;
 
@@ -99,6 +107,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     return (
         stateId === $scope.stateId  ? '⟳' :
         stateId === END_DEST        ? END_DEST :
+        !$scope.states              ? '' :
         $scope.states[stateId].name
     );
   };
@@ -361,26 +370,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     });
   };
 
-  $scope.saveExtendedRule = function(handlerName, extendedRule) {
-    if (!$scope.widgetHandlers.hasOwnProperty(handlerName)) {
-      $scope.widgetHandlers[handlerName] = [];
-    }
-
-    var rules = $scope.widgetHandlers[handlerName];
-    if ($scope.tmpRule.index !== null) {
-      rules[$scope.tmpRule.index] = extendedRule;
-    } else {
-      rules.splice(rules.length - 1, 0, extendedRule);
-    }
-
-    $scope.saveInteractiveWidget();
-  };
-
-  $scope.saveExtendedRuleWithNewDest = function(handlerName, extendedRule, destId) {
-    extendedRule['dest'] = destId;
-    $scope.saveExtendedRule(handlerName, extendedRule);
-  };
-
   $scope.saveRule = function(tmpRule) {
     if (tmpRule.description) {
       var extendedRule = {
@@ -388,12 +377,15 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         definition: {
           rule_type: tmpRule.description == 'Default' ? 'default' : 'atomic',
           name: tmpRule.name,
-          inputs: tmpRule.inputs,
-          subject: 'answer'
+          inputs: tmpRule.inputs
         },
         dest: tmpRule.dest,
         feedback: tmpRule.feedback
       };
+
+      if (extendedRule.definition.rule_type === 'atomic') {
+        extendedRule.definition.subject = 'answer';
+      }
 
       // TODO(sll): Do more error-checking here.
       if (tmpRule.dest === '?') {
@@ -426,18 +418,43 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     return ruleset[ruleset.length - 1];
   };
 
+  $scope.saveExtendedRule = function(handlerName, extendedRule) {
+    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+
+    if (!$scope.widgetHandlers.hasOwnProperty(handlerName)) {
+      $scope.widgetHandlers[handlerName] = [];
+    }
+
+    var rules = $scope.widgetHandlers[handlerName];
+    if ($scope.tmpRule.index !== null) {
+      rules[$scope.tmpRule.index] = extendedRule;
+    } else {
+      rules.splice(rules.length - 1, 0, extendedRule);
+    }
+
+    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
+  };
+
+  $scope.saveExtendedRuleWithNewDest = function(handlerName, extendedRule, destId) {
+    extendedRule['dest'] = destId;
+    $scope.saveExtendedRule(handlerName, extendedRule);
+  };
+
   $scope.swapRules = function(handlerName, index1, index2) {
+    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+
     $scope.tmpRule = $scope.widgetHandlers[handlerName][index1];
     $scope.widgetHandlers[handlerName][index1] =
         $scope.widgetHandlers[handlerName][index2];
     $scope.widgetHandlers[handlerName][index2] = $scope.tmpRule;
 
-    $scope.saveInteractiveWidget();
+    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
   };
 
   $scope.deleteRule = function(handlerName, index) {
+    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
     $scope.widgetHandlers[handlerName].splice(index, 1);
-    $scope.saveInteractiveWidget();
+    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
   };
 
   $scope.convertDestToId = function(destName, hideWarnings) {
@@ -446,9 +463,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       return;
     }
 
+    var found = false;
     var destId = '';
 
-    var found = false;
     if (destName.toUpperCase() == END_DEST) {
       found = true;
       destId = END_DEST;
@@ -495,10 +512,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
-    if (newValue !== undefined) {
-      explorationData.saveStateData($scope.stateId, {
-        'widget_sticky': $scope.widgetSticky
-      });
+    if (newValue !== undefined && oldValue !== undefined) {
+      $scope.addStateChange('widget_sticky', 'widgetSticky', newValue, oldValue);
     }
   });
 
@@ -547,14 +562,21 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.showCustomizeInteractiveWidgetModal = function(index) {
     warningsData.clear();
+    var widgetCustomizationArgsMemento = angular.copy(
+        $scope.widgetCustomizationArgs);
+
     var modalInstance = $scope.getCustomizationModalInstance(
         $scope.widgetId, $scope.widgetCustomizationArgs);
 
     modalInstance.result.then(function(result) {
       $scope.widgetCustomizationArgs = result.widgetCustomizationArgs;
-      $scope.generateWidgetPreview(
-          $scope.widgetId, $scope.widgetCustomizationArgs,
-          $scope.saveInteractiveWidget);
+      if (!angular.equals($scope.widgetCustomizationArgs, widgetCustomizationArgsMemento)) {
+        $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+        $scope.addStateChange(
+          'widget_customization_args', 'widgetCustomizationArgs',
+          $scope.widgetCustomizationArgs, widgetCustomizationArgsMemento
+        );
+      }
       console.log('Interactive customization modal saved.');
     }, function() {
       console.log('Interactive customization modal dismissed.');
@@ -564,7 +586,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   $scope.showChooseInteractiveWidgetModal = function() {
     warningsData.clear();
 
-    var modalInstance = $modal.open({
+    var widgetIdMemento = $scope.widgetId;
+    var widgetCustomizationArgsMemento = angular.copy($scope.widgetCustomizationArgs);
+    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+
+    $modal.open({
       templateUrl: 'modals/chooseInteractiveWidget',
       backdrop: 'static',
       resolve: {},
@@ -589,9 +615,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           $modalInstance.dismiss('cancel');
         };
       }
-    });
-
-    modalInstance.result.then(function(arg) {
+    }).result.then(function(arg) {
       if (!$scope.widgetId || $scope.widgetId != arg.data.widget.id) {
         $scope.widgetId = arg.data.widget.id;
         $scope.widgetCustomizationArgs = arg.data.widget.customization_args;
@@ -600,23 +624,25 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
         };
       }
-      $scope.saveInteractiveWidget();
+
+      $scope.addStateChange('widget_id', 'widgetId', $scope.widgetId, widgetIdMemento);
+      $scope.addStateChange(
+        'widget_customization_args', 'widgetCustomizationArgs',
+        $scope.widgetCustomizationArgs, widgetCustomizationArgsMemento
+      );
+      $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+
+      $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
     }, function () {
       console.log('Choose interactive widget modal dismissed.');
     });
   };
 
-  $scope.saveInteractiveWidget = function() {
-    $scope.generateWidgetPreview(
-        $scope.widgetId, $scope.widgetCustomizationArgs, function() {
-          explorationData.saveStateData($scope.stateId, {
-            'widget_id': $scope.widgetId,
-            'widget_customization_args': $scope.widgetCustomizationArgs,
-            'widget_handlers': $scope.widgetHandlers
-          });
-          $scope.updateStatesData();
-          $scope.drawGraph();
-        });
+  $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
+    $scope.addStateChange(
+        'widget_handlers', 'widgetHandlers', newHandlers, oldHandlers);
+    $scope.updateStatesData();
+    $scope.drawGraph();
   };
 
   $scope.updateStatesData = function() {

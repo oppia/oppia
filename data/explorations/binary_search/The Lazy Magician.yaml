@@ -63,7 +63,7 @@ states:
       \ town?<br><br>Apparently, this magician can guess, in just a few tries, what\
       \ number anyone is thinking of. Even big numbers, like a thousand! If he's cheating\
       \ and reading minds, he's gotta be stopped! And if he's not, you have to meet\
-      \ him and figure out what his secret is!<br><br>\"So, what do you think? how\
+      \ him and figure out what his secret is!<br><br>\"So, what do you think? How\
       \ does he do it?\""
   name: Introduction
   param_changes: []
@@ -2209,7 +2209,6 @@ states:
         param_changes: []
       - definition:
           rule_type: default
-          subject: answer
         dest: Middle try it out
         feedback:
         - 'If it''s less than {{(answer|int)+1}}, then the number is between 1 and
@@ -2438,7 +2437,6 @@ states:
         param_changes: []
       - definition:
           rule_type: default
-          subject: answer
         dest: 4 tries abstract
         feedback:
         - "No, that's not right.\_"

@@ -63,8 +63,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
       oldValue: oldValue
     });
     $scope.undoneChangeStack = [];
-
-    console.log($scope.stateChangeList);
   };
 
   $scope.saveStateChanges = function() {
@@ -86,12 +84,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     // 'Cancel' as one of the options.
     var confirmCancel = confirm('Do you want to discard your changes?');
     if (confirmCancel) {
+      // Reload the local state data variables.
+      $scope.initStateData();
+
       // Clear both change lists.
       $scope.stateChangeList = [];
       $scope.undoneChangeStack = [];
-
-      // Reload the local state data variables.
-      $scope.initStateData();
     }
   };
 

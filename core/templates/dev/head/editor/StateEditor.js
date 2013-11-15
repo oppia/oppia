@@ -184,11 +184,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
             widgetParams: widgetParams
           });
         };
-
-        $scope.cancel = function () {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
       }
     });
   };

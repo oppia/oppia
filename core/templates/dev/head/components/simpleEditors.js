@@ -226,11 +226,6 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
                   widgetDefinition: $scope.widgetDefinition
                 });
               };
-
-              $scope.cancel = function () {
-                $modalInstance.dismiss('cancel');
-                warningsData.clear();
-              };
             }
           });
 

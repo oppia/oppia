@@ -36,7 +36,7 @@
 
 <div class="container-fluid oppia-editor">
   <div class="row-fluid">
-    <div id="editorWindow" ng-show="stateId">
+    <div ng-show="stateId">
       <div>
         <div ng-if="incomingStatesShown">
           <br>
@@ -122,8 +122,7 @@
     </div>
 
     <div class="modal-footer">
-      <input type="submit" class="btn" value="Save" ng-click="save(widgetCustomizationArgs)"/>
-      <button class="btn" ng-click="cancel()">Close</button>
+      <input type="submit" class="btn" value="Use these parameters" ng-click="save(widgetCustomizationArgs)"/>
     </div>
   </script>
 </div>

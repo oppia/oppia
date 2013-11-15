@@ -205,7 +205,7 @@
         </span>
         <span ng-repeat="item in tmpRuleDescriptionFragments track by $index">
           <span ng-if="item.type == 'select'">
-            <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices.value)">
+            <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(widgetCustomizationArgs.choices.value)">
             </select>
           </span>
           <span ng-if="item.type == 'input'">
@@ -239,7 +239,7 @@
     <div class="modal-footer">
       <span ng-show="tmpRule.description">
         <button type="button" class="btn" ng-click="save()">
-          Save
+          Use this rule
         </button>
       </span>
 
