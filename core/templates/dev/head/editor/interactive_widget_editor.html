@@ -1,22 +1,31 @@
-<div ng-controller="InteractiveWidgetEditor" class="oppia-iframe-container">
-  <div>
-    <div class="span10">
-      <div class="oppia-widget-preview">
-        <!-- This iframe is dynamically resized based on its content. -->
-        <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
-        </iframe>
-      </div>
-  
+<div ng-controller="InteractiveWidgetEditor">
+  <div class="row-fluid">
+    <div class="span2">
+      <span class="oppia-editor-header">
+        interaction
+      </span>
+    </div>
+
+    <div class="span8 oppia-iframe-container">
       <div>
-        <label>
-          <input type="checkbox" ng-model="widgetSticky">
-          Use the previous state's widget if possible.
-          <img class="oppia-help" src="/images/help.png"
-              tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
-              tooltip-placement="right">
-        </label>
+        <div class="oppia-widget-preview">
+          <!-- This iframe is dynamically resized based on its content. -->
+          <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
+          </iframe>
+        </div>
+  
+        <div>
+          <label>
+            <input type="checkbox" ng-model="widgetSticky">
+            Use the previous state's widget if possible.
+            <img class="oppia-help" src="/images/help.png"
+                 tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
+                 tooltip-placement="right">
+          </label>
+        </div>
       </div>
     </div>
+
     <div class="span2">  
       <span class="pull-right">
         <button ng-click="showChooseInteractiveWidgetModal()">
@@ -32,104 +41,130 @@
     </div>
   </div>
 
-  <div><div class="span12"></div></div>
+  <br>
 
-  <div>
-    <span class="span1"></span>
-    <div class="span11">
-      <h4 id="rules">Answer classification rules</h4>
+  <div class="row-fluid" id="rules">
+    <div ng-repeat="(handlerName, handler) in widgetHandlers">
+      <div class="span2">
+        <span class="oppia-editor-header">
+          when readers <[handlerName]>:
+        </span>
+        <img class="oppia-help" src="/images/help.png"
+             tooltip="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown."
+             tooltip-placement="right">
+      </div>
 
-      <div ng-repeat="(handlerName, handler) in widgetHandlers">
-        <h5>When readers <[handlerName]>:
-          <img class="oppia-help" src="/images/help.png"
-              tooltip="The reader's answer is evaluated against each of these rules. If one matches, the reader is sent to the corresponding destination state, and the corresponding piece of feedback will be shown."
-              tooltip-placement="right">
-        </h5>
-        <table style="width: 100%">
-          <tr ng-repeat="rule in handler" ng-hide="$last">
-            <td style="width: 5%; vertical-align: top">
-              <span ng-show="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
-                •
-              </span>
-              <span ng-hide="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
-                <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-              </span>
-            </td>
-            <td style="width: 70%; vertical-align: top">
-              <span>
-                Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
-              </span>:
-              <span ng-show="rule.dest == 'END' || rule.dest == stateId">
-                (<[getStateNameForRule(rule.dest)]>,
-              </span>
-              <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
-                (<a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-                  <[getStateNameForRule(rule.dest)]>,
-                </a>
-              </span>
-              <span ng-bind-html="rule.feedback|truncate"></span>)
-            </td>
-            <td style="width: 5%; vertical-align: top"></td>
-            <td style="width: 15%; vertical-align: top">
-              <span>
-                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handlerName, $index)">Edit</a> |
-              </span>
-              <span ng-show="$index != 0">
-                <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index - 1)">⇑</a>
-              </span>
-              <span ng-hide="$index != 0">
-                <span class="oppia-grayed">⇑</span>
-              </span>
+      <div class="span10">
+        <div class="container-fluid">
+          <div class="row-fluid">
 
-              <span ng-show="$index < handler.length - 2">
-                | <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index + 1)">⇓</a>
-              </span>
-              <span ng-hide="$index < handler.length - 2">
-                | <span class="oppia-grayed">⇓</span>
-              </span>
+            <div ng-repeat="rule in handler" ng-hide="$last">
+              <div class="span9">
+                <table style="width: 100%">
+                  <tr>
+                    <td style="width: 5%; vertical-align: top">
+                      <span ng-show="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
+                        •
+                      </span>
+                      <span ng-hide="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
+                        <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+                      </span>
+                    </td>
+                    <td style="width: 95%; vertical-align: top">
+                      <span>
+                        Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                      </span>:
+                      <span ng-show="rule.dest == 'END' || rule.dest == stateId">
+                        (<[getStateNameForRule(rule.dest)]>,
+                      </span>
+                      <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
+                        (<a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
+                          <[getStateNameForRule(rule.dest)]>,
+                        </a>
+                      </span>
+                      <span ng-bind-html="rule.feedback|truncate"></span>)
+                    </td>
+                  </tr>
+                </table>
+              </div>
 
+              <div class="span3">
+                <span>
+                  <a href="#" onclick="return false;" ng-click="openEditRuleModal(handlerName, $index)">Edit</a> |
+                </span>
+                <span ng-show="$index != 0">
+                  <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index - 1)">⇑</a>
+                </span>
+                <span ng-hide="$index != 0">
+                  <span class="oppia-grayed">⇑</span>
+                </span>
+      
+                <span ng-show="$index < handler.length - 2">
+                  | <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index + 1)">⇓</a>
+                </span>
+                <span ng-hide="$index < handler.length - 2">
+                  | <span class="oppia-grayed">⇓</span>
+                </span>
+      
+                <span>
+                  | <a href="#" onclick="return false;" ng-click="deleteRule(handlerName, $index)"> &times; </a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div class="span9">
+              <table style="width: 100%">
+                <tr ng-show="widgetId != 'Continue'">
+                  <td style="width: 5%; vertical-align: top">
+                    •
+                  </td>
+                  <td style="width: 95%; vertical-align: top" class="oppia-lightly-grayed">
+                    (<em>New rules will be added here.</em>)
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="span3">
               <span>
-                | <a href="#" onclick="return false;" ng-click="deleteRule(handlerName, $index)"> &times; </a>
+                <a href="#" onclick="return false;" ng-click="openAddRuleModal(handlerName)">Add new rule</a>
               </span>
-            </td>
-          </tr>
-          <tr ng-show="widgetId != 'Continue'">
-            <td style="width: 5%; vertical-align: top">
-              •
-            </td>
-            <td style="width: 70%; vertical-align: top" class="oppia-lightly-grayed">
-              (<em>New rules will be added here.</em>)
-            </td>
-            <td style="width: 5%; vertical-align: top"></td>
-            <td style="width: 15%; vertical-align: top">
-              <a href="#" onclick="return false;" ng-click="openAddRuleModal(handlerName)">Add new rule</a>
-            </td>
-          </tr>
-          <tr>
-            <td style="width: 5%; vertical-align: top">
-              <span ng-show="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
-                •
-              </span>
-              <span ng-hide="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
-                <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-              </span>
-            </td>
-            <td style="width: 70%; vertical-align: top">
-              <span>
-                <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
-              </span>:
-              <span ng-show="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
-                (<[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
-              </span>
-              <span ng-hide="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
-                (<a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
-                  <[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
-                </a>
-              </span>
-              <span ng-bind-html="getDefaultRule(handlerName).feedback|truncate"></span>)
-            </td>
-            <td style="width: 5%; vertical-align: top"></td>
-            <td style="width: 15%; vertical-align: top">
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div class="span9">
+              <table style="width: 100%">
+                <tr>
+                  <td style="width: 5%; vertical-align: top">
+                    <span ng-show="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
+                      •
+                    </span>
+                    <span ng-hide="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
+                      <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+                    </span>
+                  </td>
+                  <td style="width: 95%; vertical-align: top">
+                    <span>
+                      <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                    </span>:
+                    <span ng-show="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
+                      (<[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
+                    </span>
+                    <span ng-hide="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
+                      (<a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
+                        <[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
+                      </a>
+                    </span>
+                    <span ng-bind-html="getDefaultRule(handlerName).feedback|truncate"></span>)
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="span3">
               <span>
                 <a href="#" onclick="return false;" ng-click="openEditRuleModal(handlerName, handler.length - 1)">Edit</a> |
               </span>
@@ -138,26 +173,40 @@
               <span class="oppia-grayed"> ⇓ </span>
               |
               <span class="oppia-grayed"> &times; </span>
-            </td>
-          </tr>
-        </table>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <br><br>
 
-      <div ng-show="!isEmpty(unresolvedAnswersMap)">
-        <h4>Answers received</h4>
-        <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
-          <span ng-show="item.count == 0">
-            <del>
-              <[item.answer]>
-            </del>
-          </span>
-          <span ng-show="item.count > 0">
-            <[item.answer]>
-            (<em>submitted <[item.count]> time<span ng-show="item.count != 1">s</span></em>)
-            <a href="#" onclick="return false;" ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</a>
-          </span>
+  <div class="row-fluid" ng-show="!isEmpty(unresolvedAnswersMap)">
+    <div span="span2">
+      <h5>Answers received</h5>
+    </div>
+
+    <div class="span10">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
+            <div class="span9">
+              <span ng-show="item.count == 0">
+                <del><[item.answer]></del>
+              </span>
+
+              <span ng-show="item.count > 0">
+                <[item.answer]>
+                (<em>submitted <[item.count]> time<span ng-show="item.count != 1">s</span></em>)
+              </span>
+            </div>
+
+            <div class="span3">
+              <span ng-show="item.count > 0">
+                <a href="#" onclick="return false;" ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</a>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

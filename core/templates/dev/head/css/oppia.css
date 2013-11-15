@@ -89,6 +89,11 @@ textarea {
   cursor: pointer;
 }
 
+.oppia-editor-header {
+  font-variant: small-caps;
+  font-size: 110%;
+}
+
 .oppia-no-scroll::-webkit-scrollbar {
   display: none;
 }
@@ -397,13 +402,17 @@ textarea {
 }
 
 .oppia-state-content {
-  border: 1px solid #aaa;
+  border-left: 1px dashed #bbb;
+  border-right: 1px dashed #bbb;
+  border-top: 1px dashed #bbb;
   min-height: 20px;
   padding: 5px;
 }
 
 .oppia-widget-preview {
-  border: 1px solid #ccc;
+  border-bottom: 1px dashed #bbb;
+  border-left: 1px dashed #bbb;
+  border-right: 1px dashed #bbb;
   margin: 0 0 2px 0;
 }
 
