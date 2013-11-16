@@ -13,14 +13,14 @@ class TarFileReadInput(widget_domain.BaseWidget):
     """
 
     # The human-readable name of the widget.
-    name = 'Tar File input'
+    name = 'Tar file upload'
 
     # The category the widget falls under in the widget repository.
-    category = 'Basic Input'
+    category = 'Custom'
 
     # A description of the widget.
     description = (
-        'A tar file input widget.'
+        'A widget for uploading tar files.'
     )
 
     # Customization parameters and their descriptions, types and default

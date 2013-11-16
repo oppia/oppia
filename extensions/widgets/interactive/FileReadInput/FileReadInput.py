@@ -13,15 +13,13 @@ class FileReadInput(widget_domain.BaseWidget):
     """
 
     # The human-readable name of the widget.
-    name = 'File input'
+    name = 'File upload'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'
 
     # A description of the widget.
-    description = (
-        'A file input widget.'
-    )
+    description = 'A widget for uploading files.'
 
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.

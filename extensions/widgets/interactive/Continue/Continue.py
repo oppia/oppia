@@ -13,20 +13,19 @@ class Continue(widget_domain.BaseWidget):
     """
 
     # The human-readable name of the widget.
-    name = 'Continue (Default widget)'
+    name = 'Continue'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'
 
     # A description of the widget.
-    description = ('A button allowing the user to continue to the next section '
-                   'of the exploration.')
+    description = 'A simple \'go to next state\' button.'
 
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'buttonText',
-        'description': 'The text that should be displayed on the button.',
+        'description': 'The text to display on the button.',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
