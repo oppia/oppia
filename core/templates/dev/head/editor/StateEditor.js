@@ -82,8 +82,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     return incomingStates;
   };
 
-  // This should only be non-empty when the state name editor is open.
-  $scope.stateNameMemento = '';
+  // This should only be non-null when the state name editor is open.
+  $scope.stateNameMemento = null;
 
   $scope.openStateNameEditor = function() {
     $scope.stateNameMemento = $scope.stateName;
@@ -111,7 +111,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       $scope.stateName = stateName;
     }
 
-    $scope.stateNameMemento = '';
+    $scope.stateNameMemento = null;
   };
 
   // TODO(sll): Replace this with a link to code.google.com documentation.
@@ -122,8 +122,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       'information about LaTeX, see ' +
       'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
 
-  // This should only be non-empty when the content editor is open.
-  $scope.contentMemento = '';
+  // This should only be non-null when the content editor is open.
+  $scope.contentMemento = null;
 
   $scope.editContent = function() {
     $scope.contentMemento = angular.copy($scope.content);
@@ -142,7 +142,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           angular.copy($scope.contentMemento)
       );
     }
-    $scope.contentMemento = '';
+    $scope.contentMemento = null;
   };
 
   $scope.getCustomizationModalInstance = function(widgetId, widgetParams) {
@@ -188,11 +188,11 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     });
   };
 
-  $scope.saveStateParamChanges = function() {
-    explorationData.saveStateData(
-      $scope.stateId,
-      {'param_changes': $scope.stateParamChanges}
-    );
+  $scope.saveStateParamChanges = function(newValue, oldValue) {
+    if (!angular.equals(newValue, oldValue)) {
+      $scope.addStateChange(
+          'param_changes', ['stateParamChanges'], newValue, oldValue);
+    }
   };
 }
 

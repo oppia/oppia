@@ -88,6 +88,8 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       $scope.resetEditor = function() {
         $scope.activeItem = -1;
         $scope.tmpParamChange = angular.copy(DEFAULT_TMP_PARAM_CHANGE);
+        // This should only be non-null when an editing view is active.
+        $scope.paramChangesMemento = null;
 
         // Initialize dropdown options for the parameter name selector.
         var namedata = [];
@@ -103,14 +105,14 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
 
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
+        $scope.paramChangesMemento = angular.copy($scope.paramChanges);
         $scope.activeItem = $scope.paramChanges.length;
         $scope.paramChanges.push(angular.copy(DEFAULT_TMP_PARAM_CHANGE));
       };
 
       // Returns a new customization args object that has been stripped of
       // unwanted keys.
-      $scope.getCleanCustomizationArgs = function(
-          generatorId, customizationArgs) {
+      $scope.getCleanCustomizationArgs = function(generatorId, customizationArgs) {
         var newCustomizationArgs = angular.copy(customizationArgs);
         var customizationArgsKeys = [];
         for (var key in newCustomizationArgs) {
@@ -130,6 +132,8 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
 
       // Called when an 'edit param change' action is triggered.
       $scope.startEditParamChange = function(index) {
+        $scope.paramChangesMemento = angular.copy($scope.paramChanges);
+
         var param = $scope.paramChanges[index];
         $scope.activeItem = index;
 
@@ -143,31 +147,14 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         };
       };
 
-      $scope.updateAndSaveParamChangeList = function(
-          index, name, generator_id, customization_args) {
-        if (index !== $scope.NEW_PARAM_CHANGE_SENTINEL) {
-          $scope.paramChanges[index] = {
-            'name': name,
-            'generator_id': generator_id,
-            'customization_args': customization_args
-          };
-        } else {
-          $scope.paramChanges.push({
-            'name': name,
-            'generator_id': generator_id,
-            'customization_args': customization_args
-          });
-        }
-
-        $scope.saveParamChanges();
-      };
-
       $scope.commitParamChange = function(index) {
         if (!$scope.tmpParamChange.name) {
           warningsData.addWarning('Please specify a parameter name.');
           return;
         }
         if ($scope.tmpParamChange.name === '[New parameter]') {
+          // This reverses a temporary parameter change addition that has not
+          // been edited.
           $scope.deleteParamChange(index);
           return;
         }
@@ -187,7 +174,17 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         var name = $scope.tmpParamChange.name;
         var generator_id = $scope.tmpParamChange.generator_id;
         var customization_args = $scope.getCleanCustomizationArgs(
-          generator_id, $scope.tmpParamChange.customization_args);
+            generator_id, $scope.tmpParamChange.customization_args);
+        var _updateAndSaveParamChangeList = function(
+            index, name, generator_id, customization_args) {
+          $scope.paramChanges[index] = {
+            'name': name,
+            'generator_id': generator_id,
+            'customization_args': customization_args
+          };
+          $scope.saveParamChanges(
+              $scope.paramChanges, angular.copy($scope.paramChangesMemento));
+        };
 
         if (!$scope.getObjTypeForParam(name)) {
           // The name is new, so add the parameter to the exploration parameter
@@ -195,20 +192,22 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           $scope.addExplorationParamSpec(
             name,
             'UnicodeString',
-            $scope.updateAndSaveParamChangeList.bind(
-              undefined, index, name, generator_id, customization_args)
+            _updateAndSaveParamChangeList.bind(
+                undefined, index, name, generator_id, customization_args)
           );
         } else {
-          $scope.updateAndSaveParamChangeList(
-            index, name, generator_id, customization_args);
+          _updateAndSaveParamChangeList(
+              index, name, generator_id, customization_args);
         }
 
         $scope.resetEditor();
       };
     
       $scope.deleteParamChange = function(index) {
+        $scope.paramChangesMemento = angular.copy($scope.paramChanges);
         $scope.paramChanges.splice(index, 1);
-        $scope.saveParamChanges();
+        $scope.saveParamChanges(
+            $scope.paramChanges, angular.copy($scope.paramChangesMemento));
         $scope.resetEditor();
       };
     }

@@ -534,10 +534,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
   };
 
-  $scope.saveExplorationParamChanges = function() {
+  $scope.saveExplorationParamChanges = function(newValue, oldValue) {
     $scope.saveExplorationProperty(
-      'explorationParamChanges', 'param_changes',
-      $scope.explorationParamChanges, null);
+        'explorationParamChanges', 'param_changes', newValue, oldValue);
   };
 
   /**
