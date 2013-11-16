@@ -95,21 +95,16 @@
         </span>
       </a>
       <span class="oppia-editor-header">
-        parameter changes
+        parameter changes (<[stateParamChanges.length]>)
       </span>
       <img class="oppia-help" src="/images/help.png"
            tooltip="You can change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields."
            tooltip-placement="right">
     </div>
 
-    <div class="span8">
-      <div ng-if="parameterChangesShown">
-        <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
-        </param-change-editor>
-      </div>
-    </div>
-
-    <div class="span2">
+    <div class="span10">
+      <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec" ng-if="parameterChangesShown">
+      </param-change-editor>
     </div>
   </div>
 

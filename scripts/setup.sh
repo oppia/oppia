@@ -58,6 +58,6 @@ mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
 
 # Adjust the path to include a reference to node.
-export PATH=`pwd`/$TOOLS_DIR/node-0.10.1/bin:$PATH
+export PATH=$TOOLS_DIR/node-0.10.1/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
