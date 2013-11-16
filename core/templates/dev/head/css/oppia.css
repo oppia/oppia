@@ -90,8 +90,8 @@ textarea {
 }
 
 .oppia-editor-header {
-  font-variant: small-caps;
   font-size: 110%;
+  font-variant: small-caps;
 }
 
 .oppia-no-scroll::-webkit-scrollbar {
@@ -99,7 +99,10 @@ textarea {
 }
 
 .oppia-save-state-button {
+  font-size: 110%;
+  font-variant: small-caps;
   font-weight: bold;
+  margin: 0 5px 0 5px;
 }
 
 .oppia-code {

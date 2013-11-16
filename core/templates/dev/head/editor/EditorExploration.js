@@ -79,11 +79,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     });
   };
 
-  $scope.cancelStateChanges = function() {
-    // TODO(sll): Replace this with a modal dialog that does not have the word
-    // 'Cancel' as one of the options.
-    var confirmCancel = confirm('Do you want to discard your changes?');
-    if (confirmCancel) {
+  $scope.discardStateChanges = function() {
+    var confirmDiscard = confirm('Do you want to discard your changes?');
+    if (confirmDiscard) {
       // Reload the local state data variables.
       $scope.initStateData();
 

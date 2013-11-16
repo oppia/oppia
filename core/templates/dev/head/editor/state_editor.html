@@ -1,16 +1,18 @@
-<div class="container-fluid oppia-editor">
+{% macro changelist_buttons_row() -%}
   <div class="row-fluid">
-    <div class="span6"></div>
-
-    <div class="span6" ng-if="isStateLockedForEditing()">
-      <button class="btn btn-success oppia-save-state-button" ng-click="saveStateChanges()">SAVE CHANGES</button>
-      <button class="btn oppia-save-state-button" ng-click="cancelStateChanges()">CANCEL CHANGES</button>
+    <div class="span6 offset6">
+      <button class="btn oppia-save-state-button pull-right" ng-click="discardStateChanges()" ng-disabled="!isStateLockedForEditing()">discard changes</button>
+      <button class="btn oppia-save-state-button pull-right" ng-class="{'btn-success': isStateLockedForEditing()}" ng-click="saveStateChanges()" ng-disabled="!isStateLockedForEditing()">save changes</button>
     </div>
   </div>
-</div>
+{%- endmacro %}
 
 
 <div class="container-fluid oppia-editor" ng-show="stateId">
+
+  {{ changelist_buttons_row() }}
+  
+  <br>
 
   <div class="row-fluid">
     <div class="span2">
@@ -142,6 +144,10 @@
   <br>
 
   {% include 'editor/interactive_widget_editor.html' %}
+
+  <br>
+
+  {{ changelist_buttons_row() }}
 </div>
 
 
