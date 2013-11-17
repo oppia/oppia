@@ -94,7 +94,7 @@ def get_exploration_components_from_dir(dir_path):
                                     'for %s' % dir_path)
                 elif not filepath.endswith('.yaml'):
                     raise Exception('The exploration data file should have a '
-                                    '.yaml suffix')
+                                    '.yaml suffix: %s' % filepath)
                 else:
                     yaml_content = get_file_contents(filepath)
             else:

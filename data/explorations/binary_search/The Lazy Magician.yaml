@@ -486,8 +486,9 @@ states:
           name: Contains
           rule_type: atomic
           subject: answer
-        dest: Ranges
-        feedback: []
+        dest: Picking in the middle
+        feedback:
+        - ''
         param_changes: []
       - definition:
           inputs:
@@ -504,8 +505,31 @@ states:
           name: Contains
           rule_type: atomic
           subject: answer
+        dest: Picking in the middle
+        feedback:
+        - ''
+        param_changes: []
+      - definition:
+          inputs:
+            x: range
+          name: Contains
+          rule_type: atomic
+          subject: answer
         dest: Ranges
-        feedback: []
+        feedback:
+        - '"Yeah, there''s something important about how he keeps track of the range
+          of possible numbers!"'
+        param_changes: []
+      - definition:
+          inputs:
+            x: between
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Ranges
+        feedback:
+        - '"Yeah, there''s something important about how he keeps track of the range
+          of possible numbers!"'
         param_changes: []
       - definition:
           inputs:
@@ -516,6 +540,16 @@ states:
         dest: Discussion Start
         feedback:
         - '"What does binary mean?"'
+        param_changes: []
+      - definition:
+          inputs:
+            x: try guess
+          name: Contains
+          rule_type: atomic
+          subject: answer
+        dest: Worst Case start
+        feedback:
+        - '"You want to try guessing yourself?"'
         param_changes: []
       - definition:
           rule_type: default
@@ -598,12 +632,13 @@ states:
       number. But these numbers are <b>variable</b> - one of them changes every time
       you make a guess."<br><br>"So if we''re guessing a number between 1 and 10,
       then at first we know that the number is <b>greater than</b> 0, and <b>smaller
-      than</b> 11. Or we can just say it''s 0-11"<br><br>"Then, suppose we guess 5,
-      and the Magician says it''s bigger than that."<br><br>"Now we just have to remember
-      that it''s <b>greater than</b> 5, but <b>smaller than</b> 11. In other words,
-      the range is 5-11 "<br><br>"Now suppose after that, we guess 7; and the Magician
-      says it''s smaller than that!"<br><br>"What is the range now? put it in the
-      same format as ''0-11'' or ''5-11'' from before."'
+      than</b> 11. Or we can just say it''s 0-11"<br><oppia-noninteractive-image filepath-with-value="&amp;quot;range0-11.png&amp;quot;"></oppia-noninteractive-image><br>"Then,
+      suppose we guess 5, and the Magician says it''s bigger than that."<br><oppia-noninteractive-image
+      filepath-with-value="&amp;quot;rangeadd5.png&amp;quot;"></oppia-noninteractive-image><br>"Now
+      we just have to remember that it''s <b>greater than</b> 5, but <b>smaller than</b>
+      11. In other words, the range is 5-11 "<br><oppia-noninteractive-image filepath-with-value="&amp;quot;range5-11.png&amp;quot;"></oppia-noninteractive-image><br>"Now
+      suppose after that, we guess 7; and the Magician says it''s smaller than that!"<br><br>"What
+      is the range now? put it in the same format as ''0-11'' or ''5-11'' from before."'
   name: Ranges
   param_changes: []
   widget:
@@ -758,7 +793,9 @@ states:
       \ example!\_</div><div><br></div><div>Suppose that I'm trying to guess a number\
       \ from 1 to 10, and I guess '7'.\_</div><div>Then the magician would answer\
       \ that the real number is either <u>less than</u> 7, <u>greater than</u> 7,\
-      \ or <u>is</u> 7. What would be the worst of those cases for me?</div></div>"
+      \ or <u>is</u> 7.\_</div><div><oppia-noninteractive-image filepath-with-value=\"\
+      &amp;quot;pick7worst.png&amp;quot;\"></oppia-noninteractive-image><br></div><div>What\
+      \ would be the worst of those cases for me?</div></div>"
   name: Picking in the middle
   param_changes: []
   widget:
@@ -863,7 +900,8 @@ states:
   - type: text
     value: '"OK, that was pretty simple. But what if it''s a number between 1 and
       3? Now I think there''s some kind of trick I can use to make it go faster."<br>"How
-      many tries do I need to guess a range of 3 numbers?"'
+      many tries do I need to guess a range of 3 numbers?"<div><oppia-noninteractive-image
+      filepath-with-value="&amp;quot;ThinkOf3.png&amp;quot;"></oppia-noninteractive-image><br></div>'
   name: Three Case
   param_changes: []
   widget:
@@ -1083,9 +1121,9 @@ states:
     value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;elimination.png&amp;quot;"></oppia-noninteractive-image><br></p><p>"So,
       no matter which number the magician is thinking of, if we guess 2 on our first
       try, we can eliminate two numbers! Then for the second try (if we even need
-      it), we know exactly what number to guess!"<br><br>"So maybe we don't save TOO
-      much time by being able to guess a number between 1-3 in just two tries... but
-      I wonder what we could do with one more try?"</p>
+      it), we know exactly what number to guess!"<br><oppia-noninteractive-image filepath-with-value="&amp;quot;2tree.png&amp;quot;"></oppia-noninteractive-image><br>"So
+      maybe we don't save TOO much time by being able to guess a number between 1-3
+      in just two tries... but I wonder what we could do with one more try?"</p>
   name: After three case
   param_changes: []
   widget:
@@ -1163,8 +1201,9 @@ states:
         dest: Reduce 3 guesses to 2
         feedback:
         - '"Here is another thing I like to do when I''m thinking about a hard question.
-          I try to imagine what the world would be like if I already knew the answer,
-          and what it would feel like."'
+          I try to imagine what the world would be like if I already knew the answer.
+          Then I try to find a way to change that situation to one where I really
+          do know the answer!"<div><br></div>'
         param_changes: []
     sticky: false
     widget_id: TextInput
@@ -1306,14 +1345,18 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '"Suppose I knew that I could guess a number from 1 to SOMETHING with three
-      guesses, and I knew exactly what my first guess should be to do this. After
-      I made the first guess, I would have two guesses left. And we already know something
-      we can do with two guesses!"<br>"So let''s pretend that after my first guess,
-      we see the same two-guess case that we saw before:" INSERT PICTURE HERE "This
-      must mean that our first guess, and the information the magician gave us in
-      response, narrowed down our possibilities to numbers between 1 and 3."<br><br>"What
-      could his response have been?"'
+    value: "\"Suppose I knew that I could guess a number from 1 to SOMETHING with\
+      \ three guesses, and I knew exactly what my first guess should be to do this.\
+      \ After I made the first guess, I would have two guesses left. And we already\
+      \ know something we can do with two guesses!\"<div><br>\"So let's pretend that\
+      \ after my first guess, we see the same two-guess case that we saw before -\
+      \ that we know the magician is thinking of a number between 1 and 3:\"\_<div><oppia-noninteractive-image\
+      \ filepath-with-value=\"&amp;quot;ThinkOf3.png&amp;quot;\"></oppia-noninteractive-image><br></div><div>\"\
+      So our first guess, and the information the magician gave us in response, narrowed\
+      \ down our possibilities to numbers between 1 and 3.\"<br></div><div><oppia-noninteractive-image\
+      \ filepath-with-value=\"&amp;quot;3guessSeq1.png&amp;quot;\"></oppia-noninteractive-image><br></div><div>\"\
+      What could his response have been?\"</div><div><oppia-noninteractive-image filepath-with-value=\"\
+      &amp;quot;3guessSeq3.png&amp;quot;\"></oppia-noninteractive-image><br></div></div>"
   name: Reduce 3 guesses to 2
   param_changes: []
   widget:
@@ -1370,7 +1413,8 @@ states:
 - content:
   - type: text
     value: '"OK, so if the magician said that the number is less than our guess, and
-      that told us that the number is between 1 and 3, what must our guess have been?"'
+      that told us that the number is between 1 and 3, what must our guess have been?"<div><oppia-noninteractive-image
+      filepath-with-value="&amp;quot;3guessSeq4.png&amp;quot;"></oppia-noninteractive-image><br></div>'
   name: Reduce2 - what was the guess
   param_changes: []
   widget:
@@ -1400,15 +1444,17 @@ states:
   - type: text
     value: '"Alright! So what do we know so far?"<br><br>"We are trying to guess a
       number in 3 tries. And we decided that on our first try, we should guess the
-      number 4."<br><br>"If the magician says his number is less than 4, we already
-      know what to do, and we can definitely guess that number in 2 more tries!"<p>
-      Picture of partial binary search tree w/root at 4.</p><p>"OK, now suppose we
-      guessed 4 but the magician told us his number was bigger than that!"<br><br>"Now
+      number 4."<div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessSeq5.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"If
+      the magician says his number is less than 4, we already know what to do, and
+      we can definitely guess that number in 2 more tries!"</div><div><oppia-noninteractive-image
+      filepath-with-value="&amp;quot;3tree-half.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"OK,
+      now suppose we guessed 4 but the magician told us his number was bigger than
+      that!"</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessBigger.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"Now
       we have two tries left, and we know that the number is between 5 and SOMETHING...
       and we''re trying to figure out what that SOMETHING can be, so that we can still
-      do this in two tries."<br><br>"I have a feeling that we can do almost the same
-      thing as in our ''between 1 and 3'' case, just... shifted."<br><br>"What do
-      you think our SOMETHING limit should be?"</p>'
+      do this in two tries."</div><div><br></div><div>"I have a feeling that we can
+      do almost the same thing as in our ''between 1 and 3'' case, just... shifted."</div><div><p>"What
+      do you think our SOMETHING limit should be?"</p></div>'
   name: What if it was bigger than 4
   param_changes: []
   widget:
@@ -1471,12 +1517,12 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: <p>Picture of full binary search tree with 7 nodes here</p>"Wow! having
-      three tries means that we can guess any number from 1 to 7! That's a lot better
-      than what we could do with 2 tries!"<br><br>"In fact, the extra try more than
-      doubled our range! On the first guess, we split our range into two, and then
-      no matter what the magician answers, we only have to deal with <b>half</b> the
-      remaining numbers."<br><br>I think we can <b>generalize</b> this - the idea
+    value: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;3tree.png&amp;quot;"></oppia-noninteractive-image><br></p><p>"Wow!
+      having three tries means that we can guess any number from 1 to 7! That's a
+      lot better than what we could do with 2 tries!"</p>"In fact, the extra try more
+      than doubled our range! On the first guess, we split our range into two, and
+      then no matter what the magician answers, we only have to deal with <b>half</b>
+      the remaining numbers."<br><br>I think we can <b>generalize</b> this - the idea
       of halving the range can apply in general, to any range of numbers!"<br><br>"What
       do you think?"
   name: Three tries explanation
@@ -1831,16 +1877,17 @@ states:
     value: "\"Wow, that's pretty good!\" - says the Magician. \"You figured out my\
       \ trick!\"<br><br>You suddenly realize that he's been watching you practice.<br><br>\"\
       So I guess you weren't really cheating!\" - says your friend<br>\"You just knew\
-      \ what the best questions to as were to get the answer really quickly!\"<br><br>\"\
+      \ what the best questions to ask were to get the answer really quickly!\"<br><br>\"\
       That's right! I'm actually pretty lazy. So when people ask me to guess a number\
       \ from 1 to 1000 I really don't feel like going through 1000 numbers! So I figured\
       \ out what I can do so I don't have to do too much! See?\"<br>He shows you his\
-      \ hand. It's covered in ink scribblings.<br><br>\"Just like we did!\"<br><br>\"\
-      That's right! \_I call these little notes <b>algorithms</b>. Hey, you guys are\
-      \ pretty clever - maybe you can help me figure out another one! You see, I really\
-      \ want to travel to a Far Away land, but I really don't want to travel more\
-      \ than I have to. So I was thinking...\"<br><br>The three of you walk off along\
-      \ a winding path, planning your next adventure...<br><br>"
+      \ hand. It's covered in ink scribblings:<br><oppia-noninteractive-image filepath-with-value=\"\
+      &amp;quot;Algorithm.png&amp;quot;\"></oppia-noninteractive-image><br>\"Just\
+      \ like we did!\"<br><br>\"That's right! \_I call these little notes <b>algorithms</b>.\
+      \ Hey, you guys are pretty clever - maybe you can help me figure out another\
+      \ one! You see, I really want to travel to a Far Away land, but I really don't\
+      \ want to travel more than I have to. So I was thinking...\"<br><br>The three\
+      \ of you walk off along a winding path, planning your next adventure...<br><br>"
   name: Worst Case Finished
   param_changes:
   - customization_args:
@@ -2224,7 +2271,9 @@ states:
           if it''s bigger than {{(answer|int)+1}}, then it''s between {{(answer|int)+2}}
           and 10. That''s a range of {{9-(answer|int)}} numbers. {{"Oh wait, it doesn''t
           make sense for the number to be bigger than 10! We''re guessing a number
-          between 1 and 10!" if 9==(answer|int) else ""}}'
+          between 1 and 10!" if 9==(answer|int) else ""}}<div>So, the worst case is
+          if the real number is {{"greater than" if 6&gt;(answer|int) else "less than"}}
+          {{answer}}!</div>'
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput
@@ -2234,9 +2283,9 @@ states:
       better the worst case is! so to get the <b>best worst case</b>, we have to guess
       as close to the middle as possible."<br><br>"So in this case, if we guess either
       5 or 6, the worst case will be that the new range is 5 numbers long. That''s
-      the best we can do!"<br><br>"(there''s no whole number exactly between 1 and
-      10... we could of course try guessing 5 and a half, but that doesn''t make a
-      whole lot of sense!)"'
+      the best we can do!"<div><oppia-noninteractive-image filepath-with-value="&amp;quot;middleworst1-10.png&amp;quot;"></oppia-noninteractive-image><br>"(there''s
+      no whole number exactly between 1 and 10... we could of course try guessing
+      5 and a half, but that doesn''t make a whole lot of sense!)"</div>'
   name: Middle Explanation
   param_changes: []
   widget:
@@ -2402,15 +2451,15 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: '<div><br></div><div>It works almost the same as when we added the third
+    value: <div><br></div><div>It works almost the same as when we added the third
       try!</div><div>When we had only two tries, we could guess any number from 1
-      to 3.</div><div>(two-deep tree picture)</div><div>With 3 tries, and the trick
-      of asking "Is it 4?" first, we added 4 more numbers, so we could guess from
-      1 to 7.</div><div>Picture: (3-deep tree redux)</div><div>If we have 4 tries,
-      we can use the same trick:</div><div>Picture of 4-deep binary tree (with one
-      half and top grayed out, no numbers drawn in those)</div><div>You can write
-      in all the numbers from left to right (or just count them up!).<br></div><div>So,
-      how many is that?</div>'
+      to 3.</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;2tree.png&amp;quot;"></oppia-noninteractive-image><br></div><div>With
+      3 tries, and the trick of asking "Is it 4?" first, we added 4 more numbers,
+      so we could guess from 1 to 7.<br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3tree.png&amp;quot;"></oppia-noninteractive-image><br></div><div>If
+      we have 4 tries, we can use the same trick:<br></div><div><oppia-noninteractive-image
+      filepath-with-value="&amp;quot;4tree-half.png&amp;quot;"></oppia-noninteractive-image><br></div><div>You
+      can write in all the numbers from left to right (or just count them up!).<br></div><div>So,
+      how many is that?</div>
   name: 4 tries abstract
   param_changes: []
   widget:
