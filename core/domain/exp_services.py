@@ -611,9 +611,16 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.name = new_state_name
 
     if param_changes:
+        if not isinstance(param_changes, list):
+            raise Exception(
+                'Expected param_changes to be a list, received %s' % 
+                param_changes)
         state.param_changes = []
         for param_change in param_changes:
-
+            if not isinstance(param_change, dict):
+                raise Exception(
+                    'Expected element of param_changes to be a dictionary, '
+                    'received %s' % param_change)
             exp_param_spec = exploration.param_specs.get(param_change['name'])
             if exp_param_spec is None:
                 raise Exception('No parameter named %s exists in this '
@@ -631,6 +638,10 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.widget_id = widget_id
 
     if widget_customization_args is not None:
+        if not isinstance(widget_customization_args, dict):
+            raise Exception(
+                'Expected widget_customization_args to be a dictionary, '
+                'received %s' % widget_customization_args)
         state.widget.customization_args = widget_customization_args
 
     if widget_sticky is not None:
@@ -641,7 +652,15 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.sticky = widget_sticky
 
     if widget_handlers:
+        if not isinstance(widget_handlers, dict):
+            raise Exception(
+                'Expected widget_handlers to be a dictionary, received %s' 
+                % widget_handlers)
         ruleset = widget_handlers['submit']
+        if not isinstance(ruleset, list):
+            raise Exception(
+                'Expected widget_handlers[submit] to be a list, received %s'
+                % ruleset)
         utils.recursively_remove_key(ruleset, u'$$hashKey')
 
         state.widget.handlers = [
@@ -654,24 +673,52 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         # parameter changes, if necessary.
         for rule_ind in range(len(ruleset)):
             rule = ruleset[rule_ind]
-            if isinstance(rule.get('feedback'), basestring):
+
+            if not isinstance(rule, dict):
                 raise Exception(
-                    'Rule feedback should be a list; received the string %s' %
-                    rule.get('feedback'))
+                    'Expected rule to be a dictionary, received %s' % rule)
+            if not isinstance(rule['definition'], dict):
+                raise Exception(
+                    'Expected rule[\'definition\'] to be a dictionary, '
+                    'received %s' % rule['definition'])
+            if not isinstance(rule['feedback'], list):
+                raise Exception(
+                    'Expected rule[\'feedback\'] to be a list, received %s'
+                    % rule['feedback'])
+
+            if rule.get('dest') not in exploration.state_ids:
+                raise ValueError(
+                    'The destination %s is not a valid state id'
+                    % rule.get('dest'))
+
             state_rule = exp_domain.RuleSpec(
                 rule.get('definition'), rule.get('dest'),
                 [html_cleaner.clean(feedback) for feedback
                                               in rule.get('feedback')],
-                rule.get('param_changes')                
-            )
+                rule.get('param_changes'))
 
             if rule['description'] == feconf.DEFAULT_RULE_NAME:
-                if (rule_ind != len(ruleset) - 1 or
-                        rule['definition']['rule_type'] !=
+                if rule_ind != len(ruleset) - 1:
+                    raise ValueError(
+                        'Invalid ruleset: rules other than the ' 
+                        'last one should not be default rules.')
+                if (rule['definition']['rule_type'] != 
                         rule_domain.DEFAULT_RULE_TYPE):
-                    raise ValueError('Invalid ruleset: the last rule '
-                                     'should be a default rule.')
+                    raise ValueError(
+                        'For a default rule the rule_type should be %s not %s'
+                        % rule_domain.DEFAULT_RULE_TYPE
+                        % rule['definition']['rule_type'])           
             else:
+                if rule_ind == len(ruleset) - 1:
+                    raise ValueError(
+                        'Invalid ruleset: the last rule should be a default '
+                        'rule')
+                if (rule['definition']['rule_type'] ==
+                        rule_domain.DEFAULT_RULE_TYPE):
+                    raise ValueError(
+                        'For a non-default rule the rule_type should not be %s'
+                        % rule_domain.DEFAULT_RULE_TYPE)
+
                 # TODO(sll): Generalize this to Boolean combinations of rules.
                 matched_rule = generic_widget.get_rule_by_name(
                     'submit', state_rule.definition['name'])
@@ -679,30 +726,44 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 # Normalize and store the rule params.
                 # TODO(sll): Generalize this to Boolean combinations of rules.
                 rule_inputs = state_rule.definition['inputs']
+                if not isinstance(rule_inputs, dict):
+                    raise Exception(
+                        'Expected rule_inputs to be a dict, received %s'
+                        % rule_inputs)
                 for param_name, value in rule_inputs.iteritems():
                     param_type = rule_domain.get_obj_type_for_param_name(
                         matched_rule, param_name)
 
-                    if (not isinstance(value, basestring) or
-                            '{{' not in value or '}}' not in value):
-                        normalized_param = param_type.normalize(value)
-                    else:
+                    if (isinstance(value, basestring) and 
+                            '{{' in value and '}}' in value):
+                        # TODO(jacobdavis11): Create checks that all parameters
+                        # referred to exist and have the correct types
                         normalized_param = value
-
-                    if normalized_param is None:
-                        raise Exception(
-                            '%s has the wrong type. Please replace it '
-                            'with a %s.' % (value, param_type.__name__))
-
-                    rule_inputs[param_name] = normalized_param
+                    else:
+                        try:
+                            normalized_param = param_type.normalize(value)
+                        except TypeError:
+                            raise Exception('%s has the wrong type. '
+                                'Please replace it with a %s.' %
+                                 (value, param_type.__name__))
+                    rule_inputs[param_name] = normalized_param     
 
             state.widget.handlers[0].rule_specs.append(state_rule)
 
     if content:
-        state.content = [
-            exp_domain.Content(item['type'], html_cleaner.clean(item['value']))
-            for item in content
-        ]
+        if not isinstance(content, list):
+            raise Exception(
+                'Expected content to be a list, received %s' % content)
+        if len(content) != 1:
+            raise Exception(
+                'Expected content to have length 1, received %s' % content)
+        if not isinstance(content[0], dict):
+            raise Exception(
+                'Expected entry in content to be a dict, received %s' 
+                % content[0])
+    
+        state.content = [exp_domain.Content(
+            content[0]['type'], content[0]['value'])]
 
     def _update_state_transaction(committer_id, exploration, state):
         save_state(committer_id, exploration.id, state)
