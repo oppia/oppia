@@ -93,8 +93,10 @@ def get_exploration_components_from_dir(dir_path):
                     raise Exception('More than one non-asset file specified '
                                     'for %s' % dir_path)
                 elif not filepath.endswith('.yaml'):
-                    raise Exception('The exploration data file should have a '
-                                    '.yaml suffix: %s' % filepath)
+                    raise Exception('Found invalid non-asset file %s. There '
+                                    'should only be a single non-asset file, '
+                                    'and it should have a .yaml suffix.' %
+                                    filepath)
                 else:
                     yaml_content = get_file_contents(filepath)
             else:
@@ -141,8 +143,10 @@ def get_exploration_components_from_zip(zip_file_contents):
                 raise Exception(
                     'More than one non-asset file specified for zip file')
             elif not filepath.endswith('.yaml'):
-                raise Exception(
-                    'The file not in assets/ should have a .yaml suffix')
+                raise Exception('Found invalid non-asset file %s. There '
+                                'should only be a single file not in assets/, '
+                                'and it should have a .yaml suffix.' %
+                                filepath)
             else:
                 yaml_content = zf.read(filepath)
 

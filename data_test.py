@@ -35,6 +35,10 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
 
     def test_default_explorations_are_valid(self):
         """Test the default explorations."""
+        # Show full failure messages for this test (both the system-generated
+        # one and the developer-specified one).
+        self.longMessage = True
+
         exploration_data_paths = os.listdir(
             os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR))
 
