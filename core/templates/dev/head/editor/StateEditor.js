@@ -114,14 +114,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.stateNameMemento = null;
   };
 
-  // TODO(sll): Replace this with a link to code.google.com documentation.
-  $scope.defaultTextContent = (
-      'Click \'Edit\' to enter text here. Text enclosed in dollar signs ' +
-      'will be displayed as $LaTeX$. To write a non-LaTeXed dollar sign, ' +
-      'type a single backslash (\'\\\') followed by \'$\'. For more ' +
-      'information about LaTeX, see ' +
-      'http://web.ift.uib.no/Teori/KURS/WRK/TeX/symALL.html');
-
   // This should only be non-null when the content editor is open.
   $scope.contentMemento = null;
 

@@ -591,8 +591,8 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
       };
 
       if (!$scope.explorationId) {
-        console.log('Error: File picker widget called without being given an exploration.');
-        // TODO(sll): Send an error to the backend.
+        warningsData.addWarning(
+          'Error: File picker widget called without being given an exploration.');
         return;
       }
 
