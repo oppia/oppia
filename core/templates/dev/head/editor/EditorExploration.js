@@ -32,7 +32,7 @@ oppia.run(function($rootScope) {
   });
 });
 
-function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
+function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
 
   $scope.doesStateIdExist = function() {
@@ -100,6 +100,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
         'You need to save your changes before continuing.');
   };
 
+  $window.addEventListener('beforeunload', function (e) {
+    if ($scope.isStateLockedForEditing()) {
+      var confirmationMessage = (
+          'You have unsaved changes which will be lost if you leave this page.');
+      (e || $window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    }
+  });
 
   /********************************************
   * Methods affecting the URL location hash.
@@ -655,7 +663,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
     .success(function(data) {
       // Reloads the page.
       explorationData.data.version = data.version;
-      window.location = $scope.explorationUrl;
+      $window.location = $scope.explorationUrl;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
@@ -664,7 +672,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
   $scope.deleteExploration = function() {
     $http['delete']($scope.explorationDataUrl)
     .success(function(data) {
-      window.location = '/gallery/';
+      $window.location = '/gallery/';
     });
   };
 
@@ -755,6 +763,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal,
  * Injects dependencies in a way that is preserved by minification.
  */
 EditorExploration.$inject = [
-  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$filter', '$rootScope',
-  'explorationData', 'warningsData', 'activeInputData', 'requestCreator'
+  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
+  '$filter', '$rootScope', 'explorationData', 'warningsData', 'activeInputData',
+  'requestCreator'
 ];
