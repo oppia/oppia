@@ -21,6 +21,15 @@
 
 
 <div class="container-fluid">
+  <div ng-if="paramChanges.length === 0">
+    <div class="row-fluid">
+      <div class="span10">
+        <em>No parameter changes have been defined.</em>
+      </div>
+      <div class="span2"></div>
+    </div>
+  </div>
+
   <div ng-repeat="param in paramChanges">
     <div class="row-fluid">
       <div class="span1">

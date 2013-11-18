@@ -32,6 +32,16 @@ h3 {
   line-height: 1.1;
 }
 
+/*
+  Override the Bootstrap default (which had the horizontal padding set to 20px 
+  on both sides, leading to alignment issues when nesting container-fluid
+  elements in the exploration editor).
+*/
+.container-fluid {
+  padding-right: 0;
+  padding-left: 0;
+}
+
 .oppia-editor h3 {
   font-size: 18px;
   margin: 0;
