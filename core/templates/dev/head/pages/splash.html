@@ -1,91 +1,23 @@
-<html ng-app>
+<!doctype html>
+<html ng-app="splash">
   <head>
+    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
+    <script src="/third_party/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <script>
+      var splash = angular.module('splash', ['ui.bootstrap']);
+      splash.config(function($interpolateProvider) {
+        $interpolateProvider.startSymbol('<[');
+        $interpolateProvider.endSymbol(']>');
+      });
+    </script>
+
+    <link rel="stylesheet" type="text/css"
+      href="/lib/static/bootstrap-2.3.1-r1/css/bootstrap.css" media="screen">
     <style media="screen">
-      .carousel-container {
-        width:  800px;
-        height: 700px;
-        position: relative;
-        margin: 0 auto 40px;
-        -webkit-perspective: 1100px;
-                perspective: 1100px;
-      }
-  
-      #carousel {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        -webkit-transform: translateZ( -550px );
-                transform: translateZ( -550px );
-        -webkit-transform-style: preserve-3d;
-                transform-style: preserve-3d;
-        -webkit-transition: -webkit-transform 1s;
-                transition: transform 1s;
-      }
-  
-      #carousel div {
-        display: block;
-        position: absolute;
-        width: 776px;
-        height: 676px;
-        left: 10px;
-        top: 10px;
-        border: 2px solid black;
-      }
- 
-      #carousel div:nth-child(1) {
-        -webkit-transform: rotateY(   0deg ) translateZ( 550px );
-                transform: rotateY(   0deg ) translateZ( 550px );
-      }
-      #carousel div:nth-child(2) {
-        -webkit-transform: rotateY(  90deg ) translateZ( 550px );
-                transform: rotateY(  90deg ) translateZ( 550px );
-      }
-      #carousel div:nth-child(3) {
-        -webkit-transform: rotateY( 180deg ) translateZ( 550px );
-                transform: rotateY( 180deg ) translateZ( 550px );
-      }
-      #carousel div:nth-child(4) {
-        -webkit-transform: rotateY( 270deg ) translateZ( 550px );
-                transform: rotateY( 270deg ) translateZ( 550px );
-      }
-
-      .oppia-left-button,
-      .oppia-right-button {
-        background: rgba(200, 200, 255, 0.3);
-        height: 40%;
-        position: absolute;
-        top: 30%;
-        width: 10%;
-      }
-
-      .oppia-left-button {
-        left: -5%;
-      }
-
-      .oppia-right-button {
-        right: -5%;
-      }
-
-      /* Try not to edit stuff above this line (unless you know what
-           you're doing!)
-       */
-
-      /* The following CSS rule sets the background color of the first
-         frame. This is just an example of how to style individual
-         frames; you can set the styles for other frames in a similar
-         fashion.
-        */
-      #carousel div:nth-child(1) {
-        background: hsla(   210, 75%, 75%, 1.0 );
-      }
-      #carousel div:nth-child(2) {
-        background: hsla(   210, 75%, 75%, 1.0 );
-      }
-      #carousel div:nth-child(3) {
-        background: hsla(   210, 75%, 75%, 1.0 );
-      }
-      #carousel div:nth-child(4) {
-        background: hsla(   210, 75%, 75%, 1.0 );
+      .oppia-splash-page {
+        background: hsla(210, 75%, 75%, 1.0);
+        padding:50px 90px 0 90px;
+        height: 600px;
       }
   
       /* This rule styles the 'explore' button at the bottom. */
@@ -109,111 +41,87 @@
   </head>
 
   <body>
-    <div ng-controller="CarouselCtrl">
-      <div class="carousel-container">
-        <div id="carousel">
-          <div align="center">
-            <!-- Edit the content of the first frame here. -->
-            <p class="ex2" style="color:white" align="left">
-            2, 4, 6, ... what comes next?
-            </p>
-            <p class="ex2" style="color:white" align="right">
-            7
-            </p>
-            <p class="ex2" style="color:white" align="left">
-            Sorry. Let's try this... what is 6-4?
-            </p>
-            <p class="ex2" style="color:white" align="right">
-            2
-            </p>
-            <p class="ex2" style="color:white" align="left">
-            Great! And what is 4-2?
-            </p>
-            <p class="ex2" style="color:white" align="right">
-            2
-            </p>
-            <p class="ex2" style="color:white" align="left">
-            Good. So in 2, 4, 6, ... what comes next?
-            </p>
-            <p class="ex2" style="color:white" align="right">
-            8
-            </p>
-            <p class="ex2" style="color:black">
-            Explorations are the learning blocks of Oppia. What is an exploration? Iterative learning fueled by discovery and thought provocation. The objective of an exploration is to teach one how to fish versus simply giving the fish. Think of explorations as bite-sized learning journeys that can be created by anyone for everyone.
-            </p>
-          </div>
-          <div align="center">
-            <!-- Edit the content of the second frame here. -->
-            <p class="ex1" style="color:white">
-            For students<img src="images/oppia_icons/graduated-icon.png" align="middle">
-            <br>
-            <br>
-            For teachers <img src="images/oppia_icons/Teacher-icon.png" align="middle">
-            <br>
-            <br>
-            For mankind <img src="images/oppia_icons/Users-icon.png" align="middle">
-            </p>
-            <p class="ex2" style="color:black">
-            Oppia is for students and teachers alike. Actually, it's for the lifelong learner in you. With Oppia you could sit and learn or stand and teach -- all on the same day. Everyone's invited :-)
-            </p>
-          </div>
-          <div align="center">
-            <!-- Edit the content of the third frame here. -->
-            <p class="ex1" style="color:white">
-            Learn. Create. Contribute.
-            <br>
-            <br>
-              <img src="images/oppia_icons/Teamwork-icon.png" width=30% height=30% align="middle">
-            <br>
-            <br>
-            The Oppia Family
-            <p class="ex2" style="color:black">
-            No matter how you use Oppia, there is plenty of room for everybody. Whether you want to sit back and learn or stand up and teach, you become a member of the Oppia family.  
-            </p>
-          </div>
-          <div align="center">
-            <!-- Edit the content of the fourth frame here. -->
-            <p class="ex1" style="color:white">
-            Made with <img src="images/oppia_icons/love-icon.png" align="middle"> everywhere.
-            <p class="ex2" style="color:black">
-            No celebrities or commercial capitals. If there is one thing that makes Oppia, it is passion - passion for educational discovery that can be found planet-wide. As a result, Oppia is constantly growing, and never quite finished! 
-            </p>
-          </div>
+    <carousel>
+      <slide align="center">
+        <div class="oppia-splash-page">
+          <!-- Edit the content of the first frame here. -->
+          <p class="ex2" style="color:white" align="left">
+          2, 4, 6, ... what comes next?
+          </p>
+          <p class="ex2" style="color:white" align="right">
+          7
+          </p>
+          <p class="ex2" style="color:white" align="left">
+          Sorry. Let's try this... what is 6-4?
+          </p>
+          <p class="ex2" style="color:white" align="right">
+          2
+          </p>
+          <p class="ex2" style="color:white" align="left">
+          Great! And what is 4-2?
+          </p>
+          <p class="ex2" style="color:white" align="right">
+          2
+          </p>
+          <p class="ex2" style="color:white" align="left">
+          Good. So in 2, 4, 6, ... what comes next?
+          </p>
+          <p class="ex2" style="color:white" align="right">
+          8
+          </p>
+          <p class="ex2" style="color:black">
+          Explorations are the learning blocks of Oppia. What is an exploration? Iterative learning fueled by discovery and thought provocation. The objective of an exploration is to teach one how to fish versus simply giving the fish. Think of explorations as bite-sized learning journeys that can be created by anyone for everyone.
+          </p>
         </div>
+      </slide>
+      <slide align="center">
+        <div class="oppia-splash-page">
+          <!-- Edit the content of the second frame here. -->
+          <p class="ex1" style="color:white">
+          For students<img src="images/oppia_icons/graduated-icon.png" align="middle">
+          <br>
+          <br>
+          For teachers <img src="images/oppia_icons/Teacher-icon.png" align="middle">
+          <br>
+          <br>
+          For mankind <img src="images/oppia_icons/Users-icon.png" align="middle">
+          </p>
+          <p class="ex2" style="color:black">
+          Oppia is for students and teachers alike. Actually, it's for the lifelong learner in you. With Oppia you could sit and learn or stand and teach -- all on the same day. Everyone's invited :-)
+          </p>
+        </div>
+      </slide>
+      <slide align="center">
+        <div class="oppia-splash-page">
+          <!-- Edit the content of the third frame here. -->
+          <p class="ex1" style="color:white">
+          Learn. Create. Contribute.
+          <br>
+          <br>
+            <img src="images/oppia_icons/Teamwork-icon.png" width=30% height=30% align="middle">
+          <br>
+          <br>
+          The Oppia Family
+          <p class="ex2" style="color:black">
+          No matter how you use Oppia, there is plenty of room for everybody. Whether you want to sit back and learn or stand up and teach, you become a member of the Oppia family.  
+          </p>
+        </div>
+      </slide>
+      <slide align="center">
+        <div class="oppia-splash-page">
+          <!-- Edit the content of the fourth frame here. -->
+          <p class="ex1" style="color:white">
+          Made with <img src="images/oppia_icons/love-icon.png" align="middle"> everywhere.
+          <p class="ex2" style="color:black">
+          No celebrities or commercial capitals. If there is one thing that makes Oppia, it is passion - passion for educational discovery that can be found planet-wide. As a result, Oppia is constantly growing, and never quite finished! 
+          </p>
+        </div>
+      </slide>
+    </carousel>
 
-        <button class="oppia-left-button" ng-click="moveBackward()">&lt;</button>
-        <button class="oppia-right-button" ng-click="moveForward()">&gt;</button>
-      </div>
-
-      <!-- This button can be restyled using the .oppia-explore-button CSS rule above. -->
-      <center>
-        <button class="oppia-explore-button">Explore</button>
-      </center>
-    </div>
-
-    <!-- Try not to edit stuff above this line (unless you know what
-         you're doing!) -->
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js">
-    </script>
-  
-    <script>
-      function CarouselCtrl($scope) {
-        var carousel = document.getElementById('carousel');
-        var panelCount = carousel.children.length;
-        $scope.theta = 0;
-  
-        $scope.moveBackward = function() {
-          $scope.theta += ( 360 / panelCount );
-          carousel.style.webkitTransform = 'translateZ( -550px ) rotateY(' + $scope.theta + 'deg)';
-          console.log(carousel.style);
-          console.log(carousel);
-        };
-  
-        $scope.moveForward = function() {
-          $scope.theta -= ( 360 / panelCount );
-          carousel.style.webkitTransform = 'translateZ( -550px ) rotateY(' + $scope.theta + 'deg)';
-        };
-      }
-    </script>
+    <!-- This button can be restyled using the .oppia-explore-button CSS rule above. -->
+    <center>
+      <button class="oppia-explore-button">Explore</button>
+    </center>
   </body>
 </html>
