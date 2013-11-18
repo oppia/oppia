@@ -612,6 +612,12 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
 
       $scope.openImageUploader = function() {
         $scope.imageUploaderIsActive = true;
+
+        // Set the filename to match the name of the uploaded file.
+        document.getElementById('newImage').onchange = function(e) {
+          $scope.newImageFilename = e.target.value.split(/(\\|\/)/g).pop();
+          $scope.$apply();
+        };
       };
 
       $scope.closeImageUploader = function() {
@@ -673,8 +679,10 @@ oppia.directive('filepath', function ($http, $rootScope, $sce, warningsData) {
         });
       };
 
+      $scope.filepathsLoaded = false;
       $http.get('/create/resource_list/' + $scope.explorationId).success(function(data) {
         $scope.filepaths = data.filepaths;
+        $scope.filepathsLoaded = true;
       });
     }
   };

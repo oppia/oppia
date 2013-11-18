@@ -4,6 +4,13 @@
   </div>
   <div ng-if="hasExplorationId()">
     <div ng-show="!imageUploaderIsActive">
+
+      <div ng-if="!filepathsLoaded">
+        <center>
+          <img src="/images/loading.gif" alt="Loading..." width="50px">
+        </center>
+      </div>
+
       <div ng-repeat="filepath in filepaths track by $index">
         <label>
           <input type="radio" ng-model="localItem.label"
