@@ -28,6 +28,13 @@ class MainPage(base.BaseHandler):
     """Main splash page for Oppia."""
 
     def get(self):
+        self.render_template('pages/splash.html')
+
+
+class WelcomePage(base.BaseHandler):
+    """Welcome exploration."""
+
+    def get(self):
         """Handles GET requests."""
         if not exp_services.get_exploration_by_id('0', strict=False):
             exp_services.delete_demo('0')
@@ -36,7 +43,7 @@ class MainPage(base.BaseHandler):
         self.values.update({
             'gallery_login_url': current_user_services.create_login_url('/gallery'),
         })
-        self.render_template('pages/splash.html')
+        self.render_template('pages/welcome.html')
 
 
 class AboutPage(base.BaseHandler):
