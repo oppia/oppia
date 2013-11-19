@@ -59,6 +59,11 @@ class BaseModel(models.Model):
         self.save()
         return self
 
+    @classmethod
+    def put_multi(cls, entities):
+        for entity in entities:
+            entity.put()
+
     def delete(self):
         super(BaseModel, self).delete()
 

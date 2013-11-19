@@ -111,9 +111,8 @@ class ExplorationHandler(base.BaseHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        exp_services.add_state(self.user_id, exploration_id, state_name)
-        state_id = exp_services.convert_state_name_to_id(
-            exploration_id, state_name)
+        state_id = exp_services.add_states(
+            self.user_id, exploration_id, [state_name])[0]
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({

@@ -30,8 +30,9 @@ class StateCounterUnitTests(test_utils.GenericTestBase):
     def test_state_entry_counts(self):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'user_id', 'exploration', 'category', 'eid'))
-        exp_services.add_state('user_id', exp.id, 'State 2')
-        second_state = exp_services.get_state_by_name(exp.id, 'State 2')
+        second_state_id = exp_services.add_states(
+            'user_id', exp.id, ['State 2'])[0]
+        second_state = exp_services.get_state_by_id(exp.id, second_state_id)
 
         state1_id = exp.init_state_id
         state2_id = second_state.id

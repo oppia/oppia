@@ -88,3 +88,24 @@ def delete(key):
         counters.MEMCACHE_DELETE_SUCCESS.inc()
 
     return return_code
+
+
+def delete_multi(keys):
+    """Deletes multiple keys in memcache.
+
+    Args:
+      - keys: the keys (strings) to delete.
+
+    Returns:
+      True if all operations complete successfully; False otherwise.
+    """
+    for key in keys:
+        assert isinstance(key, basestring)
+    return_value = memcache.delete_multi(keys)
+
+    if return_value is True:
+        counters.MEMCACHE_DELETE_SUCCESS.inc()
+    else:
+        counters.MEMCACHE_DELETE_FAILURE.inc()        
+
+    return return_value

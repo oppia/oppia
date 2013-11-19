@@ -58,3 +58,15 @@ def delete(unused_key):
     successful delete.
   """
   return 1
+
+
+def delete_multi(keys):
+    """Deletes multiple keys in memcache.
+
+    Args:
+      - keys: the keys (strings) to delete.
+
+    Returns:
+      True if all operations complete successfully; False otherwise.
+    """
+    return True

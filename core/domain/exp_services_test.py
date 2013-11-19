@@ -195,7 +195,7 @@ class ExplorationParametersUnitTests(ExplorationServicesUnitTests):
         }
         state = exploration.init_state
         state.param_changes = [independent_pc, dependent_pc]
-        exp_services.save_state('committer_id', 'eid', state)
+        exp_services.save_states('committer_id', 'eid', [state])
         exp_services.save_exploration('committer_id', exploration)
 
         reader_params = {}
@@ -205,7 +205,7 @@ class ExplorationParametersUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(reader_params, {})
 
         state.param_changes = [dependent_pc]
-        exp_services.save_state('committer_id', 'eid', state)
+        exp_services.save_states('committer_id', 'eid', [state])
         exp_services.save_exploration('committer_id', exploration)
 
         reader_params = {'a': 'secondValue'}
@@ -232,7 +232,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        exp_services.add_states(self.owner_id, exploration.id, ['New state'])
 
         exploration = exp_services.get_exploration_by_id(
             'A different exploration_id')
@@ -328,7 +328,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        exp_services.add_states(self.owner_id, exploration.id, ['New state'])
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
@@ -421,7 +421,7 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        exp_services.add_states(self.owner_id, exploration.id, ['New state'])
         yaml_content = exp_services.export_to_yaml(exploration.id)
         self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
@@ -431,7 +431,7 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        exp_services.add_states(self.owner_id, exploration.id, ['New state'])
 
         zip_file_output = exp_services.export_to_zip_file(exploration.id)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
@@ -446,7 +446,7 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
+        exp_services.add_states(self.owner_id, exploration.id, ['New state'])
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
@@ -468,13 +468,13 @@ states:
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
                 'A different exploration_id'))
-        exp_services.add_state(self.owner_id, exploration.id, 'New state')
-        new_state = exp_services.get_state_by_name(exploration.id, 'New state')
-        state_dict = exp_services.export_state_to_dict(
-            exploration.id, new_state.id)
+        new_state_id = exp_services.add_states(
+            self.owner_id, exploration.id, ['New state'])[0]
 
+        state_dict = exp_services.export_state_to_dict(
+            exploration.id, new_state_id)
         expected_dict = {
-            'id': new_state.id,
+            'id': new_state_id,
             'name': u'New state',
             'content': [{
                 'type': 'text',
@@ -491,7 +491,7 @@ states:
                         'definition': {
                             u'rule_type': u'default'
                         },
-                        'dest': new_state.id,
+                        'dest': new_state_id,
                         'feedback': [],
                         'param_changes': [],
 
@@ -507,28 +507,6 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = 'submit'
-
-    def test_convert_state_name_to_id(self):
-        """Test converting state names to ids."""
-        eid = 'exp_id'
-        exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                'user_id', 'A title', 'A category', eid))
-
-        sid = 'state_id'
-        state_name = 'State 1'
-        exp_services.add_state(
-            'user_id', exploration.id, state_name, state_id=sid)
-
-        self.assertEqual(
-            exp_services.convert_state_name_to_id(eid, state_name), sid)
-
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            exp_services.convert_state_name_to_id(eid, 'fake_name')
-
-        self.assertEqual(
-            exp_services.convert_state_name_to_id(eid, feconf.END_DEST),
-            feconf.END_DEST)
 
     def test_get_unresolved_answers(self):
         self.assertEquals(
@@ -560,27 +538,14 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 'fake@user.com', 'A title', 'A category', eid))
 
-        id_1 = '123'
         name_1 = 'State 1'
-        exp_services.add_state('fake@user.com', eid, name_1, state_id=id_1)
-        state_1 = exp_services.get_state_by_name(eid, name_1)
+        id_1 = exp_services.add_states('fake@user.com', eid, [name_1])[0]
+        state_1 = exp_services.get_state_by_id(eid, id_1)
 
         exploration = exp_services.get_exploration_by_id(eid)
         fetched_state_1 = exp_services.get_state_by_id(exploration.id, id_1)
         self.assertEqual(fetched_state_1.id, state_1.id)
         self.assertEqual(fetched_state_1.name, state_1.name)
-
-        self.assertEqual(
-            exp_services.get_state_by_name(eid, name_1).id, state_1.id)
-
-        name_2 = 'fake name'
-        self.assertIsNone(exp_services.get_state_by_name(
-            eid, name_2, strict=False))
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            exp_services.get_state_by_name(eid, name_2, strict=True)
-        # The default behavior is to fail noisily.
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            exp_services.get_state_by_name(eid, name_2)
 
     def test_delete_state(self):
         """Test deletion of states."""
@@ -588,7 +553,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID))
-        exp_services.add_state(USER_ID, EXP_ID, 'first state')
+        exp_services.add_states(USER_ID, EXP_ID, ['first state'])
         exploration = exp_services.get_exploration_by_id(EXP_ID)
 
         with self.assertRaisesRegexp(
@@ -596,7 +561,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_state(
                 USER_ID, EXP_ID, exploration.state_ids[0])
 
-        exp_services.add_state(USER_ID, EXP_ID, 'second state')
+        exp_services.add_states(USER_ID, EXP_ID, ['second state'])
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.delete_state(USER_ID, EXP_ID, exploration.state_ids[1])
@@ -633,8 +598,9 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exploration.init_state.name, 'Renamed state')
 
         # Add a new state.
-        exp_services.add_state(USER_ID, EXP_ID, 'State 2')
-        second_state = exp_services.get_state_by_name(EXP_ID, 'State 2')
+        second_state_id = exp_services.add_states(
+            USER_ID, EXP_ID, ['State 2'])[0]
+        second_state = exp_services.get_state_by_id(EXP_ID, second_state_id)
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         self.assertEqual(len(exploration.state_ids), 2)
@@ -648,7 +614,7 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         # But it is not OK to add or rename a state using a name that already
         # exists.
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
-            exp_services.add_state(USER_ID, EXP_ID, 'State 2')
+            exp_services.add_states(USER_ID, EXP_ID, ['State 2'])
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             rename_state(USER_ID, EXP_ID, second_state.id, 'Renamed state')
 
@@ -799,7 +765,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of widget_handlers."""
 
         # We create a second state to use as a rule destination
-        exp_services.add_state('fake@user.com', self.exploration.id, 'State 2')
+        exp_services.add_states(
+            'fake@user.com', self.exploration.id, ['State 2'])
         self.exploration = exp_services.get_exploration_by_id(
             self.exploration.id)
         self.widget_handlers['submit'][1]['dest'] = (
@@ -985,7 +952,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             eid, 5)
         self.assertEqual(len(snapshots_metadata), 1)
 
-        exp_services.add_state('committer_id_2', eid, 'New state')
+        new_state_id = exp_services.add_states(
+            'committer_id_2', eid, ['New state'])[0]
         commit_dict_2 = {
             'committer_id': 'committer_id_2',
             'commit_message': '',
@@ -1008,7 +976,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'bad_committer', eid, 'invalid_state_id')
 
         # Now delete the new state.
-        new_state_id = exp_services.convert_state_name_to_id(eid, 'New state')
         exp_services.delete_state('committer_id_3', eid, new_state_id)
         commit_dict_3 = {
             'committer_id': 'committer_id_3',

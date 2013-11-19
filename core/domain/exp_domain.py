@@ -401,8 +401,13 @@ class Exploration(object):
     def has_state_named(self, state_name):
         """Whether the exploration contains a state with the given name."""
         # TODO(sll): Do a projection query here to get just the state names.
-        states = [State.from_dict(
-            state_id, exp_models.StateModel.get(self.id, state_id).value
-        ) for state_id in self.state_ids]
+        # For this to work, though, the state name needs to be stored in a
+        # separate model field.
+        state_models = exp_models.StateModel.get_multi(self.id, self.state_ids)
 
-        return any([state.name == state_name for state in states])
+        for (ind, state_model) in enumerate(state_models):
+            state = State.from_dict(self.state_ids[ind], state_model.value)
+            if state.name == state_name:
+                return True
+
+        return False

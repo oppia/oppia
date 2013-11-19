@@ -75,7 +75,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         new_state = exp_domain.State(
             'Initial state id', 'name', [], [], None)
-        exp_services.save_state(USER_ID, exploration.id, new_state)
+        exp_services.save_states(USER_ID, exploration.id, [new_state])
         exploration.state_ids = ['Initial state id']
 
         # There must be at least one editor id.
@@ -99,7 +99,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         INIT_STATE_NAME = 'init state name'
         init_state = exp_domain.State(
             INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
-        exp_services.save_state(USER_ID, exploration.id, init_state)
+        exp_services.save_states(USER_ID, exploration.id, [init_state])
 
         exploration.state_ids = [INIT_STATE_ID]
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
@@ -107,7 +107,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         second_state = exp_domain.State(
             'unused_second_state', 'unused name', [], [], None)
-        exp_services.save_state(USER_ID, exploration.id, second_state)
+        exp_services.save_states(USER_ID, exploration.id, [second_state])
         exploration.state_ids.append(second_state.id)
         self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
         self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)

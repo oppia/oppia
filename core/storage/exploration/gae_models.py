@@ -50,6 +50,25 @@ class StateModel(base_models.BaseModel):
         return super(StateModel, cls).get(
             state_id, strict=strict, parent=exploration_key)
 
+    @classmethod
+    def _get_state_key(cls, exploration_id, state_id):
+        return ndb.Key(
+            ExplorationModel._get_kind(), exploration_id,
+            StateModel._get_kind(), state_id)
+
+    @classmethod
+    def get_multi(cls, exploration_id, state_ids, strict=True):
+        """Gets states by ids."""
+        state_keys = [cls._get_state_key(exploration_id, state_id)
+                      for state_id in state_ids]
+        results = ndb.get_multi(state_keys)
+        if strict:
+            for ind, result in enumerate(results):
+                if result is None:
+                    raise Exception(
+                        'Could not find state with id %s' % state_ids[ind])
+        return results
+
     # JSON representation of a state.
     value = ndb.JsonProperty(required=True, indexed=False)
 

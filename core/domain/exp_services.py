@@ -341,35 +341,41 @@ def save_exploration(committer_id, exploration):
         _save_exploration_transaction, committer_id, exploration)
 
 
-def save_state(committer_id, exploration_id, state):
-    """Commits a state domain object to persistent storage.
+def save_states(committer_id, exploration_id, states):
+    """Commits state domain objects to persistent storage.
 
-    The caller should also commit the exploration, if appropriate. For safety,
-    calls to save_state() should be in a transaction with calls to
-    save_exploration() (or with datastore operations on the corresponding
-    Explorations).
+    It is the caller's responsibility to commit the exploration, if
+    appropriate. For safety, calls to save_states() should be in a transaction
+    with calls to save_exploration() (or with datastore operations on the
+    corresponding Explorations).
     """
     # TODO(sll): This should probably be refactored as follows: the exploration
     # domain object would store a list that accumulates actions to perform
     # when the exploration domain object is saved. This method would then not
     # exist, so it cannot be called independently of save_exploration().
-    state_memcache_key = _get_state_memcache_key(exploration_id, state.id)
-    memcache_services.delete(state_memcache_key)
+    state_memcache_keys = [_get_state_memcache_key(exploration_id, state.id)
+                           for state in states]
+    memcache_services.delete_multi(state_memcache_keys)
 
-    state.validate()
+    for state in states:
+        state.validate()
 
-    def _save_state_transaction(committer_id, exploration_id, state):
-        state_model = exp_models.StateModel.get(
-            exploration_id, state.id, strict=False)
-        if state_model is None:
-            state_model = exp_models.StateModel(
-                id=state.id, exploration_id=exploration_id)
+    def _save_states_transaction(committer_id, exploration_id, states):
+        state_ids = [state.id for state in states]
+        state_models = exp_models.StateModel.get_multi(
+            exploration_id, state_ids, strict=False)
 
-        state_model.value = state.to_dict()
-        state_model.put()
+        for ind, state_model in enumerate(state_models):
+            # Craete a new state if it does not already exist.
+            if state_model is None:
+                state_models[ind] = exp_models.StateModel(
+                    id=states[ind].id, exploration_id=exploration_id)
+            state_models[ind].value = states[ind].to_dict()
+
+        exp_models.StateModel.put_multi(state_models)
 
     transaction_services.run_in_transaction(
-        _save_state_transaction, committer_id, exploration_id, state)
+        _save_states_transaction, committer_id, exploration_id, states)
 
 
 def create_new(
@@ -383,7 +389,7 @@ def create_new(
     state_id = exp_models.StateModel.get_new_id(init_state_name)
     new_state = exp_domain.State(
         state_id, init_state_name, [exp_domain.Content('text', '')], [], None)
-    save_state(user_id, exploration_id, new_state)
+    save_states(user_id, exploration_id, [new_state])
 
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
@@ -515,56 +521,37 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
 
 
 # Operations on states belonging to an exploration.
-def get_state_by_name(exploration_id, state_name, strict=True):
-    """Gets a state by name. Fails noisily if strict == True."""
+def add_states(committer_id, exploration_id, state_names):
+    """Adds multiple states at a time. Commits changes.
+
+    Returns the corresponding list of state_ids.
+    """
     exploration = get_exploration_by_id(exploration_id)
-    assert state_name
+    for state_name in state_names:
+        if exploration.has_state_named(state_name):
+            raise ValueError('Duplicate state name %s' % state_name)
 
-    # TODO(sll): This is too slow; improve it.
-    state = None
-    for candidate_state_id in exploration.state_ids:
-        # TODO(sll): Do a projection query to get just the state name.
-        candidate_state = exp_domain.State.from_dict(
-            candidate_state_id, exp_models.StateModel.get(
-                exploration_id, candidate_state_id).value)
-        if candidate_state.name == state_name:
-            state = candidate_state
-            break
+    state_ids = [exp_models.StateModel.get_new_id(name) for name in state_names]
+    new_states = []
+    for ind, state_id in enumerate(state_ids):
+        new_states.append(exp_domain.State(
+            state_id, state_names[ind], [exp_domain.Content('text', '')],
+            [], None))
 
-    if strict and not state:
-        raise Exception('State %s not found' % state_name)
-    return state
-
-
-def convert_state_name_to_id(exploration_id, state_name):
-    """Converts a state name to an id. Handles the END state case."""
-    if state_name == feconf.END_DEST:
-        return feconf.END_DEST
-    return get_state_by_name(exploration_id, state_name).id
-
-
-def add_state(committer_id, exploration_id, state_name, state_id=None):
-    """Adds a new state, and returns it. Commits changes."""
-    exploration = get_exploration_by_id(exploration_id)
-    if exploration.has_state_named(state_name):
-        raise ValueError('Duplicate state name %s' % state_name)
-
-    state_id = state_id or exp_models.StateModel.get_new_id(state_name)
-    new_state = exp_domain.State(
-        state_id, state_name, [exp_domain.Content('text', '')], [], None)
-
-    def _add_state_transaction(committer_id, exploration_id, new_state):
+    def _add_states_transaction(committer_id, exploration_id, new_states):
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration_id)
         memcache_services.delete(exploration_memcache_key)
 
-        save_state(committer_id, exploration_id, new_state)
+        save_states(committer_id, exploration_id, new_states)
         exploration = get_exploration_by_id(exploration_id)
-        exploration.state_ids.append(state_id)
+        exploration.state_ids += state_ids
         save_exploration(committer_id, exploration)
 
     transaction_services.run_in_transaction(
-        _add_state_transaction, committer_id, exploration_id, new_state)
+        _add_states_transaction, committer_id, exploration_id, new_states)
+
+    return state_ids
 
 
 def update_state(committer_id, exploration_id, state_id, new_state_name,
@@ -766,7 +753,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
             content[0]['type'], content[0]['value'])]
 
     def _update_state_transaction(committer_id, exploration, state):
-        save_state(committer_id, exploration.id, state)
+        save_states(committer_id, exploration.id, [state])
         save_exploration(committer_id, exploration)
 
     transaction_services.run_in_transaction(
@@ -798,7 +785,7 @@ def delete_state(committer_id, exploration_id, state_id):
                         rule.dest = other_state_id
                         changed = True
             if changed:
-                save_state(committer_id, exploration_id, other_state)
+                save_states(committer_id, exploration_id, [other_state])
 
         # Delete the state with id state_id.
         exploration_memcache_key = _get_exploration_memcache_key(
@@ -852,11 +839,16 @@ def create_from_yaml(
     if exploration_schema_version != CURRENT_EXPLORATION_SCHEMA_VERSION:
         raise Exception('Sorry, we can only process v1 YAML files at present.')
 
+    state_names_to_ids = {}
+
     init_state_name = exploration_dict['states'][0]['name']
 
     exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name)
+
+    exploration = get_exploration_by_id(exploration_id)
+    state_names_to_ids[init_state_name] = exploration.state_ids[0]
 
     try:
         exploration_param_specs = {
@@ -864,12 +856,20 @@ def create_from_yaml(
             for (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
         }
 
-        for sdict in exploration_dict['states']:
-            if sdict['name'] != init_state_name:
-                add_state(user_id, exploration_id, sdict['name'])
+        other_state_names = [
+            sdict['name'] for sdict in exploration_dict['states']
+            if sdict['name'] != init_state_name]
+        other_state_ids = add_states(
+            user_id, exploration_id, other_state_names)
+
+        for ind, other_state_id in enumerate(other_state_ids):
+            state_names_to_ids[other_state_names[ind]] = other_state_id
+
+        all_states = []
 
         for sdict in exploration_dict['states']:
-            state = get_state_by_name(exploration_id, sdict['name'])
+            state = get_state_by_id(
+                exploration_id, state_names_to_ids[sdict['name']])
 
             state.content = [
                 exp_domain.Content(
@@ -892,8 +892,10 @@ def create_from_yaml(
                 'name': handler['name'],
                 'rule_specs': [{
                     'definition': rule_spec['definition'],
-                    'dest': convert_state_name_to_id(
-                        exploration_id, rule_spec['dest']),
+                    'dest': (
+                        feconf.END_DEST if rule_spec['dest'] == feconf.END_DEST
+                        else state_names_to_ids[rule_spec['dest']]
+                    ),
                     'feedback': [html_cleaner.clean(feedback)
                                  for feedback in rule_spec['feedback']],
                     'param_changes': rule_spec.get('param_changes', []),
@@ -904,7 +906,9 @@ def create_from_yaml(
                 wdict['widget_id'], wdict['customization_args'],
                 widget_handlers, wdict['sticky'])
 
-            save_state(user_id, exploration_id, state)
+            all_states.append(state)
+
+        save_states(user_id, exploration_id, all_states)
 
         exploration = get_exploration_by_id(exploration_id)
         exploration.default_skin = exploration_dict['default_skin']

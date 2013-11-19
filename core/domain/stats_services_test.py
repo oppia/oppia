@@ -255,7 +255,7 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         exp.init_state.widget.handlers[0].rule_specs = [
             not_default_rule_spec, exp_domain.DEFAULT_RULESPEC
         ]
-        exp_services.save_state('fake@user.com', exp.id, exp.init_state)
+        exp_services.save_states('fake@user.com', exp.id, [exp.init_state])
 
         stats_services.EventHandler.record_state_hit(
             'eid', exp.init_state.id, True)
@@ -304,11 +304,10 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         exp = exp_services.get_exploration_by_id(exp_services.create_new(
             'fake@user.com', 'exploration', 'category', 'eid'))
         SECOND_STATE = 'State 2'
-        exp_services.add_state('fake@user.com', exp.id, SECOND_STATE)
+        state2_id = exp_services.add_states(
+            'fake@user.com', exp.id, [SECOND_STATE])[0]
         exp = exp_services.get_exploration_by_id('eid')
         state1_id = exp.init_state_id
-        second_state = exp_services.get_state_by_name('eid', SECOND_STATE)
-        state2_id = second_state.id
 
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.

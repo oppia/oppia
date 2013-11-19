@@ -43,6 +43,14 @@ class StateModel(base_models.BaseModel):
         """Gets a state by id."""
         return super(StateModel, cls).get(state_id, strict=strict)
 
+    @classmethod
+    def get_multi(cls, exploration_id, state_ids, strict=True):
+        """Gets states by ids."""
+        results = []
+        for state_id in state_ids:
+            results.append(cls.get(exploration_id, state_id, strict=strict))
+        return results
+
     # JSON representation of a state.
     # TODO(sll): Prepend the exploration id to the id of this entity.
     value = django_utils.JSONField(default={}, isdict=True)

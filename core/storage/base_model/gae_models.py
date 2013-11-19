@@ -81,6 +81,10 @@ class BaseModel(ndb.Model):
     def put(self):
         super(BaseModel, self).put()
 
+    @classmethod
+    def put_multi(cls, entities):
+        return ndb.put_multi(entities)
+
     def delete(self):
         super(BaseModel, self).key.delete()
 
