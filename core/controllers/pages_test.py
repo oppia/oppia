@@ -28,6 +28,17 @@ class MainPageTest(test_utils.GenericTestBase):
         self.assertIn('oppia-explore-button', response)
 
 
+class WelcomePageTest(test_utils.GenericTestBase):
+
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
+    def testWelcomePage(self):
+        """Test the main splash page."""
+        response = self.testapp.get('/welcome')
+        self.assertEqual(response.status_int, 200)
+        self.assertIn('Browse more explorations', response)
+
+
 class NoninteractivePagesTest(test_utils.GenericTestBase):
 
     def testAboutPage(self):
