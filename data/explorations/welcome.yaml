@@ -7,7 +7,7 @@ states:
   - type: text
     value: '<div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a tool that helps you create interactive learning explorations
       that can be continually improved over time. You can find more information at&nbsp;<a
-      href="http://code.google.com/p/oppia/">http://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
+      href="https://code.google.com/p/oppia/">https://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
       first,<span>&nbsp;do you know where the name ''Oppia''
       comes from?</span></div>'
   name: Welcome!

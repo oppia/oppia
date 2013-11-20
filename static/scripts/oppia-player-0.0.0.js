@@ -76,25 +76,88 @@ function getOppiaTagList() {
 
 /**
  * Transforms an <oppia/> tag into an iframe that embeds an Oppia exploration.
- * @param {object} oppiaNode The DOM node that corresponds to the <oppia/> tag.
+ * The following attributes on the tag are recognized:
+ *   - oppia-id (mandatory): The id of the Oppia exploration to embed.
+ *   - locale: The preferred locale. Defaults to 'en' (which is the only one
+ *       that is currently implemented).
+ *   - height: The non-changing height of the iframe (can be specified as
+ *       standard CSS). If not set, defaults to an initial height of 700px and
+ *       is allowed to change when the iframe content changes.
+ *   - width: The non-changing width of the iframe (can be specified as
+ *       standard CSS). If not set, defaults to an initial width of 700px and
+ *       is allowed to change when the iframe content changes.
+ *   - exploration-version: The version number of the exploration. Currently
+ *       this field is ignored and the latest version is used. We expect to
+ *       change this.
+ *   - autoload: If true, loads the exploration automatically, otherwise
+ *       prompts the user before loading the exploration.
+ *
+ * @param {DOMNode} oppiaNode The DOM node that corresponds to the <oppia/> tag.
  */
 function reloadOppiaTag(oppiaNode) {
-  // TODO(sll): Add error handling here if required attrs are not
-  // present. Show an error message in the iframe if anything 
-  // fails to load.
   if (!oppiaNode.getAttribute('oppia-id')) {
     console.log('Error: oppia node has no id.');
+
+    var div = document.createElement('div');
+
+    var strongTag = document.createElement('strong');
+    strongTag.textContent = 'Warning: ';
+    div.appendChild(strongTag);
+
+    var spanTag = document.createElement('span');
+    spanTag.textContent = (
+        'This Oppia exploration could not be loaded because no ' +
+        'oppia-id attribute was specified in the HTML tag.');
+    div.appendChild(spanTag);
+
+    var divStyles = [
+      'background-color: #eee',
+      'border-radius: 5px',
+      'font-size: 1.2em',
+      'margin: 10px',
+      'padding: 10px',
+      'width: 70%'
+    ];
+    div.setAttribute('style', divStyles.join('; ') + ';');
+    oppiaNode.parentNode.replaceChild(div, oppiaNode);
+    return;
+  }
+
+  var autoload = oppiaNode.getAttribute('autoload') || true;
+  if (autoload && autoload === 'false') {
+    // Do not load the exploration automatically.
+    var button = document.createElement('button');
+    button.textContent = 'Load Oppia Exploration';
+    button.setAttribute('onclick', 'reloadParentOppiaTag(this)');
+    var buttonStyles = [
+      'background-color: green',
+      'border-radius: 5px',
+      'color: white',
+      'font-size: 1.2em',
+      'height: 50px',
+      'margin: 10px',
+      'padding: 10px',
+      'width: 50%'
+    ];
+    button.setAttribute('style', buttonStyles.join('; ') + ';');
+    oppiaNode.appendChild(button);
+
+    // Set autoload to true so that the frame actually does load the next time
+    // reloadOppiaTag() is called on this node.
+    oppiaNode.setAttribute('autoload', 'true');
     return;
   }
 
   var iframe = document.createElement('iframe');
 
   var currLoc = window.location.protocol + '//' + window.location.host;
-  var language = oppiaNode.getAttribute('language') || 'en';
+  var locale = oppiaNode.getAttribute('locale') || 'en';
   var height = oppiaNode.getAttribute('height');
   var width = oppiaNode.getAttribute('width');
   var fixedHeight = 'false';
   var fixedWidth = 'false';
+  var explorationVersion = oppiaNode.getAttribute('exploration-version') || '';
+
   var tagId = oppiaNode.getAttribute('id') || generateNewRandomId();
 
   if (!height || height == 'auto') {
@@ -114,11 +177,12 @@ function reloadOppiaTag(oppiaNode) {
   // TODO(sll): Properly handle the case where ids are manually set, but are
   // not unique.
   iframe.setAttribute('id', tagId);
+  var versionString = explorationVersion ? '&v' + explorationVersion : '';
   iframe.setAttribute(
     'src',
     (oppiaNode.getAttribute('src') || currLoc) +
         '/learn/' + oppiaNode.getAttribute('oppia-id') +
-        '?iframed=true&language=en' +
+        '?iframed=true&locale=en' + versionString +
         '#' + tagId + '&' + OPPIA_EMBED_GLOBALS.version);
   iframe.setAttribute('seamless', 'seamless');
   iframe.setAttribute('height', height);
@@ -130,6 +194,10 @@ function reloadOppiaTag(oppiaNode) {
   iframe.setAttribute('class', 'oppia-no-scroll');
 
   oppiaNode.parentNode.replaceChild(iframe, oppiaNode);
+}
+
+function reloadParentOppiaTag(buttonNode) {
+  reloadOppiaTag(buttonNode.parentNode);
 }
 
 window.onload = function() {
