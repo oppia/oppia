@@ -56,9 +56,8 @@ h3 {
   margin: 0;
 }
 
-.oppia-right-column button {
-  padding: 1px 2px;
-  border-width: 1px;
+.oppia-rule-ctrl {
+  padding: 2px 3px;
 }
 
 p {
