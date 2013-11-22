@@ -38,6 +38,7 @@ from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
+from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import widget_domain
 from core.platform import models
@@ -515,10 +516,17 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
     current_version = exploration.version
     version_nums = range(current_version, oldest_version - 1, -1)
 
-    return [exp_models.ExplorationSnapshotModel.get_metadata(
+    versions = [exp_models.ExplorationSnapshotModel.get_metadata(
         exploration_id, version_num
     ) for version_num in version_nums]
 
+    for version in versions:
+       version['committer_id'] = (
+           user_services.get_username(version['committer_id'])
+           if user_services.get_username(version['committer_id'])
+           else version['committer_id'])
+
+    return versions
 
 # Operations on states belonging to an exploration.
 def add_states(committer_id, exploration_id, state_names):
