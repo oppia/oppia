@@ -1,0 +1,10 @@
+<div>
+  <span ng-hide="active">
+  	<[localValue.label]>
+    (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+  </span>
+  <span ng-show="active">
+    <input type="number" ng-model="localValue.label" placeholder="Enter a decimal number.">
+    <button type="button" ng-click="replaceValue(localValue.label)">Save</button>
+  </span>
+</div>

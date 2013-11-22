@@ -16,11 +16,22 @@
 
 __author__ = 'Sean Lip'
 
+import copy
+import inspect
+import os
+import pkgutil
+
 from extensions.objects.models import objects
+import feconf
 
 
 def get_object_class(cls_name):
     """Gets the object class based on the class name."""
+    # TODO(sll):
+    # 1. Replace the following with the function below it once the registry
+    #    fully works.
+    # 2. Make callers call Registry.get_object_class_by_type() and then
+    #    delete this function.
     try:
         assert cls_name != 'BaseObject'
 
@@ -30,3 +41,54 @@ def get_object_class(cls_name):
         raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
 
     return object_class
+
+    """
+    object_class = Registry.get_object_class_by_type(cls_name)
+
+    if object_class is None:
+        raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
+
+    return object_class
+    """
+
+
+# TODO(sll): Remove this.
+RECOGNIZED_OBJECTS = ['UnicodeString', 'Real', 'Int', 'Html', 'Filepath']
+
+
+class Registry(object):
+    """Registry of all objects."""
+
+    # Dict mapping object class names to their classes.
+    objects_dict = {}
+
+    @classmethod
+    def _refresh_registry(cls):
+        cls.objects_dict.clear()
+
+        # Add new object instances to the registry.
+        for name, clazz in inspect.getmembers(objects, inspect.isclass):
+            if name.endswith('_test') or name == 'BaseObject':
+                continue
+            
+            # TODO(sll): Remove this.
+            if name not in RECOGNIZED_OBJECTS:
+                continue
+
+            cls.objects_dict[clazz.__name__] = clazz
+
+    @classmethod
+    def get_all_object_classes(cls):
+        """Get the dict of all object classes."""
+        cls._refresh_registry()
+        return copy.deepcopy(cls.objects_dict)
+
+    @classmethod
+    def get_object_class_by_type(cls, obj_type):
+        """Gets an object class by its type. Types are CamelCased.
+
+        Refreshes once if the class is not found; subsequently, throws an
+        error."""
+        if obj_type not in cls.objects_dict:
+            cls._refresh_registry()
+        return cls.objects_dict[obj_type]

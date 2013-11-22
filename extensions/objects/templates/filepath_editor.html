@@ -13,13 +13,13 @@
 
       <div ng-repeat="filepath in filepaths track by $index">
         <label>
-          <input type="radio" ng-model="localItem.label"
+          <input type="radio" ng-model="localValue.label"
                  name="choiceGroup" id="<[filepath]>"
                  value="<[filepath]>">
           <[filepath]>
         </label>
       </div>
-      <img ng-src="<[getPreviewUrl(localItem.label)]>"/>
+      <img ng-src="<[getPreviewUrl(localValue.label)]>"/>
 
       <br><br>
       <button ng-click="openImageUploader()">Upload a new image</button>

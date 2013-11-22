@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import stats_services
 from core.domain import value_generators_domain
@@ -41,16 +42,26 @@ class ExplorationPage(base.BaseHandler):
     @base.require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
+        # TODO(sll): Cache all this generated code, if it's unlikely to change
+        # much.
         all_value_generators = (
             value_generators_domain.Registry.get_all_generator_classes())
-
         value_generators_js = ''
         for gid, generator_cls in all_value_generators.iteritems():
             value_generators_js += generator_cls.get_js_template()
 
+        all_object_editors = (
+            obj_services.Registry.get_all_object_classes())
+        # TODO(sll): Consider including the obj_generator html in a ng-template
+        # to remove the need for an additional RPC?
+        object_editors_js = ''
+        for obj_type, obj_cls in all_object_editors.iteritems():
+            object_editors_js += obj_cls.get_editor_js_template()
+
         self.values.update({
             'nav_mode': EDITOR_MODE,
-            'value_generators_js': jinja2.utils.Markup(value_generators_js)
+            'object_editors_js': jinja2.utils.Markup(object_editors_js),
+            'value_generators_js': jinja2.utils.Markup(value_generators_js),
         })
         self.render_template('editor/editor_exploration.html')
 

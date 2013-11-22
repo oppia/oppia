@@ -36,8 +36,12 @@ class Image(widget_domain.BaseWidget):
         'obj_type': 'Filepath',
     }]
 
+    # The HTML tag name for this non-interactive widget.
     frontend_name = 'image'
+    # The tooltip for the icon in the rich-text editor.
     tooltip = 'Insert image'
+    # The icon to show in the rich-text editor. This is a representation of the
+    # .png file in this widget folder.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA'
         'ABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZ'

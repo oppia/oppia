@@ -25,6 +25,8 @@ oppia.directive('restrictedCopier', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
+      $scope.unicodeStringObjType = 'UnicodeString';
+
       // TODO(sll): Should initArgs be set in the template, rather than passed
       // down through the parent?
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {

@@ -20,12 +20,14 @@ __author__ = 'Sean Lip'
 
 import base64
 import numbers
+import os
 from StringIO import StringIO
 import tarfile
 
 import feconf
 import jinja_utils
 from lxml.html.clean import clean_html
+import utils
 
 
 class BaseObject(object):
@@ -62,6 +64,18 @@ class BaseObject(object):
           TypeError: if the Python object cannot be normalized.
         """
         raise NotImplementedError('Not implemented.')
+
+    @classmethod
+    def get_editor_js_template(cls):
+        return utils.get_file_contents(os.path.join(
+            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
+            '%s.js' % cls.edit_js_filename))
+
+    @classmethod
+    def get_editor_html_template(cls):
+        return utils.get_file_contents(os.path.join(
+            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
+            '%s.html' % cls.edit_html_filename))
 
     @classmethod
     def render_view(cls, data):
@@ -132,6 +146,9 @@ class Real(Number):
 
     description = 'A real number.'
     icon_filename = ''
+    view_html_filename = 'real_view'
+    edit_html_filename = 'real_editor'
+    edit_js_filename = 'RealEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -149,6 +166,9 @@ class Int(Real):
 
     description = 'An integer.'
     icon_filename = ''
+    view_html_filename = 'int_view'
+    edit_html_filename = 'int_editor'
+    edit_js_filename = 'IntEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -236,7 +256,8 @@ class List(BaseObject):
     description = 'A list.'
     icon_filename = ''
     view_html_filename = 'list_view'
-    edit_html_filename = None
+    edit_html_filename = 'list_editor'
+    edit_js_filename = 'ListEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -271,8 +292,9 @@ class UnicodeString(BaseObject):
 
     description = 'A unicode string.'
     icon_filename = ''
-    view_html_filename = 'unicode_view'
-    edit_html_filename = None
+    view_html_filename = 'unicode_string_view'
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'UnicodeStringEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -307,7 +329,8 @@ class Html(UnicodeString):
     description = 'An HTML string.'
     icon_filename = ''
     view_html_filename = 'html_view'
-    edit_html_filename = None
+    edit_html_filename = 'html_editor'
+    edit_js_filename = 'HtmlEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -315,6 +338,10 @@ class Html(UnicodeString):
         # TODO(sll): write tests for this.
         try:
             assert isinstance(raw, basestring)
+            # TODO(sll): Add sanitization in a more controlled way using
+            # html_cleaner.
+            if not raw:
+                return ''
             return clean_html(unicode(raw))
         except Exception as e:
             raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
@@ -381,6 +408,8 @@ class Filepath(UnicodeString):
     """A string representing a filepath."""
 
     description = 'A string that represents a filepath'
+    edit_html_filename = 'filepath_editor'
+    edit_js_filename = 'FilepathEditor'
 
     @classmethod
     def normalize(cls, raw):

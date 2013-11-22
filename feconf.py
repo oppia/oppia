@@ -97,6 +97,7 @@ INTERACTIVE_WIDGETS_DIR = 'extensions/widgets/interactive'
 NONINTERACTIVE_WIDGETS_DIR = 'extensions/widgets/noninteractive'
 
 OBJECT_TEMPLATES_DIR = 'extensions/objects/templates'
+OBJECTS_DIR = 'extensions/objects'
 SKINS_TEMPLATES_DIR = 'extensions/skins'
 FRONTEND_TEMPLATES_DIR = ('core/templates/dev/head' if DEV_MODE
                           else 'core/templates/prod/head')

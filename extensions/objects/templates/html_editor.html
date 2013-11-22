@@ -1,0 +1,15 @@
+<div>
+  <span ng-if="!active">
+    <div>
+      <span class="oppia-rte-inactive" ng-bind-html="localValue.label"></span>
+      (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+    </div>
+  </span>
+  <span ng-if="active">
+    <div>
+      <rich-text-editor html-content="localValue.label" disallow-oppia-widgets="true">
+      </rich-text-editor>
+    </div>
+    <button type="button" ng-click="replaceValue(localValue.label)">Save</button>
+  </span>
+</div>

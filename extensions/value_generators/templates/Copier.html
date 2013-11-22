@@ -1,26 +1,12 @@
-<table>
-  <tr>
-    <td>
-      <span ng-if="objType == 'UnicodeString' && !initArgs.large_input">
-        <string item="customizationArgs.value"></string>
-      </span>
-      <span ng-if="objType == 'UnicodeString' && initArgs.large_input">
-        <string item="customizationArgs.value" large-input="true"></string>
-      </span>
-      <span ng-if="objType == 'Real'">
-        <real item="customizationArgs.value"></real>
-      </span>
-      <span ng-if="objType == 'Int'">
-        <int item="customizationArgs.value"></int>
-      </span>
-      <span ng-if="objType == 'List'">
-        <list items="customizationArgs.value"></list>
-      </span>
-      <span ng-if="objType == 'Filepath'">
-        <filepath item="customizationArgs.value"></filepath>
-      </span>
-    </td>
-  </tr>
+<div>
+  <span ng-if="objType == 'UnicodeString' || objType == 'Real' || objType == 'Int' || objType == 'Filepath' || objType == 'Html'">
+    <object-editor obj-type="objType" init-args="initArgs" value="customizationArgs.value">
+    </object-editor>
+  </span>
+  
+  <span ng-if="objType == 'List'">
+    <list items="customizationArgs.value"></list>
+  </span>
 </table>
 
 <label ng-if="objType == 'UnicodeString' && !initArgs.disallow_parse_with_jinja">

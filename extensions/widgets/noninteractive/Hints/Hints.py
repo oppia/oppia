@@ -36,7 +36,7 @@ class Hints(widget_domain.BaseWidget):
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'Html',
     }, {
         'name': 'low_hint',
         'description': 'The low level hint.',
@@ -48,7 +48,7 @@ class Hints(widget_domain.BaseWidget):
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'Html',
     }, {
         'name': 'medium_hint',
         'description': 'The medium level hint.',
@@ -60,7 +60,7 @@ class Hints(widget_domain.BaseWidget):
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'Html',
     }, {
         'name': 'high_hint',
         'description': 'The high level hint.',
@@ -72,11 +72,15 @@ class Hints(widget_domain.BaseWidget):
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'Html',
     }]
 
+    # The HTML tag name for this non-interactive widget.
     frontend_name = 'hints'
+    # The tooltip for the icon in the rich-text editor.
     tooltip = 'Insert hints'
+    # The icon to show in the rich-text editor. This is a representation of the
+    # .png file in this widget folder.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1%2BjfqA'
         'AAABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXH'
