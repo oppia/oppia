@@ -21,18 +21,6 @@
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, requestCreator) {
 
-  $scope.incomingStatesShown = false;
-  $scope.parameterChangesShown = false;
-
-  $scope.toggleIncomingStates = function() {
-    $scope.incomingStatesShown = !$scope.incomingStatesShown;
-  };
-
-  $scope.toggleParameterChanges = function() {
-    // TODO(sll): When the zippy is closed, should we save first?
-    $scope.parameterChangesShown = !$scope.parameterChangesShown;
-  };
-
   $scope.$on('guiTabSelected', function(event, stateData) {
     $scope.stateName = stateData.name;
     $scope.content = stateData.content || [];

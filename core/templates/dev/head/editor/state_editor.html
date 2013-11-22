@@ -50,62 +50,6 @@
 
   <div class="row-fluid">
     <div class="span2">
-      <a href="#" onclick="return false;" ng-click="toggleIncomingStates()">
-        <span ng-if="!incomingStatesShown">
-          <i class="icon-plus-sign oppia-cursor-pointer"></i>
-        </span>
-        <span ng-if="incomingStatesShown">
-          <i class="icon-minus-sign oppia-cursor-pointer"></i>
-        </span>
-      </a>
-      <span class="oppia-editor-header">
-        incoming states
-      </span>
-    </div>
-
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span9">
-            <div ng-if="incomingStatesShown">
-              <ul>
-                <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-                  <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
-                  <[incomingState.name]>
-                  </a>
-                  <span ng-if="stateId == incomingStateId" title="This state points to itself." class="oppia-cursor-pointer">
-                    ⟳
-                  </span>
-                  (<[incomingState.rules | commaSeparatedList]>)
-                </li>
-              </ul>
-
-              <span ng-show="isEmpty(getIncomingStates(stateId))">
-                <em>No incoming states.</em>
-              </span>
-            </div>
-          </div>
-
-          <div class="span3">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-
-  <div class="row-fluid">
-    <div class="span2">
-      <a href="#" onclick="return false;" ng-click="toggleParameterChanges()">
-        <span ng-if="!parameterChangesShown">
-          <i class="icon-plus-sign oppia-cursor-pointer"></i>
-        </span>
-        <span ng-if="parameterChangesShown">
-          <i class="icon-minus-sign oppia-cursor-pointer"></i>
-        </span>
-      </a>
       <span class="oppia-editor-header">
         parameter changes (<[stateParamChanges.length]>)
       </span>
@@ -115,7 +59,7 @@
     </div>
 
     <div class="span10">
-      <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec" ng-if="parameterChangesShown">
+      <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
       </param-change-editor>
     </div>
   </div>
@@ -164,6 +108,46 @@
   <br>
 
   {{ changelist_buttons_row() }}
+
+  <hr>
+
+  <div class="row-fluid">
+    <div class="span2">
+      <span class="oppia-editor-header">
+        incoming states
+      </span>
+    </div>
+
+    <div class="span10">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span9">
+            <div>
+              <ul>
+                <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
+                  <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+                  <[incomingState.name]>
+                  </a>
+                  <span ng-if="stateId == incomingStateId" title="This state points to itself." class="oppia-cursor-pointer">
+                    ⟳
+                  </span>
+                  (<[incomingState.rules | commaSeparatedList]>)
+                </li>
+              </ul>
+
+              <span ng-show="isEmpty(getIncomingStates(stateId))">
+                <em>No incoming states.</em>
+              </span>
+            </div>
+          </div>
+
+          <div class="span3">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 

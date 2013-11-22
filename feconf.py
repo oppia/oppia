@@ -138,7 +138,7 @@ PATH_MAP = {
 }
 
 # Format string for displaying datetimes in the UI.
-HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M'
+HUMAN_READABLE_DATETIME_FORMAT = '%b %d %Y, %H:%M UTC'
 
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
