@@ -22,9 +22,11 @@ from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import stats_services
+from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
+import feconf
 import utils
 
 import jinja2
@@ -81,6 +83,17 @@ class ExplorationHandler(base.BaseHandler):
             state_list[state_id] = exp_services.export_state_to_verbose_dict(
                 exploration_id, state_id)
 
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exploration_id, DEFAULT_NUM_SNAPSHOTS)
+        # Patch `snapshots` to use the editor's display name.
+        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
+            for snapshot in snapshots:
+                if snapshot['committer_id'] != 'admin':
+                    snapshot['committer_id'] = user_services.get_username(
+                        snapshot['committer_id'])
+
+        # TODO(sll): Also patch `editor_ids` to use the editors' display names.
+
         self.values.update({
             'exploration_id': exploration_id,
             'init_state_id': exploration.init_state_id,
@@ -93,8 +106,7 @@ class ExplorationHandler(base.BaseHandler):
             'param_specs': exploration.param_specs_dict,
             'version': exploration.version,
             # Add information about the most recent versions.
-            'snapshots': exp_services.get_exploration_snapshots_metadata(
-                exploration_id, DEFAULT_NUM_SNAPSHOTS),
+            'snapshots': snapshots,
             # Add information for the exploration statistics page.
             'num_visits': stats_services.get_exploration_visit_count(
                 exploration_id),

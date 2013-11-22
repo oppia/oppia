@@ -23,10 +23,10 @@
 <div class="container-fluid">
   <div ng-if="paramChanges.length === 0">
     <div class="row-fluid">
-      <div class="span10">
+      <div class="span9">
         <em>No parameter changes have been defined.</em>
       </div>
-      <div class="span2"></div>
+      <div class="span3"></div>
     </div>
   </div>
 
@@ -35,7 +35,7 @@
       <div class="span1">
         <[$index + 1]>.
       </div>
-      <div class="span9">
+      <div class="span8">
         <span ng-if="activeItem !== $index">
           Change <b><[param.name]></b> <[HUMAN_READABLE_ARGS_RENDERERS[param.generator_id](param.customization_args)]>
         </span>
@@ -45,7 +45,7 @@
         </div>
       </div>
 
-      <div class="span2">
+      <div class="span3">
         <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
           Edit
         </button>
@@ -57,10 +57,10 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span10"></div>
+    <div class="span9"></div>
 
-    <div class="span2">
-      <button type="button" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
+    <div class="span3">
+      <button type="button" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()" class="pull-right">
         Add new
       </a>
     </div>

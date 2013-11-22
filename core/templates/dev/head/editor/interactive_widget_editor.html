@@ -6,38 +6,41 @@
       </span>
     </div>
 
-    <div class="span8 oppia-iframe-container">
-      <div>
-        <div class="oppia-widget-preview">
-          <!-- This iframe is dynamically resized based on its content. -->
-          <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
-          </iframe>
-        </div>
-  
-        <div>
-          <label>
-            <input type="checkbox" ng-model="widgetSticky">
-            Reuse the previous state's interaction, if possible.
-            <img class="oppia-help" src="/images/help.png"
-                 tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
-                 tooltip-placement="right">
-          </label>
+    <div class="span10">
+      <div class="container-fluid">
+        <div class="row-fluid">
+
+          <div class="span9 oppia-iframe-container">
+            <div>
+              <div class="oppia-widget-preview">
+                <!-- This iframe is dynamically resized based on its content. -->
+                <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
+                </iframe>
+              </div>
+
+              <div>
+                <label>
+                  <input type="checkbox" ng-model="widgetSticky">
+                  Reuse the previous state's interaction, if possible.
+                  <img class="oppia-help" src="/images/help.png"
+                       tooltip="If this option is selected, then if the reader comes to this state from a state that uses the same type of interactive widget, that widget (and any previous content entered by the reader) will be preserved. Otherwise, it will be replaced with a new one."
+                       tooltip-placement="right">
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="span3">
+            <button ng-click="showChooseInteractiveWidgetModal()" class="pull-right">
+              Change type
+            </button>
+            <br><br>
+            <button ng-click="showCustomizeInteractiveWidgetModal()" class="pull-right" ng-if="!isEmpty(widgetCustomizationArgs)">
+              Customize
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="span2">  
-      <span class="pull-right">
-        <button ng-click="showChooseInteractiveWidgetModal()">
-          Pick new interaction
-        </button>
-        <br><br>
-        <span ng-if="!isEmpty(widgetCustomizationArgs)">
-          <button ng-click="showCustomizeInteractiveWidgetModal()">
-            Customize
-          </button>
-        </span>
-      </span>
     </div>
   </div>
 
@@ -88,15 +91,17 @@
                 </table>
               </div>
 
-              <div class="span3 oppia-right-column">
-                <button ng-click="openEditRuleModal(handlerName, $index)">Edit</button>
-                <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">⇑</button>
-                <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
-      
-                <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)">⇓</button>
-                <span ng-hide="$index < handler.length - 2" class="oppia-grayed">⇓</span>
-      
-                <button ng-click="deleteRule(handlerName, $index)"> &times; </button>
+              <div class="span3">
+                <span class="pull-right">
+                  <button ng-click="openEditRuleModal(handlerName, $index)" class="oppia-rule-ctrl">Edit</button>
+                  <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl">⇑</button>
+                  <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
+
+                  <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="oppia-rule-ctrl">⇓</button>
+                  <span ng-hide="$index < handler.length - 2" class="oppia-grayed">⇓</span>
+
+                  <button ng-click="deleteRule(handlerName, $index)" class="oppia-rule-ctrl"> &times; </button>
+                </span>
               </div>
             </div>
           </div>
@@ -116,8 +121,8 @@
             </div>
 
             <div class="span3">
-              <span>
-                <a href="#" onclick="return false;" ng-click="openAddRuleModal(handlerName)">Add new rule</a>
+              <span class="pull-right">
+                <button ng-click="openAddRuleModal(handlerName)" class="oppia-rule-ctrl"> Add new rule </button>
               </span>
             </div>
           </div>
@@ -153,14 +158,12 @@
             </div>
 
             <div class="span3">
-              <span>
-                <a href="#" onclick="return false;" ng-click="openEditRuleModal(handlerName, handler.length - 1)">Edit</a> |
+              <span class="pull-right">
+                <button ng-click="openEditRuleModal(handlerName, handler.length - 1)" class="oppia-rule-ctrl">Edit</button>
+                <span class="oppia-grayed oppia-rule-ctrl"> ⇑ </span>
+                <span class="oppia-grayed oppia-rule-ctrl"> ⇓ </span>
+                <span class="oppia-grayed oppia-rule-ctrl"> &times; </span>
               </span>
-              <span class="oppia-grayed"> ⇑ </span>
-              |
-              <span class="oppia-grayed"> ⇓ </span>
-              |
-              <span class="oppia-grayed"> &times; </span>
             </div>
           </div>
         </div>
