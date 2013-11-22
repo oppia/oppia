@@ -88,27 +88,15 @@
                 </table>
               </div>
 
-              <div class="span3">
-                <span>
-                  <a href="#" onclick="return false;" ng-click="openEditRuleModal(handlerName, $index)">Edit</a> |
-                </span>
-                <span ng-show="$index != 0">
-                  <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index - 1)">⇑</a>
-                </span>
-                <span ng-hide="$index != 0">
-                  <span class="oppia-grayed">⇑</span>
-                </span>
+              <div class="span3 oppia-right-column">
+                <button ng-click="openEditRuleModal(handlerName, $index)">Edit</button>
+                <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">⇑</button>
+                <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
       
-                <span ng-show="$index < handler.length - 2">
-                  | <a href="#" onclick="return false;" ng-click="swapRules(handlerName, $index, $index + 1)">⇓</a>
-                </span>
-                <span ng-hide="$index < handler.length - 2">
-                  | <span class="oppia-grayed">⇓</span>
-                </span>
+                <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)">⇓</button>
+                <span ng-hide="$index < handler.length - 2" class="oppia-grayed">⇓</span>
       
-                <span>
-                  | <a href="#" onclick="return false;" ng-click="deleteRule(handlerName, $index)"> &times; </a>
-                </span>
+                <button ng-click="deleteRule(handlerName, $index)"> &times; </button>
               </div>
             </div>
           </div>
