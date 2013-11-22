@@ -33,6 +33,43 @@ describe('Editor prerequisites controller', function() {
         'to the terms of the license.');
     });
 
+    it('should show username prompt if URL flag is set to false', function() {
+      scope = {
+        getUrlParams: function() {
+          return {
+            has_username: 'false',
+	  };
+        },
+      };
+      ctrl = new EditorPrerequisites(scope, null, mockWarningsData, null);
+      expect(scope.hasUsername).toBe(false);
+    });
+
+    it('should not show username prompt if URL flag is set to true', function() {
+      scope = {
+        getUrlParams: function() {
+          return {
+            has_username: 'true',
+          };    
+        },
+      };
+      ctrl = new EditorPrerequisites(scope, null, mockWarningsData, null);
+      expect(scope.hasUsername).toBe(true);
+    });
+
+    it('should show username prompt if URL flag is set to nonsense', function() {
+      scope = {
+        getUrlParams: function() {
+          return {
+            has_username: 'trueish',
+          };    
+        },
+      };
+      ctrl = new EditorPrerequisites(scope, null, mockWarningsData, null);
+      expect(scope.hasUsername).toBe(false);
+    });
+
+
     it('should show warning if no username provided', function($http) {
       scope = {
         getUrlParams: function() {
