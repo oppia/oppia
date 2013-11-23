@@ -48,16 +48,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     });
   };
 
-  $scope.generateUnresolvedAnswersMap = function() {
-    $scope.unresolvedAnswersMap = [];
-    for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersMap.push({
-        'answer': answerItem,
-        'count': $scope.unresolvedAnswers[answerItem]
-      });
-    }
-  };
-
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding handler name and the value has several keys:
@@ -81,10 +71,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.widgetSticky = undefined;
     $scope.$apply();
     $scope.widgetSticky = data.widget.sticky;
-    $scope.unresolvedAnswers = data.unresolved_answers;
 
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
-    $scope.generateUnresolvedAnswersMap();
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateId) {
@@ -511,14 +499,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       iframe.height = height + 'px';
     }
   }, false);
-
-  $scope.deleteUnresolvedAnswer = function(answer) {
-    $scope.unresolvedAnswers[answer] = 0;
-    explorationData.saveStateData($scope.stateId, {
-      'resolved_answers': [answer]
-    });
-    $scope.generateUnresolvedAnswersMap();
-  };
 
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
     if (newValue !== undefined && oldValue !== undefined) {

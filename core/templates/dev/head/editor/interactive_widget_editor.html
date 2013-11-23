@@ -173,38 +173,6 @@
     </div>
   </div>
 
-
-  <div class="row-fluid" ng-show="!isEmpty(unresolvedAnswersMap)">
-    <div span="span2">
-      <h5>Answers received</h5>
-    </div>
-
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
-            <div class="span9">
-              <span ng-show="item.count == 0">
-                <del><[item.answer]></del>
-              </span>
-
-              <span ng-show="item.count > 0">
-                <[item.answer]>
-                (<em>submitted <[item.count]> time<span ng-show="item.count != 1">s</span></em>)
-              </span>
-            </div>
-
-            <div class="span3">
-              <span ng-show="item.count > 0">
-                <a href="#" onclick="return false;" ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</a>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script type="text/ng-template" id="modals/chooseInteractiveWidget">
     <div class="modal-header">
       <h3>Choose an Interactive Widget</h3>
