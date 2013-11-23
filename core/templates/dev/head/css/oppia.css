@@ -530,7 +530,7 @@ textarea {
     transform-origin: 35px 65px;
 }
 
-.rule-bubble {
+.oppia-rule-bubble {
     background: steelblue;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -539,13 +539,13 @@ textarea {
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.feedback-bubble {
-    background: #CCCCCC;
+.oppia-feedback-bubble {
+    background: #E0E0E0;
     border-bottom-left-radius: 8px;
     padding: 5px;
 }
 
-.dest-bubble {
+.oppia-dest-bubble {
     background: #EEEEEE;
     border-bottom-right-radius: 8px;
     padding:5px;
