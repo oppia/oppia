@@ -45,7 +45,7 @@
         <h5>Answers</h5>
         <div ng-show="doesAnswerExist()">
           <ul>
-            <li ng-repeat="(rule, ruleData) in stateStats.rule_stats" ng-show="stateStats.rule_stats[rule].answers.length > 0">
+            <li ng-repeat="(rule, ruleData) in rulesStats" ng-show="ruleData.answers.length > 0">
               <[rule]>
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">

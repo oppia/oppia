@@ -144,6 +144,9 @@ urls = [
     get_redirect_route(
         r'/create/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
         'exploration_resources_handler'),
+    get_redirect_route(
+        r'/create/state_rules_stats/<exploration_id>/<state_id>', editor.StateRulesStatsHandler,
+        'state_rules_stats_handler'),
 
     get_redirect_route(
         r'/widgetrepository', widgets.WidgetRepositoryPage,

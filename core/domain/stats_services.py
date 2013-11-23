@@ -79,7 +79,7 @@ def get_exploration_completed_count(exploration_id):
         exploration_id, feconf.END_DEST).first_entry_count
 
 
-def _get_state_rule_stats(exploration_id, state_id):
+def get_state_rules_stats(exploration_id, state_id):
     """Gets statistics for the handlers and rules of this state.
 
     Returns:
@@ -124,17 +124,11 @@ def get_state_stats_for_exploration(exploration_id):
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
-        # TODO(sll): Do not compute this here. Only display rule stats when the
-        # editor zooms into a particular state, rather than doing this all at
-        # the start of the exploration.
-        rule_stats = _get_state_rule_stats(exploration_id, state_id)
-
         state = exp_services.get_state_by_id(exploration_id, state_id)
         state_stats[state_id] = {
             'name': state.name,
             'firstEntryCount': first_entry_count,
             'totalEntryCount': total_entry_count,
-            'rule_stats': rule_stats,
             'feedback_log': feedback_log,
             # Add information about resolved answers to the chart data.
             # TODO(sll): This should be made more generic and the chart logic

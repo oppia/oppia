@@ -296,3 +296,15 @@ class ExplorationResourcesHandler(base.BaseHandler):
         dir_list = fs.listdir('')
 
         self.render_json({'filepaths': dir_list})
+
+
+class StateRulesStatsHandler(base.BaseHandler):
+    """Returns detailed reader answer statistics for a state."""
+
+    @base.require_editor
+    def get(self, exploration_id, state_id):
+        """Handles GET requests."""
+        self.render_json({
+            'rules_stats': stats_services.get_state_rules_stats(
+                exploration_id, state_id)
+        })
