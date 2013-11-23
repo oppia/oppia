@@ -529,3 +529,25 @@ textarea {
     -webkit-transform-origin: 35px 65px;
     transform-origin: 35px 65px;
 }
+
+.rule-bubble {
+    background: steelblue;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 3px;
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.feedback-bubble {
+    background: #CCCCCC;
+    border-bottom-left-radius: 8px;
+    padding: 5px;
+}
+
+.dest-bubble {
+    background: #EEEEEE;
+    border-bottom-right-radius: 8px;
+    padding:5px;
+    width: 20%;
+}

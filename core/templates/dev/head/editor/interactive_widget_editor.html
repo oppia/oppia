@@ -65,27 +65,33 @@
               <div class="span9">
                 <table style="width: 100%">
                   <tr>
-                    <td style="width: 5%; vertical-align: top">
-                      <span ng-show="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
-                        •
-                      </span>
-                      <span ng-hide="rule.feedback.length || !matchesCurrentStateId(rule.dest)">
-                        <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-                      </span>
-                    </td>
-                    <td style="width: 95%; vertical-align: top">
-                      <span>
-                        Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
-                      </span>:
-                      <span ng-show="rule.dest == 'END' || rule.dest == stateId">
-                        (<[getStateNameForRule(rule.dest)]>,
-                      </span>
-                      <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
-                        (<a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-                          <[getStateNameForRule(rule.dest)]>,
-                        </a>
-                      </span>
-                      <span ng-bind-html="rule.feedback|truncate"></span>)
+                    <td style="width: 95%; vertical-align: top; padding: 5px">
+                      <table style="width: 100%;">
+                        <tr>
+                          <td colspan=2 class="rule-bubble">
+                             <center style="font-weight: bold;">Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]></center>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="feedback-bubble">
+                            <span ng-repeat="fb in rule.feedback">
+                               • <span ng-bind-html="fb|truncate"></span><br>
+                            </span>
+                          </td>
+                          <td class="dest-bubble">
+                            <center>
+                              <span ng-show="rule.dest == 'END' || rule.dest == stateId">
+                                 <[getStateNameForRule(rule.dest)]>
+                              </span>
+                              <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
+                                <a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
+                                  <[getStateNameForRule(rule.dest)]>
+                                 </a>
+                              </span>
+                            </center>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                 </table>
@@ -110,18 +116,15 @@
             <div class="span9">
               <table style="width: 100%">
                 <tr>
-                  <td style="width: 5%; vertical-align: top">
-                    •
-                  </td>
-                  <td style="width: 95%; vertical-align: top" class="oppia-lightly-grayed">
-                    (<em>New rules will be added here.</em>)
+                  <td style="width: 95%; vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
+                    <center>(<em>New rules will be added here.</em>)</center>
                   </td>
                 </tr>
               </table>
             </div>
 
             <div class="span3">
-              <span class="pull-right">
+              <span class="pull-right" style="padding-top: 5px;">
                 <button ng-click="openAddRuleModal(handlerName)" class="oppia-rule-ctrl"> Add new rule </button>
               </span>
             </div>
@@ -131,27 +134,38 @@
             <div class="span9">
               <table style="width: 100%">
                 <tr>
-                  <td style="width: 5%; vertical-align: top">
-                    <span ng-show="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
-                      •
-                    </span>
-                    <span ng-hide="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
-                      <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-                    </span>
-                  </td>
-                  <td style="width: 95%; vertical-align: top">
-                    <span>
-                      <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
-                    </span>:
-                    <span ng-show="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
-                      (<[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
-                    </span>
-                    <span ng-hide="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
-                      (<a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
-                        <[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
-                      </a>
-                    </span>
-                    <span ng-bind-html="getDefaultRule(handlerName).feedback|truncate"></span>)
+                  <td style="width: 100%; vertical-align: top">
+                   <table style="width: 100%;">
+                        <tr>
+                          <td colspan=2 class="rule-bubble">
+                             <center style="font-weight: bold;">
+                               <span ng-hide="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
+                                 <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+                               </span>
+                               <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                             </center>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="feedback-bubble">
+                            <span ng-repeat="fb in getDefaultRule(handlerName).feedback">
+                              • <span ng-bind-html="fb|truncate"></span><br>
+                            </span>
+                          </td>
+                          <td class="dest-bubble">
+                            <center>
+                              <span ng-show="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
+                                 <[getStateNameForRule(getDefaultRule(handlerName).dest)]>
+                              </span>
+                              <span ng-hide="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
+                                <a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
+                                  <[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
+                                </a>
+                              </span>
+                            </center>
+                          </td>
+                        </tr>
+                      </table>
                   </td>
                 </tr>
               </table>
