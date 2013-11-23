@@ -101,11 +101,28 @@ class StateRuleAnswerLog(object):
         return total_count
 
     @classmethod
+    def get_multi(cls, exploration_id, rule_data):
+        """Gets domain objects corresponding to the given rule data.
+
+        Args:
+            exploration_id: the exploration id
+            rule_data: a list of dicts, each with the following keys:
+                (state_id, handler_name, rule_str).
+        """
+        # TODO(sll): Should each rule_str be unicode instead?
+        answer_log_models = stats_models.StateRuleAnswerLogModel.get_or_create_multi(
+            exploration_id, rule_data)
+        return [cls(answer_log_model.answers)
+                for answer_log_model in answer_log_models]
+
+    @classmethod
     def get(cls, exploration_id, state_id, handler_name, rule_str):
-        # TODO(sll): Should rule_str be unicode instead?
-        answer_log_model = stats_models.StateRuleAnswerLogModel.get_or_create(
-            exploration_id, state_id, handler_name, rule_str)
-        return cls(answer_log_model.answers)
+        # TODO(sll): Deprecate this method.
+        return cls.get_multi(exploration_id, [{
+            'state_id': state_id,
+            'handler_name': handler_name,
+            'rule_str': rule_str
+        }])[0]
 
     def get_top_answers(self, N):
         """Returns the top N answers.

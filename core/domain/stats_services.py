@@ -79,6 +79,39 @@ def get_exploration_completed_count(exploration_id):
         exploration_id, feconf.END_DEST).first_entry_count
 
 
+def _get_state_rule_stats(exploration_id, state_id):
+    """Gets statistics for the handlers and rules of this state.
+
+    Returns:
+        A dict, keyed by the string '{HANDLER_NAME}.{RULE_STR}', whose
+        values are the corresponding stats_domain.StateRuleAnswerLog
+        instances.
+    """
+    state = exp_services.get_state_by_id(exploration_id, state_id)
+
+    rule_keys = []
+    for handler in state.widget.handlers:
+        for rule in handler.rule_specs:
+            rule_keys.append((handler.name, str(rule)))
+
+    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        exploration_id, [{
+            'state_id': state.id,
+            'handler_name': rule_key[0],
+            'rule_str': rule_key[1]
+        } for rule_key in rule_keys]
+    )
+
+    results = {}
+    for ind, answer_log in enumerate(answer_logs):
+        results['.'.join(rule_keys[ind])] = {
+            'answers': answer_log.get_top_answers(10),
+            'rule_hits': answer_log.total_answer_count
+        }
+
+    return results
+
+
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -91,18 +124,12 @@ def get_state_stats_for_exploration(exploration_id):
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
+        # TODO(sll): Do not compute this here. Only display rule stats when the
+        # editor zooms into a particular state, rather than doing this all at
+        # the start of the exploration.
+        rule_stats = _get_state_rule_stats(exploration_id, state_id)
+
         state = exp_services.get_state_by_id(exploration_id, state_id)
-
-        rule_stats = {}
-        for handler in state.widget.handlers:
-            for rule in handler.rule_specs:
-                answer_log = stats_domain.StateRuleAnswerLog.get(
-                    exploration_id, state.id, SUBMIT_HANDLER_NAME, str(rule))
-                rule_stats['.'.join([SUBMIT_HANDLER_NAME, str(rule)])] = {
-                    'answers': answer_log.get_top_answers(10),
-                    'rule_hits': answer_log.total_answer_count
-                }
-
         state_stats[state_id] = {
             'name': state.name,
             'firstEntryCount': first_entry_count,
@@ -128,12 +155,17 @@ def get_top_improvable_states(exploration_ids, N):
     ranked_states = []
     for exploration_id in exploration_ids:
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        for state_id in exploration.state_ids:
+
+        answer_logs = stats_domain.StateRuleAnswerLog.get_multi(exploration_id, [{
+            'state_id': state_id,
+            'handler_name': SUBMIT_HANDLER_NAME,
+            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
+        } for state_id in exploration.state_ids])
+
+        for ind, state_id in enumerate(exploration.state_ids):
             state_counts = stats_domain.StateCounter.get(
                 exploration_id, state_id)
-            default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-                exploration.id, state_id, SUBMIT_HANDLER_NAME,
-                exp_domain.DEFAULT_RULESPEC_STR)
+            default_rule_answer_log = answer_logs[ind]
 
             total_entry_count = state_counts.total_entry_count
             if total_entry_count == 0:

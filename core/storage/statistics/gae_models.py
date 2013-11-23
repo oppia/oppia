@@ -106,12 +106,44 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):
-        instance_id = '.'.join([
-            exploration_id, state_id, handler_name, rule_str])
-        answer_log = cls.get(instance_id, strict=False)
-        if not answer_log:
-            answer_log = cls(id=instance_id, answers={})
-        return answer_log
+        # TODO(sll): Deprecate this method.
+        return cls.get_or_create_multi(exploration_id, [{
+            'state_id': state_id,
+            'handler_name': handler_name,
+            'rule_str': rule_str
+        }])[0]
+
+    @classmethod
+    def _get_entity_key(cls, exploration_id, entity_id):
+        return ndb.Key(cls._get_kind(), entity_id)
+
+    @classmethod
+    def get_or_create_multi(cls, exploration_id, rule_data):
+        """Gets or creates entities for the given rules.
+
+        Args:
+            exploration_id: the exploration id
+            rule_data: a list of dicts, each with the following keys:
+                (state_id, handler_name, rule_str).
+        """
+        entity_ids = ['.'.join([
+            exploration_id, datum['state_id'],
+            datum['handler_name'], datum['rule_str']
+        ]) for datum in rule_data]
+
+        entity_keys = [cls._get_entity_key(exploration_id, entity_id)
+                       for entity_id in entity_ids]
+
+        entities = ndb.get_multi(entity_keys)
+        entities_to_put = []
+        for ind, entity in enumerate(entities):
+            if entity is None:
+                new_entity = cls(id=entity_ids[ind], answers={})
+                entities_to_put.append(new_entity)
+                entities[ind] = new_entity
+
+        ndb.put_multi(entities_to_put)
+        return entities
 
 
 def record_state_feedback_from_reader(

@@ -106,12 +106,27 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):
+        # TODO(sll): Deprecate this method.
         instance_id = '.'.join([
             exploration_id, state_id, handler_name, rule_str])
         answer_log = cls.get(instance_id, strict=False)
         if not answer_log:
             answer_log = cls(id=instance_id, answers={})
         return answer_log
+
+    @classmethod
+    def get_or_create_multi(cls, exploration_id, rule_data):
+        """Gets or creates entities for the given rules.
+
+        Args:
+            exploration_id: the exploration id
+            rule_data: a list of dicts, each with the following keys:
+                (state_id, handler_name, rule_str).
+        """
+        return [cls.get_or_create([
+            exploration_id, datum['state_id'],
+            datum['handler_name'], datum['rule_str']
+        ]) for datum in rule_data]
 
 
 def record_state_feedback_from_reader(
