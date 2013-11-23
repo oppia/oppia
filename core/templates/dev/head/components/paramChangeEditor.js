@@ -23,7 +23,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
   return {
     restrict: 'E',
     scope: {paramChanges: '=', paramSpecs: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
-    templateUrl: '/templates/param_change_editor',
+    templateUrl: 'inline/param_change_editor',
     controller: function($scope, $attrs) {
       $scope._inArray = function(array, value) {
         for (var i = 0; i < array.length; i++) {

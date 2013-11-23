@@ -5,24 +5,10 @@
 
   <ol start="1">
     <li ng-repeat="item in localValue track by $index">
-      <span ng-if="activeItem != $index">
-        <span ng-if="initArgs.objType == 'UnicodeString'">
-          <[item.label]>
-        </span>
-        <div ng-if="initArgs.objType == 'Html'" class="oppia-rte-inactive">
-          <span ng-bind-html="item.label"></span>
-          <br>
-        </div>
-
-        (<a href="#" onclick="return false;" ng-click="openEditor($index)">Edit</a> | <a href="#" onclick="return false;" ng-click="deleteItem($index)">Delete</a>)
-      </span>
-
-      <span ng-if="activeItem == $index">
-        <object-editor obj-type="<[initArgs.objType]>" value="item.label">
-        </object-editor>
-        <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
-        <button type="button" ng-click="deleteItem($index)">Delete</button>
-      </span>
+      <object-editor obj-type="<[initArgs.objType]>" value="item.label">
+      </object-editor>
+      <button type="button" class="pull-right" ng-click="deleteItem($index)">Delete</button>
+      <br><br>
     </li>
   </ol>
 

@@ -45,8 +45,6 @@ oppia.directive('listEditor', function($compile, warningsData) {
         }
         if ($scope.localValue.length === 0) {
           $scope.addItem();
-        } else {
-          $scope.activeItem = null;
         }
       });
 
@@ -58,33 +56,21 @@ oppia.directive('listEditor', function($compile, warningsData) {
         }
       };
 
-      $scope.openEditor = function(index) {
-        $scope.activeItem = index;
-      };
-
-      $scope.closeEditor = function() {
-        $scope.activeItem = null;
-      };
-
       $scope.addItem = function() {
         $scope.localValue.push({label: ''});
         $scope.activeItem = $scope.localValue.length - 1;
         $scope.$parent.value.push('');
       };
 
-      $scope.replaceItem = function(index, newItem) {
-        if (!newItem) {
-          warningsData.addWarning('Please enter a non-empty item.');
-          return;
+      $scope.$watch('localValue', function(newValue, oldValue) {
+        if (newValue && oldValue) {
+          var valuesOnly = [];
+          for (var i = 0; i < newValue.length; i++) {
+            valuesOnly.push(newValue[i].label);
+          }
+          $scope.$parent.value = valuesOnly;
         }
-        $scope.index = '';
-        $scope.replacementItem = '';
-        if (index < $scope.value.length && index >= 0) {
-          $scope.localValue[index] = {label: newItem};
-          $scope.value[index] = newItem;
-        }
-        $scope.closeEditor();
-      };
+      }, true);
 
       $scope.deleteItem = function(index) {
         $scope.activeItem = null;
