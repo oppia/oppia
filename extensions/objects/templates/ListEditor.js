@@ -16,52 +16,60 @@
 oppia.directive('listEditor', function($compile, warningsData) {
   // Directive that implements an editable list.
   return {
-    restrict: 'E',
-    scope: {items: '=', largeInput: '@', addItemText: '@'},
-    templateUrl: '/templates/list',
-    controller: function($scope, $attrs) {
-      $scope.largeInput = ($scope.largeInput || false);
-
-      $scope.getAddItemText = function() {
-        return ($scope.addItemText || 'Add List Element');
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
       };
+      $compile(element.contents())(scope);
+    },
+    restrict: 'E',
+    scope: true,
+    template: '<div ng-include="getTemplateUrl()"></div>',
+    controller: function($scope, $attrs) {
+      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
+        $scope.initArgs = $scope.$parent.initArgs;
+      });
 
-      // Reset the component each time the item list changes.
-      $scope.$watch('items', function(newValue, oldValue) {
-        // Maintain a local copy of 'items'. This is needed because it is not
-        // possible to modify 'item' directly when using "for item in items";
+      // Reset the component each time the value changes.
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        // Maintain a local copy of 'value'. This is needed because it is not
+        // possible to modify 'item' directly when using "for item in value";
         // we need a 'constant key'. So we represent each item as {label: ...}
         // instead, and manipulate item.label.
-        // TODO(sll): Check that $scope.items is a list.
-        $scope.localItems = [];
-        if ($scope.items) {
-          for (var i = 0; i < $scope.items.length; i++) {
-            $scope.localItems.push({'label': angular.copy($scope.items[i])});
+        // TODO(sll): Check that $scope.value is a list.
+        $scope.localValue = [];
+        if ($scope.value) {
+          for (var i = 0; i < $scope.value.length; i++) {
+            $scope.localValue.push({'label': angular.copy($scope.value[i])});
           }
         }
-        if ($scope.localItems.length === 0) {
+        if ($scope.localValue.length === 0) {
           $scope.addItem();
         } else {
           $scope.activeItem = null;
         }
       });
 
-      $scope.openItemEditor = function(index) {
+      $scope.getAddItemText = function() {
+        if ($scope.initArgs && $scope.initArgs.addItemText) {
+          return $scope.initArgs.addItemText;
+        } else {
+          return 'Add List Element';
+        }
+      };
+
+      $scope.openEditor = function(index) {
         $scope.activeItem = index;
       };
 
-      $scope.closeItemEditor = function() {
+      $scope.closeEditor = function() {
         $scope.activeItem = null;
       };
 
       $scope.addItem = function() {
-        $scope.localItems.push({label: ''});
-        $scope.activeItem = $scope.localItems.length - 1;
-        if ($scope.items) {
-          $scope.items.push('');
-        } else {
-          $scope.items = [''];
-        }
+        $scope.localValue.push({label: ''});
+        $scope.activeItem = $scope.localValue.length - 1;
+        $scope.$parent.value.push('');
       };
 
       $scope.replaceItem = function(index, newItem) {
@@ -71,23 +79,23 @@ oppia.directive('listEditor', function($compile, warningsData) {
         }
         $scope.index = '';
         $scope.replacementItem = '';
-        if (index < $scope.items.length && index >= 0) {
-          $scope.localItems[index] = {label: newItem};
-          $scope.items[index] = newItem;
+        if (index < $scope.value.length && index >= 0) {
+          $scope.localValue[index] = {label: newItem};
+          $scope.value[index] = newItem;
         }
-        $scope.closeItemEditor();
+        $scope.closeEditor();
       };
 
       $scope.deleteItem = function(index) {
         $scope.activeItem = null;
-        $scope.localItems.splice(index, 1);
-        $scope.items.splice(index, 1);
+        $scope.localValue.splice(index, 1);
+        $scope.value.splice(index, 1);
       };
 
       $scope.$on('externalSave', function() {
         if ($scope.activeItem !== null) {
           $scope.replaceItem(
-              $scope.activeItem, $scope.localItems[$scope.activeItem].label);
+              $scope.activeItem, $scope.localValue[$scope.activeItem].label);
           // The $scope.$apply() call is needed to propagate the replaced item.
           $scope.$apply();
         }

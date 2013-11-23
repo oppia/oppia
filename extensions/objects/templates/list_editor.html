@@ -1,28 +1,25 @@
 <div>
-  <span ng-show="items.length == 0">
+  <span ng-show="value.length == 0">
     <em>None</em>
   </span>
 
   <ol start="1">
-    <li ng-repeat="item in localItems track by $index">
+    <li ng-repeat="item in localValue track by $index">
       <span ng-if="activeItem != $index">
-        <span ng-if="!largeInput">
+        <span ng-if="initArgs.objType == 'UnicodeString'">
           <[item.label]>
         </span>
-        <div ng-if="largeInput" class="oppia-rte-inactive">
+        <div ng-if="initArgs.objType == 'Html'" class="oppia-rte-inactive">
           <span ng-bind-html="item.label"></span>
           <br>
         </div>
 
-        (<a href="#" onclick="return false;" ng-click="openItemEditor($index)">Edit</a> | <a href="#" onclick="return false;" ng-click="deleteItem($index)">Delete</a>)
+        (<a href="#" onclick="return false;" ng-click="openEditor($index)">Edit</a> | <a href="#" onclick="return false;" ng-click="deleteItem($index)">Delete</a>)
       </span>
 
       <span ng-if="activeItem == $index">
-        <input ng-if="!largeInput" type="text" ng-model="item.label">
-        <div ng-if="largeInput">
-          <rich-text-editor html-content="item.label">
-          </rich-text-editor>
-        </div>
+        <object-editor obj-type="<[initArgs.objType]>" value="item.label">
+        </object-editor>
         <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
         <button type="button" ng-click="deleteItem($index)">Delete</button>
       </span>

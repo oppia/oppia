@@ -85,10 +85,6 @@ urls = [
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
 
-    # TODO(sll): Remove this in favour of ObjectEditorHandler.
-    get_redirect_route(
-        r'/templates/<template_type>', resources.TemplateHandler,
-        'template_handler'),
     get_redirect_route(
         r'/imagehandler/<exploration_id>', resources.ImageUploadHandler,
         'image_upload_handler'),

@@ -543,11 +543,12 @@ textarea {
     background: #E0E0E0;
     border-bottom-left-radius: 8px;
     padding: 5px;
+    width: 80%;
 }
 
 .oppia-dest-bubble {
     background: #EEEEEE;
     border-bottom-right-radius: 8px;
-    padding:5px;
+    padding: 5px;
     width: 20%;
 }

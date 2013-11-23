@@ -28,18 +28,6 @@ from core.domain import value_generators_domain
 import feconf
 
 
-class TemplateHandler(base.BaseHandler):
-    """Retrieves a template for a UI component."""
-
-    def get(self, template_type):
-        """Handles GET requests."""
-        try:
-            self.response.write(self.jinja2_env.get_template(
-                'components/%s.html' % template_type).render({}))
-        except:
-            raise self.PageNotFoundException
-
-
 class ObjectEditorHandler(base.BaseHandler):
     """Retrieves a template for an object editor."""
 

@@ -28,7 +28,10 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
         'name': 'choices',
         'description': 'The options that the reader can select from.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'objType': 'UnicodeString',
+            'addItemText': 'Add choice',
+        },
         'customization_args': {
             'value': ['Default choice']
         },

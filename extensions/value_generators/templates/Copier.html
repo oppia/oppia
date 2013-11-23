@@ -1,13 +1,6 @@
 <div>
-  <span ng-if="objType == 'UnicodeString' || objType == 'Real' || objType == 'Int' || objType == 'Filepath' || objType == 'Html'">
-    <object-editor obj-type="objType" init-args="initArgs" value="customizationArgs.value">
-    </object-editor>
-  </span>
-  
-  <span ng-if="objType == 'List'">
-    <list items="customizationArgs.value"></list>
-  </span>
-</table>
+  <object-editor obj-type="<[objType]>" init-args="initArgs" value="customizationArgs.value">
+  </object-editor>
 
 <label ng-if="objType == 'UnicodeString' && !initArgs.disallow_parse_with_jinja">
   <em>Apply parameter evaluation?</em>

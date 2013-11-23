@@ -224,6 +224,15 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         $scope.states = states;
         $scope.stateId = stateId;
 
+        $scope.UNICODE_STRING_LIST_INIT_ARGS = {
+          'objType': 'UnicodeString'
+        };
+
+        $scope.FEEDBACK_LIST_INIT_ARGS = {
+          'objType': 'Html',
+          'addItemText': 'Add feedback message'
+        };
+
         $scope.resetTmpRule = function() {
           $scope.tmpRule = {
             index: null,

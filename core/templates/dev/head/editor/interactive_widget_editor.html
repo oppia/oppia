@@ -63,7 +63,7 @@
 
             <div ng-repeat="rule in handler" ng-hide="$last">
               <div class="span9" style="padding: 5px;">
-                 <table style="vertical-align: top;">
+                 <table style="vertical-align: top; width: 100%">
                     <tr>
                       <td colspan=2 class="oppia-rule-bubble">
                          <center style="font-weight: bold;">Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]></center>
@@ -254,7 +254,7 @@
             <input type="text" required ng-model="tmpRule.inputs[item.varName]">
           </span>
           <span ng-if="item.type == 'list'">
-            <list items="tmpRule.inputs[item.varName]"></list>
+            <object-editor obj-type="List" init-args="UNICODE_STRING_LIST_INIT_ARGS" value="tmpRule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'html'">
             <[item.text]>
@@ -273,7 +273,8 @@
         </div>
         <div>
           <p>Feedback for the reader (chosen at random from the following):</p>
-          <list large-input="true" items="tmpRule.feedback" add-item-text="Add feedback message"></list>
+          <object-editor obj-type="List" init-args="FEEDBACK_LIST_INIT_ARGS" value="tmpRule.feedback">
+          </object-editor>
         </div>
       </div>
     </div>

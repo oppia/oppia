@@ -25,7 +25,7 @@ oppia.directive('realEditor', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope, $attrs) {
       // Reset the component each time the value changes.
       $scope.$watch('$parent.value', function(newValue, oldValue) {
         // Maintain a local copy of 'value'.

@@ -53,7 +53,7 @@ def get_object_class(cls_name):
 
 
 # TODO(sll): Remove this.
-RECOGNIZED_OBJECTS = ['UnicodeString', 'Real', 'Int', 'Html', 'Filepath']
+RECOGNIZED_OBJECTS = ['UnicodeString', 'Real', 'Int', 'Html', 'Filepath', 'List']
 
 
 class Registry(object):
