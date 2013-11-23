@@ -66,11 +66,21 @@
                  <table style="vertical-align: top; width: 100%">
                     <tr>
                       <td colspan=2 class="oppia-rule-bubble">
-                         <center style="font-weight: bold;">Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]></center>
+                        <center style="font-weight: bold;">
+                          <span ng-if="isRuleConfusing(rule)">
+                            <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+                          </span>
+                          <span ng-class="{'oppia-red': isRuleConfusing(rule)}">
+                            Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                          </span>
+                        </center>
                       </td>
                     </tr>
                     <tr>
                       <td class="oppia-feedback-bubble">
+                        <span ng-if="rule.feedback.length === 0">
+                          <em>This rule provides no feedback.</em>
+                        </span>
                         <span ng-repeat="fb in rule.feedback">
                            • <span ng-bind-html="fb|truncate"></span><br>
                         </span>
@@ -128,17 +138,22 @@
             <div class="span9">
               <table style="width: 100%;">
                   <tr>
-                    <td colspan=2 class="oppia-rule-bubble">
-                       <center style="font-weight: bold;">
-                         <span ng-hide="handler[handler.length - 1].feedback.length || !matchesCurrentStateId(handler[handler.length - 1].dest)">
-                           <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-                         </span>
-                         <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                    <td colspan=2 ng-class="getCssClassForRule(handler[handler.length - 1])">
+                      <center style="font-weight: bold;">
+                        <span ng-if="isRuleConfusing(handler[handler.length - 1])">
+                          <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+                        </span>
+                        <span>
+                          <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                        </span>
                       </center>
                     </td>
                   </tr>
                   <tr>
                     <td class="oppia-feedback-bubble">
+                      <span ng-if="getDefaultRule(handlerName).feedback.length === 0">
+                        <em>This rule provides no feedback.</em>
+                      </span>
                       <span ng-repeat="fb in getDefaultRule(handlerName).feedback">
                         • <span ng-bind-html="fb|truncate"></span><br>
                       </span>

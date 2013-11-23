@@ -539,6 +539,15 @@ textarea {
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
+.oppia-rule-bubble-warning {
+    background: #F9EDBE;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 3px;
+    color: #000;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
 .oppia-feedback-bubble {
     background: #E0E0E0;
     border-bottom-left-radius: 8px;

@@ -205,8 +205,7 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     return state_dict
 
 
-def export_content_to_html(exploration_id, content_array, params=None,
-                           escape_text_strings=True):
+def export_content_to_html(exploration_id, content_array, params=None):
     """Takes a Content array and transforms it into HTML.
 
     Args:
@@ -216,8 +215,6 @@ def export_content_to_html(exploration_id, content_array, params=None,
             to contain exactly one entry with type 'text'. The value is an
             HTML string.
         params: any parameters used for templatizing text strings.
-        escape_text_strings: True if values supplied with content of type 'text'
-            should be escaped after Jinja evaluation; False otherwise.
 
     Returns:
         the HTML string representing the array.
@@ -233,8 +230,6 @@ def export_content_to_html(exploration_id, content_array, params=None,
     for content in content_array:
         if content.type in ALLOWED_CONTENT_TYPES:
             value = jinja_utils.parse_string(content.value, params)
-            if escape_text_strings:
-                value = cgi.escape(value)
 
             html += '<div>%s</div>' % value
         else:
@@ -673,7 +668,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                     'Expected rule[\'feedback\'] to be a list, received %s'
                     % rule['feedback'])
 
-            if rule.get('dest') not in exploration.state_ids:
+            if rule.get('dest') not in ([feconf.END_DEST] + exploration.state_ids):
                 raise ValueError(
                     'The destination %s is not a valid state id'
                     % rule.get('dest'))

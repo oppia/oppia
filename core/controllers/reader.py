@@ -77,8 +77,7 @@ class ExplorationHandler(base.BaseHandler):
 
         init_state = exploration.init_state
         init_html = exp_services.export_content_to_html(
-            exploration_id, init_state.content, reader_params,
-            escape_text_strings=False)
+            exploration_id, init_state.content, reader_params)
 
         interactive_widget = widget_domain.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
@@ -128,7 +127,7 @@ class FeedbackHandler(base.BaseHandler):
             return exp_services.export_content_to_html(
                 exploration_id,
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
-                params, escape_text_strings=False)
+                params)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
                         new_state, state_has_changed, html_output):
@@ -143,8 +142,7 @@ class FeedbackHandler(base.BaseHandler):
             if state_has_changed:
                 # Append the content for the new state.
                 state_html = exp_services.export_content_to_html(
-                    exploration_id, new_state.content, new_params,
-                    escape_text_strings=False)
+                    exploration_id, new_state.content, new_params)
 
                 if html_output and state_html:
                     html_output += '<br>'

@@ -67,17 +67,19 @@ def get_jinja_env(dir_path):
     return env
 
 
-def parse_string(string, params):
+def parse_string(string, params, autoescape=True):
     """Parses a string using Jinja templating.
 
     Args:
       string: the string to be parsed.
       params: the parameters to parse the string with.
+      autoescape: whether to enable autoescaping when parsing.
 
     Returns:
       the parsed string, or None if the string could not be parsed.
     """
-    env = jinja2.Environment()
+    env = jinja2.Environment(autoescape=autoescape)
+
     env.filters.update(JinjaConfig.FILTERS)
     try:
         parsed_string = env.parse(string)

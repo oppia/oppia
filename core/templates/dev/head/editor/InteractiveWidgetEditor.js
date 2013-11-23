@@ -454,6 +454,14 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
   };
 
+  $scope.isRuleConfusing = function(rule) {
+    return (rule.feedback.length === 0 && $scope.matchesCurrentStateId(rule.dest));
+  };
+
+  $scope.getCssClassForRule = function(rule) {
+    return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
+  };
+
   $scope.convertDestToId = function(destName, hideWarnings) {
     if (!destName) {
       warningsData.addWarning('Please choose a destination.');

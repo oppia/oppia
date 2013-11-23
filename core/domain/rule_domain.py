@@ -266,7 +266,7 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
             parsed_param = definition['inputs'][param_name]
             if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
                 parsed_param = jinja_utils.parse_string(
-                    parsed_param, context_params)
+                    parsed_param, context_params, autoescape=False)
             normalized_param = obj_cls.normalize(parsed_param)
             param_list.append(normalized_param)
 

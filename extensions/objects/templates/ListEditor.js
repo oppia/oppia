@@ -43,9 +43,6 @@ oppia.directive('listEditor', function($compile, warningsData) {
             $scope.localValue.push({'label': angular.copy($scope.value[i])});
           }
         }
-        if ($scope.localValue.length === 0) {
-          $scope.addItem();
-        }
       });
 
       $scope.getAddItemText = function() {

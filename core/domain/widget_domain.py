@@ -247,7 +247,8 @@ class BaseWidget(object):
             state_customization_args, context_params)
         parameters['answer'] = answer
 
-        return jinja_utils.parse_string(self._stats_log_template, parameters)
+        return jinja_utils.parse_string(
+            self._stats_log_template, parameters, autoescape=False)
 
     def get_widget_instance_dict(self, customization_args, context_params,
                                  preview_mode=True):
