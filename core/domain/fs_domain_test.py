@@ -61,7 +61,9 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             fs.listdir('abc'), ['abc/abcd.png'])
 
-        self.assertEqual(fs.listdir('/abc'), [])
+        with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            fs.listdir('/abc')
+
         self.assertEqual(fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
@@ -109,3 +111,29 @@ class DiskBackedFileSystemTests(test_utils.GenericTestBase):
         self.assertTrue(fs.get('img.png'))
         with self.assertRaisesRegexp(IOError, 'No such file or directory'):
             fs.get('non_existent_file.png')
+
+
+class DirectoryTraversalTests(test_utils.GenericTestBase):
+    """Tests to check for the possibility of directory traversal."""
+
+    def test_invalid_filepaths_are_caught(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem('eid'))
+
+        invalid_filepaths = [
+            '..', '../another_exploration', '../', '/..', '/abc'
+        ]
+
+        for filepath in invalid_filepaths:
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.isfile(filepath)
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.open(filepath)
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.get(filepath)
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.put(filepath, 'raw_file')
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.delete(filepath)
+            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+                fs.listdir(filepath)
