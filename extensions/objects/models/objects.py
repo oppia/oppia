@@ -24,9 +24,9 @@ import os
 from StringIO import StringIO
 import tarfile
 
+from core.domain import html_cleaner
 import feconf
 import jinja_utils
-from lxml.html.clean import clean_html
 import utils
 
 
@@ -338,11 +338,7 @@ class Html(UnicodeString):
         # TODO(sll): write tests for this.
         try:
             assert isinstance(raw, basestring)
-            # TODO(sll): Add sanitization in a more controlled way using
-            # html_cleaner.
-            if not raw:
-                return ''
-            return clean_html(unicode(raw))
+            return html_cleaner.clean(unicode(raw))
         except Exception as e:
             raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
                             (raw, e))

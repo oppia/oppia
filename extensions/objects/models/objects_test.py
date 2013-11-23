@@ -141,8 +141,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [
             ('<p onclick="evil_function()">a paragraph</p>',
              '<p>a paragraph</p>'),
-            ('<iframe src="evil-site"></iframe>', '<div></div>'),
-            (u'¡Hola!', u'<p>¡Hola!</p>'),
+            ('<iframe src="evil-site"></iframe>', ''),
+            (u'¡Hola!', u'¡Hola!'),
             ('<a href="evil-site">spam spam SPAM!</a>',
              '<a href="evil-site">spam spam SPAM!</a>'),
         ]
