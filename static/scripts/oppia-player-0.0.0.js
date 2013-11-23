@@ -178,12 +178,11 @@ function reloadOppiaTag(oppiaNode) {
   // not unique.
   iframe.setAttribute('id', tagId);
   var versionString = explorationVersion ? '&v' + explorationVersion : '';
-  iframe.setAttribute(
-    'src',
-    (oppiaNode.getAttribute('src') || currLoc) +
-        '/learn/' + oppiaNode.getAttribute('oppia-id') +
-        '?iframed=true&locale=en' + versionString +
-        '#' + tagId + '&' + OPPIA_EMBED_GLOBALS.version);
+  iframe.setAttribute('src', encodeURI(
+      (oppiaNode.getAttribute('src') || currLoc) +
+      '/learn/' + oppiaNode.getAttribute('oppia-id') +
+      '?iframed=true&locale=en' + versionString +
+      '#' + tagId + '&' + OPPIA_EMBED_GLOBALS.version));
   iframe.setAttribute('seamless', 'seamless');
   iframe.setAttribute('height', height);
   iframe.setAttribute('width', width);
