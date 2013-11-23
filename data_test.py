@@ -24,7 +24,7 @@ import string
 
 from core.domain import exp_services
 from core.domain import obj_services
-from core.domain import widget_domain
+from core.domain import widget_registry
 import feconf
 import test_utils
 import utils
@@ -100,22 +100,22 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def test_widget_counts(self):
         """Test that the correct number of widgets are loaded."""
-        widget_domain.Registry.refresh()
+        widget_registry.Registry.refresh()
 
         self.assertEqual(
-            len(widget_domain.Registry.interactive_widgets),
+            len(widget_registry.Registry.interactive_widgets),
             len(feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX])
         )
         self.assertEqual(
-            len(widget_domain.Registry.noninteractive_widgets),
+            len(widget_registry.Registry.noninteractive_widgets),
             len(feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX])
         )
 
     def test_image_data_urls_for_noninteractive_widgets(self):
         """Test the data urls for the noninteractive widget editor icons."""
-        widget_domain.Registry.refresh()
+        widget_registry.Registry.refresh()
 
-        widget_list = widget_domain.Registry.noninteractive_widgets
+        widget_list = widget_registry.Registry.noninteractive_widgets
         allowed_widgets = feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]
         for widget_name in allowed_widgets:
             image_filepath = os.path.join(
@@ -128,7 +128,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
-        bindings = widget_domain.Registry.interactive_widgets
+        bindings = widget_registry.Registry.interactive_widgets
 
         # TODO(sll): These tests ought to include non-interactive widgets as
         # well.

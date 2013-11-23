@@ -24,7 +24,6 @@ storage model to be changed without affecting this module and others above it.
 
 __author__ = 'Sean Lip'
 
-import cgi
 import copy
 import logging
 import os
@@ -39,7 +38,7 @@ from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import value_generators_domain
-from core.domain import widget_domain
+from core.domain import widget_registry
 from core.platform import models
 import feconf
 import jinja_utils
@@ -191,7 +190,7 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     for handler in state_dict['widget']['handlers']:
         for rule_spec in handler['rule_specs']:
 
-            widget = widget_domain.Registry.get_widget_by_id(
+            widget = widget_registry.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX,
                 state_dict['widget']['widget_id']
             )
@@ -648,7 +647,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.handlers = [
             exp_domain.AnswerHandlerInstance('submit', [])]
 
-        generic_widget = widget_domain.Registry.get_widget_by_id(
+        generic_widget = widget_registry.Registry.get_widget_by_id(
             'interactive', state.widget.widget_id)
 
         # TODO(yanamal): Do additional calculations here to get the
@@ -802,7 +801,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
     state = get_state_by_id(exploration_id, state_id)
 
     # Get the widget to determine the input type.
-    generic_handler = widget_domain.Registry.get_widget_by_id(
+    generic_handler = widget_registry.Registry.get_widget_by_id(
         feconf.INTERACTIVE_PREFIX, state.widget.widget_id
     ).get_handler_by_name(handler_name)
 
@@ -1062,8 +1061,8 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
             if pc['name'] not in exp_param_specs_dict:
                 raise Exception('Undeclared param name: %s' % pc['name'])
 
-            value_generator = generator_registry.get_generator_class_by_id(
-                pc['generator_id'])
+            # Check that the generator id exists.
+            generator_registry.get_generator_class_by_id(pc['generator_id'])
 
             for arg_name in pc['customization_args']:
                 if not isinstance(arg_name, basestring):
@@ -1167,7 +1166,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
                             % wp_name)
 
         try:
-            widget = widget_domain.Registry.get_widget_by_id(
+            widget = widget_registry.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX, state_dict['widget']['widget_id'])
         except Exception as e:
             raise Exception(

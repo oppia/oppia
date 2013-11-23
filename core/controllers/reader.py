@@ -22,7 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import skins_services
 from core.domain import stats_services
-from core.domain import widget_domain
+from core.domain import widget_registry
 import utils
 
 READER_MODE = 'reader'
@@ -79,7 +79,7 @@ class ExplorationHandler(base.BaseHandler):
         init_html = exp_services.export_content_to_html(
             exploration_id, init_state.content, reader_params)
 
-        interactive_widget = widget_domain.Registry.get_widget_by_id(
+        interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_raw_code(
             init_state.widget.customization_args, reader_params)
@@ -108,7 +108,7 @@ class FeedbackHandler(base.BaseHandler):
             self, old_state, answer, exploration_id, old_state_id,
             old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
-        widget = widget_domain.Registry.get_widget_by_id(
+        widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
         )
 
@@ -150,7 +150,7 @@ class FeedbackHandler(base.BaseHandler):
                 html_output += state_html
 
             interactive_html = '' if sticky else (
-                widget_domain.Registry.get_widget_by_id(
+                widget_registry.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
                 ).get_raw_code(new_state.widget.customization_args, new_params)
             )
@@ -209,7 +209,7 @@ class FeedbackHandler(base.BaseHandler):
         reader_response_html = ''
         reader_response_iframe = ''
 
-        old_widget = widget_domain.Registry.get_widget_by_id(
+        old_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
         reader_response_html, reader_response_iframe = (
             old_widget.get_reader_response_html(

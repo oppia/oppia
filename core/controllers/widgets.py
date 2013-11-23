@@ -19,7 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 import collections
 
 from core.controllers import base
-from core.domain import widget_domain
+from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -48,7 +48,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
     def get(self, widget_type):
         """Handles GET requests."""
         try:
-            widget_list = widget_domain.Registry.get_widgets_of_type(
+            widget_list = widget_registry.Registry.get_widgets_of_type(
                 widget_type)
         except Exception:
             raise self.PageNotFoundException
@@ -84,7 +84,7 @@ class WidgetHandler(base.BaseHandler):
 
         customization_args = self.payload.get('customization_args', {})
 
-        widget = widget_domain.Registry.get_widget_by_id(
+        widget = widget_registry.Registry.get_widget_by_id(
             widget_type, widget_id)
 
         self.render_json({
@@ -103,7 +103,7 @@ class WidgetTemplateHandler(base.BaseHandler):
     def get(self, widget_type, widget_id):
         """Handles GET requests."""
         try:
-            widget = widget_domain.Registry.get_widget_by_id(
+            widget = widget_registry.Registry.get_widget_by_id(
                 widget_type, widget_id)
 
             # TODO(sll): The first arg should be the widget's customization args.
