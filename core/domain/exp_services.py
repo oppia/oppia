@@ -743,8 +743,9 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 'Expected entry in content to be a dict, received %s' 
                 % content[0])
     
+        # TODO(sll): Must sanitize all content in noninteractive widget attrs.
         state.content = [exp_domain.Content(
-            content[0]['type'], content[0]['value'])]
+            content[0]['type'], html_cleaner.clean(content[0]['value']))]
 
     def _update_state_transaction(committer_id, exploration, state):
         save_states(committer_id, exploration.id, [state])

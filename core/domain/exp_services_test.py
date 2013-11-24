@@ -366,6 +366,16 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_by_id('9').title, 'Missions - Tar')
 
+        # Load more explorations.
+        exp_services.load_demo('0')
+        exp_services.load_demo('1')
+        exp_services.load_demo('2')
+        exp_services.load_demo('3')
+        exp_services.load_demo('5')
+        exp_services.load_demo('6')
+        exp_services.load_demo('7')
+        exp_services.load_demo('8')
+
         exp_services.delete_demos()
         self.assertEqual(exp_services.count_explorations(), 0)
 

@@ -144,7 +144,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             ('<iframe src="evil-site"></iframe>', ''),
             (u'¡Hola!', u'¡Hola!'),
             ('<a href="evil-site">spam spam SPAM!</a>',
-             '<a href="evil-site">spam spam SPAM!</a>'),
+             '<a>spam spam SPAM!</a>'),
         ]
         invalid_values = [{'a': 1}, [1, 2, 1], None]
 
@@ -159,6 +159,21 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(
             objects.NormalizedString, mappings, invalid_values)
+
+    def test_sanitized_url_validation(self):
+        mappings = [
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+            ('javascript:alert(5);', ''),
+            ('ftp://gopher.com', ''),
+            ('test', ''),
+            ('google.com', ''),
+            ('https://www.google!.com', 'https://www.google%21.com'),
+        ]
+
+        invalid_vals = [u'http://¡Hola!.com']
+
+        self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
 
     def test_music_note_validation(self):
         """Tests objects of type MusicNote."""

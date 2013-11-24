@@ -21,10 +21,24 @@ __author__ = 'Sean Lip'
 import bleach
 from core.domain import widget_registry
 import feconf
+import logging
+import urlparse
+
+
+def filter_a(name, value):
+    if name in ('title', 'target'):
+        return True
+    if name == 'href':
+        url_components = urlparse.urlsplit(value)
+        if url_components[0] in ['http', 'https']:
+            return True
+        logging.error('Found invalid URL href: %s' % value)
+
+    return False
 
 
 ATTRS_WHITELIST = {
-    'a': ['href', 'title', 'target'],
+    'a': filter_a,
     'b': [],
     'blockquote': [],
     'br': [],

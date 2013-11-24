@@ -19,10 +19,13 @@
 __author__ = 'Sean Lip'
 
 import base64
+import logging
 import numbers
 import os
 from StringIO import StringIO
 import tarfile
+import urllib
+import urlparse
 
 from core.domain import html_cleaner
 import feconf
@@ -335,12 +338,43 @@ class Html(UnicodeString):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        # TODO(sll): write tests for this.
         try:
             assert isinstance(raw, basestring)
             return html_cleaner.clean(unicode(raw))
         except Exception as e:
             raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
+                            (raw, e))
+
+
+class SanitizedUrl(UnicodeString):
+    """HTTP or HTTPS url string class."""
+
+    description = 'An HTTP or HTTPS url.'
+    icon_filename = ''
+    edit_js_filename = 'SanitizedUrlEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, basestring)
+            raw = unicode(raw)
+            if raw:
+                url_components = urlparse.urlsplit(raw)
+                quoted_url_components = (
+                    urllib.quote(component) for component in url_components)
+                raw = urlparse.urlunsplit(quoted_url_components)
+
+                acceptable = html_cleaner.filter_a('href', raw)
+                if not acceptable:
+                    logging.error(
+                        'Invalid URL: Sanitized URL should start with '
+                        '\'http://\' or \'https://\'; received %s' % raw)
+                    return u''
+
+            return raw
+        except Exception as e:
+            raise TypeError('Cannot convert to sanitized URL: %s. Error: %s' %
                             (raw, e))
 
 

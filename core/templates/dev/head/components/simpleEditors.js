@@ -278,6 +278,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
             autoGrow: true,
             autoSave: true,
             controls: {
+              createLink: {visible: false},
               h1: {visible: false},
               h2: {visible: false},
               h3: {visible: false},
@@ -288,7 +289,8 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               justifyRight: {visible: false},
               strikeThrough: {visible: false},
               subscript: {visible: false},
-              superscript: {visible: false}
+              superscript: {visible: false},
+              unLink: {visible: false}
             },
             debug: true,
             events: {

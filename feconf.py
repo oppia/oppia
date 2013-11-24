@@ -171,6 +171,9 @@ ALLOWED_WIDGETS = {
         'Image': {
             'dir': 'extensions/widgets/noninteractive/Image'
         },
+        'Link': {
+            'dir': 'extensions/widgets/noninteractive/Link'
+        },
         'Video': {
             'dir': 'extensions/widgets/noninteractive/Video'
         },

@@ -74,3 +74,21 @@ oppia.directive('oppiaNoninteractiveHints', function(oppiaHtmlEscaper) {
     }
   };
 });
+
+oppia.directive('oppiaNoninteractiveLink', function(oppiaHtmlEscaper) {
+  return {
+    restrict: 'E',
+    scope: {
+      urlWithValue: '@'
+    },
+    templateUrl: '/widgettemplate/noninteractive/Link',
+    controller: function($scope, $attrs) {
+      var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj($attrs.urlWithValue);
+      if (untrustedUrl.indexOf('http://') !== 0 &&
+          untrustedUrl.indexOf('https://') !== 0) {
+        return;
+      }
+      $scope.url = untrustedUrl;
+    }
+  };
+});
