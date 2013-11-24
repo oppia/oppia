@@ -44,7 +44,7 @@ class CodeRepl(widget_domain.BaseWidget):
         'obj_type': 'UnicodeString',
     }, {
         'name': 'placeholder',
-        'description': 'The placeholder for the text input field.',
+        'description': 'The placeholder for the code input field.',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
@@ -69,6 +69,28 @@ class CodeRepl(widget_domain.BaseWidget):
             'value': 60
         },
         'obj_type': 'Int',
+    }, {
+        'name': 'preCode',
+        'description': 'Code to prepend to the reader\'s submission.',
+        'generator': generators.Copier,
+        'init_args': {
+            'largeInput': True
+        },
+        'customization_args': {
+            'value': ''
+        },
+        'obj_type': 'UnicodeString'
+    }, {
+        'name': 'postCode',
+        'description': 'Code to append after the reader\'s submission.',
+        'generator': generators.Copier,
+        'init_args': {
+            'largeInput': True
+        },
+        'customization_args': {
+            'value': ''
+        },
+        'obj_type': 'UnicodeString'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

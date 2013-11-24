@@ -214,10 +214,11 @@ class CodeEvaluation(BaseObject):
         """Validates and normalizes a raw Python object."""
         try:
             assert isinstance(raw, dict)
-            assert 'code' in raw
-            assert 'output' in raw
-            assert 'evaluation' in raw
-            assert 'error' in raw
+            assert 'code' in raw and isinstance(raw['code'], basestring)
+            assert 'output' in raw and isinstance(raw['output'], basestring)
+            assert ('evaluation' in raw
+                    and isinstance(raw['evaluation'], basestring))
+            assert 'error' in raw and isinstance(raw['error'], basestring)
             return raw
         except Exception:
             raise TypeError('Cannot convert to code evaluation: %s' % raw)

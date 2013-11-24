@@ -11,32 +11,34 @@ function CodeRepl($scope) {
   $scope.placeholder = GLOBALS.placeholder;
   $scope.rows = GLOBALS.rows;
   $scope.cols = GLOBALS.columns;
+  $scope.preCode = GLOBALS.preCode;
+  $scope.postCode = GLOBALS.postCode;
 
   // Keep the code string given by the user and the stdout from the evaluation
   // until sending them back to the server.
-  var code = '';
-  var output = '';
+  $scope.code = '';
+  $scope.output = '';
 
   // Set up the jsrepl instance with callbacks set.
   var jsrepl = new JSREPL({
     output: function(out) {
       // For successful evaluation, this is called before 'result', so just keep
       // the output string here.
-      output = out;
+      $scope.output = out;
     },
     result: function(res) {
       sendResponse(res, '');
     },
     error: function(err) {
-      if (output) {
+      if ($scope.output) {
         // Part of the error message can be in the output string.
-        err += output;
-        output = '';
+        err += $scope.output;
+        $scope.output = '';
       }
       sendResponse('', err);
     },
     timeout: {
-      time: 30000,
+      time: 10000,
       callback: function() {
         sendResponse('', 'timeout');
       },
@@ -52,24 +54,28 @@ function CodeRepl($scope) {
     document.getElementById('run_button').disabled = false;
   });
 
-  $scope.runCode = function(code_input) {
-    code = code_input;
-    output = '';
+  $scope.runCode = function(codeInput) {
+    $scope.code = codeInput;
+    $scope.output = '';
 
     // Running the code. This triggers one of the callbacks set to jsrepl which
     // then calls sendResponse with the result.
-    jsrepl.eval(code);
+    var fullCode = $scope.preCode + '\n' + codeInput + '\n' + $scope.postCode;
+    console.log(fullCode);
+    jsrepl.eval(fullCode);
   };
 
   var sendResponse = function(evaluation, err) {
+    $scope.evaluation = (evaluation || '');
+    $scope.err = (err || '');
     if (parent.location.pathname.indexOf('/learn') === 0) {
       window.parent.postMessage(
           JSON.stringify({
             'submit': {
-              code: code,
-              output: output,
-              evaluation: evaluation,
-              error: err
+              code: $scope.code,
+              output: $scope.output,
+              evaluation: $scope.evaluation,
+              error: $scope.err
             }
           }),
           window.location.protocol + '//' + window.location.host);

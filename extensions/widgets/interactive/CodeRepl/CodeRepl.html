@@ -8,6 +8,8 @@
       GLOBALS.placeholder = JSON.parse('{{placeholder|js_string}}');
       GLOBALS.columns = JSON.parse('{{columns|js_string}}');
       GLOBALS.rows = JSON.parse('{{rows|js_string}}');
+      GLOBALS.preCode = JSON.parse('{{preCode|js_string}}');
+      GLOBALS.postCode = JSON.parse('{{postCode|js_string}}');
     </script>
 
     <script type="text/javascript"
@@ -21,12 +23,7 @@
       </div>
       <br>
       <form ng-submit="runCode(code)">
-
-        <input ng-show="rows == 1" ng-model="code"
-         placeholder="<[placeholder]>" required autofocus>
-
-        <textarea ng-show="rows != 1" ng-model="code"
-         placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
+        <textarea ng-model="code" placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
         </textarea>
 
         <button type="submit">Run</button>
