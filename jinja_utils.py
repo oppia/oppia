@@ -87,11 +87,16 @@ def parse_string(string, params, autoescape=True):
         raise Exception('Unable to parse string with Jinja: %s' % string)
 
     variables = meta.find_undeclared_variables(parsed_string)
-
     if any([var not in params for var in variables]):
         logging.info('Cannot parse %s fully using %s', string, params)
 
-    return env.from_string(string).render(params)
+    try:
+        return env.from_string(string).render(params)
+    except Exception:
+        logging.error(
+            'jinja_utils.parse_string() failed with args: %s, %s, %s' %
+            (string, params, autoescape))
+        return env.from_string('[CONTENT PARSING ERROR]').render({})
 
 
 def evaluate_object(obj, params):
