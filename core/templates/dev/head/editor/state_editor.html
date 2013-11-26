@@ -53,9 +53,10 @@
       <span class="oppia-editor-header">
         parameter changes (<[stateParamChanges.length]>)
       </span>
-      <img class="oppia-help" src="/images/help.png"
-           tooltip="You can change any parameters associated with a reader who enters this state. A parameter can be accessed by typing {{'{{parameter_name}}'}} in the widget customization, rule definition or feedback fields."
-           tooltip-placement="right">
+      <br>
+      <a href="https://code.google.com/p/oppia/wiki/Parameters" target="_blank">
+        More info...
+      </a>
     </div>
 
     <div class="span10">
@@ -79,7 +80,7 @@
               <span ng-show="content[0].value == ''" class="oppia-placeholder">
                 This editor supports $LaTeX$.
                 <a href="https://code.google.com/p/oppia/wiki/NonInteractiveContent" target="_blank">
-                  More information...
+                  More info...
                 </a>
               </span>
               <span angular-html-bind="content[0].value"></span>
