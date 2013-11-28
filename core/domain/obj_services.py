@@ -18,11 +18,8 @@ __author__ = 'Sean Lip'
 
 import copy
 import inspect
-import os
-import pkgutil
 
 from extensions.objects.models import objects
-import feconf
 
 
 def get_object_class(cls_name):
