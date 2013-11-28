@@ -124,8 +124,6 @@ class AppEngineTestBase(TestBase):
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
 
-        # Set up an app to be tested.
-        self.testapp = webtest.TestApp(main.app)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
@@ -141,6 +139,9 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_taskqueue_stub()
         self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+
+        # Set up the app to be tested.
+        self.testapp = webtest.TestApp(main.app)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         os.environ['USER_IS_ADMIN'] = '0'

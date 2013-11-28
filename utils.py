@@ -16,6 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import json
 import os
 import random
 import re
@@ -277,3 +278,17 @@ def set_url_query_parameter(url, param_name, param_value):
 
     return urlparse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
+
+
+class JSONEncoderForHTML(json.JSONEncoder):
+    """Encodes JSON that is safe to embed in HTML."""
+
+    def encode(self, o):
+        chunks = self.iterencode(o, True)
+        return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
+
+    def iterencode(self, o, _one_shot=False):
+        chunks = super(JSONEncoderForHTML, self).iterencode(o, _one_shot)
+        for chunk in chunks:
+            yield chunk.replace('&', '\\u0026').replace(
+                '<', '\\u003c').replace('>', '\\u003e')

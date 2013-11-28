@@ -255,7 +255,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        json_output = json.dumps(values)
+
+        json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
         # Calculate the processing time of this request.
