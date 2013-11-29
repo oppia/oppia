@@ -30,6 +30,8 @@ oppia.directive('listEditor', function($compile, warningsData) {
         $scope.initArgs = $scope.$parent.initArgs;
       });
 
+      $scope.activeItem = null;
+
       // Reset the component each time the value changes.
       $scope.$watch('$parent.value', function(newValue, oldValue) {
         // Maintain a local copy of 'value'. This is needed because it is not

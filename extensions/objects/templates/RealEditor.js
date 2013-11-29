@@ -13,8 +13,11 @@
 // limitations under the License.
 
 
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
+
 oppia.directive('realEditor', function($compile, warningsData) {
-  // Editable real number directive.
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
@@ -24,41 +27,49 @@ oppia.directive('realEditor', function($compile, warningsData) {
     },
     restrict: 'E',
     scope: true,
-    template: '<div ng-include="getTemplateUrl()"></div>',
+    template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope, $attrs) {
-      // Reset the component each time the value changes.
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'.
-        $scope.localValue = {label: $scope.value || 0.0};
-        $scope.active = false;
-      });
+      $scope.localValue = {label: $scope.$parent.value || 0.0};
 
-      $scope.openEditor = function() {
-        $scope.active = true;
-      };
+      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
+      if ($scope.alwaysEditable) {
+        $scope.$watch('localValue.label', function(newValue, oldValue) {
+          if (newValue === null || !angular.isNumber(newValue)) {
+            $scope.localValue = {label: (oldValue || 0.0)};
+            return;
+          }
+          $scope.$parent.value = newValue;
+        });
+      } else {
+        $scope.openEditor = function() {
+          $scope.active = true;
+        };
 
-      $scope.closeEditor = function() {
-        $scope.active = false;
-      };
+        $scope.closeEditor = function() {
+          $scope.active = false;
+        };
 
-      $scope.replaceValue = function(newValue) {
-        if (!newValue || !angular.isNumber(newValue)) {
-          warningsData.addWarning('Please enter a number.');
-          return;
-        }
-        warningsData.clear();
-        $scope.localValue = {label: (newValue || 0.0)};
-        $scope.$parent.value = newValue;
+        $scope.replaceValue = function(newValue) {
+          if (newValue === null || !angular.isNumber(newValue)) {
+            warningsData.addWarning('Please enter a number.');
+            return;
+          }
+          warningsData.clear();
+          $scope.localValue = {label: (newValue || 0.0)};
+          $scope.$parent.value = newValue;
+          $scope.closeEditor();
+        };
+
+        $scope.$on('externalSave', function() {
+          if ($scope.active) {
+            $scope.replaceValue($scope.localValue.label);
+            // The $scope.$apply() call is needed to propagate the replaced value.
+            $scope.$apply();
+          }
+        });
+
         $scope.closeEditor();
-      };
-
-      $scope.$on('externalSave', function() {
-        if ($scope.active) {
-          $scope.replaceValue($scope.localValue.label);
-          // The $scope.$apply() call is needed to propagate the replaced value.
-          $scope.$apply();
-        }
-      });
+      }
     }
   };
 });

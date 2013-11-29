@@ -310,6 +310,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         };
 
         $scope.save = function() {
+          $scope.$broadcast('externalSave');
           $modalInstance.close({tmpRule: tmpRule});
         };
 
