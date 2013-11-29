@@ -36,6 +36,7 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
+set -- "${remaining_params[@]}"
 
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME

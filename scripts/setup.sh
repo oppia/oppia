@@ -35,12 +35,16 @@ then
 fi
 
 # TODO: Consider using getopts command.
+declare -a remaining_params
 for arg in "$@"; do
   if [ "$arg" == "--nojsrepl" ]; then
     NO_JSREPL=true
+  else
+    remaining_params+=($arg)
   fi
 done
 export NO_JSREPL
+export remaining_params
 
 echo Checking name of current directory
 EXPECTED_PWD='oppia'
