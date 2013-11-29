@@ -8,6 +8,7 @@ core/templates/prod/*
 .coverage
 .viminfo
 libpeerconnection.log
+node_modules
 uploads/*
 venv/
 *.db
