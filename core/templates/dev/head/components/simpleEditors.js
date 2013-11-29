@@ -87,7 +87,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
   return {
     restrict: 'E',
     scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
-    template: '<textarea rows="7" cols="60"></textarea>',
+    template: '<textarea rows="7" cols="60" ng-disabled="!hasFullyLoaded"></textarea>',
     controller: function($scope, $element, $attrs) {
       $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
@@ -257,6 +257,8 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
         $scope._saveContent();
       });
 
+      $scope.hasFullyLoaded = false;
+
       $scope.init = function() {
         $http.get('/widgetrepository/data/noninteractive').then(function(response) {
           // TODO(sll): Remove the need for $http.get() if $scope.disallowOppiaWidgets
@@ -339,6 +341,8 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
 
           // Disable jquery.ui.dialog so that the link control works correctly.
           $.fn.dialog = null;
+
+          $scope.hasFullyLoaded = true;
         });
       };
 

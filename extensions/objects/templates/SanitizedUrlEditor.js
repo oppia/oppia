@@ -34,12 +34,14 @@ oppia.directive('sanitizedUrlEditor', function($compile, warningsData) {
     controller: function ($scope, $attrs) {
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
         $scope.largeInput = false;
-        if ($scope.$parent.initArgs && $scope.$parent.initArgs.largeInput) {
-          $scope.largeInput = $scope.$parent.initArgs.largeInput;
+        if (newValue && newValue.largeInput) {
+          $scope.largeInput = newValue.largeInput;
         }
       });
 
-      $scope.localValue = {label: String($scope.$parent.value) || ''};
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        $scope.localValue = {label: String(newValue) || ''};
+      }, true);
 
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
       if ($scope.alwaysEditable) {

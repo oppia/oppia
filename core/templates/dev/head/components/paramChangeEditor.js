@@ -41,13 +41,20 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         return '';
       };
 
+      $scope.DEFAULT_CUSTOMIZATION_ARGS = {
+        'Copier': {
+          value: '[New parameter value]',
+          parse_with_jinja: false
+        },
+        'RandomSelector': {
+          list_of_values: []
+        }
+      };
+
       var DEFAULT_TMP_PARAM_CHANGE = {
         name: '[New parameter]',
         generator_id: 'Copier',
-        customization_args: {
-          value: '[New parameter value]',
-          parse_with_jinja: false
-        }
+        customization_args: $scope.DEFAULT_CUSTOMIZATION_ARGS['Copier']
       };
 
       // The 0-based index of the parameter change item that is currently active for

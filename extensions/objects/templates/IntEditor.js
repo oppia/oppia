@@ -29,7 +29,11 @@ oppia.directive('intEditor', function($compile, warningsData) {
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
-      $scope.localValue = {label: $scope.$parent.value || 0};
+      // Reset the component each time the value changes (e.g. if this is part
+      // of an editable list).
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        $scope.localValue = {label: newValue || 0};
+      }, true);
 
       $scope.isInteger = function(value) {
         return (!isNaN(parseInt(value,10)) &&

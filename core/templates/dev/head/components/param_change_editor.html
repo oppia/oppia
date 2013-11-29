@@ -46,12 +46,14 @@
       </div>
 
       <div class="span3">
-        <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
-          Edit
-        </button>
-        <button type="button" ng-disabled="activeItem !== -1" ng-click="deleteParamChange($index)">
-          &times;
-        </button>
+        <span class="pull-right">
+          <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
+            Edit
+          </button>
+          <button type="button" ng-disabled="activeItem !== -1" ng-click="deleteParamChange($index)">
+            &times;
+          </button>
+        </span>
       </div>
     </div>
   </div>

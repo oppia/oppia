@@ -1,16 +1,17 @@
 <div>
-  <span ng-show="value.length == 0">
-    <em>None</em>
+  <span ng-show="localValue.length == 0">
+    <em>This list is currently empty.</em>
   </span>
 
   <ol start="1">
     <li ng-repeat="item in localValue track by $index">
-      <object-editor obj-type="<[initArgs.objType]>" value="item.label">
+      <object-editor obj-type="<[initArgs.objType]>" value="item.label" always-editable="<[alwaysEditable]>">
       </object-editor>
       <button type="button" class="pull-right" ng-click="deleteItem($index)">Delete</button>
-      <br><br>
     </li>
   </ol>
 
-  <button type="button" ng-click="addItem()"><[getAddItemText()]></button>
+  <button type="button" ng-click="addItem()" class="pull-right">
+    <[getAddItemText()]>
+  </button>
 </div>

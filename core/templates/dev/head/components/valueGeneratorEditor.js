@@ -26,11 +26,12 @@ var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_handler/';
 oppia.directive('valueGeneratorEditor', function($compile, $http, warningsData) {
   return {
     link: function(scope, element, attrs) {
-      // Converts a camel-cased string to a lower-case hyphen-separated string.
-      var directiveName = scope.generatorId.replace(
-        /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-      element.html('<' + directiveName + '></' + directiveName + '>');
-      $compile(element.contents())(scope);
+      scope.$watch('generatorId', function(newValue, oldValue) {
+        var directiveName = scope.generatorId.replace(
+            /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+        element.html('<' + directiveName + '></' + directiveName + '>');
+        $compile(element.contents())(scope);
+      });
     },
     restrict: 'E',
     scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='}

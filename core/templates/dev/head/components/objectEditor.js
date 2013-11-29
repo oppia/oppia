@@ -29,9 +29,13 @@ oppia.directive('objectEditor', function($compile, $http, warningsData) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
       var directiveName = scope.objType.replace(
           /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-      element.html(
-          '<' + directiveName + '-editor></' + directiveName + '-editor>');
-      $compile(element.contents())(scope);
+      if (directiveName) {
+        element.html(
+            '<' + directiveName + '-editor></' + directiveName + '-editor>');
+        $compile(element.contents())(scope);
+      } else {
+        console.log('Error in objectEditor: no editor type supplied.');
+      }
     },
     restrict: 'E'
   };
