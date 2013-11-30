@@ -100,13 +100,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CodeEvaluation, mappings, invalid_values)
 
-    def test_coord_2d_validation(self):
-        """Tests objects of type Coord2D."""
+    def test_coord_two_dim_validation(self):
+        """Tests objects of type CoordTwoDim."""
         mappings = [('-1, 2.2', [-1, 2.2]), ([0, 1], [0, 1]),
                     (' -1 , 3.5', [-1, 3.5]), ]
         invalid_values = ['123', 'a', [0, 1, 2], None]
 
-        self.check_normalization(objects.Coord2D, mappings, invalid_values)
+        self.check_normalization(objects.CoordTwoDim, mappings, invalid_values)
 
     def test_list_validation(self):
         """Tests objects of type List."""

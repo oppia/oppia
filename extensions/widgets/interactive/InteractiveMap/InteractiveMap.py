@@ -65,5 +65,5 @@ class InteractiveMap(widget_domain.BaseWidget):
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'input_type': objects.Coord2D
+        'name': 'submit', 'input_type': objects.CoordTwoDim
     }]

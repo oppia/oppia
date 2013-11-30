@@ -36,7 +36,7 @@ class BaseObject(object):
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as
-    Video, Image and Coord2D.
+    SanitizedUrl and CoordTwoDim.
 
     Typed objects are initialized from a raw Python object which is expected to
     be derived from a JSON object. They are validated and normalized to basic
@@ -164,7 +164,7 @@ class CodeEvaluation(BaseObject):
             raise TypeError('Cannot convert to code evaluation: %s' % raw)
 
 
-class Coord2D(BaseObject):
+class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
     description = 'A two-dimensional coordinate (a pair of reals).'

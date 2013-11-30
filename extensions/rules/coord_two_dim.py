@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for Coord2D objects."""
+"""Rules for CoordTwoDim objects."""
 
 __author__ = 'Sean Lip'
 
 from extensions.rules import base
 
 
-class Within(base.Coord2DRule):
-    description = 'is within {{d|Real}} of {{p|Coord2D}}'
+class Within(base.CoordTwoDimRule):
+    description = 'is within {{d|Real}} of {{p|CoordTwoDim}}'
 
     def _evaluate(self, subject):
         dx = subject[0] - self.p[0]
@@ -30,8 +30,8 @@ class Within(base.Coord2DRule):
         return dx * dx + dy * dy < self.d * self.d
 
 
-class NotWithin(base.Coord2DRule):
-    description = 'is not within {{d|Real}} of {{p|Coord2D}}'
+class NotWithin(base.CoordTwoDimRule):
+    description = 'is not within {{d|Real}} of {{p|CoordTwoDim}}'
 
     def _evaluate(self, subject):
         return not Within(self.d, self.p)._evaluate(subject)
