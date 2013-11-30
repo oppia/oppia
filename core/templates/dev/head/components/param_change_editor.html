@@ -1,18 +1,21 @@
 {% macro edit_parameter_form() -%}
   <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
-    Change
+    Select a parameter to change:
+
     <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose a parameter name" new-choice-regex="^[A-Za-z]+$" width="100px">
     </select2-dropdown>
+    
+    <span ng-show="tmpParamChange.name">
+      <select ng-model="tmpParamChange.generator_id"
+              ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS"
+              style="width: 220px;" required>
+      </select>
 
-    <select ng-model="tmpParamChange.generator_id"
-            ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS"
-            style="width: 220px;" required>
-    </select>
-
-    <value-generator-editor generator-id="tmpParamChange.generator_id"
-                            customization-args="tmpParamChange.customization_args"
-                            obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
-    </value-generator-editor>
+      <value-generator-editor generator-id="tmpParamChange.generator_id"
+                              customization-args="tmpParamChange.customization_args"
+                              obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+      </value-generator-editor>
+    </span>
     <br>
 
     <input type="submit" value="Close editor">

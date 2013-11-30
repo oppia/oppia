@@ -52,7 +52,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       };
 
       var DEFAULT_TMP_PARAM_CHANGE = {
-        name: '[New parameter]',
+        name: '',
         generator_id: 'Copier',
         customization_args: $scope.DEFAULT_CUSTOMIZATION_ARGS['Copier']
       };
@@ -159,7 +159,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           warningsData.addWarning('Please specify a parameter name.');
           return;
         }
-        if ($scope.tmpParamChange.name === '[New parameter]') {
+        if ($scope.tmpParamChange.name === '') {
           // This reverses a temporary parameter change addition that has not
           // been edited.
           $scope.deleteParamChange(index);

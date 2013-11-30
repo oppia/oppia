@@ -168,7 +168,8 @@ class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
     description = 'A two-dimensional coordinate (a pair of reals).'
-    edit_html_filename = None
+    edit_html_filename = 'coord_two_dim_editor'
+    edit_js_filename = 'CoordTwoDimEditor'
 
     @classmethod
     def normalize(cls, raw):
