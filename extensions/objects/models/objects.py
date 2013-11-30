@@ -47,6 +47,7 @@ class BaseObject(object):
     # These values should be overridden in subclasses.
     description = ''
     edit_html_filename = None
+    edit_js_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -78,7 +79,6 @@ class Number(BaseObject):
     """Generic number class."""
 
     description = 'A number.'
-    edit_html_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -147,7 +147,6 @@ class CodeEvaluation(BaseObject):
     """Evaluation result of programming code."""
 
     description = 'Code and its evaluation results.'
-    edit_html_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -248,6 +247,8 @@ class NormalizedString(UnicodeString):
     """Unicode string with spaces collapsed."""
 
     description = 'A unicode string with adjacent whitespace collapsed.'
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'NormalizedStringEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -259,7 +260,7 @@ class NormalizedString(UnicodeString):
             raise TypeError('Cannot convert to NormalizedString: %s' % raw)
 
 
-class Html(UnicodeString):
+class Html(BaseObject):
     """HTML string class."""
 
     description = 'An HTML string.'
@@ -277,10 +278,11 @@ class Html(UnicodeString):
                             (raw, e))
 
 
-class SanitizedUrl(UnicodeString):
+class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 
     description = 'An HTTP or HTTPS url.'
+    edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'SanitizedUrlEditor'
 
     @classmethod
@@ -327,7 +329,7 @@ class MusicNote(UnicodeString):
             raise TypeError('Cannot convert to MusicNote: %s' % raw)
 
 
-class TarFileString(UnicodeString):
+class TarFileString(BaseObject):
     """A unicode string with the base64-encoded content of a tar file"""
 
     description = 'A string with base64-encoded content of a tar file'
@@ -355,5 +357,11 @@ class Filepath(UnicodeString):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
+        try:
+            assert raw is not None
+            assert isinstance(raw, basestring)
+        except Exception:
+            raise TypeError('Cannot convert to filepath: %s' % raw)
+
         # The path will be prefixed with "[exploration_id]/assets".
         raw = super(Filepath, cls).normalize(raw)
