@@ -18,16 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
-import re
-
 from extensions.rules import base
-
-
-class CodeEquals(base.CodeEvaluationRule):
-    description = 'has code equal to {{c|NormalizedString}}'
-
-    def _evaluate(self, subject):
-        return subject['code'] == self.c
 
 
 class OutputEquals(base.CodeEvaluationRule):
@@ -35,7 +26,6 @@ class OutputEquals(base.CodeEvaluationRule):
     	'has output equal to {{x|NormalizedString}} (collapsing spaces)')
 
     def _evaluate(self, subject):
-        regex = re.compile(r'\s+')
-        normalized_result = regex.sub(' ', subject['output']).strip()
-        normalized_expected_output = regex.sub(' ', self.x).strip()
+        normalized_result = ' '.join(subject['output'].split())
+        normalized_expected_output = ' '.join(self.x.split())
         return normalized_result == normalized_expected_output
