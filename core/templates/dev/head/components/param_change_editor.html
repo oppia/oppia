@@ -2,7 +2,7 @@
   <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
     Select a parameter to change:
 
-    <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose a parameter name" new-choice-regex="^[A-Za-z]+$" width="100px">
+    <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="180px">
     </select2-dropdown>
     
     <span ng-show="tmpParamChange.name">
