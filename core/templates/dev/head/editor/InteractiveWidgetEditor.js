@@ -236,6 +236,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
         $scope.tmpRuleDescriptionFragments = [];
         $scope.$watch('tmpRule.description', function(newValue) {
+          if (!newValue) {
+            return;
+          }
+
           var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
 
           var finalInputArray = newValue.split(pattern);
@@ -247,17 +251,18 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           // TODO(sll): Remove this special-casing.
           var isMultipleChoice = Boolean($scope.widgetCustomizationArgs.choices);
           for (var i = 0; i < finalInputArray.length; i += 3) {
-            result.push({'type': 'html', 'text': finalInputArray[i]});
+            result.push({'type': 'noneditable', 'text': finalInputArray[i]});
             if (i == finalInputArray.length - 1) {
               break;
             }
 
             if (isMultipleChoice) {
               result.push({'type': 'select', 'varName': finalInputArray[i+1]});
-            } else if (finalInputArray[i+2] == 'Set') {
-              result.push({'type': 'list', 'varName': finalInputArray[i+1]});
             } else {
-              result.push({'type': 'input', 'varName': finalInputArray[i+1]});
+              result.push({
+                'type': finalInputArray[i+2],
+                'varName': finalInputArray[i+1]
+              });
             }
           }
           $scope.tmpRuleDescriptionFragments = result;

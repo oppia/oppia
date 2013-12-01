@@ -234,13 +234,10 @@
             <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(widgetCustomizationArgs.choices.value)">
             </select>
           </span>
-          <span ng-if="item.type == 'input'">
-            <object-editor obj-type="UnicodeString" always-editable="true" value="tmpRule.inputs[item.varName]"></object-editor>
+          <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+            <object-editor obj-type="<[item.type]>" always-editable="true" value="tmpRule.inputs[item.varName]"></object-editor>
           </span>
-          <span ng-if="item.type == 'list'">
-            <object-editor obj-type="List" init-args="UNICODE_STRING_LIST_INIT_ARGS" value="tmpRule.inputs[item.varName]"></object-editor>
-          </span>
-          <span ng-if="item.type == 'html'">
+          <span ng-if="item.type == 'noneditable'">
             <[item.text]>
           </span>
         </span>

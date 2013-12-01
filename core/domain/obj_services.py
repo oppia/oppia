@@ -52,7 +52,7 @@ def get_object_class(cls_name):
 # TODO(sll): Remove this.
 RECOGNIZED_OBJECTS = [
     'UnicodeString', 'Real', 'Int', 'Html', 'Filepath', 'List', 'SanitizedUrl',
-    'CoordTwoDim', 'NormalizedString', 'SetOfUnicodeString']
+    'CoordTwoDim', 'NormalizedString', 'SetOfUnicodeString', 'MusicNote']
 
 
 class Registry(object):

@@ -317,6 +317,8 @@ class MusicNote(UnicodeString):
     # TODO(sll): Make this more general -- i.e. an Enum.
 
     description = 'A music note between C4 and F5.'
+    edit_html_filename = 'music_note_editor'
+    edit_js_filename = 'MusicNoteEditor'
 
     @classmethod
     def normalize(cls, raw):
