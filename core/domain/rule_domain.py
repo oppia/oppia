@@ -54,7 +54,7 @@ def get_rules_for_input_type(input_type):
 
     rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
     if not isinstance(input_type, basestring):
-      input_type = input_type.__name__
+        input_type = input_type.__name__
     rule_class_name = '%sRule' % input_type
     results = []
 

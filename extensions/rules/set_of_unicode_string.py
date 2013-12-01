@@ -14,57 +14,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for Sets."""
+"""Rules for SetOfUnicodeString objects."""
 
 __author__ = 'Sean Lip'
 
 from extensions.rules import base
 
 
-class Equals(base.SetRule):
-    description = 'is equal to {{x|Set}}'
+class Equals(base.SetOfUnicodeStringRule):
+    description = 'is equal to {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return set(subject) == set(self.x)
 
 
-class IsSubsetOf(base.SetRule):
-    description = 'is a proper subset of {{x|Set}}'
+class IsSubsetOf(base.SetOfUnicodeStringRule):
+    description = 'is a proper subset of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return set(subject) < set(self.x)
 
 
-class IsSupersetOf(base.SetRule):
-    description = 'is a proper superset of {{x|Set}}'
+class IsSupersetOf(base.SetOfUnicodeStringRule):
+    description = 'is a proper superset of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return set(subject) > set(self.x)
 
 
-class HasElementsIn(base.SetRule):
-    description = 'has elements in common with {{x|Set}}'
+class HasElementsIn(base.SetOfUnicodeStringRule):
+    description = 'has elements in common with {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return bool(set(subject).intersection(set(self.x)))
 
 
-class HasElementsNotIn(base.SetRule):
-    description = 'has elements not in {{x|Set}}'
+class HasElementsNotIn(base.SetOfUnicodeStringRule):
+    description = 'has elements not in {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return bool(set(subject) - set(self.x))
 
 
-class OmitsElementsIn(base.SetRule):
-    description = 'omits some elements of {{x|Set}}'
+class OmitsElementsIn(base.SetOfUnicodeStringRule):
+    description = 'omits some elements of {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return bool(set(self.x) - set(subject))
 
 
-class IsDisjointFrom(base.SetRule):
-    description = 'has no elements in common with {{x|Set}}'
+class IsDisjointFrom(base.SetOfUnicodeStringRule):
+    description = 'has no elements in common with {{x|SetOfUnicodeString}}'
 
     def _evaluate(self, subject):
         return not bool(set(subject).intersection(set(self.x)))

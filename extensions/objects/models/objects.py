@@ -209,20 +209,22 @@ class List(BaseObject):
             raise TypeError('Cannot convert to list: %s' % raw)
 
 
-class Set(List):
-    """Set class."""
+class SetOfUnicodeString(List):
+    """Class for sets of UnicodeStrings."""
 
-    description = 'A set (a list with unique elements).'
-    edit_html_filename = None
+    description = 'A set (a list with unique elements) of unicode strings.'
+    edit_html_filename = 'list_editor'
+    edit_js_filename = 'SetOfUnicodeStringEditor'
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
             assert isinstance(raw, (list, set, tuple))
-            return list(set(raw))
+            assert all([isinstance(item, basestring) for item in raw])
+            return sorted(list(set([unicode(item) for item in raw])))
         except Exception:
-            raise TypeError('Cannot convert to set: %s' % raw)
+            raise TypeError('Cannot convert to set of strings: %s' % raw)
 
 
 class UnicodeString(BaseObject):

@@ -115,16 +115,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.List, mappings, invalid_values)
 
-    def test_set_validation(self):
-        """Tests objects of type Set."""
+    def test_set_of_unicode_string_validation(self):
+        """Tests objects of type SetOfUnicodeString."""
         mappings = [
-            ([3, 'a'], ['a', 3]),
+            (['ff', 'a', u'¡Hola!'], [u'a', u'ff', u'¡Hola!']),
             ([], []),
-            ([1, 2, 1], [1, 2]),
+            (['ab', 'cb', 'abc', 'cb'], [u'ab', u'abc', u'cb']),
         ]
-        invalid_values = ['123', {'a': 1}, 3.0, None]
+        invalid_values = ['123', {'a': 1}, 3.0, None, [3, 'a']]
 
-        self.check_normalization(objects.Set, mappings, invalid_values)
+        self.check_normalization(
+            objects.SetOfUnicodeString, mappings, invalid_values)
 
     def test_unicode_string_validation(self):
         """Tests objects of type UnicodeString."""
