@@ -67,8 +67,8 @@ def get_all_object_editor_js_templates():
     """Returns a string containing the JS templates for all objects."""
     object_editors_js = ''
 
-    all_object_editors = Registry.get_all_object_classes()
-    for obj_type, obj_cls in all_object_editors.iteritems():
+    all_object_classes = Registry.get_all_object_classes()
+    for obj_type, obj_cls in all_object_classes.iteritems():
         if obj_cls.has_editor_js_template():
             object_editors_js += obj_cls.get_editor_js_template()
 

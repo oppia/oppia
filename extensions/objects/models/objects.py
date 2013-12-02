@@ -143,6 +143,8 @@ class NonnegativeInt(Int):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
+    edit_html_filename = None
+    edit_js_filename = None
 
     @classmethod
     def normalize(cls, raw):
