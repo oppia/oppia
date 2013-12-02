@@ -21,21 +21,21 @@ from extensions.objects.models import objects
 import test_utils
 
 
-class GetObjectClassUnitTests(test_utils.GenericTestBase):
-    """Test the get_object_class() method."""
+class ObjectRegistryUnitTests(test_utils.GenericTestBase):
+    """Test the Registry class in obj_services."""
 
-    def test_get_object_class_method(self):
-        """Tests the normal behavior of get_object_class()."""
-        IntClass = obj_services.get_object_class('Int')
+    def test_get_object_class_by_type_method(self):
+        """Tests the normal behavior of get_object_class_by_type()."""
+        IntClass = obj_services.Registry.get_object_class_by_type('Int')
         assert IntClass.__name__ == 'Int'
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegexp(TypeError, 'not a valid typed object'):
-            obj_services.get_object_class('FakeClass')
+        with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
+            obj_services.Registry.get_object_class_by_type('FakeClass')
 
     def test_base_object_is_not_gettable(self):
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegexp(TypeError, 'not a valid typed object'):
-            obj_services.get_object_class('BaseObject')
+        with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
+            obj_services.Registry.get_object_class_by_type('BaseObject')

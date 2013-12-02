@@ -52,13 +52,9 @@ class ExplorationPage(base.BaseHandler):
         for gid, generator_cls in all_value_generators.iteritems():
             value_generators_js += generator_cls.get_js_template()
 
-        all_object_editors = (
-            obj_services.Registry.get_all_object_classes())
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
-        object_editors_js = ''
-        for obj_type, obj_cls in all_object_editors.iteritems():
-            object_editors_js += obj_cls.get_editor_js_template()
+        object_editors_js = obj_services.get_all_object_editor_js_templates()
 
         self.values.update({
             'nav_mode': EDITOR_MODE,

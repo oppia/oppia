@@ -22,39 +22,6 @@ import inspect
 from extensions.objects.models import objects
 
 
-def get_object_class(cls_name):
-    """Gets the object class based on the class name."""
-    # TODO(sll):
-    # 1. Replace the following with the function below it once the registry
-    #    fully works.
-    # 2. Make callers call Registry.get_object_class_by_type() and then
-    #    delete this function.
-    try:
-        assert cls_name != 'BaseObject'
-
-        object_class = getattr(objects, cls_name)
-        assert object_class
-    except Exception:
-        raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
-
-    return object_class
-
-    """
-    object_class = Registry.get_object_class_by_type(cls_name)
-
-    if object_class is None:
-        raise TypeError('\'%s\' is not a valid typed object class.' % cls_name)
-
-    return object_class
-    """
-
-
-# TODO(sll): Remove this.
-RECOGNIZED_OBJECTS = [
-    'UnicodeString', 'Real', 'Int', 'Html', 'Filepath', 'List', 'SanitizedUrl',
-    'CoordTwoDim', 'NormalizedString', 'SetOfUnicodeString', 'MusicNote']
-
-
 class Registry(object):
     """Registry of all objects."""
 
@@ -69,10 +36,11 @@ class Registry(object):
         for name, clazz in inspect.getmembers(objects, inspect.isclass):
             if name.endswith('_test') or name == 'BaseObject':
                 continue
-            
-            # TODO(sll): Remove this.
-            if name not in RECOGNIZED_OBJECTS:
-                continue
+
+            ancestor_names = [
+                base_class.__name__ for base_class in inspect.getmro(clazz)]
+            if 'BaseObject' not in ancestor_names:
+                continue               
 
             cls.objects_dict[clazz.__name__] = clazz
 
@@ -90,4 +58,18 @@ class Registry(object):
         error."""
         if obj_type not in cls.objects_dict:
             cls._refresh_registry()
+        if obj_type not in cls.objects_dict:
+            raise TypeError('\'%s\' is not a valid object class.' % obj_type)
         return cls.objects_dict[obj_type]
+
+
+def get_all_object_editor_js_templates():
+    """Returns a string containing the JS templates for all objects."""
+    object_editors_js = ''
+
+    all_object_editors = Registry.get_all_object_classes()
+    for obj_type, obj_cls in all_object_editors.iteritems():
+        if obj_cls.has_editor_js_template():
+            object_editors_js += obj_cls.get_editor_js_template()
+
+    return object_editors_js

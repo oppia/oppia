@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var OBJECT_EDITOR_TEMPLATES_URL = '/object_editor_handler/';
+var OBJECT_EDITOR_TEMPLATES_URL = '/object_editor_template/';
 
 // Individual object editor directives are in extensions/objects/templates.
 

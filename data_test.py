@@ -255,8 +255,9 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(param['customization_args'], dict))
                 self.assertTrue(isinstance(param['obj_type'], basestring))
 
-                obj_class = obj_services.get_object_class(param['obj_type'])
-                self.assertIsNotNone(obj_class)
+                # Ensure that this object type exists.
+                obj_services.Registry.get_object_class_by_type(
+                    param['obj_type'])
 
             # Check that the default customization args result in
             # parameters with the correct types.

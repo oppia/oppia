@@ -63,13 +63,25 @@ class BaseObject(object):
         raise NotImplementedError('Not implemented.')
 
     @classmethod
+    def has_editor_js_template(cls):
+        return cls.edit_js_filename is not None
+
+    @classmethod
     def get_editor_js_template(cls):
+        if cls.edit_js_filename is None:
+            raise Exception(
+                'There is no editor template defined for objects of type %s' %
+                cls.__name__)
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.js' % cls.edit_js_filename))
 
     @classmethod
     def get_editor_html_template(cls):
+        if cls.edit_html_filename is None:
+            raise Exception(
+                'There is no editor template defined for objects of type %s' %
+                cls.__name__)
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.html' % cls.edit_html_filename))

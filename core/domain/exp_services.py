@@ -1181,9 +1181,8 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         # Get the object class used to normalize the value for this param.
         for wp in widget.params:
             if wp.name == wp_name:
-                obj_class = obj_services.get_object_class(wp.obj_type)
-                if obj_class is None:
-                    raise Exception('No obj_class specified.' % obj_class)
+                # Ensure that the object type exists.
+                obj_services.Registry.get_object_class_by_type(wp.obj_type)
                 break
 
         # TODO(sll): Find a way to verify that the widget parameter values
@@ -1272,9 +1271,8 @@ def verify_exploration_dict(exploration_dict):
         if len(ps_value) != 1 or ps_value.keys()[0] != 'obj_type':
             raise Exception('Invalid param_spec dict: %s' % ps_value)
 
-        obj_class = obj_services.get_object_class(ps_value['obj_type'])
-        if obj_class is None:
-            raise Exception('No object class specified.')
+        # Ensure that the object type exists.
+        obj_services.Registry.get_object_class_by_type(ps_value['obj_type'])
 
     # Verify there is at least one state.
     if not exploration_dict['states']:

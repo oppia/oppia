@@ -22,7 +22,7 @@ describe('List directive', function() {
 
   beforeEach(inject(function($templateCache) {
     template = $templateCache.get(LIST_COMPONENT_HTML_PATH);
-    $templateCache.put('/object_editor_handler/List', template);
+    $templateCache.put('/object_editor_template/List', template);
   }));
 
   // TODO(sll): Add E2E tests.
