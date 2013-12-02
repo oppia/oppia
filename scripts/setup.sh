@@ -54,14 +54,22 @@ if [ ${PWD##*/} != $EXPECTED_PWD ]; then
 fi
 
 export OPPIA_DIR=`pwd`
-export TOOLS_DIR=`pwd`/../oppia_tools
-export THIRD_PARTY_DIR=third_party
+export COMMON_DIR=$OPPIA_DIR/..
+export TOOLS_DIR=$COMMON_DIR/oppia_tools
+export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
+export NODE_MODULE_DIR=$COMMON_DIR/node_modules
 export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
 
+mkdir -p $NODE_MODULE_DIR
+chown -R $ME $NODE_MODULE_DIR || sudo chown -R $ME $NODE_MODULE_DIR
+chmod -R 744 $NODE_MODULE_DIR || sudo chmod -R 744 $NODE_MODULE_DIR
+
 # Adjust the path to include a reference to node.
 export PATH=$TOOLS_DIR/node-0.10.1/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
+
+export NPM_INSTALL="$TOOLS_DIR/node-0.10.1/bin/npm install"

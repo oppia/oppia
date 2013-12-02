@@ -48,17 +48,10 @@ fi
 
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-  echo Checking whether coffeescript has been installed via node.js
-  mkdir -p node_modules
-  if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/coffee-script" ]; then
-    echo Installing CoffeeScript
-    $TOOLS_DIR/node-0.10.1/bin/npm install coffee-script@1.2.0 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install coffee-script@1.2.0
-  fi
-  echo Checking whether uglify has been installed via node.js
-  if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/uglify-js" ]; then
-    echo Installing uglify
-    $TOOLS_DIR/node-0.10.1/bin/npm install uglify-js || sudo $TOOLS_DIR/node-0.10.1/bin/npm install uglify-js
-  fi
+  echo Installing CoffeeScript
+  $NPM_INSTALL coffee-script@1.2.0
+  echo Installing uglify
+  $NPM_INSTALL uglify-js
 
   if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
     echo Downloading jsrepl
@@ -82,10 +75,10 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
     sed -e 's/path\.existsSync/fs\.existsSync/' |\
     sed -e 's/0o755/493/' |\
-    sed -e 's,uglifyjs,$OOPIA_DIR/node_modules/.bin/uglifyjs,' > $TMP_FILE
+    sed -e 's,uglifyjs,'$NODE_MODULE_DIR'/.bin/uglifyjs,' > $TMP_FILE
     mv $TMP_FILE Cakefile
-    export NODE_PATH=$TOOLS_DIR/node-0.10.1/lib/node_modules
-    $OPPIA_DIR/node_modules/.bin/cake bake
+    export NODE_PATH=$NODE_MODULE_DIR
+    $NODE_MODULE_DIR/.bin/cake bake
 
     # Return to the Oppia root folder.
     cd $OPPIA_DIR
@@ -95,10 +88,8 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 
-  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
+  chown -R $ME $TOOLS_DIR/node-0.10.1/bin
+  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
 fi
 
 # Static resources.

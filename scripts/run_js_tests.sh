@@ -43,15 +43,12 @@ source $(dirname $0)/setup_gae.sh || exit 1
 bash scripts/install_third_party.sh
 
 echo Checking whether Karma is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/node-0.10.1/lib/node_modules/karma" ]; then
+if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
   echo Installing Karma
-  mkdir -p node_modules
   $TOOLS_DIR/node-0.10.1/bin/npm install karma@0.8.7 || sudo $TOOLS_DIR/node-0.10.1/bin/npm install karma@0.8.7
 
   chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
   chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
-  chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/lib/node_modules
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/lib/node_modules
 fi
 
 export NODEJS_HOME=$TOOLS_DIR/node-0.10.1/bin/
