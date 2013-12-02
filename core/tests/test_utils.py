@@ -54,23 +54,31 @@ class TestBase(unittest.TestCase):
     TAGS = []
 
     def _delete_all_explorations(self):
-        explorations = exp_services.get_all_explorations()
-        for exploration in explorations:
-            exp_services.delete_exploration(
-                'admin', exploration.id, force_deletion=True)
+        classes = frozenset([
+            exp_models.StateModel,
+            exp_models.ExplorationModel,
+            exp_models.ExplorationSnapshotModel,
+            exp_models.ExplorationSnapshotContentModel,
+        ])
+
+        for clazz in classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete()
 
     def _delete_all_files(self):
-        for file_data in file_models.FileDataModel.get_all():
-            file_data.delete()
-        for file_data_history in file_models.FileDataHistoryModel.get_all():
-            file_data_history.delete()
-        for file_metadata in file_models.FileMetadataModel.get_all():
-            file_metadata.delete()
-        for file_metadata_history in file_models.FileMetadataHistoryModel.get_all():
-            file_metadata_history.delete()
+        classes = frozenset([
+            file_models.FileDataModel,
+            file_models.FileDataHistoryModel,
+            file_models.FileMetadataModel,
+            file_models.FileMetadataHistoryModel,
+        ])
+
+        for clazz in classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete()
 
     def _delete_all_stats(self):
-        stats_services._delete_all_stats()
+        stats_services.delete_all_stats()
 
     def _delete_all_user_settings(self):
         all_user_settings = user_models.UserSettingsModel.get_all()

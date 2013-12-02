@@ -88,7 +88,6 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new/token'))
 
     def test_nondefault_csrf_secret_is_used(self):
-        self.assertEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
         base.CsrfTokenManager.create_csrf_token('uid', 'page')
         self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
 

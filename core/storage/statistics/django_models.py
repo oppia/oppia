@@ -123,10 +123,10 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
             rule_data: a list of dicts, each with the following keys:
                 (state_id, handler_name, rule_str).
         """
-        return [cls.get_or_create([
+        return [cls.get_or_create(
             exploration_id, datum['state_id'],
             datum['handler_name'], datum['rule_str']
-        ]) for datum in rule_data]
+        ) for datum in rule_data]
 
 
 def record_state_feedback_from_reader(

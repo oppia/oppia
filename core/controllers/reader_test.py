@@ -15,11 +15,15 @@
 __author__ = 'Sean Lip'
 
 import json
+import unittest
 
 from core.domain import exp_services
+import feconf
 import test_utils
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 
