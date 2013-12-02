@@ -294,6 +294,54 @@ class Html(BaseObject):
                             (raw, e))
 
 
+class TabContent(BaseObject):
+    """Class for editing the content of a single tab.
+
+    The object is described by a dict with two keys: 'title' and 'content'.
+    These have types UnicodeString and Html respectively.
+    """
+
+    description = 'Content for a single tab.'
+    edit_html_filename = 'tab_content_editor'
+    edit_js_filename = 'TabContentEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, dict)
+            assert 'title' in raw
+            assert 'content' in raw
+            raw['title'] = UnicodeString.normalize(raw['title'])
+            raw['content'] = Html.normalize(raw['content'])
+            return raw
+        except Exception as e:
+            raise TypeError('Cannot convert to tab content: %s. Error: %s' %
+                            (raw, e))
+
+
+class ListOfTabContent(BaseObject):
+    """Class for editing the content of a tabbed view.
+
+    The object is described by a list of dicts, each representing a TabContent
+    object.
+    """
+
+    description = 'Content for a set of tabs.'
+    edit_html_filename = 'list_editor'
+    edit_js_filename = 'ListOfTabContentEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, list)
+            return [TabContent.normalize(item) for item in raw]
+        except Exception as e:
+            raise TypeError('Cannot convert to list of tab content: %s. '
+                            'Error: %s' % (raw, e))
+
+
 class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 

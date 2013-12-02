@@ -301,7 +301,7 @@ oppia.directive('richTextEditor', function($q, $sce, $modal, $http, warningsData
               }
             },
             initialContent: $scope.rteContent,
-            initialMinHeight: '200px',
+            initialMinHeight: '150px',
             resizeOptions: true
           });
 

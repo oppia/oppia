@@ -80,11 +80,11 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
 class WidgetDataUnitTests(test_utils.GenericTestBase):
     """Tests that all the default widgets are valid."""
 
-    def is_camel_cased(self, name):
+    def _is_camel_cased(self, name):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, string):
         """Check whether a string is alphanumeric."""
         return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
@@ -138,7 +138,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
         for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
             # Check that the widget_id name is valid.
-            self.assertTrue(self.is_camel_cased(widget_id))
+            self.assertTrue(self._is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
             widget_dir = os.path.join(
@@ -245,7 +245,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                     self.assertIn(p, PARAM_KEYS)
 
                 self.assertTrue(isinstance(param['name'], basestring))
-                self.assertTrue(self.is_alphanumeric_string(param['name']))
+                self.assertTrue(self._is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
 
                 # Check that the parmaeter description is non-empty.
