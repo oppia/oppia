@@ -1,0 +1,22 @@
+{% extends "editor/state_editor_row.html" %}
+{% block label %}incoming states{% endblock %}
+{% block info %}{% endblock %}
+{% block center %}
+  <div>
+    <ul>
+      <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
+        <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+        <[incomingState.name]>
+        </a>
+        <span ng-if="stateId == incomingStateId" title="This state points to itself." class="oppia-cursor-pointer">
+          ⟳
+        </span>
+        (<[incomingState.rules | commaSeparatedList]>)
+      </li>
+    </ul>
+
+    <span ng-show="isEmpty(getIncomingStates(stateId))">
+      <em>No incoming states.</em>
+    </span>
+  </div>
+{% endblock %}

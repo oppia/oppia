@@ -1,0 +1,117 @@
+<script type="text/ng-template" id="modals/chooseInteractiveWidget">
+  <div class="modal-header">
+    <h3>Choose an Interactive Widget</h3>
+  </div>
+
+  <div class="modal-body">
+    <iframe src="/widgetrepository?iframed=true&interactive=true"
+            width="100%" height="400px" frameborder="0"
+            id="interactiveWidgetRepository">
+    </iframe>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn" ng-click="cancel()">
+      Cancel
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="modals/ruleEditor">
+  <div class="modal-header">
+    <h3><[modalTitle]></h3>
+  </div>
+
+  <div class="modal-body">
+    <div ng-if="!tmpRule.description">
+      <div ng-repeat="(description, name) in existingRules" class="oppia-rule">
+        <span ng-bind-html="description | bracesToText"></span>
+        <button type="button" class="pull-right"
+                ng-click="selectRule(description, name)">
+          Select
+        </button>
+      </div>
+    </div>
+
+    <div ng-if="tmpRule.description">
+      <span ng-if="tmpRule.description != 'Default'">
+        Answer
+      </span>
+      <span ng-repeat="item in tmpRuleDescriptionFragments track by $index">
+        <span ng-if="item.type == 'select'">
+          <select ng-model="tmpRule.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(widgetCustomizationArgs.choices.value)">
+          </select>
+        </span>
+        <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+          <object-editor obj-type="<[item.type]>" always-editable="true" value="tmpRule.inputs[item.varName]"></object-editor>
+        </span>
+        <span ng-if="item.type == 'noneditable'">
+          <[item.text]>
+        </span>
+      </span>
+
+      <hr>
+      <div>
+        Destination:
+        <select ng-model="tmpRule.dest" ng-required="tmpRule.dest != '?'"
+                ng-options="getDestName(id) for id in allDests">
+        </select>
+
+        <input type="text" ng-model="tmpRule.destNew"
+                ng-required="tmpRule.dest == '?'" ng-show="tmpRule.dest == '?'">
+      </div>
+      <div>
+        <p>Feedback for the reader (chosen at random from the following):</p>
+        <object-editor obj-type="List" init-args="FEEDBACK_LIST_INIT_ARGS" value="tmpRule.feedback">
+        </object-editor>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <span ng-show="tmpRule.description">
+      <button type="button" class="btn" ng-click="save()">
+        Use this rule
+      </button>
+    </span>
+
+    <!-- The next button is shown only when a new rule is being added. -->
+    <span ng-show="tmpRule.description && tmpRule.index == null">
+      <button type="button" class="btn" ng-click="resetTmpRule()">
+        Return to rule menu
+      </button>
+    </span>
+
+    <span ng-show="!tmpRule.description && tmpRule.index == null">
+      <button type="button" class="btn" ng-click="cancel()">
+        Cancel
+      </button>
+    </span>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/customizeWidget">
+  <div class="modal-header">
+    <h3>Customize This Widget</h3>
+  </div>
+
+  <div class="modal-body">
+    The following widget parameters can be customized:
+    <br><br>
+
+    <div ng-repeat="(paramName, paramSpecDict) in widgetParamSpecs">
+      <strong><[paramDescriptions[paramName]]></strong>
+      <value-generator-editor generator-id="paramSpecDict.generator_id"
+                              init-args="paramSpecDict.init_args"
+                              customization-args="widgetCustomizationArgs[paramName]"
+                              obj-type="paramSpecDict.obj_type">
+      </value-generator-editor>
+      <br>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <input type="submit" class="btn" value="Use these parameters" ng-click="save(widgetCustomizationArgs)"/>
+  </div>
+</script>

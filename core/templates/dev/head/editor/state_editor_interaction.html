@@ -1,0 +1,32 @@
+{% extends "editor/state_editor_row.html" %}
+{% block label %}interaction{% endblock %}
+{% block info %}{% endblock %}
+{% block cls %}oppia-iframe-container{% endblock %}
+{% block center %}
+  <div>
+    <div class="oppia-widget-preview">
+      <!-- This iframe is dynamically resized based on its content. -->
+      <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
+      </iframe>
+    </div>
+
+    <div>
+      <label class="checkbox">
+        <input type="checkbox" ng-model="widgetSticky">
+        Reuse the previous state's interaction, if possible.
+        <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
+        More info...
+        </a>
+      </label>
+    </div>
+  </div>
+{% endblock %}
+{% block right %}
+  <button ng-click="showChooseInteractiveWidgetModal()" class="pull-right">
+    Change type
+  </button>
+  <br><br>
+  <button ng-click="showCustomizeInteractiveWidgetModal()" class="pull-right" ng-if="!isEmpty(widgetCustomizationArgs)">
+    Customize
+  </button>
+{% endblock %}

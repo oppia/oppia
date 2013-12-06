@@ -1,0 +1,34 @@
+<div class="row-fluid" id="{% block id %}{% endblock %}">
+  {% block row %}
+    <div class="span2">
+      <span class="oppia-editor-header">
+        {% block label %}{% endblock %}
+      </span>
+      {% block info %}
+        <br>
+        <a href="{% block link %}{% endblock %}" target="_blank">
+          More info...
+        </a>
+      {% endblock %}
+    </div>
+    <div class="span10">
+      {% block center_right %}
+        <div class="container-fluid">
+          {% block line1 %}
+            <div class="row-fluid">
+              <div class="span9 {% block cls %}{% endblock %}">
+                {% block center %}{% endblock %}
+              </div>
+
+              <div class="span3">
+                {% block right %}{% endblock %}
+              </div>
+            </div>
+          {% endblock %}
+          {% block line2 %}{% endblock %}
+          {% block line3 %}{% endblock %}
+        </div>
+      {% endblock %}
+    </div>
+  {% endblock %}
+</div>
