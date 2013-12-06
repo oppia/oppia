@@ -49,9 +49,23 @@ fi
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Installing CoffeeScript
-  $NPM_INSTALL coffee-script@1.2.0 || sudo $NPM_INSTALL coffee-script@1.2.0
+  $NPM_INSTALL coffee-script@1.2.0 || 
+  {
+    echo ""
+    echo "  If the script fails here, please try running this command:"
+    echo ""
+    echo "    sudo chown -R $ME ~/.npm"
+    echo ""
+    echo "  and then run the script again. For more information, see:"
+    echo ""
+    echo "    http://stackoverflow.com/questions/16151018/npm-throws-error-without-sudo"
+    echo ""
+
+    exit 1
+  }
+
   echo Installing uglify
-  $NPM_INSTALL uglify-js || sudo $NPM_INSTALL uglify-js
+  $NPM_INSTALL uglify-js
 
   if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
     echo Downloading jsrepl
@@ -87,9 +101,6 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
-
-  chown -R $ME $TOOLS_DIR/node-0.10.1/bin || sudo chown -R $ME $TOOLS_DIR/node-0.10.1/bin
-  chmod -R 744 $TOOLS_DIR/node-0.10.1/bin || sudo chmod -R 744 $TOOLS_DIR/node-0.10.1/bin
 fi
 
 # Static resources.

@@ -29,7 +29,7 @@ then
   echo ""
   echo "  Please run me using bash: "
   echo ""
-  echo "     bash scripts/$0"
+  echo "    bash scripts/$0"
   echo ""
   return 1
 fi
@@ -64,8 +64,8 @@ mkdir -p $TOOLS_DIR
 mkdir -p $THIRD_PARTY_DIR
 
 mkdir -p $NODE_MODULE_DIR
-chown -R $ME $NODE_MODULE_DIR || sudo chown -R $ME $NODE_MODULE_DIR
-chmod -R 744 $NODE_MODULE_DIR || sudo chmod -R 744 $NODE_MODULE_DIR
+chown -R $ME $NODE_MODULE_DIR
+chmod -R 744 $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
 export PATH=$TOOLS_DIR/node-0.10.1/bin:$PATH

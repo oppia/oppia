@@ -41,7 +41,7 @@ source $(dirname $0)/setup_gae.sh || exit 1
 echo Checking whether coverage is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
   echo Installing coverage
-  rm -rf $TOOLS_DIR/coverage || sudo rm -rf $TOOLS_DIR/coverage
+  rm -rf $TOOLS_DIR/coverage
   wget --no-check-certificate http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
   tar xvzf coverage.tar.gz -C $TOOLS_DIR
   rm coverage.tar.gz
