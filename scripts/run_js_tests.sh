@@ -43,9 +43,9 @@ source $(dirname $0)/setup_gae.sh || exit 1
 bash scripts/install_third_party.sh
 
 echo Checking whether Karma is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
+if [ ! -h "$NODE_MODULE_DIR/.bin/karma" ]; then
   echo Installing Karma
-  $TOOLS_DIR/node-0.10.1/bin/npm install karma@0.8.7
+  $NPM_INSTALL karma@0.8.7
 fi
 
 $NODE_MODULE_DIR/.bin/karma start core/tests/karma.conf.js
