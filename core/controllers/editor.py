@@ -119,19 +119,28 @@ class ExplorationHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
+
+        version = self.payload.get('version')
+        state_name = self.payload.get('state_name')
+
+        if version is None:
+            raise self.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
         if version != exploration.version:
-            raise Exception(
+            raise self.InvalidInputException(
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (exploration.version, version))
 
-        state_name = self.payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state_id = exp_services.add_states(
-            self.user_id, exploration_id, [state_name])[0]
+        try:
+            state_id = exp_services.add_states(
+                self.user_id, exploration_id, [state_name])[0]
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({

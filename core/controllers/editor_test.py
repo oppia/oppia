@@ -22,12 +22,100 @@ import feconf
 import test_utils
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class EditorTest(test_utils.GenericTestBase):
 
-    def testEditorPage(self):
+    def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-        response = self.testapp.get('/create/0/')
-        self.assertEqual(response.status_int, 301)
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Check that non-editors cannot access the editor page.
+        response = self.testapp.get('/create/0')
+        self.assertEqual(response.status_int, 302)
+
+        # Login as an admin.
+        self.login('editor@example.com', is_admin=True)
+
+        # Check that it is now possible to access the editor page.
+        response = self.testapp.get('/create/0')
+        self.assertEqual(response.status_int, 200)
+        self.assertIn('Exploration Metadata', response.body)
+        # Test that the value generator JS is included.
+        self.assertIn('RandomSelector', response.body)
+
+        self.logout()
+
+    def test_add_new_state(self):
+        """Test adding a new state to an exploration."""
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Login as an admin.
+        self.login('editor@example.com', is_admin=True)
+
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Add a new state called 'New valid state name'.
+        response_dict = self.post_json('/create/0/data', {
+            'state_name': 'New valid state name', 'version': 1
+        }, csrf_token)
+
+        self.assertDictContainsSubset({'version': 2}, response_dict)
+        self.assertTrue('stateData' in response_dict)
+        self.assertDictContainsSubset(
+            {'name': 'New valid state name'}, response_dict['stateData'])
+
+        self.logout()
+
+    def test_add_new_state_error_cases(self):
+        """Test the error cases for adding a new state."""
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Login as an admin.
+        self.login('editor@example.com', is_admin=True)
+
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        def _post_and_expect_400_error(payload):
+            return self.post_json(
+                '/create/0/data', payload, csrf_token,
+                expect_errors=True, expected_status_int=400)
+
+        # A POST request with no version number is invalid.
+        response_dict = _post_and_expect_400_error({'state_name': 'New state'})
+        self.assertIn('a version must be specified', response_dict['error'])
+
+        # A POST request with the wrong version number is invalid.
+        response_dict = _post_and_expect_400_error({
+            'state_name': 'New state', 'version': 123})
+        self.assertIn('which is too old', response_dict['error'])
+
+        # A POST request with no state name is invalid.
+        response_dict = _post_and_expect_400_error({'version': 1})
+        self.assertIn('Please specify a state name.', response_dict['error'])
+
+        # A POST request with an empty state name is invalid.
+        response_dict = _post_and_expect_400_error({
+            'state_name': '', 'version': 1})
+        self.assertIn('Please specify a state name.', response_dict['error'])
+
+        # A POST request with a state name containing invalid characters is
+        # invalid.
+        response_dict = _post_and_expect_400_error({
+            'state_name': '[Bad State Name]', 'version': 1})
+        self.assertIn('Invalid character [', response_dict['error'])
+
+        # A POST request with a state name of feconf.END_DEST is invalid.
+        response_dict = _post_and_expect_400_error({
+            'state_name': feconf.END_DEST, 'version': 1})
+        self.assertIn('Invalid state name', response_dict['error'])
+
+        self.logout()
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',

@@ -14,10 +14,10 @@
 
 import main
 import os
+import re
 import unittest
 import webtest
 
-from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
 (exp_models, file_models, user_models) = models.Registry.import_models([
@@ -99,6 +99,18 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
+    def post_json(self, url, payload, csrf_token, expect_errors=False,
+                  expected_status_int=200):
+        """Post an object to the server by JSON; return the received object."""
+        json_response = self.testapp.post(url, {
+            'csrf_token': csrf_token,
+            'payload': json.dumps(payload)
+        }, expect_errors=expect_errors)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self.parse_json_response(
+            json_response, expect_errors=expect_errors)
+
     def parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
@@ -109,6 +121,12 @@ class TestBase(unittest.TestCase):
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
+
+    def get_csrf_token_from_response(self, response):
+        """Retrieve the CSRF token from a GET response."""
+        CSRF_REGEX = (
+            r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
+        return re.search(CSRF_REGEX, response.body).group(1)
 
 
 class AppEngineTestBase(TestBase):

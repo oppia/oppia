@@ -77,7 +77,7 @@ class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):
         self.assertFalse(rule.eval(['a', 'c', 'b']))
         self.assertFalse(rule.eval(['a', 'b']))
 
-    def is_disjoint_from_rule(self):
+    def test_is_disjoint_from_rule(self):
         rule = set_rules.IsDisjointFrom(['a', 'b'])
 
         self.assertTrue(rule.eval(['c', 'ab']))
@@ -87,4 +87,3 @@ class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):
         self.assertFalse(rule.eval(['a', 'c', 'b']))
         self.assertFalse(rule.eval(['a', 'b']))
         self.assertFalse(rule.eval(['a']))
-
