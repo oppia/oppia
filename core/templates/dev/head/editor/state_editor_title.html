@@ -1,0 +1,24 @@
+{% extends "editor/state_editor_row.html" %}
+
+{% block label %}state name{% endblock %}
+
+{% block info %}{% endblock %}
+
+{% block center %}
+  <h3>
+    <span ng-if="!stateNameMemento">
+      <[stateName]>
+    </span>
+    <span ng-if="!!stateNameMemento">
+      <input type="text" ng-model="stateName">
+      <button ng-click="saveStateName(stateName)">Close</button>
+    </span>
+  </h3>
+{% endblock %}
+
+{% block right %}
+  <button ng-if="!stateNameMemento"
+      ng-click="openStateNameEditor()" class="pull-right">
+    Edit name
+  </button>
+{% endblock %}
