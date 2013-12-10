@@ -1,16 +1,21 @@
 {% extends "editor/state_editor_row.html" %}
+
 {% block id %}rules{% endblock %}
+
 {% block row %}
   <div ng-repeat="(handlerName, handler) in widgetHandlers">
     {{ super() }}
   </div>
 {% endblock %}
+
 {% block label %}
   when readers <[handlerName]>:
 {% endblock %}
+
 {% block link %}
   https://code.google.com/p/oppia/wiki/Rules
 {% endblock %}
+
 {% block line1 %}
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
@@ -68,6 +73,7 @@
     </div>
   </div>
 {% endblock %}
+
 {% block line2 %}
   <div class="row-fluid" ng-show="widgetId != 'Continue'">
     <div class="span9">
@@ -87,6 +93,7 @@
     </div>
   </div>
 {% endblock %}
+
 {% block line3 %}
   <div class="row-fluid">
     <div class="span9">

@@ -1,7 +1,11 @@
 {% extends "editor/state_editor_row.html" %}
+
 {% block label %}content{% endblock %}
+
 {% block info %}{% endblock %}
+
 {% block cls %}oppia-state-content{% endblock %}
+
 {% block center %}
   <div ng-if="!contentMemento">
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
@@ -18,6 +22,7 @@
     <button ng-click="saveTextContent()">Close</button>
   </div>
 {% endblock %}
+
 {% block right %}
   <button ng-if="!contentMemento" ng-click="editContent()" class="pull-right">
     Edit content

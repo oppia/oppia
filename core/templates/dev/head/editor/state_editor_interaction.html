@@ -1,7 +1,11 @@
 {% extends "editor/state_editor_row.html" %}
+
 {% block label %}interaction{% endblock %}
+
 {% block info %}{% endblock %}
+
 {% block cls %}oppia-iframe-container{% endblock %}
+
 {% block center %}
   <div>
     <div class="oppia-widget-preview">
@@ -21,6 +25,7 @@
     </div>
   </div>
 {% endblock %}
+
 {% block right %}
   <button ng-click="showChooseInteractiveWidgetModal()" class="pull-right">
     Change type
