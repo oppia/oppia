@@ -22,7 +22,7 @@
 //
 // $ ../oppia_tools/node-0.10.1/bin/npm install ejs
 //
-// This script can then be ran as:
+// This script can then be run as:
 //
 // $ node scripts/expand_template.js scripts/data/cities_template.yaml < cities.tsv > data/explorations/cities.yaml
 
