@@ -103,8 +103,18 @@ class TestBase(unittest.TestCase):
                   expected_status_int=200):
         """Post an object to the server by JSON; return the received object."""
         json_response = self.testapp.post(url, {
-            'csrf_token': csrf_token,
-            'payload': json.dumps(payload)
+            'csrf_token': csrf_token, 'payload': json.dumps(payload)
+        }, expect_errors=expect_errors)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self.parse_json_response(
+            json_response, expect_errors=expect_errors)
+
+    def put_json(self, url, payload, csrf_token, expect_errors=False,
+                 expected_status_int=200):
+        """Put an object to the server by JSON; return the received object."""
+        json_response = self.testapp.put(url, {
+            'csrf_token': csrf_token, 'payload': json.dumps(payload)
         }, expect_errors=expect_errors)
 
         self.assertEqual(json_response.status_int, expected_status_int)

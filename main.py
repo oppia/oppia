@@ -142,6 +142,9 @@ urls = [
         r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
         'state_handler'),
     get_redirect_route(
+        r'/create/<exploration_id>/<state_id>/resolved_answers', editor.ResolvedAnswersHandler,
+        'resolved_answers_handler'),
+    get_redirect_route(
         r'/create/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
         'exploration_resources_handler'),
     get_redirect_route(

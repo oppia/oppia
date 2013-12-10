@@ -117,6 +117,96 @@ class EditorTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_resolved_answers_handler(self):
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')        
+
+        # In the reader perspective, submit the first multiple-choice answer,
+        # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
+        response = self.testapp.get('/learn/0/data')
+        exploration_dict = self.parse_json_response(response)
+        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+
+        state_id = exploration_dict['state_id']
+        response = self.testapp.post(str('/learn/0/%s' % state_id), {
+            'payload': json.dumps({
+                'answer': '0', 'block_number': 0, 'handler': 'submit',
+                'state_history': exploration_dict['state_history'],
+            })
+        })
+
+        exploration_dict = self.parse_json_response(response)
+        state_id = exploration_dict['state_id']
+        response = self.testapp.post(str('/learn/0/%s' % state_id), {
+            'payload': json.dumps({
+                'answer': 'blah', 'block_number': 0, 'handler': 'submit',
+                'state_history': exploration_dict['state_history'],
+            })
+        })
+
+        for _ in range(2):
+            exploration_dict = self.parse_json_response(response)
+            response = self.testapp.post(str('/learn/0/%s' % state_id), {
+                'payload': json.dumps({
+                    'answer': 'blah2', 'block_number': 0, 'handler': 'submit',
+                    'state_history': exploration_dict['state_history'],
+                })
+            })
+
+        for _ in range(3):
+            exploration_dict = self.parse_json_response(response)
+            response = self.testapp.post(str('/learn/0/%s' % state_id), {
+                'payload': json.dumps({
+                    'answer': 'blah3', 'block_number': 0, 'handler': 'submit',
+                    'state_history': exploration_dict['state_history'],
+                })
+            })
+
+        # Log in as an editor.
+        self.login('editor@example.com', is_admin=True)
+
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+        url = str('/create/0/%s/resolved_answers' % state_id)
+
+        def _get_unresolved_answers():
+            return exp_services.get_unresolved_answers_for_default_rule(
+                '0', state_id)
+
+        self.assertEqual(
+            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
+
+        # An empty request should result in an error.
+        response_dict = self.put_json(
+            url, {'something_else': []}, csrf_token,
+            expect_errors=True, expected_status_int=400)
+        self.assertIn('Expected a list', response_dict['error'])
+
+        # A request of the wrong type should result in an error.
+        response_dict = self.put_json(
+            url, {'resolved_answers': 'this_is_a_string'}, csrf_token,
+            expect_errors=True, expected_status_int=400)
+        self.assertIn('Expected a list', response_dict['error'])
+
+        # Trying to remove an answer that wasn't submitted has no effect.
+        response_dict = self.put_json(
+            url, {'resolved_answers': ['not_submitted_answer']}, csrf_token)
+        self.assertEqual(
+            _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
+
+        # A successful request should remove the answer in question.
+        response_dict = self.put_json(
+            url, {'resolved_answers': ['blah']}, csrf_token)
+        self.assertEqual(
+            _get_unresolved_answers(), {'blah2': 2, 'blah3': 3})
+
+        # It is possible to remove more than one answer at a time.
+        response_dict = self.put_json(
+            url, {'resolved_answers': ['blah2', 'blah3']}, csrf_token)
+        self.assertEqual(_get_unresolved_answers(), {})
+
+        self.logout()
+
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
                  'login not implemented for non-GAE platform')
