@@ -28,7 +28,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'widget_handlers',
     'widget_sticky',
     'param_changes',
-    'resolved_answers',
     'state_name'
   ];
 
@@ -110,8 +109,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
     propertyValueMap['version'] = explorationData.data.version;
 
-    console.log(propertyValueMap);
-
     $http.put(
         explorationUrl + '/' + stateId + '/data',
         $.param({
@@ -130,6 +127,21 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
+  };
+
+  explorationData.resolveAnswers = function(stateId, resolvedAnswersList) {
+    $http.put(
+        explorationUrl + '/' + stateId + '/resolved_answers',
+        $.param({
+          csrf_token: GLOBALS.csrf_token,
+          payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
+        }, true),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).error(function(data) {
+      warningsData.addWarning(data.error || 'Error communicating with server.');
+    });
+
+    warningsData.clear();
   };
 
   return explorationData;

@@ -54,13 +54,9 @@ function UnresolvedAnswers($scope, warningsData, explorationData) {
 
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
-    explorationData.saveStateData($scope.stateId, {
-      'resolved_answers': [answer]
-    });
+    explorationData.resolveAnswers($scope.stateId, [answer]);
     $scope.generateUnresolvedAnswersMap();
   };
 }
 
-InteractiveWidgetEditor.$inject = [
-  '$scope', 'warningsData', 'explorationData'
-];
+UnresolvedAnswers.$inject = ['$scope', 'warningsData', 'explorationData'];
