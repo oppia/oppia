@@ -66,6 +66,7 @@ DEMO_EXPLORATIONS = [
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
+    ('multiples.yaml', 'Project Euler #1', 'Coding')
 ]
 
 # Whether to unconditionally log info messages.
