@@ -245,11 +245,12 @@ class StateHandler(base.BaseHandler):
         widget_handlers = self.payload.get('widget_handlers')
         widget_sticky = self.payload.get('widget_sticky')
         content = self.payload.get('content')
+        commit_message = self.payload.get('commit_message')
 
         exp_services.update_state(
             self.user_id, exploration_id, state_id, state_name, param_changes,
             widget_id, widget_customization_args, widget_handlers,
-            widget_sticky, content
+            widget_sticky, content, commit_message
         )
 
         exploration = exp_services.get_exploration_by_id(exploration_id)

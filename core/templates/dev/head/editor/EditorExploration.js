@@ -65,7 +65,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveStateChanges = function() {
+  $scope.saveStateChanges = function(commitMessage) {
     var finalChangeList = {};
     for (var i = 0; i < $scope.stateChangeList.length; i++) {
       finalChangeList[$scope.stateChangeList[i].backendName] = (
@@ -73,10 +73,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
     // Reload the exploration page, including drawing the graph.
     // TODO(sll): This takes a long time. Can we shorten it?
-    explorationData.saveStateData($scope.stateId, finalChangeList, function() {
-      $scope.stateChangeList = [];
-      $scope.initExplorationPage();
-    });
+    explorationData.saveStateData(
+      $scope.stateId, finalChangeList, commitMessage, function() {
+        $scope.stateChangeList = [];
+        $scope.initExplorationPage();
+      }
+    );
   };
 
   $scope.discardStateChanges = function() {

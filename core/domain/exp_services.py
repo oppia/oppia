@@ -271,7 +271,7 @@ def export_to_zip_file(exploration_id):
 
 
 # Repository SAVE and DELETE methods.
-def save_exploration(committer_id, exploration):
+def save_exploration(committer_id, exploration, commit_message=''):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
@@ -299,7 +299,7 @@ def save_exploration(committer_id, exploration):
                 for state_id in exploration.state_ids]
         }
 
-    def _save_exploration_transaction(committer_id, exploration):
+    def _save_exploration_transaction(committer_id, exploration, commit_message):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
         if exploration.version != exploration_model.version:
             raise Exception(
@@ -329,10 +329,11 @@ def save_exploration(committer_id, exploration):
 
         # Create a snapshot for the version history.
         exploration_model.put(
-            committer_id, properties_dict, snapshot=versionable_dict)
+            committer_id, properties_dict, versionable_dict, commit_message)
 
     transaction_services.run_in_transaction(
-        _save_exploration_transaction, committer_id, exploration)
+        _save_exploration_transaction, committer_id, exploration, 
+        commit_message)
 
 
 def save_states(committer_id, exploration_id, states):
@@ -550,7 +551,7 @@ def add_states(committer_id, exploration_id, state_names):
 
 def update_state(committer_id, exploration_id, state_id, new_state_name,
                  param_changes, widget_id, widget_customization_args,
-                 widget_handlers, widget_sticky, content):
+                 widget_handlers, widget_sticky, content, commit_message):
     """Updates the given state, and commits changes.
 
     Args:
@@ -579,6 +580,9 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         'value'). Currently we expect this list to have exactly one element
         with type 'text'. If present, this list represents the non-interactive
         content for the state.
+    - commit_message: A description of changes made to the state. For published
+        explorations, this must be present; for unpublished explorations, it
+        should be equal to None.
     """
     # TODO(sll): Add more documentation for widget_handlers, above.
 
@@ -747,12 +751,23 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.content = [exp_domain.Content(
             content[0]['type'], html_cleaner.clean(content[0]['value']))]
 
-    def _update_state_transaction(committer_id, exploration, state):
+    if exploration.is_public and commit_message is None:
+        raise ValueError(
+            'Exploration is public so expected a commit message but received '
+            'none.')
+    if not exploration.is_public and commit_message is not None:
+        raise ValueError(
+            'Exploration is unpublished so expected no commit message, but '
+            'received %s' % commit_message)
+
+    def _update_state_transaction(
+            committer_id, exploration, state, commit_message):
         save_states(committer_id, exploration.id, [state])
-        save_exploration(committer_id, exploration)
+        save_exploration(committer_id, exploration, commit_message)
 
     transaction_services.run_in_transaction(
-        _update_state_transaction, committer_id, exploration, state)
+        _update_state_transaction, committer_id, exploration, state, 
+        commit_message)
 
 
 def delete_state(committer_id, exploration_id, state_id):

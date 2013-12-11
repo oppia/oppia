@@ -174,6 +174,183 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           'param_changes', ['stateParamChanges'], newValue, oldValue);
     }
   };
+
+  $scope.PROPERTY_CHANGE_SUMMARIES = {
+    // In future these will be elaborated to describe the changes made to each
+    // state property.
+    'state_name': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'State name';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'state name';
+      }
+    },
+    'param_changes': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Parameter changes';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'parameter changes';
+      }
+    },
+    'content': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Content';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'content';
+      }
+    },
+    'widget_id': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Interaction type';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'interaction type';
+      }
+    },
+    'widget_customization_args': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Interaction customizations';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'interaction customizations';
+      }
+    },
+    'widget_sticky': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Whether to reuse the previous interaction'
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'whether to reuse the previous interaction'
+      }
+    },
+    'widget_handlers': {
+      'saveStateModalFormat': function(newValue, oldValue) {
+        return 'Reader submission rules';
+      },
+      'versionLogFormat': function(newValue, oldValue) {
+        return 'reader submission rules';
+      }
+    }
+  };
+
+  $scope.getPropertyChangeSummary = function(
+      propertyName, format, values) {
+    return $scope.PROPERTY_CHANGE_SUMMARIES[propertyName][format](
+      values['newValue'], values['oldValue']);
+  };
+
+  $scope.createStateChangeSummary = function() {
+    // This ensures the property changes are listed in the same order as 
+    // properties appear on the webpage.
+    var changes = {};
+    for (property in $scope.PROPERTY_CHANGE_SUMMARIES) {
+      changes[property] = null;
+    }
+
+    //Identifies the net changes made to each property
+    for (var i = 0; i < $scope.stateChangeList.length; i++) {
+      var stateChange = $scope.stateChangeList[i];
+      if (changes[stateChange['backendName']] === null) {
+        changes[stateChange['backendName']] = {
+          'newValue': stateChange['newValue'],
+          'oldValue': stateChange['oldValue']
+        };
+      } else {
+        changes[stateChange['backendName']]['newValue'] = (
+          stateChange['newValue']);
+      }
+    }
+
+    var changesExist = false;
+    var saveStateModalSummary = [];
+    var versionLogSummaryArrary = [];
+
+    //The summary displayed in the save confirmation dialogue
+    for (property in changes) {
+      if (changes[property] !== null) {
+        if (JSON.stringify(changes[property]['newValue']) !==
+            JSON.stringify(changes[property]['oldValue'])) {
+          changesExist = true;
+          saveStateModalSummary.push(
+            $scope.getPropertyChangeSummary(
+              property, 'saveStateModalFormat', changes[property]));
+          versionLogSummaryArrary.push(
+            $scope.getPropertyChangeSummary(
+              property, 'versionLogFormat', changes[property]));
+        }
+      }
+    }
+
+    //The summary included in the commit message
+    if (changesExist) {
+      var versionLogSummary = 'Changes have been made to these properties of ' +
+        'state \'' + $scope.stateName + '\': ' + 
+        versionLogSummaryArrary.join(", ") + ".";
+    } else {
+      var versionLogSummary = '';
+    }
+
+    return {
+      'changesExist': changesExist,
+      'saveStateModalFormat': saveStateModalSummary,
+      'versionLogFormat': versionLogSummary
+    };
+  };
+ 
+  $scope.showSaveStateModal = function() {
+    //Create the save-confirmation and commit-message request dialogue.
+    if (!$scope.isPublic) {
+      // For unpublished explorations no commit message is needed
+      $scope.saveStateChanges('');
+    } else {
+      warningsData.clear();
+      $scope.stateChangeSummary = $scope.createStateChangeSummary();
+      if (!$scope.stateChangeSummary['changesExist']) {
+        warningsData.addWarning('Your changes all cancel each other out, ' +
+          'so nothing has been saved.');
+      } else {
+        var modalInstance = $modal.open({
+          templateUrl: 'modals/saveState',
+          backdrop: 'static',
+          resolve: {
+            stateChangeSummary: function() {
+              return $scope.stateChangeSummary;
+            }
+          },
+          controller: function($scope, $modalInstance, stateChangeSummary) {
+            $scope.stateChangeSummary = (
+              stateChangeSummary['saveStateModalFormat']);
+            $scope.neatJoin = function(string1, string2) {
+              if(string1.slice(-1) === "." || string1.slice(-1) === "!" || 
+                  string1.slice(-1) === "?") {
+                return string1 + " " + string2;
+              } else {
+                return string1 + ". " + string2;
+              }
+            };
+            $scope.publish = function(commitMessage) {
+              $modalInstance.close(
+                $scope.neatJoin(
+                  commitMessage, stateChangeSummary['versionLogFormat']));
+            };
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        });
+
+        modalInstance.result.then(function(commitMessage) {
+          $scope.saveStateChanges(commitMessage);
+        }, function () {
+          console.log('Save state modal dismissed.');
+        });
+      }        
+    }
+  };
 }
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
