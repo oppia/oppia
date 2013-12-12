@@ -86,6 +86,39 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/saveExploration">
+      <div class="modal-header">
+        <h3>Save Exploration</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          You are about to save changes to this exploration. These changes will immediately be publicly visible.
+        </p>
+        <p>
+          Please enter a brief description of what you have changed:
+          <textarea rows="3" cols="50" ng-model="commitMessage"></textarea>
+        </p>
+
+        <div>
+          <em>
+            You made changes to the following states:
+          </em>
+          <div ng-repeat="(stateId, stateChanges) in explorationChangeSummary">
+            <h5><[stateIdsToNames[stateId]]></h5>
+            <ul>
+              <li ng-repeat="entry in stateChanges track by $index">
+                <[entry]>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
+        <button class="btn" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
         <div class="span12">
@@ -140,14 +173,19 @@
 
           <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
           <div ng-show="!!explorationTitle">
+            <div style="float: right;">
+              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardExplorationChanges()" ng-disabled="!isExplorationLockedForEditing()">discard changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationLockedForEditing()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationLockedForEditing()">save changes</button>
+            </div>
+
             <tabset>
-              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()" disabled="isStateLockedForEditing()">
+              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
                 {% include 'editor/editor_metadata.html' %}
                 <hr>
                 {% include 'editor/editor_viz.html' %}
               </tab>
 
-              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()" disabled="isStateLockedForEditing()">
+              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
                 {% include 'editor/stats_viewer.html' %}
               </tab>
 

@@ -194,9 +194,40 @@ class ExplorationHandler(base.BaseHandler):
 
         exp_services.save_exploration(self.user_id, exploration)
 
+        states = self.payload.get('states')
+        commit_message = self.payload.get('commit_message')
+
+        if states:
+            for (state_id, state_data) in states.iteritems():
+                state_name = state_data.get('state_name')
+                param_changes = state_data.get('param_changes')
+                widget_id = state_data.get('widget_id')
+                widget_customization_args = state_data.get(
+                    'widget_customization_args')
+                widget_handlers = state_data.get('widget_handlers')
+                widget_sticky = state_data.get('widget_sticky')
+                content = state_data.get('content')
+
+                # TODO(sll): This method will do a save each time this is
+                # called, which is undesirable. Batch the saves into a single
+                # save with the given commit message.
+                exp_services.update_state(
+                    self.user_id, exploration_id, state_id, state_name,
+                    param_changes, widget_id, widget_customization_args,
+                    widget_handlers, widget_sticky, content, commit_message
+                )
+
+        updated_states = {}
+        for state_id in states:
+            updated_states[state_id] = (
+                exp_services.export_state_to_verbose_dict(
+                    exploration_id, state_id)
+            )
+
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
-            'version': exploration.version
+            'version': exploration.version,
+            'updatedStates': updated_states
         })
 
     @base.require_editor
@@ -228,37 +259,6 @@ class StateHandler(base.BaseHandler):
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (exploration_version, version_from_payload))
-
-    @base.require_editor
-    def put(self, exploration_id, state_id):
-        """Saves updates to a state."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-
-        version = self.payload.get('version')
-        self._require_valid_version(version, exploration.version)
-
-        state_name = self.payload.get('state_name')
-        param_changes = self.payload.get('param_changes')
-        widget_id = self.payload.get('widget_id')
-        widget_customization_args = self.payload.get(
-            'widget_customization_args')
-        widget_handlers = self.payload.get('widget_handlers')
-        widget_sticky = self.payload.get('widget_sticky')
-        content = self.payload.get('content')
-        commit_message = self.payload.get('commit_message')
-
-        exp_services.update_state(
-            self.user_id, exploration_id, state_id, state_name, param_changes,
-            widget_id, widget_customization_args, widget_handlers,
-            widget_sticky, content, commit_message
-        )
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        self.render_json({
-            'version': exploration.version,
-            'stateData': exp_services.export_state_to_verbose_dict(
-                exploration_id, state_id)
-        })
 
     @base.require_editor
     def delete(self, exploration_id, state_id):

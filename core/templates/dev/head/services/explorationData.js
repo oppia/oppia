@@ -57,95 +57,122 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
           return response.data;
         });
       }
-    }
-  };
+    },
 
-  // Returns a promise that supplies the data for the given state.
-  explorationData.getStateData = function(stateId) {
-    if (!stateId) {
-      return;
-    }
+    // Returns a promise that supplies the data for the given state.
+    getStateData: function(stateId) {
+      if (!stateId) {
+        return;
+      }
 
-    console.log('Getting state data for state ' + stateId);
-    explorationData.stateId = stateId;
-    console.log(explorationData.data);
+      console.log('Getting state data for state ' + stateId);
+      explorationData.stateId = stateId;
+      console.log(explorationData.data);
 
-    if (explorationData.data && 'states' in explorationData.data &&
-        stateId in explorationData.data.states) {
-      var deferred = $q.defer();
-      deferred.resolve(angular.copy(explorationData.data.states[stateId]));
-      return deferred.promise;
-    } else {
-      return explorationData.getData().then(function(response) {
-        return angular.copy(explorationData.data.states[stateId]);
+      if (explorationData.data && 'states' in explorationData.data &&
+          stateId in explorationData.data.states) {
+        var deferred = $q.defer();
+        deferred.resolve(angular.copy(explorationData.data.states[stateId]));
+        return deferred.promise;
+      } else {
+        return explorationData.getData().then(function(response) {
+          return angular.copy(explorationData.data.states[stateId]);
+        });
+      }
+    },
+
+    getStateProperty: function(stateId, property) {
+      if (!stateId) {
+        return;
+      }
+      console.log(
+          'Getting state property ' + property + ' for state ' + stateId);
+      return explorationData.getStateData(stateId).then(function(stateData) {
+        if (!stateData.hasOwnProperty(property)) {
+          warningsData.addWarning('Invalid property name: ' + property);
+          return;
+        }
+        return stateData[property];
       });
-    }
-  };
+    },
 
-  explorationData.getStateProperty = function(stateId, property) {
-    if (!stateId) {
-      return;
-    }
-    console.log(
-        'Getting state property ' + property + ' for state ' + stateId);
-    return explorationData.getStateData(stateId).then(function(stateData) {
-      if (!stateData.hasOwnProperty(property)) {
-        warningsData.addWarning('Invalid property name: ' + property);
-        return;
+
+    /**
+     * Saves the exploration to the backend, and, on a success callback,
+     * updates the data for the updated states in the frontend.
+     * @param {object} explorationChanges Represents changes to the exploration,
+     *     keyed by property name. The values are the most up-to-date values
+     *     for the corresponding exploration properties.
+     * @param {object} stateChanges Contains one key-value pair for each state
+     *     that is modified. Each key is a state id, and each value is an
+     *     object whose meaning is similar to that of explorationChanges.
+     * @param {string} commitMessage The full commit message for this save
+     *     operation.
+     */
+    saveExploration: function(explorationChanges, stateChanges, commitMessage,
+        successCallback) {
+      // TODO(sll): Update the frontend data immediately, where possible; do
+      //              not wait for the server round-trip.
+      // TODO(sll): Handle explorationChanges too.
+
+      var statesForBackend = {};
+      for (var stateId in stateChanges) {
+        var changeMap = {};
+        for (var property in stateChanges[stateId]) {
+          if (validStateProperties.indexOf(property) < 0) {
+            warningsData.addWarning('Invalid property name: ' + property);
+            return;
+          }
+          changeMap[property] = stateChanges[stateId][property].newValue;
+        }
+        statesForBackend[stateId] = changeMap;
       }
-      return stateData[property];
-    });
-  };
 
-  // Saves data for a given state to the backend, and, on a success callback,
-  // updates the data for that state in the frontend.
-  explorationData.saveStateData = function(
-      stateId, propertyValueMap, commitMessage, successCallback) {
-    for (var property in propertyValueMap) {
-      if (validStateProperties.indexOf(property) < 0) {
-        warningsData.addWarning('Invalid property name: ' + property);
-        return;
+      var propertyValueMap = {
+        states: statesForBackend,
+        version: explorationData.data.version,
+      };
+
+      if (commitMessage !== '') {
+        propertyValueMap['commit_message'] = commitMessage;
       }
-    }
 
-    propertyValueMap['version'] = explorationData.data.version;
-    if(commitMessage !== '') {
-      propertyValueMap['commit_message'] = commitMessage;
-    }
+      $http.put(
+          explorationUrl + '/data',
+          $.param({
+            csrf_token: GLOBALS.csrf_token,
+            payload: JSON.stringify(propertyValueMap)
+          }, true),
+          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      ).success(function(data) {
+        warningsData.clear();
+        console.log('Changes to this exploration were saved successfully.');
+        explorationData.data.version = data.version;
+        for (var stateId in data.updatedStates) {
+          explorationData.data['states'][stateId] = data.updatedStates[stateId];
+        }
+        if (successCallback) {
+          successCallback();
+        }
+      }).error(function(data) {
+        warningsData.addWarning(data.error || 'Error communicating with server.');
+      });
+    },
 
-    $http.put(
-        explorationUrl + '/' + stateId + '/data',
-        $.param({
-          csrf_token: GLOBALS.csrf_token,
-          payload: JSON.stringify(propertyValueMap)
-        }, true),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function(data) {
+    resolveAnswers: function(stateId, resolvedAnswersList) {
+      $http.put(
+          explorationUrl + '/' + stateId + '/resolved_answers',
+          $.param({
+            csrf_token: GLOBALS.csrf_token,
+            payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
+          }, true),
+          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      ).error(function(data) {
+        warningsData.addWarning(data.error || 'Error communicating with server.');
+      });
+
       warningsData.clear();
-      console.log('Changes to this state were saved successfully.');
-      explorationData.data.version = data.version;
-      explorationData.data['states'][stateId] = data.stateData;
-      if (successCallback) {
-        successCallback();
-      }
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
-  };
-
-  explorationData.resolveAnswers = function(stateId, resolvedAnswersList) {
-    $http.put(
-        explorationUrl + '/' + stateId + '/resolved_answers',
-        $.param({
-          csrf_token: GLOBALS.csrf_token,
-          payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
-        }, true),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
-
-    warningsData.clear();
+    }
   };
 
   return explorationData;
