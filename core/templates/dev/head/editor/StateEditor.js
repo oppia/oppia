@@ -242,15 +242,17 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       values['newValue'], values['oldValue']);
   };
 
+  // Returns whether any net changes have occurred, together with summaries of
+  // the changes to display in the save dialogue and include in the version log.
   $scope.createStateChangeSummary = function() {
     // This ensures the property changes are listed in the same order as 
     // properties appear on the webpage.
     var changes = {};
-    for (property in $scope.PROPERTY_CHANGE_SUMMARIES) {
+    for (var property in $scope.PROPERTY_CHANGE_SUMMARIES) {
       changes[property] = null;
     }
 
-    //Identifies the net changes made to each property
+    // Identifies the net changes made to each property.
     for (var i = 0; i < $scope.stateChangeList.length; i++) {
       var stateChange = $scope.stateChangeList[i];
       if (changes[stateChange['backendName']] === null) {
@@ -266,29 +268,29 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
     var changesExist = false;
     var saveStateModalSummary = [];
-    var versionLogSummaryArrary = [];
+    var versionLogSummaryArray = [];
 
-    //The summary displayed in the save confirmation dialogue
-    for (property in changes) {
+    // Construct the summary for the save confirmation dialogue.
+    for (var property in changes) {
       if (changes[property] !== null) {
         if (JSON.stringify(changes[property]['newValue']) !==
             JSON.stringify(changes[property]['oldValue'])) {
           changesExist = true;
-          saveStateModalSummary.push(
+          saveStateModalSummary .push(
             $scope.getPropertyChangeSummary(
               property, 'saveStateModalFormat', changes[property]));
-          versionLogSummaryArrary.push(
+          versionLogSummaryArray.push(
             $scope.getPropertyChangeSummary(
               property, 'versionLogFormat', changes[property]));
         }
       }
     }
 
-    //The summary included in the commit message
+    // Construct the summary to be included in the commit message.
     if (changesExist) {
       var versionLogSummary = 'Changes have been made to these properties of ' +
         'state \'' + $scope.stateName + '\': ' + 
-        versionLogSummaryArrary.join(", ") + ".";
+        versionLogSummaryArray.join(', ') + '.';
     } else {
       var versionLogSummary = '';
     }
@@ -298,12 +300,12 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       'saveStateModalFormat': saveStateModalSummary,
       'versionLogFormat': versionLogSummary
     };
-  };
+  };  
  
   $scope.showSaveStateModal = function() {
-    //Create the save-confirmation and commit-message request dialogue.
+    // Create the save-confirmation and commit-message request dialogue.
     if (!$scope.isPublic) {
-      // For unpublished explorations no commit message is needed
+      // For unpublished explorations no commit message is needed.
       $scope.saveStateChanges('');
     } else {
       warningsData.clear();
@@ -323,18 +325,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           controller: function($scope, $modalInstance, stateChangeSummary) {
             $scope.stateChangeSummary = (
               stateChangeSummary['saveStateModalFormat']);
-            $scope.neatJoin = function(string1, string2) {
-              if(string1.slice(-1) === "." || string1.slice(-1) === "!" || 
-                  string1.slice(-1) === "?") {
-                return string1 + " " + string2;
-              } else {
-                return string1 + ". " + string2;
-              }
-            };
             $scope.publish = function(commitMessage) {
-              $modalInstance.close(
-                $scope.neatJoin(
-                  commitMessage, stateChangeSummary['versionLogFormat']));
+              $modalInstance.close(commitMessage);
             };
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
@@ -344,7 +336,9 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
         });
 
         modalInstance.result.then(function(commitMessage) {
-          $scope.saveStateChanges(commitMessage);
+          $scope.saveStateChanges(
+            $scope.neatJoin(
+              commitMessage, $scope.stateChangeSummary['versionLogFormat']));
         }, function () {
           console.log('Save state modal dismissed.');
         });
