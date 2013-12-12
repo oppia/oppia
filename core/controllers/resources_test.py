@@ -26,6 +26,8 @@ import test_utils
                  'login not implemented for non-GAE platform')
 class ImageHandlerTest(test_utils.GenericTestBase):
 
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def _initialize(self):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')

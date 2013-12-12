@@ -22,6 +22,7 @@ from core import settings
 
 # Code contributors, in alphabetical order.
 CODE_CONTRIBUTORS = [
+    'Jacob Davis',
     'Jeremy Emerson',
     'Koji Ashida',
     'Manas Tungare',
@@ -66,7 +67,7 @@ DEMO_EXPLORATIONS = [
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
-    ('multiples.yaml', 'Project Euler #1', 'Coding')
+    ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
 ]
 
 # Whether to unconditionally log info messages.

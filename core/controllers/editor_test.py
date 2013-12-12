@@ -26,6 +26,8 @@ import test_utils
                  'login not implemented for non-GAE platform')
 class EditorTest(test_utils.GenericTestBase):
 
+    TAGS = [test_utils.TestTags.SLOW_TEST]
+
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
         exp_services.delete_demo('0')
