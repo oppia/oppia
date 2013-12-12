@@ -1,43 +1,4 @@
-{% macro changelist_buttons_row() -%}
-  <div class="row-fluid">
-    <div class="span6 offset6">
-      <button class="btn oppia-save-state-button pull-right" ng-click="discardStateChanges()" ng-disabled="!isStateLockedForEditing()">discard changes</button>
-      <button class="btn oppia-save-state-button pull-right" ng-class="{'btn-success': isStateLockedForEditing()}" ng-click="showSaveStateModal()" ng-disabled="!isStateLockedForEditing()">save changes</button>
-    </div>
-  </div>
-{%- endmacro %}
-
-<script type="text/ng-template" id="modals/saveState">
-  <div class="modal-header">
-    <h3>Save State</h3>
-  </div>
-  <div class="modal-body">
-    <p>
-      You are about to save changes to this state. These changes will immediately be publicly visible.
-    </p>
-    <p>
-      Please enter a brief description of what you have changed:
-      <textarea rows="3" cols="50" ng-model = "commitMessage"></textarea>
-    </p>
-    <div>
-      <em>
-        You made changes to the following items:
-        <ul>
-          <li ng-repeat="entry in stateChangeSummary">
-            <[entry]>
-          </li>
-        </ul>
-      </em>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
-    <button class="btn" ng-click="cancel()">Cancel</button>
-  </div>
-</script>
-
 <div class="container-fluid oppia-editor" ng-show="stateId">
-  {{ changelist_buttons_row() }}<br>
   {% include 'editor/state_editor_title.html' %}<br>
   {% include 'editor/state_editor_param.html' %}<br>
   {% include 'editor/state_editor_content.html' %}<br>
@@ -46,11 +7,9 @@
     {% include 'editor/state_editor_rules.html' %}
   </div>
   <br>
-  {{ changelist_buttons_row() }}
   <hr>
   {% include 'editor/state_editor_incoming.html' %}
   {% include 'editor/unresolved_answers.html' %}
 </div>
-
 
 {% include 'editor/state_editor_modals.html' %}
