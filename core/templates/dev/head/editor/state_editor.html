@@ -13,18 +13,22 @@
   </div>
   <div class="modal-body">
     <p>
-      You are about the save changes to this state. These changes will immediately be publicly visible.
+      You are about to save changes to this state. These changes will immediately be publicly visible.
     </p>
     <p>
       Please enter a brief description of what you have changed:
       <textarea rows="3" cols="50" ng-model = "commitMessage"></textarea>
     </p>
-    <p>
-      Changes have been made to the following properties:
-      <li ng-repeat="entry in stateChangeSummary">
-        <[entry]>
-      </li>
-    </p>
+    <div>
+      <em>
+        You made changes to the following items:
+        <ul>
+          <li ng-repeat="entry in stateChangeSummary">
+            <[entry]>
+          </li>
+        </ul>
+      </em>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
