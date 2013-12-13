@@ -750,7 +750,7 @@ def _update_state(exploration_id, state_id, new_state_name,
 
 
 def update_exploration(
-        committer_id, exploration_id, title, category, is_public, param_specs,
+        committer_id, exploration_id, title, category, param_specs,
         param_changes, states, commit_message):
     """Update an exploration.
 
@@ -760,7 +760,6 @@ def update_exploration(
     - exploration_id: str. The exploration id.
     - title: str or None. The title of the exploration.
     - category: str or None. The category for this exploration in the gallery.
-    - is_public: bool or None. Whether this exploration is public.
     - param_specs: dict or None. If the former, a dict specifying the types of
         parameters used in this exploration. The keys of the dict are the
         parameter names, and the values are their object types.
@@ -787,8 +786,6 @@ def update_exploration(
             'Exploration is unpublished so expected no commit message, but '
             'received %s' % commit_message)
 
-    if is_public:
-        exploration.is_public = True
     if category:
         exploration.category = category
     if title:

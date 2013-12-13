@@ -110,7 +110,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
      *     operation.
      */
     save: function(explorationChanges, stateChanges, commitMessage,
-        successCallback) {
+        successCallback, errorCallback) {
       // TODO(sll): Update the frontend data immediately, where possible; do
       //              not wait for the server round-trip.
       // TODO(sll): Handle explorationChanges too.
@@ -133,6 +133,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         version: explorationData.data.version,
       };
 
+      for (var property in explorationChanges) {
+        propertyValueMap[property] = explorationChanges[property].newValue;
+      }
+
       if (commitMessage !== '') {
         propertyValueMap['commit_message'] = commitMessage;
       }
@@ -149,13 +153,19 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         console.log('Changes to this exploration were saved successfully.');
         explorationData.data.version = data.version;
         for (var stateId in data.updatedStates) {
-          explorationData.data['states'][stateId] = data.updatedStates[stateId];
+          explorationData.data.states[stateId] = data.updatedStates[stateId];
+        }
+        for (var property in explorationChanges) {
+          explorationData.data[property] = data[property];
         }
         if (successCallback) {
           successCallback();
         }
       }).error(function(data) {
         warningsData.addWarning(data.error || 'Error communicating with server.');
+        if (errorCallback) {
+          errorCallback();
+        }
       });
     },
 
