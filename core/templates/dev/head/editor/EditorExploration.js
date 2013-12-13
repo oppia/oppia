@@ -321,7 +321,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     var latestStateNames = {};
     var stateId;
     for (stateId in stateChanges) {
-      var latestStateName = $scope.states[stateId].name;
+      latestStateNames[stateId] = $scope.getStateName(stateId);
       if (stateChanges[stateId].hasOwnProperty('state_name')) {
         latestStateNames[stateId] = stateChanges[stateId].state_name.newValue;
       }

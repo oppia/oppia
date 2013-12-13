@@ -549,14 +549,12 @@ def add_states(committer_id, exploration_id, state_names):
     return state_ids
 
 
-def update_state(committer_id, exploration_id, state_id, new_state_name,
+def _update_state(exploration_id, state_id, new_state_name,
                  param_changes, widget_id, widget_customization_args,
-                 widget_handlers, widget_sticky, content, commit_message):
-    """Updates the given state, and commits changes.
+                 widget_handlers, widget_sticky, content):
+    """Updates the given state and returns it. Does not commit changes.
 
     Args:
-    - committer_id: str. Email address of the user who is performing the update
-        action.
     - exploration_id: str. The id of the exploration.
     - state_id: str. The id of the state being updated.
     - new_state_name: str or None. If present, the new name for the state.
@@ -580,9 +578,6 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         'value'). Currently we expect this list to have exactly one element
         with type 'text'. If present, this list represents the non-interactive
         content for the state.
-    - commit_message: A description of changes made to the state. For published
-        explorations, this must be present; for unpublished explorations, it
-        should be equal to None.
     """
     # TODO(sll): Add more documentation for widget_handlers, above.
 
@@ -751,23 +746,92 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.content = [exp_domain.Content(
             content[0]['type'], html_cleaner.clean(content[0]['value']))]
 
+    return state
+
+
+def update_exploration(
+        committer_id, exploration_id, title, category, is_public, param_specs,
+        param_changes, states, commit_message):
+    """Update an exploration.
+
+    Args:
+    - committer_id: str. Email address of the user who is performing the update
+        action.
+    - exploration_id: str. The exploration id.
+    - title: str or None. The title of the exploration.
+    - category: str or None. The category for this exploration in the gallery.
+    - is_public: bool or None. Whether this exploration is public.
+    - param_specs: dict or None. If the former, a dict specifying the types of
+        parameters used in this exploration. The keys of the dict are the
+        parameter names, and the values are their object types.
+    - param_changes: list or None. If the former, a list of dicts, each
+        representing a parameter change.
+    - states: dict or None. If the former, a dict of states, keyed by the state
+        id, whose values are dicts containing new values for the fields of the
+        state. See the documentation of _update_state() for more information
+        on how these fields are defined.
+    - commit_message: str or None. A description of changes made to the state.
+        For published explorations, this must be present; for unpublished
+        explorations, it should be equal to None.
+    """
+    # TODO(sll): Add tests to ensure that the parameters are of the correct
+    # types, etc.
+    exploration = get_exploration_by_id(exploration_id)
+
     if exploration.is_public and commit_message is None:
         raise ValueError(
-            'Exploration is public so expected a commit message but received '
-            'none.')
+            'Exploration is public so expected a commit message but '
+            'received none.')
     if not exploration.is_public and commit_message is not None:
         raise ValueError(
             'Exploration is unpublished so expected no commit message, but '
             'received %s' % commit_message)
 
-    def _update_state_transaction(
-            committer_id, exploration, state, commit_message):
-        save_states(committer_id, exploration.id, [state])
+    if is_public:
+        exploration.is_public = True
+    if category:
+        exploration.category = category
+    if title:
+        exploration.title = title
+    if param_specs is not None:
+        exploration.param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in param_specs.iteritems()
+        }
+    if param_changes is not None:
+        exploration.param_changes = [
+            param_domain.ParamChange.from_dict(param_change)
+            for param_change in param_changes
+        ]
+
+    modified_states = []
+    if states:
+        for (state_id, state_data) in states.iteritems():
+            state_name = state_data.get('state_name')
+            param_changes = state_data.get('param_changes')
+            widget_id = state_data.get('widget_id')
+            widget_customization_args = state_data.get(
+                'widget_customization_args')
+            widget_handlers = state_data.get('widget_handlers')
+            widget_sticky = state_data.get('widget_sticky')
+            content = state_data.get('content')
+
+            modified_state = _update_state(
+                exploration_id, state_id, state_name, param_changes, widget_id,
+                widget_customization_args, widget_handlers, widget_sticky,
+                content
+            )
+
+            modified_states.append(modified_state)
+
+    def _update_exploration_transaction(
+            committer_id, exploration, states, commit_message):
+        save_states(committer_id, exploration.id, states)
         save_exploration(committer_id, exploration, commit_message)
 
     transaction_services.run_in_transaction(
-        _update_state_transaction, committer_id, exploration, state, 
-        commit_message)
+        _update_exploration_transaction, committer_id, exploration,
+        modified_states, commit_message)
 
 
 def delete_state(committer_id, exploration_id, state_id):
