@@ -99,12 +99,12 @@
           <textarea rows="3" cols="50" ng-model="commitMessage"></textarea>
         </p>
 
-        <div>
+        <div ng-if="changeSummary">
           <em>
-            You made changes to the following states:
+            You made the following changes to states:
           </em>
-          <div ng-repeat="(stateId, stateChanges) in explorationChangeSummary">
-            <h5><[stateIdsToNames[stateId]]></h5>
+          <div ng-repeat="(stateName, stateChanges) in changeSummary">
+            <h5><[stateName]></h5>
             <ul>
               <li ng-repeat="entry in stateChanges track by $index">
                 <[entry]>
@@ -174,8 +174,8 @@
           <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
           <div ng-show="!!explorationTitle">
             <div style="float: right;">
-              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardExplorationChanges()" ng-disabled="!isExplorationLockedForEditing()">discard changes</button>
-              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationLockedForEditing()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationLockedForEditing()">save changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardExplorationChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationSaveable()">save changes</button>
             </div>
 
             <tabset>

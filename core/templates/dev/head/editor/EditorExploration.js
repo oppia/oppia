@@ -48,6 +48,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
   $scope.undoneChangeStack = [];
+  // Whether or not a save action is currently in progress.
+  $scope.isSaveInProgress = false;
 
   // TODO(sll): Implement undo, redo functionality. Show a message on each step
   // saying what the step is doing.
@@ -71,15 +73,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveExplorationChanges = function(
+  $scope.saveChanges = function(
       explorationChanges, stateChanges, commitMessage) {
 
-    explorationData.saveExploration(
+    $scope.isSaveInProgress = true;
+    explorationData.save(
       explorationChanges, stateChanges, commitMessage, function() {
         // Reload the exploration page, including drawing the graph.
         // TODO(sll): This takes a long time. Can we shorten it?
         $scope.explorationChangeList = [];
         $scope.initExplorationPage();
+        $scope.isSaveInProgress = false;
       });
   };
 
@@ -95,6 +99,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.explorationChangeList = [];
       $scope.undoneChangeStack = [];
     }
+  };
+
+  $scope.isExplorationSaveable = function() {
+    return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
   };
 
   $scope.isExplorationLockedForEditing = function() {
@@ -123,8 +131,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     var changesExist = (
       !$.isEmptyObject(explorationChanges) || !$.isEmptyObject(stateChanges));
     if (!changesExist) {
-      warningsData.addWarning('Your changes all cancel each other out, ' +
+      warningsData.addWarning('Your changes cancel each other out, ' +
         'so nothing has been saved.');
+      return;
     }
 
     warningsData.clear();
@@ -132,31 +141,21 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // Create the save-confirmation and commit-message request dialogue.
     if (!$scope.isPublic) {
       // For unpublished explorations no commit message is needed.
-      $scope.saveExplorationChanges(explorationChanges, stateChanges, '');
+      $scope.saveChanges(explorationChanges, stateChanges, '');
     } else {
-      $scope.explorationChangeSummary = $scope.createExplorationChangeSummary(
+      $scope.changeSummaries = $scope.createChangeSummaries(
         explorationChanges, stateChanges);
-
-      var stateIdsToNames = {};
-      for (var stateId in $scope.explorationChangeSummary['MODAL_FORMAT']) {
-        stateIdsToNames[stateId] = $scope.getStateName(stateId);
-      }
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
         backdrop: 'static',
         resolve: {
-          explorationChangeSummary: function() {
-            return $scope.explorationChangeSummary;
-          },
-          stateIdsToNames: function() {
-            return stateIdsToNames;
+          changeSummaries: function() {
+            return $scope.changeSummaries;
           }
         },
-        controller: function($scope, $modalInstance, explorationChangeSummary,
-            stateIdsToNames) {
-          $scope.explorationChangeSummary = explorationChangeSummary['MODAL_FORMAT'];
-          $scope.stateIdsToNames = stateIdsToNames;
+        controller: function($scope, $modalInstance, changeSummaries) {
+          $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
           $scope.publish = function(commitMessage) {
             $modalInstance.close(commitMessage);
           };
@@ -169,10 +168,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
       modalInstance.result.then(function(commitMessage) {
         var fullCommitMessage = $scope.neatJoin(
-          commitMessage, $scope.explorationChangeSummary['VERSION_LOG_FORMAT']
+          commitMessage, $scope.changeSummaries['VERSION_LOG_FORMAT']
         );
-        $scope.saveExplorationChanges(
-          explorationChanges, stateChanges, fullCommitMessage);
+        $scope.saveChanges(explorationChanges, stateChanges, fullCommitMessage);
       });
     }
   };
@@ -182,7 +180,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // state property.
     'state_name': {
       MODAL_FORMAT: function(newValue, oldValue) {
-        return 'State name (from \'' + newValue + '\' to \'' + oldValue + '\')';
+        return 'State name (from \'' + oldValue + '\' to \'' + newValue + '\')';
       },
       VERSION_LOG_FORMAT: function(newValue, oldValue) {
         return 'state name';
@@ -309,22 +307,42 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     };
   };
 
+  // An ordered list of state properties that determines the order in which
+  // to show them in the save confirmation modal.
+  $scope.ORDERED_STATE_PROPERTIES = [
+    'state_name', 'param_changes', 'content', 'widget_id',
+    'widget_customization_args', 'widget_sticky', 'widget_handlers'
+  ];
+
   // Returns summaries of the changes to display in the save dialogue and
   // include in the version log.
-  $scope.createExplorationChangeSummary = function(explorationChanges, stateChanges) {
+  $scope.createChangeSummaries = function(explorationChanges, stateChanges) {
+    // Get the most up-to-date state names.
+    var latestStateNames = {};
+    var stateId;
+    for (stateId in stateChanges) {
+      var latestStateName = $scope.states[stateId].name;
+      if (stateChanges[stateId].hasOwnProperty('state_name')) {
+        latestStateNames[stateId] = stateChanges[stateId].state_name.newValue;
+      }
+    }
+
     // Construct the summary for the save confirmation dialogue.
     // TODO(sll): Add corresponding code for explorationChanges.
     var modalSummaryForStates = {};
 
-    for (var stateId in stateChanges) {
-      if (!modalSummaryForStates.hasOwnProperty(stateId)) {
-        modalSummaryForStates[stateId] = [];
-      }
-      for (var property in stateChanges[stateId]) {
-        modalSummaryForStates[stateId].push(
-          $scope.getPropertyChangeSummary(
+    for (stateId in stateChanges) {
+      var changes = [];
+
+      for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
+        var property = $scope.ORDERED_STATE_PROPERTIES[i];
+        if (stateChanges[stateId].hasOwnProperty(property)) {
+          changes.push($scope.getPropertyChangeSummary(
             property, 'MODAL_FORMAT', stateChanges[stateId][property]));
+        }
       }
+
+      modalSummaryForStates[latestStateNames[stateId]] = changes;
     }
 
     // Construct the summary to be included in the commit message for the
@@ -335,14 +353,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       versionLogSummary = 'States that were changed: ';
 
       var stateChangeStrings = [];
-      for (var stateId in stateChanges) {
+      for (stateId in stateChanges) {
         var humanReadablePropertyChanges = [];
-        for (var property in stateChanges[stateId]) {
-          humanReadablePropertyChanges.push(
-            $scope.getPropertyChangeSummary(
+        for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
+          var property = $scope.ORDERED_STATE_PROPERTIES[i];
+          if (stateChanges[stateId].hasOwnProperty(property)) {
+            humanReadablePropertyChanges.push($scope.getPropertyChangeSummary(
               property, 'VERSION_LOG_FORMAT', stateChanges[stateId][property]));
+          }
         }
-        stateChangeStrings.push($scope.states[stateId].name + ' (' +
+
+        stateChangeStrings.push(latestStateNames[stateId] + ' (' +
           humanReadablePropertyChanges.join(', ') + ')');
       }
 
