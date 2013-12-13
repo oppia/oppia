@@ -2,179 +2,51 @@
   <div class="row-fluid">
     <div class="span6 offset6">
       <button class="btn oppia-save-state-button pull-right" ng-click="discardStateChanges()" ng-disabled="!isStateLockedForEditing()">discard changes</button>
-      <button class="btn oppia-save-state-button pull-right" ng-class="{'btn-success': isStateLockedForEditing()}" ng-click="saveStateChanges()" ng-disabled="!isStateLockedForEditing()">save changes</button>
+      <button class="btn oppia-save-state-button pull-right" ng-class="{'btn-success': isStateLockedForEditing()}" ng-click="showSaveStateModal()" ng-disabled="!isStateLockedForEditing()">save changes</button>
     </div>
   </div>
 {%- endmacro %}
 
+<script type="text/ng-template" id="modals/saveState">
+  <div class="modal-header">
+    <h3>Save State</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      You are about the save changes to this state. These changes will immediately be publicly visible.
+    </p>
+    <p>
+      Please enter a brief description of what you have changed:
+      <textarea rows="3" cols="50" ng-model = "commitMessage"></textarea>
+    </p>
+    <p>
+      Changes have been made to the following properties:
+      <li ng-repeat="entry in stateChangeSummary">
+        <[entry]>
+      </li>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
+    <button class="btn" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
 
 <div class="container-fluid oppia-editor" ng-show="stateId">
-
+  {{ changelist_buttons_row() }}<br>
+  {% include 'editor/state_editor_title.html' %}<br>
+  {% include 'editor/state_editor_param.html' %}<br>
+  {% include 'editor/state_editor_content.html' %}<br>
+  <div ng-controller="InteractiveWidgetEditor">
+    {% include 'editor/state_editor_interaction.html' %}<br>
+    {% include 'editor/state_editor_rules.html' %}
+  </div>
+  <br>
   {{ changelist_buttons_row() }}
-
-  <br>
-
-  <div class="row-fluid">
-    <div class="span2">
-      <span class="oppia-editor-header">
-        state name
-      </span>
-    </div>
-
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span9">
-            <h3>
-              <span ng-if="!stateNameMemento">
-                <[stateName]>
-              </span>
-              <span ng-if="!!stateNameMemento">
-                <input type="text" ng-model="stateName">
-                <button ng-click="saveStateName(stateName)">Close</button>
-              </span>
-            </h3>
-          </div>
-
-          <div class="span3">
-            <button ng-if="!stateNameMemento" ng-click="openStateNameEditor()" class="pull-right">
-              Edit name
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-  <div class="row-fluid">
-    <div class="span2">
-      <span class="oppia-editor-header">
-        parameter changes (<[stateParamChanges.length]>)
-      </span>
-      <br>
-      <a href="https://code.google.com/p/oppia/wiki/Parameters" target="_blank">
-        More info...
-      </a>
-    </div>
-
-    <div class="span10">
-      <param-change-editor param-changes="stateParamChanges" param-specs="paramSpecs" save-param-changes="saveStateParamChanges" add-exploration-param-spec="addExplorationParamSpec">
-      </param-change-editor>
-    </div>
-  </div>
-
-  <br>
-
-  <div class="row-fluid">
-    <div class="span2">
-      <span class="oppia-editor-header">content</span>
-    </div>
-
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span9 oppia-state-content">
-            <div ng-if="!contentMemento">
-              <span ng-show="content[0].value == ''" class="oppia-placeholder">
-                This editor supports $LaTeX$.
-                <a href="https://code.google.com/p/oppia/wiki/NonInteractiveContent" target="_blank">
-                  More info...
-                </a>
-              </span>
-              <span angular-html-bind="content[0].value"></span>
-            </div>
-
-            <div ng-if="!!contentMemento">
-              <rich-text-editor html-content="content[0].value"></rich-text-editor>
-              <button ng-click="saveTextContent()">Close</button>
-            </div>
-          </div>
-
-          <div class="span3">
-            <button ng-if="!contentMemento" ng-click="editContent()" class="pull-right">
-              Edit content
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-  {% include 'editor/interactive_widget_editor.html' %}
-
-  <br>
-
-  {{ changelist_buttons_row() }}
-
   <hr>
-
-  <div class="row-fluid">
-    <div class="span2">
-      <span class="oppia-editor-header">
-        incoming states
-      </span>
-    </div>
-
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span9">
-            <div>
-              <ul>
-                <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-                  <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
-                  <[incomingState.name]>
-                  </a>
-                  <span ng-if="stateId == incomingStateId" title="This state points to itself." class="oppia-cursor-pointer">
-                    ⟳
-                  </span>
-                  (<[incomingState.rules | commaSeparatedList]>)
-                </li>
-              </ul>
-
-              <span ng-show="isEmpty(getIncomingStates(stateId))">
-                <em>No incoming states.</em>
-              </span>
-            </div>
-          </div>
-
-          <div class="span3">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  {% include 'editor/state_editor_incoming.html' %}
   {% include 'editor/unresolved_answers.html' %}
-
 </div>
 
 
-<script type="text/ng-template" id="modals/customizeWidget">
-  <div class="modal-header">
-    <h3>Customize This Widget</h3>
-  </div>
-
-  <div class="modal-body">
-    The following widget parameters can be customized:
-    <br><br>
-
-    <div ng-repeat="(paramName, paramSpecDict) in widgetParamSpecs">
-      <strong><[paramDescriptions[paramName]]></strong>
-      <value-generator-editor generator-id="paramSpecDict.generator_id"
-                              init-args="paramSpecDict.init_args"
-                              customization-args="widgetCustomizationArgs[paramName]"
-                              obj-type="paramSpecDict.obj_type">
-      </value-generator-editor>
-      <br>
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <input type="submit" class="btn" value="Use these parameters" ng-click="save(widgetCustomizationArgs)"/>
-  </div>
-</script>
+{% include 'editor/state_editor_modals.html' %}

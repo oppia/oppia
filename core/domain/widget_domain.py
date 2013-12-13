@@ -201,8 +201,9 @@ class BaseWidget(object):
                     raise
 
             # Normalize the generated values to the correct obj_type.
-            parameters[param.name] = obj_services.get_object_class(
-                param.obj_type).normalize(generated_value)
+            parameters[param.name] = (
+                obj_services.Registry.get_object_class_by_type(
+                    param.obj_type).normalize(generated_value))
 
         return parameters
 

@@ -3,6 +3,47 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.1.1 (2 Dec 2013)
+-------------------
+New features:
+* Oppia explorations can now be easily embedded in any webpage using the oppia-player-0.0.0.js script in the static/scripts directory. This is done by using an <oppia/> tag at the place where the exploration should be embedded, and including the aforementioned script at the bottom of the embedding webpage.
+* Explorations are now represented as zip files which contain a single YAML file and a directory for static assets.
+* Published explorations can now only be deleted by an admin.
+
+Reader-visible improvements:
+* Improve the look-and-feel of the gallery page.
+
+Editor improvements:
+* Significantly improve the state editor user interface, which now includes contextual help links, a new interface for rules, descriptions of widget parameters, a three-column layout, and numerous other small improvements.
+* Improve the saving flow by allowing changes to a state to be batched into a single commit. The user is prompted if he/she tries to close or navigate away from the page before his/her changes are committed to the server.
+* Allow each type of object (such as a real number of a music note) to have its own specialized editor.
+* Collapse the various non-interactive content textareas into a single textarea, and add controls for including videos, images, links and tabs.
+
+Extensions:
+* For the code REPL widget, make it possible for code to be prepended and appended to the reader's submission before the latter is executed, and allow comparison of the output of the reader's program against a reference output.
+* Add a "Cities of the World" exploration, which was created programmatically using data from Wikipedia.
+* Improve the existing binary search exploration by adding pictures and fixing bugs.
+
+Speed:
+* Make explorations load faster by batching datastore operations, and by only retrieving partial exploration statistics when an exploration is first loaded.
+
+Infrastructure:
+* Add a versioned file system for each exploration, so that images can be uploaded.
+* When a user deletes an exploration, mark it as deleted rather than remove it from the datastore, in case it needs to be reinstated later.
+
+Development:
+* Modify the startup scripts to be more modular, and to require as little use of sudo as possible.
+
+Security:
+* Add HTML sanitization, XSSI protection, escaping of special characters and various other improvements.
+
+Dependencies:
+* Update AngularJS to version 1.2.0-rc.3.
+* Use jwysiwyg for the rich text editor, replacing the YUI 2 library.
+* Remove the AngularUI dependency in favor of ui-bootstrap.
+* Try to load the JQuery and JQueryUI dependencies from the Google CDN before fetching them from the local server.
+
+
 v1.1.0 (14 Sep 2013)
 --------------------
 Reader-visible improvements:

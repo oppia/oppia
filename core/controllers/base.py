@@ -223,8 +223,8 @@ class BaseHandler(webapp2.RequestHandler):
 
                 if not is_csrf_token_valid:
                     raise Exception(
-                        'Invalid CSRF token. Changes were not saved. '
-                        'Please reload the page.')
+                        'Your session has expired, and unfortunately your '
+                        'changes cannot be saved. Please refresh the page.')
             except Exception as e:
                 logging.error('%s: page name %s, payload %s',
                     e, self.PAGE_NAME_FOR_CSRF, self.payload)
@@ -255,7 +255,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        json_output = json.dumps(values)
+
+        json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
         # Calculate the processing time of this request.

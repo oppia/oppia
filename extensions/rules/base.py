@@ -24,12 +24,8 @@ class CodeEvaluationRule(rule_domain.Rule):
     subject_type = objects.CodeEvaluation
 
 
-class Coord2DRule(rule_domain.Rule):
-    subject_type = objects.Coord2D
-
-
-class ListRule(rule_domain.Rule):
-    subject_type = objects.List
+class CoordTwoDimRule(rule_domain.Rule):
+    subject_type = objects.CoordTwoDim
 
 
 class MusicNoteRule(rule_domain.Rule):
@@ -52,8 +48,8 @@ class RealRule(rule_domain.Rule):
     subject_type = objects.Real
 
 
-class SetRule(rule_domain.Rule):
-    subject_type = objects.Set
+class SetOfUnicodeStringRule(rule_domain.Rule):
+    subject_type = objects.SetOfUnicodeString
 
 
 class UnicodeStringRule(rule_domain.Rule):

@@ -66,6 +66,7 @@ DEMO_EXPLORATIONS = [
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('tar', 'Missions - Tar', 'Open Source Tools'),
+    ('multiples.yaml', 'Project Euler #1', 'Coding')
 ]
 
 # Whether to unconditionally log info messages.
@@ -165,14 +166,14 @@ REQUIRE_EDITORS_TO_ACCEPT_TERMS = False
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {
-        'Hints': {
-            'dir': 'extensions/widgets/noninteractive/Hints'
-        },
         'Image': {
             'dir': 'extensions/widgets/noninteractive/Image'
         },
         'Link': {
             'dir': 'extensions/widgets/noninteractive/Link'
+        },
+        'Tabs': {
+            'dir': 'extensions/widgets/noninteractive/Tabs'
         },
         'Video': {
             'dir': 'extensions/widgets/noninteractive/Video'

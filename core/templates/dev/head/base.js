@@ -194,6 +194,14 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
   };
+
+  $scope.neatJoin = function(string1, string2) {
+    if('.!?'.indexOf(string1.slice(-1)) !== -1) {
+        return string1 + " " + string2;
+      } else {
+        return string1 + ". " + string2;
+      }
+  };
 }
 
 /**

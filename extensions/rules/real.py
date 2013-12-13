@@ -22,7 +22,7 @@ from extensions.rules import base
 
 
 class Equals(base.RealRule):
-    description = 'is equal to {{x|Number}}'
+    description = 'is equal to {{x|Real}}'
 
     def _evaluate(self, subject):
         return subject == self.x

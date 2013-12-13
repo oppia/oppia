@@ -86,6 +86,7 @@ _PARSER.add_argument(
     action='store_true')
 
 OPPIA_TOOLS_DIR = os.path.join(os.getcwd(), '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(os.getcwd(), 'third_party')
 
 
 def create_test_suites(parsed_args):
@@ -131,6 +132,10 @@ def main():
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.append(os.path.abspath(
         os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2')))
+    sys.path.append(os.path.abspath(
+        os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2')))
+    sys.path.append(os.path.abspath(
+        os.path.join(THIRD_PARTY_DIR, 'html5lib-python-0.95')))
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 

@@ -13,8 +13,11 @@
 // limitations under the License.
 
 
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
+
 oppia.directive('unicodeStringEditor', function($compile, warningsData) {
-  // Editable string directive.
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
@@ -26,46 +29,51 @@ oppia.directive('unicodeStringEditor', function($compile, warningsData) {
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
+      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
+      $scope.largeInput = false;
+
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
         $scope.largeInput = false;
-        if ($scope.$parent.initArgs && $scope.$parent.initArgs.largeInput) {
-          $scope.largeInput = $scope.$parent.initArgs.largeInput;
+        if (newValue && newValue.largeInput) {
+          $scope.largeInput = newValue.largeInput;
         }
       });
 
-      // Reset the component each time the value changes.
+      // Reset the component each time the value changes (e.g. if this is part
+      // of an editable list).
       $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'.
-        $scope.localValue = {label: $scope.value || ''};
-        $scope.active = false;
-      });
+        $scope.localValue = {label: $scope.$parent.value || ''};
+      }, true);
 
-      $scope.openEditor = function() {
-        $scope.active = true;
-      };
+      if ($scope.alwaysEditable) {
+        $scope.$watch('localValue.label', function(newValue, oldValue) {
+          $scope.$parent.value = newValue;
+        });
+      } else {
+        $scope.openEditor = function() {
+          $scope.active = true;
+        };
+  
+        $scope.closeEditor = function() {
+          $scope.active = false;
+        };
 
-      $scope.closeEditor = function() {
-        $scope.active = false;
-      };
+        $scope.replaceValue = function(newValue) {
+          $scope.localValue = {label: newValue};
+          $scope.$parent.value = newValue;
+          $scope.closeEditor();
+        };
 
-      $scope.replaceValue = function(newValue) {
-        if (!newValue) {
-          warningsData.addWarning('Please enter a non-empty value.');
-          return;
-        }
-        warningsData.clear();
-        $scope.localValue = {label: newValue};
-        $scope.$parent.value = newValue;
+        $scope.$on('externalSave', function() {
+          if ($scope.active) {
+            $scope.replaceValue($scope.localValue.label);
+            // The $scope.$apply() call is needed to propagate the replaced value.
+            $scope.$apply();
+          }
+        });
+
         $scope.closeEditor();
-      };
-
-      $scope.$on('externalSave', function() {
-        if ($scope.active) {
-          $scope.replaceValue($scope.localValue.label);
-          // The $scope.$apply() call is needed to propagate the replaced value.
-          $scope.$apply();
-        }
-      });
+      }
     }
   };
 });

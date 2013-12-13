@@ -35,7 +35,7 @@ oppia.run(function($rootScope) {
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
 
-  $scope.doesStateIdExist = function() {
+  $scope.currentlyInStateContext = function() {
     return Boolean($scope.stateId);
   };
 
@@ -65,7 +65,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveStateChanges = function() {
+  $scope.saveStateChanges = function(commitMessage) {
     var finalChangeList = {};
     for (var i = 0; i < $scope.stateChangeList.length; i++) {
       finalChangeList[$scope.stateChangeList[i].backendName] = (
@@ -73,10 +73,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
     // Reload the exploration page, including drawing the graph.
     // TODO(sll): This takes a long time. Can we shorten it?
-    explorationData.saveStateData($scope.stateId, finalChangeList, function() {
-      $scope.stateChangeList = [];
-      $scope.initExplorationPage();
-    });
+    explorationData.saveStateData(
+      $scope.stateId, finalChangeList, commitMessage, function() {
+        $scope.stateChangeList = [];
+        $scope.initExplorationPage();
+      }
+    );
   };
 
   $scope.discardStateChanges = function() {
@@ -602,11 +604,27 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // TODO(sll): Initialize the newly displayed field.
   };
 
+  $scope.isNewStateNameValid = function(newStateName) {
+    if (!$scope.isValidEntityName(newStateName) ||
+        newStateName.toUpperCase() == END_DEST) {
+      return false;
+    }
+
+    for (var id in $scope.states) {
+      if (id != $scope.stateId && $scope.states[id]['name'] == newStateName) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
     newStateName = $scope.normalizeWhitespace(newStateName);
-    if (!$scope.isValidEntityName(newStateName, true))
+    if (!$scope.isValidEntityName(newStateName, true)) {
       return;
+    }
     if (newStateName.toUpperCase() == END_DEST) {
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
@@ -637,8 +655,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               // TODO(sll): Actually force a refresh, since the data on the
               // page may be out of date.
               warningsData.addWarning(
-                  'Server error when adding state: ' + data.error + '. ' +
-                   'Please refresh your page.');
+                  'Server error when adding state: ' + data.error + '. ');
             });
   };
 

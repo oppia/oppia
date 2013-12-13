@@ -36,14 +36,15 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
+set -- "${remaining_params[@]}"
 
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.7.7.zip -O gae-download.zip
-  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.7.7/
+  wget http://googleappengine.googlecode.com/files/google_appengine_1.8.8.zip -O gae-download.zip
+  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.8.8/
   rm gae-download.zip
 fi
 

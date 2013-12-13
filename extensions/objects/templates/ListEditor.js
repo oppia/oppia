@@ -13,8 +13,11 @@
 // limitations under the License.
 
 
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
+
 oppia.directive('listEditor', function($compile, warningsData) {
-  // Directive that implements an editable list.
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
@@ -26,25 +29,16 @@ oppia.directive('listEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
+      $scope.initArgs = {};
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
-        $scope.initArgs = $scope.$parent.initArgs;
-      });
-
-      // Reset the component each time the value changes.
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'. This is needed because it is not
-        // possible to modify 'item' directly when using "for item in value";
-        // we need a 'constant key'. So we represent each item as {label: ...}
-        // instead, and manipulate item.label.
-        // TODO(sll): Check that $scope.value is a list.
-        $scope.localValue = [];
-        if ($scope.value) {
-          for (var i = 0; i < $scope.value.length; i++) {
-            $scope.localValue.push({'label': angular.copy($scope.value[i])});
-          }
+        if (newValue) {
+          $scope.initArgs = newValue;
         }
-      });
+      }, true);
 
+      $scope.alwaysEditable = ($scope.$parent.alwaysEditable || '');
+
+      // Get the text for the 'Add Item' button.
       $scope.getAddItemText = function() {
         if ($scope.initArgs && $scope.initArgs.addItemText) {
           return $scope.initArgs.addItemText;
@@ -53,11 +47,40 @@ oppia.directive('listEditor', function($compile, warningsData) {
         }
       };
 
+      // Reset the component each time the value changes (e.g. if this is part
+      // of an editable list).
+      $scope.$watch('$parent.value', function(newValue, oldValue) {
+        // Maintain a local copy of 'value'. This is needed because it is not
+        // possible to modify 'item' directly when using "for item in value";
+        // we need a 'constant key'. So we represent each item as {label: ...}
+        // instead, and manipulate item.label.
+        // TODO(sll): Check that $scope.$parent.value is a list.
+        $scope.localValue = [];
+        if (newValue) {
+          for (var i = 0; i < newValue.length; i++) {
+            $scope.localValue.push({'label': angular.copy(newValue[i])});
+          }
+        }
+      }, true);
+
       $scope.addItem = function() {
         $scope.localValue.push({label: ''});
-        $scope.activeItem = $scope.localValue.length - 1;
-        $scope.$parent.value.push('');
+        if (!$scope.alwaysEditable) {
+          $scope.activeItem = $scope.localValue.length - 1;
+        }
       };
+
+      $scope.deleteItem = function(index) {
+        $scope.localValue.splice(index, 1);
+        $scope.$parent.value.splice(index, 1);
+        if (!$scope.alwaysEditable) {
+          $scope.activeItem = null;
+        }
+      };
+
+      if (!$scope.alwaysEditable) {
+        $scope.activeItem = null;
+      }
 
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
@@ -68,21 +91,6 @@ oppia.directive('listEditor', function($compile, warningsData) {
           $scope.$parent.value = valuesOnly;
         }
       }, true);
-
-      $scope.deleteItem = function(index) {
-        $scope.activeItem = null;
-        $scope.localValue.splice(index, 1);
-        $scope.value.splice(index, 1);
-      };
-
-      $scope.$on('externalSave', function() {
-        if ($scope.activeItem !== null) {
-          $scope.replaceItem(
-              $scope.activeItem, $scope.localValue[$scope.activeItem].label);
-          // The $scope.$apply() call is needed to propagate the replaced item.
-          $scope.$apply();
-        }
-      });
     }
   };
 });

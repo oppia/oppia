@@ -28,7 +28,6 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'widget_handlers',
     'widget_sticky',
     'param_changes',
-    'resolved_answers',
     'state_name'
   ];
 
@@ -100,7 +99,8 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
   // Saves data for a given state to the backend, and, on a success callback,
   // updates the data for that state in the frontend.
-  explorationData.saveStateData = function(stateId, propertyValueMap, successCallback) {
+  explorationData.saveStateData = function(
+      stateId, propertyValueMap, commitMessage, successCallback) {
     for (var property in propertyValueMap) {
       if (validStateProperties.indexOf(property) < 0) {
         warningsData.addWarning('Invalid property name: ' + property);
@@ -109,8 +109,9 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }
 
     propertyValueMap['version'] = explorationData.data.version;
-
-    console.log(propertyValueMap);
+    if(commitMessage !== '') {
+      propertyValueMap['commit_message'] = commitMessage;
+    }
 
     $http.put(
         explorationUrl + '/' + stateId + '/data',
@@ -130,6 +131,21 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error communicating with server.');
     });
+  };
+
+  explorationData.resolveAnswers = function(stateId, resolvedAnswersList) {
+    $http.put(
+        explorationUrl + '/' + stateId + '/resolved_answers',
+        $.param({
+          csrf_token: GLOBALS.csrf_token,
+          payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
+        }, true),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).error(function(data) {
+      warningsData.addWarning(data.error || 'Error communicating with server.');
+    });
+
+    warningsData.clear();
   };
 
   return explorationData;

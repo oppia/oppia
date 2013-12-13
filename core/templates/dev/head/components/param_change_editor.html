@@ -1,25 +1,3 @@
-{% macro edit_parameter_form() -%}
-  <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
-    Change
-    <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose a parameter name" new-choice-regex="^[A-Za-z]+$" width="100px">
-    </select2-dropdown>
-
-    <select ng-model="tmpParamChange.generator_id"
-            ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS"
-            style="width: 220px;" required>
-    </select>
-
-    <value-generator-editor generator-id="tmpParamChange.generator_id"
-                            customization-args="tmpParamChange.customization_args"
-                            obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
-    </value-generator-editor>
-    <br>
-
-    <input type="submit" value="Close editor">
-  </form>
-{%- endmacro %}
-
-
 <div class="container-fluid">
   <div ng-if="paramChanges.length === 0">
     <div class="row-fluid">
@@ -41,17 +19,39 @@
         </span>
 
         <div ng-if="activeItem === $index">
-          {{ edit_parameter_form() }}
+          <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
+            Select a parameter to change:
+
+            <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="180px">
+            </select2-dropdown>
+            
+            <span ng-show="tmpParamChange.name">
+              <select ng-model="tmpParamChange.generator_id"
+                      ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS"
+                      style="width: 220px;" required>
+              </select>
+
+              <value-generator-editor generator-id="tmpParamChange.generator_id"
+                                      customization-args="tmpParamChange.customization_args"
+                                      obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+              </value-generator-editor>
+            </span>
+            <br>
+
+            <input type="submit" value="Close editor">
+          </form>
         </div>
       </div>
 
       <div class="span3">
-        <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
-          Edit
-        </button>
-        <button type="button" ng-disabled="activeItem !== -1" ng-click="deleteParamChange($index)">
-          &times;
-        </button>
+        <span class="pull-right">
+          <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
+            Edit
+          </button>
+          <button type="button" ng-disabled="activeItem !== -1" ng-click="deleteParamChange($index)">
+            &times;
+          </button>
+        </span>
       </div>
     </div>
   </div>

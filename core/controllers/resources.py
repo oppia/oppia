@@ -28,7 +28,7 @@ from core.domain import value_generators_domain
 import feconf
 
 
-class ObjectEditorHandler(base.BaseHandler):
+class ObjectEditorTemplateHandler(base.BaseHandler):
     """Retrieves a template for an object editor."""
 
     def get(self, obj_type):

@@ -15,7 +15,6 @@
 __author__ = 'Sean Lip'
 
 import json
-import re
 import unittest
 
 import feconf
@@ -65,16 +64,12 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/profile/editor_prerequisites')
-        CSRF_REGEX = (
-            r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
-        csrf_token = re.search(CSRF_REGEX, response.body).group(1)
+        csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'agreed_to_terms': False})},
-            expect_errors=True
-        )      
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'agreed_to_terms': False})
+        }, expect_errors=True)      
 
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
@@ -82,23 +77,20 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.assertEqual(parsed_response['code'], 400)
         self.assertIn('you will need to accept', parsed_response['error'])
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'agreed_to_terms': 'Hasta la vista!'})},
-            expect_errors=True
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'agreed_to_terms': 'Hasta la vista!'})
+        }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
             response, expect_errors=True)
         self.assertEqual(parsed_response['code'], 400)
         self.assertIn('you will need to accept', parsed_response['error'])
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'agreed_to_terms': True})}
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'agreed_to_terms': True})
+        })
         self.assertEqual(response.status_int, 200)
 
         self.logout()
@@ -109,40 +101,32 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/profile/editor_prerequisites')
-        CSRF_REGEX = (
-            r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
-        csrf_token = re.search(CSRF_REGEX, response.body).group(1)
+        csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({})},
-            expect_errors=True
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({})
+        }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
             response, expect_errors=True)
         self.assertEqual(parsed_response['code'], 400)
         self.assertIn('No username supplied', parsed_response['error'])
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'username': ''})},
-            expect_errors=True
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'username': ''})
+        }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
             response, expect_errors=True)
         self.assertEqual(parsed_response['code'], 400)
         self.assertIn('No username supplied', parsed_response['error'])
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'username': '!a!'})},
-            expect_errors=True
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'username': '!a!'})
+        }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
             response, expect_errors=True)
@@ -150,12 +134,10 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.assertIn(
             'can only have alphanumeric characters', parsed_response['error'])
 
-        response = self.testapp.post(
-            '/profile/editor_prerequisites',
-            {'csrf_token': csrf_token,
-             'payload': json.dumps({'username': 'abcde'})},
-            expect_errors=True
-        )
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({'username': 'abcde'})
+        }, expect_errors=True)
         self.assertEqual(response.status_int, 200)
 
         self.logout()

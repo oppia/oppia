@@ -14,19 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for classification of Sets."""
+"""Rules for CoordTwoDim objects."""
 
 __author__ = 'Sean Lip'
 
-import extensions.rules.set as set_rules
-import test_utils
+from extensions.rules import base
 
 
-class SetRuleUnitTests(test_utils.GenericTestBase):
-    """Tests for rules operating on Set objects."""
+class Within(base.CoordTwoDimRule):
+    description = 'is within {{d|Real}} of {{p|CoordTwoDim}}'
 
-    def test_equals_rule(self):
-        self.assertTrue(set_rules.Equals([1, 3]).eval([3, 1]))
-        self.assertFalse(set_rules.Equals([1]).eval([3, 1]))
+    def _evaluate(self, subject):
+        dx = subject[0] - self.p[0]
+        dy = subject[1] - self.p[1]
+        return dx * dx + dy * dy < self.d * self.d
 
-    # TODO(sll): Add more tests.
+
+class NotWithin(base.CoordTwoDimRule):
+    description = 'is not within {{d|Real}} of {{p|CoordTwoDim}}'
+
+    def _evaluate(self, subject):
+        return not Within(self.d, self.p)._evaluate(subject)

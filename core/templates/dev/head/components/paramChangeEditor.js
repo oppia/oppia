@@ -41,13 +41,20 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         return '';
       };
 
-      var DEFAULT_TMP_PARAM_CHANGE = {
-        name: '[New parameter]',
-        generator_id: 'Copier',
-        customization_args: {
+      $scope.DEFAULT_CUSTOMIZATION_ARGS = {
+        'Copier': {
           value: '[New parameter value]',
           parse_with_jinja: false
+        },
+        'RandomSelector': {
+          list_of_values: []
         }
+      };
+
+      var DEFAULT_TMP_PARAM_CHANGE = {
+        name: '',
+        generator_id: 'Copier',
+        customization_args: $scope.DEFAULT_CUSTOMIZATION_ARGS['Copier']
       };
 
       // The 0-based index of the parameter change item that is currently active for
@@ -152,7 +159,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           warningsData.addWarning('Please specify a parameter name.');
           return;
         }
-        if ($scope.tmpParamChange.name === '[New parameter]') {
+        if ($scope.tmpParamChange.name === '') {
           // This reverses a temporary parameter change addition that has not
           // been edited.
           $scope.deleteParamChange(index);
@@ -189,6 +196,11 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         if (!$scope.getObjTypeForParam(name)) {
           // The name is new, so add the parameter to the exploration parameter
           // list.
+          // TODO(sll): We should probably defer doing this for real until the
+          // change has actually been committed to the backend. One way to
+          // handle this is by having $scope.addExplorationParamSpec() add to
+          // the list of temporary changes, rather than make an immediate
+          // commit to the server.
           $scope.addExplorationParamSpec(
             name,
             'UnicodeString',

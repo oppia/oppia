@@ -1,0 +1,30 @@
+{% extends "editor/state_editor_row.html" %}
+
+{% block label %}content{% endblock %}
+
+{% block info %}{% endblock %}
+
+{% block cls %}oppia-state-content{% endblock %}
+
+{% block center %}
+  <div ng-if="!contentMemento">
+    <span ng-show="content[0].value == ''" class="oppia-placeholder">
+      This editor supports $LaTeX$.
+      <a href="https://code.google.com/p/oppia/wiki/NonInteractiveContent" target="_blank">
+        More info...
+      </a>
+    </span>
+    <span angular-html-bind="content[0].value"></span>
+  </div>
+
+  <div ng-if="!!contentMemento">
+    <rich-text-editor html-content="content[0].value"></rich-text-editor>
+    <button ng-click="saveTextContent()">Close</button>
+  </div>
+{% endblock %}
+
+{% block right %}
+  <button ng-if="!contentMemento" ng-click="editContent()" class="pull-right">
+    Edit content
+  </button>
+{% endblock %}

@@ -1,0 +1,27 @@
+<div ng-if="!active && !alwaysEditable">
+  <p>
+    <strong>Tab title</strong>: <[localValue.label.title]>
+  </p>
+  <div>
+    <strong>Tab content</strong>
+    <span class="oppia-rte-inactive" ng-bind-html="localValue.label.content"></span>
+  </div>
+
+  (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+</div>
+
+<div ng-if="active || alwaysEditable">
+  <p>
+    <strong>Tab title</strong>:
+    <input type="text" ng-model="localValue.label.title">
+  </p>
+  <div>
+    <strong>Tab content</strong>
+    <rich-text-editor html-content="localValue.label.content" disallow-oppia-widgets="true">
+    </rich-text-editor>
+  </div>
+
+  <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
+    Close
+  </button>
+</span>

@@ -28,8 +28,8 @@ from core.domain import value_generators_domain
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
     def __init__(self, obj_type):
-        if not obj_services.get_object_class(obj_type):
-            raise ValueError('Invalid obj_type: %s' % obj_type)
+        # Ensure that this object class exists.
+        obj_services.Registry.get_object_class_by_type(obj_type)
 
         self.obj_type = obj_type
 
@@ -109,4 +109,5 @@ class ParamChange(object):
     def get_normalized_value(self, obj_type, context_params):
         """Generates a single normalized value for a parameter change."""
         raw_value = self._get_value(context_params)
-        return obj_services.get_object_class(obj_type).normalize(raw_value)
+        return obj_services.Registry.get_object_class_by_type(
+            obj_type).normalize(raw_value)

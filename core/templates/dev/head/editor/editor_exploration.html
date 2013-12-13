@@ -35,7 +35,9 @@
         <p>
           Once you publish an exploration, you cannot unpublish it. Deletion
           of a published exploration may only occur with the approval of the
-          site moderators.
+          site moderators. You will still be able to edit the exploration, and
+          in the future we we plan to make it possible for other people to 
+          improve it too.
         </p>
 
         <p>
@@ -149,8 +151,8 @@
                 {% include 'editor/stats_viewer.html' %}
               </tab>
 
-              <tab heading="State Editor" disabled="!doesStateIdExist()" active="guiTabActive" select="selectGuiTab()">
-                <div ng-controller="StateEditor" ng-if="doesStateIdExist()">
+              <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive" select="selectGuiTab()">
+                <div ng-controller="StateEditor" ng-if="currentlyInStateContext()">
                   {% include 'editor/state_editor.html' %}
                 </div>
               </tab>

@@ -52,13 +52,9 @@ class ExplorationPage(base.BaseHandler):
         for gid, generator_cls in all_value_generators.iteritems():
             value_generators_js += generator_cls.get_js_template()
 
-        all_object_editors = (
-            obj_services.Registry.get_all_object_classes())
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
-        object_editors_js = ''
-        for obj_type, obj_cls in all_object_editors.iteritems():
-            object_editors_js += obj_cls.get_editor_js_template()
+        object_editors_js = obj_services.get_all_object_editor_js_templates()
 
         self.values.update({
             'nav_mode': EDITOR_MODE,
@@ -72,6 +68,17 @@ class ExplorationHandler(base.BaseHandler):
     """Page with editor data for a single exploration."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
+
+    def _require_valid_version(self, version_from_payload, exploration_version):
+        if version_from_payload is None:
+            raise self.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
+        if version_from_payload != exploration_version:
+            raise self.InvalidInputException(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration_version, version_from_payload))
 
     @base.require_editor
     def get(self, exploration_id):
@@ -123,19 +130,19 @@ class ExplorationHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
+
+        version = self.payload.get('version')
+        self._require_valid_version(version, exploration.version)
 
         state_name = self.payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state_id = exp_services.add_states(
-            self.user_id, exploration_id, [state_name])[0]
+        try:
+            state_id = exp_services.add_states(
+                self.user_id, exploration_id, [state_name])[0]
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
@@ -147,14 +154,10 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
-
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
+
+        version = self.payload.get('version')
+        self._require_valid_version(version, exploration.version)
 
         is_public = self.payload.get('is_public')
         category = self.payload.get('category')
@@ -215,22 +218,24 @@ class StateHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
+    def _require_valid_version(self, version_from_payload, exploration_version):
+        if version_from_payload is None:
+            raise self.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
+        if version_from_payload != exploration_version:
+            raise self.InvalidInputException(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration_version, version_from_payload))
+
     @base.require_editor
     def put(self, exploration_id, state_id):
         """Saves updates to a state."""
-
-        if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit',
-                self.payload.get('resolved_answers'))
-
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
+
+        version = self.payload.get('version')
+        self._require_valid_version(version, exploration.version)
 
         state_name = self.payload.get('state_name')
         param_changes = self.payload.get('param_changes')
@@ -240,11 +245,12 @@ class StateHandler(base.BaseHandler):
         widget_handlers = self.payload.get('widget_handlers')
         widget_sticky = self.payload.get('widget_sticky')
         content = self.payload.get('content')
+        commit_message = self.payload.get('commit_message')
 
         exp_services.update_state(
             self.user_id, exploration_id, state_id, state_name, param_changes,
             widget_id, widget_customization_args, widget_handlers,
-            widget_sticky, content
+            widget_sticky, content, commit_message
         )
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -266,6 +272,29 @@ class StateHandler(base.BaseHandler):
         self.render_json({
             'version': exploration.version
         })
+
+
+class ResolvedAnswersHandler(base.BaseHandler):
+    """Allows readers' answers for a state to be marked as resolved."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_editor
+    def put(self, exploration_id, state_id):
+        """Marks readers' answers as resolved."""
+
+        resolved_answers = self.payload.get('resolved_answers')
+
+        if not isinstance(resolved_answers, list):
+            raise self.InvalidInputException(
+                'Expected a list of resolved answers; received %s.' %
+                resolved_answers)
+
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration_id, state_id, 'submit', resolved_answers)
+
+        self.render_json({})
 
 
 class ExplorationDownloadHandler(base.BaseHandler):
