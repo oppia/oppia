@@ -159,19 +159,9 @@ class ExplorationHandler(base.BaseHandler):
         version = self.payload.get('version')
         self._require_valid_version(version, exploration.version)
 
-        is_public = self.payload.get('is_public')
-        category = self.payload.get('category')
-        title = self.payload.get('title')
+        # TODO(sll): Move this to a separate controller that handles rights
+        # management.
         editors = self.payload.get('editors')
-        param_specs = self.payload.get('param_specs')
-        param_changes = self.payload.get('param_changes')
-
-        if is_public:
-            exploration.is_public = True
-        if category:
-            exploration.category = category
-        if title:
-            exploration.title = title
         if editors:
             if (self.is_admin or (exploration.editor_ids and
                                   self.user_id == exploration.editor_ids[0])):
@@ -181,42 +171,20 @@ class ExplorationHandler(base.BaseHandler):
             else:
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
-        if param_specs is not None:
-            exploration.param_specs = {
-                ps_name: param_domain.ParamSpec.from_dict(ps_val)
-                for (ps_name, ps_val) in param_specs.iteritems()
-            }
-        if param_changes is not None:
-            exploration.param_changes = [
-                param_domain.ParamChange.from_dict(param_change)
-                for param_change in param_changes
-            ]
 
-        exp_services.save_exploration(self.user_id, exploration)
-
+        is_public = self.payload.get('is_public')
+        category = self.payload.get('category')
+        title = self.payload.get('title')
+        param_specs = self.payload.get('param_specs')
+        param_changes = self.payload.get('param_changes')
         states = self.payload.get('states')
         commit_message = self.payload.get('commit_message')
 
-        if states:
-            for (state_id, state_data) in states.iteritems():
-                state_name = state_data.get('state_name')
-                param_changes = state_data.get('param_changes')
-                widget_id = state_data.get('widget_id')
-                widget_customization_args = state_data.get(
-                    'widget_customization_args')
-                widget_handlers = state_data.get('widget_handlers')
-                widget_sticky = state_data.get('widget_sticky')
-                content = state_data.get('content')
+        exp_services.update_exploration(
+            self.user_id, exploration_id, title, category, is_public,
+            param_specs, param_changes, states, commit_message)
 
-                # TODO(sll): This method will do a save each time this is
-                # called, which is undesirable. Batch the saves into a single
-                # save with the given commit message.
-                exp_services.update_state(
-                    self.user_id, exploration_id, state_id, state_name,
-                    param_changes, widget_id, widget_customization_args,
-                    widget_handlers, widget_sticky, content, commit_message
-                )
-
+        exploration = exp_services.get_exploration_by_id(exploration_id)
         updated_states = {}
         for state_id in states:
             updated_states[state_id] = (
@@ -224,7 +192,6 @@ class ExplorationHandler(base.BaseHandler):
                     exploration_id, state_id)
             )
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
             'version': exploration.version,
             'updatedStates': updated_states
