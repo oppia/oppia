@@ -109,7 +109,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
      * @param {string} commitMessage The full commit message for this save
      *     operation.
      */
-    saveExploration: function(explorationChanges, stateChanges, commitMessage,
+    save: function(explorationChanges, stateChanges, commitMessage,
         successCallback) {
       // TODO(sll): Update the frontend data immediately, where possible; do
       //              not wait for the server round-trip.
