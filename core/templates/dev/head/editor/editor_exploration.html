@@ -99,11 +99,22 @@
           <textarea rows="3" cols="50" ng-model="commitMessage"></textarea>
         </p>
 
-        <div ng-if="changeSummary">
+        <div ng-if="explorationChangesExist">
+          <em>
+            You changed the following properties of the exploration:
+          </em>
+          <ul>
+            <li ng-repeat="(property, changeInfo) in changeSummary.exploration">
+              <[changeInfo]>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-if="stateChangesExist">
           <em>
             You made the following changes to states:
           </em>
-          <div ng-repeat="(stateName, stateChanges) in changeSummary">
+          <div ng-repeat="(stateName, stateChanges) in changeSummary.states">
             <h5><[stateName]></h5>
             <ul>
               <li ng-repeat="entry in stateChanges track by $index">

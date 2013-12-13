@@ -73,6 +73,16 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
+  $scope.addExplorationChange = function(backendName, frontendNames, newValue, oldValue) {
+    $scope.explorationChangeList.push({
+      backendName: backendName,
+      frontendNames: frontendNames,
+      newValue: newValue,
+      oldValue: oldValue
+    });
+    $scope.undoneChangeStack = [];
+  };
+
   $scope.saveChanges = function(
       explorationChanges, stateChanges, commitMessage) {
 
@@ -83,6 +93,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         // TODO(sll): This takes a long time. Can we shorten it?
         $scope.explorationChangeList = [];
         $scope.initExplorationPage();
+        $scope.isSaveInProgress = false;
+      }, function() {
         $scope.isSaveInProgress = false;
       });
   };
@@ -110,8 +122,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.displaySaveReminderWarning = function() {
-    warningsData.addWarning(
-        'You need to save your changes before continuing.');
+    warningsData.addWarning('You need to save your changes before continuing.');
   };
 
   $window.addEventListener('beforeunload', function(e) {
@@ -156,6 +167,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         },
         controller: function($scope, $modalInstance, changeSummaries) {
           $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
+
+          $scope.explorationChangesExist = !$.isEmptyObject(
+            $scope.changeSummary.exploration);
+          $scope.stateChangesExist = !$.isEmptyObject(
+            $scope.changeSummary.states);
+
           $scope.publish = function(commitMessage) {
             $modalInstance.close(commitMessage);
           };
@@ -175,7 +192,48 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
   };
 
-  $scope.PROPERTY_CHANGE_SUMMARIES = {
+  $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES = {
+    'title': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Title (from \'' + oldValue + '\' to \'' + newValue + '\')';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'title';
+      }
+    },
+    'category': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Category (from \'' + oldValue + '\' to \'' + newValue + '\')';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'category';
+      }
+    },
+    'param_specs': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Parameter specifications';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'parameter specifications';
+      }
+    },
+    'param_changes': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Initial parameter changes';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'initial parameter changes';
+      }
+    }
+  };
+
+  $scope.getExplorationPropertyChangeSummary = function(
+      propertyName, format, values) {
+    return $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
+      values['newValue'], values['oldValue']);
+  };
+
+  $scope.STATE_PROPERTY_CHANGE_SUMMARIES = {
     // In future these will be elaborated to describe the changes made to each
     // state property.
     'state_name': {
@@ -236,9 +294,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
   };
 
-  $scope.getPropertyChangeSummary = function(
+  $scope.getStatePropertyChangeSummary = function(
       propertyName, format, values) {
-    return $scope.PROPERTY_CHANGE_SUMMARIES[propertyName][format](
+    return $scope.STATE_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
       values['newValue'], values['oldValue']);
   };
 
@@ -328,29 +386,48 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
 
     // Construct the summary for the save confirmation dialogue.
-    // TODO(sll): Add corresponding code for explorationChanges.
-    var modalSummaryForStates = {};
+    var modalSummaryForExploration = {};
+    for (var property in explorationChanges) {
+      modalSummaryForExploration[property] = (
+        $scope.getExplorationPropertyChangeSummary(
+          property, 'MODAL_FORMAT', explorationChanges[property]));
+    }
 
+    var modalSummaryForStates = {};
     for (stateId in stateChanges) {
       var changes = [];
-
       for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
         var property = $scope.ORDERED_STATE_PROPERTIES[i];
         if (stateChanges[stateId].hasOwnProperty(property)) {
-          changes.push($scope.getPropertyChangeSummary(
+          changes.push($scope.getStatePropertyChangeSummary(
             property, 'MODAL_FORMAT', stateChanges[stateId][property]));
         }
       }
-
       modalSummaryForStates[latestStateNames[stateId]] = changes;
     }
 
     // Construct the summary to be included in the commit message for the
     // version log.
     // TODO(sll): Add corresponding code for explorationChanges.
-    var versionLogSummary = '';
+    var versionLogSummaryForExploration = '';
+    if (!$.isEmptyObject(explorationChanges)) {
+      var explorationChangeStrings = [];
+      for (var property in explorationChanges) {
+        explorationChangeStrings.push(
+          $scope.getExplorationPropertyChangeSummary(
+            property, 'VERSION_LOG_FORMAT', explorationChanges[property]
+          )
+        );
+      }
+
+      versionLogSummaryForExploration = (
+        'Exploration properties that were changed: ' +
+        explorationChangeStrings.join(', '));
+    }
+
+    var versionLogSummaryForStates = '';
     if (!$.isEmptyObject(stateChanges)) {
-      versionLogSummary = 'States that were changed: ';
+      versionLogSummaryForStates = 'States that were changed: ';
 
       var stateChangeStrings = [];
       for (stateId in stateChanges) {
@@ -358,8 +435,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
           var property = $scope.ORDERED_STATE_PROPERTIES[i];
           if (stateChanges[stateId].hasOwnProperty(property)) {
-            humanReadablePropertyChanges.push($scope.getPropertyChangeSummary(
-              property, 'VERSION_LOG_FORMAT', stateChanges[stateId][property]));
+            humanReadablePropertyChanges.push(
+              $scope.getStatePropertyChangeSummary(
+                property, 'VERSION_LOG_FORMAT', stateChanges[stateId][property]
+              )
+            );
           }
         }
 
@@ -367,11 +447,26 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           humanReadablePropertyChanges.join(', ') + ')');
       }
 
-      versionLogSummary += stateChangeStrings.join(', ') + '.';
+      versionLogSummaryForStates += stateChangeStrings.join(', ');
+    }
+    var versionLogSummary = '';
+    if (versionLogSummaryForExploration && versionLogSummaryForStates) {
+      versionLogSummary = (
+        versionLogSummaryForExploration + '; ' + versionLogSummaryForStates);
+    } else {
+      versionLogSummary = (
+        versionLogSummaryForExploration + versionLogSummaryForStates);
+    }
+
+    if (versionLogSummary) {
+      versionLogSummary += '.';
     }
 
     return {
-      MODAL_FORMAT: modalSummaryForStates,
+      MODAL_FORMAT: {
+        exploration: modalSummaryForExploration,
+        states: modalSummaryForStates
+      },
       VERSION_LOG_FORMAT: versionLogSummary
     };
   };
@@ -814,6 +909,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope[frontendName] = oldValue;
       return;
     }
+
+    if ($scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES.hasOwnProperty(backendName)) {
+      // This is an exploration property and will only be saved when the
+      // 'Save changes' button is clicked.
+      $scope.addExplorationChange(backendName, [frontendName], newValue, oldValue);
+      return;
+    }
+
     var requestParameters = {};
     requestParameters[backendName] = newValue;
     requestParameters['version'] = explorationData.data.version;

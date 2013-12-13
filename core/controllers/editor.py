@@ -20,7 +20,6 @@ from core.controllers import base
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import obj_services
-from core.domain import param_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -159,8 +158,12 @@ class ExplorationHandler(base.BaseHandler):
         version = self.payload.get('version')
         self._require_valid_version(version, exploration.version)
 
-        # TODO(sll): Move this to a separate controller that handles rights
+        # TODO(sll): Move these to a separate controller that handles rights
         # management.
+        is_public = self.payload.get('is_public')
+        if is_public:
+            exploration.is_public = True
+
         editors = self.payload.get('editors')
         if editors:
             if (self.is_admin or (exploration.editor_ids and
@@ -172,16 +175,15 @@ class ExplorationHandler(base.BaseHandler):
                 raise self.UnauthorizedUserException(
                     'Only the exploration owner can add new collaborators.')
 
-        is_public = self.payload.get('is_public')
-        category = self.payload.get('category')
         title = self.payload.get('title')
+        category = self.payload.get('category')
         param_specs = self.payload.get('param_specs')
         param_changes = self.payload.get('param_changes')
         states = self.payload.get('states')
         commit_message = self.payload.get('commit_message')
 
         exp_services.update_exploration(
-            self.user_id, exploration_id, title, category, is_public,
+            self.user_id, exploration_id, title, category,
             param_specs, param_changes, states, commit_message)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -194,7 +196,11 @@ class ExplorationHandler(base.BaseHandler):
 
         self.render_json({
             'version': exploration.version,
-            'updatedStates': updated_states
+            'updatedStates': updated_states,
+            'title': exploration.title,
+            'category': exploration.category,
+            'param_specs': exploration.param_specs_dict,
+            'param_changes': exploration.param_change_dicts
         })
 
     @base.require_editor
