@@ -231,7 +231,7 @@ class ExplorationRightsHandler(base.BaseHandler):
 
 
 class DeleteStateHandler(base.BaseHandler):
-    """Handles state transactions."""
+    """Handles state deletions."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 

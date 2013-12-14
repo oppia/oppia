@@ -7,42 +7,6 @@
     <script>
       var GLOBALS = {};
       GLOBALS.csrf_token = JSON.parse('{{csrf_token|js_string}}');
-
-      var oppia = angular.module('oppia', []);
-      oppia.config(function($interpolateProvider) {
-        $interpolateProvider.startSymbol('<[');
-        $interpolateProvider.endSymbol(']>');
-      });
-
-      function Admin($scope, $http) {
-        $scope.message = '';
-
-        $scope.reloadExploration = function(explorationId) {
-          if ($scope.message == 'Processing...') {
-            return;
-          }
-
-          $scope.message = 'Processing...';
-          var request = $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              action: 'reload_exploration',
-              explorationId: String(explorationId) 
-            })
-          }, true);
-
-          $http.post(
-            '/admin',
-            request,
-            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-          success(function(data) {
-              $scope.message = 'Data reloaded successfully. Please remember ' +
-                'to flush memcache so that users do not see stale values.';
-            }).error(function(errorResponse) {
-              $scope.message = 'Server error: ' + errorResponse.error;
-            });
-        };
-      };
     </script>
   </head>
 
@@ -74,5 +38,12 @@
       {% endfor %}
     <br><br>
     <[message]>
+
+    {% include 'footer_js_libs.html' %}
+
+    <script>
+      {{ include_js_file('app.js') }}
+      {{ include_js_file('admin/Admin.js') }}
+    </script>
   </body>
 </html>
