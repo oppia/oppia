@@ -135,7 +135,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       };
 
       $scope.filepathsLoaded = false;
-      $http.get('/create/resource_list/' + $scope.explorationId).success(function(data) {
+      $http.get('/createhandler/resource_list/' + $scope.explorationId).success(function(data) {
         $scope.filepaths = data.filepaths;
         $scope.filepathsLoaded = true;
       });

@@ -129,26 +129,28 @@ urls = [
         'reader_feedback_handler'),
 
     get_redirect_route(
-        r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
-        'exploration_download_helper'),
-    get_redirect_route(
         r'/create/<exploration_id>', editor.ExplorationPage,
         'editor_exploration_page'),
     get_redirect_route(
-        r'/create/<exploration_id>/data', editor.ExplorationHandler,
+        r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
-    # TODO(sll): there is a potential collision here if the state_id is 'data'.
     get_redirect_route(
-        r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
-        'state_handler'),
+        r'/createhandler/delete_state/<exploration_id>/<state_id>', editor.DeleteStateHandler,
+        'delete_state_handler'),
     get_redirect_route(
-        r'/create/<exploration_id>/<state_id>/resolved_answers', editor.ResolvedAnswersHandler,
+        r'/createhandler/download/<exploration_id>', editor.ExplorationDownloadHandler,
+        'exploration_download_handler'),
+    get_redirect_route(
+        r'/createhandler/rights/<exploration_id>', editor.ExplorationRightsHandler,
+        'exploration_rights_handler'),
+    get_redirect_route(
+        r'/createhandler/resolved_answers/<exploration_id>/<state_id>', editor.ResolvedAnswersHandler,
         'resolved_answers_handler'),
     get_redirect_route(
-        r'/create/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
+        r'/createhandler/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
         'exploration_resources_handler'),
     get_redirect_route(
-        r'/create/state_rules_stats/<exploration_id>/<state_id>', editor.StateRulesStatsHandler,
+        r'/createhandler/state_rules_stats/<exploration_id>/<state_id>', editor.StateRulesStatsHandler,
         'state_rules_stats_handler'),
 
     get_redirect_route(

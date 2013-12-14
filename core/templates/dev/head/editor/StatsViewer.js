@@ -24,7 +24,7 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
     warningsData.clear();
 
     $http.get(
-        '/create/state_rules_stats/' + $scope.explorationId + '/' + stateId
+        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + stateId
     ).then(function(response) {
       var rulesStats = response.data.rules_stats;
 

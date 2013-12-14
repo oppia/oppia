@@ -1066,7 +1066,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'committer_id_2', eid, ['New state'])[0]
         commit_dict_2 = {
             'committer_id': 'committer_id_2',
-            'commit_message': '',
+            'commit_message': 'Added new state(s): New state',
             'version_number': 2,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
@@ -1089,7 +1089,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exp_services.delete_state('committer_id_3', eid, new_state_id)
         commit_dict_3 = {
             'committer_id': 'committer_id_3',
-            'commit_message': '',
+            'commit_message': 'Deleted state: New state',
             'version_number': 3,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(

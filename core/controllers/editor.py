@@ -35,6 +35,18 @@ EDITOR_MODE = 'editor'
 DEFAULT_NUM_SNAPSHOTS = 10
 
 
+def _require_valid_version(version_from_payload, exploration_version):
+    if version_from_payload is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid POST request: a version must be specified.')
+
+    if version_from_payload != exploration_version:
+        raise base.BaseHandler.InvalidInputException(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_version, version_from_payload))
+
+
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
@@ -67,17 +79,6 @@ class ExplorationHandler(base.BaseHandler):
     """Page with editor data for a single exploration."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
-
-    def _require_valid_version(self, version_from_payload, exploration_version):
-        if version_from_payload is None:
-            raise self.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != exploration_version:
-            raise self.InvalidInputException(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_version, version_from_payload))
 
     @base.require_editor
     def get(self, exploration_id):
@@ -131,7 +132,7 @@ class ExplorationHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
         version = self.payload.get('version')
-        self._require_valid_version(version, exploration.version)
+        _require_valid_version(version, exploration.version)
 
         state_name = self.payload.get('state_name')
         if not state_name:
@@ -154,26 +155,8 @@ class ExplorationHandler(base.BaseHandler):
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
-
         version = self.payload.get('version')
-        self._require_valid_version(version, exploration.version)
-
-        # TODO(sll): Move these to a separate controller that handles rights
-        # management.
-        is_public = self.payload.get('is_public')
-        if is_public:
-            exploration.is_public = True
-
-        editors = self.payload.get('editors')
-        if editors:
-            if (self.is_admin or (exploration.editor_ids and
-                                  self.user_id == exploration.editor_ids[0])):
-                exploration.editor_ids = []
-                for email in editors:
-                    exploration.add_editor(email)
-            else:
-                raise self.UnauthorizedUserException(
-                    'Only the exploration owner can add new collaborators.')
+        _require_valid_version(version, exploration.version)
 
         title = self.payload.get('title')
         category = self.payload.get('category')
@@ -217,21 +200,40 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.delete_exploration(self.user_id, exploration_id)
 
 
-class StateHandler(base.BaseHandler):
-    """Handles state transactions."""
+class ExplorationRightsHandler(base.BaseHandler):
+    """Handles management of exploration editing rights."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _require_valid_version(self, version_from_payload, exploration_version):
-        if version_from_payload is None:
-            raise self.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
+    @base.require_editor
+    def put(self, exploration_id):
+        """Updates the editing rights for the given exploration."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
 
-        if version_from_payload != exploration_version:
-            raise self.InvalidInputException(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_version, version_from_payload))
+        is_public = self.payload.get('is_public')
+        editors = self.payload.get('editors')
+        if editors is not None and not self.is_admin and not (
+                exploration.editor_ids and
+                self.user_id == exploration.editor_ids[0]):
+            raise self.UnauthorizedUserException(
+                'Only the exploration owner can add new editors.')
+
+        exp_services.update_exploration_rights(
+            self.user_id, exploration_id, is_public, editors)
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        # TODO(sll): Also add information about is_public and editors.
+        self.render_json({
+            'version': exploration.version,
+        })
+
+
+class DeleteStateHandler(base.BaseHandler):
+    """Handles state transactions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
     def delete(self, exploration_id, state_id):

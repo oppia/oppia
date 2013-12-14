@@ -31,8 +31,10 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
     'state_name'
   ];
 
-  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  // The pathname (without the hash) should be: .../create/{exploration_id}
   var explorationUrl = '/create/' + pathnameArray[2];
+  var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
+  var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + pathnameArray[2];
 
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
@@ -49,7 +51,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
         return deferred.promise;
       } else {
         // Retrieve data from the server.
-        return $http.get(explorationUrl + '/data').then(function(response) {
+        return $http.get(explorationDataUrl).then(function(response) {
           console.log('Retrieved exploration data.');
           console.log(response.data);
 
@@ -142,7 +144,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
       }
 
       $http.put(
-          explorationUrl + '/data',
+          explorationDataUrl,
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify(propertyValueMap)
@@ -171,7 +173,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
 
     resolveAnswers: function(stateId, resolvedAnswersList) {
       $http.put(
-          explorationUrl + '/' + stateId + '/resolved_answers',
+          resolvedAnswersUrlPrefix + '/' + stateId,
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
