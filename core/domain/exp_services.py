@@ -323,13 +323,13 @@ def save_exploration(committer_id, exploration, commit_message=''):
             'version': exploration_model.version,
         }
 
-        versionable_dict = feconf.NULL_SNAPSHOT
+        version_snapshot = feconf.NULL_SNAPSHOT
         if exploration.is_public:
-            versionable_dict = export_to_versionable_dict(exploration)
+            version_snapshot = export_to_versionable_dict(exploration)
 
         # Create a snapshot for the version history.
         exploration_model.put(
-            committer_id, properties_dict, versionable_dict, commit_message)
+            committer_id, properties_dict, version_snapshot, commit_message)
 
     transaction_services.run_in_transaction(
         _save_exploration_transaction, committer_id, exploration, 
@@ -541,7 +541,10 @@ def add_states(committer_id, exploration_id, state_names):
         save_states(committer_id, exploration_id, new_states)
         exploration = get_exploration_by_id(exploration_id)
         exploration.state_ids += state_ids
-        save_exploration(committer_id, exploration)
+
+        state_names = [state.name for state in new_states]
+        commit_message = 'Added new state(s): %s' % ', '.join(state_names)
+        save_exploration(committer_id, exploration, commit_message)
 
     transaction_services.run_in_transaction(
         _add_states_transaction, committer_id, exploration_id, new_states)
@@ -752,7 +755,7 @@ def _update_state(exploration_id, state_id, new_state_name,
 def update_exploration(
         committer_id, exploration_id, title, category, param_specs,
         param_changes, states, commit_message):
-    """Update an exploration.
+    """Update an exploration. Commits changes.
 
     Args:
     - committer_id: str. Email address of the user who is performing the update
@@ -831,6 +834,48 @@ def update_exploration(
         modified_states, commit_message)
 
 
+def update_exploration_rights(committer_id, exploration_id, is_public, editors):
+    """Update the rights for an exploration. Commits changes.
+
+    Args:
+    - committer_id: str. Email address of the user who is performing the update
+        action.
+    - exploration_id: str. The exploration id.
+    - is_public: bool or None. If present, whether the exploration has been
+        made public.
+    - editors: list of str, or None. If present, a list with the email
+        addresses of allowed editors.
+    """
+    # TODO(sll): Add tests to ensure that the parameters are of the correct
+    # types, etc.
+    exploration = get_exploration_by_id(exploration_id)
+
+    commit_message_list = []
+
+    if is_public is not None:
+        if is_public is False:
+            raise Exception('A published exploration cannot be unpublished.')
+        if exploration.is_public is True:
+            raise Exception('An exploration cannot be republished.')
+        exploration.is_public = True
+        commit_message_list.append('Exploration published.')
+
+    if editors is not None:
+        exploration.editor_ids = []
+        for email in editors:
+            exploration.add_editor(email)
+        # TODO(sll): Add more detail here.
+        commit_message_list.append('Exploration editor list changed.')
+
+    def _update_exploration_rights_transaction(
+            committer_id, exploration, commit_message):
+        save_exploration(committer_id, exploration, commit_message)
+
+    transaction_services.run_in_transaction(
+        _update_exploration_rights_transaction, committer_id, exploration,
+        ' '.join(commit_message_list))
+
+
 def delete_state(committer_id, exploration_id, state_id):
     """Deletes the given state. Commits changes."""
     exploration = get_exploration_by_id(exploration_id)
@@ -858,6 +903,8 @@ def delete_state(committer_id, exploration_id, state_id):
             if changed:
                 save_states(committer_id, exploration_id, [other_state])
 
+        state_name = get_state_by_id(exploration_id, state_id).name
+
         # Delete the state with id state_id.
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration_id)
@@ -865,7 +912,8 @@ def delete_state(committer_id, exploration_id, state_id):
 
         delete_state_model(exploration_id, state_id)
         exploration.state_ids.remove(state_id)
-        save_exploration(committer_id, exploration)
+        save_exploration(
+            committer_id, exploration, 'Deleted state: %s' % state_name)
 
     transaction_services.run_in_transaction(
         _delete_state_transaction, committer_id, exploration_id, state_id)

@@ -19,7 +19,6 @@
  */
 
 var END_DEST = 'END';
-var QN_DEST_PREFIX = 'q-';
 var NONEXISTENT_STATE = '[none]';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
@@ -590,14 +589,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
    *********************************************************/
   var explorationFullyLoaded = false;
 
-  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  // The pathname should be: .../create/{exploration_id}
   $scope.explorationId = pathnameArray[2];
   // The exploration id needs to be attached to the root scope in order for
   // the file picker widget to work. (Note that an alternative approach might
   // also be to replicate this URL-based calculation in the file picker widget.)
   $rootScope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
-  $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
+  $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
+  $scope.deleteStateUrlPrefix = '/createhandler/delete_state/' + $scope.explorationId;
+  $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
+  $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
 
   // Initializes the exploration page using data from the backend. Called on
   // page load.
@@ -856,35 +858,23 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   $scope.addNewEditor = function(newEditorEmail) {
     activeInputData.name = 'explorationMetadata';
-    $scope.explorationEditors.push(newEditorEmail);
+    var oldValue = angular.copy($scope.explorationEditors);
+    var newValue = angular.copy(oldValue);
+    newValue.push(newEditorEmail);
 
-    $http.put(
-        $scope.explorationDataUrl,
-        requestCreator.createRequest({
-          editors: $scope.explorationEditors,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              console.log('PUT request succeeded');
-              explorationData.data.version = data.version;
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  'Error adding collaborator: ' + data.error);
-              $scope.explorationEditors.pop();
-            });
+    $scope.saveExplorationRightsChange(
+      'explorationEditors', 'editors', newValue, oldValue);
   };
 
   /**
    * Downloads the YAML representation of an exploration.
    */
   $scope.downloadExploration = function() {
-    document.location = '/create/download/' + $scope.explorationId;
+    document.location = $scope.explorationDownloadUrl;
   };
 
   $scope.makePublic = function() {
-    $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
+    $scope.saveExplorationRightsChange('isPublic', 'is_public', true, false);
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
@@ -916,30 +906,30 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.addExplorationChange(backendName, [frontendName], newValue, oldValue);
       return;
     }
+  };
 
-    var requestParameters = {};
+  $scope.saveExplorationRightsChange = function(frontendName, backendName, newValue, oldValue) {
+    var requestParameters = {
+      version: explorationData.data.version
+    };
     requestParameters[backendName] = newValue;
-    requestParameters['version'] = explorationData.data.version;
 
     $http.put(
-        $scope.explorationDataUrl,
+        $scope.explorationRightsUrl,
         requestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              if (frontendName == 'isPublic') {
-                $scope[frontendName] = newValue;
-              }
-              console.log('PUT request succeeded');
               explorationData.data.version = data.version;
             }).
             error(function(data) {
-              console.log('ERROR');
               warningsData.addWarning(
-                  'Error modifying exploration properties: ' + data.error);
+                  'Error modifying exploration rights: ' + data.error);
               // TODO(sll): Reinstate the following line without causing the
               //     $watch to trigger.
               // $scope[frontendName] = oldValue;
             });
+
+    $scope[frontendName] = newValue;
   };
 
   $scope.initializeNewActiveInput = function(newActiveInput) {
@@ -1027,7 +1017,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
-    $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
+    $http['delete']($scope.deleteStateUrlPrefix + '/' + stateId)
     .success(function(data) {
       // Reloads the page.
       explorationData.data.version = data.version;

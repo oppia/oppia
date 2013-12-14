@@ -61,7 +61,7 @@ class EditorTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add a new state called 'New valid state name'.
-        response_dict = self.post_json('/create/0/data', {
+        response_dict = self.post_json('/createhandler/data/0', {
             'state_name': 'New valid state name', 'version': 1
         }, csrf_token)
 
@@ -85,7 +85,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         def _post_and_expect_400_error(payload):
             return self.post_json(
-                '/create/0/data', payload, csrf_token,
+                '/createhandler/data/0', payload, csrf_token,
                 expect_errors=True, expected_status_int=400)
 
         # A POST request with no version number is invalid.
@@ -169,7 +169,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/create/0/%s/resolved_answers' % state_id)
+        url = str('/createhandler/resolved_answers/0/%s' % state_id)
 
         def _get_unresolved_answers():
             return exp_services.get_unresolved_answers_for_default_rule(
@@ -222,7 +222,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # Check, from the editor perspective, that no stats have been recorded.
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get('/create/0/data')
+        response = self.testapp.get('/createhandler/data/0')
         editor_exploration_dict = self.parse_json_response(response)
         self.assertEqual(editor_exploration_dict['num_visits'], 0)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
@@ -252,7 +252,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # Now switch back to the editor perspective.
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get('/create/0/data')
+        response = self.testapp.get('/createhandler/data/0')
         editor_exploration_json = self.parse_json_response(response)
         self.assertEqual(editor_exploration_json['num_visits'], 1)
         self.assertEqual(editor_exploration_json['num_completions'], 0)
@@ -286,18 +286,19 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
         self.login(self.editor_id, is_admin=False)
         response = self.testapp.delete(
-            '/create/%s/data' % UNPUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.viewer_id, is_admin=False)
         response = self.testapp.delete(
-            '/create/%s/data' % UNPUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.owner_id, is_admin=False)
-        response = self.testapp.delete('/create/%s/data' % UNPUBLISHED_EXP_ID)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -314,23 +315,24 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
         self.login(self.editor_id, is_admin=False)
         response = self.testapp.delete(
-            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.viewer_id, is_admin=False)
         response = self.testapp.delete(
-            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.owner_id, is_admin=False)
         response = self.testapp.delete(
-            '/create/%s/data' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.admin_id, is_admin=True)
-        response = self.testapp.delete('/create/%s/data' % PUBLISHED_EXP_ID)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % PUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.logout()
