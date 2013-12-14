@@ -193,7 +193,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
             '6', 'Parametrized Adventure',
-            'Hello, brave adventurer! What is your name?'
+            'Hello, brave adventurer'
         ).submit_and_compare(
             'My Name', 'Hello, I\'m My Name!.*get a pretty red'
         ).submit_and_compare(
