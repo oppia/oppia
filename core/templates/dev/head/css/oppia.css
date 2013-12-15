@@ -398,6 +398,7 @@ textarea {
 .oppia-warning {
   background: #F9EDBE;
   width: 80%;
+  max-width: 700px;
 }
 
 .oppia-cursor-pointer {

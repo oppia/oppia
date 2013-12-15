@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 
+from core.domain import obj_services
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
@@ -25,28 +26,39 @@ memcache_services = models.Registry.import_memcache_services()
 class ConfigProperty(object):
     """A property with a name and a default value."""
 
-    ALLOWED_TYPES = frozenset([str, unicode])
+    ALLOWED_TYPES = frozenset(['UnicodeString'])
 
-    def __init__(self, name, value_type, description, default_value=None):
+    def __init__(self, name, obj_type, description, default_value=None):
 
-        if not value_type in self.ALLOWED_TYPES:
-            raise Exception('Bad value type: %s' % value_type)
-
-        try:
-            value_type(default_value)
-        except Exception:
-            raise Exception('Cannot cast value of %s to %s (expected type %s)'
-                            % (name, default_value, value_type))
+        if not obj_type in self.ALLOWED_TYPES:
+            raise Exception('Bad config property obj_type: %s' % obj_type)
 
         if name in Registry._config_registry:
             raise Exception('Property with name %s already exists' % name)
 
-        self.name = name
-        self.value_type = value_type
-        self.description = description
-        self.default_value = value_type(default_value)
+        self._name = name
+        self._obj_type = obj_type
+        self._description = description
+        self._default_value = obj_services.Registry.get_object_class_by_type(
+            obj_type).normalize(default_value)
 
         Registry._config_registry[self.name] = self
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def obj_type(self):
+        return self._obj_type
+
+    @property
+    def description(self):
+        return self._description
+
+    @property
+    def default_value(self):
+        return self._default_value
 
     @property
     def value(self):
@@ -68,8 +80,29 @@ class ConfigProperty(object):
 
 class Registry(object):
     """Registry of all configuration properties."""
+
+    # The keys of _config_registry are the property names, and the values are
+    # ConfigProperty instances.
     _config_registry = {}
 
     @classmethod
     def get_config_property(cls, name):
         return cls._config_registry.get(name)
+
+    @classmethod
+    def get_config_property_schemas(cls):
+        """Return a dict of config property schemas.
+
+        The keys of the dict are config property names. The values are dicts
+        with the following keys: obj_type, description, value.
+        """
+        schemas_dict = {}
+
+        for (property_name, instance) in cls._config_registry.iteritems():
+            schemas_dict[property_name] = {
+                'obj_type': instance.obj_type,
+                'description': instance.description,
+                'value': instance.value
+            }
+
+        return schemas_dict

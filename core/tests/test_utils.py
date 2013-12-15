@@ -99,6 +99,12 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
+    def get_json(self, url):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(url)
+        self.assertEqual(json_response.status_int, 200)
+        return self.parse_json_response(json_response, expect_errors=False)
+
     def post_json(self, url, payload, csrf_token, expect_errors=False,
                   expected_status_int=200):
         """Post an object to the server by JSON; return the received object."""

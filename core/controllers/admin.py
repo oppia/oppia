@@ -16,10 +16,17 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import logging
+
 from core import counters
 from core.controllers import base
+from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_services
+from core.domain import obj_services
 import feconf
+
+import jinja2
 
 
 class AdminPage(base.BaseHandler):
@@ -56,16 +63,48 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
-        demo_explorations = [(str(ind), exp[0]) for ind, exp in
-                             enumerate(feconf.DEMO_EXPLORATIONS)]
-        self.values['demo_explorations'] = demo_explorations
+        self.values.update({
+            'demo_explorations': [
+                (str(ind), exp[0]) for ind, exp in
+                enumerate(feconf.DEMO_EXPLORATIONS)],
+            'object_editors_js': jinja2.utils.Markup(
+                obj_services.get_all_object_editor_js_templates())
+        })
 
         self.render_template('admin/admin.html')
 
+
+class AdminHandler(base.BaseHandler):
+    """Handler for the admin page."""
+
+    PAGE_NAME_FOR_CSRF = 'admin'
+
+    @base.require_admin
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_json({
+            'config_properties': (
+                config_domain.Registry.get_config_property_schemas())
+        })
+
     @base.require_admin
     def post(self):
-        """Reloads the default explorations."""
+        """Handles POST requests."""
+
         if self.payload.get('action') == 'reload_exploration':
             exploration_id = self.payload.get('explorationId')
+            logging.info(
+                '[ADMIN] %s reloaded exploration %s' %
+                (self.user_id, exploration_id))
             exp_services.delete_demo(str(exploration_id))
             exp_services.load_demo(str(exploration_id))
+        elif self.payload.get('action') == 'save_config_properties':
+            new_config_property_values = self.payload.get(
+                'new_config_property_values')        
+            logging.info('[ADMIN] %s saved config property values: %s' %
+                         (self.user_id, new_config_property_values))
+            for (name, value) in new_config_property_values.iteritems():
+                config_services.set_property(name, value)
+
+        self.render_json({})

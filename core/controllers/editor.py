@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import obj_services
@@ -33,6 +34,11 @@ import jinja2
 EDITOR_MODE = 'editor'
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 10
+
+EDITOR_PAGE_WARNING_MESSAGE = config_domain.ConfigProperty(
+    'editor_page_warning_message', 'UnicodeString',
+    'A persistent warning message to display on top of all editor pages.',
+    default_value='')
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -71,6 +77,7 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': EDITOR_MODE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
+            'warning_message': EDITOR_PAGE_WARNING_MESSAGE.value,
         })
         self.render_template('editor/editor_exploration.html')
 

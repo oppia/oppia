@@ -20,6 +20,55 @@
 
 function Admin($scope, $http) {
   $scope.message = '';
+  $scope.adminHandlerUrl = '/adminhandler';
+  $scope.configProperties = {};
+
+  $scope.isNonemptyObject = function(object) {
+    var hasAtLeastOneElement = false;
+    for (var property in object) {
+      hasAtLeastOneElement = true;
+    }
+    return hasAtLeastOneElement;
+  };
+
+  $scope.reloadConfigProperties = function() {
+    $http.get($scope.adminHandlerUrl).success(function(data) {
+      $scope.configProperties = data.config_properties;
+    });
+  };
+
+  $scope.reloadConfigProperties();
+
+  $scope.saveConfigProperties = function() {
+    if ($scope.message == 'Saving...') {
+      return;
+    }
+
+    $scope.message = 'Saving...';
+
+    var newConfigPropertyValues = {};
+    for (var property in $scope.configProperties) {
+      newConfigPropertyValues[property] = $scope.configProperties[property].value;
+    }
+
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'save_config_properties',
+        new_config_property_values: newConfigPropertyValues
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+      $scope.message = 'Data saved successfully.';
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
 
   $scope.reloadExploration = function(explorationId) {
     if ($scope.message == 'Processing...') {
@@ -36,12 +85,11 @@ function Admin($scope, $http) {
     }, true);
 
     $http.post(
-      '/admin',
+      $scope.adminHandlerUrl,
       request,
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function(data) {
-        $scope.message = 'Data reloaded successfully. Please remember ' +
-          'to flush memcache so that users do not see stale values.';
+        $scope.message = 'Data reloaded successfully.';
       }).error(function(errorResponse) {
         $scope.message = 'Server error: ' + errorResponse.error;
       });

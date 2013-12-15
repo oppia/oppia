@@ -45,7 +45,7 @@ import webapp2
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 
 CSRF_SECRET = config_domain.ConfigProperty(
-    'oppia_csrf_secret', str, 'Text used to encrypt CSRF tokens.',
+    'oppia_csrf_secret', 'UnicodeString', 'Text used to encrypt CSRF tokens.',
     DEFAULT_CSRF_SECRET)
 
 
