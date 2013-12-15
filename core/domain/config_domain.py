@@ -23,6 +23,9 @@ from core.platform import models
 memcache_services = models.Registry.import_memcache_services()
 
 
+COMPUTED_PROPERTY_PREFIX = 'computed:'
+
+
 class ConfigProperty(object):
     """A property with a name and a default value."""
 
@@ -78,6 +81,16 @@ class ConfigProperty(object):
         return self.default_value
 
 
+class ComputedProperty(ConfigProperty):
+    """A property whose value is computed rather than specified explicitly."""
+
+    def __init__(self, name, obj_type, description, fn, *args):
+        default_value = fn(*args)
+        super(ComputedProperty, self).__init__(
+            '%s%s' % (COMPUTED_PROPERTY_PREFIX, name),
+            obj_type, description, default_value)
+
+
 class Registry(object):
     """Registry of all configuration properties."""
 
@@ -91,7 +104,7 @@ class Registry(object):
 
     @classmethod
     def get_config_property_schemas(cls):
-        """Return a dict of config property schemas.
+        """Return a dict of editable config property schemas.
 
         The keys of the dict are config property names. The values are dicts
         with the following keys: obj_type, description, value.
@@ -99,10 +112,11 @@ class Registry(object):
         schemas_dict = {}
 
         for (property_name, instance) in cls._config_registry.iteritems():
-            schemas_dict[property_name] = {
-                'obj_type': instance.obj_type,
-                'description': instance.description,
-                'value': instance.value
-            }
+            if not property_name.startswith(COMPUTED_PROPERTY_PREFIX):
+                schemas_dict[property_name] = {
+                    'obj_type': instance.obj_type,
+                    'description': instance.description,
+                    'value': instance.value
+                }
 
         return schemas_dict

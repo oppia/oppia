@@ -35,6 +35,24 @@ EDITOR_MODE = 'editor'
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 10
 
+
+def get_value_generators_js():
+    all_value_generators = (
+        value_generators_domain.Registry.get_all_generator_classes())
+    value_generators_js = ''
+    for gid, generator_cls in all_value_generators.iteritems():
+        value_generators_js += generator_cls.get_js_template()
+    return value_generators_js
+
+VALUE_GENERATORS_JS = config_domain.ComputedProperty(
+    'value_generators_js', 'UnicodeString',
+    'JavaScript code for the value generators', get_value_generators_js)
+
+OBJECT_EDITORS_JS = config_domain.ComputedProperty(
+    'object_editors_js', 'UnicodeString',
+    'JavaScript code for the object editors',
+    obj_services.get_all_object_editor_js_templates)
+
 EDITOR_PAGE_WARNING_MESSAGE = config_domain.ConfigProperty(
     'editor_page_warning_message', 'UnicodeString',
     'A persistent warning message to display on top of all editor pages.',
@@ -61,17 +79,10 @@ class ExplorationPage(base.BaseHandler):
     @base.require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
-        # TODO(sll): Cache all this generated code, if it's unlikely to change
-        # much.
-        all_value_generators = (
-            value_generators_domain.Registry.get_all_generator_classes())
-        value_generators_js = ''
-        for gid, generator_cls in all_value_generators.iteritems():
-            value_generators_js += generator_cls.get_js_template()
-
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
-        object_editors_js = obj_services.get_all_object_editor_js_templates()
+        object_editors_js = OBJECT_EDITORS_JS.value
+        value_generators_js = VALUE_GENERATORS_JS.value
 
         self.values.update({
             'nav_mode': EDITOR_MODE,

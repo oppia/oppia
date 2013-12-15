@@ -15,6 +15,12 @@
       Click <a href="/">here</a> to go to the Oppia main page.
     </div>
 
+    <br>
+
+    <div ng-if="message" style="background-color: lightyellow;">
+      <[message]>
+    </div>
+
     <h3>Performance Counters</h3>
 
     <ul>
@@ -52,8 +58,7 @@
           </button>
         </li>
       {% endfor %}
-    <br><br>
-    <[message]>
+    </ul>
 
     {% include 'footer_js_libs.html' %}
 

@@ -196,21 +196,11 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         if (!$scope.getObjTypeForParam(name)) {
           // The name is new, so add the parameter to the exploration parameter
           // list.
-          // TODO(sll): We should probably defer doing this for real until the
-          // change has actually been committed to the backend. One way to
-          // handle this is by having $scope.addExplorationParamSpec() add to
-          // the list of temporary changes, rather than make an immediate
-          // commit to the server.
-          $scope.addExplorationParamSpec(
-            name,
-            'UnicodeString',
-            _updateAndSaveParamChangeList.bind(
-                undefined, index, name, generator_id, customization_args)
-          );
-        } else {
-          _updateAndSaveParamChangeList(
-              index, name, generator_id, customization_args);
+          $scope.addExplorationParamSpec(name, 'UnicodeString');
         }
+        
+        _updateAndSaveParamChangeList(
+          index, name, generator_id, customization_args);
 
         $scope.resetEditor();
       };

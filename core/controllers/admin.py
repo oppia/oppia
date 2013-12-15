@@ -20,10 +20,10 @@ import logging
 
 from core import counters
 from core.controllers import base
+from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
-from core.domain import obj_services
 import feconf
 
 import jinja2
@@ -68,7 +68,7 @@ class AdminPage(base.BaseHandler):
                 (str(ind), exp[0]) for ind, exp in
                 enumerate(feconf.DEMO_EXPLORATIONS)],
             'object_editors_js': jinja2.utils.Markup(
-                obj_services.get_all_object_editor_js_templates())
+                editor.OBJECT_EDITORS_JS.value)
         })
 
         self.render_template('admin/admin.html')

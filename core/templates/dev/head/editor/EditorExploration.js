@@ -49,6 +49,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.undoneChangeStack = [];
   // Whether or not a save action is currently in progress.
   $scope.isSaveInProgress = false;
+  // Whether or not a discard action is currently in progress.
+  $scope.isDiscardInProgress = false;
 
   // TODO(sll): Implement undo, redo functionality. Show a message on each step
   // saying what the step is doing.
@@ -101,14 +103,22 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.discardExplorationChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
-      // Reload the local state data variables.
-      if ($scope.stateId) {
-        $scope.initStateData();
-      }
+      $scope.isDiscardInProgress = true;
 
-      // Clear both change lists.
-      $scope.explorationChangeList = [];
-      $scope.undoneChangeStack = [];
+      $scope.initExplorationPage(function() {
+        if ($scope.stateId) {
+          $scope.initStateData();
+        }
+
+        // The $apply() is needed to call all the exploration field $watch()
+        // methods before flipping isDiscardInProgress.
+        $scope.$apply();
+        $scope.isDiscardInProgress = false;
+
+        // Clear both change lists.
+        $scope.explorationChangeList = [];
+        $scope.undoneChangeStack = [];
+      });
     }
   };
 
@@ -603,19 +613,19 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   // Initializes the exploration page using data from the backend. Called on
   // page load.
-  $scope.initExplorationPage = function() {
+  $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.stateId = explorationData.stateId;
-      $scope.states = data.states;
+      $scope.states = angular.copy(data.states);
       $scope.explorationTitle = data.title;
       $scope.explorationCategory = data.category;
       $scope.explorationEditors = data.editors;
       $scope.initStateId = data.init_state_id;
       $scope.isPublic = data.is_public;
       $scope.currentUser = data.user;
-      $scope.paramSpecs = data.param_specs || {};
-      $scope.explorationParamChanges = data.param_changes || [];
+      $scope.paramSpecs = angular.copy(data.param_specs || {});
+      $scope.explorationParamChanges = angular.copy(data.param_changes || []);
   
       $scope.explorationSnapshots = [];
       for (var i = 0; i < data.snapshots.length; i++) {
@@ -665,6 +675,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.drawGraph();
   
       explorationFullyLoaded = true;
+
+      if (successCallback) {
+        successCallback();
+      }
     });
   };
 
@@ -678,14 +692,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         )
     );
   };
-
-  $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    // Do not save on the initial data load.
-    if (oldValue !== undefined) {
-      $scope.saveExplorationProperty(
-          'explorationCategory', 'category', newValue, oldValue);
-    }
-  });
 
   $scope.reformatResponse = function(states, initStateId) {
     var SENTINEL_DEPTH = 3000;
@@ -807,15 +813,21 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     return {nodes: nodeList, links: links, initStateId: initStateId};
   };
 
-
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
     // Do not save on the initial data load.
-    if (oldValue !== undefined) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
       $scope.saveExplorationProperty(
           'explorationTitle', 'title', newValue, oldValue);
     }
   });
 
+  $scope.$watch('explorationCategory', function(newValue, oldValue) {
+    // Do not save on the initial data load.
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
+      $scope.saveExplorationProperty(
+          'explorationCategory', 'category', newValue, oldValue);
+    }
+  });
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     console.log("adding parameter to exploration");
@@ -826,26 +838,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
 
     $scope.paramSpecs[name] = {obj_type: type};
-    $http.put(
-        $scope.explorationDataUrl,
-        requestCreator.createRequest({
-          param_specs: $scope.paramSpecs,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              console.log('PUT request succeeded');
-              explorationData.data.version = data.version;
-              if (successCallback) {
-                successCallback();
-              }
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  'Error adding parameter: ' + data.error);
-              delete $scope.paramSpecs[name];
-            });
   };
+
+  $scope.$watch('paramSpecs', function(newValue, oldValue) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
+      $scope.saveExplorationProperty(
+        'paramSpecs', 'param_specs', newValue, oldValue);
+    }
+  });
 
   $scope.openAddNewEditorForm = function() {
     activeInputData.name = 'explorationMetadata.addNewEditor';
@@ -894,10 +894,15 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     if (!explorationFullyLoaded) {
       return;
     }
-    newValue = $scope.normalizeWhitespace(newValue);
-    if (oldValue && !$scope.isValidEntityName(newValue, true)) {
-      $scope[frontendName] = oldValue;
+    if (angular.equals(newValue, oldValue)) {
       return;
+    }
+    newValue = $scope.normalizeWhitespace(newValue);
+    if (backendName == 'title' || backendName == 'category') {
+      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
+        $scope[frontendName] = oldValue;
+        return;
+      }
     }
 
     if ($scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES.hasOwnProperty(backendName)) {
