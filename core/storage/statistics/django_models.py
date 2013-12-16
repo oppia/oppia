@@ -25,6 +25,8 @@ from core import django_utils
 
 from django.db import models
 
+QUERY_LIMIT = 100
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -64,23 +66,6 @@ class StateCounterModel(base_models.BaseModel):
             counter.subsequent_entries_count += 1
 
         counter.put()
-
-
-class StateFeedbackFromReaderModel(base_models.BaseModel):
-    """A record of all the feedback given by readers for a particular state.
-
-    The id/key for instances of this class has the form
-        [EXPLORATION_ID].[STATE_ID]
-    """
-    feedback_log = django_utils.JSONField(default=[], isdict=False, blank=True)
-
-    @classmethod
-    def get_or_create(cls, exploration_id, state_id):
-      instance_id = '.'.join([exploration_id, state_id])
-      reader_feedback = cls.get(instance_id, strict=False)
-      if not reader_feedback:
-          reader_feedback = cls(id=instance_id, feedback_log=[])
-      return reader_feedback
 
 
 class StateRuleAnswerLogModel(base_models.BaseModel):
@@ -129,21 +114,48 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         ) for datum in rule_data]
 
 
-def record_state_feedback_from_reader(
-        exploration_id, state_id, feedback, history):
-    """Adds feedback to the reader feedback log for the given state.
+class FeedbackItemModel(base_models.BaseModel):
+    """A piece of feedback for a particular resource."""
+    # The id for the target of the feedback (e.g. an exploration, a state, the
+    # app as a whole, etc.)
+    target_id = models.CharField(max_length=100)
+    # The text of the feedback message.
+    content = models.CharField(max_length=500)
+    # Additional data supplied with the feedback message, such as the reader's
+    # state/answer history.
+    additional_data = django_utils.JSONField(blank=True, default={})
+    # The id of the user who submitted this feedback. If None, it means that
+    # the feedback was submitted anonymously.
+    submitter_id = models.CharField(blank=True, max_length=100)
 
-    Args:
-        exploration_id: the exploration id
-        state_id: the state id
-        feedback: str. The feedback typed by the reader.
-        history: list. The history of the exploration for this reader.
-    """
-    reader_feedback = StateFeedbackFromReaderModel.get_or_create(
-        exploration_id, state_id)
-    reader_feedback.feedback_log.append({
-        'feedback': feedback, 'history': history})
-    reader_feedback.put()
+
+    STATUS_CHOICES = (
+        ('new', 'new'), ('accepted', 'accepted'), ('fixed', 'fixed'),
+        ('verified', 'verified'), ('will_not_fix', 'will_not_fix'),
+        ('needs_clarification', 'needs_clarification')
+    )
+
+    # The status of the feedback.
+    status = models.CharField(
+        max_length=20,
+        default='new',
+        choices=STATUS_CHOICES
+    )
+
+    @classmethod
+    def get_or_create(cls, target_id, content, additional_data, submitter_id):
+        """Creates a new feedback entry."""
+        feedback_entity = cls(
+            target_id=target_id, content=content,
+            additional_data=additional_data, submitter_id=submitter_id)
+        feedback_entity.put()
+
+        return feedback_entity
+
+    @classmethod
+    def get_feedback_items_for_target(cls, target_id):
+        """Gets all feedback items corresponding to a given target_id."""
+        return cls.get_all().filter(target_id=target_id)
 
 
 def process_submitted_answer(

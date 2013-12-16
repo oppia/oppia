@@ -244,18 +244,19 @@ class FeedbackHandler(base.BaseHandler):
 
 
 class ReaderFeedbackHandler(base.BaseHandler):
-   """Submits feedback from the reader."""
+    """Submits feedback from the reader."""
 
-   REQUIRE_PAYLOAD_CSRF_CHECK = False
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-   def post(self, exploration_id, state_id):
-     """Handles POST requests."""
+    def post(self, exploration_id, state_id):
+        """Handles POST requests."""
 
-     feedback = self.payload.get('feedback')
-     # TODO(sll): Add the reader's history log here.
-
-     stats_services.EventHandler.record_state_feedback_from_reader(
-         exploration_id, state_id, feedback, [])
+        feedback = self.payload.get('feedback')
+        state_history = self.payload.get('state_history')
+        # TODO(sll): Add the reader's history log here.
+        stats_services.EventHandler.record_state_feedback_from_reader(
+            exploration_id, state_id, feedback,
+            {'state_history': state_history})
 
 
 class RandomExplorationPage(base.BaseHandler):

@@ -61,23 +61,6 @@ class StateCounter(object):
         )
 
 
-class StateFeedbackFromReader(object):
-    """Domain object that keeps reader feedback associated with states.
-
-    All methods and properties in this file should be independent of the
-    specific storage model used.
-    """
-    def __init__(self, feedback_log):
-        self.feedback_log = feedback_log
-
-    @classmethod
-    def get(cls, exploration_id, state_id):
-        state_feedback_model = (
-            stats_models.StateFeedbackFromReaderModel.get_or_create(
-                exploration_id, state_id))
-        return cls(state_feedback_model.feedback_log)
-
-
 class StateRuleAnswerLog(object):
     """Domain object that stores answers which match different state rules.
 
@@ -137,3 +120,64 @@ class StateRuleAnswerLog(object):
         return sorted(
             self.answers.iteritems(), key=operator.itemgetter(1),
             reverse=True)[:N]
+
+
+class FeedbackItem(object):
+    """Domain object for a generic feedback item.
+
+    All methods and properties in this file should be independent of the
+    specific storage model used.
+    """
+    def __init__(self, feedback_item_model):
+        self.target_id = feedback_item_model.target_id
+        self.content = feedback_item_model.content
+        self.additional_data = feedback_item_model.additional_data
+        self.submitter_id = feedback_item_model.submitter_id
+        self.status = feedback_item_model.status
+
+    @classmethod
+    def _get_feedback_items_for_target(cls, target_id):
+        return [FeedbackItem(f) for f in
+                stats_models.FeedbackItemModel.get_feedback_items_for_target(
+                    target_id)]
+
+    @classmethod
+    def _get_target_id_for_state(cls, exploration_id, state_id):
+        return 'state:%s.%s' % (exploration_id, state_id)
+
+    @classmethod
+    def _get_target_id_for_exploration(cls, exploration_id):
+        return 'exploration:%s' % (exploration_id)
+
+    @classmethod
+    def get_feedback_items_for_state(cls, exploration_id, state_id):
+        target_id = cls._get_target_id_for_state(exploration_id, state_id)
+        return cls._get_feedback_items_for_target(target_id)
+
+    @classmethod
+    def get_feedback_items_for_exploration(cls, exploration_id):
+        target_id = cls._get_target_id_for_exploration(exploration_id)
+        return cls._get_feedback_items_for_target(target_id)
+
+    @classmethod
+    def _create_feedback_for_target(
+            cls, target_id, content, additional_data, submitter_id):
+        feedback_item_model = stats_models.FeedbackItemModel.get_or_create(
+            target_id, content, additional_data, submitter_id)
+        return cls(feedback_item_model)
+
+    @classmethod
+    def create_feedback_for_state(
+            cls, exploration_id, state_id, content, additional_data=None,
+            submitter_id=None):
+        target_id = cls._get_target_id_for_state(exploration_id, state_id)
+        return cls._create_feedback_for_target(
+            target_id, content, additional_data, submitter_id)
+
+    @classmethod
+    def create_feedback_for_exploration(
+            cls, exploration_id, content, additional_data=None,
+            submitter_id=None):
+        target_id = cls._get_target_id_for_exploration(exploration_id)
+        return cls._create_feedback_for_target(
+            target_id, content, additional_data, submitter_id)

@@ -41,6 +41,18 @@
         <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
       </p>
 
+      <div ng-if="stateStats.feedback_log.length">
+        <h5>
+          Feedback
+          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
+        </h5>
+        <ul>
+          <li ng-repeat="item in stateStats.feedback_log track by $index">
+            <[item.content]>
+          </li>
+        </ul>
+      </div>
+
       <div ng-if="stateStats.totalEntryCount">
         <h5>Answers</h5>
         <div ng-show="doesAnswerExist()">
@@ -65,18 +77,6 @@
             Edit content
           </a>
         </div>
-      </div>
-
-      <div ng-if="stateStats.feedback_log.length">
-        <h5>
-          Feedback
-          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
-        </h5>
-        <ul>
-          <li ng-repeat="item in stateStats.feedback_log track by $index">
-            <[item.feedback]>
-          </li>
-        </ul>
       </div>
 
     </div>

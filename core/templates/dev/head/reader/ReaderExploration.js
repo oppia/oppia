@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
- function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
+function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   // The following is needed for image displaying to work.
@@ -113,6 +113,7 @@
   $scope.submitFeedback = function(feedback) {
     var requestMap = {
       feedback: feedback,
+      state_history: angular.copy($scope.stateHistory)
     };
 
     $http.post(

@@ -59,10 +59,18 @@ class EventHandler(object):
 
     @classmethod
     def record_state_feedback_from_reader(
-            cls, exploration_id, state_id, history, feedback):
+            cls, exploration_id, state_id, feedback, history):
         """Records user feedback for a particular state."""
-        stats_models.record_state_feedback_from_reader(
-            exploration_id, state_id, history, feedback)
+        stats_domain.FeedbackItem.create_feedback_for_state(
+            exploration_id, state_id, feedback,
+            additional_data={'history': history})
+
+    @classmethod
+    def record_exploration_feedback_from_reader(
+            cls, exploration_id, feedback, history):
+        """Records user feedback for a particular exploration."""
+        stats_domain.FeedbackItem.create_feedback_for_exploration(
+            exploration_id, feedback, additional_data={'history': history})
 
 
 def get_exploration_visit_count(exploration_id):
@@ -119,8 +127,14 @@ def get_state_stats_for_exploration(exploration_id):
     state_stats = {}
     for state_id in exploration.state_ids:
         state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
-        feedback_log = stats_domain.StateFeedbackFromReader.get(
-            exploration_id, state_id).feedback_log
+
+        feedback_items = stats_domain.FeedbackItem.get_feedback_items_for_state(
+            exploration_id, state_id)
+        feedback_log = [{
+            'content': fi.content,
+            'stateHistory': fi.additional_data.get('state_history')
+        } for fi in feedback_items]
+
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
