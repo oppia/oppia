@@ -1,0 +1,30 @@
+<div ng-controller="StateReaderFeedback">
+  <div class="row-fluid" ng-show="!isEmpty(stateReaderFeedback)">
+    <div class="span2">
+      <span class="oppia-editor-header">
+        reader feedback
+      </span>
+    </div>
+  
+    <div class="span10">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div ng-repeat="item in stateReaderFeedback">
+            <li class="span9">
+              <[item.content]>
+            </li>
+
+            <!--  
+            <div class="span3">
+              <span ng-show="item.count > 0">
+                <button ng-click="resolveReaderFeedback(item.id, 'fixed')" class="pull-right">Fix</button>
+                <button ng-click="resolveReaderFeedback(item.id, 'will_not_fix')" class="pull-right">Reject</button>
+              </span>
+            </div>
+            -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

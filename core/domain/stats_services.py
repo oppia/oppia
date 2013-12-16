@@ -130,7 +130,8 @@ def get_state_stats_for_exploration(exploration_id):
 
         feedback_items = stats_domain.FeedbackItem.get_feedback_items_for_state(
             exploration_id, state_id)
-        feedback_log = [{
+        reader_feedback = [{
+            'id': fi.id,
             'content': fi.content,
             'stateHistory': fi.additional_data.get('state_history')
         } for fi in feedback_items]
@@ -143,7 +144,7 @@ def get_state_stats_for_exploration(exploration_id):
             'name': state.name,
             'firstEntryCount': first_entry_count,
             'totalEntryCount': total_entry_count,
-            'feedback_log': feedback_log,
+            'readerFeedback': reader_feedback,
             # Add information about resolved answers to the chart data.
             # TODO(sll): This should be made more generic and the chart logic
             # moved to the frontend.

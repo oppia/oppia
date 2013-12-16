@@ -129,6 +129,7 @@ class FeedbackItem(object):
     specific storage model used.
     """
     def __init__(self, feedback_item_model):
+        self.id = feedback_item_model.id
         self.target_id = feedback_item_model.target_id
         self.content = feedback_item_model.content
         self.additional_data = feedback_item_model.additional_data

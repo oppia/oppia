@@ -41,13 +41,13 @@
         <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
       </p>
 
-      <div ng-if="stateStats.feedback_log.length">
+      <div ng-if="stateStats.readerFeedback.length">
         <h5>
           Feedback
           <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
         </h5>
         <ul>
-          <li ng-repeat="item in stateStats.feedback_log track by $index">
+          <li ng-repeat="item in stateStats.readerFeedback track by $index">
             <[item.content]>
           </li>
         </ul>
