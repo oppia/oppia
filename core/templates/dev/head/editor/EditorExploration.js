@@ -610,6 +610,26 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.deleteStateUrlPrefix = '/createhandler/delete_state/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
+  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
+
+  // Refreshes the displayed version history log.
+  $scope.refreshVersionHistory = function() {
+    $http.get($scope.explorationSnapshotsUrl).then(function(response) {
+      console.log('Reloading exploration snapshots.');
+
+      var data = response.data;
+
+      $scope.explorationSnapshots = [];
+      for (var i = 0; i < data.snapshots.length; i++) {
+        $scope.explorationSnapshots.push({
+          'committerId': data.snapshots[i].committer_id,
+          'createdOn': data.snapshots[i].created_on,
+          'commitMessage': data.snapshots[i].commit_message,
+          'versionNumber': data.snapshots[i].version_number
+        });
+      }
+    });
+  };
 
   // Initializes the exploration page using data from the backend. Called on
   // page load.
@@ -626,17 +646,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
-  
-      $scope.explorationSnapshots = [];
-      for (var i = 0; i < data.snapshots.length; i++) {
-        $scope.explorationSnapshots.push({
-          'committerId': data.snapshots[i].committer_id,
-          'createdOn': data.snapshots[i].created_on,
-          'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number
-        });
-      }
-  
+
       $scope.stats = {
         'numVisits': data.num_visits,
         'numCompletions': data.num_completions,
@@ -673,6 +683,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
   
       $scope.drawGraph();
+      $scope.refreshVersionHistory();
   
       explorationFullyLoaded = true;
 

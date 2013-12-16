@@ -151,6 +151,9 @@ urls = [
         r'/createhandler/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
         'exploration_resources_handler'),
     get_redirect_route(
+        r'/createhandler/snapshots/<exploration_id>', editor.ExplorationSnapshotsHandler,
+        'exploration_snapshots_handler'),
+    get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<state_id>', editor.StateRulesStatsHandler,
         'state_rules_stats_handler'),
 
