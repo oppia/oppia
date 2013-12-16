@@ -116,7 +116,7 @@
     };
 
     $http.post(
-        '/learn/give-feedback/' + $scope.explorationId + '/' + $scope.stateId,
+        '/learn/give_feedback/' + $scope.explorationId + '/' + $scope.stateId,
         requestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {

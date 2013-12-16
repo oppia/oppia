@@ -3,6 +3,7 @@
   <head>
     <title>Oppia Admin Panel</title>
 
+    {% include 'header_css_libs.html' %}
     {% include 'header_js_libs.html' %}
     <script>
       var GLOBALS = {};
@@ -61,11 +62,13 @@
     </ul>
 
     {% include 'footer_js_libs.html' %}
+    {% include 'rte_js_libs.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
       {{ include_js_file('admin/Admin.js') }}
       {{ include_js_file('services/warningsData.js') }}
+      {{ include_js_file('components/richTextEditor.js') }}
       {{ include_js_file('components/objectEditor.js') }}
       {{ object_editors_js }}
     </script>

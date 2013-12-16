@@ -68,16 +68,21 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # Login as an admin.
         self.login('admin@example.com', is_admin=True)
 
-        WARNING_MESSAGE_TEXT = 'TEST WARNING MESSAGE'
+        ANNOUNCEMENT_TEXT = 'TEST ANNOUNCEMENT'
 
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.assertNotIn(WARNING_MESSAGE_TEXT, response.body)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': ''
+        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.EDITOR_PAGE_WARNING_MESSAGE.name: WARNING_MESSAGE_TEXT
+                editor.EDITOR_PAGE_ANNOUNCEMENT.name: ANNOUNCEMENT_TEXT
             }
         }
         self.post_json('/adminhandler', payload, csrf_token)
@@ -85,7 +90,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': WARNING_MESSAGE_TEXT
-        }, response_config_properties[editor.EDITOR_PAGE_WARNING_MESSAGE.name])
+            'value': ANNOUNCEMENT_TEXT
+        }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
 
         self.logout()

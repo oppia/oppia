@@ -13,10 +13,10 @@
 {% endblock header_js %}
 
 {% block content %}
-  {% if warning_message %}
+  {% if announcement %}
     <center>
       <div class="oppia-warning">
-        <strong style="color: red">Warning</strong>: {{ warning_message }}
+        {{ announcement }}
       </div>
     </center>
   {% endif %}

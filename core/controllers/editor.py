@@ -53,9 +53,9 @@ OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
 
-EDITOR_PAGE_WARNING_MESSAGE = config_domain.ConfigProperty(
-    'editor_page_warning_message', 'UnicodeString',
-    'A persistent warning message to display on top of all editor pages.',
+EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
+    'editor_page_announcement', 'Html',
+    'A persistent announcement to display on top of all editor pages.',
     default_value='')
 
 
@@ -88,7 +88,7 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': EDITOR_MODE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'warning_message': EDITOR_PAGE_WARNING_MESSAGE.value,
+            'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value),
         })
         self.render_template('editor/editor_exploration.html')
 

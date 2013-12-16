@@ -29,7 +29,7 @@ COMPUTED_PROPERTY_PREFIX = 'computed:'
 class ConfigProperty(object):
     """A property with a name and a default value."""
 
-    ALLOWED_TYPES = frozenset(['UnicodeString'])
+    ALLOWED_TYPES = frozenset(['UnicodeString', 'Html'])
 
     def __init__(self, name, obj_type, description, default_value=None):
 
