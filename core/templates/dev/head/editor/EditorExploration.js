@@ -611,12 +611,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
+  $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
-      console.log('Reloading exploration snapshots.');
-
       var data = response.data;
 
       $scope.explorationSnapshots = [];
@@ -627,6 +626,48 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           'commitMessage': data.snapshots[i].commit_message,
           'versionNumber': data.snapshots[i].version_number
         });
+      }
+    });
+  };
+
+  $scope.refreshExplorationStatistics = function() {
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      var data = response.data;
+
+      $scope.stats = {
+        'numVisits': data.num_visits,
+        'numCompletions': data.num_completions,
+        'stateStats': data.state_stats,
+        'imp': data.imp
+      };
+
+      $scope.chartData = [
+        ['', 'Completions', 'Non-completions'],
+        ['', data.num_completions, data.num_visits - data.num_completions]
+      ];
+      $scope.chartColors = ['green', 'firebrick'];
+
+      $scope.statsGraphOpacities = {
+        legend: 'Students entering state'
+      };
+      for (var stateId in $scope.states) {
+        var visits = $scope.stats.stateStats[stateId].firstEntryCount;
+        $scope.statsGraphOpacities[stateId] = Math.max(
+            visits / $scope.stats.numVisits, 0.05);
+      }
+      $scope.statsGraphOpacities[END_DEST] = Math.max(
+          $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
+
+      $scope.highlightStates = {
+        legend: '#EE8800:Needs more feedback,brown:May be confusing'
+      };
+      for (var j = 0; j < data.imp.length; j++) {
+        if (data.imp[j].type == 'default') {
+          $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
+        }
+        if (data.imp[j].type == 'incomplete') {
+          $scope.highlightStates[data.imp[j].state_id] = 'brown';
+        }
       }
     });
   };
@@ -647,45 +688,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
 
-      $scope.stats = {
-        'numVisits': data.num_visits,
-        'numCompletions': data.num_completions,
-        'stateStats': data.state_stats,
-        'imp': data.imp
-      };
-  
-      $scope.chartData = [
-        ['', 'Completions', 'Non-completions'],
-        ['', data.num_completions, data.num_visits - data.num_completions]
-      ];
-      $scope.chartColors = ['green', 'firebrick'];
-      $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
-  
-      $scope.statsGraphOpacities = {};
-      $scope.statsGraphOpacities['legend'] = 'Students entering state';
-      for (var stateId in $scope.states) {
-        var visits = $scope.stats.stateStats[stateId].firstEntryCount;
-        $scope.statsGraphOpacities[stateId] = Math.max(
-            visits / $scope.stats.numVisits, 0.05);
-      }
-      $scope.statsGraphOpacities[END_DEST] = Math.max(
-          $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
-  
-      $scope.highlightStates = {};
-      $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
-      for (var j = 0; j < data.imp.length; j++) {
-        if (data.imp[j].type == 'default') {
-          $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
-        }
-        if (data.imp[j].type == 'incomplete') {
-          $scope.highlightStates[data.imp[j].state_id] = 'brown';
-        }
-      }
-  
       $scope.drawGraph();
       $scope.refreshVersionHistory();
-  
+
       explorationFullyLoaded = true;
+
+      $scope.refreshExplorationStatistics();
 
       if (successCallback) {
         successCallback();

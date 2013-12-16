@@ -119,15 +119,6 @@ class ExplorationHandler(base.BaseHandler):
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
             'version': exploration.version,
-            # Add information for the exploration statistics page.
-            'num_visits': stats_services.get_exploration_visit_count(
-                exploration_id),
-            'num_completions': stats_services.get_exploration_completed_count(
-                exploration_id),
-            'state_stats': stats_services.get_state_stats_for_exploration(
-                exploration_id),
-            'imp': stats_services.get_top_improvable_states(
-                [exploration_id], 10),
         })
         self.render_json(self.values)
 
@@ -327,6 +318,24 @@ class ExplorationSnapshotsHandler(base.BaseHandler):
 
         self.render_json({
             'snapshots': snapshots,
+        })
+
+
+class ExplorationStatisticsHandler(base.BaseHandler):
+    """Returns statistics for an exploration."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.render_json({
+            'num_visits': stats_services.get_exploration_visit_count(
+                exploration_id),
+            'num_completions': stats_services.get_exploration_completed_count(
+                exploration_id),
+            'state_stats': stats_services.get_state_stats_for_exploration(
+                exploration_id),
+            'imp': stats_services.get_top_improvable_states(
+                [exploration_id], 10),
         })
 
 

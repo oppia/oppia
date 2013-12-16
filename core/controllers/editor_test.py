@@ -219,10 +219,12 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
+        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
+
         # Check, from the editor perspective, that no stats have been recorded.
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get('/createhandler/data/0')
+        response = self.testapp.get(EXPLORATION_STATISTICS_URL)
         editor_exploration_dict = self.parse_json_response(response)
         self.assertEqual(editor_exploration_dict['num_visits'], 0)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
@@ -252,7 +254,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # Now switch back to the editor perspective.
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get('/createhandler/data/0')
+        response = self.testapp.get(EXPLORATION_STATISTICS_URL)
         editor_exploration_json = self.parse_json_response(response)
         self.assertEqual(editor_exploration_json['num_visits'], 1)
         self.assertEqual(editor_exploration_json['num_completions'], 0)
