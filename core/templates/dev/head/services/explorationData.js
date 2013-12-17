@@ -35,6 +35,7 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   var explorationUrl = '/create/' + pathnameArray[2];
   var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
   var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + pathnameArray[2];
+  var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + pathnameArray[2];
 
   // TODO(sll): Find a fix for multiple users editing the same exploration
   // concurrently.
@@ -177,6 +178,21 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
+          }, true),
+          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      ).error(function(data) {
+        warningsData.addWarning(data.error || 'Error communicating with server.');
+      });
+
+      warningsData.clear();
+    },
+
+    resolveReaderFeedback: function(stateId, feedbackId, newStatus) {
+      $http.put(
+          resolvedFeedbackUrlPrefix + '/' + stateId,
+          $.param({
+            csrf_token: GLOBALS.csrf_token,
+            payload: JSON.stringify({'feedback_id': feedbackId, 'new_status': newStatus})
           }, true),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       ).error(function(data) {

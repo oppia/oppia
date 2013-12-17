@@ -30,6 +30,9 @@ IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 SUBMIT_HANDLER_NAME = 'submit'
 
+STATUS_FIXED = 'fixed'
+STATUS_WILL_NOT_FIX = 'will_not_fix'
+
 
 class EventHandler(object):
     """Records events."""
@@ -71,6 +74,40 @@ class EventHandler(object):
         """Records user feedback for a particular exploration."""
         stats_domain.FeedbackItem.create_feedback_for_exploration(
             exploration_id, feedback, additional_data={'history': history})
+
+    @classmethod
+    def resolve_feedback(cls, feedback_item_id, new_status):
+        """Resolves a feedback item."""
+        if new_status not in [STATUS_FIXED, STATUS_WILL_NOT_FIX]:
+            raise Exception('Unexpected status: %s' % new_status)
+        feedback_item = get_feedback_item_by_id(feedback_item_id)
+        feedback_item.change_status(new_status)
+        _save_feedback_item(feedback_item)
+
+
+def get_feedback_item_by_id(feedback_item_id, strict=True):
+    """Returns a domain object representing a feedback item."""
+    feedback_item_model = stats_models.FeedbackItemModel.get(
+        feedback_item_id, strict=strict)
+    if feedback_item_model:
+        feedback_item = stats_domain.FeedbackItem(feedback_item_model)
+        return feedback_item
+    else:
+        return None
+
+
+def _save_feedback_item(feedback_item):
+    """Commits a feedback item to persistent storage."""
+    feedback_item_model = stats_models.FeedbackItemModel.get(
+        feedback_item.id)
+
+    feedback_item_model.target_id = feedback_item.target_id
+    feedback_item_model.content = feedback_item.content
+    feedback_item_model.additional_data = feedback_item.additional_data
+    feedback_item_model.submitter_id = feedback_item.submitter_id
+    feedback_item_model.status = feedback_item.status
+
+    feedback_item_model.put()
 
 
 def get_exploration_visit_count(exploration_id):
@@ -130,11 +167,12 @@ def get_state_stats_for_exploration(exploration_id):
 
         feedback_items = stats_domain.FeedbackItem.get_feedback_items_for_state(
             exploration_id, state_id)
-        reader_feedback = [{
-            'id': fi.id,
-            'content': fi.content,
-            'stateHistory': fi.additional_data.get('state_history')
-        } for fi in feedback_items]
+        reader_feedback = {}
+        for fi in feedback_items:
+            reader_feedback[fi.id] = {
+                'content': fi.content,
+                'stateHistory': fi.additional_data.get('state_history')
+            }
 
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count

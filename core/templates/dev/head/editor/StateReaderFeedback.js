@@ -39,8 +39,8 @@ function StateReaderFeedback($scope, warningsData, explorationData) {
   });
 
   $scope.resolveReaderFeedback = function(feedbackId, newStatus) {
-    // TODO(sll): Write this method.
-    return;
+    explorationData.resolveReaderFeedback($scope.stateId, feedbackId, newStatus);
+    $scope.stateReaderFeedback[feedbackId].deleted = true;
   };
 }
 

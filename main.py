@@ -148,6 +148,9 @@ urls = [
         r'/createhandler/resolved_answers/<exploration_id>/<state_id>', editor.ResolvedAnswersHandler,
         'resolved_answers_handler'),
     get_redirect_route(
+        r'/createhandler/resolved_feedback/<exploration_id>/<state_id>', editor.ResolvedFeedbackHandler,
+        'resolved_feedback_handler'),
+    get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
         'exploration_resources_handler'),
     get_redirect_route(

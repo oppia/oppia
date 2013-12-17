@@ -268,6 +268,27 @@ class ResolvedAnswersHandler(base.BaseHandler):
         self.render_json({})
 
 
+class ResolvedFeedbackHandler(base.BaseHandler):
+    """Allows readers' feedback for a state to be resolved."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_editor
+    def put(self, exploration_id, state_id):
+        """Marks readers' feedback as resolved."""
+
+        feedback_id = self.payload.get('feedback_id')
+        new_status = self.payload.get('new_status')
+
+        if not feedback_id:
+            raise self.InvalidInputException(
+                'Invalid feedback resolution request: no feedback_id given')
+
+        stats_services.EventHandler.resolve_feedback(feedback_id, new_status)
+
+        self.render_json({})
+
+
 class ExplorationDownloadHandler(base.BaseHandler):
     """Downloads an exploration as a YAML file."""
 

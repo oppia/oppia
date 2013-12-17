@@ -41,14 +41,17 @@
         <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
       </p>
 
-      <div ng-if="stateStats.readerFeedback.length">
+      <div ng-if="!isEmpty(stateStats.readerFeedback)">
         <h5>
           Feedback
           <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
         </h5>
         <ul>
-          <li ng-repeat="item in stateStats.readerFeedback track by $index">
-            <[item.content]>
+          <li ng-repeat="(feedbackId, feedbackItem) in stateStats.readerFeedback">
+            <[feedbackItem.content]>
+            <a href="#" onclick="return false;" ng-click="gotoStateEditor('feedback')">
+              Address this feedback
+            </a>
           </li>
         </ul>
       </div>
@@ -73,7 +76,7 @@
 
         <div ng-if="!doesAnswerExist()">
           <em>No students gave answers.</em>
-          <a href="#" onclick="return false;" ng-click="gotoStateEditor('noninteractive')">
+          <a href="#" onclick="return false;" ng-click="gotoStateEditor('content')">
             Edit content
           </a>
         </div>

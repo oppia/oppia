@@ -138,9 +138,10 @@ class FeedbackItem(object):
 
     @classmethod
     def _get_feedback_items_for_target(cls, target_id):
-        return [FeedbackItem(f) for f in
-                stats_models.FeedbackItemModel.get_feedback_items_for_target(
-                    target_id)]
+        return [
+            FeedbackItem(f) for f in
+            stats_models.FeedbackItemModel.get_new_feedback_items_for_target(
+                target_id)]
 
     @classmethod
     def _get_target_id_for_state(cls, exploration_id, state_id):
@@ -182,3 +183,6 @@ class FeedbackItem(object):
         target_id = cls._get_target_id_for_exploration(exploration_id)
         return cls._create_feedback_for_target(
             target_id, content, additional_data, submitter_id)
+
+    def change_status(self, new_status):
+        self.status = new_status

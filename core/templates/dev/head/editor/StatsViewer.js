@@ -59,7 +59,16 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
             var suffix = (numberOfTimes == 1 ? ' time' : ' times');
             return numberOfTimes + suffix;
           };
-  
+
+          $scope.isEmpty = function(obj) {
+            for (var property in obj) {
+              if (obj.hasOwnProperty(property)) {
+                return false;
+              }
+            }
+            return true;
+          };
+
           $scope.doesAnswerExist = function() {
             for (var rule in $scope.rulesStats) {
               if ($scope.rulesStats[rule].answers.length > 0) {

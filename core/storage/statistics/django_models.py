@@ -145,17 +145,18 @@ class FeedbackItemModel(base_models.BaseModel):
     @classmethod
     def get_or_create(cls, target_id, content, additional_data, submitter_id):
         """Creates a new feedback entry."""
+        entity_id = cls.get_new_id('%s:%s' % (target_id, content))
         feedback_entity = cls(
-            target_id=target_id, content=content,
+            id=entity_id, target_id=target_id, content=content,
             additional_data=additional_data, submitter_id=submitter_id)
         feedback_entity.put()
 
         return feedback_entity
 
     @classmethod
-    def get_feedback_items_for_target(cls, target_id):
+    def get_new_feedback_items_for_target(cls, target_id):
         """Gets all feedback items corresponding to a given target_id."""
-        return cls.get_all().filter(target_id=target_id)
+        return cls.get_all().filter(target_id=target_id).filter(status='new')
 
 
 def process_submitted_answer(
