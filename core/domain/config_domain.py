@@ -31,8 +31,10 @@ class ConfigProperty(object):
 
     ALLOWED_TYPES = frozenset(['UnicodeString', 'Html'])
 
-    def __init__(self, name, obj_type, description, default_value=None):
+    def refresh_default_value(self, default_value):
+        pass        
 
+    def __init__(self, name, obj_type, description, default_value=None):
         if not obj_type in self.ALLOWED_TYPES:
             raise Exception('Bad config property obj_type: %s' % obj_type)
 
@@ -43,7 +45,7 @@ class ConfigProperty(object):
         self._obj_type = obj_type
         self._description = description
         self._default_value = obj_services.Registry.get_object_class_by_type(
-            obj_type).normalize(default_value)
+            self.obj_type).normalize(default_value)
 
         Registry._config_registry[self.name] = self
 
@@ -82,10 +84,17 @@ class ConfigProperty(object):
 
 
 class ComputedProperty(ConfigProperty):
-    """A property whose value is computed rather than specified explicitly."""
+    """A property whose default value is computed using a given function."""
+
+    def refresh_default_value(self):
+        memcache_services.delete_multi([self.name])
+        self._default_value = self.fn(*self.args)
 
     def __init__(self, name, obj_type, description, fn, *args):
-        default_value = fn(*args)
+        self.fn = fn
+        self.args = args
+
+        default_value = self.fn(*self.args)
         super(ComputedProperty, self).__init__(
             '%s%s' % (COMPUTED_PROPERTY_PREFIX, name),
             obj_type, description, default_value)
@@ -120,3 +129,16 @@ class Registry(object):
                 }
 
         return schemas_dict
+
+    @classmethod
+    def get_computed_property_names(cls):
+        """Return a list of computed property names."""
+        computed_properties = {}
+
+        for (property_name, instance) in cls._config_registry.iteritems():
+            if property_name.startswith(COMPUTED_PROPERTY_PREFIX):
+                computed_properties[property_name] = {
+                    'description': instance.description
+                }
+
+        return computed_properties

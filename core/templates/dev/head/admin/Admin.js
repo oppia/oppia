@@ -34,10 +34,31 @@ function Admin($scope, $http) {
   $scope.reloadConfigProperties = function() {
     $http.get($scope.adminHandlerUrl).success(function(data) {
       $scope.configProperties = data.config_properties;
+      $scope.computedProperties = data.computed_properties;
     });
   };
 
   $scope.reloadConfigProperties();
+
+  $scope.refreshComputedProperty = function(computedPropertyId) {
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'refresh_computed_property',
+        computed_property_name: computedPropertyId
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+      $scope.message = 'Computed property reloaded successfully.';
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
 
   $scope.saveConfigProperties = function() {
     if ($scope.message == 'Saving...') {

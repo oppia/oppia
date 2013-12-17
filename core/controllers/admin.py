@@ -85,7 +85,9 @@ class AdminHandler(base.BaseHandler):
 
         self.render_json({
             'config_properties': (
-                config_domain.Registry.get_config_property_schemas())
+                config_domain.Registry.get_config_property_schemas()),
+            'computed_properties': (
+                config_domain.Registry.get_computed_property_names()),
         })
 
     @base.require_admin
@@ -106,5 +108,9 @@ class AdminHandler(base.BaseHandler):
                          (self.user_id, new_config_property_values))
             for (name, value) in new_config_property_values.iteritems():
                 config_services.set_property(name, value)
+        elif self.payload.get('action') == 'refresh_computed_property':
+            computed_property_name = self.payload.get('computed_property_name')
+            config_domain.Registry.get_config_property(
+                computed_property_name).refresh_default_value()
 
         self.render_json({})
