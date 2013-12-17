@@ -66,7 +66,6 @@ DEMO_EXPLORATIONS = [
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('tar', 'Missions - Tar', 'Open Source Tools'),
     ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
 ]
 

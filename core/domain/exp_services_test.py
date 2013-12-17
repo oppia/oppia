@@ -364,7 +364,8 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_by_id('4').title, u'¡Hola!')
         self.assertEqual(
-            exp_services.get_exploration_by_id('9').title, 'Missions - Tar')
+            exp_services.get_exploration_by_id('9').title,
+            u'Project Euler Problem 1')
 
         # Load more explorations.
         exp_services.load_demo('0')
