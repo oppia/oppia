@@ -3,6 +3,24 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.1.2 (17 Dec 2013)
+--------------------
+Major changes:
+* Make the startup and test scripts runnable without any use of sudo.
+* Add commit messages to the version history log. Each message consists of an automatically-generated part (stating which parts of the exploration have changed) that is attached to a human-written commit message.
+* Allow edits to multiple states and exploration-level properties to be batched in a single commit.
+* Allow some configuration properties for the app to be edited via the Oppia admin interface.
+* Show reader feedback in the state editor page, and allow exploration creators to mark it as 'fixed' or 'will not fix'.
+
+Minor changes:
+* Update Google App Engine SDK from version 1.7.7 to version 1.8.8.
+* Links in an exploration now open in a new window, so that the reader does not lose progress.
+* Add a new exploration to demonstrate the use of the coding widget. Tweak the Parameterized Adventure exploration in response to reader feedback. Remove the tar exploration.
+* Appstats logging now takes place at level DEBUG instead of level INFO.
+* Delay the fetching of exploration statistics at the outset, in order to make the exploration editor page load faster.
+* Various UI tweaks.
+
+
 v1.1.1 (2 Dec 2013)
 -------------------
 New features:
