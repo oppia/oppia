@@ -27,7 +27,7 @@ function StateReaderFeedback($scope, warningsData, explorationData) {
   });
 
   $scope.initReaderFeedback = function() {
-    if ($scope.stateId && $scope.$parent.stats) {
+    if ($scope.stateId && $scope.$parent.stats && $scope.$parent.stats.stateStats[$scope.stateId]) {
       $scope.stateReaderFeedback = $scope.$parent.stats.stateStats[$scope.stateId].readerFeedback;
     }
   };

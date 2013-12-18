@@ -986,6 +986,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before adding a state.');
+      return;
+    }
+
     newStateName = $scope.normalizeWhitespace(newStateName);
     if (!$scope.isValidEntityName(newStateName, true)) {
       return;
@@ -1033,6 +1039,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     if (stateId == $scope.initStateId) {
       warningsData.addWarning('Deleting the initial state of a question is not ' +
           'supported. Perhaps edit it instead?');
+      return;
+    }
+
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before deleting a state.');
       return;
     }
 
@@ -1109,6 +1121,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.showDeleteStateModal = function(deleteStateId) {
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before deleting a state.');
+      return;
+    }
+
     warningsData.clear();
 
     var modalInstance = $modal.open({
