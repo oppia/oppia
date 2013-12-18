@@ -28,4 +28,4 @@ class ConfigPropertyModel(base_models.BaseModel):
     The id is the name of the property.
     """
     # The property value.
-    value = django_utils.JsonField(default={})
+    value = django_utils.JSONField(default={})
