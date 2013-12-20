@@ -153,7 +153,7 @@ class BaseWidget(object):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
 
-    def _get_widget_param_instances(self, state_customization_args, 
+    def _get_widget_param_instances(self, state_customization_args,
                                     context_params, preview_mode=False):
         """Returns a dict of parameter names and values for the widget.
 

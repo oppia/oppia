@@ -76,12 +76,13 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         page = 'page_name'
 
         token = base.CsrfTokenManager.create_csrf_token(uid, page)
-        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(uid, page, token))
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, page, token))
 
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
-        self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, 'wrong_page', token))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, 'wrong_page', token))
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
         self.assertFalse(

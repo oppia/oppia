@@ -282,20 +282,23 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
     elif definition['rule_type'] == AND_RULE_TYPE:
         for child_dict in definition['children']:
             if not evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params, answer):
+                    child_dict, param_specs, answer_type, context_params,
+                    answer):
                 return False
         return True
 
     elif definition['rule_type'] == OR_RULE_TYPE:
         for child_dict in definition['children']:
             if evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params, answer):
+                    child_dict, param_specs, answer_type, context_params,
+                    answer):
                 return True
         return False
 
     elif definition['rule_type'] == NOT_RULE_TYPE:
         return (not evaluate_rule(
-            definition['child'], param_specs, answer_type, context_params, answer))
+            definition['child'], param_specs, answer_type, context_params,
+            answer))
 
     else:
         raise Exception('Unrecognized rule type %s' % definition['rule_type'])

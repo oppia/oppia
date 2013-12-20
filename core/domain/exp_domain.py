@@ -70,8 +70,8 @@ class RuleSpec(object):
             rulespec_dict['dest'],
             rulespec_dict['feedback'],
             [param_domain.ParamChange(
-                 param_change['name'], param_change['generator_id'],
-                 param_change['customization_args'])
+                param_change['name'], param_change['generator_id'],
+                param_change['customization_args'])
              for param_change in rulespec_dict['param_changes']],
         )
 
@@ -273,7 +273,7 @@ class State(object):
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
             param_change.customization_args)
-        for param_change in param_changes]
+            for param_change in param_changes]
         # The interactive widget instance associated with this state. Set to be
         # the default widget if not explicitly specified by the caller.
         if widget is None:

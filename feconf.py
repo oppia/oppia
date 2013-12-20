@@ -75,9 +75,10 @@ DEBUG = False
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
 PLATFORM = 'gae' if (
-    os.environ.get('SERVER_SOFTWARE')
-    and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-    or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+    os.environ.get('SERVER_SOFTWARE') and (
+        os.environ['SERVER_SOFTWARE'].startswith('Development')
+        or os.environ['SERVER_SOFTWARE'].startswith('Google'))
+    ) else 'django'
 
 
 # Whether we should serve the development or production experience.

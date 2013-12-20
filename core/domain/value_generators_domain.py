@@ -78,12 +78,15 @@ class Registry(object):
     def _refresh_registry(cls):
         cls.value_generators_dict.clear()
 
-        # Assemble all generators in extensions/value_generators/models/generators.py.
+        # Assemble all generators in
+        # extensions/value_generators/models/generators.py.
         VALUE_GENERATOR_PATHS = [os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'models')]
 
-        # Crawl the directories and add new generator instances to the registries.
-        for loader, name, _ in pkgutil.iter_modules(path=VALUE_GENERATOR_PATHS):
+        # Crawl the directories and add new generator instances to the
+        # registries.
+        for loader, name, _ in pkgutil.iter_modules(
+                path=VALUE_GENERATOR_PATHS):
             if name.endswith('_test'):
                 continue
             module = loader.find_module(name).load_module(name)

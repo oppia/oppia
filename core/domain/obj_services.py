@@ -40,7 +40,7 @@ class Registry(object):
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
             if 'BaseObject' not in ancestor_names:
-                continue               
+                continue
 
             cls.objects_dict[clazz.__name__] = clazz
 

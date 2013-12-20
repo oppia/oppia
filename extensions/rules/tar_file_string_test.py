@@ -64,7 +64,8 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasUnexpectedFile(
-            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+            ["myproject-0.1", "myproject-0.1/hello.c",
+             "myproject-0.1/Makefile"]
         )
 
         file_name = 'unexpected-file.tar.gz'
@@ -102,7 +103,8 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.MissingExpectedFile(
-            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+            ["myproject-0.1", "myproject-0.1/hello.c",
+             "myproject-0.1/Makefile"]
         )
 
         file_name = 'missing-expected-file.tar.gz'

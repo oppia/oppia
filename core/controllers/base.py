@@ -54,7 +54,8 @@ def require_user(handler):
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in."""
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(
+                self.request.uri))
             return
         return handler(self, **kwargs)
 
@@ -73,16 +74,18 @@ def require_editor(handler):
             **kwargs: any other arguments passed to the handler
 
         Returns:
-            The user and exploration instance, if the user is authorized to edit
-            this exploration. Also, the state instance, if one is supplied.
+            The user and exploration instance, if the user is authorized to
+            edit this exploration. Also, the state instance, if one is
+            supplied.
 
         Raises:
             self.NotLoggedInException: if there is no current user.
-            self.UnauthorizedUserException: if the user exists but does not have
-                the right credentials.
+            self.UnauthorizedUserException: if the user exists but does not
+                have the right credentials.
         """
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(self.request.uri))
+            self.redirect(current_user_services.create_login_url(
+                self.request.uri))
             return
 
         user_settings_model = None
@@ -91,8 +94,8 @@ def require_editor(handler):
 
         if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
             if user_settings_model is None:
-                user_settings_model = user_models.UserSettingsModel.get_or_create(
-                    self.user_id)
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_or_create(self.user_id))
 
             if not user_settings_model.username:
                 must_redirect = True
@@ -101,8 +104,8 @@ def require_editor(handler):
 
         if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
             if user_settings_model is None:
-                user_settings_model = user_models.UserSettingsModel.get_or_create(
-                    self.user_id)
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_or_create(self.user_id))
 
             if not user_settings_model.agreed_to_terms:
                 must_redirect = True
@@ -142,7 +145,8 @@ def require_admin(handler):
     def test_admin(self, **kwargs):
         """Checks if the user is logged in and is an admin."""
         if not self.user_id:
-            self.redirect(current_user_services.create_login_url(self.request.uri))
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
             return
         if not current_user_services.is_current_user_admin(self.request):
             raise self.UnauthorizedUserException(
@@ -226,7 +230,8 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: page name %s, payload %s',
+                logging.error(
+                    '%s: page name %s, payload %s',
                     e, self.PAGE_NAME_FOR_CSRF, self.payload)
 
                 return self.handle_exception(e, self.app.debug)
@@ -266,7 +271,8 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
         counters.JSON_RESPONSE_COUNT.inc()
 
-    def render_template(self, filename, values=None, iframe_restriction='DENY'):
+    def render_template(
+            self, filename, values=None, iframe_restriction='DENY'):
         if values is None:
             values = self.values
 
@@ -329,7 +335,8 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if isinstance(exception, self.NotLoggedInException):
-            self.redirect(current_user_services.create_login_url(self.request.uri))
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
             return
 
         if isinstance(exception, self.UnauthorizedUserException):
@@ -357,7 +364,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Error class for users that are not logged in (error code 401)."""
 
     class InvalidInputException(Exception):
-        """Error class for invalid input on the user's side (error code 400)."""
+        """Error class for invalid input on the user side (error code 400)."""
 
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""

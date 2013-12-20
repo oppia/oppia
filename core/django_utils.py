@@ -70,14 +70,18 @@ class JSONFormField(fields.Field):
                 'false': False,
             }
             try:
-                value = simplejson.dumps(eval(value, json_globals, json_locals), **self.encoder_kwargs)
+                value = simplejson.dumps(
+                    eval(value, json_globals, json_locals),
+                    **self.encoder_kwargs)
             except Exception, e:  # eval can throw many different errors
-                raise util.ValidationError('%s (Caught "%s")' % (self.help_text, e))
+                raise util.ValidationError(
+                    '%s (Caught "%s")' % (self.help_text, e))
 
         try:
             simplejson.loads(value, **self.decoder_kwargs)
         except ValueError, e:
-            raise util.ValidationError('%s (Caught "%s")' % (self.help_text, e))
+            raise util.ValidationError(
+                '%s (Caught "%s")' % (self.help_text, e))
 
         return value
 
@@ -95,8 +99,8 @@ class Converter():
         That single key maps to another dict which is just the encoded __dict__
         of the object being encoded."""
 
-        if isinstance(
-            obj, (int, long, float, complex, bool, basestring, type(None), Decimal)
+        if isinstance(obj, (
+            int, long, float, complex, bool, basestring, type(None), Decimal)
         ):
             return obj
         elif isinstance(obj, list):
@@ -230,7 +234,8 @@ class JSONField(models.TextField):
         self.decoder_kwargs = decoder_kwargs
 
         kwargs['default'] = kwargs.get('default', 'null')
-        kwargs['help_text'] = kwargs.get('help_text', self.default_error_messages['invalid'])
+        kwargs['help_text'] = kwargs.get(
+            'help_text', self.default_error_messages['invalid'])
 
         super(JSONField, self).__init__(*args, **kwargs)
 
@@ -247,7 +252,8 @@ class JSONField(models.TextField):
                 value = simplejson.loads(value, **self.decoder_kwargs)
                 if not self.primitivelist:
                     schema = self.schema
-                    if isinstance(schema, list) and isinstance(schema[0], object):
+                    if isinstance(schema, list) and isinstance(
+                            schema[0], object):
                         obj_class = schema[0]
                         value = Converter.decode(obj_class, value)
             except JSON_DECODE_ERROR:
@@ -257,7 +263,8 @@ class JSONField(models.TextField):
             try:
                 if not self.primitivelist:
                     schema = self.schema
-                    if isinstance(schema, list) and isinstance(schema[0], object):
+                    if isinstance(schema, list) and isinstance(
+                            schema[0], object):
                         obj_class = schema[0]
                         value = Converter.decode(obj_class, value)
             except TypeError:
@@ -298,7 +305,9 @@ class JSONField(models.TextField):
         return self.get_db_prep_value(self._get_val_from_obj(obj))
 
     def value_from_object(self, obj):
-        return simplejson.dumps(super(JSONField, self).value_from_object(obj), **self.encoder_kwargs)
+        return simplejson.dumps(
+            super(JSONField, self).value_from_object(obj),
+            **self.encoder_kwargs)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -314,7 +323,8 @@ class JSONField(models.TextField):
         super(JSONField, self).contribute_to_class(cls, name)
 
         def get_json(model_instance):
-            return self.get_db_prep_value(getattr(model_instance, self.attname, None), force=True)
+            return self.get_db_prep_value(
+                getattr(model_instance, self.attname, None), force=True)
         setattr(cls, 'get_%s_json' % self.name, get_json)
 
         def set_json(model_instance, value):

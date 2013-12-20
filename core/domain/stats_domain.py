@@ -93,8 +93,9 @@ class StateRuleAnswerLog(object):
                 (state_id, handler_name, rule_str).
         """
         # TODO(sll): Should each rule_str be unicode instead?
-        answer_log_models = stats_models.StateRuleAnswerLogModel.get_or_create_multi(
-            exploration_id, rule_data)
+        answer_log_models = (
+            stats_models.StateRuleAnswerLogModel.get_or_create_multi(
+                exploration_id, rule_data))
         return [cls(answer_log_model.answers)
                 for answer_log_model in answer_log_models]
 

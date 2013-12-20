@@ -103,7 +103,7 @@ class AdminHandler(base.BaseHandler):
             exp_services.load_demo(str(exploration_id))
         elif self.payload.get('action') == 'save_config_properties':
             new_config_property_values = self.payload.get(
-                'new_config_property_values')        
+                'new_config_property_values')
             logging.info('[ADMIN] %s saved config property values: %s' %
                          (self.user_id, new_config_property_values))
             for (name, value) in new_config_property_values.iteritems():

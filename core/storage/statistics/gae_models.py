@@ -170,7 +170,7 @@ class FeedbackItemModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.target_id == target_id
         ).filter(cls.status == 'new').fetch(QUERY_LIMIT)
- 
+
 
 def process_submitted_answer(
         exploration_id, state_id, handler_name, rule_str, answer):

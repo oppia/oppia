@@ -28,6 +28,10 @@ import feconf
 import json
 
 
+CSRF_REGEX = (
+    r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
+
+
 def empty_environ():
     os.environ['AUTH_DOMAIN'] = 'example.com'
     os.environ['SERVER_NAME'] = 'localhost'
@@ -140,8 +144,6 @@ class TestBase(unittest.TestCase):
 
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
-        CSRF_REGEX = (
-            r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
         return re.search(CSRF_REGEX, response.body).group(1)
 
 

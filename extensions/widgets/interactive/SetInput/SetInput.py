@@ -35,7 +35,7 @@ class SetInput(widget_domain.BaseWidget):
         },
         'customization_args': {
             'value': 'UnicodeString'
-        },        
+        },
         'obj_type': 'UnicodeString',
     }]
 

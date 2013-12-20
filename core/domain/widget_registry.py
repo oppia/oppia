@@ -95,7 +95,7 @@ class Registry(object):
     def get_tag_list_with_attrs(cls, widget_type):
         """Returns a dict of HTML tag names and attributes for widgets.
 
-        The keys of the dict are tag names starting with 'oppia-noninteractive-'
+        The keys are tag names starting with 'oppia-noninteractive-'
         or 'oppia-interactive-', followed by the hyphenated version of the
         widget name. The values are lists of allowed attributes of the
         form [PARAM_NAME]-with-[CUSTOMIZATION_ARG_NAME].
@@ -113,7 +113,7 @@ class Registry(object):
                 prefix = '%s-with-' % param.name
                 for arg in param.customization_args:
                     attr_list.append('%s%s' % (prefix, arg))
-        
+
             widget_tags[tag_name] = attr_list
 
         return widget_tags

@@ -299,7 +299,8 @@ def save_exploration(committer_id, exploration, commit_message=''):
                 for state_id in exploration.state_ids]
         }
 
-    def _save_exploration_transaction(committer_id, exploration, commit_message):
+    def _save_exploration_transaction(
+            committer_id, exploration, commit_message):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
         if exploration.version != exploration_model.version:
             raise Exception(
@@ -310,7 +311,7 @@ def save_exploration(committer_id, exploration, commit_message=''):
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration.id)
         memcache_services.delete(exploration_memcache_key)
-        
+
         properties_dict = {
             'category': exploration.category,
             'title': exploration.title,
@@ -332,7 +333,7 @@ def save_exploration(committer_id, exploration, commit_message=''):
             committer_id, properties_dict, version_snapshot, commit_message)
 
     transaction_services.run_in_transaction(
-        _save_exploration_transaction, committer_id, exploration, 
+        _save_exploration_transaction, committer_id, exploration,
         commit_message)
 
 
@@ -526,7 +527,8 @@ def add_states(committer_id, exploration_id, state_names):
         if exploration.has_state_named(state_name):
             raise ValueError('Duplicate state name %s' % state_name)
 
-    state_ids = [exp_models.StateModel.get_new_id(name) for name in state_names]
+    state_ids = [
+        exp_models.StateModel.get_new_id(name) for name in state_names]
     new_states = []
     for ind, state_id in enumerate(state_ids):
         new_states.append(exp_domain.State(
@@ -553,8 +555,8 @@ def add_states(committer_id, exploration_id, state_names):
 
 
 def _update_state(exploration_id, state_id, new_state_name,
-                 param_changes, widget_id, widget_customization_args,
-                 widget_handlers, widget_sticky, content):
+                  param_changes, widget_id, widget_customization_args,
+                  widget_handlers, widget_sticky, content):
     """Updates the given state and returns it. Does not commit changes.
 
     Args:
@@ -596,7 +598,7 @@ def _update_state(exploration_id, state_id, new_state_name,
     if param_changes:
         if not isinstance(param_changes, list):
             raise Exception(
-                'Expected param_changes to be a list, received %s' % 
+                'Expected param_changes to be a list, received %s' %
                 param_changes)
         state.param_changes = []
         for param_change in param_changes:
@@ -637,7 +639,7 @@ def _update_state(exploration_id, state_id, new_state_name,
     if widget_handlers:
         if not isinstance(widget_handlers, dict):
             raise Exception(
-                'Expected widget_handlers to be a dictionary, received %s' 
+                'Expected widget_handlers to be a dictionary, received %s'
                 % widget_handlers)
         ruleset = widget_handlers['submit']
         if not isinstance(ruleset, list):
@@ -669,28 +671,29 @@ def _update_state(exploration_id, state_id, new_state_name,
                     'Expected rule[\'feedback\'] to be a list, received %s'
                     % rule['feedback'])
 
-            if rule.get('dest') not in ([feconf.END_DEST] + exploration.state_ids):
+            if rule.get('dest') not in (
+                    [feconf.END_DEST] + exploration.state_ids):
                 raise ValueError(
                     'The destination %s is not a valid state id'
                     % rule.get('dest'))
 
             state_rule = exp_domain.RuleSpec(
                 rule.get('definition'), rule.get('dest'),
-                [html_cleaner.clean(feedback) for feedback
-                                              in rule.get('feedback')],
+                [html_cleaner.clean(feedback)
+                 for feedback in rule.get('feedback')],
                 rule.get('param_changes'))
 
             if rule['description'] == feconf.DEFAULT_RULE_NAME:
                 if rule_ind != len(ruleset) - 1:
                     raise ValueError(
-                        'Invalid ruleset: rules other than the ' 
+                        'Invalid ruleset: rules other than the '
                         'last one should not be default rules.')
-                if (rule['definition']['rule_type'] != 
+                if (rule['definition']['rule_type'] !=
                         rule_domain.DEFAULT_RULE_TYPE):
                     raise ValueError(
                         'For a default rule the rule_type should be %s not %s'
                         % rule_domain.DEFAULT_RULE_TYPE
-                        % rule['definition']['rule_type'])           
+                        % rule['definition']['rule_type'])
             else:
                 if rule_ind == len(ruleset) - 1:
                     raise ValueError(
@@ -717,7 +720,7 @@ def _update_state(exploration_id, state_id, new_state_name,
                     param_type = rule_domain.get_obj_type_for_param_name(
                         matched_rule, param_name)
 
-                    if (isinstance(value, basestring) and 
+                    if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types
@@ -726,10 +729,11 @@ def _update_state(exploration_id, state_id, new_state_name,
                         try:
                             normalized_param = param_type.normalize(value)
                         except TypeError:
-                            raise Exception('%s has the wrong type. '
+                            raise Exception(
+                                '%s has the wrong type. '
                                 'Please replace it with a %s.' %
-                                 (value, param_type.__name__))
-                    rule_inputs[param_name] = normalized_param     
+                                (value, param_type.__name__))
+                    rule_inputs[param_name] = normalized_param
 
             state.widget.handlers[0].rule_specs.append(state_rule)
 
@@ -742,9 +746,9 @@ def _update_state(exploration_id, state_id, new_state_name,
                 'Expected content to have length 1, received %s' % content)
         if not isinstance(content[0], dict):
             raise Exception(
-                'Expected entry in content to be a dict, received %s' 
+                'Expected entry in content to be a dict, received %s'
                 % content[0])
-    
+
         # TODO(sll): Must sanitize all content in noninteractive widget attrs.
         state.content = [exp_domain.Content(
             content[0]['type'], html_cleaner.clean(content[0]['value']))]
@@ -834,7 +838,8 @@ def update_exploration(
         modified_states, commit_message)
 
 
-def update_exploration_rights(committer_id, exploration_id, is_public, editors):
+def update_exploration_rights(
+        committer_id, exploration_id, is_public, editors):
     """Update the rights for an exploration. Commits changes.
 
     Args:
@@ -949,7 +954,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 # Creation and deletion methods.
 def create_from_yaml(
-    yaml_content, user_id, title, category, exploration_id=None):
+        yaml_content, user_id, title, category, exploration_id=None):
     """Creates an exploration from a YAML text string."""
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
@@ -971,8 +976,8 @@ def create_from_yaml(
 
     try:
         exploration_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
+            ps_name: param_domain.ParamSpec.from_dict(ps_val) for
+            (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
         }
 
         other_state_names = [
@@ -1163,7 +1168,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
 
         if len(state_content_list) != 1:
             raise Exception(
-                'Each state content list should contain exactly one element. %s'
+                'Each state content list must contain exactly one element. %s'
                 % state_content_list)
 
         for content_item in state_content_list:
@@ -1203,7 +1208,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         ('inputs', dict), ('name', basestring), ('rule_type', basestring),
         ('subject', basestring)]
     COMPOSITE_RULE_DEFINITION_SCHEMA = [
-       ('children', list), ('rule_type', basestring)]
+        ('children', list), ('rule_type', basestring)]
     DEFAULT_RULE_DEFINITION_SCHEMA = [('rule_type', basestring)]
     ALLOWED_COMPOSITE_RULE_TYPES = [
         rule_domain.AND_RULE_TYPE, rule_domain.OR_RULE_TYPE,
@@ -1221,7 +1226,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         if rule_type == rule_domain.DEFAULT_RULE_TYPE:
             utils.verify_dict_keys_and_types(
                 rule_definition, DEFAULT_RULE_DEFINITION_SCHEMA)
-        elif rule_type  == rule_domain.ATOMIC_RULE_TYPE:
+        elif rule_type == rule_domain.ATOMIC_RULE_TYPE:
             utils.verify_dict_keys_and_types(
                 rule_definition, ATOMIC_RULE_DEFINITION_SCHEMA)
 
@@ -1270,7 +1275,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
             if rule['dest'] not in state_name_list + [feconf.END_DEST]:
                 raise Exception('Destination %s is invalid.' % rule['dest'])
 
-            # Check that there are no feedback-less self-loops. 
+            # Check that there are no feedback-less self-loops.
             # NB: Sometimes it makes sense for a self-loop to not have
             # feedback, such as unreachable rules in a ruleset for multiple-
             # choice questions. This should be handled in the frontend so
@@ -1313,6 +1318,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         # have the correct type. Can we get sample values for the context
         # parameters?
 
+
 def _verify_all_states_reachable(states_list):
     """Verifies that all states are reachable from the initial state."""
 
@@ -1345,6 +1351,7 @@ def _verify_all_states_reachable(states_list):
             set([s['name'] for s in states_list]) - set(processed_queue))
         raise Exception('The following states are not reachable from the '
                         'initial state: %s' % ', '.join(unseen_states))
+
 
 def _verify_no_dead_ends(states_list):
     """Verifies that the END state is reachable from all states."""
@@ -1380,6 +1387,7 @@ def _verify_no_dead_ends(states_list):
         raise Exception('The END state is not reachable from the '
                         'following states: %s' %
                         ', '.join(dead_end_states))
+
 
 def verify_exploration_dict(exploration_dict):
     """Verifies an exploration dict."""

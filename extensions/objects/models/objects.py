@@ -388,7 +388,8 @@ class MusicNote(UnicodeString):
         try:
             result = super(MusicNote, cls).normalize(raw)
             assert result in [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
+                'F5'
             ]
             return result
         except Exception:

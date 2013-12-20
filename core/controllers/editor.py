@@ -88,7 +88,7 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': EDITOR_MODE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value),
+            'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value)
         })
         self.render_template('editor/editor_exploration.html')
 

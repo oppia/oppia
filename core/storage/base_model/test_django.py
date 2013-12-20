@@ -111,7 +111,6 @@ class AttrListUnitTests(unittest.TestCase):
 
     def test_elements_of_attr_lists_for_all_classes_are_strings(self):
         subclasses = inheritors(base_models.BaseModel)
-        primitive = (basestring, bool, float, int)
         for subclass in subclasses:
             attr_list = subclass.attr_list()
             self.assertNotEqual(attr_list, [])

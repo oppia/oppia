@@ -32,7 +32,7 @@ class ConfigProperty(object):
     ALLOWED_TYPES = frozenset(['UnicodeString', 'Html'])
 
     def refresh_default_value(self, default_value):
-        pass        
+        pass
 
     def __init__(self, name, obj_type, description, default_value=None):
         if not obj_type in self.ALLOWED_TYPES:

@@ -121,7 +121,7 @@ class EditorTest(test_utils.GenericTestBase):
 
     def test_resolved_answers_handler(self):
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')        
+        exp_services.load_demo('0')
 
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.

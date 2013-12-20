@@ -33,7 +33,8 @@ class MusicStaff(widget_domain.BaseWidget):
         'generator': generators.RestrictedCopier,
         'init_args': {
             'choices': [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
+                'F5'
             ]
         },
         'customization_args': {

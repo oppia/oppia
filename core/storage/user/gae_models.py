@@ -25,6 +25,7 @@ from google.appengine.ext import ndb
 
 QUERY_LIMIT = 100
 
+
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
 

@@ -49,8 +49,8 @@ class CodeRepl(widget_domain.BaseWidget):
         'init_args': {},
         'customization_args': {
             'value': 'Type your code here.'
-        },        
-        'obj_type': 'UnicodeString',        
+        },
+        'obj_type': 'UnicodeString',
     }, {
         'name': 'rows',
         'description': 'The number of rows for the text input field.',

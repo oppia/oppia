@@ -128,7 +128,6 @@ class FeedbackItemModel(base_models.BaseModel):
     # the feedback was submitted anonymously.
     submitter_id = models.CharField(blank=True, max_length=100)
 
-
     STATUS_CHOICES = (
         ('new', 'new'), ('accepted', 'accepted'), ('fixed', 'fixed'),
         ('verified', 'verified'), ('will_not_fix', 'will_not_fix'),

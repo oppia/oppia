@@ -157,7 +157,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             `expected_response` will be interpreted as a regex string.
             """
             reader_dict = self._submit_answer(answer)
-            self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+            self.assertRegexpMatches(
+                reader_dict['oppia_html'], expected_response)
             return self
 
     def init_player(self, exploration_id, expected_title, expected_response):

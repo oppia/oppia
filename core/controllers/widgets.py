@@ -106,7 +106,8 @@ class WidgetTemplateHandler(base.BaseHandler):
             widget = widget_registry.Registry.get_widget_by_id(
                 widget_type, widget_id)
 
-            # TODO(sll): The first arg should be the widget's customization args.
+            # TODO(sll): The first arg should be the widget's customization
+            # args.
             # TODO(sll): preview_mode should probably be False.
             self.response.write(widget.get_raw_code(
                 {}, {}, preview_mode=True))

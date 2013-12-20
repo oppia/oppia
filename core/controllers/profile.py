@@ -82,7 +82,7 @@ class EditorPrerequisitesPage(base.BaseHandler):
 
     @base.require_user
     def post(self):
-        """Handles POST requests.""" 
+        """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
 

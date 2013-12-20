@@ -165,8 +165,9 @@ def get_state_stats_for_exploration(exploration_id):
     for state_id in exploration.state_ids:
         state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
 
-        feedback_items = stats_domain.FeedbackItem.get_feedback_items_for_state(
-            exploration_id, state_id)
+        feedback_items = (
+            stats_domain.FeedbackItem.get_feedback_items_for_state(
+                exploration_id, state_id))
         reader_feedback = {}
         for fi in feedback_items:
             reader_feedback[fi.id] = {
@@ -197,17 +198,19 @@ def get_state_stats_for_exploration(exploration_id):
 
 
 def get_top_improvable_states(exploration_ids, N):
-    """Returns the top N improvable states across all the given explorations."""
+    """Returns the top N improvable states across the given explorations."""
 
     ranked_states = []
     for exploration_id in exploration_ids:
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
-        answer_logs = stats_domain.StateRuleAnswerLog.get_multi(exploration_id, [{
-            'state_id': state_id,
-            'handler_name': SUBMIT_HANDLER_NAME,
-            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-        } for state_id in exploration.state_ids])
+        answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+            exploration_id, [{
+                'state_id': state_id,
+                'handler_name': SUBMIT_HANDLER_NAME,
+                'rule_str': exp_domain.DEFAULT_RULESPEC_STR
+            } for state_id in exploration.state_ids]
+        )
 
         for ind, state_id in enumerate(exploration.state_ids):
             state_counts = stats_domain.StateCounter.get(

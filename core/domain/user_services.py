@@ -22,6 +22,7 @@ from core.platform import models
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
+
 def set_username(user_id, username):
     """Sets the username for a given user."""
     user_settings = user_models.UserSettingsModel.get_or_create(user_id)
@@ -38,7 +39,8 @@ def get_username(user_id):
 
 def is_username_taken(username):
     """Normalizes the username and checks if that is taken."""
-    return user_models.UserSettingsModel.is_normalized_username_taken(normalize(username))
+    return user_models.UserSettingsModel.is_normalized_username_taken(
+        normalize(username))
 
 
 def normalize(username):

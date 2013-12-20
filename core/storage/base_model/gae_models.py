@@ -96,7 +96,7 @@ class BaseModel(ndb.Model):
         deleted are returned as well.
         """
         query = cls.query()
-        if include_deleted_entities != True:
+        if not include_deleted_entities:
             query = query.filter(cls.deleted == False)
         return query
 
