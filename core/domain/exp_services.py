@@ -24,7 +24,6 @@ storage model to be changed without affecting this module and others above it.
 
 __author__ = 'Sean Lip'
 
-import cgi
 import copy
 import logging
 import os
@@ -39,7 +38,7 @@ from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import value_generators_domain
-from core.domain import widget_domain
+from core.domain import widget_registry
 from core.platform import models
 import feconf
 import jinja_utils
@@ -191,7 +190,7 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     for handler in state_dict['widget']['handlers']:
         for rule_spec in handler['rule_specs']:
 
-            widget = widget_domain.Registry.get_widget_by_id(
+            widget = widget_registry.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX,
                 state_dict['widget']['widget_id']
             )
@@ -205,8 +204,7 @@ def export_state_to_verbose_dict(exploration_id, state_id):
     return state_dict
 
 
-def export_content_to_html(exploration_id, content_array, params=None,
-                           escape_text_strings=True):
+def export_content_to_html(exploration_id, content_array, params=None):
     """Takes a Content array and transforms it into HTML.
 
     Args:
@@ -216,8 +214,6 @@ def export_content_to_html(exploration_id, content_array, params=None,
             to contain exactly one entry with type 'text'. The value is an
             HTML string.
         params: any parameters used for templatizing text strings.
-        escape_text_strings: True if values supplied with content of type 'text'
-            should be escaped after Jinja evaluation; False otherwise.
 
     Returns:
         the HTML string representing the array.
@@ -233,8 +229,6 @@ def export_content_to_html(exploration_id, content_array, params=None,
     for content in content_array:
         if content.type in ALLOWED_CONTENT_TYPES:
             value = jinja_utils.parse_string(content.value, params)
-            if escape_text_strings:
-                value = cgi.escape(value)
 
             html += '<div>%s</div>' % value
         else:
@@ -277,7 +271,7 @@ def export_to_zip_file(exploration_id):
 
 
 # Repository SAVE and DELETE methods.
-def save_exploration(committer_id, exploration):
+def save_exploration(committer_id, exploration, commit_message=''):
     """Commits an exploration domain object to persistent storage."""
     exploration.validate()
 
@@ -305,7 +299,8 @@ def save_exploration(committer_id, exploration):
                 for state_id in exploration.state_ids]
         }
 
-    def _save_exploration_transaction(committer_id, exploration):
+    def _save_exploration_transaction(
+            committer_id, exploration, commit_message):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
         if exploration.version != exploration_model.version:
             raise Exception(
@@ -316,7 +311,7 @@ def save_exploration(committer_id, exploration):
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration.id)
         memcache_services.delete(exploration_memcache_key)
-        
+
         properties_dict = {
             'category': exploration.category,
             'title': exploration.title,
@@ -329,16 +324,17 @@ def save_exploration(committer_id, exploration):
             'version': exploration_model.version,
         }
 
-        versionable_dict = feconf.NULL_SNAPSHOT
+        version_snapshot = feconf.NULL_SNAPSHOT
         if exploration.is_public:
-            versionable_dict = export_to_versionable_dict(exploration)
+            version_snapshot = export_to_versionable_dict(exploration)
 
         # Create a snapshot for the version history.
         exploration_model.put(
-            committer_id, properties_dict, snapshot=versionable_dict)
+            committer_id, properties_dict, version_snapshot, commit_message)
 
     transaction_services.run_in_transaction(
-        _save_exploration_transaction, committer_id, exploration)
+        _save_exploration_transaction, committer_id, exploration,
+        commit_message)
 
 
 def save_states(committer_id, exploration_id, states):
@@ -531,7 +527,8 @@ def add_states(committer_id, exploration_id, state_names):
         if exploration.has_state_named(state_name):
             raise ValueError('Duplicate state name %s' % state_name)
 
-    state_ids = [exp_models.StateModel.get_new_id(name) for name in state_names]
+    state_ids = [
+        exp_models.StateModel.get_new_id(name) for name in state_names]
     new_states = []
     for ind, state_id in enumerate(state_ids):
         new_states.append(exp_domain.State(
@@ -546,7 +543,10 @@ def add_states(committer_id, exploration_id, state_names):
         save_states(committer_id, exploration_id, new_states)
         exploration = get_exploration_by_id(exploration_id)
         exploration.state_ids += state_ids
-        save_exploration(committer_id, exploration)
+
+        state_names = [state.name for state in new_states]
+        commit_message = 'Added new state(s): %s' % ', '.join(state_names)
+        save_exploration(committer_id, exploration, commit_message)
 
     transaction_services.run_in_transaction(
         _add_states_transaction, committer_id, exploration_id, new_states)
@@ -554,14 +554,12 @@ def add_states(committer_id, exploration_id, state_names):
     return state_ids
 
 
-def update_state(committer_id, exploration_id, state_id, new_state_name,
-                 param_changes, widget_id, widget_customization_args,
-                 widget_handlers, widget_sticky, content):
-    """Updates the given state, and commits changes.
+def _update_state(exploration_id, state_id, new_state_name,
+                  param_changes, widget_id, widget_customization_args,
+                  widget_handlers, widget_sticky, content):
+    """Updates the given state and returns it. Does not commit changes.
 
     Args:
-    - committer_id: str. Email address of the user who is performing the update
-        action.
     - exploration_id: str. The id of the exploration.
     - state_id: str. The id of the state being updated.
     - new_state_name: str or None. If present, the new name for the state.
@@ -600,7 +598,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
     if param_changes:
         if not isinstance(param_changes, list):
             raise Exception(
-                'Expected param_changes to be a list, received %s' % 
+                'Expected param_changes to be a list, received %s' %
                 param_changes)
         state.param_changes = []
         for param_change in param_changes:
@@ -641,7 +639,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
     if widget_handlers:
         if not isinstance(widget_handlers, dict):
             raise Exception(
-                'Expected widget_handlers to be a dictionary, received %s' 
+                'Expected widget_handlers to be a dictionary, received %s'
                 % widget_handlers)
         ruleset = widget_handlers['submit']
         if not isinstance(ruleset, list):
@@ -653,7 +651,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
         state.widget.handlers = [
             exp_domain.AnswerHandlerInstance('submit', [])]
 
-        generic_widget = widget_domain.Registry.get_widget_by_id(
+        generic_widget = widget_registry.Registry.get_widget_by_id(
             'interactive', state.widget.widget_id)
 
         # TODO(yanamal): Do additional calculations here to get the
@@ -673,28 +671,29 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                     'Expected rule[\'feedback\'] to be a list, received %s'
                     % rule['feedback'])
 
-            if rule.get('dest') not in exploration.state_ids:
+            if rule.get('dest') not in (
+                    [feconf.END_DEST] + exploration.state_ids):
                 raise ValueError(
                     'The destination %s is not a valid state id'
                     % rule.get('dest'))
 
             state_rule = exp_domain.RuleSpec(
                 rule.get('definition'), rule.get('dest'),
-                [html_cleaner.clean(feedback) for feedback
-                                              in rule.get('feedback')],
+                [html_cleaner.clean(feedback)
+                 for feedback in rule.get('feedback')],
                 rule.get('param_changes'))
 
             if rule['description'] == feconf.DEFAULT_RULE_NAME:
                 if rule_ind != len(ruleset) - 1:
                     raise ValueError(
-                        'Invalid ruleset: rules other than the ' 
+                        'Invalid ruleset: rules other than the '
                         'last one should not be default rules.')
-                if (rule['definition']['rule_type'] != 
+                if (rule['definition']['rule_type'] !=
                         rule_domain.DEFAULT_RULE_TYPE):
                     raise ValueError(
                         'For a default rule the rule_type should be %s not %s'
                         % rule_domain.DEFAULT_RULE_TYPE
-                        % rule['definition']['rule_type'])           
+                        % rule['definition']['rule_type'])
             else:
                 if rule_ind == len(ruleset) - 1:
                     raise ValueError(
@@ -721,7 +720,7 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                     param_type = rule_domain.get_obj_type_for_param_name(
                         matched_rule, param_name)
 
-                    if (isinstance(value, basestring) and 
+                    if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types
@@ -730,10 +729,11 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                         try:
                             normalized_param = param_type.normalize(value)
                         except TypeError:
-                            raise Exception('%s has the wrong type. '
+                            raise Exception(
+                                '%s has the wrong type. '
                                 'Please replace it with a %s.' %
-                                 (value, param_type.__name__))
-                    rule_inputs[param_name] = normalized_param     
+                                (value, param_type.__name__))
+                    rule_inputs[param_name] = normalized_param
 
             state.widget.handlers[0].rule_specs.append(state_rule)
 
@@ -746,18 +746,139 @@ def update_state(committer_id, exploration_id, state_id, new_state_name,
                 'Expected content to have length 1, received %s' % content)
         if not isinstance(content[0], dict):
             raise Exception(
-                'Expected entry in content to be a dict, received %s' 
+                'Expected entry in content to be a dict, received %s'
                 % content[0])
-    
-        state.content = [exp_domain.Content(
-            content[0]['type'], content[0]['value'])]
 
-    def _update_state_transaction(committer_id, exploration, state):
-        save_states(committer_id, exploration.id, [state])
-        save_exploration(committer_id, exploration)
+        # TODO(sll): Must sanitize all content in noninteractive widget attrs.
+        state.content = [exp_domain.Content(
+            content[0]['type'], html_cleaner.clean(content[0]['value']))]
+
+    return state
+
+
+def update_exploration(
+        committer_id, exploration_id, title, category, param_specs,
+        param_changes, states, commit_message):
+    """Update an exploration. Commits changes.
+
+    Args:
+    - committer_id: str. Email address of the user who is performing the update
+        action.
+    - exploration_id: str. The exploration id.
+    - title: str or None. The title of the exploration.
+    - category: str or None. The category for this exploration in the gallery.
+    - param_specs: dict or None. If the former, a dict specifying the types of
+        parameters used in this exploration. The keys of the dict are the
+        parameter names, and the values are their object types.
+    - param_changes: list or None. If the former, a list of dicts, each
+        representing a parameter change.
+    - states: dict or None. If the former, a dict of states, keyed by the state
+        id, whose values are dicts containing new values for the fields of the
+        state. See the documentation of _update_state() for more information
+        on how these fields are defined.
+    - commit_message: str or None. A description of changes made to the state.
+        For published explorations, this must be present; for unpublished
+        explorations, it should be equal to None.
+    """
+    # TODO(sll): Add tests to ensure that the parameters are of the correct
+    # types, etc.
+    exploration = get_exploration_by_id(exploration_id)
+
+    if exploration.is_public and commit_message is None:
+        raise ValueError(
+            'Exploration is public so expected a commit message but '
+            'received none.')
+    if not exploration.is_public and commit_message is not None:
+        raise ValueError(
+            'Exploration is unpublished so expected no commit message, but '
+            'received %s' % commit_message)
+
+    if category:
+        exploration.category = category
+    if title:
+        exploration.title = title
+    if param_specs is not None:
+        exploration.param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in param_specs.iteritems()
+        }
+    if param_changes is not None:
+        exploration.param_changes = [
+            param_domain.ParamChange.from_dict(param_change)
+            for param_change in param_changes
+        ]
+
+    modified_states = []
+    if states:
+        for (state_id, state_data) in states.iteritems():
+            state_name = state_data.get('state_name')
+            param_changes = state_data.get('param_changes')
+            widget_id = state_data.get('widget_id')
+            widget_customization_args = state_data.get(
+                'widget_customization_args')
+            widget_handlers = state_data.get('widget_handlers')
+            widget_sticky = state_data.get('widget_sticky')
+            content = state_data.get('content')
+
+            modified_state = _update_state(
+                exploration_id, state_id, state_name, param_changes, widget_id,
+                widget_customization_args, widget_handlers, widget_sticky,
+                content
+            )
+
+            modified_states.append(modified_state)
+
+    def _update_exploration_transaction(
+            committer_id, exploration, states, commit_message):
+        save_states(committer_id, exploration.id, states)
+        save_exploration(committer_id, exploration, commit_message)
 
     transaction_services.run_in_transaction(
-        _update_state_transaction, committer_id, exploration, state)
+        _update_exploration_transaction, committer_id, exploration,
+        modified_states, commit_message)
+
+
+def update_exploration_rights(
+        committer_id, exploration_id, is_public, editors):
+    """Update the rights for an exploration. Commits changes.
+
+    Args:
+    - committer_id: str. Email address of the user who is performing the update
+        action.
+    - exploration_id: str. The exploration id.
+    - is_public: bool or None. If present, whether the exploration has been
+        made public.
+    - editors: list of str, or None. If present, a list with the email
+        addresses of allowed editors.
+    """
+    # TODO(sll): Add tests to ensure that the parameters are of the correct
+    # types, etc.
+    exploration = get_exploration_by_id(exploration_id)
+
+    commit_message_list = []
+
+    if is_public is not None:
+        if is_public is False:
+            raise Exception('A published exploration cannot be unpublished.')
+        if exploration.is_public is True:
+            raise Exception('An exploration cannot be republished.')
+        exploration.is_public = True
+        commit_message_list.append('Exploration published.')
+
+    if editors is not None:
+        exploration.editor_ids = []
+        for email in editors:
+            exploration.add_editor(email)
+        # TODO(sll): Add more detail here.
+        commit_message_list.append('Exploration editor list changed.')
+
+    def _update_exploration_rights_transaction(
+            committer_id, exploration, commit_message):
+        save_exploration(committer_id, exploration, commit_message)
+
+    transaction_services.run_in_transaction(
+        _update_exploration_rights_transaction, committer_id, exploration,
+        ' '.join(commit_message_list))
 
 
 def delete_state(committer_id, exploration_id, state_id):
@@ -787,6 +908,8 @@ def delete_state(committer_id, exploration_id, state_id):
             if changed:
                 save_states(committer_id, exploration_id, [other_state])
 
+        state_name = get_state_by_id(exploration_id, state_id).name
+
         # Delete the state with id state_id.
         exploration_memcache_key = _get_exploration_memcache_key(
             exploration_id)
@@ -794,7 +917,8 @@ def delete_state(committer_id, exploration_id, state_id):
 
         delete_state_model(exploration_id, state_id)
         exploration.state_ids.remove(state_id)
-        save_exploration(committer_id, exploration)
+        save_exploration(
+            committer_id, exploration, 'Deleted state: %s' % state_name)
 
     transaction_services.run_in_transaction(
         _delete_state_transaction, committer_id, exploration_id, state_id)
@@ -807,7 +931,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
     state = get_state_by_id(exploration_id, state_id)
 
     # Get the widget to determine the input type.
-    generic_handler = widget_domain.Registry.get_widget_by_id(
+    generic_handler = widget_registry.Registry.get_widget_by_id(
         feconf.INTERACTIVE_PREFIX, state.widget.widget_id
     ).get_handler_by_name(handler_name)
 
@@ -830,7 +954,7 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 # Creation and deletion methods.
 def create_from_yaml(
-    yaml_content, user_id, title, category, exploration_id=None):
+        yaml_content, user_id, title, category, exploration_id=None):
     """Creates an exploration from a YAML text string."""
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
@@ -852,8 +976,8 @@ def create_from_yaml(
 
     try:
         exploration_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
+            ps_name: param_domain.ParamSpec.from_dict(ps_val) for
+            (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
         }
 
         other_state_names = [
@@ -1044,7 +1168,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
 
         if len(state_content_list) != 1:
             raise Exception(
-                'Each state content list should contain exactly one element. %s'
+                'Each state content list must contain exactly one element. %s'
                 % state_content_list)
 
         for content_item in state_content_list:
@@ -1067,8 +1191,8 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
             if pc['name'] not in exp_param_specs_dict:
                 raise Exception('Undeclared param name: %s' % pc['name'])
 
-            value_generator = generator_registry.get_generator_class_by_id(
-                pc['generator_id'])
+            # Check that the generator id exists.
+            generator_registry.get_generator_class_by_id(pc['generator_id'])
 
             for arg_name in pc['customization_args']:
                 if not isinstance(arg_name, basestring):
@@ -1084,7 +1208,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         ('inputs', dict), ('name', basestring), ('rule_type', basestring),
         ('subject', basestring)]
     COMPOSITE_RULE_DEFINITION_SCHEMA = [
-       ('children', list), ('rule_type', basestring)]
+        ('children', list), ('rule_type', basestring)]
     DEFAULT_RULE_DEFINITION_SCHEMA = [('rule_type', basestring)]
     ALLOWED_COMPOSITE_RULE_TYPES = [
         rule_domain.AND_RULE_TYPE, rule_domain.OR_RULE_TYPE,
@@ -1102,7 +1226,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         if rule_type == rule_domain.DEFAULT_RULE_TYPE:
             utils.verify_dict_keys_and_types(
                 rule_definition, DEFAULT_RULE_DEFINITION_SCHEMA)
-        elif rule_type  == rule_domain.ATOMIC_RULE_TYPE:
+        elif rule_type == rule_domain.ATOMIC_RULE_TYPE:
             utils.verify_dict_keys_and_types(
                 rule_definition, ATOMIC_RULE_DEFINITION_SCHEMA)
 
@@ -1151,7 +1275,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
             if rule['dest'] not in state_name_list + [feconf.END_DEST]:
                 raise Exception('Destination %s is invalid.' % rule['dest'])
 
-            # Check that there are no feedback-less self-loops. 
+            # Check that there are no feedback-less self-loops.
             # NB: Sometimes it makes sense for a self-loop to not have
             # feedback, such as unreachable rules in a ruleset for multiple-
             # choice questions. This should be handled in the frontend so
@@ -1172,7 +1296,7 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
                             % wp_name)
 
         try:
-            widget = widget_domain.Registry.get_widget_by_id(
+            widget = widget_registry.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX, state_dict['widget']['widget_id'])
         except Exception as e:
             raise Exception(
@@ -1186,14 +1310,14 @@ def verify_state_dict(state_dict, state_name_list, exp_param_specs_dict):
         # Get the object class used to normalize the value for this param.
         for wp in widget.params:
             if wp.name == wp_name:
-                obj_class = obj_services.get_object_class(wp.obj_type)
-                if obj_class is None:
-                    raise Exception('No obj_class specified.' % obj_class)
+                # Ensure that the object type exists.
+                obj_services.Registry.get_object_class_by_type(wp.obj_type)
                 break
 
         # TODO(sll): Find a way to verify that the widget parameter values
         # have the correct type. Can we get sample values for the context
         # parameters?
+
 
 def _verify_all_states_reachable(states_list):
     """Verifies that all states are reachable from the initial state."""
@@ -1227,6 +1351,7 @@ def _verify_all_states_reachable(states_list):
             set([s['name'] for s in states_list]) - set(processed_queue))
         raise Exception('The following states are not reachable from the '
                         'initial state: %s' % ', '.join(unseen_states))
+
 
 def _verify_no_dead_ends(states_list):
     """Verifies that the END state is reachable from all states."""
@@ -1263,6 +1388,7 @@ def _verify_no_dead_ends(states_list):
                         'following states: %s' %
                         ', '.join(dead_end_states))
 
+
 def verify_exploration_dict(exploration_dict):
     """Verifies an exploration dict."""
     EXPLORATION_SCHEMA = [
@@ -1277,9 +1403,8 @@ def verify_exploration_dict(exploration_dict):
         if len(ps_value) != 1 or ps_value.keys()[0] != 'obj_type':
             raise Exception('Invalid param_spec dict: %s' % ps_value)
 
-        obj_class = obj_services.get_object_class(ps_value['obj_type'])
-        if obj_class is None:
-            raise Exception('No object class specified.')
+        # Ensure that the object type exists.
+        obj_services.Registry.get_object_class_by_type(ps_value['obj_type'])
 
     # Verify there is at least one state.
     if not exploration_dict['states']:

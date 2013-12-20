@@ -23,7 +23,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
   return {
     restrict: 'E',
     scope: {paramChanges: '=', paramSpecs: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
-    templateUrl: '/templates/param_change_editor',
+    templateUrl: 'inline/param_change_editor',
     controller: function($scope, $attrs) {
       $scope._inArray = function(array, value) {
         for (var i = 0; i < array.length; i++) {
@@ -41,13 +41,20 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         return '';
       };
 
-      var DEFAULT_TMP_PARAM_CHANGE = {
-        name: '[New parameter]',
-        generator_id: 'Copier',
-        customization_args: {
+      $scope.DEFAULT_CUSTOMIZATION_ARGS = {
+        'Copier': {
           value: '[New parameter value]',
           parse_with_jinja: false
+        },
+        'RandomSelector': {
+          list_of_values: []
         }
+      };
+
+      var DEFAULT_TMP_PARAM_CHANGE = {
+        name: '',
+        generator_id: 'Copier',
+        customization_args: $scope.DEFAULT_CUSTOMIZATION_ARGS['Copier']
       };
 
       // The 0-based index of the parameter change item that is currently active for
@@ -152,7 +159,7 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           warningsData.addWarning('Please specify a parameter name.');
           return;
         }
-        if ($scope.tmpParamChange.name === '[New parameter]') {
+        if ($scope.tmpParamChange.name === '') {
           // This reverses a temporary parameter change addition that has not
           // been edited.
           $scope.deleteParamChange(index);
@@ -189,16 +196,11 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
         if (!$scope.getObjTypeForParam(name)) {
           // The name is new, so add the parameter to the exploration parameter
           // list.
-          $scope.addExplorationParamSpec(
-            name,
-            'UnicodeString',
-            _updateAndSaveParamChangeList.bind(
-                undefined, index, name, generator_id, customization_args)
-          );
-        } else {
-          _updateAndSaveParamChangeList(
-              index, name, generator_id, customization_args);
+          $scope.addExplorationParamSpec(name, 'UnicodeString');
         }
+        
+        _updateAndSaveParamChangeList(
+          index, name, generator_id, customization_args);
 
         $scope.resetEditor();
       };

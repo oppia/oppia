@@ -48,16 +48,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     });
   };
 
-  $scope.generateUnresolvedAnswersMap = function() {
-    $scope.unresolvedAnswersMap = [];
-    for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersMap.push({
-        'answer': answerItem,
-        'count': $scope.unresolvedAnswers[answerItem]
-      });
-    }
-  };
-
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding handler name and the value has several keys:
@@ -81,10 +71,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.widgetSticky = undefined;
     $scope.$apply();
     $scope.widgetSticky = data.widget.sticky;
-    $scope.unresolvedAnswers = data.unresolved_answers;
 
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
-    $scope.generateUnresolvedAnswersMap();
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateId) {
@@ -224,6 +212,15 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         $scope.states = states;
         $scope.stateId = stateId;
 
+        $scope.UNICODE_STRING_LIST_INIT_ARGS = {
+          'objType': 'UnicodeString'
+        };
+
+        $scope.FEEDBACK_LIST_INIT_ARGS = {
+          'objType': 'Html',
+          'addItemText': 'Add feedback message'
+        };
+
         $scope.resetTmpRule = function() {
           $scope.tmpRule = {
             index: null,
@@ -237,73 +234,38 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           };
         };
 
-        $scope.getRuleDescriptionFragments = function(input, isMultipleChoice) {
-          if (!input) {
-            return '';
-          }
-          var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-          var index = 0;
-
-          var finalInput = input;
-          var iter = 0;
-          while (true) {
-            if (!input.match(pattern) || iter == 100) {
-              break;
-            }
-            iter++;
-
-            var varName = input.match(pattern)[1],
-                varType = null;
-            if (input.match(pattern)[2]) {
-              varType = input.match(pattern)[2].substring(1);
-            }
-      
-            var replacementHtml = '';
-            if (isMultipleChoice) {
-              replacementHtml = '<SELECT|' + varName + '>';
-            } else if (varType == 'Set') {
-              replacementHtml = '<LIST|' + varName + '>';
-            } else {
-              replacementHtml = '<INPUT|' + varName + '>';
-            }
-    
-            finalInput = finalInput.replace(pattern, replacementHtml);
-            input = input.replace(pattern, ' ');
-            index++;
-          }
-
-          var finalInputArray = finalInput.split('<');
-          var result = [];
-          for (var i = 0; i < finalInputArray.length; i++) {
-            var tmpVarName;
-            if (finalInputArray[i].indexOf('SELECT') === 0) {
-              finalInputArray[i] = finalInputArray[i].substr(7);
-              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
-              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
-              result.push({'type': 'select', 'varName': tmpVarName});
-            } else if (finalInputArray[i].indexOf('INPUT') === 0) {
-              finalInputArray[i] = finalInputArray[i].substr(6);
-              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
-              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
-              result.push({'type': 'input', 'varName': tmpVarName});
-            } else if (finalInputArray[i].indexOf('LIST') === 0) {
-              finalInputArray[i] = finalInputArray[i].substr(5);
-              tmpVarName = finalInputArray[i].substring(0, finalInputArray[i].indexOf('>'));
-              finalInputArray[i] = finalInputArray[i].substr(tmpVarName.length + 1);
-              result.push({'type': 'list', 'varName': tmpVarName});
-            }
-            
-            result.push({'type': 'html', 'text': finalInputArray[i]});
-          }
-          return result;
-        };
-
         $scope.tmpRuleDescriptionFragments = [];
         $scope.$watch('tmpRule.description', function(newValue) {
+          if (!newValue) {
+            return;
+          }
+
+          var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+
+          var finalInputArray = newValue.split(pattern);
+          if (finalInputArray.length % 3 !== 1) {
+            console.log('Error: could not process rule description.');
+          }
+
+          var result = [];
           // TODO(sll): Remove this special-casing.
           var isMultipleChoice = Boolean($scope.widgetCustomizationArgs.choices);
-          $scope.tmpRuleDescriptionFragments = $scope.getRuleDescriptionFragments(
-              newValue, isMultipleChoice);
+          for (var i = 0; i < finalInputArray.length; i += 3) {
+            result.push({'type': 'noneditable', 'text': finalInputArray[i]});
+            if (i == finalInputArray.length - 1) {
+              break;
+            }
+
+            if (isMultipleChoice) {
+              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+            } else {
+              result.push({
+                'type': finalInputArray[i+2],
+                'varName': finalInputArray[i+1]
+              });
+            }
+          }
+          $scope.tmpRuleDescriptionFragments = result;
         });
 
         $scope.getDestName = function(stateId) {
@@ -353,6 +315,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         };
 
         $scope.save = function() {
+          $scope.$broadcast('externalSave');
           $modalInstance.close({tmpRule: tmpRule});
         };
 
@@ -457,6 +420,14 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
   };
 
+  $scope.isRuleConfusing = function(rule) {
+    return (rule.feedback.length === 0 && $scope.matchesCurrentStateId(rule.dest));
+  };
+
+  $scope.getCssClassForRule = function(rule) {
+    return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
+  };
+
   $scope.convertDestToId = function(destName, hideWarnings) {
     if (!destName) {
       warningsData.addWarning('Please choose a destination.');
@@ -502,14 +473,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       iframe.height = height + 'px';
     }
   }, false);
-
-  $scope.deleteUnresolvedAnswer = function(answer) {
-    $scope.unresolvedAnswers[answer] = 0;
-    explorationData.saveStateData($scope.stateId, {
-      'resolved_answers': [answer]
-    });
-    $scope.generateUnresolvedAnswersMap();
-  };
 
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
     if (newValue !== undefined && oldValue !== undefined) {

@@ -22,6 +22,7 @@ from core import settings
 
 # Code contributors, in alphabetical order.
 CODE_CONTRIBUTORS = [
+    'Jacob Davis',
     'Jeremy Emerson',
     'Koji Ashida',
     'Manas Tungare',
@@ -65,7 +66,7 @@ DEMO_EXPLORATIONS = [
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('tar', 'Missions - Tar', 'Open Source Tools'),
+    ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
 ]
 
 # Whether to unconditionally log info messages.
@@ -74,9 +75,10 @@ DEBUG = False
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
 PLATFORM = 'gae' if (
-    os.environ.get('SERVER_SOFTWARE')
-    and (os.environ['SERVER_SOFTWARE'].startswith('Development')
-    or os.environ['SERVER_SOFTWARE'].startswith('Google'))) else 'django'
+    os.environ.get('SERVER_SOFTWARE') and (
+        os.environ['SERVER_SOFTWARE'].startswith('Development')
+        or os.environ['SERVER_SOFTWARE'].startswith('Google'))
+    ) else 'django'
 
 
 # Whether we should serve the development or production experience.
@@ -165,11 +167,14 @@ REQUIRE_EDITORS_TO_ACCEPT_TERMS = False
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {
-        'Hints': {
-            'dir': 'extensions/widgets/noninteractive/Hints'
-        },
         'Image': {
             'dir': 'extensions/widgets/noninteractive/Image'
+        },
+        'Link': {
+            'dir': 'extensions/widgets/noninteractive/Link'
+        },
+        'Tabs': {
+            'dir': 'extensions/widgets/noninteractive/Tabs'
         },
         'Video': {
             'dir': 'extensions/widgets/noninteractive/Video'

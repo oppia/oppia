@@ -28,19 +28,7 @@ from core.domain import value_generators_domain
 import feconf
 
 
-class TemplateHandler(base.BaseHandler):
-    """Retrieves a template for a UI component."""
-
-    def get(self, template_type):
-        """Handles GET requests."""
-        try:
-            self.response.write(self.jinja2_env.get_template(
-                'components/%s.html' % template_type).render({}))
-        except:
-            raise self.PageNotFoundException
-
-
-class ObjectEditorHandler(base.BaseHandler):
+class ObjectEditorTemplateHandler(base.BaseHandler):
     """Retrieves a template for an object editor."""
 
     def get(self, obj_type):
@@ -82,7 +70,7 @@ class ImageHandler(base.BaseHandler):
         """
         try:
             filepath = urllib.unquote(encoded_filepath)
-            format = filepath[(filepath.rfind('.') + 1) :]
+            format = filepath[(filepath.rfind('.') + 1):]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
             self.response.headers['Content-Type'] = str('image/%s' % format)
@@ -161,9 +149,10 @@ class StaticFileHandler(base.BaseHandler):
                 file_path = file_path.replace(path, feconf.PATH_MAP[path])
         try:
             f = open(file_path, 'r')
-            self.response.headers['Content-Type'] = mimetypes.guess_type(file_path)[0]
-             # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate caching
-             # headers if that's turned on.
+            self.response.headers['Content-Type'] = mimetypes.guess_type(
+                file_path)[0]
+             # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate
+             # caching headers if that's turned on.
             self.response.write(f.read())
             f.close()
         except Exception:

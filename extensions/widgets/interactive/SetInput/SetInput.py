@@ -1,5 +1,6 @@
 from core.domain import widget_domain
 from extensions.objects.models import objects
+from extensions.value_generators.models import generators
 
 
 class SetInput(widget_domain.BaseWidget):
@@ -25,12 +26,31 @@ class SetInput(widget_domain.BaseWidget):
 
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
-    _params = []
+    _params = [{
+        'name': 'element_type',
+        'description': 'The type of the elements comprising the set.',
+        'generator': generators.RestrictedCopier,
+        'init_args': {
+            'choices': ['UnicodeString']
+        },
+        'customization_args': {
+            'value': 'UnicodeString'
+        },
+        'obj_type': 'UnicodeString',
+    }]
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated input types. Interactive widgets
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
-    _handlers = [{
-        'name': 'submit', 'input_type': objects.Set
-    }]
+    @property
+    def _handlers(self):
+        input_type = None
+        for param_spec in self._params:
+            if param_spec['name'] == 'element_type':
+                input_type = param_spec['customization_args']['value']
+        input_type = 'SetOf%s' % input_type
+
+        return [{
+            'name': 'submit', 'input_type': getattr(objects, input_type)
+        }]

@@ -18,13 +18,16 @@
 
 __author__ = 'Sean Lip'
 
+import inspect
 import os
+import pkgutil
 import re
 import string
 
 from core.domain import exp_services
 from core.domain import obj_services
-from core.domain import widget_domain
+from core.domain import rule_domain
+from core.domain import widget_registry
 import feconf
 import test_utils
 import utils
@@ -77,11 +80,11 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
 class WidgetDataUnitTests(test_utils.GenericTestBase):
     """Tests that all the default widgets are valid."""
 
-    def is_camel_cased(self, name):
+    def _is_camel_cased(self, name):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, string):
         """Check whether a string is alphanumeric."""
         return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
@@ -100,22 +103,22 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def test_widget_counts(self):
         """Test that the correct number of widgets are loaded."""
-        widget_domain.Registry.refresh()
+        widget_registry.Registry.refresh()
 
         self.assertEqual(
-            len(widget_domain.Registry.interactive_widgets),
+            len(widget_registry.Registry.interactive_widgets),
             len(feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX])
         )
         self.assertEqual(
-            len(widget_domain.Registry.noninteractive_widgets),
+            len(widget_registry.Registry.noninteractive_widgets),
             len(feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX])
         )
 
     def test_image_data_urls_for_noninteractive_widgets(self):
         """Test the data urls for the noninteractive widget editor icons."""
-        widget_domain.Registry.refresh()
+        widget_registry.Registry.refresh()
 
-        widget_list = widget_domain.Registry.noninteractive_widgets
+        widget_list = widget_registry.Registry.noninteractive_widgets
         allowed_widgets = feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]
         for widget_name in allowed_widgets:
             image_filepath = os.path.join(
@@ -128,14 +131,14 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def test_default_widgets_are_valid(self):
         """Test the default widgets."""
-        bindings = widget_domain.Registry.interactive_widgets
+        bindings = widget_registry.Registry.interactive_widgets
 
         # TODO(sll): These tests ought to include non-interactive widgets as
         # well.
 
         for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
             # Check that the widget_id name is valid.
-            self.assertTrue(self.is_camel_cased(widget_id))
+            self.assertTrue(self._is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
             widget_dir = os.path.join(
@@ -242,7 +245,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                     self.assertIn(p, PARAM_KEYS)
 
                 self.assertTrue(isinstance(param['name'], basestring))
-                self.assertTrue(self.is_alphanumeric_string(param['name']))
+                self.assertTrue(self._is_alphanumeric_string(param['name']))
                 self.assertTrue(isinstance(param['description'], basestring))
 
                 # Check that the parmaeter description is non-empty.
@@ -255,10 +258,41 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(param['customization_args'], dict))
                 self.assertTrue(isinstance(param['obj_type'], basestring))
 
-                obj_class = obj_services.get_object_class(param['obj_type'])
-                self.assertIsNotNone(obj_class)
+                # Ensure that this object type exists.
+                obj_services.Registry.get_object_class_by_type(
+                    param['obj_type'])
 
             # Check that the default customization args result in
             # parameters with the correct types.
             for param in widget.params:
                 widget._get_widget_param_instances({}, {})
+
+
+class RuleDataUnitTests(test_utils.GenericTestBase):
+
+    def test_that_all_rules_have_object_editor_templates(self):
+        rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
+
+        at_least_one_rule_found = False
+
+        clses = []
+
+        for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+            if name.endswith('_test') or name == 'base':
+                continue
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                param_list = rule_domain.get_param_list(clazz.description)
+
+                for (param_name, param_obj_type) in param_list:
+                    # TODO(sll): Get rid of this special case.
+                    if param_obj_type.__name__ == 'NonnegativeInt':
+                        continue
+
+                    self.assertTrue(
+                        param_obj_type.has_editor_js_template(),
+                        msg='(%s)' % clazz.description)
+                    at_least_one_rule_found = True
+                clses.append(clazz)
+
+        self.assertTrue(at_least_one_rule_found)

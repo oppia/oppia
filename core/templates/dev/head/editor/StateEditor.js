@@ -174,6 +174,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           'param_changes', ['stateParamChanges'], newValue, oldValue);
     }
   };
+
 }
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',

@@ -25,6 +25,8 @@ from core.platform import models
 
 from google.appengine.ext import ndb
 
+QUERY_LIMIT = 100
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -66,23 +68,6 @@ class StateCounterModel(base_models.BaseModel):
         counter.put()
 
 
-class StateFeedbackFromReaderModel(base_models.BaseModel):
-    """A record of all the feedback given by readers for a particular state.
-
-    The id/key for instances of this class has the form
-        [EXPLORATION_ID].[STATE_ID]
-    """
-    feedback_log = ndb.JsonProperty(repeated=True, indexed=False)
-
-    @classmethod
-    def get_or_create(cls, exploration_id, state_id):
-      instance_id = '.'.join([exploration_id, state_id])
-      reader_feedback = cls.get(instance_id, strict=False)
-      if not reader_feedback:
-          reader_feedback = cls(id=instance_id, feedback_log=[])
-      return reader_feedback
-
-
 class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
@@ -106,30 +91,86 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):
-        instance_id = '.'.join([
-            exploration_id, state_id, handler_name, rule_str])
-        answer_log = cls.get(instance_id, strict=False)
-        if not answer_log:
-            answer_log = cls(id=instance_id, answers={})
-        return answer_log
+        # TODO(sll): Deprecate this method.
+        return cls.get_or_create_multi(exploration_id, [{
+            'state_id': state_id,
+            'handler_name': handler_name,
+            'rule_str': rule_str
+        }])[0]
+
+    @classmethod
+    def _get_entity_key(cls, exploration_id, entity_id):
+        return ndb.Key(cls._get_kind(), entity_id)
+
+    @classmethod
+    def get_or_create_multi(cls, exploration_id, rule_data):
+        """Gets or creates entities for the given rules.
+
+        Args:
+            exploration_id: the exploration id
+            rule_data: a list of dicts, each with the following keys:
+                (state_id, handler_name, rule_str).
+        """
+        entity_ids = ['.'.join([
+            exploration_id, datum['state_id'],
+            datum['handler_name'], datum['rule_str']
+        ]) for datum in rule_data]
+
+        entity_keys = [cls._get_entity_key(exploration_id, entity_id)
+                       for entity_id in entity_ids]
+
+        entities = ndb.get_multi(entity_keys)
+        entities_to_put = []
+        for ind, entity in enumerate(entities):
+            if entity is None:
+                new_entity = cls(id=entity_ids[ind], answers={})
+                entities_to_put.append(new_entity)
+                entities[ind] = new_entity
+
+        ndb.put_multi(entities_to_put)
+        return entities
 
 
-def record_state_feedback_from_reader(
-        exploration_id, state_id, feedback, history):
-    """Adds feedback to the reader feedback log for the given state.
+class FeedbackItemModel(base_models.BaseModel):
+    """A piece of feedback for a particular resource."""
+    # The id for the target of the feedback (e.g. an exploration, a state, the
+    # app as a whole, etc.)
+    target_id = ndb.StringProperty()
+    # The text of the feedback message.
+    content = ndb.TextProperty(indexed=False)
+    # Additional data supplied with the feedback message, such as the reader's
+    # state/answer history.
+    additional_data = ndb.JsonProperty(indexed=False)
+    # The id of the user who submitted this feedback. If None, it means that
+    # the feedback was submitted anonymously.
+    submitter_id = ndb.StringProperty()
+    # The status of the feedback.
+    status = ndb.StringProperty(
+        default='new',
+        choices=[
+            'new', 'accepted', 'fixed', 'verified', 'will_not_fix',
+            'needs_clarification'
+        ]
+    )
 
-    Args:
-        exploration_id: the exploration id
-        state_id: the state id
-        feedback: str. The feedback typed by the reader.
-        history: list. The history of the exploration for this reader.
-    """
-    reader_feedback = StateFeedbackFromReaderModel.get_or_create(
-        exploration_id, state_id)
-    reader_feedback.feedback_log.append({
-        'feedback': feedback, 'history': history})
-    reader_feedback.put()
- 
+    @classmethod
+    def get_or_create(cls, target_id, content, additional_data, submitter_id):
+        """Creates a new feedback entry."""
+        entity_id = cls.get_new_id('%s:%s' % (target_id, content))
+        feedback_entity = cls(
+            id=entity_id, target_id=target_id, content=content,
+            additional_data=additional_data, submitter_id=submitter_id)
+        feedback_entity.put()
+
+        return feedback_entity
+
+    @classmethod
+    def get_new_feedback_items_for_target(cls, target_id):
+        """Gets all 'new' feedback items corresponding to a given target_id."""
+        return cls.get_all().filter(
+            cls.target_id == target_id
+        ).filter(cls.status == 'new').fetch(QUERY_LIMIT)
+
 
 def process_submitted_answer(
         exploration_id, state_id, handler_name, rule_str, answer):

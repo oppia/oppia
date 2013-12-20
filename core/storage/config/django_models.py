@@ -18,9 +18,9 @@
 
 __author__ = 'Sean Lip'
 
+from core import django_utils
 import core.storage.base_model.models as base_models
 
-from django.db import models
 
 class ConfigPropertyModel(base_models.BaseModel):
     """A class that represents a named configuration property.
@@ -28,4 +28,4 @@ class ConfigPropertyModel(base_models.BaseModel):
     The id is the name of the property.
     """
     # The property value.
-    value = models.TextField(max_length=200, blank=True)
+    value = django_utils.JSONField(default={})

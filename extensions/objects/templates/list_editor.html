@@ -1,33 +1,26 @@
-<div>
-  <span ng-show="items.length == 0">
-    <em>None</em>
+<div class="container-fluid">
+  <span ng-show="localValue.length == 0">
+    <em>This list is currently empty.</em>
   </span>
 
-  <ol start="1">
-    <li ng-repeat="item in localItems track by $index">
-      <span ng-if="activeItem != $index">
-        <span ng-if="!largeInput">
-          <[item.label]>
-        </span>
-        <div ng-if="largeInput" class="oppia-rte-inactive">
-          <span ng-bind-html="item.label"></span>
-          <br>
-        </div>
+  <div class="row-fluid" ng-repeat="item in localValue track by $index">
+    <div class="span1">
+      <[$index + 1]>
+    </div>
 
-        (<a href="#" onclick="return false;" ng-click="openItemEditor($index)">Edit</a> | <a href="#" onclick="return false;" ng-click="deleteItem($index)">Delete</a>)
-      </span>
+    <div class="span8">
+      <object-editor obj-type="<[initArgs.objType]>" value="item.label" always-editable="<[alwaysEditable]>">
+      </object-editor>
+    </div>
 
-      <span ng-if="activeItem == $index">
-        <input ng-if="!largeInput" type="text" ng-model="item.label">
-        <div ng-if="largeInput">
-          <rich-text-editor html-content="item.label">
-          </rich-text-editor>
-        </div>
-        <button type="button" ng-click="replaceItem($index, item.label)">Save</button>
-        <button type="button" ng-click="deleteItem($index)">Delete</button>
-      </span>
-    </li>
-  </ol>
+    <div class="span3">
+      <button type="button" class="pull-right" ng-click="deleteItem($index)">Delete</button>
+    </div>
+  </div>
 
-  <button type="button" ng-click="addItem()"><[getAddItemText()]></button>
+  <div class="row-fluid">
+    <button type="button" ng-click="addItem()" class="pull-right">
+      <[getAddItemText()]>
+    </button>
+  </div>
 </div>

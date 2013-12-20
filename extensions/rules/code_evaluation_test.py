@@ -25,18 +25,30 @@ import test_utils
 class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on CodeEvaluation objects."""
 
-    def test_equals_rule(self):
-        rule = code_evaluation.CodeEquals('hello')
+    def test_output_equals_rule(self):
+        rule = code_evaluation.OutputEquals('1')
 
         self.assertTrue(rule.eval({
+            'code': 'hello',
+            'output': '1',
+            'evaluation': '',
+            'error': ''
+        }))
+        self.assertTrue(rule.eval({
+            'code': 'hello',
+            'output': '\n1\n     ',
+            'evaluation': '',
+            'error': ''
+        }))
+        self.assertFalse(rule.eval({
             'code': 'hello',
             'output': '',
             'evaluation': '',
             'error': ''
         }))
         self.assertFalse(rule.eval({
-            'code': 'goodbye',
-            'output': '',
+            'code': 'hello',
+            'output': 'bad output',
             'evaluation': '',
             'error': ''
         }))

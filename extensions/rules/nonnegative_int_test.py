@@ -18,7 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-from extensions.rules import number
+from extensions.rules import nonnegative_int
 import test_utils
 
 
@@ -26,5 +26,5 @@ class NonnegativeIntUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on NonnegativeInt objects."""
 
     def test_equals_rule(self):
-        self.assertTrue(number.Equals(3).eval(3))
-        self.assertFalse(number.Equals(4).eval(3))
+        self.assertTrue(nonnegative_int.Equals(3).eval(3))
+        self.assertFalse(nonnegative_int.Equals(4).eval(3))

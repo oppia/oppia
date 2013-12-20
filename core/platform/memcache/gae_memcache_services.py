@@ -106,6 +106,6 @@ def delete_multi(keys):
     if return_value is True:
         counters.MEMCACHE_DELETE_SUCCESS.inc()
     else:
-        counters.MEMCACHE_DELETE_FAILURE.inc()        
+        counters.MEMCACHE_DELETE_FAILURE.inc()
 
     return return_value

@@ -1,14 +1,3 @@
-{% macro add_state_form() -%}
-  <form ng-submit="addState(newStateDesc)">
-    Add a new state:
-    <input style="width: 30" type="text" list="states" ng-model="newStateDesc" placeholder="New State Name" required>
-    <datalist id="states">
-      <option ng-repeat="(id, properties) in states | orderBy:'properties.name':true" value="<[properties.name]>"></option>
-    </datalist>
-  </form>
-{%- endmacro %}
-
-
 <h4>
   Visualization
   <img class="oppia-help" src="/images/help.png" tooltip="This visualization shows how the exploration's states are linked. You can access each state's editor by clicking on its node." tooltip-placement="right">
@@ -29,5 +18,11 @@
   </center>
   <state-graph-viz val="graphData"></state-graph-viz>
 
-  {{ add_state_form() }}
+  <form ng-submit="addState(newStateDesc)">
+    Add a new state:
+    <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name" required>
+    <button class="btn" type="submit" ng-disabled="!isNewStateNameValid(newStateDesc)">
+      Submit
+    </button>
+  </form>
 </div>

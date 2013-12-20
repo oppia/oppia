@@ -25,7 +25,7 @@ from google.appengine.ext import ndb
 def run_in_transaction(fn, *args, **kwargs):
     """Run a function in a transaction."""
     return ndb.transaction(
-    	lambda: fn(*args, **kwargs),
-    	xg=True,
-    	propagation=ndb.TransactionOptions.ALLOWED,
+        lambda: fn(*args, **kwargs),
+        xg=True,
+        propagation=ndb.TransactionOptions.ALLOWED,
     )

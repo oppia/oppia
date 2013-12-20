@@ -19,14 +19,16 @@
 __author__ = 'Sean Lip'
 
 import base64
+import logging
 import numbers
 import os
 from StringIO import StringIO
 import tarfile
+import urllib
+import urlparse
 
+from core.domain import html_cleaner
 import feconf
-import jinja_utils
-from lxml.html.clean import clean_html
 import utils
 
 
@@ -34,23 +36,18 @@ class BaseObject(object):
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as
-    Video, Image and Coord2D.
+    SanitizedUrl and CoordTwoDim.
 
     Typed objects are initialized from a raw Python object which is expected to
     be derived from a JSON object. They are validated and normalized to basic
     Python objects (primitive types combined via lists and dicts; no sets or
     tuples).
-
-    The object can be rendered in view mode and in edit mode. This is done using
-    the render_view() and render_edit() methods, respectively. These methods can
-    be overridden in subclasses.
     """
 
     # These values should be overridden in subclasses.
     description = ''
-    icon_filename = ''
-    view_html_filename = None
     edit_html_filename = None
+    edit_js_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -66,69 +63,34 @@ class BaseObject(object):
         raise NotImplementedError('Not implemented.')
 
     @classmethod
+    def has_editor_js_template(cls):
+        return cls.edit_js_filename is not None
+
+    @classmethod
     def get_editor_js_template(cls):
+        if cls.edit_js_filename is None:
+            raise Exception(
+                'There is no editor template defined for objects of type %s' %
+                cls.__name__)
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.js' % cls.edit_js_filename))
 
     @classmethod
     def get_editor_html_template(cls):
+        if cls.edit_html_filename is None:
+            raise Exception(
+                'There is no editor template defined for objects of type %s' %
+                cls.__name__)
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.html' % cls.edit_html_filename))
-
-    @classmethod
-    def render_view(cls, data):
-        """Renders a view-only version of the Object, suitable for editors of it.
-
-        The default implementation uses takes the Jinja template supplied in the
-        class and renders against it. This template has autoescape=True turned
-        on, so strings that are passed in will be escaped. The default
-        implementation can be overwritten by subclasses -- but they are then
-        responsible for ensuring that autoescaping takes place.
-
-        Args:
-          data: the normalized Python representation of the Object.
-        """
-        assert cls.view_html_filename, 'No view template specified.'
-        return jinja_utils.get_jinja_env(
-            feconf.OBJECT_TEMPLATES_DIR).get_template(
-                '%s.html' % cls.view_html_filename).render({'data': data})
-
-    @classmethod
-    def render_edit(cls, frontend_name, data=None):
-        """Renders an editable version of the Object.
-
-        The default implementation assumes that there is an AngularJS variable
-        named frontend_name with the same internal format as the normalized
-        Python representation. In the implementation, a new variable named
-        temp_[frontend_name] will be created.
-
-        WARNING: IT IS THE CLIENT'S RESPONSIBILITY TO ENSURE THAT THERE IS NO
-        VARIABLE CALLED temp_[frontend_name] IN THE FRONTEND. Usually, such a
-        variable will not exist, by virtue of the standard JavaScript naming
-        conventions.
-
-        The default implementation is rendered using a template that enables
-        autoescaping. If it is overwritten by a subclass, the subclass is
-        responsible for ensuring that autoescaping takes place.
-
-        Args:
-          frontend_name: the name used for the data variable in the frontend.
-          data: the normalized Python representation of the existing object.
-              If it is None, an empty object is used.
-        """
-        # TODO(sll): Implement this (generically).
-        raise NotImplementedError('Not implemented yet.')
 
 
 class Number(BaseObject):
     """Generic number class."""
 
     description = 'A number.'
-    icon_filename = ''
-    view_html_filename = 'number_view'
-    edit_html_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -145,8 +107,6 @@ class Real(Number):
     """Real number class."""
 
     description = 'A real number.'
-    icon_filename = ''
-    view_html_filename = 'real_view'
     edit_html_filename = 'real_editor'
     edit_js_filename = 'RealEditor'
 
@@ -165,8 +125,6 @@ class Int(Real):
     """Integer class."""
 
     description = 'An integer.'
-    icon_filename = ''
-    view_html_filename = 'int_view'
     edit_html_filename = 'int_editor'
     edit_js_filename = 'IntEditor'
 
@@ -185,7 +143,8 @@ class NonnegativeInt(Int):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
-    icon_filename = ''
+    edit_html_filename = None
+    edit_js_filename = None
 
     @classmethod
     def normalize(cls, raw):
@@ -202,31 +161,28 @@ class CodeEvaluation(BaseObject):
     """Evaluation result of programming code."""
 
     description = 'Code and its evaluation results.'
-    icon_filename = ''
-    view_html_filename = 'code_evaluation_view'
-    edit_html_filename = None
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
             assert isinstance(raw, dict)
-            assert 'code' in raw
-            assert 'output' in raw
-            assert 'evaluation' in raw
-            assert 'error' in raw
+            assert 'code' in raw and isinstance(raw['code'], basestring)
+            assert 'output' in raw and isinstance(raw['output'], basestring)
+            assert ('evaluation' in raw
+                    and isinstance(raw['evaluation'], basestring))
+            assert 'error' in raw and isinstance(raw['error'], basestring)
             return raw
         except Exception:
             raise TypeError('Cannot convert to code evaluation: %s' % raw)
 
 
-class Coord2D(BaseObject):
+class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
     description = 'A two-dimensional coordinate (a pair of reals).'
-    icon_filename = ''
-    view_html_filename = 'coord_2d_view'
-    edit_html_filename = None
+    edit_html_filename = 'coord_two_dim_editor'
+    edit_js_filename = 'CoordTwoDimEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -254,8 +210,6 @@ class List(BaseObject):
     """List class."""
 
     description = 'A list.'
-    icon_filename = ''
-    view_html_filename = 'list_view'
     edit_html_filename = 'list_editor'
     edit_js_filename = 'ListEditor'
 
@@ -269,30 +223,28 @@ class List(BaseObject):
             raise TypeError('Cannot convert to list: %s' % raw)
 
 
-class Set(List):
-    """Set class."""
+class SetOfUnicodeString(List):
+    """Class for sets of UnicodeStrings."""
 
-    description = 'A set (a list with unique elements).'
-    icon_filename = ''
-    view_html_filename = 'set_view'
-    edit_html_filename = None
+    description = 'A set (a list with unique elements) of unicode strings.'
+    edit_html_filename = 'list_editor'
+    edit_js_filename = 'SetOfUnicodeStringEditor'
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
             assert isinstance(raw, (list, set, tuple))
-            return list(set(raw))
+            assert all([isinstance(item, basestring) for item in raw])
+            return sorted(list(set([unicode(item) for item in raw])))
         except Exception:
-            raise TypeError('Cannot convert to set: %s' % raw)
+            raise TypeError('Cannot convert to set of strings: %s' % raw)
 
 
 class UnicodeString(BaseObject):
     """Unicode string class."""
 
     description = 'A unicode string.'
-    icon_filename = ''
-    view_html_filename = 'unicode_string_view'
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'UnicodeStringEditor'
 
@@ -311,7 +263,8 @@ class NormalizedString(UnicodeString):
     """Unicode string with spaces collapsed."""
 
     description = 'A unicode string with adjacent whitespace collapsed.'
-    icon_filename = ''
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'NormalizedStringEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -323,28 +276,101 @@ class NormalizedString(UnicodeString):
             raise TypeError('Cannot convert to NormalizedString: %s' % raw)
 
 
-class Html(UnicodeString):
+class Html(BaseObject):
     """HTML string class."""
 
     description = 'An HTML string.'
-    icon_filename = ''
-    view_html_filename = 'html_view'
     edit_html_filename = 'html_editor'
     edit_js_filename = 'HtmlEditor'
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        # TODO(sll): write tests for this.
         try:
             assert isinstance(raw, basestring)
-            # TODO(sll): Add sanitization in a more controlled way using
-            # html_cleaner.
-            if not raw:
-                return ''
-            return clean_html(unicode(raw))
+            return html_cleaner.clean(unicode(raw))
         except Exception as e:
             raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
+                            (raw, e))
+
+
+class TabContent(BaseObject):
+    """Class for editing the content of a single tab.
+
+    The object is described by a dict with two keys: 'title' and 'content'.
+    These have types UnicodeString and Html respectively.
+    """
+
+    description = 'Content for a single tab.'
+    edit_html_filename = 'tab_content_editor'
+    edit_js_filename = 'TabContentEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, dict)
+            assert 'title' in raw
+            assert 'content' in raw
+            raw['title'] = UnicodeString.normalize(raw['title'])
+            raw['content'] = Html.normalize(raw['content'])
+            return raw
+        except Exception as e:
+            raise TypeError('Cannot convert to tab content: %s. Error: %s' %
+                            (raw, e))
+
+
+class ListOfTabContent(BaseObject):
+    """Class for editing the content of a tabbed view.
+
+    The object is described by a list of dicts, each representing a TabContent
+    object.
+    """
+
+    description = 'Content for a set of tabs.'
+    edit_html_filename = 'list_editor'
+    edit_js_filename = 'ListOfTabContentEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, list)
+            return [TabContent.normalize(item) for item in raw]
+        except Exception as e:
+            raise TypeError('Cannot convert to list of tab content: %s. '
+                            'Error: %s' % (raw, e))
+
+
+class SanitizedUrl(BaseObject):
+    """HTTP or HTTPS url string class."""
+
+    description = 'An HTTP or HTTPS url.'
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'SanitizedUrlEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, basestring)
+            raw = unicode(raw)
+            if raw:
+                url_components = urlparse.urlsplit(raw)
+                quoted_url_components = (
+                    urllib.quote(component) for component in url_components)
+                raw = urlparse.urlunsplit(quoted_url_components)
+
+                acceptable = html_cleaner.filter_a('href', raw)
+                if not acceptable:
+                    logging.error(
+                        'Invalid URL: Sanitized URL should start with '
+                        '\'http://\' or \'https://\'; received %s' % raw)
+                    return u''
+
+            return raw
+        except Exception as e:
+            raise TypeError('Cannot convert to sanitized URL: %s. Error: %s' %
                             (raw, e))
 
 
@@ -353,7 +379,8 @@ class MusicNote(UnicodeString):
     # TODO(sll): Make this more general -- i.e. an Enum.
 
     description = 'A music note between C4 and F5.'
-    icon_filename = ''
+    edit_html_filename = 'music_note_editor'
+    edit_js_filename = 'MusicNoteEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -361,32 +388,15 @@ class MusicNote(UnicodeString):
         try:
             result = super(MusicNote, cls).normalize(raw)
             assert result in [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5'
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
+                'F5'
             ]
             return result
         except Exception:
             raise TypeError('Cannot convert to MusicNote: %s' % raw)
 
 
-class Video(UnicodeString):
-    """String that represents a Youtube video id."""
-
-    description = 'A string representing a video id.'
-    icon_filename = ''
-    view_html_filename = 'video_view'
-    edit_html_filename = None
-
-
-class Image(UnicodeString):
-    """String that represents an image key in the datastore."""
-
-    description = 'A string representing an image key.'
-    icon_filename = ''
-    view_html_filename = 'image_view'
-    edit_html_filename = None
-
-
-class TarFileString(UnicodeString):
+class TarFileString(BaseObject):
     """A unicode string with the base64-encoded content of a tar file"""
 
     description = 'A string with base64-encoded content of a tar file'
@@ -414,5 +424,11 @@ class Filepath(UnicodeString):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
+        try:
+            assert raw is not None
+            assert isinstance(raw, basestring)
+        except Exception:
+            raise TypeError('Cannot convert to filepath: %s' % raw)
+
         # The path will be prefixed with "[exploration_id]/assets".
         raw = super(Filepath, cls).normalize(raw)

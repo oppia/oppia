@@ -19,12 +19,26 @@
 __author__ = 'Sean Lip'
 
 import bleach
-from core.domain import widget_domain
+from core.domain import widget_registry
 import feconf
+import logging
+import urlparse
+
+
+def filter_a(name, value):
+    if name in ('title', 'target'):
+        return True
+    if name == 'href':
+        url_components = urlparse.urlsplit(value)
+        if url_components[0] in ['http', 'https']:
+            return True
+        logging.error('Found invalid URL href: %s' % value)
+
+    return False
 
 
 ATTRS_WHITELIST = {
-    'a': ['href', 'title', 'target'],
+    'a': filter_a,
     'b': [],
     'blockquote': [],
     'br': [],
@@ -53,7 +67,7 @@ def clean(user_submitted_html):
     This only allows HTML from a restricted set of tags, attrs and styles. It
     strips out unrecognized tags.
     """
-    oppia_custom_tags = widget_domain.Registry.get_tag_list_with_attrs(
+    oppia_custom_tags = widget_registry.Registry.get_tag_list_with_attrs(
         feconf.NONINTERACTIVE_PREFIX)
 
     core_tags = ATTRS_WHITELIST.copy()

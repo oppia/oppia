@@ -13,9 +13,13 @@
 {% endblock header_js %}
 
 {% block content %}
-  <div ng-show="isDemoServer()" style="background-color: lightyellow; width: 700px; margin: 0 auto">
-    <strong style="color: red">Warning</strong>: This site is a public demo playground for Oppia, and is updated frequently. Please regard any explorations that you create on it as transient -- they may be deleted at any time.
-  </div>
+  {% if announcement %}
+    <center>
+      <div class="oppia-warning">
+        {{ announcement }}
+      </div>
+    </center>
+  {% endif %}
 
   <div ng-controller="EditorExploration" ng-cloak>
     <script type="text/ng-template" id="modals/publishExploration">
@@ -35,7 +39,9 @@
         <p>
           Once you publish an exploration, you cannot unpublish it. Deletion
           of a published exploration may only occur with the approval of the
-          site moderators.
+          site moderators. You will still be able to edit the exploration, and
+          in the future we we plan to make it possible for other people to 
+          improve it too.
         </p>
 
         <p>
@@ -81,6 +87,50 @@
       <div class="modal-footer">
         <button class="btn" ng-click="delete()">Delete</button>
         <button class="btn" ng-click="cancel()">Close</button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/saveExploration">
+      <div class="modal-header">
+        <h3>Save Exploration</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          You are about to save changes to this exploration. These changes will immediately be publicly visible.
+        </p>
+        <p>
+          Please enter a brief description of what you have changed:
+          <textarea rows="3" cols="50" ng-model="commitMessage"></textarea>
+        </p>
+
+        <div ng-if="explorationChangesExist">
+          <em>
+            You changed the following properties of the exploration:
+          </em>
+          <ul>
+            <li ng-repeat="(property, changeInfo) in changeSummary.exploration">
+              <[changeInfo]>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-if="stateChangesExist">
+          <em>
+            You made the following changes to states:
+          </em>
+          <div ng-repeat="(stateName, stateChanges) in changeSummary.states">
+            <h5><[stateName]></h5>
+            <ul>
+              <li ng-repeat="entry in stateChanges track by $index">
+                <[entry]>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
+        <button class="btn" ng-click="cancel()">Cancel</button>
       </div>
     </script>
 
@@ -138,19 +188,24 @@
 
           <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
           <div ng-show="!!explorationTitle">
+            <div style="float: right;">
+              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardExplorationChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationSaveable()">save changes</button>
+            </div>
+
             <tabset>
-              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()" disabled="isStateLockedForEditing()">
+              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
                 {% include 'editor/editor_metadata.html' %}
                 <hr>
                 {% include 'editor/editor_viz.html' %}
               </tab>
 
-              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()" disabled="isStateLockedForEditing()">
+              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
                 {% include 'editor/stats_viewer.html' %}
               </tab>
 
-              <tab heading="State Editor" disabled="!doesStateIdExist()" active="guiTabActive" select="selectGuiTab()">
-                <div ng-controller="StateEditor" ng-if="doesStateIdExist()">
+              <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive" select="selectGuiTab()">
+                <div ng-controller="StateEditor" ng-if="currentlyInStateContext()">
                   {% include 'editor/state_editor.html' %}
                 </div>
               </tab>
@@ -160,6 +215,11 @@
       </div>
     </div>
   </div>
+
+  <script type="text/ng-template" id="inline/param_change_editor">
+    {% include 'components/param_change_editor.html' %}
+  </script>
+
 {% endblock content %}
 
 {% block footer_js %}
@@ -174,6 +234,8 @@
     {{ object_editors_js }}
     {{ include_js_file('editor/StatsViewer.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
+    {{ include_js_file('editor/StateReaderFeedback.js') }}
+    {{ include_js_file('editor/UnresolvedAnswers.js') }}
     // These should come after the valueGeneratorEditor scripts.
     {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}

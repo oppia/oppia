@@ -54,7 +54,7 @@ def get_rules_for_input_type(input_type):
 
     rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
     if not isinstance(input_type, basestring):
-      input_type = input_type.__name__
+        input_type = input_type.__name__
     rule_class_name = '%sRule' % input_type
     results = []
 
@@ -266,7 +266,7 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
             parsed_param = definition['inputs'][param_name]
             if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
                 parsed_param = jinja_utils.parse_string(
-                    parsed_param, context_params)
+                    parsed_param, context_params, autoescape=False)
             normalized_param = obj_cls.normalize(parsed_param)
             param_list.append(normalized_param)
 
@@ -282,20 +282,23 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
     elif definition['rule_type'] == AND_RULE_TYPE:
         for child_dict in definition['children']:
             if not evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params, answer):
+                    child_dict, param_specs, answer_type, context_params,
+                    answer):
                 return False
         return True
 
     elif definition['rule_type'] == OR_RULE_TYPE:
         for child_dict in definition['children']:
             if evaluate_rule(
-                    child_dict, param_specs, answer_type, context_params, answer):
+                    child_dict, param_specs, answer_type, context_params,
+                    answer):
                 return True
         return False
 
     elif definition['rule_type'] == NOT_RULE_TYPE:
         return (not evaluate_rule(
-            definition['child'], param_specs, answer_type, context_params, answer))
+            definition['child'], param_specs, answer_type, context_params,
+            answer))
 
     else:
         raise Exception('Unrecognized rule type %s' % definition['rule_type'])

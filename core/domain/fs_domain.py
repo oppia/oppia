@@ -85,6 +85,10 @@ class ExplorationFileSystem(object):
     def __init__(self, exploration_id):
         self._exploration_id = exploration_id
 
+    @property
+    def exploration_id(self):
+        return self._exploration_id
+
     def _get_file_metadata(self, filepath, version):
         """Return the desired file metadata."""
         if version is None:
@@ -207,7 +211,7 @@ class ExplorationFileSystem(object):
 class DiskBackedFileSystem(object):
     """Implementation for a disk-backed file system.
 
-    This implementation ignores versioning and is used only for tests.
+    This implementation ignores versioning and is used only by tests.
     """
 
     def __init__(self, root):
@@ -217,6 +221,11 @@ class DiskBackedFileSystem(object):
             root: the path to append to the oppia/ directory.
         """
         self._root = os.path.join(os.getcwd(), root)
+        self._exploration_id = 'test'
+
+    @property
+    def exploration_id(self):
+        return self._exploration_id
 
     def isfile(self, filepath):
         """Checks if a file exists."""
@@ -244,26 +253,46 @@ class AbstractFileSystem(object):
     def __init__(self, impl):
         self._impl = impl
 
+    @property
+    def impl(self):
+        return self._impl
+
+    def _check_filepath(self, filepath):
+        """Raises an error if a filepath is invalid."""
+        base_dir = os.path.join('/', self.impl.exploration_id, 'assets')
+        absolute_path = os.path.join(base_dir, filepath)
+        normalized_path = os.path.normpath(absolute_path)
+
+        # This check prevents directory traversal.
+        if not normalized_path.startswith(base_dir):
+            raise IOError('Invalid filepath: %s' % filepath)
+
     def isfile(self, filepath):
         """Checks if a file exists. Similar to os.path.isfile(...)."""
+        self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
     def open(self, filepath, version=None):
         """Returns a stream with the file content. Similar to open(...)."""
+        self._check_filepath(filepath)
         return self._impl.get(filepath, version=version)
 
     def get(self, filepath, version=None):
         """Returns a bytestring with the file content, but no metadata."""
+        self._check_filepath(filepath)
         return self._impl.get(filepath, version=version).read()
 
     def put(self, filepath, raw_bytes):
         """Replaces the contents of the file with the given bytestring."""
+        self._check_filepath(filepath)
         self._impl.put(filepath, raw_bytes)
 
     def delete(self, filepath):
         """Deletes a file and the metadata associated with it."""
+        self._check_filepath(filepath)
         self._impl.delete(filepath)
 
     def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...)."""
+        self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)

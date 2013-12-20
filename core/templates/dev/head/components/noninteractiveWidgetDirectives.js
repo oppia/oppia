@@ -55,22 +55,33 @@ oppia.directive('oppiaNoninteractiveVideo', function($sce, oppiaHtmlEscaper) {
   };
 });
 
-oppia.directive('oppiaNoninteractiveHints', function(oppiaHtmlEscaper) {
+oppia.directive('oppiaNoninteractiveTabs', function(oppiaHtmlEscaper) {
   return {
     restrict: 'E',
     scope: {
-      lowHintWithValue: '@',
-      mediumHintWithValue: '@',
-      highHintWithValue: '@',
-      hintPlaceholderWithValue: '@'
+      tabContentsWithValue: '@'
     },
-    templateUrl: '/widgettemplate/noninteractive/Hints',
+    templateUrl: '/widgettemplate/noninteractive/Tabs',
     controller: function($scope, $attrs) {
-      $scope.lowHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.lowHintWithValue);
-      $scope.mediumHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.mediumHintWithValue);
-      $scope.highHint = oppiaHtmlEscaper.escapedJsonToObj($attrs.highHintWithValue);
-      $scope.hintPlaceholder = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.hintPlaceholderWithValue);
+      $scope.tabContents = oppiaHtmlEscaper.escapedJsonToObj($attrs.tabContentsWithValue);
+    }
+  };
+});
+
+oppia.directive('oppiaNoninteractiveLink', function(oppiaHtmlEscaper) {
+  return {
+    restrict: 'E',
+    scope: {
+      urlWithValue: '@'
+    },
+    templateUrl: '/widgettemplate/noninteractive/Link',
+    controller: function($scope, $attrs) {
+      var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj($attrs.urlWithValue);
+      if (untrustedUrl.indexOf('http://') !== 0 &&
+          untrustedUrl.indexOf('https://') !== 0) {
+        return;
+      }
+      $scope.url = untrustedUrl;
     }
   };
 });

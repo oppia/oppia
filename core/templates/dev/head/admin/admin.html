@@ -3,52 +3,23 @@
   <head>
     <title>Oppia Admin Panel</title>
 
+    {% include 'header_css_libs.html' %}
     {% include 'header_js_libs.html' %}
     <script>
       var GLOBALS = {};
       GLOBALS.csrf_token = JSON.parse('{{csrf_token|js_string}}');
-
-      var oppia = angular.module('oppia', []);
-      oppia.config(function($interpolateProvider) {
-        $interpolateProvider.startSymbol('<[');
-        $interpolateProvider.endSymbol(']>');
-      });
-
-      function Admin($scope, $http) {
-        $scope.message = '';
-
-        $scope.reloadExploration = function(explorationId) {
-          if ($scope.message == 'Processing...') {
-            return;
-          }
-
-          $scope.message = 'Processing...';
-          var request = $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              action: 'reload_exploration',
-              explorationId: String(explorationId) 
-            })
-          }, true);
-
-          $http.post(
-            '/admin',
-            request,
-            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-          success(function(data) {
-              $scope.message = 'Data reloaded successfully. Please remember ' +
-                'to flush memcache so that users do not see stale values.';
-            }).error(function(errorResponse) {
-              $scope.message = 'Server error: ' + errorResponse.error;
-            });
-        };
-      };
     </script>
   </head>
 
   <body ng-controller="Admin">
     <div>
       Click <a href="/">here</a> to go to the Oppia main page.
+    </div>
+
+    <br>
+
+    <div ng-if="message" style="background-color: lightyellow;">
+      <[message]>
     </div>
 
     <h3>Performance Counters</h3>
@@ -61,6 +32,37 @@
       {% endfor %}
     </ul>
 
+    <h3>Configuration</h3>
+
+    <div ng-if="isNonemptyObject(configProperties)">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
+        <em><[configPropertyData.description]></em>
+        <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
+      </div>
+
+      <button ng-click="saveConfigProperties()">Save</button>
+      <button ng-click="reloadConfigProperties()">Undo changes</button>
+    </div>
+
+    <div ng-if="!isNonemptyObject(configProperties)">
+      No configuration properties are available.
+    </div>
+
+    <h3>Computed configuration properties</h3>
+
+    <div ng-if="isNonemptyObject(computedProperties)">
+      <ul>
+        <li ng-repeat="(computedPropertyId, computedPropertyData) in computedProperties">
+          <em><[computedPropertyData.description]></em>
+          <button ng-click="refreshComputedProperty(computedPropertyId)">Reload</button>
+        </li>
+      </ul>
+    </div>
+
+    <div ng-if="!isNonemptyObject(computedProperties)">
+      No computed configuration properties are available.
+    </div>
+
     <h3>Actions</h3>
     <h4>Reload a single exploration</h4>
     <ul>
@@ -72,7 +74,18 @@
           </button>
         </li>
       {% endfor %}
-    <br><br>
-    <[message]>
+    </ul>
+
+    {% include 'footer_js_libs.html' %}
+    {% include 'rte_js_libs.html' %}
+
+    <script>
+      {{ include_js_file('app.js') }}
+      {{ include_js_file('admin/Admin.js') }}
+      {{ include_js_file('services/warningsData.js') }}
+      {{ include_js_file('components/richTextEditor.js') }}
+      {{ include_js_file('components/objectEditor.js') }}
+      {{ object_editors_js }}
+    </script>
   </body>
 </html>

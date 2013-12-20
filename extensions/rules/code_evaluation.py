@@ -21,8 +21,11 @@ __author__ = 'Koji Ashida'
 from extensions.rules import base
 
 
-class CodeEquals(base.CodeEvaluationRule):
-    description = 'has code equal to {{c|NormalizedString}}'
+class OutputEquals(base.CodeEvaluationRule):
+    description = (
+        'has output equal to {{x|NormalizedString}} (collapsing spaces)')
 
     def _evaluate(self, subject):
-        return subject['code'] == self.c
+        normalized_result = ' '.join(subject['output'].split())
+        normalized_expected_output = ' '.join(self.x.split())
+        return normalized_result == normalized_expected_output

@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +17,12 @@
 __author__ = 'Sean Lip'
 
 import copy
+import feconf
 import re
 import types
+
+import webapp2
+import webtest
 
 from core.controllers import base
 import main
@@ -70,19 +76,19 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         page = 'page_name'
 
         token = base.CsrfTokenManager.create_csrf_token(uid, page)
-        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(uid, page, token))
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, page, token))
 
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
-        self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, 'wrong_page', token))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, 'wrong_page', token))
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new/token'))
 
     def test_nondefault_csrf_secret_is_used(self):
-        self.assertEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
         base.CsrfTokenManager.create_csrf_token('uid', 'page')
         self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
 
@@ -148,3 +154,47 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
         self.assertFalse(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+
+
+class EscapingTest(test_utils.GenericTestBase):
+
+    class FakeAboutPage(base.BaseHandler):
+        """Fake page for testing autoescaping."""
+
+        def get(self):
+            """Handles GET requests."""
+            self.values.update({
+                'code_contributors_list': ['<[angular_tag]>'],
+                'idea_contributors_str': '{{51 * 3}}',
+            })
+            self.render_template('pages/about.html')
+
+        def post(self):
+            """Handles POST requests."""
+            self.render_json({'big_value': u'\n<script>马={{'})
+
+    def setUp(self):
+        super(EscapingTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/fake', self.FakeAboutPage, name='FakePage')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_jinja_autoescaping(self):
+        response = self.testapp.get('/fake')
+        self.assertEqual(response.status_int, 200)
+
+        self.assertIn('&lt;[angular_tag]&gt;', response.body)
+        self.assertNotIn('<[angular_tag]>', response.body)
+
+        self.assertIn('{{51 * 3}}', response.body)
+        self.assertNotIn('153', response.body)
+
+    def test_special_char_escaping(self):
+        response = self.testapp.post('/fake', {})
+        self.assertEqual(response.status_int, 200)
+
+        self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))
+        self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
+        self.assertNotIn('<script>', response.body)
+        self.assertNotIn('马', response.body)

@@ -129,7 +129,8 @@ class ExplorationModel(base_models.BaseModel):
         """Returns a list of explorations viewable by the given user."""
         public_explorations = cls.get_public_explorations()
         if user_id:
-            editable_explorations = cls.objects.filter(editor_ids__icontains=user_id)
+            editable_explorations = cls.objects.filter(
+                editor_ids__icontains=user_id)
             return list(set(public_explorations).union(editable_explorations))
         else:
             return public_explorations
@@ -225,7 +226,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
                 'Snapshot with exploration id %s and version number %s '
                 'already exists' % (exploration_id, version_number))
 
-        # Save the snapshot content.    
+        # Save the snapshot content.
         ExplorationSnapshotContentModel.save_snapshot_content(
             snapshot_id, snapshot_format, json_blob)
 

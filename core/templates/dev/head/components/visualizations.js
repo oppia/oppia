@@ -133,16 +133,16 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
           .style({'stop-color': nodeFill, 'stop-opacity': 0.1});
 
         if (opacityMap || highlightStates) {
-            var wth = 200;
+            var legendWidth = 210;
             var x = 450;
             var legendHeight = 0;
             var legend = vis.append('svg:rect')
-              .attr({'width': wth, 'x': x})
+              .attr({'width': legendWidth, 'x': x})
               .style({'fill': 'transparent', 'stroke': 'black'});
 
             if (opacityMap) {
               vis.append('svg:rect').attr({
-                'width': wth - 20,
+                'width': legendWidth - 20,
                 'height': 20,
                 'x': x + 10,
                 'y': 10

@@ -15,11 +15,15 @@
 __author__ = 'Sean Lip'
 
 import json
+import unittest
 
 from core.domain import exp_services
+import feconf
 import test_utils
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 
@@ -153,7 +157,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             `expected_response` will be interpreted as a regex string.
             """
             reader_dict = self._submit_answer(answer)
-            self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+            self.assertRegexpMatches(
+                reader_dict['oppia_html'], expected_response)
             return self
 
     def init_player(self, exploration_id, expected_title, expected_response):
@@ -189,7 +194,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
             '6', 'Parametrized Adventure',
-            'Hello, brave adventurer! What is your name?'
+            'Hello, brave adventurer'
         ).submit_and_compare(
             'My Name', 'Hello, I\'m My Name!.*get a pretty red'
         ).submit_and_compare(

@@ -478,7 +478,9 @@ states:
           rule_type: atomic
           subject: answer
         dest: Picking in the middle
-        feedback: []
+        feedback:
+        - '"I agree, it''s probably important that he''s always picking a number in
+          the middle of the range of possible numbers."'
         param_changes: []
       - definition:
           inputs:
@@ -488,7 +490,8 @@ states:
           subject: answer
         dest: Picking in the middle
         feedback:
-        - ''
+        - '"Yeah, he divides the range of possible numbers about in half every time.
+          I wonder why?"'
         param_changes: []
       - definition:
           inputs:
@@ -497,7 +500,9 @@ states:
           rule_type: atomic
           subject: answer
         dest: Picking in the middle
-        feedback: []
+        feedback:
+        - Yeah, he divides the range of possible numbers about in half every time.
+          I wonder why?<br>
         param_changes: []
       - definition:
           inputs:
@@ -507,7 +512,8 @@ states:
           subject: answer
         dest: Picking in the middle
         feedback:
-        - ''
+        - Yeah, he divides the range of possible numbers about in half every time.
+          I wonder why?
         param_changes: []
       - definition:
           inputs:
@@ -1880,14 +1886,14 @@ states:
       \ what the best questions to ask were to get the answer really quickly!\"<br><br>\"\
       That's right! I'm actually pretty lazy. So when people ask me to guess a number\
       \ from 1 to 1000 I really don't feel like going through 1000 numbers! So I figured\
-      \ out what I can do so I don't have to do too much! See?\"<br>He shows you his\
-      \ hand. It's covered in ink scribblings:<br><oppia-noninteractive-image filepath-with-value=\"\
-      &amp;quot;Algorithm.png&amp;quot;\"></oppia-noninteractive-image><br>\"Just\
-      \ like we did!\"<br><br>\"That's right! \_I call these little notes <b>algorithms</b>.\
+      \ out what I can do so I don't have to do too much! See?\"<div><br>He shows\
+      \ you his hand. It's covered in ink scribblings:<br><oppia-noninteractive-image\
+      \ filepath-with-value=\"&amp;quot;Algorithm.png&amp;quot;\"></oppia-noninteractive-image></div><div><br>\"\
+      Just like we did!\"<br><br>\"That's right! \_I call these little notes <b>algorithms</b>.\
       \ Hey, you guys are pretty clever - maybe you can help me figure out another\
       \ one! You see, I really want to travel to a Far Away land, but I really don't\
       \ want to travel more than I have to. So I was thinking...\"<br><br>The three\
-      \ of you walk off along a winding path, planning your next adventure...<br><br>"
+      \ of you walk off along a winding path, planning your next adventure...<br><br></div>"
   name: Worst Case Finished
   param_changes:
   - customization_args:
@@ -2271,9 +2277,9 @@ states:
           if it''s bigger than {{(answer|int)+1}}, then it''s between {{(answer|int)+2}}
           and 10. That''s a range of {{9-(answer|int)}} numbers. {{"Oh wait, it doesn''t
           make sense for the number to be bigger than 10! We''re guessing a number
-          between 1 and 10!" if 9==(answer|int) else ""}}<div>So, the worst case is
-          if the real number is {{"greater than" if 6&gt;(answer|int) else "less than"}}
-          {{answer}}!</div>'
+          between 1 and 10!" if 9==(answer|int) else ""}}<br><div>So, the worst case
+          is if the real number is {{"greater than" if 6==(answer|int) else "less
+          than"}} {{answer}}!<br></div>'
         param_changes: []
     sticky: false
     widget_id: MultipleChoiceInput

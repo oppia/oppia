@@ -13,6 +13,8 @@
 // limitations under the License.
 
 
+// This directive is always editable. No 'save' button needs to be clicked.
+
 oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, warningsData) {
   // Editable filepath directive. This can only be used in the context of an
   // exploration.
@@ -27,9 +29,10 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function ($scope, $attrs) {
+      // Reset the component each time the value changes (e.g. if this is part
+      // of an editable list).
       $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'.
-        $scope.localValue = {label: $scope.value || ''};
+        $scope.localValue = {label: newValue || ''};
         $scope.imageUploaderIsActive = false;
       });
 
@@ -132,7 +135,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       };
 
       $scope.filepathsLoaded = false;
-      $http.get('/create/resource_list/' + $scope.explorationId).success(function(data) {
+      $http.get('/createhandler/resource_list/' + $scope.explorationId).success(function(data) {
         $scope.filepaths = data.filepaths;
         $scope.filepathsLoaded = true;
       });

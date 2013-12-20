@@ -41,7 +41,8 @@ class Image(widget_domain.BaseWidget):
     # The tooltip for the icon in the rich-text editor.
     tooltip = 'Insert image'
     # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this widget folder.
+    # .png file in this widget folder, generated with the
+    # utils.convert_png_to_data_url() function.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA'
         'ABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZ'

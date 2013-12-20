@@ -17,6 +17,7 @@
 __author__ = 'Jeremy Emerson'
 
 from core.domain import widget_domain
+from core.domain import widget_registry
 from extensions.objects.models import objects
 import feconf
 import test_utils
@@ -44,7 +45,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
 
         MUSIC_STAFF_ID = 'MusicStaff'
 
-        widget = widget_domain.Registry.get_widget_by_id(
+        widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
         self.assertEqual(widget.id, MUSIC_STAFF_ID)
         self.assertEqual(widget.name, 'Music staff')

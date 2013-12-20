@@ -25,6 +25,11 @@ oppia.directive('randomSelector', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
+      $scope.UNICODE_STRING_LIST_INIT_ARGS = {
+        'objType': 'UnicodeString',
+        'addItemText': 'Add New Choice'
+      };
+
       $scope.$watch('$parent.objType', function(newValue, oldValue) {
         $scope.objType = $scope.$parent.objType;
       }, true);

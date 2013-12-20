@@ -41,11 +41,26 @@
         <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
       </p>
 
+      <div ng-if="!isEmpty(stateStats.readerFeedback)">
+        <h5>
+          Feedback
+          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
+        </h5>
+        <ul>
+          <li ng-repeat="(feedbackId, feedbackItem) in stateStats.readerFeedback">
+            <[feedbackItem.content]>
+            <a href="#" onclick="return false;" ng-click="gotoStateEditor('feedback')">
+              Address this feedback
+            </a>
+          </li>
+        </ul>
+      </div>
+
       <div ng-if="stateStats.totalEntryCount">
         <h5>Answers</h5>
         <div ng-show="doesAnswerExist()">
           <ul>
-            <li ng-repeat="(rule, ruleData) in stateStats.rule_stats" ng-show="stateStats.rule_stats[rule].answers.length > 0">
+            <li ng-repeat="(rule, ruleData) in rulesStats" ng-show="ruleData.answers.length > 0">
               <[rule]>
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">
@@ -61,22 +76,10 @@
 
         <div ng-if="!doesAnswerExist()">
           <em>No students gave answers.</em>
-          <a href="#" onclick="return false;" ng-click="gotoStateEditor('noninteractive')">
+          <a href="#" onclick="return false;" ng-click="gotoStateEditor('content')">
             Edit content
           </a>
         </div>
-      </div>
-
-      <div ng-if="stateStats.feedback_log.length">
-        <h5>
-          Feedback
-          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
-        </h5>
-        <ul>
-          <li ng-repeat="item in stateStats.feedback_log track by $index">
-            <[item.feedback]>
-          </li>
-        </ul>
       </div>
 
     </div>

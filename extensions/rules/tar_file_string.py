@@ -44,7 +44,7 @@ class ChecksWrapperDirPresence(base.TarFileStringRule):
 
 
 class HasAppleDoubleFile(base.TarFileStringRule):
-    description = 'Contains an Apple Double file.'
+    description = 'contains an Apple Double file.'
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -55,7 +55,7 @@ class HasAppleDoubleFile(base.TarFileStringRule):
 
 
 class HasUnexpectedFile(base.TarFileStringRule):
-    description = 'Contains a file not present in {{expected_files|List}}.'
+    description = 'contains a file not present in {{expected_files|List}}.'
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -66,7 +66,7 @@ class HasUnexpectedFile(base.TarFileStringRule):
 
 
 class MissingExpectedFile(base.TarFileStringRule):
-    description = 'Omits one or more files in {{expected_files|List}}.'
+    description = 'omits one or more files in {{expected_files|List}}.'
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -80,7 +80,7 @@ class MissingExpectedFile(base.TarFileStringRule):
 
 
 class HasUnexpectedContent(base.TarFileStringRule):
-    description = 'Contains file not present in {{file_list|List}}.'
+    description = 'contains file not present in {{file_list|List}}.'
 
     def _evaluate(self, subject):
         members = subject.getmembers()

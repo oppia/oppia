@@ -1,4 +1,3 @@
-.gitignore
 *~
 *.pyc
 *.swp
@@ -11,3 +10,4 @@ libpeerconnection.log
 uploads/*
 venv/
 *.db
+.DS_Store

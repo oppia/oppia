@@ -233,7 +233,7 @@ class ExplorationSnapshotModel(base_models.BaseModel):
                 'Snapshot with exploration id %s and version number %s '
                 'already exists' % (exploration_id, version_number))
 
-        # Save the snapshot content.    
+        # Save the snapshot content.
         ExplorationSnapshotContentModel.save_snapshot_content(
             snapshot_id, snapshot_format, json_blob)
 

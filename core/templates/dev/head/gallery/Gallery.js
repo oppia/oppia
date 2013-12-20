@@ -21,11 +21,11 @@
 function Gallery($scope, $http, $modal, warningsData, requestCreator) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
-  $scope.galleryUrl = '/gallery/data/';
+  $scope.galleryDataUrl = '/gallery/data/';
   $scope.categoryList = [];
 
   // Retrieves gallery data from the server.
-  $http.get($scope.galleryUrl).success(function(galleryData) {
+  $http.get($scope.galleryDataUrl).success(function(galleryData) {
     $scope.categories = galleryData.categories;
 
     // Put the category names in a list.

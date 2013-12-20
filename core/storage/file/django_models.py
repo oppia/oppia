@@ -45,8 +45,8 @@ class FileMetadataModel(base_models.BaseModel):
 
     @classmethod
     def get_undeleted(cls):
-    	# TODO(sunu0000): Impose a limit of QUERY_LIMIT on the number of
-    	# results.
+        # TODO(sunu0000): Impose a limit of QUERY_LIMIT on the number of
+        # results.
         return cls.get_all().filter(deleted=False)
 
     @classmethod

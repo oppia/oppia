@@ -17,10 +17,10 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import obj_services
-from core.domain import param_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -32,8 +32,43 @@ import utils
 import jinja2
 
 EDITOR_MODE = 'editor'
-# The maximum number of exploration history snapshots to show by default.
+# The number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 10
+
+
+def get_value_generators_js():
+    all_value_generators = (
+        value_generators_domain.Registry.get_all_generator_classes())
+    value_generators_js = ''
+    for gid, generator_cls in all_value_generators.iteritems():
+        value_generators_js += generator_cls.get_js_template()
+    return value_generators_js
+
+VALUE_GENERATORS_JS = config_domain.ComputedProperty(
+    'value_generators_js', 'UnicodeString',
+    'JavaScript code for the value generators', get_value_generators_js)
+
+OBJECT_EDITORS_JS = config_domain.ComputedProperty(
+    'object_editors_js', 'UnicodeString',
+    'JavaScript code for the object editors',
+    obj_services.get_all_object_editor_js_templates)
+
+EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
+    'editor_page_announcement', 'Html',
+    'A persistent announcement to display on top of all editor pages.',
+    default_value='')
+
+
+def _require_valid_version(version_from_payload, exploration_version):
+    if version_from_payload is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid POST request: a version must be specified.')
+
+    if version_from_payload != exploration_version:
+        raise base.BaseHandler.InvalidInputException(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_version, version_from_payload))
 
 
 class ExplorationPage(base.BaseHandler):
@@ -44,26 +79,16 @@ class ExplorationPage(base.BaseHandler):
     @base.require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
-        # TODO(sll): Cache all this generated code, if it's unlikely to change
-        # much.
-        all_value_generators = (
-            value_generators_domain.Registry.get_all_generator_classes())
-        value_generators_js = ''
-        for gid, generator_cls in all_value_generators.iteritems():
-            value_generators_js += generator_cls.get_js_template()
-
-        all_object_editors = (
-            obj_services.Registry.get_all_object_classes())
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
-        object_editors_js = ''
-        for obj_type, obj_cls in all_object_editors.iteritems():
-            object_editors_js += obj_cls.get_editor_js_template()
+        object_editors_js = OBJECT_EDITORS_JS.value
+        value_generators_js = VALUE_GENERATORS_JS.value
 
         self.values.update({
             'nav_mode': EDITOR_MODE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
+            'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value)
         })
         self.render_template('editor/editor_exploration.html')
 
@@ -83,17 +108,6 @@ class ExplorationHandler(base.BaseHandler):
             state_list[state_id] = exp_services.export_state_to_verbose_dict(
                 exploration_id, state_id)
 
-        snapshots = exp_services.get_exploration_snapshots_metadata(
-            exploration_id, DEFAULT_NUM_SNAPSHOTS)
-        # Patch `snapshots` to use the editor's display name.
-        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
-            for snapshot in snapshots:
-                if snapshot['committer_id'] != 'admin':
-                    snapshot['committer_id'] = user_services.get_username(
-                        snapshot['committer_id'])
-
-        # TODO(sll): Also patch `editor_ids` to use the editors' display names.
-
         self.values.update({
             'exploration_id': exploration_id,
             'init_state_id': exploration.init_state_id,
@@ -105,17 +119,6 @@ class ExplorationHandler(base.BaseHandler):
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
             'version': exploration.version,
-            # Add information about the most recent versions.
-            'snapshots': snapshots,
-            # Add information for the exploration statistics page.
-            'num_visits': stats_services.get_exploration_visit_count(
-                exploration_id),
-            'num_completions': stats_services.get_exploration_completed_count(
-                exploration_id),
-            'state_stats': stats_services.get_state_stats_for_exploration(
-                exploration_id),
-            'imp': stats_services.get_top_improvable_states(
-                [exploration_id], 10),
         })
         self.render_json(self.values)
 
@@ -123,19 +126,19 @@ class ExplorationHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
+
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
 
         state_name = self.payload.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        state_id = exp_services.add_states(
-            self.user_id, exploration_id, [state_name])[0]
+        try:
+            state_id = exp_services.add_states(
+                self.user_id, exploration_id, [state_name])[0]
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
@@ -147,53 +150,36 @@ class ExplorationHandler(base.BaseHandler):
     @base.require_editor
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
-
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
 
-        is_public = self.payload.get('is_public')
-        category = self.payload.get('category')
         title = self.payload.get('title')
-        editors = self.payload.get('editors')
+        category = self.payload.get('category')
         param_specs = self.payload.get('param_specs')
         param_changes = self.payload.get('param_changes')
+        states = self.payload.get('states')
+        commit_message = self.payload.get('commit_message')
 
-        if is_public:
-            exploration.is_public = True
-        if category:
-            exploration.category = category
-        if title:
-            exploration.title = title
-        if editors:
-            if (self.is_admin or (exploration.editor_ids and
-                                  self.user_id == exploration.editor_ids[0])):
-                exploration.editor_ids = []
-                for email in editors:
-                    exploration.add_editor(email)
-            else:
-                raise self.UnauthorizedUserException(
-                    'Only the exploration owner can add new collaborators.')
-        if param_specs is not None:
-            exploration.param_specs = {
-                ps_name: param_domain.ParamSpec.from_dict(ps_val)
-                for (ps_name, ps_val) in param_specs.iteritems()
-            }
-        if param_changes is not None:
-            exploration.param_changes = [
-                param_domain.ParamChange.from_dict(param_change)
-                for param_change in param_changes
-            ]
-
-        exp_services.save_exploration(self.user_id, exploration)
+        exp_services.update_exploration(
+            self.user_id, exploration_id, title, category,
+            param_specs, param_changes, states, commit_message)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
+        updated_states = {}
+        for state_id in states:
+            updated_states[state_id] = (
+                exp_services.export_state_to_verbose_dict(
+                    exploration_id, state_id)
+            )
+
         self.render_json({
-            'version': exploration.version
+            'version': exploration.version,
+            'updatedStates': updated_states,
+            'title': exploration.title,
+            'category': exploration.category,
+            'param_specs': exploration.param_specs_dict,
+            'param_changes': exploration.param_change_dicts
         })
 
     @base.require_editor
@@ -210,49 +196,40 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.delete_exploration(self.user_id, exploration_id)
 
 
-class StateHandler(base.BaseHandler):
-    """Handles state transactions."""
+class ExplorationRightsHandler(base.BaseHandler):
+    """Handles management of exploration editing rights."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
-    def put(self, exploration_id, state_id):
-        """Saves updates to a state."""
+    def put(self, exploration_id):
+        """Updates the editing rights for the given exploration."""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
 
-        if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit',
-                self.payload.get('resolved_answers'))
+        is_public = self.payload.get('is_public')
+        editors = self.payload.get('editors')
+        if editors is not None and not self.is_admin and not (
+                exploration.editor_ids and
+                self.user_id == exploration.editor_ids[0]):
+            raise self.UnauthorizedUserException(
+                'Only the exploration owner can add new editors.')
+
+        exp_services.update_exploration_rights(
+            self.user_id, exploration_id, is_public, editors)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.payload['version']
-        if version != exploration.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration.version, version))
-
-        state_name = self.payload.get('state_name')
-        param_changes = self.payload.get('param_changes')
-        widget_id = self.payload.get('widget_id')
-        widget_customization_args = self.payload.get(
-            'widget_customization_args')
-        widget_handlers = self.payload.get('widget_handlers')
-        widget_sticky = self.payload.get('widget_sticky')
-        content = self.payload.get('content')
-
-        exp_services.update_state(
-            self.user_id, exploration_id, state_id, state_name, param_changes,
-            widget_id, widget_customization_args, widget_handlers,
-            widget_sticky, content
-        )
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        # TODO(sll): Also add information about is_public and editors.
         self.render_json({
             'version': exploration.version,
-            'stateData': exp_services.export_state_to_verbose_dict(
-                exploration_id, state_id)
         })
+
+
+class DeleteStateHandler(base.BaseHandler):
+    """Handles state deletions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
 
     @base.require_editor
     def delete(self, exploration_id, state_id):
@@ -266,6 +243,50 @@ class StateHandler(base.BaseHandler):
         self.render_json({
             'version': exploration.version
         })
+
+
+class ResolvedAnswersHandler(base.BaseHandler):
+    """Allows readers' answers for a state to be marked as resolved."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_editor
+    def put(self, exploration_id, state_id):
+        """Marks readers' answers as resolved."""
+
+        resolved_answers = self.payload.get('resolved_answers')
+
+        if not isinstance(resolved_answers, list):
+            raise self.InvalidInputException(
+                'Expected a list of resolved answers; received %s.' %
+                resolved_answers)
+
+        if 'resolved_answers' in self.payload:
+            stats_services.EventHandler.resolve_answers_for_default_rule(
+                exploration_id, state_id, 'submit', resolved_answers)
+
+        self.render_json({})
+
+
+class ResolvedFeedbackHandler(base.BaseHandler):
+    """Allows readers' feedback for a state to be resolved."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_editor
+    def put(self, exploration_id, state_id):
+        """Marks readers' feedback as resolved."""
+
+        feedback_id = self.payload.get('feedback_id')
+        new_status = self.payload.get('new_status')
+
+        if not feedback_id:
+            raise self.InvalidInputException(
+                'Invalid feedback resolution request: no feedback_id given')
+
+        stats_services.EventHandler.resolve_feedback(feedback_id, new_status)
+
+        self.render_json({})
 
 
 class ExplorationDownloadHandler(base.BaseHandler):
@@ -296,3 +317,56 @@ class ExplorationResourcesHandler(base.BaseHandler):
         dir_list = fs.listdir('')
 
         self.render_json({'filepaths': dir_list})
+
+
+class ExplorationSnapshotsHandler(base.BaseHandler):
+    """Returns the exploration snapshot history."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exploration_id, DEFAULT_NUM_SNAPSHOTS)
+
+        # Patch `snapshots` to use the editor's display name.
+        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
+            for snapshot in snapshots:
+                if snapshot['committer_id'] != 'admin':
+                    snapshot['committer_id'] = user_services.get_username(
+                        snapshot['committer_id'])
+
+        # TODO(sll): Also patch `editor_ids` to use the editors' display names.
+
+        self.render_json({
+            'snapshots': snapshots,
+        })
+
+
+class ExplorationStatisticsHandler(base.BaseHandler):
+    """Returns statistics for an exploration."""
+
+    @base.require_editor
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.render_json({
+            'num_visits': stats_services.get_exploration_visit_count(
+                exploration_id),
+            'num_completions': stats_services.get_exploration_completed_count(
+                exploration_id),
+            'state_stats': stats_services.get_state_stats_for_exploration(
+                exploration_id),
+            'imp': stats_services.get_top_improvable_states(
+                [exploration_id], 10),
+        })
+
+
+class StateRulesStatsHandler(base.BaseHandler):
+    """Returns detailed reader answer statistics for a state."""
+
+    @base.require_editor
+    def get(self, exploration_id, state_id):
+        """Handles GET requests."""
+        self.render_json({
+            'rules_stats': stats_services.get_state_rules_stats(
+                exploration_id, state_id)
+        })

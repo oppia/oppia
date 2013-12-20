@@ -23,60 +23,79 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
   $scope.showStateStatsModal = function(stateId, improvementType) {
     warningsData.clear();
 
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/stateStats',
-      backdrop: 'static',
-      resolve: {
-        stateId: function() {
-          return stateId;
-        },
-        stateName: function() {
-          return $scope.getStateName(stateId);
-        },
-        stateStats: function() {
-          return $scope.stats.stateStats[stateId];
-        },
-        improvementType: function() {
-          return improvementType;
-        }
-      },
-      controller: function($scope, $modalInstance, stateId, stateName, stateStats, improvementType) {
-        $scope.stateId = stateId;
-        $scope.stateName = stateName;
-        $scope.stateStats = stateStats;
-        $scope.improvementType = improvementType;
+    $http.get(
+        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + stateId
+    ).then(function(response) {
+      var rulesStats = response.data.rules_stats;
 
-        $scope.getNumTimesString = function(numberOfTimes) {
-          var suffix = (numberOfTimes == 1 ? ' time' : ' times');
-          return numberOfTimes + suffix;
-        };
-
-        $scope.doesAnswerExist = function() {
-          for (var rule in $scope.stateStats.rule_stats) {
-            if ($scope.stateStats.rule_stats[rule].answers.length > 0) {
-              return true;
-            }
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/stateStats',
+        backdrop: 'static',
+        resolve: {
+          stateId: function() {
+            return stateId;
+          },
+          stateName: function() {
+            return $scope.getStateName(stateId);
+          },
+          stateStats: function() {
+            return $scope.stats.stateStats[stateId];
+          },
+          improvementType: function() {
+            return improvementType;
+          },
+          rulesStats: function() {
+            return rulesStats;
           }
-          return false;
-        };
+        },
+        controller: function($scope, $modalInstance, stateId, stateName, stateStats, improvementType, rulesStats) {
+          $scope.stateId = stateId;
+          $scope.stateName = stateName;
+          $scope.stateStats = stateStats;
+          $scope.improvementType = improvementType;
+          $scope.rulesStats = rulesStats;
+  
+          $scope.getNumTimesString = function(numberOfTimes) {
+            var suffix = (numberOfTimes == 1 ? ' time' : ' times');
+            return numberOfTimes + suffix;
+          };
 
-        $scope.gotoStateEditor = function(locationHash) {
-          $modalInstance.close({locationHash: locationHash});
-        };
+          $scope.isEmpty = function(obj) {
+            for (var property in obj) {
+              if (obj.hasOwnProperty(property)) {
+                return false;
+              }
+            }
+            return true;
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
-    });
+          $scope.doesAnswerExist = function() {
+            for (var rule in $scope.rulesStats) {
+              if ($scope.rulesStats[rule].answers.length > 0) {
+                return true;
+              }
+            }
+            return false;
+          };
+  
+          $scope.gotoStateEditor = function(locationHash) {
+            $modalInstance.close({locationHash: locationHash});
+          };
+  
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      });
 
-    modalInstance.result.then(function(result) {
-      $location.hash(result.locationHash);
-      $scope.$parent.stateId = stateId;
-      $scope.selectGuiTab();
-    }, function () {
-      console.log('State stats modal dismissed.');
+      modalInstance.result.then(function(result) {
+        $location.hash(result.locationHash);
+        $scope.$parent.stateId = stateId;
+        $scope.selectGuiTab();
+      }, function () {
+        console.log('State stats modal dismissed.');
+      });
     });
   };
 }

@@ -71,7 +71,8 @@ class RestrictedCopier(value_generators_domain.BaseValueGenerator):
 
     def __init__(self, choices):
         if not isinstance(choices, list):
-            raise TypeError('Expected a list of choices, received %s' % choices)
+            raise TypeError(
+                'Expected a list of choices, received %s' % choices)
         self.choices = choices
 
     def generate_value(self, context_params, value, parse_with_jinja=False):

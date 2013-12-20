@@ -14,10 +14,10 @@
 
 import main
 import os
+import re
 import unittest
 import webtest
 
-from core.domain import exp_services
 from core.domain import stats_services
 from core.platform import models
 (exp_models, file_models, user_models) = models.Registry.import_models([
@@ -26,6 +26,10 @@ from core.platform import models
 import feconf
 
 import json
+
+
+CSRF_REGEX = (
+    r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
 
 
 def empty_environ():
@@ -54,23 +58,31 @@ class TestBase(unittest.TestCase):
     TAGS = []
 
     def _delete_all_explorations(self):
-        explorations = exp_services.get_all_explorations()
-        for exploration in explorations:
-            exp_services.delete_exploration(
-                'admin', exploration.id, force_deletion=True)
+        classes = frozenset([
+            exp_models.StateModel,
+            exp_models.ExplorationModel,
+            exp_models.ExplorationSnapshotModel,
+            exp_models.ExplorationSnapshotContentModel,
+        ])
+
+        for clazz in classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete()
 
     def _delete_all_files(self):
-        for file_data in file_models.FileDataModel.get_all():
-            file_data.delete()
-        for file_data_history in file_models.FileDataHistoryModel.get_all():
-            file_data_history.delete()
-        for file_metadata in file_models.FileMetadataModel.get_all():
-            file_metadata.delete()
-        for file_metadata_history in file_models.FileMetadataHistoryModel.get_all():
-            file_metadata_history.delete()
+        classes = frozenset([
+            file_models.FileDataModel,
+            file_models.FileDataHistoryModel,
+            file_models.FileMetadataModel,
+            file_models.FileMetadataHistoryModel,
+        ])
+
+        for clazz in classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete()
 
     def _delete_all_stats(self):
-        stats_services._delete_all_stats()
+        stats_services.delete_all_stats()
 
     def _delete_all_user_settings(self):
         all_user_settings = user_models.UserSettingsModel.get_all()
@@ -91,6 +103,34 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
+    def get_json(self, url):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(url)
+        self.assertEqual(json_response.status_int, 200)
+        return self.parse_json_response(json_response, expect_errors=False)
+
+    def post_json(self, url, payload, csrf_token, expect_errors=False,
+                  expected_status_int=200):
+        """Post an object to the server by JSON; return the received object."""
+        json_response = self.testapp.post(url, {
+            'csrf_token': csrf_token, 'payload': json.dumps(payload)
+        }, expect_errors=expect_errors)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self.parse_json_response(
+            json_response, expect_errors=expect_errors)
+
+    def put_json(self, url, payload, csrf_token, expect_errors=False,
+                 expected_status_int=200):
+        """Put an object to the server by JSON; return the received object."""
+        json_response = self.testapp.put(url, {
+            'csrf_token': csrf_token, 'payload': json.dumps(payload)
+        }, expect_errors=expect_errors)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self.parse_json_response(
+            json_response, expect_errors=expect_errors)
+
     def parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
@@ -101,6 +141,10 @@ class TestBase(unittest.TestCase):
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
+
+    def get_csrf_token_from_response(self, response):
+        """Retrieve the CSRF token from a GET response."""
+        return re.search(CSRF_REGEX, response.body).group(1)
 
 
 class AppEngineTestBase(TestBase):
@@ -124,8 +168,6 @@ class AppEngineTestBase(TestBase):
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
 
-        # Set up an app to be tested.
-        self.testapp = webtest.TestApp(main.app)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
@@ -141,6 +183,9 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_taskqueue_stub()
         self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+
+        # Set up the app to be tested.
+        self.testapp = webtest.TestApp(main.app)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         os.environ['USER_IS_ADMIN'] = '0'

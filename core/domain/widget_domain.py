@@ -18,9 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-import inspect
 import os
-import pkgutil
 
 from core.domain import obj_services
 from core.domain import rule_domain
@@ -155,7 +153,7 @@ class BaseWidget(object):
         return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
 
-    def _get_widget_param_instances(self, state_customization_args, 
+    def _get_widget_param_instances(self, state_customization_args,
                                     context_params, preview_mode=False):
         """Returns a dict of parameter names and values for the widget.
 
@@ -203,8 +201,9 @@ class BaseWidget(object):
                     raise
 
             # Normalize the generated values to the correct obj_type.
-            obj_class = obj_services.get_object_class(param.obj_type)
-            parameters[param.name] = obj_class.normalize(generated_value)
+            parameters[param.name] = (
+                obj_services.Registry.get_object_class_by_type(
+                    param.obj_type).normalize(generated_value))
 
         return parameters
 
@@ -247,7 +246,8 @@ class BaseWidget(object):
             state_customization_args, context_params)
         parameters['answer'] = answer
 
-        return jinja_utils.parse_string(self._stats_log_template, parameters)
+        return jinja_utils.parse_string(
+            self._stats_log_template, parameters, autoescape=False)
 
     def get_widget_instance_dict(self, customization_args, context_params,
                                  preview_mode=True):
@@ -326,95 +326,3 @@ class BaseWidget(object):
         handler = self.get_handler_by_name(handler_name)
         return next(
             r for r in handler.rules if r.__name__ == rule_name)
-
-
-class Registry(object):
-    """Registry of all widgets."""
-
-    # The keys of these dicts are the widget ids and the values are instances
-    # of the corresponding widgets.
-    interactive_widgets = {}
-    noninteractive_widgets = {}
-
-    # Maps a widget_type to a (registry_dict, source_dir) pair.
-    WIDGET_TYPE_MAPPING = {
-        feconf.INTERACTIVE_PREFIX: (
-            interactive_widgets, feconf.INTERACTIVE_WIDGETS_DIR
-        ),
-        feconf.NONINTERACTIVE_PREFIX: (
-            noninteractive_widgets, feconf.NONINTERACTIVE_WIDGETS_DIR
-        ),
-    }
-
-    @classmethod
-    def _refresh_widgets_of_type(cls, widget_type):
-        registry_dict = cls.WIDGET_TYPE_MAPPING[widget_type][0]
-        registry_dict.clear()
-
-        # Assemble all extensions/widgets/[WIDGET_TYPE]/[WIDGET_ID] paths.
-        ALL_WIDGET_PATHS = [
-            defn['dir'] for (widget, defn) in
-            feconf.ALLOWED_WIDGETS[widget_type].iteritems()
-        ]
-
-        # Crawl the directories and add new widget instances to the registries.
-        for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
-            module = loader.find_module(name).load_module(name)
-            for name, clazz in inspect.getmembers(module, inspect.isclass):
-                if issubclass(clazz, BaseWidget):
-                    if clazz.__name__ in registry_dict:
-                        raise Exception(
-                            'Duplicate widget name %s' % clazz.__name__)
-
-                    registry_dict[clazz.__name__] = clazz()
-
-    @classmethod
-    def refresh(cls):
-        """Repopulate the dict of widget bindings."""
-        cls._refresh_widgets_of_type(feconf.INTERACTIVE_PREFIX)
-        cls._refresh_widgets_of_type(feconf.NONINTERACTIVE_PREFIX)
-
-    @classmethod
-    def get_widgets_of_type(cls, widget_type):
-        """Get a list of widget classes whose id starts with widget_prefix."""
-        assert widget_type in cls.WIDGET_TYPE_MAPPING
-
-        Registry.refresh()
-        return cls.WIDGET_TYPE_MAPPING[widget_type][0].values()
-
-    @classmethod
-    def get_widget_by_id(cls, widget_type, widget_id):
-        """Gets a widget instance by its type and id.
-
-        Refreshes once if the widget is not found; subsequently, throws an
-        error."""
-        if widget_id not in cls.WIDGET_TYPE_MAPPING[widget_type][0]:
-            cls.refresh()
-        return cls.WIDGET_TYPE_MAPPING[widget_type][0][widget_id]
-
-    @classmethod
-    def get_tag_list_with_attrs(cls, widget_type):
-        """Returns a dict of HTML tag names and attributes for widgets.
-
-        The keys of the dict are tag names starting with 'oppia-noninteractive-'
-        or 'oppia-interactive-', followed by the hyphenated version of the
-        widget name. The values are lists of allowed attributes of the
-        form [PARAM_NAME]-with-[CUSTOMIZATION_ARG_NAME].
-        """
-        # TODO(sll): Cache this computation and update it on each refresh.
-        widget_list = cls.get_widgets_of_type(widget_type)
-
-        widget_tags = {}
-        for widget in widget_list:
-            tag_name = 'oppia-%s-%s' % (
-                widget_type, utils.camelcase_to_hyphenated(widget.name))
-
-            attr_list = []
-            for param in widget._params:
-                prefix = '%s-with-' % param['name']
-                for arg in param['customization_args']:
-                    attr_list.append('%s%s' % (prefix, arg))
-        
-            widget_tags[tag_name] = attr_list
-
-        return widget_tags

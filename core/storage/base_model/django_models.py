@@ -96,7 +96,7 @@ class BaseModel(models.Model):
     def get_all(cls, include_deleted_entities=False):
         """Returns a filterable iterable of all entities of this class."""
         query = cls.objects.all()
-        if include_deleted_entities != True:
+        if not include_deleted_entities:
             query = query.filter(deleted=False)
         return query
 
@@ -158,6 +158,7 @@ django_internal_attrs = dir(dummymodel)
 internal_attrs = ['_json_field_cache']
 
 all_internal_attrs = django_internal_attrs + internal_attrs
+
 
 class FakeModel(BaseModel):
     pass

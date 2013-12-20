@@ -84,20 +84,17 @@ urls = [
     get_redirect_route(r'/feedback', pages.FeedbackPage, 'feedback_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
+    get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
 
-    # TODO(sll): Remove this in favour of ObjectEditorHandler.
-    get_redirect_route(
-        r'/templates/<template_type>', resources.TemplateHandler,
-        'template_handler'),
     get_redirect_route(
         r'/imagehandler/<exploration_id>', resources.ImageUploadHandler,
         'image_upload_handler'),
     get_redirect_route(
-        r'/imagehandler/<exploration_id>/<encoded_filepath>', resources.ImageHandler,
-        'image_handler'),
+        r'/imagehandler/<exploration_id>/<encoded_filepath>',
+        resources.ImageHandler, 'image_handler'),
     get_redirect_route(
-        r'/object_editor_handler/<obj_type>',
-        resources.ObjectEditorHandler, 'object_editor_handler'),
+        r'/object_editor_template/<obj_type>',
+        resources.ObjectEditorTemplateHandler, 'object_editor_template'),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
@@ -105,7 +102,8 @@ urls = [
     get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(
         r'/gallery/data', gallery.GalleryHandler, 'gallery_handler'),
-    get_redirect_route(r'/create_new', gallery.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'/create_new', gallery.NewExploration, 'new_exploration'),
     get_redirect_route(r'/fork', gallery.ForkExploration, 'fork_exploration'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
@@ -129,25 +127,42 @@ urls = [
         r'/learn_random', reader.RandomExplorationPage,
         'random_exploration_page'),
     get_redirect_route(
-        r'/learn/give-feedback/<exploration_id>/<state_id>', reader.ReaderFeedbackHandler,
-        'reader_feedback_handler'),
+        r'/learn/give_feedback/<exploration_id>/<state_id>',
+        reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
-    get_redirect_route(
-        r'/create/download/<exploration_id>', editor.ExplorationDownloadHandler,
-        'exploration_download_helper'),
     get_redirect_route(
         r'/create/<exploration_id>', editor.ExplorationPage,
         'editor_exploration_page'),
     get_redirect_route(
-        r'/create/<exploration_id>/data', editor.ExplorationHandler,
+        r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
-    # TODO(sll): there is a potential collision here if the state_id is 'data'.
     get_redirect_route(
-        r'/create/<exploration_id>/<state_id>/data', editor.StateHandler,
-        'state_handler'),
+        r'/createhandler/delete_state/<exploration_id>/<state_id>',
+        editor.DeleteStateHandler, 'delete_state_handler'),
     get_redirect_route(
-        r'/create/resource_list/<exploration_id>', editor.ExplorationResourcesHandler,
-        'exploration_resources_handler'),
+        r'/createhandler/download/<exploration_id>',
+        editor.ExplorationDownloadHandler, 'exploration_download_handler'),
+    get_redirect_route(
+        r'/createhandler/rights/<exploration_id>',
+        editor.ExplorationRightsHandler, 'exploration_rights_handler'),
+    get_redirect_route(
+        r'/createhandler/resolved_answers/<exploration_id>/<state_id>',
+        editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
+    get_redirect_route(
+        r'/createhandler/resolved_feedback/<exploration_id>/<state_id>',
+        editor.ResolvedFeedbackHandler, 'resolved_feedback_handler'),
+    get_redirect_route(
+        r'/createhandler/resource_list/<exploration_id>',
+        editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
+    get_redirect_route(
+        r'/createhandler/snapshots/<exploration_id>',
+        editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>',
+        editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
+    get_redirect_route(
+        r'/createhandler/state_rules_stats/<exploration_id>/<state_id>',
+        editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
 
     get_redirect_route(
         r'/widgetrepository', widgets.WidgetRepositoryPage,
@@ -159,8 +174,8 @@ urls = [
         r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
         'widget_handler'),
     get_redirect_route(
-        r'/widgettemplate/<widget_type>/<widget_id>', widgets.WidgetTemplateHandler,
-        'widget_template_handler'),
+        r'/widgettemplate/<widget_type>/<widget_id>',
+        widgets.WidgetTemplateHandler, 'widget_template_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),

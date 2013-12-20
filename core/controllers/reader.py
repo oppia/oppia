@@ -22,7 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import skins_services
 from core.domain import stats_services
-from core.domain import widget_domain
+from core.domain import widget_registry
 import utils
 
 READER_MODE = 'reader'
@@ -77,10 +77,9 @@ class ExplorationHandler(base.BaseHandler):
 
         init_state = exploration.init_state
         init_html = exp_services.export_content_to_html(
-            exploration_id, init_state.content, reader_params,
-            escape_text_strings=False)
+            exploration_id, init_state.content, reader_params)
 
-        interactive_widget = widget_domain.Registry.get_widget_by_id(
+        interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_raw_code(
             init_state.widget.customization_args, reader_params)
@@ -109,7 +108,7 @@ class FeedbackHandler(base.BaseHandler):
             self, old_state, answer, exploration_id, old_state_id,
             old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
-        widget = widget_domain.Registry.get_widget_by_id(
+        widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
         )
 
@@ -128,7 +127,7 @@ class FeedbackHandler(base.BaseHandler):
             return exp_services.export_content_to_html(
                 exploration_id,
                 [exp_domain.Content('text', '<br>'.join(feedback_bits))],
-                params, escape_text_strings=False)
+                params)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
                         new_state, state_has_changed, html_output):
@@ -143,8 +142,7 @@ class FeedbackHandler(base.BaseHandler):
             if state_has_changed:
                 # Append the content for the new state.
                 state_html = exp_services.export_content_to_html(
-                    exploration_id, new_state.content, new_params,
-                    escape_text_strings=False)
+                    exploration_id, new_state.content, new_params)
 
                 if html_output and state_html:
                     html_output += '<br>'
@@ -152,7 +150,7 @@ class FeedbackHandler(base.BaseHandler):
                 html_output += state_html
 
             interactive_html = '' if sticky else (
-                widget_domain.Registry.get_widget_by_id(
+                widget_registry.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
                 ).get_raw_code(new_state.widget.customization_args, new_params)
             )
@@ -211,7 +209,7 @@ class FeedbackHandler(base.BaseHandler):
         reader_response_html = ''
         reader_response_iframe = ''
 
-        old_widget = widget_domain.Registry.get_widget_by_id(
+        old_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
         reader_response_html, reader_response_iframe = (
             old_widget.get_reader_response_html(
@@ -246,18 +244,19 @@ class FeedbackHandler(base.BaseHandler):
 
 
 class ReaderFeedbackHandler(base.BaseHandler):
-   """Submits feedback from the reader."""
+    """Submits feedback from the reader."""
 
-   REQUIRE_PAYLOAD_CSRF_CHECK = False
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-   def post(self, exploration_id, state_id):
-     """Handles POST requests."""
+    def post(self, exploration_id, state_id):
+        """Handles POST requests."""
 
-     feedback = self.payload.get('feedback')
-     # TODO(sll): Add the reader's history log here.
-
-     stats_services.EventHandler.record_state_feedback_from_reader(
-         exploration_id, state_id, feedback, [])
+        feedback = self.payload.get('feedback')
+        state_history = self.payload.get('state_history')
+        # TODO(sll): Add the reader's history log here.
+        stats_services.EventHandler.record_state_feedback_from_reader(
+            exploration_id, state_id, feedback,
+            {'state_history': state_history})
 
 
 class RandomExplorationPage(base.BaseHandler):

@@ -64,7 +64,8 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasUnexpectedFile(
-            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+            ["myproject-0.1", "myproject-0.1/hello.c",
+             "myproject-0.1/Makefile"]
         )
 
         file_name = 'unexpected-file.tar.gz'
@@ -83,12 +84,12 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DiskBackedFileSystem(TEST_DATA_DIR))
 
-        EXPLORATION_DATA_DIR = 'data/explorations/tar/assets'
-        exp_fs = fs_domain.AbstractFileSystem(
-            fs_domain.DiskBackedFileSystem(EXPLORATION_DATA_DIR))
+        CANONICAL_DATA_DIR = 'extensions/rules/testdata/canonical'
+        canonical_fs = fs_domain.AbstractFileSystem(
+            fs_domain.DiskBackedFileSystem(CANONICAL_DATA_DIR))
 
         rule = tar_file_string.HasUnexpectedContent(
-            ['hello.c', 'Makefile']).set_fs(exp_fs)
+            ['hello.c', 'Makefile']).set_fs(canonical_fs)
 
         file_name = 'incorrect-contents.tar.gz'
         encoded_content = base64.b64encode(fs.get(file_name))
@@ -102,7 +103,8 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.MissingExpectedFile(
-            ["myproject-0.1", "myproject-0.1/hello.c", "myproject-0.1/Makefile"]
+            ["myproject-0.1", "myproject-0.1/hello.c",
+             "myproject-0.1/Makefile"]
         )
 
         file_name = 'missing-expected-file.tar.gz'

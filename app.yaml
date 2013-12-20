@@ -6,7 +6,7 @@ threadsafe: false
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
-  OPPIA_VERSION: '1.1.0'
+  OPPIA_VERSION: '1.1.2'
 
 builtins:
 - appstats: on
@@ -70,7 +70,5 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
-- name: lxml
-  version: '2.3'
 - name: webapp2
   version: '2.5.2'

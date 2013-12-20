@@ -19,7 +19,6 @@
  */
 
 var END_DEST = 'END';
-var QN_DEST_PREFIX = 'q-';
 var NONEXISTENT_STATE = '[none]';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
@@ -35,20 +34,23 @@ oppia.run(function($rootScope) {
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
 
-  $scope.doesStateIdExist = function() {
+  $scope.currentlyInStateContext = function() {
     return Boolean($scope.stateId);
   };
 
   /**************************************************
-  * Methods affecting the saving of state content.
+  * Methods affecting the saving of explorations.
   **************************************************/
-  $scope.stateLockedForEditing = false;
 
-  // Temporary buffer for changes made to the state.
-  $scope.stateChangeList = [];
+  // Temporary buffer for changes made to the exploration.
+  $scope.explorationChangeList = [];
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
   $scope.undoneChangeStack = [];
+  // Whether or not a save action is currently in progress.
+  $scope.isSaveInProgress = false;
+  // Whether or not a discard action is currently in progress.
+  $scope.isDiscardInProgress = false;
 
   // TODO(sll): Implement undo, redo functionality. Show a message on each step
   // saying what the step is doing.
@@ -56,7 +58,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   // as the list of changes in the undo stack.
 
   $scope.addStateChange = function(backendName, frontendNames, newValue, oldValue) {
-    $scope.stateChangeList.push({
+    if (!$scope.stateId) {
+      warningsData.addWarning('Unexpected error: a state property was saved ' +
+          'outside the context of a state. We would appreciate it if you ' +
+          'reported this bug here: https://code.google.com/p/oppia/issues/list.');
+      return;
+    }
+    $scope.explorationChangeList.push({
+      stateId: $scope.stateId,
       backendName: backendName,
       frontendNames: frontendNames,
       newValue: newValue,
@@ -65,49 +74,411 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveStateChanges = function() {
-    var finalChangeList = {};
-    for (var i = 0; i < $scope.stateChangeList.length; i++) {
-      finalChangeList[$scope.stateChangeList[i].backendName] = (
-          $scope.stateChangeList[i].newValue);
-    }
-    // Reload the exploration page, including drawing the graph.
-    // TODO(sll): This takes a long time. Can we shorten it?
-    explorationData.saveStateData($scope.stateId, finalChangeList, function() {
-      $scope.stateChangeList = [];
-      $scope.initExplorationPage();
+  $scope.addExplorationChange = function(backendName, frontendNames, newValue, oldValue) {
+    $scope.explorationChangeList.push({
+      backendName: backendName,
+      frontendNames: frontendNames,
+      newValue: newValue,
+      oldValue: oldValue
     });
+    $scope.undoneChangeStack = [];
   };
 
-  $scope.discardStateChanges = function() {
+  $scope.saveChanges = function(
+      explorationChanges, stateChanges, commitMessage) {
+
+    $scope.isSaveInProgress = true;
+    explorationData.save(
+      explorationChanges, stateChanges, commitMessage, function() {
+        // Reload the exploration page, including drawing the graph.
+        // TODO(sll): This takes a long time. Can we shorten it?
+        $scope.explorationChangeList = [];
+        $scope.initExplorationPage();
+        $scope.isSaveInProgress = false;
+      }, function() {
+        $scope.isSaveInProgress = false;
+      });
+  };
+
+  $scope.discardExplorationChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
-      // Reload the local state data variables.
-      $scope.initStateData();
+      $scope.isDiscardInProgress = true;
 
-      // Clear both change lists.
-      $scope.stateChangeList = [];
-      $scope.undoneChangeStack = [];
+      $scope.initExplorationPage(function() {
+        if ($scope.stateId) {
+          $scope.initStateData();
+        }
+
+        // The $apply() is needed to call all the exploration field $watch()
+        // methods before flipping isDiscardInProgress.
+        $scope.$apply();
+        $scope.isDiscardInProgress = false;
+
+        // Clear both change lists.
+        $scope.explorationChangeList = [];
+        $scope.undoneChangeStack = [];
+      });
     }
   };
 
-  $scope.isStateLockedForEditing = function() {
-    return $scope.stateChangeList.length > 0;
+  $scope.isExplorationSaveable = function() {
+    return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
+  };
+
+  $scope.isExplorationLockedForEditing = function() {
+    return $scope.explorationChangeList.length > 0;
   };
 
   $scope.displaySaveReminderWarning = function() {
-    warningsData.addWarning(
-        'You need to save your changes before continuing.');
+    warningsData.addWarning('You need to save your changes before continuing.');
   };
 
-  $window.addEventListener('beforeunload', function (e) {
-    if ($scope.isStateLockedForEditing()) {
+  $window.addEventListener('beforeunload', function(e) {
+    if ($scope.isExplorationLockedForEditing()) {
       var confirmationMessage = (
           'You have unsaved changes which will be lost if you leave this page.');
       (e || $window.event).returnValue = confirmationMessage;
       return confirmationMessage;
     }
   });
+
+  $scope.showSaveExplorationModal = function() {
+    var netExplorationChanges = $scope.getNetExplorationChanges();
+    var explorationChanges = netExplorationChanges.explorationChanges;
+    var stateChanges = netExplorationChanges.stateChanges;
+
+    var changesExist = (
+      !$.isEmptyObject(explorationChanges) || !$.isEmptyObject(stateChanges));
+    if (!changesExist) {
+      warningsData.addWarning('Your changes cancel each other out, ' +
+        'so nothing has been saved.');
+      return;
+    }
+
+    warningsData.clear();
+
+    // Create the save-confirmation and commit-message request dialogue.
+    if (!$scope.isPublic) {
+      // For unpublished explorations no commit message is needed.
+      $scope.saveChanges(explorationChanges, stateChanges, '');
+    } else {
+      $scope.changeSummaries = $scope.createChangeSummaries(
+        explorationChanges, stateChanges);
+
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/saveExploration',
+        backdrop: 'static',
+        resolve: {
+          changeSummaries: function() {
+            return $scope.changeSummaries;
+          }
+        },
+        controller: function($scope, $modalInstance, changeSummaries) {
+          $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
+
+          $scope.explorationChangesExist = !$.isEmptyObject(
+            $scope.changeSummary.exploration);
+          $scope.stateChangesExist = !$.isEmptyObject(
+            $scope.changeSummary.states);
+
+          $scope.publish = function(commitMessage) {
+            $modalInstance.close(commitMessage);
+          };
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      });
+
+      modalInstance.result.then(function(commitMessage) {
+        var fullCommitMessage = $scope.neatJoin(
+          commitMessage, $scope.changeSummaries['VERSION_LOG_FORMAT']
+        );
+        $scope.saveChanges(explorationChanges, stateChanges, fullCommitMessage);
+      });
+    }
+  };
+
+  $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES = {
+    'title': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Title (from \'' + oldValue + '\' to \'' + newValue + '\')';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'title';
+      }
+    },
+    'category': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Category (from \'' + oldValue + '\' to \'' + newValue + '\')';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'category';
+      }
+    },
+    'param_specs': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Parameter specifications';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'parameter specifications';
+      }
+    },
+    'param_changes': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Initial parameter changes';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'initial parameter changes';
+      }
+    }
+  };
+
+  $scope.getExplorationPropertyChangeSummary = function(
+      propertyName, format, values) {
+    return $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
+      values['newValue'], values['oldValue']);
+  };
+
+  $scope.STATE_PROPERTY_CHANGE_SUMMARIES = {
+    // In future these will be elaborated to describe the changes made to each
+    // state property.
+    'state_name': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'State name (from \'' + oldValue + '\' to \'' + newValue + '\')';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'state name';
+      }
+    },
+    'param_changes': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Parameter changes';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'parameter changes';
+      }
+    },
+    'content': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Content';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'content';
+      }
+    },
+    'widget_id': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Interaction type';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'interaction type';
+      }
+    },
+    'widget_customization_args': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Interaction customizations';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'interaction customizations';
+      }
+    },
+    'widget_sticky': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Whether to reuse the previous interaction';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'whether to reuse the previous interaction';
+      }
+    },
+    'widget_handlers': {
+      MODAL_FORMAT: function(newValue, oldValue) {
+        return 'Reader submission rules';
+      },
+      VERSION_LOG_FORMAT: function(newValue, oldValue) {
+        return 'reader submission rules';
+      }
+    }
+  };
+
+  $scope.getStatePropertyChangeSummary = function(
+      propertyName, format, values) {
+    return $scope.STATE_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
+      values['newValue'], values['oldValue']);
+  };
+
+  // Returns whether any net changes have occurred.
+  $scope.getNetExplorationChanges = function() {
+    // This object is keyed by the name of the property that has changed.
+    var rawExplorationChanges = {};
+    // This object is keyed by the state id. The value of each property is
+    // another object that is keyed by the name of the property for that state
+    // that has changed.
+    var rawStateChanges = {};
+
+    // Identifies the net changes made to each property.
+    for (var i = 0; i < $scope.explorationChangeList.length; i++) {
+      var change = $scope.explorationChangeList[i];
+      if (change.stateId) {
+        var stateId = change.stateId;
+
+        if (!rawStateChanges.hasOwnProperty(stateId)) {
+          rawStateChanges[stateId] = {};
+        }
+
+        if (!rawStateChanges[stateId][change.backendName]) {
+          rawStateChanges[stateId][change.backendName] = {
+            oldValue: change.oldValue
+          };
+        }
+        rawStateChanges[stateId][change.backendName].newValue = change.newValue;
+      } else {
+        // This is a change to an exploration property.
+        if (!rawExplorationChanges[change.backendName]) {
+          rawExplorationChanges[change.backendName] = {
+            oldValue: change.oldValue
+          };
+        }
+        rawExplorationChanges[change.backendName].newValue = change.newValue;
+      }
+    }
+
+    // Remove changes with zero net effect.
+    var explorationChanges = {};
+    var stateChanges = {};
+    for (var key in rawExplorationChanges) {
+      if (!angular.equals(rawExplorationChanges[key].newValue,
+                          rawExplorationChanges[key].oldValue)) {
+        explorationChanges[key] = rawExplorationChanges[key];
+      }
+    }
+
+    for (var stateId in rawStateChanges) {
+      var stateChangeObj = {};
+      for (var key in rawStateChanges[stateId]) {
+        if (!angular.equals(rawStateChanges[stateId][key].newValue,
+                            rawStateChanges[stateId][key].oldValue)) {
+          stateChangeObj[key] = rawStateChanges[stateId][key];
+        }
+      }
+      if (!$.isEmptyObject(stateChangeObj)) {
+        stateChanges[stateId] = stateChangeObj;
+      }
+    }
+
+    return {
+      explorationChanges: explorationChanges,
+      stateChanges: stateChanges
+    };
+  };
+
+  // An ordered list of state properties that determines the order in which
+  // to show them in the save confirmation modal.
+  $scope.ORDERED_STATE_PROPERTIES = [
+    'state_name', 'param_changes', 'content', 'widget_id',
+    'widget_customization_args', 'widget_sticky', 'widget_handlers'
+  ];
+
+  // Returns summaries of the changes to display in the save dialogue and
+  // include in the version log.
+  $scope.createChangeSummaries = function(explorationChanges, stateChanges) {
+    // Get the most up-to-date state names.
+    var latestStateNames = {};
+    var stateId;
+    for (stateId in stateChanges) {
+      latestStateNames[stateId] = $scope.getStateName(stateId);
+      if (stateChanges[stateId].hasOwnProperty('state_name')) {
+        latestStateNames[stateId] = stateChanges[stateId].state_name.newValue;
+      }
+    }
+
+    // Construct the summary for the save confirmation dialogue.
+    var modalSummaryForExploration = {};
+    for (var property in explorationChanges) {
+      modalSummaryForExploration[property] = (
+        $scope.getExplorationPropertyChangeSummary(
+          property, 'MODAL_FORMAT', explorationChanges[property]));
+    }
+
+    var modalSummaryForStates = {};
+    for (stateId in stateChanges) {
+      var changes = [];
+      for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
+        var property = $scope.ORDERED_STATE_PROPERTIES[i];
+        if (stateChanges[stateId].hasOwnProperty(property)) {
+          changes.push($scope.getStatePropertyChangeSummary(
+            property, 'MODAL_FORMAT', stateChanges[stateId][property]));
+        }
+      }
+      modalSummaryForStates[latestStateNames[stateId]] = changes;
+    }
+
+    // Construct the summary to be included in the commit message for the
+    // version log.
+    // TODO(sll): Add corresponding code for explorationChanges.
+    var versionLogSummaryForExploration = '';
+    if (!$.isEmptyObject(explorationChanges)) {
+      var explorationChangeStrings = [];
+      for (var property in explorationChanges) {
+        explorationChangeStrings.push(
+          $scope.getExplorationPropertyChangeSummary(
+            property, 'VERSION_LOG_FORMAT', explorationChanges[property]
+          )
+        );
+      }
+
+      versionLogSummaryForExploration = (
+        'Exploration properties that were changed: ' +
+        explorationChangeStrings.join(', '));
+    }
+
+    var versionLogSummaryForStates = '';
+    if (!$.isEmptyObject(stateChanges)) {
+      versionLogSummaryForStates = 'States that were changed: ';
+
+      var stateChangeStrings = [];
+      for (stateId in stateChanges) {
+        var humanReadablePropertyChanges = [];
+        for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
+          var property = $scope.ORDERED_STATE_PROPERTIES[i];
+          if (stateChanges[stateId].hasOwnProperty(property)) {
+            humanReadablePropertyChanges.push(
+              $scope.getStatePropertyChangeSummary(
+                property, 'VERSION_LOG_FORMAT', stateChanges[stateId][property]
+              )
+            );
+          }
+        }
+
+        stateChangeStrings.push(latestStateNames[stateId] + ' (' +
+          humanReadablePropertyChanges.join(', ') + ')');
+      }
+
+      versionLogSummaryForStates += stateChangeStrings.join(', ');
+    }
+    var versionLogSummary = '';
+    if (versionLogSummaryForExploration && versionLogSummaryForStates) {
+      versionLogSummary = (
+        versionLogSummaryForExploration + '; ' + versionLogSummaryForStates);
+    } else {
+      versionLogSummary = (
+        versionLogSummaryForExploration + versionLogSummaryForStates);
+    }
+
+    if (versionLogSummary) {
+      versionLogSummary += '.';
+    }
+
+    return {
+      MODAL_FORMAT: {
+        exploration: modalSummaryForExploration,
+        states: modalSummaryForStates
+      },
+      VERSION_LOG_FORMAT: versionLogSummary
+    };
+  };
 
   /********************************************
   * Methods affecting the URL location hash.
@@ -141,26 +512,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $location.path('/gui/' + $scope.stateId);
   };
 
-  $scope.forceNextLocationChange = false;
-
   $scope.$watch(function() {
     return $location.path();
   }, function(newPath, oldPath) {
-    if ($scope.isStateLockedForEditing()) {
-      // If a location change is made while a state is being edited, revert to
-      // the old path.
-      if (!$scope.forceNextLocationChange) {
-        // This ensures that we don't get into an infinite loop with the
-        // location path changes.
-        $scope.forceNextLocationChange = true;
-        $scope.displaySaveReminderWarning();
-        $location.path(oldPath);
-      } else {
-        $scope.forceNextLocationChange = false;
-      }
-      return;
-    }
-
     var path = newPath;
     console.log('Path is now ' + path);
 
@@ -245,31 +599,25 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
    *********************************************************/
   var explorationFullyLoaded = false;
 
-  // The pathname should be: .../create/{exploration_id}[/{state_id}]
+  // The pathname should be: .../create/{exploration_id}
   $scope.explorationId = pathnameArray[2];
   // The exploration id needs to be attached to the root scope in order for
   // the file picker widget to work. (Note that an alternative approach might
   // also be to replicate this URL-based calculation in the file picker widget.)
   $rootScope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
-  $scope.explorationDataUrl = '/create/' + $scope.explorationId + '/data';
+  $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
+  $scope.deleteStateUrlPrefix = '/createhandler/delete_state/' + $scope.explorationId;
+  $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
+  $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
+  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
+  $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
 
-  // Initializes the exploration page using data from the backend. Called on
-  // page load.
-  $scope.initExplorationPage = function() {
-    explorationData.getData().then(function(data) {
-      $scope.currentUserIsAdmin = data.is_admin;
-      $scope.stateId = explorationData.stateId;
-      $scope.states = data.states;
-      $scope.explorationTitle = data.title;
-      $scope.explorationCategory = data.category;
-      $scope.explorationEditors = data.editors;
-      $scope.initStateId = data.init_state_id;
-      $scope.isPublic = data.is_public;
-      $scope.currentUser = data.user;
-      $scope.paramSpecs = data.param_specs || {};
-      $scope.explorationParamChanges = data.param_changes || [];
-  
+  // Refreshes the displayed version history log.
+  $scope.refreshVersionHistory = function() {
+    $http.get($scope.explorationSnapshotsUrl).then(function(response) {
+      var data = response.data;
+
       $scope.explorationSnapshots = [];
       for (var i = 0; i < data.snapshots.length; i++) {
         $scope.explorationSnapshots.push({
@@ -279,23 +627,29 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           'versionNumber': data.snapshots[i].version_number
         });
       }
-  
+    });
+  };
+
+  $scope.refreshExplorationStatistics = function() {
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      var data = response.data;
+
       $scope.stats = {
         'numVisits': data.num_visits,
         'numCompletions': data.num_completions,
         'stateStats': data.state_stats,
         'imp': data.imp
       };
-  
+
       $scope.chartData = [
         ['', 'Completions', 'Non-completions'],
         ['', data.num_completions, data.num_visits - data.num_completions]
       ];
       $scope.chartColors = ['green', 'firebrick'];
-      $scope.ruleChartColors = ['cornflowerblue', 'transparent'];
-  
-      $scope.statsGraphOpacities = {};
-      $scope.statsGraphOpacities['legend'] = 'Students entering state';
+
+      $scope.statsGraphOpacities = {
+        legend: 'Students entering state'
+      };
       for (var stateId in $scope.states) {
         var visits = $scope.stats.stateStats[stateId].firstEntryCount;
         $scope.statsGraphOpacities[stateId] = Math.max(
@@ -303,9 +657,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
       $scope.statsGraphOpacities[END_DEST] = Math.max(
           $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
-  
-      $scope.highlightStates = {};
-      $scope.highlightStates['legend'] = '#EE8800:Needs more feedback,brown:May be confusing';
+
+      $scope.highlightStates = {
+        legend: '#EE8800:Needs more feedback,brown:May be confusing'
+      };
       for (var j = 0; j < data.imp.length; j++) {
         if (data.imp[j].type == 'default') {
           $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
@@ -314,10 +669,35 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           $scope.highlightStates[data.imp[j].state_id] = 'brown';
         }
       }
-  
+    });
+  };
+
+  // Initializes the exploration page using data from the backend. Called on
+  // page load.
+  $scope.initExplorationPage = function(successCallback) {
+    explorationData.getData().then(function(data) {
+      $scope.currentUserIsAdmin = data.is_admin;
+      $scope.stateId = explorationData.stateId;
+      $scope.states = angular.copy(data.states);
+      $scope.explorationTitle = data.title;
+      $scope.explorationCategory = data.category;
+      $scope.explorationEditors = data.editors;
+      $scope.initStateId = data.init_state_id;
+      $scope.isPublic = data.is_public;
+      $scope.currentUser = data.user;
+      $scope.paramSpecs = angular.copy(data.param_specs || {});
+      $scope.explorationParamChanges = angular.copy(data.param_changes || []);
+
       $scope.drawGraph();
-  
+      $scope.refreshVersionHistory();
+
       explorationFullyLoaded = true;
+
+      $scope.refreshExplorationStatistics();
+
+      if (successCallback) {
+        successCallback();
+      }
     });
   };
 
@@ -331,14 +711,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         )
     );
   };
-
-  $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    // Do not save on the initial data load.
-    if (oldValue !== undefined) {
-      $scope.saveExplorationProperty(
-          'explorationCategory', 'category', newValue, oldValue);
-    }
-  });
 
   $scope.reformatResponse = function(states, initStateId) {
     var SENTINEL_DEPTH = 3000;
@@ -460,15 +832,21 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     return {nodes: nodeList, links: links, initStateId: initStateId};
   };
 
-
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
     // Do not save on the initial data load.
-    if (oldValue !== undefined) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
       $scope.saveExplorationProperty(
           'explorationTitle', 'title', newValue, oldValue);
     }
   });
 
+  $scope.$watch('explorationCategory', function(newValue, oldValue) {
+    // Do not save on the initial data load.
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
+      $scope.saveExplorationProperty(
+          'explorationCategory', 'category', newValue, oldValue);
+    }
+  });
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     console.log("adding parameter to exploration");
@@ -479,26 +857,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
 
     $scope.paramSpecs[name] = {obj_type: type};
-    $http.put(
-        $scope.explorationDataUrl,
-        requestCreator.createRequest({
-          param_specs: $scope.paramSpecs,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              console.log('PUT request succeeded');
-              explorationData.data.version = data.version;
-              if (successCallback) {
-                successCallback();
-              }
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  'Error adding parameter: ' + data.error);
-              delete $scope.paramSpecs[name];
-            });
   };
+
+  $scope.$watch('paramSpecs', function(newValue, oldValue) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
+      $scope.saveExplorationProperty(
+        'paramSpecs', 'param_specs', newValue, oldValue);
+    }
+  });
 
   $scope.openAddNewEditorForm = function() {
     activeInputData.name = 'explorationMetadata.addNewEditor';
@@ -511,35 +877,23 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   $scope.addNewEditor = function(newEditorEmail) {
     activeInputData.name = 'explorationMetadata';
-    $scope.explorationEditors.push(newEditorEmail);
+    var oldValue = angular.copy($scope.explorationEditors);
+    var newValue = angular.copy(oldValue);
+    newValue.push(newEditorEmail);
 
-    $http.put(
-        $scope.explorationDataUrl,
-        requestCreator.createRequest({
-          editors: $scope.explorationEditors,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              console.log('PUT request succeeded');
-              explorationData.data.version = data.version;
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  'Error adding collaborator: ' + data.error);
-              $scope.explorationEditors.pop();
-            });
+    $scope.saveExplorationRightsChange(
+      'explorationEditors', 'editors', newValue, oldValue);
   };
 
   /**
    * Downloads the YAML representation of an exploration.
    */
   $scope.downloadExploration = function() {
-    document.location = '/create/download/' + $scope.explorationId;
+    document.location = $scope.explorationDownloadUrl;
   };
 
   $scope.makePublic = function() {
-    $scope.saveExplorationProperty('isPublic', 'is_public', true, false);
+    $scope.saveExplorationRightsChange('isPublic', 'is_public', true, false);
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
@@ -559,34 +913,47 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     if (!explorationFullyLoaded) {
       return;
     }
-    newValue = $scope.normalizeWhitespace(newValue);
-    if (oldValue && !$scope.isValidEntityName(newValue, true)) {
-      $scope[frontendName] = oldValue;
+    if (angular.equals(newValue, oldValue)) {
       return;
     }
-    var requestParameters = {};
+    newValue = $scope.normalizeWhitespace(newValue);
+    if (backendName == 'title' || backendName == 'category') {
+      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
+        $scope[frontendName] = oldValue;
+        return;
+      }
+    }
+
+    if ($scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES.hasOwnProperty(backendName)) {
+      // This is an exploration property and will only be saved when the
+      // 'Save changes' button is clicked.
+      $scope.addExplorationChange(backendName, [frontendName], newValue, oldValue);
+      return;
+    }
+  };
+
+  $scope.saveExplorationRightsChange = function(frontendName, backendName, newValue, oldValue) {
+    var requestParameters = {
+      version: explorationData.data.version
+    };
     requestParameters[backendName] = newValue;
-    requestParameters['version'] = explorationData.data.version;
 
     $http.put(
-        $scope.explorationDataUrl,
+        $scope.explorationRightsUrl,
         requestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              if (frontendName == 'isPublic') {
-                $scope[frontendName] = newValue;
-              }
-              console.log('PUT request succeeded');
               explorationData.data.version = data.version;
             }).
             error(function(data) {
-              console.log('ERROR');
               warningsData.addWarning(
-                  'Error modifying exploration properties: ' + data.error);
+                  'Error modifying exploration rights: ' + data.error);
               // TODO(sll): Reinstate the following line without causing the
               //     $watch to trigger.
               // $scope[frontendName] = oldValue;
             });
+
+    $scope[frontendName] = newValue;
   };
 
   $scope.initializeNewActiveInput = function(newActiveInput) {
@@ -602,11 +969,33 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // TODO(sll): Initialize the newly displayed field.
   };
 
+  $scope.isNewStateNameValid = function(newStateName) {
+    if (!$scope.isValidEntityName(newStateName) ||
+        newStateName.toUpperCase() == END_DEST) {
+      return false;
+    }
+
+    for (var id in $scope.states) {
+      if (id != $scope.stateId && $scope.states[id]['name'] == newStateName) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
-    newStateName = $scope.normalizeWhitespace(newStateName);
-    if (!$scope.isValidEntityName(newStateName, true))
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before adding a state.');
       return;
+    }
+
+    newStateName = $scope.normalizeWhitespace(newStateName);
+    if (!$scope.isValidEntityName(newStateName, true)) {
+      return;
+    }
     if (newStateName.toUpperCase() == END_DEST) {
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
@@ -637,8 +1026,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               // TODO(sll): Actually force a refresh, since the data on the
               // page may be out of date.
               warningsData.addWarning(
-                  'Server error when adding state: ' + data.error + '. ' +
-                   'Please refresh your page.');
+                  'Server error when adding state: ' + data.error + '. ');
             });
   };
 
@@ -654,12 +1042,18 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before deleting a state.');
+      return;
+    }
+
     if (stateId == NONEXISTENT_STATE) {
       warningsData.addWarning('No state with id ' + stateId + ' exists.');
       return;
     }
 
-    $http['delete']($scope.explorationUrl + '/' + stateId + '/data')
+    $http['delete']($scope.deleteStateUrlPrefix + '/' + stateId)
     .success(function(data) {
       // Reloads the page.
       explorationData.data.version = data.version;
@@ -727,6 +1121,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.showDeleteStateModal = function(deleteStateId) {
+    if ($scope.isExplorationLockedForEditing()) {
+      warningsData.addWarning(
+        'You need to save or discard your existing changes before deleting a state.');
+      return;
+    }
+
     warningsData.clear();
 
     var modalInstance = $modal.open({

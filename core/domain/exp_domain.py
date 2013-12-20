@@ -70,8 +70,8 @@ class RuleSpec(object):
             rulespec_dict['dest'],
             rulespec_dict['feedback'],
             [param_domain.ParamChange(
-                 param_change['name'], param_change['generator_id'],
-                 param_change['customization_args'])
+                param_change['name'], param_change['generator_id'],
+                param_change['customization_args'])
              for param_change in rulespec_dict['param_changes']],
         )
 
@@ -221,18 +221,21 @@ class WidgetInstance(object):
 class State(object):
     """Domain object for a state."""
 
-    def validate(self):
+    @classmethod
+    def require_valid_state_name(cls, name):
         for c in feconf.INVALID_NAME_CHARS:
-            if c in self.name:
+            if c in name:
                 raise utils.ValidationError(
-                    'Invalid character %s in state name %s' % (c, self.name))
+                    'Invalid character %s in state name %s' % (c, name))
 
-        if self.name == feconf.END_DEST:
+        if name == feconf.END_DEST:
             raise utils.ValidationError(
                 'Invalid state name: %s' % feconf.END_DEST)
 
-        # TODO(sll): This needs lots more validation.
-        pass
+    def validate(self):
+        State.require_valid_state_name(self.name)
+
+        # TODO(sll): Add more validation.
 
     def to_dict(self):
         return {
@@ -270,7 +273,7 @@ class State(object):
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
             param_change.customization_args)
-        for param_change in param_changes]
+            for param_change in param_changes]
         # The interactive widget instance associated with this state. Set to be
         # the default widget if not explicitly specified by the caller.
         if widget is None:

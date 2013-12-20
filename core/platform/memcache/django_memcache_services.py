@@ -48,16 +48,16 @@ def set_multi(key_value_mapping):
 
 
 def delete(unused_key):
-  """Deletes a key in memcache.
+    """Deletes a key in memcache.
 
-  Args:
-    - key: a key (string) to delete.
+    Args:
+      - key: a key (string) to delete.
 
-  Returns:
-    0 on network failure, 1 if the item does not exist, and 2 for a
-    successful delete.
-  """
-  return 1
+    Returns:
+      0 on network failure, 1 if the item does not exist, and 2 for a
+      successful delete.
+    """
+    return 1
 
 
 def delete_multi(keys):
