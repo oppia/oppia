@@ -267,6 +267,8 @@ class RandomExplorationPage(base.BaseHandler):
         iframed = (self.request.get('iframed') == 'true')
 
         explorations = exp_services.get_public_explorations()
+        if len(explorations) <= 1:
+            raise self.PageNotFoundException()
         selected_exploration = utils.get_random_choice(explorations[1:])
         dest_url = '/learn/%s' % selected_exploration.id
         if iframed:

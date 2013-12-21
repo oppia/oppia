@@ -24,27 +24,15 @@ current_user_services = models.Registry.import_current_user_services()
 import utils
 
 
-class MainPage(base.BaseHandler):
-    """Main splash page for Oppia."""
+class SplashPage(base.BaseHandler):
+    """Splash page for Oppia."""
 
     def get(self):
-        self.render_template('pages/splash.html')
-
-
-class WelcomePage(base.BaseHandler):
-    """Welcome exploration."""
-
-    def get(self):
-        """Handles GET requests."""
         if not exp_services.get_exploration_by_id('0', strict=False):
             exp_services.delete_demo('0')
             exp_services.load_demo('0')
 
-        self.values.update({
-            'gallery_login_url': current_user_services.create_login_url(
-                '/gallery'),
-        })
-        self.render_template('pages/welcome.html')
+        self.render_template('pages/splash.html')
 
 
 class AboutPage(base.BaseHandler):

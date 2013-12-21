@@ -77,7 +77,7 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
 
 # Register the URL with the responsible classes
 urls = [
-    webapp2.Route(r'/', pages.MainPage, name="home"),
+    webapp2.Route(r'/', pages.SplashPage, name="home"),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/feedback', pages.FeedbackPage, 'feedback_page'),
