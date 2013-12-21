@@ -494,74 +494,104 @@ textarea {
 }
 
 .oppia-feedback-button {
-    transition-property: all;
-    transition-duration: 0.2s;
-    align-content: center;
-    background: green;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    bottom: 10px;
-    box-shadow: -5px 5px 3px #CCCCCC;
-    color: white;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: bold;
-    height: 90px;
-    left: 0;
-    opacity: 0.75;
-    position: fixed;
-    top: 50%;
-    width: 100px;
+  transition-property: all;
+  transition-duration: 0.2s;
+  align-content: center;
+  background: green;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  bottom: 10px;
+  box-shadow: -5px 5px 3px #CCCCCC;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  height: 90px;
+  left: 0;
+  opacity: 0.75;
+  position: fixed;
+  top: 50%;
+  width: 100px;
 
-    -moz-transform-origin: 25px 75px;
-    -ms-transform-origin: 25px 75px;
-    -o-transform-origin: 25px 75px;
-    -webkit-transform-origin: 25px 75px;
-    transform-origin: 25px 75px;
+  -moz-transform-origin: 25px 75px;
+  -ms-transform-origin: 25px 75px;
+  -o-transform-origin: 25px 75px;
+  -webkit-transform-origin: 25px 75px;
+  transform-origin: 25px 75px;
 
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
 .oppia-feedback-button:hover {
-    opacity: 1;
-    -moz-transform-origin: 35px 65px;
-    -ms-transform-origin: 35px 65px;
-    -o-transform-origin: 35px 65px;
-    -webkit-transform-origin: 35px 65px;
-    transform-origin: 35px 65px;
+  opacity: 1;
+  -moz-transform-origin: 35px 65px;
+  -ms-transform-origin: 35px 65px;
+  -o-transform-origin: 35px 65px;
+  -webkit-transform-origin: 35px 65px;
+  transform-origin: 35px 65px;
 }
 
 .oppia-rule-bubble {
-    background: steelblue;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    padding: 3px;
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background: steelblue;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 3px;
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 .oppia-rule-bubble-warning {
-    background: #F9EDBE;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    padding: 3px;
-    color: #000;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background: #F9EDBE;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 3px;
+  color: #000;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 .oppia-feedback-bubble {
-    background: #E0E0E0;
-    border-bottom-left-radius: 8px;
-    padding: 5px;
-    width: 80%;
+  background: #E0E0E0;
+  border-bottom-left-radius: 8px;
+  padding: 5px;
+  width: 80%;
 }
 
 .oppia-dest-bubble {
-    background: #EEEEEE;
-    border-bottom-right-radius: 8px;
-    padding: 5px;
-    width: 20%;
+  background: #EEEEEE;
+  border-bottom-right-radius: 8px;
+  padding: 5px;
+  width: 20%;
+}
+
+.oppia-splash {
+  background: hsla(210, 75%, 75%, 1.0);
+}
+
+.oppia-carousel-slide {
+  height: 800px;
+  padding: 50px 90px 0 90px;
+}
+
+.oppia-splash-button-container {
+  font-size: 200%;
+  height: 100px;
+}
+
+.oppia-splash-header {
+  color: black;
+  font: 40px open sans,sans-serif;
+  font-weight: bold;
+}
+  
+.oppia-splash-subtitle {
+  color: black;
+  font: 20px open sans,sans-serif;
+}
+
+.oppia-splash-image {
+  height: 130px;
+  padding: 0 20px;
 }

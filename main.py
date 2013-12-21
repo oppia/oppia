@@ -80,7 +80,6 @@ urls = [
     webapp2.Route(r'/', pages.MainPage, name="home"),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
-    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/feedback', pages.FeedbackPage, 'feedback_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Home
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="oppia-splash">
+    <carousel>
+      <slide align="left">
+        <div class="oppia-carousel-slide">
+          <div class="oppia-splash-header">
+            Create interactive activities that help people to learn by doing.
+          </div>
+
+          <br><br>
+
+          <div class="oppia-splash-subtitle">
+            With Oppia, you can create interactive educational explorations. Think of these as bite-sized learning journeys that can be created by anyone for everyone. Here's an example:
+          </div>
+
+          <br><br>
+
+          <oppia oppia-id="0" height="700"></oppia>
+        </div>
+      </slide>
+
+      <slide align="left">
+        <div class="oppia-carousel-slide">
+          <center>
+            <div class="oppia-splash-header">
+              Learn. Create. Contribute.
+            </div>
+          </center>
+
+          <br><br>
+
+          <div class="oppia-splash-subtitle">
+            You can:
+          </div>
+
+          <br><br>
+
+          <div class="oppia-splash-subtitle" style="width: 650px;">
+            <p>
+              <img class="oppia-splash-image" src="/images/learn.png">
+              <a href="/gallery">learn</a> from explorations,
+            </p>
+
+            <p class="pull-right">
+              <a href="/profile">create</a> new explorations or improve existing ones,
+              <img class="oppia-splash-image" src="/images/create.png">
+            </p>
+
+            <div style="clear: both;"></div>
+
+            <p>
+              <img src="/images/computer.png" class="oppia-splash-image">
+              contribute to the
+              <a href="https://code.google.com/p/oppia" target="_blank">codebase</a> ... and more!
+            </p>
+          </div>
+        </div>
+      </slide>
+
+      <slide align="left">
+        <div class="oppia-carousel-slide">
+          <center>
+            <div class="oppia-splash-header">
+              All for free.
+            </div>
+          </center>
+
+          <br><br>
+
+          <div class="oppia-splash-subtitle">
+            Feel free to use Oppia explorations in your courses and websites.
+
+            <br><br>
+
+            If you can, please try to give back, or pay it forward. Help someone else learn something new today!
+
+            <br><br>
+
+            To finish, here's another exploration we picked for you at random:
+
+            <br><br>
+
+            <div>
+              <iframe src="/learn_random?iframed=true" width="100%" seamless="true" height="600px">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </slide>
+    </carousel>
+
+    <center>
+      <div class="oppia-splash-button-container">
+        <button type="button" class="btn btn-large" onclick="window.open('/gallery')">
+          Start Exploring Oppia
+        </button>
+      </div>
+    </center>
+  </div>
+
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/scripts/oppia-player-0.0.0.js"></script>
+{% endblock footer_js %}
