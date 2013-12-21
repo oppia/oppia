@@ -23,6 +23,7 @@ from core.platform import models
 (exp_models, file_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.file, models.NAMES.user
 ])
+current_user_services = models.Registry.import_current_user_services()
 import feconf
 
 import json
@@ -56,6 +57,8 @@ class TestBase(unittest.TestCase):
     maxDiff = 2500
 
     TAGS = []
+
+    DEFAULT_USERNAME = 'defaultusername'
 
     def _delete_all_explorations(self):
         classes = frozenset([
@@ -146,13 +149,38 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
+    def register(self, email, username=None, is_admin=True):
+        """Register a user with the given username."""
+        if username is None:
+            username = self.DEFAULT_USERNAME
+
+        self.login(email, is_admin=is_admin)
+
+        response = self.testapp.get('/profile/editor_prerequisites')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.testapp.post('/profile/editor_prerequisites', {
+            'csrf_token': csrf_token,
+            'payload': json.dumps({
+                'username': username,
+                'agreed_to_terms': True
+            })
+        }, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+
+        self.logout()
+
+    def get_user_id_from_email(self, email):
+        return current_user_services.get_user_id_from_email(email)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def login(self, email, is_admin=False):
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = email
+        os.environ['USER_ID'] = current_user_services.get_user_id_from_email(
+            email)
         os.environ['USER_IS_ADMIN'] = '1' if is_admin else '0'
 
     def logout(self):

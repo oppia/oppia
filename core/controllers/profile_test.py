@@ -42,8 +42,6 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         super(EditorPrerequisitesTest, self).tearDown()
 
     def test_redirect_to_prerequisites_page_happens(self):
-        feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS = True
-
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -59,7 +57,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_accepting_terms_is_handled_correctly(self):
-        feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS = True
+        self.register('editor@example.com')
 
         self.login('editor@example.com', is_admin=True)
 
@@ -96,8 +94,6 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_username_is_handled_correctly(self):
-        feconf.REQUIRE_EDITORS_TO_SET_USERNAMES = True
-
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/profile/editor_prerequisites')
@@ -105,7 +101,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response = self.testapp.post('/profile/editor_prerequisites', {
             'csrf_token': csrf_token,
-            'payload': json.dumps({})
+            'payload': json.dumps({'agreed_to_terms': True})
         }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
@@ -115,7 +111,10 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response = self.testapp.post('/profile/editor_prerequisites', {
             'csrf_token': csrf_token,
-            'payload': json.dumps({'username': ''})
+            'payload': json.dumps({
+                'username': '',
+                'agreed_to_terms': True
+            })
         }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
@@ -125,7 +124,10 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response = self.testapp.post('/profile/editor_prerequisites', {
             'csrf_token': csrf_token,
-            'payload': json.dumps({'username': '!a!'})
+            'payload': json.dumps({
+                'username': '!a!',
+                'agreed_to_terms': True
+            })
         }, expect_errors=True)
         self.assertEqual(response.status_int, 400)
         parsed_response = self.parse_json_response(
@@ -136,7 +138,10 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response = self.testapp.post('/profile/editor_prerequisites', {
             'csrf_token': csrf_token,
-            'payload': json.dumps({'username': 'abcde'})
+            'payload': json.dumps({
+                'username': 'abcde',
+                'agreed_to_terms': True
+            })
         }, expect_errors=True)
         self.assertEqual(response.status_int, 200)
 

@@ -104,6 +104,9 @@ class EditorPrerequisitesPage(base.BaseHandler):
             if not re.match(feconf.ALPHANUMERIC_REGEX, username):
                 raise self.InvalidInputException(
                     'Usernames can only have alphanumeric characters.')
+            if 'admin' in username.lower().strip():
+                raise self.InvalidInputException(
+                    'This username is already taken.')
             if not user_services.is_username_taken(username):
                 user_services.set_username(self.user_id, username)
             else:

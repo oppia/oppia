@@ -877,12 +877,27 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   $scope.addNewEditor = function(newEditorEmail) {
     activeInputData.name = 'explorationMetadata';
-    var oldValue = angular.copy($scope.explorationEditors);
-    var newValue = angular.copy(oldValue);
-    newValue.push(newEditorEmail);
 
-    $scope.saveExplorationRightsChange(
-      'explorationEditors', 'editors', newValue, oldValue);
+    var requestParameters = {
+      version: explorationData.data.version,
+      new_editor_email: newEditorEmail
+    };
+
+    $http.put(
+        $scope.explorationRightsUrl,
+        requestCreator.createRequest(requestParameters),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+            success(function(data) {
+              explorationData.data.version = data.version;
+              $scope.explorationEditors = data.editors;
+            }).
+            error(function(data) {
+              warningsData.addWarning(
+                  'Error modifying exploration rights: ' + data.error);
+              // TODO(sll): Reinstate the following line without causing the
+              //     $watch to trigger.
+              // $scope[frontendName] = oldValue;
+            });
   };
 
   /**

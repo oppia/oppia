@@ -37,7 +37,8 @@ class EditorTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
 
-        # Login as an admin.
+        # Register and login as an admin.
+        self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         # Check that it is now possible to access the editor page.
@@ -54,7 +55,8 @@ class EditorTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Login as an admin.
+        # Register and log in as an admin.
+        self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -77,7 +79,8 @@ class EditorTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Login as an admin.
+        # Register and log in as an admin.
+        self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -164,7 +167,8 @@ class EditorTest(test_utils.GenericTestBase):
                 })
             })
 
-        # Log in as an editor.
+        # Register and log in as an editor.
+        self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -222,6 +226,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
 
         # Check, from the editor perspective, that no stats have been recorded.
+        self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get(EXPLORATION_STATISTICS_URL)
@@ -271,10 +276,21 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
     def setUp(self):
         """Creates dummy users."""
         super(ExplorationDeletionRightsTest, self).setUp()
-        self.owner_id = 'owner@example.com'
-        self.editor_id = 'editor@example.com'
-        self.viewer_id = 'viewer@example.com'
-        self.admin_id = 'admin@example.com'
+        self.admin_email = 'admin@example.com'
+        self.owner_email = 'owner@example.com'
+        self.editor_email = 'editor@example.com'
+        self.viewer_email = 'viewer@example.com'
+
+        # Usernames containing the string 'admin' are reserved.
+        self.register(self.admin_email, username='adm')
+        self.register(self.owner_email, username='owner')
+        self.register(self.editor_email, username='editor')
+        self.register(self.viewer_email, username='viewer')
+
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.editor_id = self.get_user_id_from_email(self.editor_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)        
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -286,19 +302,19 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         exploration.editor_ids.append(self.editor_id)
         exp_services.save_exploration(self.owner_id, exploration)
 
-        self.login(self.editor_id, is_admin=False)
+        self.login(self.editor_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_id, is_admin=False)
+        self.login(self.viewer_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_id, is_admin=False)
+        self.login(self.owner_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -315,25 +331,25 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         exploration.is_public = True
         exp_services.save_exploration(self.owner_id, exploration)
 
-        self.login(self.editor_id, is_admin=False)
+        self.login(self.editor_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_id, is_admin=False)
+        self.login(self.viewer_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_id, is_admin=False)
+        self.login(self.owner_email, is_admin=False)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.admin_id, is_admin=True)
+        self.login(self.admin_email, is_admin=True)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)

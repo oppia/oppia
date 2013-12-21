@@ -397,7 +397,7 @@ class Exploration(object):
         return False if self.is_public else self.is_owned_by(user_id)
 
     def add_editor(self, editor_id):
-        """Adds a new editor. Does not commit changes."""
+        """Adds a new editor id. Does not commit changes."""
         self.editor_ids.append(editor_id)
 
     # Methods relating to states comprising this exploration.

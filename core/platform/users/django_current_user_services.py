@@ -55,3 +55,11 @@ def get_current_user(request):
         return user
     except Session.DoesNotExist:
         return None
+
+
+def get_user_id_from_email(email):
+    """Given an email address, return a user id.
+
+    Returns None if the email address does not correspond to a valid user id.
+    """
+    return None

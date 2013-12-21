@@ -114,7 +114,8 @@ class ExplorationHandler(base.BaseHandler):
             'is_public': exploration.is_public,
             'category': exploration.category,
             'title': exploration.title,
-            'editors': exploration.editor_ids,
+            'editors': exp_services.get_human_readable_editor_list(
+                exploration_id),
             'states': state_list,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
@@ -209,20 +210,22 @@ class ExplorationRightsHandler(base.BaseHandler):
         _require_valid_version(version, exploration.version)
 
         is_public = self.payload.get('is_public')
-        editors = self.payload.get('editors')
-        if editors is not None and not self.is_admin and not (
+        new_editor_email = self.payload.get('new_editor_email')
+        if not self.is_admin and not (
                 exploration.editor_ids and
                 self.user_id == exploration.editor_ids[0]):
             raise self.UnauthorizedUserException(
                 'Only the exploration owner can add new editors.')
 
         exp_services.update_exploration_rights(
-            self.user_id, exploration_id, is_public, editors)
+            self.user_id, exploration_id, is_public, [new_editor_email])
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         # TODO(sll): Also add information about is_public and editors.
         self.render_json({
             'version': exploration.version,
+            'editors': exp_services.get_human_readable_editor_list(
+                exploration_id),
         })
 
 
@@ -334,8 +337,6 @@ class ExplorationSnapshotsHandler(base.BaseHandler):
                 if snapshot['committer_id'] != 'admin':
                     snapshot['committer_id'] = user_services.get_username(
                         snapshot['committer_id'])
-
-        # TODO(sll): Also patch `editor_ids` to use the editors' display names.
 
         self.render_json({
             'snapshots': snapshots,

@@ -28,16 +28,19 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
 
+    EDITOR_EMAIL = 'editor@example.com'
+
     def _initialize(self):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
+        self.register(self.EDITOR_EMAIL)
 
     def test_image_upload_and_download(self):
         """Test image uploading and downloading."""
 
         self._initialize()
 
-        self.login('editor@example.com', is_admin=True)
+        self.login(self.EDITOR_EMAIL, is_admin=True)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
@@ -59,7 +62,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self._initialize()
 
-        self.login('editor@example.com', is_admin=True)
+        self.login(self.EDITOR_EMAIL, is_admin=True)
 
         # Upload an empty image.
         response = self.testapp.post(
@@ -81,7 +84,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self._initialize()
 
-        self.login('editor@example.com', is_admin=True)
+        self.login(self.EDITOR_EMAIL, is_admin=True)
 
         # Upload an empty image.
         response = self.testapp.post(
@@ -123,7 +126,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         # TODO(sll): Add more tests here.
         self._initialize()
 
-        self.login('editor@example.com', is_admin=True)
+        self.login(self.EDITOR_EMAIL, is_admin=True)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()

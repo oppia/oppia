@@ -268,9 +268,14 @@ class RandomExplorationPage(base.BaseHandler):
 
         explorations = exp_services.get_public_explorations()
         if len(explorations) <= 1:
-            raise self.PageNotFoundException()
-        selected_exploration = utils.get_random_choice(explorations[1:])
-        dest_url = '/learn/%s' % selected_exploration.id
+            exp_services.delete_demo('1')
+            exp_services.load_demo('1')
+            selected_exploration_id = '1'
+        else:
+            selected_exploration_id = utils.get_random_choice(
+                explorations[1:]).id
+
+        dest_url = '/learn/%s' % selected_exploration_id
         if iframed:
             dest_url += '?iframed=true'
         self.redirect(dest_url)

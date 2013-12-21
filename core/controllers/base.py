@@ -30,6 +30,7 @@ from core import counters
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 import jinja_utils
@@ -189,12 +190,12 @@ class BaseHandler(webapp2.RequestHandler):
         }
 
         self.user = current_user_services.get_current_user(self.request)
-        self.user_id = self.user.email() if self.user else None
+        self.user_id = self.user.user_id() if self.user else None
         self.is_admin = False
         if self.user_id:
             self.values['logout_url'] = (
                 current_user_services.create_logout_url(self.request.uri))
-            self.values['user'] = self.user.nickname()
+            self.values['user'] = user_services.get_username(self.user_id)
             self.is_admin = current_user_services.is_current_user_admin(
                 self.request)
         else:

@@ -32,7 +32,7 @@
         </span>
 
         <ul>
-          <li ng-repeat="editor in explorationEditors">
+          <li ng-repeat="editor in explorationEditors track by $index">
             <span ng-show="$index == 0">
               <em><[editor]></em>
             </span>

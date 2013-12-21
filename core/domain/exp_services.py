@@ -37,11 +37,13 @@ from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import stats_domain
+from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import widget_registry
 from core.platform import models
 import feconf
 import jinja_utils
+current_user_services = models.Registry.import_current_user_services()
 memcache_services = models.Registry.import_memcache_services()
 transaction_services = models.Registry.import_transaction_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -202,6 +204,26 @@ def export_state_to_verbose_dict(exploration_id, state_id):
             )
 
     return state_dict
+
+
+def get_human_readable_editor_list(exploration_id):
+    """Returns a list of editor usernames.
+
+    Editors who have been invited but who have not signed in are marked as
+    'pending'.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+    result = []
+    for editor_id in exploration.editor_ids:
+        if editor_id == 'admin':
+            result.append('[admin]')
+        else:
+            username = user_services.get_username(editor_id)
+            if username:
+                result.append(username)
+            else:
+                result.append('[pending]')
+    return result
 
 
 def export_content_to_html(exploration_id, content_array, params=None):
@@ -762,7 +784,7 @@ def update_exploration(
     """Update an exploration. Commits changes.
 
     Args:
-    - committer_id: str. Email address of the user who is performing the update
+    - committer_id: str. The id of the user who is performing the update
         action.
     - exploration_id: str. The exploration id.
     - title: str or None. The title of the exploration.
@@ -839,17 +861,17 @@ def update_exploration(
 
 
 def update_exploration_rights(
-        committer_id, exploration_id, is_public, editors):
+        committer_id, exploration_id, is_public, new_editor_emails):
     """Update the rights for an exploration. Commits changes.
 
     Args:
-    - committer_id: str. Email address of the user who is performing the update
+    - committer_id: str. The id of the user who is performing the update
         action.
     - exploration_id: str. The exploration id.
     - is_public: bool or None. If present, whether the exploration has been
         made public.
-    - editors: list of str, or None. If present, a list with the email
-        addresses of allowed editors.
+    - editor_ids: list of str, or None. If present, a list with the emails
+        of new editors.
     """
     # TODO(sll): Add tests to ensure that the parameters are of the correct
     # types, etc.
@@ -865,12 +887,20 @@ def update_exploration_rights(
         exploration.is_public = True
         commit_message_list.append('Exploration published.')
 
-    if editors is not None:
-        exploration.editor_ids = []
-        for email in editors:
-            exploration.add_editor(email)
-        # TODO(sll): Add more detail here.
-        commit_message_list.append('Exploration editor list changed.')
+    if new_editor_emails is not None:
+        successful_adds = 0
+        for email in new_editor_emails:
+            editor_id = current_user_services.get_user_id_from_email(email)
+            if editor_id:
+                if editor_id not in exploration.editor_ids:
+                    exploration.add_editor(editor_id)
+                    successful_adds += 1
+                else:
+                    raise Exception(
+                        'This user is already an editor of the exploration.')
+        if successful_adds > 0:
+            commit_message_list.append(
+                'Added %s new editors.' % successful_adds)
 
     def _update_exploration_rights_transaction(
             committer_id, exploration, commit_message):

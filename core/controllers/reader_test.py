@@ -31,14 +31,19 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ReaderPermissionsTest, self).setUp()
 
+        self.first_editor_email = 'editor@example.com'
+        self.first_editor_id = self.get_user_id_from_email(
+            self.first_editor_email)
+        
+        self.register(self.first_editor_email)
+
         self.exploration_id = 'eid'
-        self.first_editor = 'editor@example.com'
         self.exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                self.first_editor, 'A title', 'A category',
+                self.first_editor_id, 'A title', 'A category',
                 self.exploration_id))
 
-        exp_services.save_exploration(self.first_editor, self.exploration)
+        exp_services.save_exploration(self.first_editor_id, self.exploration)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -67,7 +72,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
-        self.login('editor@example.com', is_admin=False)
+        self.login(self.first_editor_email, is_admin=False)
         response = self.testapp.get('/learn/%s' % self.exploration_id)
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
@@ -82,7 +87,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def test_published_explorations_are_visible_to_anyone(self):
         self.exploration.is_public = True
-        exp_services.save_exploration(self.first_editor, self.exploration)
+        exp_services.save_exploration(self.first_editor_id, self.exploration)
 
         response = self.testapp.get(
             '/learn/%s' % self.exploration_id, expect_errors=True)

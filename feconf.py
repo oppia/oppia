@@ -159,9 +159,9 @@ NULL_SNAPSHOT = {}
 # Whether to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
 # Whether or not to require editors to have usernames.
-REQUIRE_EDITORS_TO_SET_USERNAMES = False
+REQUIRE_EDITORS_TO_SET_USERNAMES = True
 # Whether or not to require editors to agree to terms before contributing.
-REQUIRE_EDITORS_TO_ACCEPT_TERMS = False
+REQUIRE_EDITORS_TO_ACCEPT_TERMS = True
 
 
 # Ids and locations of the permitted widgets.
