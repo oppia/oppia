@@ -265,6 +265,11 @@ class RandomExplorationPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        iframed = (self.request.get('iframed') == 'true')
+
         explorations = exp_services.get_public_explorations()
-        selected_exploration = utils.get_random_choice(explorations)
-        self.redirect('/learn/%s' % selected_exploration.id)
+        selected_exploration = utils.get_random_choice(explorations[1:])
+        dest_url = '/learn/%s' % selected_exploration.id
+        if iframed:
+            dest_url += '?iframed=true'
+        self.redirect(dest_url)

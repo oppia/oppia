@@ -525,3 +525,35 @@ textarea {
     -webkit-transform-origin: 35px 65px;
     transform-origin: 35px 65px;
 }
+
+/* Styles for the splash page. */
+
+.oppia-splash {
+  background: hsla(210, 75%, 75%, 1.0);
+}
+
+.oppia-carousel-slide {
+  height: 800px;
+  padding: 50px 90px 0 90px;
+}
+
+.oppia-splash-button-container {
+  font-size: 200%;
+  height: 100px;
+}
+
+.oppia-splash-header {
+  color: black;
+  font: 40px open sans,sans-serif;
+  font-weight: bold;
+}
+  
+.oppia-splash-subtitle {
+  color: black;
+  font: 20px open sans,sans-serif;
+}
+
+.oppia-splash-image {
+  height: 130px;
+  padding: 0 20px;
+}
