@@ -25,9 +25,7 @@
 oppia.directive('oppiaNoninteractiveImage', function($rootScope, $sce, oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {
-      filepathWithValue: '@'
-    },
+    scope: {},
     templateUrl: '/widgettemplate/noninteractive/Image',
     controller: function($scope, $attrs) {
       $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
@@ -39,12 +37,21 @@ oppia.directive('oppiaNoninteractiveImage', function($rootScope, $sce, oppiaHtml
   };
 });
 
+oppia.directive('oppiaNoninteractiveMath', function($rootScope, $sce, oppiaHtmlEscaper) {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: '/widgettemplate/noninteractive/Math',
+    controller: function($scope, $attrs) {
+      $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj($attrs.rawLatexWithValue);
+    }
+  };
+});
+
 oppia.directive('oppiaNoninteractiveVideo', function($sce, oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {
-      videoIdWithValue: '@'
-    },
+    scope: {},
     templateUrl: '/widgettemplate/noninteractive/Video',
     controller: function($scope, $attrs) {
       $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
@@ -58,9 +65,7 @@ oppia.directive('oppiaNoninteractiveVideo', function($sce, oppiaHtmlEscaper) {
 oppia.directive('oppiaNoninteractiveTabs', function(oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {
-      tabContentsWithValue: '@'
-    },
+    scope: {},
     templateUrl: '/widgettemplate/noninteractive/Tabs',
     controller: function($scope, $attrs) {
       $scope.tabContents = oppiaHtmlEscaper.escapedJsonToObj($attrs.tabContentsWithValue);
@@ -71,9 +76,7 @@ oppia.directive('oppiaNoninteractiveTabs', function(oppiaHtmlEscaper) {
 oppia.directive('oppiaNoninteractiveLink', function(oppiaHtmlEscaper) {
   return {
     restrict: 'E',
-    scope: {
-      urlWithValue: '@'
-    },
+    scope: {},
     templateUrl: '/widgettemplate/noninteractive/Link',
     controller: function($scope, $attrs) {
       var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj($attrs.urlWithValue);

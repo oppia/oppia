@@ -11,10 +11,7 @@
 {% block center %}
   <div ng-if="!contentMemento">
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
-      This editor supports $LaTeX$.
-      <a href="https://code.google.com/p/oppia/wiki/NonInteractiveContent" target="_blank">
-        More info...
-      </a>
+      In this section, type what you want the reader to see before interacting with this state.
     </span>
     <span angular-html-bind="content[0].value"></span>
   </div>

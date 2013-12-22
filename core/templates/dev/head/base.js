@@ -54,11 +54,6 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
     return params;
   };
 
-  $scope.updateMath = function() {
-    console.log('Updating math expressions.');
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-  };
-
   /**
    * Checks if an object is empty.
    */

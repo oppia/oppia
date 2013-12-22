@@ -184,11 +184,6 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
     $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.reloadInteractiveIframe($scope.inputTemplate);
-
-    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
-    // The call to $apply() is needed before updateMath() is called.
-    $scope.$apply();
-    $scope.updateMath();
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -241,11 +236,6 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
       // is not sticky and should be replaced.
       $scope.reloadInteractiveIframe($scope.inputTemplate);
     }
-
-    // TODO(sll): Try and get rid of the "$digest already in progress" error here.
-    // The call to $apply() is needed before updateMath() is called.
-    $scope.$apply();
-    $scope.updateMath();
 
     if (data.reader_response_iframe) {
       // The previous user response needs to be rendered in a custom html with

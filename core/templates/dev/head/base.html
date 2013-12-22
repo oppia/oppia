@@ -16,16 +16,16 @@
     <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
-        /* Hide the 'loading' and 'processing' messages. */
+        skipStartupTypeset: true,
         messageStyle: 'none',
-        tex2jax: {
-          inlineMath: [['$','$'], ['\\(','\\)']],
-          processEscapes: true
+        'HTML-CSS': {
+          showMathMenu: false
         }
       });
+      MathJax.Hub.Configured();
     </script>
-    <script type="text/javascript"
-            src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+
+    <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
     <script>
       var GLOBALS = {};
@@ -106,7 +106,7 @@
             </div>
           </div>
         {% endif %}
-  
+
         <div ng-cloak>
           <div class="oppia-alert-blocks">
             <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
@@ -121,7 +121,7 @@
         </div>
         <br><br>
       </div>
-  
+
       {% if not iframed %}
         <div class="navbar oppia-footer">
           <div class="oppia-content">

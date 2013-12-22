@@ -5,11 +5,10 @@ schema_version: 1
 states:
 - content:
   - type: text
-    value: '<div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a tool that helps you create interactive learning activities
-      that can be continually improved over time. You can find more information at <a
-      href="https://code.google.com/p/oppia/">https://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
-      first, do you know where the name ''Oppia''
-      comes from?</div>'
+    value: <div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a tool
+      that helps you create interactive learning activities that can be continually
+      improved over time. You can find more information at <a href="https://code.google.com/p/oppia/">https://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
+      first, do you know where the name 'Oppia' comes from?</div>
   name: Welcome!
   param_changes: []
   widget:
@@ -139,7 +138,9 @@ states:
     widget_id: InteractiveMap
 - content:
   - type: text
-    value: <div>Let $x = 11$. What is the value of $x^2$?<br></div>
+    value: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
+      ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
+      \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
   name: Numeric input
   param_changes: []
   widget:
@@ -210,15 +211,16 @@ states:
     widget_id: NumericInput
 - content:
   - type: text
-    value: That's a very quick sample of Oppia. For more sample explorations, check
-      out the gallery, which you can get to by clicking the 'Gallery' tab on the top.<div><br></div><div>If
-      you want to add custom question types, or run your own instance of Oppia, have
-      a look at our code site:</div><div><br></div><div>&nbsp; &nbsp; &nbsp;<a href="https://code.google.com/p/oppia/"
-      target="_blank">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You
-      can also create new explorations, like this one, by clicking on the "Create
-      a new exploration" button in the gallery.</div><br><div>We hope you enjoy using
-      Oppia. If you have feedback, let us know! You can find our discussion forum
-      at&nbsp;<a href="https://groups.google.com/forum/?fromgroups#!forum/oppia" target="_blank">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>
+    value: "That's a very quick sample of Oppia. For more sample explorations, check\
+      \ out the gallery, which you can get to by clicking the 'Gallery' tab on the\
+      \ top.<div><br></div><div>If you want to add custom question types, or run your\
+      \ own instance of Oppia, have a look at our code site:</div><div><br></div><div>\_\
+      \ \_ \_<a href=\"https://code.google.com/p/oppia/\" target=\"_blank\">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You\
+      \ can also create new explorations, like this one, by clicking on the \"Create\
+      \ a new exploration\" button in the gallery.</div><br><div>We hope you enjoy\
+      \ using Oppia. If you have feedback, let us know! You can find our discussion\
+      \ forum at\_<a href=\"https://groups.google.com/forum/?fromgroups#!forum/oppia\"\
+      \ target=\"_blank\">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>"
   name: Things you can do
   param_changes: []
   widget:

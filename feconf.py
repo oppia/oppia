@@ -173,6 +173,9 @@ ALLOWED_WIDGETS = {
         'Link': {
             'dir': 'extensions/widgets/noninteractive/Link'
         },
+        'Math': {
+            'dir': 'extensions/widgets/noninteractive/Math'
+        },
         'Tabs': {
             'dir': 'extensions/widgets/noninteractive/Tabs'
         },

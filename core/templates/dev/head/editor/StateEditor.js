@@ -27,9 +27,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.stateParamChanges = stateData.param_changes || [];
 
     $scope.$broadcast('stateEditorInitialized', $scope.stateId);
-    // TODO(sll): Why isn't this working?
-    $scope.updateMath();
-
     console.log('Content updated.');
   });
 
