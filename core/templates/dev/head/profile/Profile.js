@@ -18,7 +18,7 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function Profile($scope, $http, warningsData, requestCreator) {
+function Profile($scope, $http, warningsData, oppiaRequestCreator) {
   $scope.profileUrl = '/profile/data/';
   $scope.pageLoaded = false;
 
@@ -44,4 +44,4 @@ function Profile($scope, $http, warningsData, requestCreator) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Profile.$inject = ['$scope', '$http', 'warningsData', 'requestCreator'];
+Profile.$inject = ['$scope', '$http', 'warningsData', 'oppiaRequestCreator'];

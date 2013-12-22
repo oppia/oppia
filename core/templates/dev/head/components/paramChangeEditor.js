@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
+oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
   // Directive that implements an editor for specifying parameter changes.
   return {
     restrict: 'E',
@@ -198,13 +198,13 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
           // list.
           $scope.addExplorationParamSpec(name, 'UnicodeString');
         }
-        
+
         _updateAndSaveParamChangeList(
           index, name, generator_id, customization_args);
 
         $scope.resetEditor();
       };
-    
+
       $scope.deleteParamChange = function(index) {
         $scope.paramChangesMemento = angular.copy($scope.paramChanges);
         $scope.paramChanges.splice(index, 1);
@@ -214,4 +214,4 @@ oppia.directive('paramChangeEditor', function($compile, $http, warningsData) {
       };
     }
   };
-});
+}]);

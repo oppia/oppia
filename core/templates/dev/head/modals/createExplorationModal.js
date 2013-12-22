@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function CreateExplorationModal($scope, $http, $modal, warningsData, requestCreator) {
+function CreateExplorationModal($scope, $http, $modal, warningsData, oppiaRequestCreator) {
 
   $scope.showCreateExplorationModal = function(categoryList) {
     warningsData.clear();
@@ -107,7 +107,7 @@ function CreateExplorationModal($scope, $http, $modal, warningsData, requestCrea
     } else {
       $http.post(
           '/create_new',
-          requestCreator.createRequest({title: title, category: category}),
+          oppiaRequestCreator.createRequest({title: title, category: category}),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
               success(function(data) {
                 window.location = '/create/' + data.explorationId;
@@ -122,4 +122,4 @@ function CreateExplorationModal($scope, $http, $modal, warningsData, requestCrea
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-CreateExplorationModal.$inject = ['$scope', '$http', '$modal', 'warningsData', 'requestCreator'];
+CreateExplorationModal.$inject = ['$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator'];

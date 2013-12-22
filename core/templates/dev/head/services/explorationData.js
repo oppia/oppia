@@ -19,7 +19,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('explorationData', function($rootScope, $http, $resource, warningsData, $q) {
+oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http, warningsData, $q) {
   // Valid state properties that can be saved.
   var validStateProperties = [
     'content',
@@ -204,4 +204,4 @@ oppia.factory('explorationData', function($rootScope, $http, $resource, warnings
   };
 
   return explorationData;
-});
+}]);

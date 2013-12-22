@@ -22,7 +22,7 @@ var OBJECT_EDITOR_TEMPLATES_URL = '/object_editor_template/';
 
 // Individual object editor directives are in extensions/objects/templates.
 
-oppia.directive('objectEditor', function($compile, $http, warningsData) {
+oppia.directive('objectEditor', ['$compile', function($compile) {
   return {
     scope: {objType: '@', value: '=', initArgs: '=', alwaysEditable: '@'},
     link: function(scope, element, attrs) {
@@ -39,4 +39,4 @@ oppia.directive('objectEditor', function($compile, $http, warningsData) {
     },
     restrict: 'E'
   };
-});
+}]);

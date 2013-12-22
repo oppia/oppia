@@ -41,7 +41,7 @@ describe('Gallery controller', function() {
         }
       });
       scope = $rootScope.$new();
-      ctrl = $controller(Gallery, {$scope: scope, warningsData: null, requestCreator: null});
+      ctrl = $controller(Gallery, {$scope: scope, warningsData: null, oppiaRequestCreator: null});
     }));
 
     it('should create current URL', function() {

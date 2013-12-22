@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Gallery($scope, $http, $modal, warningsData, requestCreator) {
+function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
   $scope.galleryDataUrl = '/gallery/data/';
@@ -69,7 +69,7 @@ function Gallery($scope, $http, $modal, warningsData, requestCreator) {
   $scope.forkExploration = function(explorationId) {
     $http.post(
         '/fork',
-        requestCreator.createRequest({exploration_id: explorationId}),
+        oppiaRequestCreator.createRequest({exploration_id: explorationId}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               window.location = '/create/' + data.explorationId;
@@ -90,4 +90,4 @@ function Gallery($scope, $http, $modal, warningsData, requestCreator) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData', 'requestCreator'];
+Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator'];

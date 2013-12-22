@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('warningsData', function($rootScope) {
+oppia.factory('warningsData', [function() {
   var warningsData = {warnings: []};
   var MAX_WARNINGS = 5;
 
@@ -49,4 +49,4 @@ oppia.factory('warningsData', function($rootScope) {
   };
 
   return warningsData;
-});
+}]);

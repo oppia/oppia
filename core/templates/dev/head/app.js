@@ -19,13 +19,13 @@
  */
 
 var oppia = angular.module(
-    'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap']);
+  'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap']);
 
 // Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
-oppia.config(function($interpolateProvider) {
+oppia.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
-});
+}]);
 
 // Service for HTML serialization and escaping.
 oppia.factory('oppiaHtmlEscaper', function() {
@@ -65,7 +65,7 @@ oppia.factory('oppiaHtmlEscaper', function() {
 });
 
 // Service for converting requests to a form that can be sent to the server.
-oppia.factory('requestCreator', function() {
+oppia.factory('oppiaRequestCreator', [function() {
   return {
     /**
      * Creates a request object that can be sent to the server.
@@ -80,4 +80,4 @@ oppia.factory('requestCreator', function() {
       }, true);
     }
   };
-});
+}]);

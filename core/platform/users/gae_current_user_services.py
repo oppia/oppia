@@ -50,15 +50,15 @@ class FakeUser(ndb.Model):
 
 
 def get_user_id_from_email(email):
-	"""Given an email address, returns a user id.
+    """Given an email address, returns a user id.
 
-	Returns None if the email address does not correspond to a valid user id.
-	"""
-	u = users.User(email)
-	key = FakeUser(user=u).put()
-	obj = FakeUser.get_by_id(key.id())
-	user_id = obj.user.user_id()
-	if user_id:
-		return unicode(user_id)
-	else:
-		return None
+    Returns None if the email address does not correspond to a valid user id.
+    """
+    u = users.User(email)
+    key = FakeUser(user=u).put()
+    obj = FakeUser.get_by_id(key.id())
+    user_id = obj.user.user_id()
+    if user_id:
+        return unicode(user_id)
+    else:
+        return None

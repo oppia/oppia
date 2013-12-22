@@ -22,7 +22,7 @@
 
 // TODO(sll): on-blur, this value should revert to '' unless the user has
 // clicked inside another input box.
-oppia.factory('activeInputData', function($rootScope) {
+oppia.factory('activeInputData', [function() {
   var activeInputData = {
     name: '',
     scope: null,
@@ -46,4 +46,4 @@ oppia.factory('activeInputData', function($rootScope) {
   };
 
   return activeInputData;
-});
+}]);

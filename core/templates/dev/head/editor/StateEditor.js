@@ -19,7 +19,7 @@
  */
 
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
-                   warningsData, activeInputData, requestCreator) {
+                   warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.$on('guiTabSelected', function(event, stateData) {
     $scope.stateName = stateData.name;
@@ -135,13 +135,13 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           return widgetParams;
         }
       },
-      controller: function($scope, $http, $modalInstance, widgetId, widgetParams, warningsData, requestCreator) {
+      controller: function($scope, $http, $modalInstance, widgetId, widgetParams, warningsData, oppiaRequestCreator) {
         $scope.widgetId = widgetId;
         $scope.widgetParams = widgetParams;
 
         $http.post(
             '/widgets/interactive/' + widgetId,
-            requestCreator.createRequest({
+            oppiaRequestCreator.createRequest({
               'customization_args': {}
             }),
             {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
@@ -175,4 +175,4 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 }
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
-    'explorationData', 'warningsData', 'activeInputData', 'requestCreator'];
+    'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator'];

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('barChart', function() {
+oppia.directive('barChart', [function() {
   return {
     restrict: 'E',
     scope: {chartData: '=', chartColors: '='},
@@ -43,9 +43,9 @@ oppia.directive('barChart', function() {
       });
     }
   };
-});
+}]);
 
-oppia.directive('stateGraphViz', function(explorationData, $filter) {
+oppia.directive('stateGraphViz', ['explorationData', '$filter', function(explorationData, $filter) {
   // constants
   var i = 0;
   var NODE_PADDING_X = 8;
@@ -376,4 +376,4 @@ oppia.directive('stateGraphViz', function(explorationData, $filter) {
       }
     }
   };
-});
+}]);

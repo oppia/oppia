@@ -23,7 +23,7 @@ var VALUE_GENERATOR_TEMPLATES_URL = '/value_generator_handler/';
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 
-oppia.directive('valueGeneratorEditor', function($compile, $http, warningsData) {
+oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
   return {
     link: function(scope, element, attrs) {
       scope.$watch('generatorId', function(newValue, oldValue) {
@@ -36,4 +36,4 @@ oppia.directive('valueGeneratorEditor', function($compile, $http, warningsData) 
     restrict: 'E',
     scope: {generatorId: '=', initArgs: '=', customizationArgs: '=', objType: '='}
   };
-});
+}]);

@@ -32,7 +32,7 @@ oppia.run(function($rootScope) {
 });
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
-    $filter, $rootScope, explorationData, warningsData, activeInputData, requestCreator) {
+    $filter, $rootScope, explorationData, warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.currentlyInStateContext = function() {
     return Boolean($scope.stateId);
@@ -885,7 +885,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     $http.put(
         $scope.explorationRightsUrl,
-        requestCreator.createRequest(requestParameters),
+        oppiaRequestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               explorationData.data.version = data.version;
@@ -955,7 +955,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     $http.put(
         $scope.explorationRightsUrl,
-        requestCreator.createRequest(requestParameters),
+        oppiaRequestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               explorationData.data.version = data.version;
@@ -1024,7 +1024,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     $http.post(
         $scope.explorationDataUrl,
-        requestCreator.createRequest({
+        oppiaRequestCreator.createRequest({
           state_name: newStateName,
           version: explorationData.data.version
         }),
@@ -1180,5 +1180,5 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 EditorExploration.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', 'explorationData', 'warningsData', 'activeInputData',
-  'requestCreator'
+  'oppiaRequestCreator'
 ];

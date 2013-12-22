@@ -21,7 +21,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('messengerService', function() {
+oppia.factory('messengerService', [function() {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };
@@ -81,4 +81,4 @@ oppia.factory('messengerService', function() {
   };
 
   return messenger;
-});
+}]);

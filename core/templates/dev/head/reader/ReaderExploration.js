@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, requestCreator) {
+function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, oppiaRequestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   // The following is needed for image displaying to work.
@@ -118,7 +118,7 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
 
     $http.post(
         '/learn/give_feedback/' + $scope.explorationId + '/' + $scope.stateId,
-        requestCreator.createRequest(requestMap),
+        oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {
       $scope.feedback = '';
@@ -203,7 +203,7 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
 
     $http.post(
         '/learn/' + $scope.explorationId + '/' + $scope.stateId,
-        requestCreator.createRequest(requestMap),
+        oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
     .error(function(data) {
@@ -282,5 +282,5 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'requestCreator'
+  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'oppiaRequestCreator'
 ];

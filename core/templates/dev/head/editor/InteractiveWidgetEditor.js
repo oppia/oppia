@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor($scope, $http, $modal, warningsData, explorationData, requestCreator) {
+function InteractiveWidgetEditor($scope, $http, $modal, warningsData, explorationData, oppiaRequestCreator) {
   // The id of the widget preview iframe.
   $scope.previewIframeId = 'interactiveWidgetPreview';
 
@@ -30,7 +30,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
         '/widgets/interactive/' + widgetId,
-        requestCreator.createRequest({customization_args: customizationArgs}),
+        oppiaRequestCreator.createRequest({customization_args: customizationArgs}),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       $scope.widgetHandlerSpecs = data.widget.handlers;
@@ -497,7 +497,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         }
       },
       controller: function($scope, $http, $modalInstance, widgetId, widgetParamSpecs,
-          widgetCustomizationArgs, warningsData, requestCreator) {
+          widgetCustomizationArgs, warningsData, oppiaRequestCreator) {
 
         $scope.widgetId = widgetId;
         $scope.widgetParamSpecs = widgetParamSpecs;
@@ -619,5 +619,5 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 }
 
 InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'requestCreator'
+  '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaRequestCreator'
 ];

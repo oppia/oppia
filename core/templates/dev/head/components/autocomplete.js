@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('select2Dropdown', function() {
+oppia.directive('select2Dropdown', [function() {
   // Directive for incorporating select2 dropdowns.
   return {
     restrict: 'E',
@@ -81,4 +81,4 @@ oppia.directive('select2Dropdown', function() {
       });
     }
   };
-});
+}]);
