@@ -24,3 +24,4 @@ StateModel = django_models.StateModel
 ExplorationModel = django_models.ExplorationModel
 ExplorationSnapshotModel = django_models.ExplorationSnapshotModel
 ExplorationSnapshotContentModel = django_models.ExplorationSnapshotContentModel
+ExplorationRightsModel = django_models.ExplorationRightsModel

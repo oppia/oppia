@@ -33,7 +33,7 @@ def create_logout_url(slug):
     return users.create_logout_url(slug)
 
 
-def is_current_user_admin(request):
+def is_current_user_admin(request=None):
     """Checks whether the current user is an admin."""
     return users.is_current_user_admin()
 

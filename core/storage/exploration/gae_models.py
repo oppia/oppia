@@ -296,3 +296,26 @@ class ExplorationSnapshotContentModel(base_models.BaseModel):
         snapshot_content_model = cls(
             id=snapshot_id, format=snapshot_format, content=json_blob)
         snapshot_content_model.put()
+
+
+class ExplorationRightsModel(base_models.BaseModel):
+    """Storage model for rights related to an exploration.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+
+    # The user_ids of owners of this exploration.
+    owners = ndb.StringProperty(repeated=True)
+    # The user_ids of users who are allowed to edit this exploration.
+    editors = ndb.StringProperty(repeated=True)
+    # The user_ids of users who are allowed to view this exploration.
+    viewers = ndb.StringProperty(repeated=True)
+
+    # Whether this exploration is owned by the community.
+    community_owned = ndb.BooleanProperty(default=False)
+
+    # The publication status of this exploration.
+    status = ndb.StringProperty(
+        default='private',
+        choices=['private', 'tentatively_public', 'public', 'publicized']
+    )

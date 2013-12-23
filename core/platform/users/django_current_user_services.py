@@ -24,19 +24,19 @@ from django.contrib.auth.models import User
 
 def create_login_url(slug):
     """Creates a login url."""
-    # Currently we have no way to implement this on non-GAE platforms 
-	# as a stand alone app.
+    # Currently we have no way to implement this on non-GAE platforms
+    # as a stand alone app.
     return ''
 
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    # Currently we have no way to implement this on non-GAE platforms 
-	# as a stand alone app.
+    # Currently we have no way to implement this on non-GAE platforms
+    # as a stand alone app.
     return ''
 
 
-def is_current_user_admin(request):
+def is_current_user_admin(request=None):
     """Checks whether the current user is an admin."""
     user = get_current_user(request)
     if user:
