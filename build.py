@@ -17,10 +17,20 @@
 import os
 import re
 import shutil
+from subprocess import call
 
 HEAD_DIR = 'core/templates/dev/head/'
 OUT_DIR = 'core/templates/prod/head/'
 REMOVE_WS = re.compile(r'\s{2,}').sub
+
+
+def _minify(source_path, target_path):
+    """Runs the given file through a minifier and outputs it to target_path."""
+    YUICOMPRESSOR_DIR = (
+        '../oppia_tools/yuicompressor-2.4.8/yuicompressor-2.4.8.jar')
+    cmd = 'java -jar %s %s -o %s' % (
+        YUICOMPRESSOR_DIR, source_path, target_path)
+    call(cmd, shell=True)
 
 
 def ensure_directory_exists(f):
@@ -42,27 +52,14 @@ def process_html(filename, target):
     d.write(content)
 
 
-def minify_css(css):
-    """Collapse whitespace in CSS file."""
-    # TODO(sll): replace with a third-party minifier, such as yuicompressor.
-    return re.sub(r'\s+', ' ', css)
+def process_css(source_path, target_path):
+    ensure_directory_exists(target_path)
+    _minify(source_path, target_path)
 
 
-def process_css(filename, target):
-    f = open(filename, 'r')
-    ensure_directory_exists(target)
-    d = open(target, 'w+')
-    d.write(minify_css(f.read()))
-
-
-def process_js(filename, target):
-    # TODO(sll): Add minification.
-    ensure_directory_exists(target)
-    f = open(filename, 'r')
-    content = f.read()
-    d = open(target, 'w+')
-    d.write(content)
-    return
+def process_js(source_path, target_path):
+    ensure_directory_exists(target_path)
+    _minify(source_path, target_path)
 
 
 # Script starts here.
@@ -78,14 +75,16 @@ for root in os.listdir(os.path.join(os.getcwd())):
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
         for directory in dirs:
             print('Processing %s' % os.path.join(root, directory))
-        for fn in files:
-            full_filename = os.path.join(root) + '/' + fn
-            if full_filename.find(OUT_DIR) > 0:
+        for filename in files:
+            source_path = os.path.join(root, filename)
+            if source_path.find(OUT_DIR) > 0:
                 continue
-            target_filename = get_target(full_filename)
-            if fn.endswith('.html'):
-                process_html(full_filename, target_filename)
-            if fn.endswith('.css'):
-                process_css(full_filename, target_filename)
-            if fn.endswith('.js'):
-                process_js(full_filename, target_filename)
+            if source_path.find(HEAD_DIR) == -1:
+                continue
+            target_path = get_target(source_path)
+            if filename.endswith('.html'):
+                process_html(source_path, target_path)
+            if filename.endswith('.css'):
+                process_css(source_path, target_path)
+            if filename.endswith('.js'):
+                process_js(source_path, target_path)

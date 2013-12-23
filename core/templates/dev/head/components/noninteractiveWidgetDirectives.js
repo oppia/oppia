@@ -28,13 +28,13 @@ oppia.directive('oppiaNoninteractiveImage', [
       restrict: 'E',
       scope: {},
       templateUrl: '/widgettemplate/noninteractive/Image',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(
             '/imagehandler/' + $rootScope.explorationId + '/' +
             encodeURIComponent($scope.filepath)
         );
-      }
+      }]
     };
   }
 ]);
@@ -45,9 +45,9 @@ oppia.directive('oppiaNoninteractiveMath', [
       restrict: 'E',
       scope: {},
       templateUrl: '/widgettemplate/noninteractive/Math',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj($attrs.rawLatexWithValue);
-      }
+      }]
     };
   }
 ]);
@@ -58,12 +58,12 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: '/widgettemplate/noninteractive/Video',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
         $scope.videoUrl = $sce.trustAsResourceUrl(
             'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0'
         );
-      }
+      }]
     };
   }
 ]);
@@ -74,9 +74,9 @@ oppia.directive('oppiaNoninteractiveTabs', [
       restrict: 'E',
       scope: {},
       templateUrl: '/widgettemplate/noninteractive/Tabs',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.tabContents = oppiaHtmlEscaper.escapedJsonToObj($attrs.tabContentsWithValue);
-      }
+      }]
     };
   }
 ]);
@@ -87,14 +87,14 @@ oppia.directive('oppiaNoninteractiveLink', [
       restrict: 'E',
       scope: {},
       templateUrl: '/widgettemplate/noninteractive/Link',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj($attrs.urlWithValue);
         if (untrustedUrl.indexOf('http://') !== 0 &&
             untrustedUrl.indexOf('https://') !== 0) {
           return;
         }
         $scope.url = untrustedUrl;
-      }
+      }]
     };
   }
 ]);

@@ -31,37 +31,40 @@ function CreateExplorationModal($scope, $http, $modal, warningsData, oppiaReques
           return categoryList;
         }
       },
-      controller: function($scope, $modalInstance, categoryList) {
-        $scope.categoryList = categoryList;
+      controller: [
+        '$scope', '$modalInstance', 'categoryList',
+        function($scope, $modalInstance, categoryList) {
+          $scope.categoryList = categoryList;
 
-        $scope.newExplorationTitle = '';
-        $scope.newExplorationCategory = '';
-        $scope.includeYamlFile = false;
+          $scope.newExplorationTitle = '';
+          $scope.newExplorationCategory = '';
+          $scope.includeYamlFile = false;
 
-        $scope.create = function(title, newCategory) {
-          if (!title) {
-            warningsData.addWarning('Please specify an exploration title.');
-            return;
-          }
+          $scope.create = function(title, newCategory) {
+            if (!title) {
+              warningsData.addWarning('Please specify an exploration title.');
+              return;
+            }
 
-          if (!newCategory) {
-            warningsData.addWarning('Please specify a category for this exploration.');
-            return;
-          }
+            if (!newCategory) {
+              warningsData.addWarning('Please specify a category for this exploration.');
+              return;
+            }
 
-          $modalInstance.close({
-            title: title,
-            category: newCategory,
-            includeYamlFile: $scope.includeYamlFile,
-            yamlFile: $scope.file
-          });
-        };
+            $modalInstance.close({
+              title: title,
+              category: newCategory,
+              includeYamlFile: $scope.includeYamlFile,
+              yamlFile: $scope.file
+            });
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
 
     modalInstance.result.then(function(result) {

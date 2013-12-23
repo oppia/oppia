@@ -22,7 +22,7 @@ var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 
 // Global utility methods.
-function Base($scope, $http, $rootScope, warningsData, activeInputData, messengerService) {
+function Base($scope, $http, $rootScope, $window, warningsData, activeInputData, messengerService) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
@@ -31,7 +31,7 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
   // TODO(sll): This is wrong; it should only happen for the reader app.
   // Otherwise the iframed widget repository also causes a sent message and
   // broadcast.
-  window.onBodyLoad = function() {
+  $window.onBodyLoad = function() {
     messengerService.sendMessage(
       messengerService.HEIGHT_CHANGE, document.body.scrollHeight);
 
@@ -48,7 +48,7 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
   // Gets URL parameter values.
   $scope.getUrlParams = function() {
     var params = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    var parts = $window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
       params[key] = value;
     });
     return params;
@@ -202,4 +202,4 @@ function Base($scope, $http, $rootScope, warningsData, activeInputData, messenge
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'activeInputData', 'messengerService'];
+Base.$inject = ['$scope', '$http', '$rootScope', '$window', 'warningsData', 'activeInputData', 'messengerService'];

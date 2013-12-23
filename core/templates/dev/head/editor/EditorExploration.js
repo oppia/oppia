@@ -25,11 +25,11 @@ var NONEXISTENT_STATE = '[none]';
 // TODO(sll): console.log is not supported in IE.
 
 // Receive events from the iframed widget repository.
-oppia.run(function($rootScope) {
+oppia.run(['$rootScope', function($rootScope) {
   window.addEventListener('message', function(evt) {
     $rootScope.$broadcast('message', evt);
   });
-});
+}]);
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, explorationData, warningsData, activeInputData, oppiaRequestCreator) {
@@ -84,9 +84,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveChanges = function(
-      explorationChanges, stateChanges, commitMessage) {
-
+  $scope.saveChanges = function(explorationChanges, stateChanges, commitMessage) {
     $scope.isSaveInProgress = true;
     explorationData.save(
       explorationChanges, stateChanges, commitMessage, function() {
@@ -174,22 +172,25 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             return $scope.changeSummaries;
           }
         },
-        controller: function($scope, $modalInstance, changeSummaries) {
-          $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
+        controller: [
+          '$scope', '$modalInstance', 'changeSummaries',
+          function($scope, $modalInstance, changeSummaries) {
+            $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
 
-          $scope.explorationChangesExist = !$.isEmptyObject(
-            $scope.changeSummary.exploration);
-          $scope.stateChangesExist = !$.isEmptyObject(
-            $scope.changeSummary.states);
+            $scope.explorationChangesExist = !$.isEmptyObject(
+              $scope.changeSummary.exploration);
+            $scope.stateChangesExist = !$.isEmptyObject(
+              $scope.changeSummary.states);
 
-          $scope.publish = function(commitMessage) {
-            $modalInstance.close(commitMessage);
-          };
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
+            $scope.publish = function(commitMessage) {
+              $modalInstance.close(commitMessage);
+            };
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        ]
       });
 
       modalInstance.result.then(function(commitMessage) {
@@ -1091,16 +1092,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     var modalInstance = $modal.open({
       templateUrl: 'modals/publishExploration',
       backdrop: 'static',
-      controller: function($scope, $modalInstance) {
-        $scope.publish = function() {
-          $modalInstance.close();
-        };
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = function() {
+            $modalInstance.close();
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
 
     modalInstance.result.then(function() {
@@ -1116,16 +1118,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     var modalInstance = $modal.open({
       templateUrl: 'modals/deleteExploration',
       backdrop: 'static',
-      controller: function($scope, $modalInstance) {
-        $scope.delete = function() {
-          $modalInstance.close();
-        };
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope['delete'] = function() {
+            $modalInstance.close();
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
 
     modalInstance.result.then(function() {
@@ -1152,18 +1155,21 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           return $scope.getStateName(deleteStateId);
         }
       },
-      controller: function($scope, $modalInstance, deleteStateName) {
-        $scope.deleteStateName = deleteStateName;
+      controller: [
+        '$scope', '$modalInstance', 'deleteStateName',
+        function($scope, $modalInstance, deleteStateName) {
+          $scope.deleteStateName = deleteStateName;
 
-        $scope.delete = function() {
-          $modalInstance.close({deleteStateId: deleteStateId});
-        };
+          $scope['delete'] = function() {
+            $modalInstance.close({deleteStateId: deleteStateId});
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
 
     modalInstance.result.then(function(result) {

@@ -24,7 +24,7 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
     restrict: 'E',
     scope: {paramChanges: '=', paramSpecs: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
     templateUrl: 'inline/param_change_editor',
-    controller: function($scope, $attrs) {
+    controller: ['$scope', '$attrs', function($scope, $attrs) {
       $scope._inArray = function(array, value) {
         for (var i = 0; i < array.length; i++) {
           if (array[i] == value) {
@@ -212,6 +212,6 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
             $scope.paramChanges, angular.copy($scope.paramChangesMemento));
         $scope.resetEditor();
       };
-    }
+    }]
   };
 }]);

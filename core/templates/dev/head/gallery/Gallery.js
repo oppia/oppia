@@ -53,30 +53,33 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
         },
         isDemoServer: $scope.isDemoServer
       },
-      controller: function($scope, $modalInstance, currentId, root, isDemoServer) {
-        $scope.isDemoServer = isDemoServer;
-        $scope.root = root;
-        $scope.currentId = currentId;
+      controller: [
+        '$scope', '$modalInstance', 'currentId', 'root', 'isDemoServer',
+        function($scope, $modalInstance, currentId, root, isDemoServer) {
+          $scope.isDemoServer = isDemoServer;
+          $scope.root = root;
+          $scope.currentId = currentId;
 
-        $scope.cancel = function () {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
   };
 
   $scope.forkExploration = function(explorationId) {
     $http.post(
-        '/fork',
-        oppiaRequestCreator.createRequest({exploration_id: explorationId}),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              window.location = '/create/' + data.explorationId;
-            }).error(function(data) {
-              warningsData.addWarning(data.error ? data.error :
-                  'Error: Could not add new exploration.');
-            });
+      '/fork',
+      oppiaRequestCreator.createRequest({exploration_id: explorationId}),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+        success(function(data) {
+          window.location = '/create/' + data.explorationId;
+        }).error(function(data) {
+          warningsData.addWarning(data.error ? data.error :
+            'Error: Could not add new exploration.');
+        });
   };
 
   /*********************************************************************

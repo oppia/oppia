@@ -20,55 +20,6 @@ import os
 
 from core import settings
 
-# Code contributors, in alphabetical order.
-CODE_CONTRIBUTORS = [
-    'Jacob Davis',
-    'Jeremy Emerson',
-    'Koji Ashida',
-    'Manas Tungare',
-    'Reinaldo Aguiar',
-    'Sean Lip',
-    'Stephanie Federwisch',
-    'Tarashish Mishra',
-    'Wilson Hong',
-    'Yana Malysheva',
-]
-
-# Idea contributors, in alphabetical order.
-IDEA_CONTRIBUTORS = [
-    'Albert Gural',
-    'Alex Kauffmann',
-    'Catherine Colman',
-    'John Cox',
-    'John Orr',
-    'Neil Fraser',
-    'Pavel Simakov',
-    'Peter Norvig',
-    'Phil Wagner',
-    'Philip Guo',
-]
-
-# Demo explorations to load on startup. The id assigned to each exploration
-# is based on the index of the exploration in this list, so if you want to
-# add a new exploration and preserve the existing ids, add that exploration
-# to the end of the list.
-# Each item is represented as a tuple: (filepath, title, category). If the
-# filepath is a yaml file it should end with '.yaml', otherwise it should
-# be the path to the directory WITHOUT a trailing '/'.
-DEMO_EXPLORATIONS = [
-    ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
-    ('pitch.yaml', 'Pitch Perfect', 'Music'),
-    ('counting.yaml', 'Three Balls', 'Mathematics'),
-    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
-    ('hola.yaml', '¡Hola!', 'Languages'),
-    ('cities.yaml', 'World Cities', 'Geography'),
-    ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
-    ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
-     'Mathematics'),
-    ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
-]
-
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -80,7 +31,6 @@ PLATFORM = 'gae' if (
         or os.environ['SERVER_SOFTWARE'].startswith('Google'))
     ) else 'django'
 
-
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
@@ -88,10 +38,7 @@ if PLATFORM == 'gae':
 elif PLATFORM == 'django':
     DEV_MODE = settings.DEV
 
-# The directory containing data files for tests.
 TESTS_DATA_DIR = 'core/tests/data'
-
-# The directories containing sample explorations and widgets.
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
 WIDGETS_DIR = 'extensions/widgets'
 RULES_DIR = 'extensions/rules'
@@ -216,3 +163,52 @@ ALLOWED_WIDGETS = {
         },
     }
 }
+
+# Code contributors, in alphabetical order.
+CODE_CONTRIBUTORS = [
+    'Jacob Davis',
+    'Jeremy Emerson',
+    'Koji Ashida',
+    'Manas Tungare',
+    'Reinaldo Aguiar',
+    'Sean Lip',
+    'Stephanie Federwisch',
+    'Tarashish Mishra',
+    'Wilson Hong',
+    'Yana Malysheva',
+]
+
+# Idea contributors, in alphabetical order.
+IDEA_CONTRIBUTORS = [
+    'Albert Gural',
+    'Alex Kauffmann',
+    'Catherine Colman',
+    'John Cox',
+    'John Orr',
+    'Neil Fraser',
+    'Pavel Simakov',
+    'Peter Norvig',
+    'Phil Wagner',
+    'Philip Guo',
+]
+
+# Demo explorations to load on startup. The id assigned to each exploration
+# is based on the index of the exploration in this list, so if you want to
+# add a new exploration and preserve the existing ids, add that exploration
+# to the end of the list.
+# Each item is represented as a tuple: (filepath, title, category). If the
+# filepath is a yaml file it should end with '.yaml', otherwise it should
+# be the path to the directory WITHOUT a trailing '/'.
+DEMO_EXPLORATIONS = [
+    ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
+    ('pitch.yaml', 'Pitch Perfect', 'Music'),
+    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
+    ('hola.yaml', '¡Hola!', 'Languages'),
+    ('cities.yaml', 'World Cities', 'Geography'),
+    ('adventure.yaml', 'Parametrized Adventure', 'Interactive Fiction'),
+    ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
+     'Mathematics'),
+    ('binary_search', 'The Lazy Magician', 'Mathematics'),
+    ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
+]

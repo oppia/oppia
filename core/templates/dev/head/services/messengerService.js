@@ -52,6 +52,10 @@ oppia.factory('messengerService', [function() {
       if (window.parent != window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
         var idAndVersionHash = window.location.hash.substring(1);
+        if (!idAndVersionHash) {
+          return;
+        }
+
         if (idAndVersionHash.indexOf('&') === -1) {
           console.log(
               'Embedding error: Invalid id/version hash: ' + idAndVersionHash);

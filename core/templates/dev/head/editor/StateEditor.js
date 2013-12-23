@@ -135,33 +135,37 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
           return widgetParams;
         }
       },
-      controller: function($scope, $http, $modalInstance, widgetId, widgetParams, warningsData, oppiaRequestCreator) {
-        $scope.widgetId = widgetId;
-        $scope.widgetParams = widgetParams;
+      controller: [
+        '$scope', '$http', '$modalInstance', 'widgetId', 'widgetParams',
+        'warningsData', 'oppiaRequestCreator',
+        function($scope, $http, $modalInstance, widgetId, widgetParams, warningsData, oppiaRequestCreator) {
+          $scope.widgetId = widgetId;
+          $scope.widgetParams = widgetParams;
 
-        $http.post(
-            '/widgets/interactive/' + widgetId,
-            oppiaRequestCreator.createRequest({
-              'customization_args': {}
-            }),
-            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-                success(function(data) {
-                  $scope.paramDescriptions = {};
-                  for (var paramName in data.widget.params) {
-                    $scope.paramDescriptions[paramName] = data.widget.params[paramName].description;
-                  }
-                }).error(function(data) {
-                  warningsData.addWarning(
-                      'Error: Failed to obtain widget parameter descriptions.');
-                });
+          $http.post(
+              '/widgets/interactive/' + widgetId,
+              oppiaRequestCreator.createRequest({
+                'customization_args': {}
+              }),
+              {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+                  success(function(data) {
+                    $scope.paramDescriptions = {};
+                    for (var paramName in data.widget.params) {
+                      $scope.paramDescriptions[paramName] = data.widget.params[paramName].description;
+                    }
+                  }).error(function(data) {
+                    warningsData.addWarning(
+                        'Error: Failed to obtain widget parameter descriptions.');
+                  });
 
-        $scope.save = function(widgetParams) {
-          $scope.$broadcast('externalSave');
-          $modalInstance.close({
-            widgetParams: widgetParams
-          });
-        };
-      }
+          $scope.save = function(widgetParams) {
+            $scope.$broadcast('externalSave');
+            $modalInstance.close({
+              widgetParams: widgetParams
+            });
+          };
+        }
+      ]
     });
   };
 

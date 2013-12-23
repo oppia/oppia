@@ -49,7 +49,7 @@ fi
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Installing CoffeeScript
-  $NPM_INSTALL coffee-script@1.2.0 || 
+  $NPM_INSTALL coffee-script@1.2.0 ||
   {
     echo ""
     echo "  [oppia-message]"
@@ -114,6 +114,12 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
+fi
+
+if [ ! -d "$TOOLS_DIR/yuicompressor-2.4.8" ]; then
+  echo Installing YUI Compressor
+  mkdir -p $TOOLS_DIR/yuicompressor-2.4.8
+  wget https://github.com/yui/yuicompressor/releases/download/v2.4.8/yuicompressor-2.4.8.jar -O $TOOLS_DIR/yuicompressor-2.4.8/yuicompressor-2.4.8.jar
 fi
 
 # Static resources.
@@ -181,7 +187,7 @@ if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3" ]; then
 
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.js
   wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js.map  
+  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js.map
 
   # Files for tests.
   wget http://code.angularjs.org/1.2.0-rc.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-mocks.js

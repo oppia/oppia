@@ -201,129 +201,133 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           return $scope.stateId;
         }
       },
-      controller: function($scope, $modalInstance, modalTitle, tmpRule,
+      controller: [
+        '$scope', '$modalInstance', 'modalTitle', 'tmpRule', 'handlerName',
+        'existingRules', 'widgetCustomizationArgs', 'allDests', 'states', 'stateId',
+        function($scope, $modalInstance, modalTitle, tmpRule,
             handlerName, existingRules, widgetCustomizationArgs, allDests, states, stateId) {
-        $scope.modalTitle = modalTitle;
-        $scope.tmpRule = tmpRule;
-        $scope.handlerName = handlerName;
-        $scope.existingRules = existingRules;
-        $scope.widgetCustomizationArgs = widgetCustomizationArgs;
-        $scope.allDests = allDests;
-        $scope.states = states;
-        $scope.stateId = stateId;
+          $scope.modalTitle = modalTitle;
+          $scope.tmpRule = tmpRule;
+          $scope.handlerName = handlerName;
+          $scope.existingRules = existingRules;
+          $scope.widgetCustomizationArgs = widgetCustomizationArgs;
+          $scope.allDests = allDests;
+          $scope.states = states;
+          $scope.stateId = stateId;
 
-        $scope.UNICODE_STRING_LIST_INIT_ARGS = {
-          'objType': 'UnicodeString'
-        };
-
-        $scope.FEEDBACK_LIST_INIT_ARGS = {
-          'objType': 'Html',
-          'addItemText': 'Add feedback message'
-        };
-
-        $scope.resetTmpRule = function() {
-          $scope.tmpRule = {
-            index: null,
-            description: null,
-            name: null,
-            inputs: {},
-            dest: null,
-            destNew: '',
-            feedback: [],
-            paramChanges: null
+          $scope.UNICODE_STRING_LIST_INIT_ARGS = {
+            'objType': 'UnicodeString'
           };
-        };
 
-        $scope.tmpRuleDescriptionFragments = [];
-        $scope.$watch('tmpRule.description', function(newValue) {
-          if (!newValue) {
-            return;
-          }
+          $scope.FEEDBACK_LIST_INIT_ARGS = {
+            'objType': 'Html',
+            'addItemText': 'Add feedback message'
+          };
 
-          var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+          $scope.resetTmpRule = function() {
+            $scope.tmpRule = {
+              index: null,
+              description: null,
+              name: null,
+              inputs: {},
+              dest: null,
+              destNew: '',
+              feedback: [],
+              paramChanges: null
+            };
+          };
 
-          var finalInputArray = newValue.split(pattern);
-          if (finalInputArray.length % 3 !== 1) {
-            console.log('Error: could not process rule description.');
-          }
-
-          var result = [];
-          // TODO(sll): Remove this special-casing.
-          var isMultipleChoice = Boolean($scope.widgetCustomizationArgs.choices);
-          for (var i = 0; i < finalInputArray.length; i += 3) {
-            result.push({'type': 'noneditable', 'text': finalInputArray[i]});
-            if (i == finalInputArray.length - 1) {
-              break;
+          $scope.tmpRuleDescriptionFragments = [];
+          $scope.$watch('tmpRule.description', function(newValue) {
+            if (!newValue) {
+              return;
             }
 
-            if (isMultipleChoice) {
-              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
-            } else {
-              result.push({
-                'type': finalInputArray[i+2],
-                'varName': finalInputArray[i+1]
-              });
-            }
-          }
-          $scope.tmpRuleDescriptionFragments = result;
-        });
+            var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
 
-        $scope.getDestName = function(stateId) {
-          return (
-              stateId === '?'            ? 'Add New State...' :
-              stateId === END_DEST       ? END_DEST :
-              stateId === $scope.stateId ? $scope.states[stateId].name + ' ⟳' :
-              $scope.states[stateId].name
-          );
-        };
-
-        $scope.getExtendedChoiceArray = function(choices) {
-          var result = [];
-          for (var i = 0; i < choices.length; i++) {
-            result.push({id: i, val: choices[i]});
-          }
-          return result;
-        };
-
-        $scope.selectRule = function(description, name) {
-          $scope.tmpRule.description = description;
-          $scope.tmpRule.name = name;
-          $scope.tmpRule.dest = explorationData.stateId;
-          $scope.tmpRule.destNew = '';
-
-          // Finds the parameters and sets them in $scope.tmpRule.inputs.
-          var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-          var copyOfRule = description;
-          while (true) {
-            if (!copyOfRule.match(pattern)) {
-              break;
-            }
-            var varName = copyOfRule.match(pattern)[1];
-            var varType = null;
-            if (copyOfRule.match(pattern)[2]) {
-              varType = copyOfRule.match(pattern)[2].substring(1);
+            var finalInputArray = newValue.split(pattern);
+            if (finalInputArray.length % 3 !== 1) {
+              console.log('Error: could not process rule description.');
             }
 
-            if (varType == 'Set') {
-              $scope.tmpRule.inputs[varName] = [];
-            } else {
-              $scope.tmpRule.inputs[varName] = '';
+            var result = [];
+            // TODO(sll): Remove this special-casing.
+            var isMultipleChoice = Boolean($scope.widgetCustomizationArgs.choices);
+            for (var i = 0; i < finalInputArray.length; i += 3) {
+              result.push({'type': 'noneditable', 'text': finalInputArray[i]});
+              if (i == finalInputArray.length - 1) {
+                break;
+              }
+
+              if (isMultipleChoice) {
+                result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+              } else {
+                result.push({
+                  'type': finalInputArray[i+2],
+                  'varName': finalInputArray[i+1]
+                });
+              }
             }
+            $scope.tmpRuleDescriptionFragments = result;
+          });
 
-            copyOfRule = copyOfRule.replace(pattern, ' ');
-          }
-        };
+          $scope.getDestName = function(stateId) {
+            return (
+                stateId === '?'            ? 'Add New State...' :
+                stateId === END_DEST       ? END_DEST :
+                stateId === $scope.stateId ? $scope.states[stateId].name + ' ⟳' :
+                $scope.states[stateId].name
+            );
+          };
 
-        $scope.save = function() {
-          $scope.$broadcast('externalSave');
-          $modalInstance.close({tmpRule: tmpRule});
-        };
+          $scope.getExtendedChoiceArray = function(choices) {
+            var result = [];
+            for (var i = 0; i < choices.length; i++) {
+              result.push({id: i, val: choices[i]});
+            }
+            return result;
+          };
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+          $scope.selectRule = function(description, name) {
+            $scope.tmpRule.description = description;
+            $scope.tmpRule.name = name;
+            $scope.tmpRule.dest = explorationData.stateId;
+            $scope.tmpRule.destNew = '';
+
+            // Finds the parameters and sets them in $scope.tmpRule.inputs.
+            var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+            var copyOfRule = description;
+            while (true) {
+              if (!copyOfRule.match(pattern)) {
+                break;
+              }
+              var varName = copyOfRule.match(pattern)[1];
+              var varType = null;
+              if (copyOfRule.match(pattern)[2]) {
+                varType = copyOfRule.match(pattern)[2].substring(1);
+              }
+
+              if (varType == 'Set') {
+                $scope.tmpRule.inputs[varName] = [];
+              } else {
+                $scope.tmpRule.inputs[varName] = '';
+              }
+
+              copyOfRule = copyOfRule.replace(pattern, ' ');
+            }
+          };
+
+          $scope.save = function() {
+            $scope.$broadcast('externalSave');
+            $modalInstance.close({tmpRule: tmpRule});
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
     });
 
     modalInstance.result.then(function(result) {
@@ -496,30 +500,33 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           return widgetCustomizationArgs;
         }
       },
-      controller: function($scope, $http, $modalInstance, widgetId, widgetParamSpecs,
-          widgetCustomizationArgs, warningsData, oppiaRequestCreator) {
+      controller: ['$scope', '$http', '$modalInstance', 'widgetId', 'widgetParamSpecs',
+        'widgetCustomizationArgs', 'warningsData', 'oppiaRequestCreator',
+        function($scope, $http, $modalInstance, widgetId, widgetParamSpecs,
+            widgetCustomizationArgs, warningsData, oppiaRequestCreator) {
 
-        $scope.widgetId = widgetId;
-        $scope.widgetParamSpecs = widgetParamSpecs;
-        $scope.widgetCustomizationArgs = widgetCustomizationArgs;
+          $scope.widgetId = widgetId;
+          $scope.widgetParamSpecs = widgetParamSpecs;
+          $scope.widgetCustomizationArgs = widgetCustomizationArgs;
 
-        $scope.paramDescriptions = {};
-        for (var paramName in $scope.widgetParamSpecs) {
-          $scope.paramDescriptions[paramName] = $scope.widgetParamSpecs[paramName].description;
+          $scope.paramDescriptions = {};
+          for (var paramName in $scope.widgetParamSpecs) {
+            $scope.paramDescriptions[paramName] = $scope.widgetParamSpecs[paramName].description;
+          }
+
+          $scope.save = function(widgetCustomizationArgs) {
+            $scope.$broadcast('externalSave');
+            $modalInstance.close({
+              widgetCustomizationArgs: widgetCustomizationArgs
+            });
+          };
+
+          $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
         }
-
-        $scope.save = function(widgetCustomizationArgs) {
-          $scope.$broadcast('externalSave');
-          $modalInstance.close({
-            widgetCustomizationArgs: widgetCustomizationArgs
-          });
-        };
-
-        $scope.cancel = function () {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }
+      ]
     });
   };
 
@@ -557,7 +564,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       templateUrl: 'modals/chooseInteractiveWidget',
       backdrop: 'static',
       resolve: {},
-      controller: function($scope, $modalInstance) {
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         // Receive messages from the exploration editor broadcast (these
         // messages originate from the widget repository).
         // TODO(sll): This results in a "Cannot read property '$$nextSibling'
@@ -577,7 +584,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           warningsData.clear();
           $modalInstance.dismiss('cancel');
         };
-      }
+      }]
     }).result.then(function(arg) {
       if (!$scope.widgetId || $scope.widgetId != arg.data.widget.id) {
         $scope.widgetId = arg.data.widget.id;

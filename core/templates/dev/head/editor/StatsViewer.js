@@ -48,45 +48,47 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
             return rulesStats;
           }
         },
-        controller: function($scope, $modalInstance, stateId, stateName, stateStats, improvementType, rulesStats) {
-          $scope.stateId = stateId;
-          $scope.stateName = stateName;
-          $scope.stateStats = stateStats;
-          $scope.improvementType = improvementType;
-          $scope.rulesStats = rulesStats;
-  
-          $scope.getNumTimesString = function(numberOfTimes) {
-            var suffix = (numberOfTimes == 1 ? ' time' : ' times');
-            return numberOfTimes + suffix;
-          };
+        controller: ['$scope', '$modalInstance', 'stateId', 'stateName', 'stateStats', 'improvementType', 'rulesStats',
+          function($scope, $modalInstance, stateId, stateName, stateStats, improvementType, rulesStats) {
+            $scope.stateId = stateId;
+            $scope.stateName = stateName;
+            $scope.stateStats = stateStats;
+            $scope.improvementType = improvementType;
+            $scope.rulesStats = rulesStats;
 
-          $scope.isEmpty = function(obj) {
-            for (var property in obj) {
-              if (obj.hasOwnProperty(property)) {
-                return false;
-              }
-            }
-            return true;
-          };
+            $scope.getNumTimesString = function(numberOfTimes) {
+              var suffix = (numberOfTimes == 1 ? ' time' : ' times');
+              return numberOfTimes + suffix;
+            };
 
-          $scope.doesAnswerExist = function() {
-            for (var rule in $scope.rulesStats) {
-              if ($scope.rulesStats[rule].answers.length > 0) {
-                return true;
+            $scope.isEmpty = function(obj) {
+              for (var property in obj) {
+                if (obj.hasOwnProperty(property)) {
+                  return false;
+                }
               }
-            }
-            return false;
-          };
-  
-          $scope.gotoStateEditor = function(locationHash) {
-            $modalInstance.close({locationHash: locationHash});
-          };
-  
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
+              return true;
+            };
+
+            $scope.doesAnswerExist = function() {
+              for (var rule in $scope.rulesStats) {
+                if ($scope.rulesStats[rule].answers.length > 0) {
+                  return true;
+                }
+              }
+              return false;
+            };
+
+            $scope.gotoStateEditor = function(locationHash) {
+              $modalInstance.close({locationHash: locationHash});
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        ]
       });
 
       modalInstance.result.then(function(result) {

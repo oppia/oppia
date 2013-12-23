@@ -18,7 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, warningsData, messengerService, oppiaRequestCreator) {
+function ReaderExploration(
+    $scope, $http, $rootScope, $sce, $timeout, $modal, warningsData,
+    messengerService, oppiaRequestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
   // The following is needed for image displaying to work.
@@ -70,7 +72,7 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
       templateUrl: 'modals/readerFeedback',
       backdrop: 'static',
       resolve: {},
-      controller: function($scope, $modalInstance) {
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.submit = function(feedback) {
           $modalInstance.close({feedback: feedback});
         };
@@ -79,7 +81,7 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
           $modalInstance.dismiss('cancel');
           warningsData.clear();
         };
-      }
+      }]
     });
 
     modalInstance.result.then(function(result) {
@@ -101,12 +103,12 @@ function ReaderExploration($scope, $http, $rootScope, $sce, $timeout, $modal, wa
       templateUrl: 'modals/readerFeedbackConfirmation',
       backdrop: 'static',
       resolve: {},
-      controller: function($scope, $modalInstance) {
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
           warningsData.clear();
         };
-      }
+      }]
     });
   };
 

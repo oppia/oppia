@@ -21,7 +21,7 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-oppia.directive('angularHtmlBind', function($compile) {
+oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'A',
     scope: {
@@ -34,11 +34,11 @@ oppia.directive('angularHtmlBind', function($compile) {
       });
     }
   };
-});
+}]);
 
 
 // override the default input to update on blur
-oppia.directive('ngModelOnblur', function() {
+oppia.directive('ngModelOnblur', [function() {
   return {
     restrict: 'A',
     require: 'ngModel',
@@ -52,12 +52,12 @@ oppia.directive('ngModelOnblur', function() {
       });
     }
   };
-});
+}]);
 
 
-oppia.directive('mathjaxBind', function() {
+oppia.directive('mathjaxBind', [function() {
   return {
-    restrict: "A",
+    restrict: 'A',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
       $scope.$watch($attrs.mathjaxBind, function(value) {
         var $script = angular.element('<script type="math/tex">')
@@ -68,4 +68,4 @@ oppia.directive('mathjaxBind', function() {
       });
     }]
   };
-});
+}]);

@@ -30,7 +30,7 @@ oppia.directive('select2Dropdown', [function() {
       width: '@'
     },
     template: '<input type="hidden">',
-    controller: function($scope, $element, $attrs) {
+    controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
       $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
       $scope.makeUnique = function(arr) {
@@ -79,6 +79,6 @@ oppia.directive('select2Dropdown', [function() {
         $scope.item = e.val;
         $scope.$apply();
       });
-    }
+    }]
   };
 }]);

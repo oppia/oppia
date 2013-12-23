@@ -25,7 +25,7 @@ oppia.directive('richTextEditor', [
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
       template: '<textarea rows="7" cols="60" ng-disabled="!hasFullyLoaded"></textarea>',
-      controller: function($scope, $element, $attrs) {
+      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
         var rteNode = $element[0].firstChild;
@@ -146,24 +146,28 @@ oppia.directive('richTextEditor', [
                   return response.data.widget.customization_args;
                 }
               },
-              controller: function($scope, $modalInstance, widgetDefinition, widgetParamSpecs, widgetCustomizationArgs) {
-                $scope.widgetParamSpecs = widgetParamSpecs || {};
-                $scope.widgetCustomizationArgs = widgetCustomizationArgs;
-                $scope.widgetDefinition = widgetDefinition;
+              controller: [
+                '$scope', '$modalInstance', 'widgetDefinition', 'widgetParamSpecs',
+                'widgetCustomizationArgs',
+                function($scope, $modalInstance, widgetDefinition, widgetParamSpecs, widgetCustomizationArgs) {
+                  $scope.widgetParamSpecs = widgetParamSpecs || {};
+                  $scope.widgetCustomizationArgs = widgetCustomizationArgs;
+                  $scope.widgetDefinition = widgetDefinition;
 
-                $scope.paramDescriptions = {};
-                for (var paramName in $scope.widgetParamSpecs) {
-                  $scope.paramDescriptions[paramName] = (
-                      $scope.widgetParamSpecs[paramName].description);
+                  $scope.paramDescriptions = {};
+                  for (var paramName in $scope.widgetParamSpecs) {
+                    $scope.paramDescriptions[paramName] = (
+                        $scope.widgetParamSpecs[paramName].description);
+                  }
+
+                  $scope.save = function(customizationArgs) {
+                    $modalInstance.close({
+                      customizationArgs: customizationArgs,
+                      widgetDefinition: $scope.widgetDefinition
+                    });
+                  };
                 }
-
-                $scope.save = function(customizationArgs) {
-                  $modalInstance.close({
-                    customizationArgs: customizationArgs,
-                    widgetDefinition: $scope.widgetDefinition
-                  });
-                };
-              }
+              ]
             });
 
             modalInstance.result.then(function(result) {
@@ -284,7 +288,7 @@ oppia.directive('richTextEditor', [
         };
 
         $scope.init();
-      }
+      }]
     };
   }
 ]);
