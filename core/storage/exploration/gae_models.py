@@ -92,7 +92,7 @@ class ExplorationModel(base_models.BaseModel):
     version = ndb.IntegerProperty(default=0)
 
     # The category this exploration belongs to.
-    category = ndb.StringProperty(required=True)
+    category = ndb.StringProperty(required=True, indexed=True)
     # What this exploration is called.
     title = ndb.StringProperty(default='New exploration')
     # The list of state ids this exploration consists of. This list should not

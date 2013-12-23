@@ -30,6 +30,9 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
     EDITOR_EMAIL = 'editor@example.com'
 
+    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
+    IMAGE_VIEW_URL_PREFIX = '/imagehandler'
+
     def _initialize(self):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
@@ -45,7 +48,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         response = self.testapp.post(
-            '/imagehandler/0',
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', raw_image),)
         )
@@ -53,7 +56,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.testapp.get(str('/imagehandler/0/%s' % filepath))
+        response = self.testapp.get(
+            str('%s/0/%s' % (self.IMAGE_VIEW_URL_PREFIX, filepath)))
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.body, raw_image)
 
@@ -66,7 +70,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         # Upload an empty image.
         response = self.testapp.post(
-            '/imagehandler/0',
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', ''),),
             expect_errors=True
@@ -88,7 +92,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         # Upload an empty image.
         response = self.testapp.post(
-            '/imagehandler/0',
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             upload_files=(('image', 'unused_filename', 'bad_image'),),
             expect_errors=True
@@ -107,7 +111,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self._initialize()
 
         response = self.testapp.get(
-            '/imagehandler/0/bad_image', expect_errors=True)
+            '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_unauthorized_image_upload(self):
@@ -116,7 +120,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self._initialize()
 
         response = self.testapp.post(
-            '/imagehandler/0',
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             upload_files=(('image', 'unused_filename', 'abc'),),
             expect_errors=True
         )
@@ -131,7 +135,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         response = self.testapp.post(
-            '/imagehandler/0',
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test/a.png'},
             upload_files=(('image', 'unused_filename', raw_image),),
             expect_errors=True

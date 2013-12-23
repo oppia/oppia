@@ -16,6 +16,8 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import imghdr
+
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
@@ -27,6 +29,9 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([
+    models.NAMES.user
+])
 import feconf
 import utils
 
@@ -72,12 +77,95 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
-class ExplorationPage(base.BaseHandler):
-    """Page describing a single exploration."""
+def require_editor(handler):
+    """Decorator that checks if the user can edit the given entity."""
+    def test_editor(self, exploration_id, state_id=None, **kwargs):
+        """Gets the user and exploration id if the user can edit it.
 
+        Args:
+            self: the handler instance
+            exploration_id: the exploration id
+            state_id: the state id, if it exists
+            **kwargs: any other arguments passed to the handler
+
+        Returns:
+            The user and exploration instance, if the user is authorized to
+            edit this exploration. Also, the state instance, if one is
+            supplied.
+
+        Raises:
+            self.NotLoggedInException: if there is no current user.
+            self.UnauthorizedUserException: if the user exists but does not
+                have the right credentials.
+        """
+        if not self.user_id:
+            self.redirect(current_user_services.create_login_url(
+                self.request.uri))
+            return
+
+        user_settings_model = None
+        redirect_url = '/profile/editor_prerequisites'
+        must_redirect = False
+
+        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
+            if user_settings_model is None:
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_or_create(self.user_id))
+
+            if not user_settings_model.username:
+                must_redirect = True
+                redirect_url = utils.set_url_query_parameter(
+                    redirect_url, 'has_username', 'false')
+
+        if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
+            if user_settings_model is None:
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_or_create(self.user_id))
+
+            if not user_settings_model.agreed_to_terms:
+                must_redirect = True
+                redirect_url = utils.set_url_query_parameter(
+                    redirect_url, 'agreed_to_terms', 'false')
+
+        if must_redirect:
+            redirect_url = utils.set_url_query_parameter(
+                redirect_url, 'return_url', self.request.uri)
+            self.redirect(redirect_url)
+            return
+
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        if (not current_user_services.is_current_user_admin(self.request) and
+                not exploration.is_editable_by(self.user_id)):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to edit this exploration.',
+                self.user_id)
+
+        if not state_id:
+            return handler(self, exploration_id, **kwargs)
+        try:
+            exp_services.get_state_by_id(exploration_id, state_id)
+        except:
+            raise self.PageNotFoundException
+        return handler(self, exploration_id, state_id, **kwargs)
+
+    return test_editor
+
+
+class EditorHandler(base.BaseHandler):
+    """Base class for all handlers for the editor page."""
+
+    # The page name to use as a key for generating CSRF tokens.
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+
+class ExplorationPage(EditorHandler):
+    """Page describing a single exploration."""
+
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         # TODO(sll): Consider including the obj_generator html in a ng-template
@@ -94,12 +182,12 @@ class ExplorationPage(base.BaseHandler):
         self.render_template('editor/editor_exploration.html')
 
 
-class ExplorationHandler(base.BaseHandler):
+class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -136,7 +224,7 @@ class ExplorationHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @base.require_editor
+    @require_editor
     def post(self, exploration_id):
         """Adds a new state to the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -161,7 +249,7 @@ class ExplorationHandler(base.BaseHandler):
                 exploration_id, state_id)
         })
 
-    @base.require_editor
+    @require_editor
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -196,7 +284,7 @@ class ExplorationHandler(base.BaseHandler):
             'param_changes': exploration.param_change_dicts
         })
 
-    @base.require_editor
+    @require_editor
     def delete(self, exploration_id):
         """Deletes the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -210,12 +298,12 @@ class ExplorationHandler(base.BaseHandler):
         exp_services.delete_exploration(self.user_id, exploration_id)
 
 
-class ExplorationRightsHandler(base.BaseHandler):
+class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+    @require_editor
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -264,12 +352,12 @@ class ExplorationRightsHandler(base.BaseHandler):
         })
 
 
-class DeleteStateHandler(base.BaseHandler):
+class DeleteStateHandler(EditorHandler):
     """Handles state deletions."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+    @require_editor
     def delete(self, exploration_id, state_id):
         """Deletes the state with id state_id."""
         # TODO(sll): Add a version check here. This probably involves NOT using
@@ -283,12 +371,12 @@ class DeleteStateHandler(base.BaseHandler):
         })
 
 
-class ResolvedAnswersHandler(base.BaseHandler):
+class ResolvedAnswersHandler(EditorHandler):
     """Allows readers' answers for a state to be marked as resolved."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+    @require_editor
     def put(self, exploration_id, state_id):
         """Marks readers' answers as resolved."""
 
@@ -306,12 +394,12 @@ class ResolvedAnswersHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ResolvedFeedbackHandler(base.BaseHandler):
+class ResolvedFeedbackHandler(EditorHandler):
     """Allows readers' feedback for a state to be resolved."""
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_editor
+    @require_editor
     def put(self, exploration_id, state_id):
         """Marks readers' feedback as resolved."""
 
@@ -327,10 +415,10 @@ class ResolvedFeedbackHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ExplorationDownloadHandler(base.BaseHandler):
+class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a YAML file."""
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -344,10 +432,10 @@ class ExplorationDownloadHandler(base.BaseHandler):
         self.response.write(exp_services.export_to_zip_file(exploration_id))
 
 
-class ExplorationResourcesHandler(base.BaseHandler):
+class ExplorationResourcesHandler(EditorHandler):
     """Manages assets associated with an exploration."""
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         fs = fs_domain.AbstractFileSystem(
@@ -357,10 +445,10 @@ class ExplorationResourcesHandler(base.BaseHandler):
         self.render_json({'filepaths': dir_list})
 
 
-class ExplorationSnapshotsHandler(base.BaseHandler):
+class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         snapshots = exp_services.get_exploration_snapshots_metadata(
@@ -378,10 +466,10 @@ class ExplorationSnapshotsHandler(base.BaseHandler):
         })
 
 
-class ExplorationStatisticsHandler(base.BaseHandler):
+class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
         self.render_json({
@@ -396,13 +484,68 @@ class ExplorationStatisticsHandler(base.BaseHandler):
         })
 
 
-class StateRulesStatsHandler(base.BaseHandler):
+class StateRulesStatsHandler(EditorHandler):
     """Returns detailed reader answer statistics for a state."""
 
-    @base.require_editor
+    @require_editor
     def get(self, exploration_id, state_id):
         """Handles GET requests."""
         self.render_json({
             'rules_stats': stats_services.get_state_rules_stats(
                 exploration_id, state_id)
         })
+
+
+class ImageUploadHandler(EditorHandler):
+    """Handles image uploads."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @require_editor
+    def post(self, exploration_id):
+        """Saves an image uploaded by a content creator."""
+        # This sets the payload so that an error response is rendered as JSON
+        # instead of HTML.
+        # TODO(sll): This is hacky and needs to be cleaned up.
+        self.payload = 'image_upload'
+
+        raw = self.request.get('image')
+        filename = self.request.get('filename')
+        if not raw:
+            raise self.InvalidInputException('No image supplied')
+
+        format = imghdr.what(None, h=raw)
+        if format not in feconf.ACCEPTED_IMAGE_FORMATS:
+            allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
+            raise Exception('Image file not recognized: it should be in '
+                            'one of the following formats: %s.' %
+                            allowed_formats)
+
+        if not filename:
+            raise self.InvalidInputException('No filename supplied')
+        if '/' in filename or '..' in filename:
+            raise self.InvalidInputException(
+                'Filenames should not include slashes (/) or consecutive dot '
+                'characters.')
+        if '.' in filename:
+            dot_index = filename.rfind('.')
+            primary_name = filename[:dot_index]
+            extension = filename[dot_index+1:]
+            if extension != format:
+                raise self.InvalidInputException(
+                    'Expected a filename ending in .%s; received %s' %
+                    (format, filename))
+        else:
+            primary_name = filename
+
+        filepath = '%s.%s' % (primary_name, format)
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        if fs.isfile(filepath):
+            raise self.InvalidInputException(
+                'A file with the name %s already exists. Please choose a '
+                'different name.' % filepath)
+        fs.put(filepath, raw)
+
+        self.render_json({'filepath': filepath})

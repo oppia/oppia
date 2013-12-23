@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import imghdr
 import logging
 import mimetypes
 import urllib
@@ -81,61 +80,6 @@ class ImageHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
-
-
-class ImageUploadHandler(base.BaseHandler):
-    """Handles image uploads."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    @base.require_editor
-    def post(self, exploration_id):
-        """Saves an image uploaded by a content creator."""
-        # This sets the payload so that an error response is rendered as JSON
-        # instead of HTML.
-        # TODO(sll): This is hacky and needs to be cleaned up.
-        self.payload = 'image_upload'
-
-        raw = self.request.get('image')
-        filename = self.request.get('filename')
-        if not raw:
-            raise self.InvalidInputException('No image supplied')
-
-        format = imghdr.what(None, h=raw)
-        if format not in feconf.ACCEPTED_IMAGE_FORMATS:
-            allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
-            raise Exception('Image file not recognized: it should be in '
-                            'one of the following formats: %s.' %
-                            allowed_formats)
-
-        if not filename:
-            raise self.InvalidInputException('No filename supplied')
-        if '/' in filename or '..' in filename:
-            raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive dot '
-                'characters.')
-        if '.' in filename:
-            dot_index = filename.rfind('.')
-            primary_name = filename[:dot_index]
-            extension = filename[dot_index+1:]
-            if extension != format:
-                raise self.InvalidInputException(
-                    'Expected a filename ending in .%s; received %s' %
-                    (format, filename))
-        else:
-            primary_name = filename
-
-        filepath = '%s.%s' % (primary_name, format)
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        if fs.isfile(filepath):
-            raise self.InvalidInputException(
-                'A file with the name %s already exists. Please choose a '
-                'different name.' % filepath)
-        fs.put(filepath, raw)
-
-        self.render_json({'filepath': filepath})
 
 
 class StaticFileHandler(base.BaseHandler):

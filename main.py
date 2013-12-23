@@ -86,9 +86,6 @@ urls = [
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
 
     get_redirect_route(
-        r'/imagehandler/<exploration_id>', resources.ImageUploadHandler,
-        'image_upload_handler'),
-    get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler, 'image_handler'),
     get_redirect_route(
@@ -142,8 +139,8 @@ urls = [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
     get_redirect_route(
-        r'/createhandler/rights/<exploration_id>',
-        editor.ExplorationRightsHandler, 'exploration_rights_handler'),
+        r'/createhandler/imageupload/<exploration_id>', editor.ImageUploadHandler,
+        'image_upload_handler'),
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<state_id>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
@@ -153,6 +150,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
+    get_redirect_route(
+        r'/createhandler/rights/<exploration_id>',
+        editor.ExplorationRightsHandler, 'exploration_rights_handler'),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),

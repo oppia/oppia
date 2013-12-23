@@ -104,7 +104,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
         form.append('filename', filename);
 
         var request = $.ajax({
-          url: '/imagehandler/' + $scope.explorationId,
+          url: '/createhandler/imageupload/' + $scope.explorationId,
           data: form,
           processData: false,
           contentType: false,
