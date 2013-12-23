@@ -103,13 +103,6 @@ class ExplorationModel(base_models.BaseModel):
         blank=True, default=[], primitivelist=True, validators=[]
     )
 
-    # Whether this exploration is publicly viewable.
-    is_public = models.BooleanField(default=False)
-
-    # List of ids of users who can edit this exploration. If the exploration is
-    # a demo exploration, the list is empty. Otherwise, the first element is
-    # the original creator of the exploration.
-    editor_ids = django_utils.ListField(default=[], blank=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = models.CharField(max_length=100, default='conversation_v1')
@@ -122,18 +115,17 @@ class ExplorationModel(base_models.BaseModel):
     @classmethod
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
-        return cls.get_all_explorations().filter(is_public=True)
+        public_rights_models = ExplorationRightsModel.objects.all().filter(
+            status='public')
+        tentatively_public_rights_models = (
+            ExplorationRightsModel.objects.all().filter(
+                status='tentatively_public'))
 
-    @classmethod
-    def get_viewable_explorations(cls, user_id):
-        """Returns a list of explorations viewable by the given user."""
-        public_explorations = cls.get_public_explorations()
-        if user_id:
-            editable_explorations = cls.objects.filter(
-                editor_ids__icontains=user_id)
-            return list(set(public_explorations).union(editable_explorations))
-        else:
-            return public_explorations
+        exploration_ids = (
+            [model.id for model in public_rights_models] +
+            [model.id for model in tentatively_public_rights_models])
+
+        return [cls.get_by_id(eid) for eid in exploration_ids]
 
     @classmethod
     def get_exploration_count(cls):
@@ -298,11 +290,11 @@ class ExplorationRightsModel(base_models.BaseModel):
     """
 
     # The user_ids of owners of this exploration.
-    owners = django_utils.ListField(default=[], blank=True)
+    owner_ids = django_utils.ListField(default=[], blank=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editors = django_utils.ListField(default=[], blank=True)
+    editor_ids = django_utils.ListField(default=[], blank=True)
     # The user_ids of users who are allowed to view this exploration.
-    viewers = django_utils.ListField(default=[], blank=True)
+    viewer_ids = django_utils.ListField(default=[], blank=True)
 
     # Whether this exploration is owned by the community.
     community_owned = models.BooleanField(default=False)

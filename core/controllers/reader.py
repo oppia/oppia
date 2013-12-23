@@ -20,6 +20,7 @@ import feconf
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
@@ -38,18 +39,15 @@ class ExplorationPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        # An unpublished exploration can only be viewed by admins and the
-        # editors of that explorations.
-        if not exploration.is_public:
-            if not (self.is_admin or self.user_id in exploration.editor_ids):
-                raise self.PageNotFoundException
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
 
         iframed = (self.request.get('iframed') == 'true')
 
         self.values.update({
             'content': skins_services.get_skin_html(exploration.default_skin),
             'iframed': iframed,
-            'is_public': exploration.is_public,
+            'is_public': rights_manager.is_exploration_public(exploration_id),
             'nav_mode': READER_MODE,
         })
         self.render_template(

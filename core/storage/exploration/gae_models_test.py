@@ -19,6 +19,7 @@ __author__ = 'Jeremy Emerson'
 import unittest
 
 from core.domain import exp_services
+from core.domain import rights_manager
 import feconf
 import test_utils
 
@@ -46,9 +47,6 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
 
         # A new exploration should have a default title property.
         self.assertEqual(exploration.title, 'New exploration')
-
-        # A new exploration should have a default is_public property.
-        self.assertEqual(exploration.is_public, False)
 
         state = exp_models.StateModel(
             exploration_id=exploration.id,
@@ -87,13 +85,6 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
 
         exploration.param_specs = {'theParameter': {'obj_type': 'Int'}}
 
-        # The 'is_public' property must be a boolean.
-        with self.assertRaises(db.BadValueError):
-            exploration.is_public = 'true'
-        exploration.is_public = True
-
-        exploration.editor_ids = ['A user id']
-
         # Put and retrieve the exploration.
         exploration.put('A user id', {})
 
@@ -109,9 +100,6 @@ class ExplorationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
-
-        self.assertEqual(retrieved_exploration.is_public, True)
-        self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
@@ -159,9 +147,10 @@ class ExplorationSnapshotModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(snapshot_model)
 
         # The exploration is made public, so a new version is created.
+        rights_manager.publish_exploration(USER_ID, EXP_ID)
+
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exploration.title = 'Newer title'
-        exploration.is_public = True
         exp_services.save_exploration(USER_ID, exploration)
 
         exploration_model = exp_models.ExplorationModel.get(EXP_ID)

@@ -39,9 +39,6 @@ class ExplorationModelUnitTests(unittest.TestCase):
         # A new exploration should have a default title property.
         self.assertEqual(exploration.title, 'New exploration')
 
-        # A new exploration should have a default is_public property.
-        self.assertEqual(exploration.is_public, False)
-
         state = exp_models.StateModel(
             exploration_id=exploration.id,
             id='The state hash id', value={
@@ -85,13 +82,6 @@ class ExplorationModelUnitTests(unittest.TestCase):
 
         exploration.param_specs = {'theParameter': {'obj_type': 'Int'}}
 
-        # The 'is_public' property must be a boolean.
-        with self.assertRaises(ValidationError):
-            exploration.is_public = 'true'
-            exploration.put('user_id', {})
-        exploration.is_public = True
-        exploration.editor_ids = ['A user id']
-
         # Put and retrieve the exploration.
         exploration.put('user_id', {})
 
@@ -103,5 +93,3 @@ class ExplorationModelUnitTests(unittest.TestCase):
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
-        self.assertEqual(retrieved_exploration.is_public, True)
-        self.assertEqual(retrieved_exploration.editor_ids, ['A user id'])

@@ -25,6 +25,7 @@ __author__ = 'Sean Lip'
 import re
 
 from core.domain import param_domain
+from core.domain import rights_manager
 from core.domain import rule_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
@@ -298,8 +299,6 @@ class Exploration(object):
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in exploration_model.param_changes]
-        self.is_public = exploration_model.is_public
-        self.editor_ids = exploration_model.editor_ids
         self.default_skin = exploration_model.default_skin
         self.version = exploration_model.version
 
@@ -320,9 +319,6 @@ class Exploration(object):
                 exp_models.StateModel.get(self.id, state_id)
             except base_models.BaseModel.EntityNotFoundError:
                 raise utils.ValidationError('Invalid state_id %s' % state_id)
-
-        if not self.editor_ids:
-            raise utils.ValidationError('This exploration has no editors.')
 
         for c in feconf.INVALID_NAME_CHARS:
             if c in self.title:
@@ -375,30 +371,9 @@ class Exploration(object):
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
     # Methods relating to owners and editors.
-    def is_forkable_by(self, user_id):
-        """Whether the given user has rights to fork this exploration.
-
-        This is a policy decision, and the criterion here can be changed.
-        For example, it may depend on whether the user has completed the
-        exploration or earned admin credentials.
-        """
-        return self.is_demo or self.is_editable_by(user_id)
-
-    def is_owned_by(self, user_id):
-        """Whether the given user owns the exploration."""
-        return user_id == self.editor_ids[0]
-
     def is_editable_by(self, user_id):
         """Whether the given user has rights to edit this exploration."""
-        return user_id in self.editor_ids
-
-    def is_deletable_by(self, user_id):
-        """Whether the given user has rights to delete this exploration."""
-        return False if self.is_public else self.is_owned_by(user_id)
-
-    def add_editor(self, editor_id):
-        """Adds a new editor id. Does not commit changes."""
-        self.editor_ids.append(editor_id)
+        return rights_manager.Actor(user_id).can_edit(self.id)
 
     # Methods relating to states comprising this exploration.
     def has_state_named(self, state_name):

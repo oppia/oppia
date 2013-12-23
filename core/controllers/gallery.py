@@ -21,6 +21,7 @@ import feconf
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 
@@ -62,10 +63,12 @@ class GalleryHandler(base.BaseHandler):
             categories[exploration.category].append({
                 'can_edit': exploration.id in editable_exploration_ids,
                 'can_fork': self.user_id and exploration.is_demo,
+                # TODO(sll): Replace this with a query that gets all viewable
+                # explorations for this user.
+                'can_view': (
+                    rights_manager.Actor(self.user_id).can_view(exploration.id)
+                ),
                 'id': exploration.id,
-                'is_owner': (
-                    current_user_services.is_current_user_admin(self.request)
-                    or exploration.is_owned_by(self.user_id)),
                 'title': exploration.title,
             })
 
@@ -98,7 +101,7 @@ class NewExploration(base.BaseHandler):
                 yaml_content, self.user_id, title, category)
         else:
             exploration_id = exp_services.create_new(
-                self.user_id, title=title, category=category)
+                self.user_id, title, category)
 
         self.render_json({'explorationId': exploration_id})
 
@@ -114,6 +117,6 @@ class ForkExploration(base.BaseHandler):
         exploration_id = self.payload.get('exploration_id')
 
         self.render_json({
-            'explorationId': exp_services.fork_exploration(
-                exploration_id, self.user_id)
+            'explorationId': exp_services.clone_exploration(
+                self.user_id, exploration_id)
         })

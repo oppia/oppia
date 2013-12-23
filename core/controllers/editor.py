@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import rights_manager
 from core.domain import obj_services
 from core.domain import stats_services
 from core.domain import user_services
@@ -108,14 +109,26 @@ class ExplorationHandler(base.BaseHandler):
             state_list[state_id] = exp_services.export_state_to_verbose_dict(
                 exploration_id, state_id)
 
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+
+        # TODO(sll): Tidy this up; show owners, editors and viewers.
+        editors = []
+        for editor_id in (
+                exploration_rights.owner_ids + exploration_rights.editor_ids):
+            username = user_services.get_username(editor_id)
+            if username:
+                editors.append(username)
+            else:
+                editors.append('[Awaiting response]')
+
         self.values.update({
             'exploration_id': exploration_id,
             'init_state_id': exploration.init_state_id,
-            'is_public': exploration.is_public,
+            'is_public': rights_manager.is_exploration_public(exploration_id),
             'category': exploration.category,
             'title': exploration.title,
-            'editors': exp_services.get_human_readable_editor_list(
-                exploration_id),
+            'editors': editors,
             'states': state_list,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
@@ -187,8 +200,8 @@ class ExplorationHandler(base.BaseHandler):
     def delete(self, exploration_id):
         """Deletes the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        can_delete = (current_user_services.is_current_user_admin(self.request)
-                      or exploration.is_deletable_by(self.user_id))
+        can_delete = rights_manager.Actor(self.user_id).can_delete(
+            exploration.id)
         if not can_delete:
             raise self.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
@@ -211,14 +224,36 @@ class ExplorationRightsHandler(base.BaseHandler):
 
         is_public = self.payload.get('is_public')
         new_editor_email = self.payload.get('new_editor_email')
-        if not self.is_admin and not (
-                exploration.editor_ids and
-                self.user_id == exploration.editor_ids[0]):
-            raise self.UnauthorizedUserException(
-                'Only the exploration owner can add new editors.')
 
-        exp_services.update_exploration_rights(
-            self.user_id, exploration_id, is_public, [new_editor_email])
+        if new_editor_email:
+            if not rights_manager.Actor(self.user_id).can_modify_roles(
+                    exploration_id):
+                raise self.UnauthorizedUserException(
+                    'Only an owner of this exploration can add new editors.')
+
+            new_editor_id = current_user_services.get_user_id_from_email(
+                new_editor_email)
+
+            if new_editor_id is None:
+                raise Exception(
+                    'Sorry, we could not find a user with this email address.')
+
+            rights_manager.assign_role(
+                self.user_id, exploration_id, new_editor_id,
+                rights_manager.ROLE_EDITOR)
+
+        elif is_public:
+            # TODO(sll): If this is the case, don't show the 'publish' button
+            # in the first place.
+            if not rights_manager.Actor(self.user_id).can_publish(
+                    exploration_id):
+                raise self.UnauthorizedUserException(
+                    'This exploration cannot be published.')
+            rights_manager.publish_exploration(self.user_id, exploration_id)
+
+        else:
+            raise self.InvalidInputException(
+                'No change was made to this exploration.')
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         # TODO(sll): Also add information about is_public and editors.

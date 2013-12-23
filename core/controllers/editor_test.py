@@ -18,6 +18,7 @@ import json
 import unittest
 
 from core.domain import exp_services
+from core.domain import rights_manager
 import feconf
 import test_utils
 
@@ -64,10 +65,10 @@ class EditorTest(test_utils.GenericTestBase):
 
         # Add a new state called 'New valid state name'.
         response_dict = self.post_json('/createhandler/data/0', {
-            'state_name': 'New valid state name', 'version': 1
+            'state_name': 'New valid state name', 'version': 0
         }, csrf_token)
 
-        self.assertDictContainsSubset({'version': 2}, response_dict)
+        self.assertDictContainsSubset({'version': 1}, response_dict)
         self.assertTrue('stateData' in response_dict)
         self.assertDictContainsSubset(
             {'name': 'New valid state name'}, response_dict['stateData'])
@@ -101,23 +102,23 @@ class EditorTest(test_utils.GenericTestBase):
         self.assertIn('which is too old', response_dict['error'])
 
         # A POST request with no state name is invalid.
-        response_dict = _post_and_expect_400_error({'version': 1})
+        response_dict = _post_and_expect_400_error({'version': 0})
         self.assertIn('Please specify a state name.', response_dict['error'])
 
         # A POST request with an empty state name is invalid.
         response_dict = _post_and_expect_400_error({
-            'state_name': '', 'version': 1})
+            'state_name': '', 'version': 0})
         self.assertIn('Please specify a state name.', response_dict['error'])
 
         # A POST request with a state name containing invalid characters is
         # invalid.
         response_dict = _post_and_expect_400_error({
-            'state_name': '[Bad State Name]', 'version': 1})
+            'state_name': '[Bad State Name]', 'version': 0})
         self.assertIn('Invalid character [', response_dict['error'])
 
         # A POST request with a state name of feconf.END_DEST is invalid.
         response_dict = _post_and_expect_400_error({
-            'state_name': feconf.END_DEST, 'version': 1})
+            'state_name': feconf.END_DEST, 'version': 0})
         self.assertIn('Invalid state name', response_dict['error'])
 
         self.logout()
@@ -290,7 +291,7 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.admin_email)
         self.owner_id = self.get_user_id_from_email(self.owner_email)
         self.editor_id = self.get_user_id_from_email(self.editor_email)
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)        
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -298,9 +299,9 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         exp_services.create_new(
             self.owner_id, 'A title', 'A category', UNPUBLISHED_EXP_ID)
 
-        exploration = exp_services.get_exploration_by_id(UNPUBLISHED_EXP_ID)
-        exploration.editor_ids.append(self.editor_id)
-        exp_services.save_exploration(self.owner_id, exploration)
+        rights_manager.assign_role(
+            self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
+            rights_manager.ROLE_EDITOR)
 
         self.login(self.editor_email, is_admin=False)
         response = self.testapp.delete(
@@ -326,10 +327,10 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         exp_services.create_new(
             self.owner_id, 'A title', 'A category', PUBLISHED_EXP_ID)
 
-        exploration = exp_services.get_exploration_by_id(PUBLISHED_EXP_ID)
-        exploration.editor_ids.append(self.editor_id)
-        exploration.is_public = True
-        exp_services.save_exploration(self.owner_id, exploration)
+        rights_manager.assign_role(
+            self.owner_id, PUBLISHED_EXP_ID, self.editor_id,
+            rights_manager.ROLE_EDITOR)
+        rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
 
         self.login(self.editor_email, is_admin=False)
         response = self.testapp.delete(

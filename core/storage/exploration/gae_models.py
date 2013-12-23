@@ -105,12 +105,6 @@ class ExplorationModel(base_models.BaseModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
-    # Whether this exploration is publicly viewable.
-    is_public = ndb.BooleanProperty(default=False)
-    # List of ids of users who can edit this exploration. If the exploration is
-    # a demo exploration, the list is empty. Otherwise, the first element is
-    # the original creator of the exploration.
-    editor_ids = ndb.StringProperty(repeated=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = ndb.StringProperty(default='conversation_v1')
@@ -118,14 +112,17 @@ class ExplorationModel(base_models.BaseModel):
     @classmethod
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
-        return cls.get_all().filter(cls.is_public == True).fetch(QUERY_LIMIT)
+        qo = ndb.QueryOptions(keys_only=True)
+        exp_keys_1 = ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == 'public'
+        ).fetch(QUERY_LIMIT, options=qo)
+        exp_keys_2 = ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == 'tentatively_public'
+        ).fetch(QUERY_LIMIT, options=qo)
 
-    @classmethod
-    def get_viewable_explorations(cls, user_id):
-        """Returns a list of explorations viewable by the given user_id."""
-        return cls.get_all().filter(
-            ndb.OR(cls.is_public == True, cls.editor_ids == user_id)
-        ).fetch(QUERY_LIMIT)
+        exp_keys = ([ndb.Key(cls, exp_key.id()) for exp_key in exp_keys_1] +
+                    [ndb.Key(cls, exp_key.id()) for exp_key in exp_keys_2])
+        return ndb.get_multi(exp_keys)
 
     @classmethod
     def get_exploration_count(cls):
@@ -170,8 +167,6 @@ class ExplorationModel(base_models.BaseModel):
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1
-            if self.version == 1:
-                commit_message = 'Exploration first published.'
             ExplorationSnapshotModel.save_snapshot(
                 self.id, self.version, committer_id,
                 ExplorationSnapshotContentModel.FORMAT_TYPE_FULL,
@@ -305,14 +300,17 @@ class ExplorationRightsModel(base_models.BaseModel):
     """
 
     # The user_ids of owners of this exploration.
-    owners = ndb.StringProperty(repeated=True)
+    owner_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editors = ndb.StringProperty(repeated=True)
+    editor_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to view this exploration.
-    viewers = ndb.StringProperty(repeated=True)
+    viewer_ids = ndb.StringProperty(repeated=True)
 
     # Whether this exploration is owned by the community.
     community_owned = ndb.BooleanProperty(default=False)
+    # The exploration id which this exploration was cloned from. If None, this
+    # exploration was created from scratch.
+    cloned_from = ndb.StringProperty()
 
     # The publication status of this exploration.
     status = ndb.StringProperty(

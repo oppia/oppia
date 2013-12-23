@@ -24,6 +24,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
+from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import stats_services
 from core.platform import models
@@ -71,23 +72,26 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
 
     def test_get_public_explorations(self):
+        EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                self.owner_id, 'A title', 'A category', 'A exploration_id'))
+                self.owner_id, 'A title', 'A category', EXP_ID))
         self.assertEqual(exp_services.get_public_explorations(), [])
 
-        exploration.is_public = True
-        exp_services.save_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner_id, EXP_ID)
+
         self.assertEqual(
             [e.id for e in exp_services.get_public_explorations()],
             [exploration.id]
         )
 
     def test_get_viewable_explorations(self):
+        EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        exploration.add_editor(self.editor_id)
+                self.owner_id, 'A title', 'A category', EXP_ID))
+        rights_manager.assign_role(
+            self.owner_id, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
         exp_services.save_exploration(self.owner_id, exploration)
 
         def get_viewable_ids(user_id):
@@ -100,8 +104,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(get_viewable_ids(None), [])
 
         # Set the exploration's status to published.
-        exploration.is_public = True
-        exp_services.save_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner_id, EXP_ID)
 
         self.assertEqual(get_viewable_ids(self.owner_id), [exploration.id])
         self.assertEqual(
@@ -109,10 +112,12 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(get_viewable_ids(None), [exploration.id])
 
     def test_get_editable_explorations(self):
+        EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                self.owner_id, 'A title', 'A category', 'A exploration_id'))
-        exploration.add_editor(self.editor_id)
+                self.owner_id, 'A title', 'A category', EXP_ID))
+        rights_manager.assign_role(
+            self.owner_id, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
         exp_services.save_exploration(self.owner_id, exploration)
 
         def get_editable_ids(user_id):
@@ -124,9 +129,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(get_editable_ids(self.viewer_id), [])
         self.assertEqual(get_editable_ids(None), [])
 
-        # Set the exploration's status to published.
-        exploration.is_public = True
-        exp_services.save_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner_id, EXP_ID)
 
         self.assertEqual(get_editable_ids(self.owner_id), [exploration.id])
         self.assertEqual(get_editable_ids(self.viewer_id), [])
@@ -322,8 +325,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
-    def test_fork_exploration(self):
-        """Test forking an exploration with assets."""
+    def test_clone_exploration(self):
+        """Test cloning an exploration with assets."""
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
                 self.owner_id, 'A title', 'A category',
@@ -336,7 +339,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             fs_domain.ExplorationFileSystem(exploration.id))
         fs.put('abc.png', raw_image)
 
-        new_eid = exp_services.fork_exploration(exploration.id, self.owner_id)
+        new_eid = exp_services.clone_exploration(self.owner_id, exploration.id)
         new_fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(new_eid))
         new_exploration = exp_services.get_exploration_by_id(new_eid)
@@ -965,8 +968,8 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
 
     def test_record_commit_message(self):
         """Check published explorations record commit messages."""
-        self.exploration.is_public = True
-        exp_services.save_exploration('fake@user.com', self.exploration)
+        rights_manager.publish_exploration(
+            'fake@user.com', self.exploration.id)
 
         exp_services.update_exploration(
             'fake@user.com', self.exploration.id, None, None, None, None,
@@ -979,8 +982,8 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
 
     def test_demand_commit_message(self):
         """Check published explorations demand commit messages"""
-        self.exploration.is_public = True
-        exp_services.save_exploration('fake@user.com', self.exploration)
+        rights_manager.publish_exploration(
+            'fake@user.com', self.exploration.id)
 
         with self.assertRaisesRegexp(
                 ValueError, 'Exploration is public so expected a commit '
@@ -1006,21 +1009,27 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     def test_get_exploration_snapshots_metadata(self):
         eid = 'exp_id'
         exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new('user_id', 'A title', 'A category', eid))
+            exp_services.create_new(
+                'committer_id_1', 'A title', 'A category', eid))
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(eid, 3), [])
 
         # Publish the exploration so that version snapshots start getting
         # recorded.
-        exploration.is_public = True
-        exp_services.save_exploration('committer_id_1', exploration)
+        rights_manager.publish_exploration('committer_id_1', eid)
+
+        exploration = exp_services.get_exploration_by_id(eid)
+        exploration.title = 'First title'
+        exp_services.save_exploration(
+            'committer_id_1', exploration, 'Changed title.')
+
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 3)
         self.assertEqual(len(snapshots_metadata), 1)
         self.assertDictContainsSubset({
             'committer_id': 'committer_id_1',
-            'commit_message': 'Exploration first published.',
+            'commit_message': 'Changed title.',
             'version_number': 1,
         }, snapshots_metadata[0])
 
@@ -1041,7 +1050,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         }, snapshots_metadata[0])
         self.assertDictContainsSubset({
             'committer_id': 'committer_id_1',
-            'commit_message': 'Exploration first published.',
+            'commit_message': 'Changed title.',
             'version_number': 1,
         }, snapshots_metadata[1])
         self.assertGreaterEqual(
@@ -1051,15 +1060,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     def test_versioning_with_add_and_delete_states(self):
         eid = 'exp_id'
         exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new('user_id', 'A title', 'A category', eid))
+            exp_services.create_new(
+                'committer_id_1', 'A title', 'A category', eid))
 
         # Publish the exploration so that version snapshots start getting
         # recorded.
-        exploration.is_public = True
-        exp_services.save_exploration('committer_id_1', exploration)
+        rights_manager.publish_exploration('committer_id_1', eid)
+
+        exploration = exp_services.get_exploration_by_id(eid)
+        exploration.title = 'First title'
+        exp_services.save_exploration(
+            'committer_id_1', exploration, 'Changed title.')
         commit_dict_1 = {
             'committer_id': 'committer_id_1',
-            'commit_message': 'Exploration first published.',
+            'commit_message': 'Changed title.',
             'version_number': 1,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(

@@ -35,6 +35,7 @@ from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import obj_services
 from core.domain import param_domain
+from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import user_services
@@ -127,14 +128,18 @@ def get_public_explorations():
 
 def get_viewable_explorations(user_id):
     """Returns domain objects for explorations viewable by the given user."""
-    return [exp_domain.Exploration(e) for e in
-            exp_models.ExplorationModel.get_viewable_explorations(user_id)]
+    actor = rights_manager.Actor(user_id)
+    all_explorations = exp_models.ExplorationModel.get_all()
+    return [exp_domain.Exploration(e) for e in all_explorations if
+            actor.can_view(e.id)]
 
 
 def get_editable_explorations(user_id):
     """Returns domain objects for explorations editable by the given user."""
-    return [e for e in get_viewable_explorations(user_id)
-            if e.is_editable_by(user_id)]
+    actor = rights_manager.Actor(user_id)
+    all_explorations = exp_models.ExplorationModel.get_all()
+    return [exp_domain.Exploration(e) for e in all_explorations if
+            actor.can_edit(e.id)]
 
 
 def count_explorations():
@@ -204,26 +209,6 @@ def export_state_to_verbose_dict(exploration_id, state_id):
             )
 
     return state_dict
-
-
-def get_human_readable_editor_list(exploration_id):
-    """Returns a list of editor usernames.
-
-    Editors who have been invited but who have not signed in are marked as
-    'pending'.
-    """
-    exploration = get_exploration_by_id(exploration_id)
-    result = []
-    for editor_id in exploration.editor_ids:
-        if editor_id == 'admin':
-            result.append('[admin]')
-        else:
-            username = user_services.get_username(editor_id)
-            if username:
-                result.append(username)
-            else:
-                result.append('[pending]')
-    return result
 
 
 def export_content_to_html(exploration_id, content_array, params=None):
@@ -305,7 +290,7 @@ def save_exploration(committer_id, exploration, commit_message=''):
         property something I would be happy with being overwritten?". Thus, the
         following properties are excluded for explorations:
 
-            ['category', 'default_skin', 'editor_ids', 'is_public', 'title']
+            ['category', 'default_skin', 'title']
 
         The exploration id will be used to name the object in the history log,
         so it does not need to be saved within the returned dict.
@@ -324,7 +309,12 @@ def save_exploration(committer_id, exploration, commit_message=''):
     def _save_exploration_transaction(
             committer_id, exploration, commit_message):
         exploration_model = exp_models.ExplorationModel.get(exploration.id)
-        if exploration.version != exploration_model.version:
+        if exploration.version > exploration_model.version:
+            raise Exception(
+                'Unexpected error: trying to update version %s of exploration '
+                'from version %s. Please reload the page and try again.'
+                % (exploration_model.version, exploration.version))
+        elif exploration.version < exploration_model.version:
             raise Exception(
                 'Trying to update version %s of exploration from version %s, '
                 'which is too old. Please reload the page and try again.'
@@ -340,14 +330,13 @@ def save_exploration(committer_id, exploration, commit_message=''):
             'state_ids': exploration.state_ids,
             'param_specs': exploration.param_specs_dict,
             'param_changes': exploration.param_change_dicts,
-            'is_public': exploration.is_public,
-            'editor_ids': exploration.editor_ids,
             'default_skin': exploration.default_skin,
             'version': exploration_model.version,
         }
 
         version_snapshot = feconf.NULL_SNAPSHOT
-        if exploration.is_public:
+
+        if rights_manager.is_exploration_public(exploration.id):
             version_snapshot = export_to_versionable_dict(exploration)
 
         # Create a snapshot for the version history.
@@ -398,7 +387,7 @@ def save_states(committer_id, exploration_id, states):
 
 def create_new(
     user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME):
+        init_state_name=feconf.DEFAULT_STATE_NAME, cloned_from=None):
     """Creates and saves a new exploration; returns its id."""
     # Generate a new exploration id, if one wasn't passed in.
     exploration_id = (exploration_id or
@@ -411,10 +400,14 @@ def create_new(
 
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
-        state_ids=[state_id], editor_ids=[user_id])
+        state_ids=[state_id])
     exploration_model.put(user_id, {})
 
-    return exploration_model.id
+    exploration_rights = rights_manager.ExplorationRights(
+        exploration_id, [user_id], [], [], cloned_from=cloned_from)
+    rights_manager.save_exploration_rights(exploration_rights)
+
+    return exploration_id
 
 
 def delete_state_model(exploration_id, state_id, force_deletion=False):
@@ -425,7 +418,7 @@ def delete_state_model(exploration_id, state_id, force_deletion=False):
 
     If force_deletion is True the state is fully deleted and is unrecoverable.
     Otherwise, the state is marked as deleted, but the corresponding model is
-    still retained in the datastore. This last option is the preferred one.
+    still retained in the datastore. This latter option is the preferred one.
     """
     state_model = exp_models.StateModel.get(exploration_id, state_id)
     if force_deletion:
@@ -805,12 +798,13 @@ def update_exploration(
     # TODO(sll): Add tests to ensure that the parameters are of the correct
     # types, etc.
     exploration = get_exploration_by_id(exploration_id)
+    is_public = rights_manager.is_exploration_public(exploration_id)
 
-    if exploration.is_public and commit_message is None:
+    if is_public and commit_message is None:
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
-    if not exploration.is_public and commit_message is not None:
+    if not is_public and commit_message is not None:
         raise ValueError(
             'Exploration is unpublished so expected no commit message, but '
             'received %s' % commit_message)
@@ -858,57 +852,6 @@ def update_exploration(
     transaction_services.run_in_transaction(
         _update_exploration_transaction, committer_id, exploration,
         modified_states, commit_message)
-
-
-def update_exploration_rights(
-        committer_id, exploration_id, is_public, new_editor_emails):
-    """Update the rights for an exploration. Commits changes.
-
-    Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - exploration_id: str. The exploration id.
-    - is_public: bool or None. If present, whether the exploration has been
-        made public.
-    - editor_ids: list of str, or None. If present, a list with the emails
-        of new editors.
-    """
-    # TODO(sll): Add tests to ensure that the parameters are of the correct
-    # types, etc.
-    exploration = get_exploration_by_id(exploration_id)
-
-    commit_message_list = []
-
-    if is_public is not None:
-        if is_public is False:
-            raise Exception('A published exploration cannot be unpublished.')
-        if exploration.is_public is True:
-            raise Exception('An exploration cannot be republished.')
-        exploration.is_public = True
-        commit_message_list.append('Exploration published.')
-
-    if new_editor_emails is not None:
-        successful_adds = 0
-        for email in new_editor_emails:
-            editor_id = current_user_services.get_user_id_from_email(email)
-            if editor_id:
-                if editor_id not in exploration.editor_ids:
-                    exploration.add_editor(editor_id)
-                    successful_adds += 1
-                else:
-                    raise Exception(
-                        'This user is already an editor of the exploration.')
-        if successful_adds > 0:
-            commit_message_list.append(
-                'Added %s new editors.' % successful_adds)
-
-    def _update_exploration_rights_transaction(
-            committer_id, exploration, commit_message):
-        save_exploration(committer_id, exploration, commit_message)
-
-    transaction_services.run_in_transaction(
-        _update_exploration_rights_transaction, committer_id, exploration,
-        ' '.join(commit_message_list))
 
 
 def delete_state(committer_id, exploration_id, state_id):
@@ -984,7 +927,8 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 # Creation and deletion methods.
 def create_from_yaml(
-        yaml_content, user_id, title, category, exploration_id=None):
+        yaml_content, user_id, title, category, exploration_id=None,
+        cloned_from=None):
     """Creates an exploration from a YAML text string."""
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
@@ -999,7 +943,7 @@ def create_from_yaml(
 
     exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name)
+        init_state_name=init_state_name, cloned_from=cloned_from)
 
     exploration = get_exploration_by_id(exploration_id)
     state_names_to_ids[init_state_name] = exploration.state_ids[0]
@@ -1078,15 +1022,16 @@ def create_from_yaml(
     return exploration_id
 
 
-def fork_exploration(old_exploration_id, user_id):
-    """Forks an exploration and returns the new exploration's id."""
+def clone_exploration(committer_id, old_exploration_id):
+    """Clones an exploration and returns the new exploration's id."""
     old_exploration = get_exploration_by_id(old_exploration_id)
-    if not old_exploration.is_forkable_by(user_id):
+    if not rights_manager.Actor(committer_id).can_clone(old_exploration_id):
         raise Exception('You cannot copy this exploration.')
 
     new_exploration_id = create_from_yaml(
-        export_to_yaml(old_exploration_id), user_id,
-        'Copy of %s' % old_exploration.title, old_exploration.category
+        export_to_yaml(old_exploration_id), committer_id,
+        'Copy of %s' % old_exploration.title, old_exploration.category,
+        cloned_from=old_exploration_id
     )
 
     # Duplicate the assets of the old exploration.
@@ -1151,8 +1096,9 @@ def load_demo(exploration_id):
         fs.put(asset_filename, asset_content)
 
     exploration = get_exploration_by_id(exploration_id)
-    exploration.is_public = True
     save_exploration(ADMIN_COMMITTER_ID, exploration)
+
+    rights_manager.publish_exploration(ADMIN_COMMITTER_ID, exploration_id)
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 

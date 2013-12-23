@@ -127,7 +127,7 @@ def require_editor(handler):
         if (not current_user_services.is_current_user_admin(self.request) and
                 not exploration.is_editable_by(self.user_id)):
             raise self.UnauthorizedUserException(
-                '%s does not have the credentials to edit this exploration.',
+                'You do not have the credentials to edit this exploration.',
                 self.user_id)
 
         if not state_id:

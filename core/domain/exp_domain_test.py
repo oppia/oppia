@@ -33,8 +33,6 @@ class FakeExploration(exp_domain.Exploration):
         self.category = 'category'
         self.state_ids = []
         self.parameters = []
-        self.is_public = False
-        self.editor_ids = [owner_id] if owner_id else []
 
     def put(self):
         """The put() method is patched to make no commits to the datastore."""
@@ -78,13 +76,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exp_services.save_states(USER_ID, exploration.id, [new_state])
         exploration.state_ids = ['Initial state id']
 
-        # There must be at least one editor id.
-        exploration.editor_ids = []
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'exploration has no editors'):
-            exp_services.save_exploration(USER_ID, exploration)
-
-        exploration.editor_ids = [USER_ID]
         exploration.title = 'Hello #'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid character #'):
@@ -122,31 +113,3 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         notdemo2 = FakeExploration(exp_id='abcd')
         self.assertEqual(notdemo2.is_demo, False)
-
-    def test_is_owned_by(self):
-        """Test the is_owned_by() method."""
-        owner_id = 'owner@example.com'
-        editor_id = 'editor@example.com'
-        viewer_id = 'viewer@example.com'
-
-        exploration = FakeExploration(owner_id=owner_id)
-        exploration.add_editor(editor_id)
-
-        self.assertTrue(exploration.is_owned_by(owner_id))
-        self.assertFalse(exploration.is_owned_by(editor_id))
-        self.assertFalse(exploration.is_owned_by(viewer_id))
-        self.assertFalse(exploration.is_owned_by(None))
-
-    def test_is_editable_by(self):
-        """Test the is_editable_by() method."""
-        owner_id = 'owner@example.com'
-        editor_id = 'editor@example.com'
-        viewer_id = 'viewer@example.com'
-
-        exploration = FakeExploration(owner_id=owner_id)
-        exploration.add_editor(editor_id)
-
-        self.assertTrue(exploration.is_editable_by(owner_id))
-        self.assertTrue(exploration.is_editable_by(editor_id))
-        self.assertFalse(exploration.is_editable_by(viewer_id))
-        self.assertFalse(exploration.is_editable_by(None))

@@ -86,7 +86,7 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
   * Variables and methods for storing and applying user preferences.
   *********************************************************************/
   $scope.canViewExploration = function(exploration) {
-    return !$scope.showMyExplorations || exploration.is_owner || exploration.can_edit;
+    return !$scope.showMyExplorations || exploration.can_view;
   };
 }
 
