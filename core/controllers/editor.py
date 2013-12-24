@@ -504,13 +504,9 @@ class ImageUploadHandler(EditorHandler):
     @require_editor
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
-        # This sets the payload so that an error response is rendered as JSON
-        # instead of HTML.
-        # TODO(sll): This is hacky and needs to be cleaned up.
-        self.payload = 'image_upload'
 
         raw = self.request.get('image')
-        filename = self.request.get('filename')
+        filename = self.payload.get('filename')
         if not raw:
             raise self.InvalidInputException('No image supplied')
 

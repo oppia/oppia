@@ -44,15 +44,18 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self._initialize()
 
         self.login(self.EDITOR_EMAIL, is_admin=True)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
-        response = self.testapp.post(
+        response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
+            csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-        filepath = self.parse_json_response(response)['filepath']
+        filepath = response_dict['filepath']
 
         self.logout()
 
@@ -67,19 +70,20 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self._initialize()
 
         self.login(self.EDITOR_EMAIL, is_admin=True)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
 
         # Upload an empty image.
-        response = self.testapp.post(
+        response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
-            upload_files=(('image', 'unused_filename', ''),),
-            expect_errors=True
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400,
+            upload_files=(('image', 'unused_filename', ''),)
         )
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertEqual(parsed_response['error'], 'No image supplied')
+        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['error'], 'No image supplied')
 
         self.logout()
 
@@ -89,19 +93,21 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         self._initialize()
 
         self.login(self.EDITOR_EMAIL, is_admin=True)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
 
-        # Upload an empty image.
-        response = self.testapp.post(
+        # Upload a malformed image.
+        response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
-            upload_files=(('image', 'unused_filename', 'bad_image'),),
-            expect_errors=True
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=500,
+            upload_files=(
+                ('image', 'unused_filename', 'this_is_not_an_image'),)
         )
-        self.assertEqual(response.status_int, 500)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 500)
-        self.assertIn('Image file not recognized', parsed_response['error'])
+        self.assertEqual(response_dict['code'], 500)
+        self.assertIn('Image file not recognized', response_dict['error'])
 
         self.logout()
 
@@ -114,36 +120,24 @@ class ImageHandlerTest(test_utils.GenericTestBase):
             '%s/0/bad_image' % self.IMAGE_VIEW_URL_PREFIX, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-    def test_unauthorized_image_upload(self):
-        """Test that images can only be uploaded by an exploration editor."""
-
-        self._initialize()
-
-        response = self.testapp.post(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
-            upload_files=(('image', 'unused_filename', 'abc'),),
-            expect_errors=True
-        )
-        self.assertEqual(response.status_int, 302)
-
     def test_bad_filenames_are_detected(self):
         # TODO(sll): Add more tests here.
         self._initialize()
 
         self.login(self.EDITOR_EMAIL, is_admin=True)
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
-        response = self.testapp.post(
+        response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test/a.png'},
+            csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400,
             upload_files=(('image', 'unused_filename', raw_image),),
-            expect_errors=True
         )
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertIn('Filenames should not include', parsed_response['error'])
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('Filenames should not include', response_dict['error'])
 
         self.logout()

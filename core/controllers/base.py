@@ -242,9 +242,11 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.values.update(values)
             if error_code == 404:
-                self.render_template('error/error_404.html')
+                self.render_template(
+                    'error/error_404.html', iframe_restriction=None)
             else:
-                self.render_template('error/error.html')
+                self.render_template(
+                    'error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, debug_mode):
         """Overwrites the default exception handler."""

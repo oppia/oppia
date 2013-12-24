@@ -105,131 +105,86 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
 
-    class ExplorationPlayer(object):
-        """Simulates the frontend API for an exploration."""
-        def __init__(self, testapp, assertEqual, assertRegexpMatches,
-                     parse_json_response, exploration_id):
-            self.testapp = testapp
-            self.assertEqual = assertEqual
-            self.assertRegexpMatches = assertRegexpMatches
-            self.parse_json_response = parse_json_response
-            self.exploration_id = exploration_id
-            self.last_block_number = 0
-            self.last_params = {}
-            self.last_state_id = None
-            self.state_history = []
+    def _submit_answer(self, answer):
+        """Action representing submission of an answer to the backend."""
+        url = '/learnhandler/transition/%s/%s' % (
+            self.exploration_id, self.last_state_id)
+        reader_dict = self.post_json(url, {
+            'answer': answer, 'block_number': self.last_block_number,
+            'handler': 'submit', 'params': self.last_params,
+            'state_history': self.state_history,
+        })
 
-        def get_initial_response(self):
-            """Returns the result of an initial GET request to the server."""
-            json_response = self.testapp.get(
-                '/learn/%s/data' % self.exploration_id)
-            reader_dict = self.parse_json_response(json_response)
+        self.last_block_number = reader_dict['block_number']
+        self.last_params = reader_dict['params']
+        self.last_state_id = reader_dict['state_id']
+        self.state_history += [self.last_state_id]
+        self.assertEqual(reader_dict['state_history'], self.state_history)
 
-            self.last_block_number = reader_dict['block_number']
-            self.last_params = reader_dict['params']
-            self.last_state_id = reader_dict['state_id']
-            self.state_history = [self.last_state_id]
-            self.assertEqual(reader_dict['state_history'], self.state_history)
+        return reader_dict
 
-            return reader_dict
+    def submit_and_compare(self, answer, expected_response):
+        """Submits an answer and compares the output to a regex.
 
-        def _interact(self, reader_payload):
-            """Returns the result of subsequent feedback interactions."""
-            url_path = '/learn/%s/%s' % (
-                self.exploration_id, self.last_state_id)
-            json_response = self.testapp.post(
-                str(url_path), {'payload': json.dumps(reader_payload)}
-            )
-            reader_dict = self.parse_json_response(json_response)
-
-            self.last_block_number = reader_dict['block_number']
-            self.last_params = reader_dict['params']
-            self.last_state_id = reader_dict['state_id']
-            self.state_history += [self.last_state_id]
-            self.assertEqual(reader_dict['state_history'], self.state_history)
-
-            return reader_dict
-
-        def _submit_answer(self, answer):
-            """Action representing submission of an answer to the backend."""
-            return self._interact({
-                'answer': answer, 'block_number': self.last_block_number,
-                'handler': 'submit', 'params': self.last_params,
-                'state_history': self.state_history,
-            })
-
-        def submit_and_compare(self, answer, expected_response):
-            """Submits an answer and compares the output to a regex.
-
-            `expected_response` will be interpreted as a regex string.
-            """
-            reader_dict = self._submit_answer(answer)
-            self.assertRegexpMatches(
-                reader_dict['oppia_html'], expected_response)
-            return self
+        `expected_response` will be interpreted as a regex string.
+        """
+        reader_dict = self._submit_answer(answer)
+        self.assertRegexpMatches(
+            reader_dict['oppia_html'], expected_response)
+        return self
 
     def init_player(self, exploration_id, expected_title, expected_response):
-        """Initializes a reader playthrough.
+        """Starts a reader session and gets the first state from the server.
 
         `expected_response` will be interpreted as a regex string.
         """
         exp_services.delete_demo(exploration_id)
         exp_services.load_demo(exploration_id)
 
-        player = self.ExplorationPlayer(
-            self.testapp, self.assertEqual, self.assertRegexpMatches,
-            self.parse_json_response, exploration_id)
+        self.exploration_id = exploration_id
 
-        reader_dict = player.get_initial_response()
+        reader_dict = self.get_json(
+            '/learnhandler/init/%s' % self.exploration_id)
+
+        self.last_block_number = reader_dict['block_number']
+        self.last_params = reader_dict['params']
+        self.last_state_id = reader_dict['state_id']
+        self.state_history = [self.last_state_id]
+
+        self.assertEqual(reader_dict['state_history'], self.state_history)
         self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
         self.assertEqual(reader_dict['title'], expected_title)
-        return player
 
     def test_welcome_exploration(self):
         """Test a reader's progression through the default exploration."""
         self.init_player(
-            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\''
-        ).submit_and_compare(
-            '0', 'In fact, the word Oppia means \'learn\'.'
-        ).submit_and_compare(
-            'Finish', 'Check your spelling!'
-        ).submit_and_compare(
-            'Finnish', 'Yes! Oppia is the Finnish word for learn.'
-        )
+            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
+        self.submit_and_compare(
+            '0', 'In fact, the word Oppia means \'learn\'.')
+        self.submit_and_compare('Finish', 'Check your spelling!')
+        self.submit_and_compare(
+            'Finnish', 'Yes! Oppia is the Finnish word for learn.')
 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
-            '6', 'Parametrized Adventure',
-            'Hello, brave adventurer'
-        ).submit_and_compare(
-            'My Name', 'Hello, I\'m My Name!.*get a pretty red'
-        ).submit_and_compare(
-            0, 'fork in the road'
-        ).submit_and_compare(
-            'ne', 'Hello, My Name. You have to pay a toll'
-        )
+            '6', 'Parametrized Adventure', 'Hello, brave adventurer')
+        self.submit_and_compare(
+            'My Name', 'Hello, I\'m My Name!.*get a pretty red')
+        self.submit_and_compare(0, 'fork in the road')
+        self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')
 
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""
         self.init_player(
-            '8', 'The Lazy Magician', 'How does he do it?'
-        ).submit_and_compare(
-            'Dont know', 'town square'
-        ).submit_and_compare(
-            0, 'Is it'
-        ).submit_and_compare(
-            2, 'Do you want to play again?'
-        ).submit_and_compare(
-            1, 'how do you think he does it?'
-        ).submit_and_compare(
-            'middle', 'what number the magician picked'
-        ).submit_and_compare(
-            0, 'try it out'
-        ).submit_and_compare(
-            10, 'best worst case'
-        ).submit_and_compare(
-            0, 'to be sure our strategy works in all cases'
-        ).submit_and_compare(
-            0, 'try to guess'
-        )
+            '8', 'The Lazy Magician', 'How does he do it?')
+        self.submit_and_compare('Dont know', 'town square')
+        self.submit_and_compare(0, 'Is it')
+        self.submit_and_compare(2, 'Do you want to play again?')
+        self.submit_and_compare(1, 'how do you think he does it?')
+        self.submit_and_compare('middle', 'what number the magician picked')
+        self.submit_and_compare(0, 'try it out')
+        self.submit_and_compare(10, 'best worst case')
+        self.submit_and_compare(
+            0, 'to be sure our strategy works in all cases')
+        self.submit_and_compare(0, 'try to guess')

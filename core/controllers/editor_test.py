@@ -129,44 +129,42 @@ class EditorTest(test_utils.GenericTestBase):
 
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
-        response = self.testapp.get('/learn/0/data')
-        exploration_dict = self.parse_json_response(response)
+        exploration_dict = self.get_json('/learnhandler/init/0')
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
         state_id = exploration_dict['state_id']
-        response = self.testapp.post(str('/learn/0/%s' % state_id), {
-            'payload': json.dumps({
+        exploration_dict = self.post_json(
+            '/learnhandler/transition/0/%s' % state_id, {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
-            })
-        })
+            }
+        )
 
-        exploration_dict = self.parse_json_response(response)
         state_id = exploration_dict['state_id']
-        response = self.testapp.post(str('/learn/0/%s' % state_id), {
-            'payload': json.dumps({
+        exploration_dict = self.post_json(
+            '/learnhandler/transition/0/%s' % state_id, {
                 'answer': 'blah', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
-            })
-        })
+            }
+        )
 
         for _ in range(2):
-            exploration_dict = self.parse_json_response(response)
-            response = self.testapp.post(str('/learn/0/%s' % state_id), {
-                'payload': json.dumps({
+            exploration_dict = self.post_json(
+                '/learnhandler/transition/0/%s' % state_id,
+                {
                     'answer': 'blah2', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
-                })
-            })
+                }
+            )
 
         for _ in range(3):
-            exploration_dict = self.parse_json_response(response)
-            response = self.testapp.post(str('/learn/0/%s' % state_id), {
-                'payload': json.dumps({
+            exploration_dict = self.post_json(
+                '/learnhandler/transition/0/%s' % state_id,
+                {
                     'answer': 'blah3', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
-                })
-            })
+                }
+            )
 
         # Register and log in as an editor.
         self.register('editor@example.com')
@@ -230,40 +228,34 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get(EXPLORATION_STATISTICS_URL)
-        editor_exploration_dict = self.parse_json_response(response)
+        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_visits'], 0)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # Switch to the reader perspective. First submit the first
         # multiple-choice answer, then submit 'blah'.
-        response = self.testapp.get('/learn/0/data')
-        exploration_dict = self.parse_json_response(response)
+        exploration_dict = self.get_json('/learnhandler/init/0')
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
         state_id = exploration_dict['state_id']
-        response = self.testapp.post(str('/learn/0/%s' % state_id), {
-            'payload': json.dumps({
+        exploration_dict = self.post_json(
+            '/learnhandler/transition/0/%s' % state_id, {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
-            })
-        })
-        exploration_dict = self.parse_json_response(response)
+            }
+        )
         state_id = exploration_dict['state_id']
-        response = self.testapp.post(str('/learn/0/%s' % state_id), {
-            'payload': json.dumps({
-                'answer': 'blah', 'block_number': 0, 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            })
+        self.post_json('/learnhandler/transition/0/%s' % state_id, {
+            'answer': 'blah', 'block_number': 0, 'handler': 'submit',
+            'state_history': exploration_dict['state_history']
         })
 
         # Now switch back to the editor perspective.
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get(EXPLORATION_STATISTICS_URL)
-        editor_exploration_json = self.parse_json_response(response)
-        self.assertEqual(editor_exploration_json['num_visits'], 1)
-        self.assertEqual(editor_exploration_json['num_completions'], 0)
+        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
+        self.assertEqual(editor_exploration_dict['num_visits'], 1)
+        self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # TODO(sll): Add more checks here.
 

@@ -113,3 +113,5 @@ class EditorPrerequisitesPage(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Sorry, the username \"%s\" is already taken! Please pick '
                     'a different one.' % username)
+
+        self.render_json({})

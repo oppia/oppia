@@ -106,35 +106,7 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
-    def get_json(self, url):
-        """Get a JSON response, transformed to a Python object."""
-        json_response = self.testapp.get(url)
-        self.assertEqual(json_response.status_int, 200)
-        return self.parse_json_response(json_response, expect_errors=False)
-
-    def post_json(self, url, payload, csrf_token, expect_errors=False,
-                  expected_status_int=200):
-        """Post an object to the server by JSON; return the received object."""
-        json_response = self.testapp.post(url, {
-            'csrf_token': csrf_token, 'payload': json.dumps(payload)
-        }, expect_errors=expect_errors)
-
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self.parse_json_response(
-            json_response, expect_errors=expect_errors)
-
-    def put_json(self, url, payload, csrf_token, expect_errors=False,
-                 expected_status_int=200):
-        """Put an object to the server by JSON; return the received object."""
-        json_response = self.testapp.put(url, {
-            'csrf_token': csrf_token, 'payload': json.dumps(payload)
-        }, expect_errors=expect_errors)
-
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self.parse_json_response(
-            json_response, expect_errors=expect_errors)
-
-    def parse_json_response(self, json_response, expect_errors=False):
+    def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
@@ -144,6 +116,41 @@ class TestBase(unittest.TestCase):
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
+
+    def get_json(self, url):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(url)
+        self.assertEqual(json_response.status_int, 200)
+        return self._parse_json_response(json_response, expect_errors=False)
+
+    def post_json(self, url, payload, csrf_token=None, expect_errors=False,
+                  expected_status_int=200, upload_files=None):
+        """Post an object to the server by JSON; return the received object."""
+        data = {'payload': json.dumps(payload)}
+        if csrf_token:
+            data['csrf_token'] = csrf_token
+
+        json_response = self.testapp.post(
+            str(url), data, expect_errors=expect_errors,
+            upload_files=upload_files)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
+
+    def put_json(self, url, payload, csrf_token=None, expect_errors=False,
+                 expected_status_int=200):
+        """Put an object to the server by JSON; return the received object."""
+        data = {'payload': json.dumps(payload)}
+        if csrf_token:
+            data['csrf_token'] = csrf_token
+
+        json_response = self.testapp.put(
+            str(url), data, expect_errors=expect_errors)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""

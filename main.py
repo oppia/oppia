@@ -113,17 +113,16 @@ urls = [
         r'/learn/<exploration_id>', reader.ExplorationPage,
         'exploration_page'),
     get_redirect_route(
-        r'/learn/<exploration_id>/data', reader.ExplorationHandler,
-        'exploration_handler'),
-    # TODO(sll): there is a potential collision here if the state_id is 'data'.
-    get_redirect_route(
-        r'/learn/<exploration_id>/<state_id>', reader.FeedbackHandler,
-        'feedback_handler'),
-    get_redirect_route(
         r'/learn_random', reader.RandomExplorationPage,
         'random_exploration_page'),
     get_redirect_route(
-        r'/learn/give_feedback/<exploration_id>/<state_id>',
+        r'/learnhandler/init/<exploration_id>', reader.ExplorationHandler,
+        'exploration_handler'),
+    get_redirect_route(
+        r'/learnhandler/transition/<exploration_id>/<state_id>',
+        reader.FeedbackHandler, 'feedback_handler'),
+    get_redirect_route(
+        r'/learnhandler/give_feedback/<exploration_id>/<state_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(

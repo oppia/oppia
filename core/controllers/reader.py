@@ -42,16 +42,36 @@ class ExplorationPage(base.BaseHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
-        iframed = (self.request.get('iframed') == 'true')
-
         self.values.update({
             'content': skins_services.get_skin_html(exploration.default_skin),
-            'iframed': iframed,
+            'iframed': (self.request.get('iframed') == 'true'),
             'is_public': rights_manager.is_exploration_public(exploration_id),
             'nav_mode': READER_MODE,
         })
         self.render_template(
             'reader/reader_exploration.html', iframe_restriction=None)
+
+
+class RandomExplorationPage(base.BaseHandler):
+    """Returns the page for a random exploration."""
+
+    def get(self):
+        """Handles GET requests."""
+        iframed = (self.request.get('iframed') == 'true')
+
+        explorations = exp_services.get_public_explorations()
+        if len(explorations) <= 1:
+            exp_services.delete_demo('1')
+            exp_services.load_demo('1')
+            selected_exploration_id = '1'
+        else:
+            selected_exploration_id = utils.get_random_choice(
+                explorations[1:]).id
+
+        dest_url = '/learn/%s' % selected_exploration_id
+        if iframed:
+            dest_url += '?iframed=true'
+        self.redirect(dest_url)
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -255,25 +275,3 @@ class ReaderFeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_id, feedback,
             {'state_history': state_history})
-
-
-class RandomExplorationPage(base.BaseHandler):
-    """Returns the page for a random exploration."""
-
-    def get(self):
-        """Handles GET requests."""
-        iframed = (self.request.get('iframed') == 'true')
-
-        explorations = exp_services.get_public_explorations()
-        if len(explorations) <= 1:
-            exp_services.delete_demo('1')
-            exp_services.load_demo('1')
-            selected_exploration_id = '1'
-        else:
-            selected_exploration_id = utils.get_random_choice(
-                explorations[1:]).id
-
-        dest_url = '/learn/%s' % selected_exploration_id
-        if iframed:
-            dest_url += '?iframed=true'
-        self.redirect(dest_url)

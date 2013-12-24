@@ -25,7 +25,7 @@ function ReaderExploration(
   $scope.explorationId = pathnameArray[2];
   // The following is needed for image displaying to work.
   $rootScope.explorationId = pathnameArray[2];
-  $scope.explorationDataUrl = '/learn/' + $scope.explorationId + '/data';
+  $scope.explorationDataUrl = '/learnhandler/init/' + $scope.explorationId;
 
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
@@ -119,7 +119,7 @@ function ReaderExploration(
     };
 
     $http.post(
-        '/learn/give_feedback/' + $scope.explorationId + '/' + $scope.stateId,
+        '/learnhandler/give_feedback/' + $scope.explorationId + '/' + $scope.stateId,
         oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {
@@ -204,7 +204,7 @@ function ReaderExploration(
     $scope.answerIsBeingProcessed = true;
 
     $http.post(
-        '/learn/' + $scope.explorationId + '/' + $scope.stateId,
+        '/learnhandler/transition/' + $scope.explorationId + '/' + $scope.stateId,
         oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)

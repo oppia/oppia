@@ -64,32 +64,23 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         response = self.testapp.get('/profile/editor_prerequisites')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({'agreed_to_terms': False})
-        }, expect_errors=True)      
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites', {'agreed_to_terms': False},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
 
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertIn('you will need to accept', parsed_response['error'])
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('you will need to accept', response_dict['error'])
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({'agreed_to_terms': 'Hasta la vista!'})
-        }, expect_errors=True)
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertIn('you will need to accept', parsed_response['error'])
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites',
+            {'agreed_to_terms': 'Hasta la vista!'},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('you will need to accept', response_dict['error'])
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({'agreed_to_terms': True})
-        })
-        self.assertEqual(response.status_int, 200)
+        self.post_json(
+            '/profile/editor_prerequisites', {'agreed_to_terms': True},
+            csrf_token=csrf_token)
 
         self.logout()
 
@@ -99,50 +90,30 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         response = self.testapp.get('/profile/editor_prerequisites')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({'agreed_to_terms': True})
-        }, expect_errors=True)
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertIn('No username supplied', parsed_response['error'])
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites', {'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('No username supplied', response_dict['error'])
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': '',
-                'agreed_to_terms': True
-            })
-        }, expect_errors=True)
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
-        self.assertIn('No username supplied', parsed_response['error'])
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites',
+            {'username': '', 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn('No username supplied', response_dict['error'])
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': '!a!',
-                'agreed_to_terms': True
-            })
-        }, expect_errors=True)
-        self.assertEqual(response.status_int, 400)
-        parsed_response = self.parse_json_response(
-            response, expect_errors=True)
-        self.assertEqual(parsed_response['code'], 400)
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites',
+            {'username': '!a!', 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
         self.assertIn(
-            'can only have alphanumeric characters', parsed_response['error'])
+            'can only have alphanumeric characters', response_dict['error'])
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': 'abcde',
-                'agreed_to_terms': True
-            })
-        }, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        response_dict = self.post_json(
+            '/profile/editor_prerequisites',
+            {'username': 'abcde', 'agreed_to_terms': True},
+            csrf_token=csrf_token)
 
         self.logout()
