@@ -117,13 +117,7 @@ class ExplorationModel(base_models.BaseModel):
         """Returns an iterable containing publicly-available explorations."""
         public_rights_models = ExplorationRightsModel.objects.all().filter(
             status='public')
-        tentatively_public_rights_models = (
-            ExplorationRightsModel.objects.all().filter(
-                status='tentatively_public'))
-
-        exploration_ids = (
-            [model.id for model in public_rights_models] +
-            [model.id for model in tentatively_public_rights_models])
+        exploration_ids = [model.id for model in public_rights_models]
 
         return [cls.get_by_id(eid) for eid in exploration_ids]
 
@@ -301,7 +295,6 @@ class ExplorationRightsModel(base_models.BaseModel):
 
     STATUS_CHOICES = (
         ('private', 'private'),
-        ('tentatively_public', 'tentatively_public'),
         ('public', 'public'),
         ('publicized', 'publicized')
     )

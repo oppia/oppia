@@ -27,7 +27,6 @@ current_user_services = models.Registry.import_current_user_services()
 
 
 EXPLORATION_STATUS_PRIVATE = 'private'
-EXPLORATION_STATUS_TENTATIVELY_PUBLIC = 'tentatively_public'
 EXPLORATION_STATUS_PUBLIC = 'public'
 EXPLORATION_STATUS_PUBLICIZED = 'publicized'
 
@@ -75,8 +74,7 @@ def save_exploration_rights(exploration_rights):
 
 def is_exploration_public(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
-    return exploration_rights.status in [
-        EXPLORATION_STATUS_PUBLIC, EXPLORATION_STATUS_TENTATIVELY_PUBLIC]
+    return exploration_rights.status == EXPLORATION_STATUS_PUBLIC
 
 
 def get_exploration_members(exploration_id):
@@ -145,7 +143,7 @@ class Actor(object):
                 self._is_owner(exploration_id) or self._is_admin())
 
     def can_accept_submitted_change(self, exploration_id):
-        return self._is_editor(exploration_id)
+        return self.can_edit(exploration_id)
 
     def can_delete(self, exploration_id):
         if self._is_admin():
@@ -170,7 +168,10 @@ class Actor(object):
             return True
 
         exp_rights = get_exploration_rights(exploration_id)
-        return (exp_rights.status == EXPLORATION_STATUS_TENTATIVELY_PUBLIC and
+        # TODO(sll): Deny unpublishing of the exploration if an
+        # external user has edited or submitted feedback for it since
+        # it was published.
+        return (exp_rights.status == EXPLORATION_STATUS_PUBLIC and
                 self._is_owner(exploration_id))
 
     def can_modify_roles(self, exploration_id):
@@ -190,8 +191,7 @@ class Actor(object):
 
     def can_publicize(self, exploration_id):
         exp_rights = get_exploration_rights(exploration_id)
-        if (exp_rights.status == EXPLORATION_STATUS_PRIVATE or
-                exp_rights.status == EXPLORATION_STATUS_PUBLICIZED):
+        if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
             return False
         return self._is_admin()
 
@@ -274,7 +274,7 @@ def publish_exploration(committer_id, exploration_id):
         raise Exception('Could not publish exploration.')
 
     exp_rights = get_exploration_rights(exploration_id)
-    exp_rights.status = EXPLORATION_STATUS_TENTATIVELY_PUBLIC
+    exp_rights.status = EXPLORATION_STATUS_PUBLIC
     save_exploration_rights(exp_rights)
 
     logging.info(

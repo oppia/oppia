@@ -113,16 +113,14 @@ class ExplorationModel(base_models.BaseModel):
     def get_public_explorations(cls):
         """Returns an iterable containing publicly-available explorations."""
         qo = ndb.QueryOptions(keys_only=True)
-        exp_keys_1 = ExplorationRightsModel.query().filter(
+        exp_rights_keys = ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status == 'public'
         ).fetch(QUERY_LIMIT, options=qo)
-        exp_keys_2 = ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status == 'tentatively_public'
-        ).fetch(QUERY_LIMIT, options=qo)
 
-        exp_keys = ([ndb.Key(cls, exp_key.id()) for exp_key in exp_keys_1] +
-                    [ndb.Key(cls, exp_key.id()) for exp_key in exp_keys_2])
-        return ndb.get_multi(exp_keys)
+        exploration_keys = [
+            ndb.Key(cls, exp_rights_key.id())
+            for exp_rights_key in exp_rights_keys]
+        return ndb.get_multi(exploration_keys)
 
     @classmethod
     def get_exploration_count(cls):
@@ -314,6 +312,5 @@ class ExplorationRightsModel(base_models.BaseModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default='private',
-        choices=['private', 'tentatively_public', 'public', 'publicized']
+        default='private', choices=['private', 'public', 'publicized']
     )
