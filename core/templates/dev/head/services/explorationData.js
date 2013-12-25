@@ -63,42 +63,26 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
     },
 
     // Returns a promise that supplies the data for the given state.
-    getStateData: function(stateId) {
-      if (!stateId) {
+    getStateData: function(stateName) {
+      if (!stateName) {
         return;
       }
 
-      console.log('Getting state data for state ' + stateId);
-      explorationData.stateId = stateId;
+      console.log('Getting state data for state ' + stateName);
+      explorationData.stateName = stateName;
       console.log(explorationData.data);
 
       if (explorationData.data && 'states' in explorationData.data &&
-          stateId in explorationData.data.states) {
+          stateName in explorationData.data.states) {
         var deferred = $q.defer();
-        deferred.resolve(angular.copy(explorationData.data.states[stateId]));
+        deferred.resolve(angular.copy(explorationData.data.states[stateName]));
         return deferred.promise;
       } else {
         return explorationData.getData().then(function(response) {
-          return angular.copy(explorationData.data.states[stateId]);
+          return angular.copy(explorationData.data.states[stateName]);
         });
       }
     },
-
-    getStateProperty: function(stateId, property) {
-      if (!stateId) {
-        return;
-      }
-      console.log(
-          'Getting state property ' + property + ' for state ' + stateId);
-      return explorationData.getStateData(stateId).then(function(stateData) {
-        if (!stateData.hasOwnProperty(property)) {
-          warningsData.addWarning('Invalid property name: ' + property);
-          return;
-        }
-        return stateData[property];
-      });
-    },
-
 
     /**
      * Saves the exploration to the backend, and, on a success callback,
@@ -107,7 +91,7 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
      *     keyed by property name. The values are the most up-to-date values
      *     for the corresponding exploration properties.
      * @param {object} stateChanges Contains one key-value pair for each state
-     *     that is modified. Each key is a state id, and each value is an
+     *     that is modified. Each key is a state name, and each value is an
      *     object whose meaning is similar to that of explorationChanges.
      * @param {string} commitMessage The full commit message for this save
      *     operation.
@@ -119,16 +103,16 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
       // TODO(sll): Handle explorationChanges too.
 
       var statesForBackend = {};
-      for (var stateId in stateChanges) {
+      for (var stateName in stateChanges) {
         var changeMap = {};
-        for (var property in stateChanges[stateId]) {
+        for (var property in stateChanges[stateName]) {
           if (validStateProperties.indexOf(property) < 0) {
             warningsData.addWarning('Invalid property name: ' + property);
             return;
           }
-          changeMap[property] = stateChanges[stateId][property].newValue;
+          changeMap[property] = stateChanges[stateName][property].newValue;
         }
-        statesForBackend[stateId] = changeMap;
+        statesForBackend[stateName] = changeMap;
       }
 
       var propertyValueMap = {
@@ -155,9 +139,8 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
         warningsData.clear();
         console.log('Changes to this exploration were saved successfully.');
         explorationData.data.version = data.version;
-        for (var stateId in data.updatedStates) {
-          explorationData.data.states[stateId] = data.updatedStates[stateId];
-        }
+        explorationData.data.states = data.updatedStates;
+        explorationData.data.init_state_name = data.initStateName;
         for (var property in explorationChanges) {
           explorationData.data[property] = data[property];
         }
@@ -172,9 +155,9 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
       });
     },
 
-    resolveAnswers: function(stateId, resolvedAnswersList) {
+    resolveAnswers: function(stateName, resolvedAnswersList) {
       $http.put(
-          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateId),
+          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
@@ -187,9 +170,9 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
       warningsData.clear();
     },
 
-    resolveReaderFeedback: function(stateId, feedbackId, newStatus) {
+    resolveReaderFeedback: function(stateName, feedbackId, newStatus) {
       $http.put(
-          resolvedFeedbackUrlPrefix + '/' + encodeURIComponent(stateId),
+          resolvedFeedbackUrlPrefix + '/' + encodeURIComponent(stateName),
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'feedback_id': feedbackId, 'new_status': newStatus})

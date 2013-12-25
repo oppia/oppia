@@ -20,11 +20,11 @@
 
 function StatsViewer($scope, $http, $location, $modal, warningsData, activeInputData) {
 
-  $scope.showStateStatsModal = function(stateId, improvementType) {
+  $scope.showStateStatsModal = function(stateName, improvementType) {
     warningsData.clear();
 
     $http.get(
-        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + stateId
+        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + encodeURIComponent(stateName)
     ).then(function(response) {
       var rulesStats = response.data.rules_stats;
 
@@ -32,14 +32,11 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
         templateUrl: 'modals/stateStats',
         backdrop: 'static',
         resolve: {
-          stateId: function() {
-            return stateId;
-          },
           stateName: function() {
-            return $scope.getStateName(stateId);
+            return stateName;
           },
           stateStats: function() {
-            return $scope.stats.stateStats[stateId];
+            return $scope.stats.stateStats[stateName];
           },
           improvementType: function() {
             return improvementType;
@@ -48,9 +45,8 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
             return rulesStats;
           }
         },
-        controller: ['$scope', '$modalInstance', 'stateId', 'stateName', 'stateStats', 'improvementType', 'rulesStats',
-          function($scope, $modalInstance, stateId, stateName, stateStats, improvementType, rulesStats) {
-            $scope.stateId = stateId;
+        controller: ['$scope', '$modalInstance', 'stateName', 'stateStats', 'improvementType', 'rulesStats',
+          function($scope, $modalInstance, stateName, stateStats, improvementType, rulesStats) {
             $scope.stateName = stateName;
             $scope.stateStats = stateStats;
             $scope.improvementType = improvementType;
@@ -93,7 +89,7 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
 
       modalInstance.result.then(function(result) {
         $location.hash(result.locationHash);
-        $scope.$parent.stateId = stateId;
+        $scope.$parent.stateName = stateName;
         $scope.selectGuiTab();
       }, function () {
         console.log('State stats modal dismissed.');

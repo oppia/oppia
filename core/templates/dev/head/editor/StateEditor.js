@@ -22,26 +22,26 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.$on('guiTabSelected', function(event, stateData) {
-    $scope.stateName = $scope.stateId;
+    $scope.displayedStateName = $scope.$parent.getLatestStateNames()[$scope.stateName];
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 
-    $scope.$broadcast('stateEditorInitialized', $scope.stateId);
+    $scope.$broadcast('stateEditorInitialized', $scope.stateName);
     console.log('Content updated.');
   });
 
-  $scope.getIncomingStates = function(stateId) {
+  $scope.getIncomingStates = function(stateName) {
     var incomingStates = {},
         statesToRuleNames = {},
-        otherStateId;
+        otherStateName;
 
-    for (otherStateId in $scope.states) {
-      var handlers = $scope.states[otherStateId].widget.handlers;
-      var widgetParams = $scope.states[otherStateId].widget.customization_args;
+    for (otherStateName in $scope.states) {
+      var handlers = $scope.states[otherStateName].widget.handlers;
+      var widgetParams = $scope.states[otherStateName].widget.customization_args;
       for (var i = 0; i < handlers.length; i++) {
         for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-          if (handlers[i].rule_specs[j].dest == stateId) {
-            incomingStates[otherStateId] = $scope.states[otherStateId];
+          if (handlers[i].rule_specs[j].dest == stateName) {
+            incomingStates[otherStateName] = $scope.states[otherStateName];
 
             var previousChoices = null;
             if (widgetParams.hasOwnProperty('choices')) {
@@ -51,18 +51,18 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
             var ruleName = $filter('parameterizeRuleDescription')(
                 handlers[i].rule_specs[j], previousChoices);
 
-            if (otherStateId in statesToRuleNames) {
-              statesToRuleNames[otherStateId].push(ruleName);
+            if (otherStateName in statesToRuleNames) {
+              statesToRuleNames[otherStateName].push(ruleName);
             } else {
-              statesToRuleNames[otherStateId] = [ruleName];
+              statesToRuleNames[otherStateName] = [ruleName];
             }
           }
         }
       }
     }
 
-    for (otherStateId in incomingStates) {
-      incomingStates[otherStateId].rules = statesToRuleNames[otherStateId];
+    for (otherStateName in incomingStates) {
+      incomingStates[otherStateName].rules = statesToRuleNames[otherStateName];
     }
     return incomingStates;
   };
@@ -71,29 +71,30 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   $scope.stateNameMemento = null;
 
   $scope.openStateNameEditor = function() {
-    $scope.stateNameMemento = $scope.stateName;
+    $scope.stateNameMemento = $scope.displayedStateName;
   };
 
-  $scope.saveStateName = function(stateName) {
-    stateName = $scope.normalizeWhitespace(stateName);
-    if (!$scope.isValidEntityName(stateName, true)) {
+  $scope.saveStateName = function(newStateName) {
+    newStateName = $scope.normalizeWhitespace(newStateName);
+    if (!$scope.isValidEntityName(newStateName, true)) {
       return;
     }
-    if ($scope.isDuplicateInput(
-            $scope.states, 'name', $scope.stateId, stateName)) {
+    var latestStateNames = $scope.$parent.getLatestStateNames();
+    if (newStateName != $scope.displayedStateName &&
+        latestStateNames.hasOwnProperty(newStateName)) {
       warningsData.addWarning(
-          'The name \'' + stateName + '\' is already in use.');
+          'The name \'' + newStateName + '\' is already in use.');
       return;
     }
 
-    if ($scope.stateNameMemento !== stateName) {
+    if ($scope.stateNameMemento !== newStateName) {
       $scope.addStateChange(
           'state_name',
-          ['stateName', 'states.' + $scope.stateId + '.name'],
-          stateName,
+          ['stateName', 'states.' + $scope.newStateName + '.name'],
+          newStateName,
           $scope.stateNameMemento
       );
-      $scope.stateName = stateName;
+      $scope.displayedStateName = newStateName;
     }
 
     $scope.stateNameMemento = null;

@@ -294,7 +294,7 @@ class Exploration(object):
     def _require_valid_state_name(cls, name):
         # This check is needed because state names are used in URLs and as ids
         # for statistics, so the name length should be bounded above.
-        if len(name) > 50:
+        if len(name) > 50 or len(name) < 1:
             raise utils.ValidationError(
                 'State name should have a length of at most 50 characters.')
 

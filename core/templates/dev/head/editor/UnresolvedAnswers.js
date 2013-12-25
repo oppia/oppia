@@ -26,10 +26,10 @@ function UnresolvedAnswers($scope, warningsData, explorationData) {
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateId) {
-    $scope.stateId = stateId;
-    if ($scope.stateId) {
-      var dataOrPromise = explorationData.getStateData($scope.stateId);
+  $scope.$on('stateEditorInitialized', function(evt, stateName) {
+    $scope.stateName = stateName;
+    if ($scope.stateName) {
+      var dataOrPromise = explorationData.getStateData($scope.stateName);
       if (dataOrPromise) {
         if ('then' in dataOrPromise) {
           dataOrPromise.then($scope.initUnresolvedAnswers);
@@ -37,7 +37,7 @@ function UnresolvedAnswers($scope, warningsData, explorationData) {
           $scope.initUnresolvedAnswers(data);
         }
       } else {
-        console.log('No state data exists for state ' + $scope.stateId);
+        console.log('No state data exists for state ' + $scope.stateName);
       }
     }
   });
@@ -54,7 +54,7 @@ function UnresolvedAnswers($scope, warningsData, explorationData) {
 
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
-    explorationData.resolveAnswers($scope.stateId, [answer]);
+    explorationData.resolveAnswers($scope.stateName, [answer]);
     $scope.generateUnresolvedAnswersMap();
   };
 }

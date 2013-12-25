@@ -119,7 +119,7 @@ function ReaderExploration(
     };
 
     $http.post(
-        '/learnhandler/give_feedback/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateId),
+        '/learnhandler/give_feedback/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateName),
         oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function() {
@@ -181,7 +181,7 @@ function ReaderExploration(
     $scope.inputTemplate = data.interactive_html;
     $scope.responseLog = [data.oppia_html];
     $scope.params = data.params;
-    $scope.stateId = data.state_name;
+    $scope.stateName = data.state_name;
     $scope.title = data.title;
     $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
@@ -204,7 +204,7 @@ function ReaderExploration(
     $scope.answerIsBeingProcessed = true;
 
     $http.post(
-        '/learnhandler/transition/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateId),
+        '/learnhandler/transition/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateName),
         oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success($scope.refreshPage)
@@ -222,7 +222,7 @@ function ReaderExploration(
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.inputTemplate = data.interactive_html;
-    $scope.stateId = data.state_name;
+    $scope.stateName = data.state_name;
     $scope.finished = data.finished;
 
     $scope.params = data.params;

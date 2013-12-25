@@ -44,12 +44,15 @@
               </td>
               <td class="oppia-dest-bubble">
                 <center>
-                  <span ng-show="rule.dest == 'END' || rule.dest == stateId">
-                      <[getStateNameForRule(rule.dest)]>
+                  <span ng-if="rule.dest == stateName">
+                    ⟳
                   </span>
-                  <span ng-hide="rule.dest == 'END' || rule.dest == stateId">
+                  <span ng-if="rule.dest == 'END' || rule.dest == stateName">
+                    <[rule.dest]>
+                  </span>
+                  <span ng-if="rule.dest != 'END' && rule.dest != stateName">
                     <a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-                        <[getStateNameForRule(rule.dest)]>
+                      <[rule.dest]>
                     </a>
                   </span>
                 </center>
@@ -121,12 +124,15 @@
             </td>
             <td class="oppia-dest-bubble">
               <center>
-                <span ng-show="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
-                    <[getStateNameForRule(getDefaultRule(handlerName).dest)]>
+                <span ng-if="getDefaultRule(handlerName).dest == stateName">
+                  ⟳
                 </span>
-                <span ng-hide="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateId">
+                <span ng-if="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateName">
+                    <[getDefaultRule(handlerName).dest]>
+                </span>
+                <span ng-if="getDefaultRule(handlerName).dest != 'END' && getDefaultRule(handlerName).dest != stateName">
                   <a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
-                    <[getStateNameForRule(getDefaultRule(handlerName).dest)]>,
+                    <[getDefaultRule(handlerName).dest]>
                   </a>
                 </span>
               </center>

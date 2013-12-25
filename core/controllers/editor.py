@@ -279,7 +279,7 @@ class ExplorationHandler(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         updated_states = {}
-        for state_name in states:
+        for state_name in exploration.states:
             updated_states[state_name] = (
                 exp_services.export_state_to_verbose_dict(
                     exploration_id, state_name)
@@ -287,6 +287,8 @@ class ExplorationHandler(EditorHandler):
 
         self.render_json({
             'version': exploration.version,
+            # This is needed if the name of the initial state is changed.
+            'initStateName': exploration.init_state_name,
             'updatedStates': updated_states,
             'title': exploration.title,
             'category': exploration.category,

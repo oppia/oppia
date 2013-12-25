@@ -77,7 +77,7 @@ oppia.directive('stateGraphViz', [
 
         scope.$watch('val', function (newVal, oldVal) {
           if (newVal) {
-            drawGraph(newVal.nodes, newVal.links, newVal.initStateId,
+            drawGraph(newVal.nodes, newVal.links, newVal.initStateName,
                       scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
                       scope.highlightStates, scope.stateStats);
             for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
@@ -87,7 +87,7 @@ oppia.directive('stateGraphViz', [
           }
         });
 
-        function drawGraph(nodes, links, initStateId, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
+        function drawGraph(nodes, links, initStateName, nodeFill, opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
           height = 0;
           width = 0;
 
@@ -280,12 +280,12 @@ oppia.directive('stateGraphViz', [
                 ) : 'black');
               },
               'stroke-width': function(d) {
-                return (d.hashId == initStateId || d.hashId == END_DEST || highlightStates) ? '3' : '2';
+                return (d.hashId == initStateName || d.hashId == END_DEST || highlightStates) ? '3' : '2';
               },
               'fill': function(d) {
                 return (
                   nodeFill ? nodeFill :
-                  d.hashId == initStateId ? 'olive' :
+                  d.hashId == initStateName ? 'olive' :
                   d.hashId == END_DEST ? 'green' :
                   d.reachable === false ? 'pink' :
                   d.reachableFromEnd === false ? 'pink' :
@@ -299,9 +299,9 @@ oppia.directive('stateGraphViz', [
             .on('click', function(d) {
               if (d.hashId != END_DEST) {
                 explorationData.getStateData(d.hashId);
-                scope.$parent.stateId = d.hashId;
+                scope.$parent.stateName = d.hashId;
                 if (!stateStats) {
-                  scope.$parent.stateId = d.hashId;
+                  scope.$parent.stateName = d.hashId;
                   scope.$parent.selectGuiTab();
                   // The call to $apply() is needed in order to trigger the
                   // tab change event on the parent controller.
@@ -358,7 +358,7 @@ oppia.directive('stateGraphViz', [
             })
             .style('fill', 'pink')
             .on('click', function (d) {
-              if (d.hashId != initStateId && d.hashId != END_DEST) {
+              if (d.hashId != initStateName && d.hashId != END_DEST) {
                 scope.$parent.showDeleteStateModal(d.hashId);
               }
             });
@@ -369,7 +369,7 @@ oppia.directive('stateGraphViz', [
               'text-anchor': 'right'
             })
             .text(function(d) {
-              return (d.hashId != initStateId && d.hashId != END_DEST) ? 'x' : '';
+              return (d.hashId != initStateName && d.hashId != END_DEST) ? 'x' : '';
             });
           }
 

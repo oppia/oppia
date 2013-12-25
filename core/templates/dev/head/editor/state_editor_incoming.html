@@ -7,18 +7,18 @@
 {% block center %}
   <div>
     <ul>
-      <li ng-repeat="(incomingStateId, incomingState) in getIncomingStates(stateId)">
-        <a ng-if="stateId != incomingStateId" href="/create/<[explorationId]>#/gui/<[incomingStateId]>">
+      <li ng-repeat="(incomingStateName, incomingState) in getIncomingStates(stateName)">
+        <a ng-if="stateName != incomingStateName" href="/create/<[explorationId]>#/gui/<[incomingStateName]>">
         <[incomingState.name]>
         </a>
-        <span ng-if="stateId == incomingStateId" title="This state points to itself." class="oppia-cursor-pointer">
+        <span ng-if="stateName == incomingStateName" title="This state points to itself." class="oppia-cursor-pointer">
           ⟳
         </span>
         (<[incomingState.rules | commaSeparatedList]>)
       </li>
     </ul>
 
-    <span ng-show="isEmpty(getIncomingStates(stateId))">
+    <span ng-if="isEmpty(getIncomingStates(stateName))">
       <em>No incoming states.</em>
     </span>
   </div>

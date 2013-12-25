@@ -75,10 +75,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateId) {
-    $scope.stateId = stateId;
-    if ($scope.stateId) {
-      var dataOrPromise = explorationData.getStateData($scope.stateId);
+  $scope.$on('stateEditorInitialized', function(evt, stateName) {
+    $scope.stateName = stateName;
+    if ($scope.stateName) {
+      var dataOrPromise = explorationData.getStateData($scope.stateName);
       if (dataOrPromise) {
         if ('then' in dataOrPromise) {
           dataOrPromise.then($scope.initInteractiveWidget);
@@ -86,23 +86,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           $scope.initInteractiveWidget(dataOrPromise);
         }
       } else {
-        console.log('No state data exists for state ' + $scope.stateId);
+        console.log('No state data exists for state ' + $scope.stateName);
       }
     }
   });
-
-  $scope.getStateNameForRule = function(stateId) {
-    return (
-        stateId === $scope.stateId  ? '⟳ ' + stateId :
-        stateId === END_DEST        ? END_DEST :
-        !$scope.states              ? '' :
-        stateId
-    );
-  };
-
-  $scope.matchesCurrentStateId = function(stateId) {
-    return stateId === $scope.stateId;
-  };
 
   // Returns a list of all states, as well as 'END' and 'Add New State' options.
   $scope.getAllDests = function() {
@@ -197,15 +184,15 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         states: function() {
           return $scope.states;
         },
-        stateId: function() {
-          return $scope.stateId;
+        stateName: function() {
+          return $scope.stateName;
         }
       },
       controller: [
         '$scope', '$modalInstance', 'modalTitle', 'tmpRule', 'handlerName',
-        'existingRules', 'widgetCustomizationArgs', 'allDests', 'states', 'stateId',
+        'existingRules', 'widgetCustomizationArgs', 'allDests', 'states', 'stateName',
         function($scope, $modalInstance, modalTitle, tmpRule,
-            handlerName, existingRules, widgetCustomizationArgs, allDests, states, stateId) {
+            handlerName, existingRules, widgetCustomizationArgs, allDests, states, stateName) {
           $scope.modalTitle = modalTitle;
           $scope.tmpRule = tmpRule;
           $scope.handlerName = handlerName;
@@ -213,7 +200,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           $scope.widgetCustomizationArgs = widgetCustomizationArgs;
           $scope.allDests = allDests;
           $scope.states = states;
-          $scope.stateId = stateId;
+          $scope.stateName = stateName;
 
           $scope.UNICODE_STRING_LIST_INIT_ARGS = {
             'objType': 'UnicodeString'
@@ -271,12 +258,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
             $scope.tmpRuleDescriptionFragments = result;
           });
 
-          $scope.getDestName = function(stateId) {
+          $scope.getDestName = function(stateName) {
             return (
-                stateId === '?'            ? 'Add New State...' :
-                stateId === END_DEST       ? END_DEST :
-                stateId === $scope.stateId ? stateId + ' ⟳' :
-                stateId
+                stateName === '?'              ? 'Add New State...' :
+                stateName === $scope.stateName ? stateName + ' ⟳' :
+                stateName
             );
           };
 
@@ -291,7 +277,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           $scope.selectRule = function(description, name) {
             $scope.tmpRule.description = description;
             $scope.tmpRule.name = name;
-            $scope.tmpRule.dest = explorationData.stateId;
+            $scope.tmpRule.dest = explorationData.stateName;
             $scope.tmpRule.destNew = '';
 
             // Finds the parameters and sets them in $scope.tmpRule.inputs.
@@ -425,7 +411,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.isRuleConfusing = function(rule) {
-    return (rule.feedback.length === 0 && $scope.matchesCurrentStateId(rule.dest));
+    return rule.feedback.length === 0 && stateName === $scope.stateName;
   };
 
   $scope.getCssClassForRule = function(rule) {
@@ -617,7 +603,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.updateStatesData = function() {
     // Updates $scope.states from $scope.widgetHandlers.
-    var stateDict = $scope.states[$scope.stateId];
+    var stateDict = $scope.states[$scope.stateName];
     for (var i = 0; i < stateDict.widget.handlers.length; i++) {
       var handlerName = stateDict.widget.handlers[i].name;
       stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];

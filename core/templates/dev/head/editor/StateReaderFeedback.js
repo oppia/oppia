@@ -21,14 +21,16 @@
 
 function StateReaderFeedback($scope, warningsData, explorationData) {
 
-  $scope.$on('stateEditorInitialized', function(evt, stateId) {
-    $scope.stateId = stateId;
+  $scope.$on('stateEditorInitialized', function(evt, stateName) {
+    $scope.stateName = stateName;
     $scope.initReaderFeedback();
   });
 
   $scope.initReaderFeedback = function() {
-    if ($scope.stateId && $scope.$parent.stats && $scope.$parent.stats.stateStats[$scope.stateId]) {
-      $scope.stateReaderFeedback = $scope.$parent.stats.stateStats[$scope.stateId].readerFeedback;
+    if ($scope.stateName && $scope.$parent.stats &&
+        $scope.$parent.stats.stateStats[$scope.stateName]) {
+      $scope.stateReaderFeedback = (
+        $scope.$parent.stats.stateStats[$scope.stateName].readerFeedback);
     }
   };
 
@@ -39,7 +41,7 @@ function StateReaderFeedback($scope, warningsData, explorationData) {
   });
 
   $scope.resolveReaderFeedback = function(feedbackId, newStatus) {
-    explorationData.resolveReaderFeedback($scope.stateId, feedbackId, newStatus);
+    explorationData.resolveReaderFeedback($scope.stateName, feedbackId, newStatus);
     $scope.stateReaderFeedback[feedbackId].deleted = true;
   };
 }
