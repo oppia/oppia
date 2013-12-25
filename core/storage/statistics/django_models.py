@@ -32,7 +32,7 @@ class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
     The id/key of instances of this class has the form
-        [EXPLORATION_ID].[STATE_ID].
+        [EXPLORATION_ID].[STATE_NAME].
     """
     # Number of times the state was entered for the first time in a reader
     # session.
@@ -48,17 +48,17 @@ class StateCounterModel(base_models.BaseModel):
     active_answer_count = models.IntegerField(default=0)
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_id):
-        instance_id = '.'.join([exploration_id, state_id])
+    def get_or_create(cls, exploration_id, state_name):
+        instance_id = '.'.join([exploration_id, state_name])
         counter = cls.get(instance_id, strict=False)
         if not counter:
             counter = cls(id=instance_id)
         return counter
 
     @classmethod
-    def inc(cls, exploration_id, state_id, first_time):
+    def inc(cls, exploration_id, state_name, first_time):
         """Increments the relevant counter for state entries."""
-        counter = cls.get_or_create(exploration_id, state_id)
+        counter = cls.get_or_create(exploration_id, state_name)
 
         if first_time:
             counter.first_entry_count += 1
@@ -72,7 +72,7 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
 
     The id/key of instances of this class has the form
-        [EXPLORATION_ID].[STATE_ID].[HANDLER_NAME].[RULE_NAME]
+        [EXPLORATION_ID].[STATE_NAME].[HANDLER_NAME].[RULE_NAME]
 
     WARNING: If a change is made to existing rules in data/objects (e.g.
     renaming them or changing their signature), this class will contain
@@ -90,10 +90,10 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     answers = django_utils.JSONField(default={}, isdict=True, blank=True)
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_id, handler_name, rule_str):
+    def get_or_create(cls, exploration_id, state_name, handler_name, rule_str):
         # TODO(sll): Deprecate this method.
         instance_id = '.'.join([
-            exploration_id, state_id, handler_name, rule_str])
+            exploration_id, state_name, handler_name, rule_str])
         answer_log = cls.get(instance_id, strict=False)
         if not answer_log:
             answer_log = cls(id=instance_id, answers={})
@@ -106,10 +106,10 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
-                (state_id, handler_name, rule_str).
+                (state_name, handler_name, rule_str).
         """
         return [cls.get_or_create(
-            exploration_id, datum['state_id'],
+            exploration_id, datum['state_name'],
             datum['handler_name'], datum['rule_str']
         ) for datum in rule_data]
 
@@ -159,12 +159,12 @@ class FeedbackItemModel(base_models.BaseModel):
 
 
 def process_submitted_answer(
-        exploration_id, state_id, handler_name, rule_str, answer):
+        exploration_id, state_name, handler_name, rule_str, answer):
     """Adds an answer to the answer log for the rule it hits.
 
     Args:
         exploration_id: the exploration id
-        state_id: the state id
+        state_name: the state id
         handler_name: a string representing the handler name (e.g., 'submit')
         rule_str: a string representation of the rule
         answer: an HTML string representation of the answer
@@ -172,24 +172,25 @@ def process_submitted_answer(
     # TODO(sll): Run these two updates in a transaction.
 
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_id, handler_name, rule_str)
+        exploration_id, state_name, handler_name, rule_str)
     if answer in answer_log.answers:
         answer_log.answers[answer] += 1
     else:
         answer_log.answers[answer] = 1
     answer_log.put()
 
-    counter = StateCounterModel.get_or_create(exploration_id, state_id)
+    counter = StateCounterModel.get_or_create(exploration_id, state_name)
     counter.active_answer_count += 1
     counter.put()
 
 
-def resolve_answers(exploration_id, state_id, handler_name, rule_str, answers):
+def resolve_answers(
+        exploration_id, state_name, handler_name, rule_str, answers):
     """Resolves selected answers for the given rule.
 
     Args:
         exploration_id: the exploration id
-        state_id: the state id
+        state_name: the state id
         handler_name: a string representing the handler name (e.g., 'submit')
         rule_str: a string representation of the rule
         answers: a list of HTML string representations of the resolved answers
@@ -198,7 +199,7 @@ def resolve_answers(exploration_id, state_id, handler_name, rule_str, answers):
     # state).
     assert isinstance(answers, list)
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_id, handler_name, rule_str)
+        exploration_id, state_name, handler_name, rule_str)
 
     resolved_count = 0
     for answer in answers:
@@ -206,13 +207,14 @@ def resolve_answers(exploration_id, state_id, handler_name, rule_str, answers):
             logging.error(
                 'Answer %s not found in answer log for rule %s of exploration '
                 '%s, state %s, handler %s' % (
-                    answer, rule_str, exploration_id, state_id, handler_name))
+                    answer, rule_str, exploration_id, state_name,
+                    handler_name))
         else:
             resolved_count += answer_log.answers[answer]
             del answer_log.answers[answer]
     answer_log.put()
 
-    counter = StateCounterModel.get_or_create(exploration_id, state_id)
+    counter = StateCounterModel.get_or_create(exploration_id, state_name)
     counter.active_answer_count -= resolved_count
     counter.resolved_answer_count += resolved_count
     counter.put()
