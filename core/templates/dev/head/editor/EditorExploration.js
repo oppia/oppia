@@ -90,8 +90,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     explorationData.save(
       explorationChanges, stateChanges, commitMessage, function() {
-        // Reload the exploration page, including drawing the graph.
-        // TODO(sll): This takes a long time. Can we shorten it?
         $scope.explorationChangeList = [];
         $scope.initExplorationPage();
         if ($scope.stateName) {
@@ -105,7 +103,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       });
   };
 
-  $scope.discardExplorationChanges = function() {
+  $scope.discardChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
       $scope.isDiscardInProgress = true;
@@ -322,7 +320,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.getNetExplorationChanges = function() {
     // This object is keyed by the name of the property that has changed.
     var rawExplorationChanges = {};
-    // This object is keyed by the state id. The value of each property is
+    // This object is keyed by the state name. The value of each property is
     // another object that is keyed by the name of the property for that state
     // that has changed.
     var rawStateChanges = {};

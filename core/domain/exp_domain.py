@@ -25,6 +25,7 @@ __author__ = 'Sean Lip'
 import copy
 import re
 
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import widget_registry
@@ -387,6 +388,95 @@ class State(object):
 
         self.widget.validate()
 
+    def update_content(self, content_list):
+        # TODO(sll): Must sanitize all content in noninteractive widget attrs.
+        self.content = [Content.from_dict(content_list[0])]
+
+    def update_param_changes(self, param_change_dicts):
+        self.param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in param_change_dicts]
+
+    def update_widget_id(self, widget_id):
+        self.widget.widget_id = widget_id
+        # TODO(sll): This should also clear widget.handlers (except for the
+        # default rule).
+
+    def update_widget_customization_args(self, widget_customization_args):
+        self.widget.customization_args = widget_customization_args
+
+    def update_widget_sticky(self, widget_sticky):
+        self.widget.sticky = widget_sticky
+
+    def update_widget_handlers(self, widget_handlers_dict):
+        if not isinstance(widget_handlers_dict, dict):
+            raise Exception(
+                'Expected widget_handlers to be a dictionary, received %s'
+                % widget_handlers_dict)
+        ruleset = widget_handlers_dict['submit']
+        if not isinstance(ruleset, list):
+            raise Exception(
+                'Expected widget_handlers[submit] to be a list, received %s'
+                % ruleset)
+
+        widget_handlers = [AnswerHandlerInstance('submit', [])]
+        generic_widget = widget_registry.Registry.get_widget_by_id(
+            'interactive', self.widget.widget_id)
+
+        # TODO(yanamal): Do additional calculations here to get the
+        # parameter changes, if necessary.
+        for rule_ind in range(len(ruleset)):
+            rule_dict = ruleset[rule_ind]
+            rule_dict['feedback'] = [html_cleaner.clean(feedback)
+                                     for feedback in rule_dict['feedback']]
+            if 'param_changes' not in rule_dict:
+                rule_dict['param_changes'] = []
+            rule_spec = RuleSpec.from_dict(rule_dict)
+            rule_type = rule_spec.definition['rule_type']
+
+            if rule_ind == len(ruleset) - 1:
+                if rule_type != rule_domain.DEFAULT_RULE_TYPE:
+                    raise ValueError(
+                        'Invalid ruleset: the last rule should be a default '
+                        'rule')
+            else:
+                if rule_type == rule_domain.DEFAULT_RULE_TYPE:
+                    raise ValueError(
+                        'Invalid ruleset: rules other than the '
+                        'last one should not be default rules.')
+
+                # TODO(sll): Generalize this to Boolean combinations of rules.
+                matched_rule = generic_widget.get_rule_by_name(
+                    'submit', rule_spec.definition['name'])
+
+                # Normalize and store the rule params.
+                # TODO(sll): Generalize this to Boolean combinations of rules.
+                rule_inputs = rule_spec.definition['inputs']
+                if not isinstance(rule_inputs, dict):
+                    raise Exception(
+                        'Expected rule_inputs to be a dict, received %s'
+                        % rule_inputs)
+                for param_name, value in rule_inputs.iteritems():
+                    param_type = rule_domain.get_obj_type_for_param_name(
+                        matched_rule, param_name)
+
+                    if (isinstance(value, basestring) and
+                            '{{' in value and '}}' in value):
+                        # TODO(jacobdavis11): Create checks that all parameters
+                        # referred to exist and have the correct types
+                        normalized_param = value
+                    else:
+                        try:
+                            normalized_param = param_type.normalize(value)
+                        except TypeError:
+                            raise Exception(
+                                '%s has the wrong type. It should be a %s.' %
+                                (value, param_type.__name__))
+                    rule_inputs[param_name] = normalized_param
+
+            widget_handlers[0].rule_specs.append(rule_spec)
+            self.widget.handlers = widget_handlers
+
     def to_dict(self):
         return {
             'content': [item.to_dict() for item in self.content],
@@ -457,7 +547,11 @@ class Exploration(object):
                 'Invalid state name: %s' % feconf.END_DEST)
 
     def validate(self, strict=False):
-        """Validates the exploration before it is committed to storage."""
+        """Validates the exploration before it is committed to storage.
+
+        If strict is True, performs advanced checks and returns a list of
+        warnings.
+        """
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
@@ -572,10 +666,24 @@ class Exploration(object):
                                 'does not exist in this exploration'
                                 % param_change.name)
 
+        warnings = []
         if strict:
-            self._verify_no_self_loops()
-            self._verify_all_states_reachable()
-            self._verify_no_dead_ends()
+            try:
+                self._verify_no_self_loops()
+            except utils.ValidationError as e:
+                warnings.append(e)
+
+            try:
+                self._verify_all_states_reachable()
+            except utils.ValidationError as e:
+                warnings.append(e)
+
+            try:
+                self._verify_no_dead_ends()
+            except utils.ValidationError as e:
+                warnings.append(e)
+
+        return warnings
 
     def _verify_no_self_loops(self):
         """Verify that there are no self-loops."""
@@ -623,8 +731,9 @@ class Exploration(object):
         if len(self.states) != len(processed_queue):
             unseen_states = list(
                 set(self.states.keys()) - set(processed_queue))
-            raise Exception('The following states are not reachable from the '
-                            'initial state: %s' % ', '.join(unseen_states))
+            raise utils.ValidationError(
+                'The following states are not reachable from the initial '
+                'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
         """Verifies that the END state is reachable from all states."""
@@ -654,9 +763,9 @@ class Exploration(object):
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
-            raise Exception('The END state is not reachable from the '
-                            'following states: %s' %
-                            ', '.join(dead_end_states))
+            raise utils.ValidationError(
+                'The END state is not reachable from the following states: %s'
+                % ', '.join(dead_end_states))
 
     # Derived attributes of an exploration,
     @property
@@ -689,6 +798,24 @@ class Exploration(object):
         return self.id.isdigit() and (
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
+    def update_title(self, title):
+        self.title = title
+
+    def update_category(self, category):
+        self.category = category
+
+    def update_param_specs(self, param_specs_dict):
+        self.param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in param_specs_dict.iteritems()
+        }
+
+    def update_param_changes(self, param_changes_list):
+        self.param_changes = [
+            param_domain.ParamChange.from_dict(param_change)
+            for param_change in param_changes_list
+        ]
+
     # Methods relating to states.
     def add_states(self, state_names):
         """Adds multiple states to the exploration."""
@@ -701,6 +828,8 @@ class Exploration(object):
 
     def rename_state(self, old_state_name, new_state_name):
         """Renames the given state."""
+        if old_state_name not in self.states:
+            raise ValueError('State %s does not exist' % old_state_name)
         if (old_state_name != new_state_name and
                 new_state_name in self.states):
             raise ValueError('Duplicate state name: %s' % new_state_name)
@@ -725,3 +854,23 @@ class Exploration(object):
                 for rule in handler.rule_specs:
                     if rule.dest == old_state_name:
                         rule.dest = new_state_name
+
+    def delete_state(self, state_name):
+        """Deletes the given state."""
+        if state_name not in self.states:
+            raise ValueError('State %s does not exist' % state_name)
+
+        # Do not allow deletion of initial states.
+        if self.init_state_name == state_name:
+            raise ValueError('Cannot delete initial state of an exploration.')
+
+        # Find all destinations in the exploration which equal the deleted
+        # state, and change them to loop back to their containing state.
+        for other_state_name in self.states:
+            other_state = self.states[other_state_name]
+            for handler in other_state.widget.handlers:
+                for rule in handler.rule_specs:
+                    if rule.dest == state_name:
+                        rule.dest = other_state_name
+
+        del self.states[state_name]

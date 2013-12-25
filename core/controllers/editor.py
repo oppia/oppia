@@ -375,8 +375,11 @@ class DeleteStateHandler(EditorHandler):
         # TODO(sll): Add a version check here. This probably involves NOT using
         # delete(), but regarding this as an exploration put() instead. Or the
         # param can be passed via the URL.
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration.delete_state(state_name)
+        exp_services.save_exploration(
+            self.user_id, exploration, 'Deleted state: %s' % state_name)
 
-        exp_services.delete_state(self.user_id, exploration_id, state_name)
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
             'version': exploration.version

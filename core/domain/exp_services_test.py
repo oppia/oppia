@@ -384,7 +384,9 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
             exp_id = str(ind)
             exp_services.load_demo(exp_id)
             exploration = exp_services.get_exploration_by_id(exp_id)
-            exploration.validate(strict=True)
+            warnings = exploration.validate(strict=True)
+            if warnings:
+                raise Exception(warnings)
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
@@ -683,17 +685,16 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         with self.assertRaisesRegexp(
                 ValueError, 'Cannot delete initial state'):
-            exp_services.delete_state(
-                USER_ID, EXP_ID, exploration.init_state_name)
+            exploration.delete_state(exploration.init_state_name)
 
         exploration.add_states(['second state'])
         exp_services.save_exploration('fake@user.com', exploration)
 
         exploration = exp_services.get_exploration_by_id(EXP_ID)
-        exp_services.delete_state(USER_ID, EXP_ID, 'second state')
+        exploration.delete_state('second state')
 
-        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exp_services.delete_state(USER_ID, EXP_ID, 'fake state')
+        with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
+            exploration.delete_state('fake state')
 
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
@@ -976,8 +977,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_extra_default_rule(self):
         """Test that rules other than the last cannot be default."""
-        self.widget_handlers['submit'][0]['description'] = (
-            feconf.DEFAULT_RULE_NAME)
+        self.widget_handlers['submit'][0]['definition']['rule_type'] = (
+            rule_domain.DEFAULT_RULE_TYPE)
         with self.assertRaisesRegexp(
                 ValueError, 'Invalid ruleset: rules other than the last one '
                             'should not be default rules.'):
@@ -991,7 +992,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_missing_default_rule(self):
         """Test that the last rule must be default."""
-        self.widget_handlers['submit'][1]['description'] = 'atomic'
+        self.widget_handlers['submit'][1]['definition']['rule_type'] = 'atomic'
         with self.assertRaisesRegexp(
                 ValueError,
                 'Invalid ruleset: the last rule should be a default rule'):
@@ -1008,8 +1009,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.widget_handlers['submit'][0]['definition']['inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(
                 Exception,
-                'abc has the wrong type. Please replace it with a '
-                'NonnegativeInt.'):
+                'abc has the wrong type. It should be a NonnegativeInt.'):
             exp_services.update_exploration(
                 'fake@user.com', self.EXP_ID, None, None, None, None, {
                     self.init_state_name: {
@@ -1204,12 +1204,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
-        with self.assertRaisesRegexp(ValueError, 'Invalid state name'):
-            exp_services.delete_state(
-                'bad_committer', eid, 'invalid_state_name')
+        with self.assertRaisesRegexp(ValueError, 'does not exist'):
+            exploration.delete_state('invalid_state_name')
 
         # Now delete the new state.
-        exp_services.delete_state('committer_id_3', eid, 'New state')
+        exploration.delete_state('New state')
         commit_dict_3 = {
             'committer_id': 'committer_id_3',
             'commit_message': 'Deleted state: New state',
@@ -1232,4 +1231,3 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(eid)
         self.assertEqual(len(exploration.states), 1)
         """
-

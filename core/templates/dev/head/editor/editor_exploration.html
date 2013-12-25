@@ -189,7 +189,7 @@
           <!-- The !! is necessary because the string 'f' is treated as false in AngularJS. -->
           <div ng-show="!!explorationTitle">
             <div style="float: right;">
-              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardExplorationChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
               <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationSaveable()">save changes</button>
             </div>
 
