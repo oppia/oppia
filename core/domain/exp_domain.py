@@ -579,7 +579,7 @@ class Exploration(object):
 
     def _verify_no_self_loops(self):
         """Verify that there are no self-loops."""
-        for (state_name, state) in self.states:
+        for (state_name, state) in self.states.iteritems():
             for handler in state.widget.handlers:
                 for rule in handler.rule_specs:
                     # Check that there are no feedback-less self-loops.

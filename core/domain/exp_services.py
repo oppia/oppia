@@ -227,7 +227,11 @@ def export_to_zip_file(exploration_id):
 # Repository SAVE and DELETE methods.
 def save_exploration(committer_id, exploration, commit_message=''):
     """Commits an exploration domain object to persistent storage."""
-    exploration.validate()
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+        exploration.validate(strict=True)
+    else:
+        exploration.validate()
 
     def export_to_versionable_dict(exploration):
         """Returns a serialized version of this exploration for versioning.
@@ -293,13 +297,16 @@ def save_exploration(committer_id, exploration, commit_message=''):
 
 def create_new(
     user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME, cloned_from=None):
+        init_state_name=feconf.DEFAULT_STATE_NAME,
+        default_dest_is_end_state=False, cloned_from=None):
     """Creates and saves a new exploration; returns its id."""
     # Generate a new exploration id, if one wasn't passed in.
     exploration_id = (exploration_id or
                       exp_models.ExplorationModel.get_new_id(title))
 
-    init_state = exp_domain.State.create_default_state(init_state_name)
+    default_dest = (
+        feconf.END_DEST if default_dest_is_end_state else init_state_name)
+    init_state = exp_domain.State.create_default_state(default_dest)
 
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
@@ -588,10 +595,6 @@ def update_exploration(
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
-    if not is_public and commit_message is not None:
-        raise ValueError(
-            'Exploration is unpublished so expected no commit message, but '
-            'received %s' % commit_message)
 
     if category:
         exploration.category = category

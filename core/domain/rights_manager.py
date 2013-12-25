@@ -270,6 +270,7 @@ def publish_exploration(committer_id, exploration_id):
         action.
     - exploration_id: str. The exploration id.
     """
+    # TODO(sll): Before publishing this exploration, validate it strictly.
     if not Actor(committer_id).can_publish(exploration_id):
         raise Exception('Could not publish exploration.')
 

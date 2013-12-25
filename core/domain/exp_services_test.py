@@ -384,7 +384,7 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
             exp_id = str(ind)
             exp_services.load_demo(exp_id)
             exploration = exp_services.get_exploration_by_id(exp_id)
-            exploration.validate()
+            exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
@@ -1058,7 +1058,8 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
         self.EXP_ID = 'A exploration_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                'fake@user.com', 'A title', 'A category', self.EXP_ID))
+                'fake@user.com', 'A title', 'A category', self.EXP_ID,
+                default_dest_is_end_state=True))
         self.init_state_name = exploration.init_state_name
 
     def test_record_commit_message(self):
@@ -1069,8 +1070,6 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
             'fake@user.com', self.EXP_ID, None, None, None, None,
             {self.init_state_name: {'widget_sticky': False}},
             'A message')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
@@ -1088,16 +1087,17 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
                 'fake@user.com', self.EXP_ID, None, None, None, None,
                 {self.init_state_name: {'widget_sticky': False}}, None)
 
-    def test_reject_commit_message(self):
-        """Check unpublished explorations do not accept commit messages"""
+    def test_unpublished_explorations_can_accept_commit_message(self):
+        """Test unpublished explorations can accept optional commit messages"""
 
-        with self.assertRaisesRegexp(
-                ValueError, 'Exploration is unpublished so expected no commit '
-                            'message, but received A message'):
-            exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None,
-                {self.init_state_name: {'widget_sticky': False}},
-                'A message')
+        exp_services.update_exploration(
+            'fake@user.com', self.EXP_ID, None, None, None, None,
+            {self.init_state_name: {'widget_sticky': False}},
+            'A message')
+
+        exp_services.update_exploration(
+            'fake@user.com', self.EXP_ID, None, None, None, None,
+            {self.init_state_name: {'widget_sticky': True}}, None)
 
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
@@ -1107,7 +1107,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         eid = 'exp_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                'committer_id_1', 'A title', 'A category', eid))
+                'committer_id_1', 'A title', 'A category', eid,
+                default_dest_is_end_state=True))
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(eid, 3), [])
@@ -1158,12 +1159,16 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         eid = 'exp_id'
         exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
-                'committer_id_1', 'A title', 'A category', eid))
+                'committer_id_1', 'A title', 'A category', eid,
+                default_dest_is_end_state=True))
 
         # Publish the exploration so that version snapshots start getting
         # recorded.
         rights_manager.publish_exploration('committer_id_1', eid)
 
+        # TODO(sll): Reinstate the following when state add/delete operations
+        # can be done as part of a larger commit.
+        """
         exploration = exp_services.get_exploration_by_id(eid)
         exploration.title = 'First title'
         exp_services.save_exploration(
@@ -1226,3 +1231,5 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(eid)
         self.assertEqual(len(exploration.states), 1)
+        """
+

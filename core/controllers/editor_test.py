@@ -53,22 +53,24 @@ class EditorTest(test_utils.GenericTestBase):
 
     def test_add_new_state(self):
         """Test adding a new state to an exploration."""
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
         # Register and log in as an admin.
         self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
-        response = self.testapp.get('/create/0')
+        EXP_ID = 'eid'
+        exp_services.create_new(
+            'editor@example.com', 'A title', 'A category',
+            exploration_id=EXP_ID, default_dest_is_end_state=True)
+
+        response = self.testapp.get('/create/%s' % EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add a new state called 'New valid state name'.
-        response_dict = self.post_json('/createhandler/data/0', {
+        response_dict = self.post_json('/createhandler/data/%s' % EXP_ID, {
             'state_name': 'New valid state name', 'version': 0
         }, csrf_token)
 
-        self.assertDictContainsSubset({'version': 1}, response_dict)
+        self.assertDictContainsSubset({'version': 0}, response_dict)
         self.assertTrue('stateData' in response_dict)
         self.assertEqual(response_dict['stateName'], 'New valid state name')
 

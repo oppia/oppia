@@ -14,7 +14,6 @@
 
 __author__ = 'Sean Lip'
 
-import json
 import unittest
 
 from core.domain import exp_services
@@ -42,7 +41,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
                 self.first_editor_id, 'A title', 'A category',
-                self.exploration_id))
+                self.exploration_id, default_dest_is_end_state=True))
 
         exp_services.save_exploration(self.first_editor_id, self.exploration)
 

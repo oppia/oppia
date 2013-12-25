@@ -25,7 +25,6 @@ import test_utils
 
 if feconf.PLATFORM == 'gae':
     import core.storage.exploration.gae_models as exp_models
-    from google.appengine.ext import db
 
 
 @unittest.skipIf(feconf.PLATFORM != 'gae',
@@ -42,7 +41,9 @@ class ExplorationSnapshotModelUnitTests(test_utils.GenericTestBase):
         USER_ID = 'user_id'
         EXP_ID = 'exp_id'
 
-        exp_services.create_new(USER_ID, 'A title', 'A category', EXP_ID)
+        exp_services.create_new(
+            USER_ID, 'A title', 'A category', EXP_ID,
+            default_dest_is_end_state=True)
 
         exploration_model = exp_models.ExplorationModel.get(EXP_ID)
         self.assertEqual(exploration_model.version, 0)
