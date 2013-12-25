@@ -236,16 +236,16 @@ def verify_dict_keys_and_types(adict, dict_schema):
 
     TOP_LEVEL_KEYS = [item[0] for item in dict_schema]
     if sorted(TOP_LEVEL_KEYS) != sorted(adict.keys()):
-        raise Exception('Dict %s should conform to schema %s.' %
-                        (adict, dict_schema))
+        raise ValidationError(
+            'Dict %s should conform to schema %s.' % (adict, dict_schema))
 
     for item in dict_schema:
         if item[1] == ANY_TYPE:
             continue
         if not isinstance(adict[item[0]], item[1]):
-            raise Exception('Value \'%s\' for key \'%s\' is not of type %s '
-                            ' in:\n\n %s' %
-                            (adict[item[0]], item[0], item[1], adict))
+            raise ValidationError(
+                'Value \'%s\' for key \'%s\' is not of type %s in:\n\n %s'
+                % (adict[item[0]], item[0], item[1], adict))
 
 
 def convert_png_to_data_url(filepath):

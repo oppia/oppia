@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import test_utils
 
 from core.domain import exp_domain
+from core.domain import param_domain
 import utils
 
 
@@ -36,6 +37,8 @@ class FakeExploration(exp_domain.Exploration):
         self.states = {}
         self.parameters = []
         self.param_specs = {}
+        self.param_changes = []
+        self.default_skin = 'default_skin'
 
     def put(self):
         """The put() method is patched to make no commits to the datastore."""
@@ -64,14 +67,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.category = 'Category'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'has no initial state name'):
-            exploration.validate()
 
-        exploration.init_state_name = 'initname'
-
-        new_state = exp_domain.State(
-            [], [], exp_domain.WidgetInstance.create_default_widget('name'))
+        new_state = exp_domain.State.create_default_state('ABC')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -87,7 +84,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'Invalid character _ in state name'):
             exploration.validate()
 
-        exploration.states = {'Initial state name': new_state}
+        exploration.states = {'ABC': new_state}
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'has no initial state name'):
+            exploration.validate()
+
+        exploration.init_state_name = 'initname'
 
         with self.assertRaisesRegexp(
                 utils.ValidationError,
@@ -95,6 +98,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.states = {exploration.init_state_name: new_state}
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'destination ABC is not a valid'):
+            exploration.validate()
+
+        exploration.states = {
+            exploration.init_state_name: exp_domain.State.create_default_state(
+                exploration.init_state_name)
+        }
+
         exploration.validate()
 
         exploration.param_specs = 'A string'
@@ -103,24 +116,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
         exploration.param_specs = {
-            '@': {
-                'obj_type': 'Int'
-            }
+            '@': param_domain.ParamSpec.from_dict({'obj_type': 'Int'})
         }
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Only parameter names with characters'):
             exploration.validate()
 
         exploration.param_specs = {
-            'notAParamSpec': {
-                'obj_type': 'Int'
-            }
+            'notAParamSpec': param_domain.ParamSpec.from_dict(
+                {'obj_type': 'Int'})
         }
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected a ParamSpec'):
-            exploration.validate()
-
-        exploration.param_specs = {}
         exploration.validate()
 
     def test_is_demo_property(self):

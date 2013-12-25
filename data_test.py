@@ -36,8 +36,8 @@ import utils
 class ExplorationDataUnitTests(test_utils.GenericTestBase):
     """Tests that all the default explorations are valid."""
 
-    def test_default_explorations_are_valid(self):
-        """Test the default explorations."""
+    def test_demo_explorations_are_valid(self):
+        """Test the demo explorations."""
         # Show full failure messages for this test (both the system-generated
         # one and the developer-specified one).
         self.longMessage = True
@@ -70,11 +70,6 @@ class ExplorationDataUnitTests(test_utils.GenericTestBase):
             # exploration exists.
             exploration_yaml, unused_assets = (
                 exp_services.get_demo_exploration_components(data_path))
-            exploration_dict = utils.dict_from_yaml(exploration_yaml)
-            try:
-                exp_services.verify_exploration_dict(exploration_dict)
-            except Exception as e:
-                raise Exception('%s: %s' % (full_path, e))
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):

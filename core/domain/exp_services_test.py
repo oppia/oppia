@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
 import os
 import StringIO
 import zipfile
@@ -373,16 +374,25 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
 
-    def test_loading_and_deletion_of_some_demo_explorations(self):
-        """Test loading and deletion of some demo explorations."""
+    def test_loading_and_validation_and_deletion_of_demo_explorations(self):
+        """Test loading, validation and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)
 
-        # Load an exploration from yaml.
-        exp_services.load_demo('4')
-        self.assertEqual(exp_services.count_explorations(), 1)
-        # Load an exploration from a folder.
-        exp_services.load_demo('9')
-        self.assertEqual(exp_services.count_explorations(), 2)
+        for ind in range(len(feconf.DEMO_EXPLORATIONS)):
+            start_time = datetime.datetime.utcnow()
+
+            exp_id = str(ind)
+            exp_services.load_demo(exp_id)
+            exploration = exp_services.get_exploration_by_id(exp_id)
+            exploration.validate()
+
+            duration = datetime.datetime.utcnow() - start_time
+            processing_time = duration.seconds + duration.microseconds / 1E6
+            print 'Loaded and validated exploration %s (%.2f seconds)' % (
+                exploration.title, processing_time)
+
+        self.assertEqual(
+            exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))
 
         self.assertEqual(
             exp_services.get_exploration_by_id('4').title, u'¡Hola!')
@@ -390,17 +400,8 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
             exp_services.get_exploration_by_id('9').title,
             u'Project Euler Problem 1')
 
-        # Load more explorations.
-        exp_services.load_demo('0')
-        exp_services.load_demo('1')
-        exp_services.load_demo('2')
-        exp_services.load_demo('3')
-        exp_services.load_demo('5')
-        exp_services.load_demo('6')
-        exp_services.load_demo('7')
-        exp_services.load_demo('8')
-
-        exp_services.delete_demos()
+        for ind in range(len(feconf.DEMO_EXPLORATIONS)):
+            exp_services.delete_demo(str(ind))
         self.assertEqual(exp_services.count_explorations(), 0)
 
 
@@ -768,7 +769,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
 
         self.widget_handlers = {
-            "submit": [{
+            'submit': [{
                 'description': 'is equal to {{x|NonnegativeInt}}',
                 'definition': {
                     'rule_type': 'atomic',
@@ -782,8 +783,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }, {
                 'description': feconf.DEFAULT_RULE_NAME,
                 'definition': {
-                    'rule_type': rule_domain.DEFAULT_RULE_TYPE,
-                    'subject': 'answer'
+                    'rule_type': rule_domain.DEFAULT_RULE_TYPE
                 },
                 'dest': self.init_state_name,
                 'feedback': ['Incorrect', '<b>Wrong answer</b>'],
@@ -811,10 +811,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_update_invalid_param_changes(self):
-        """Check that updates cannot be made to non-existant parameters."""
+        """Check that updates cannot be made to non-existent parameters."""
         with self.assertRaisesRegexp(
-                Exception,
-                'No parameter named myParam exists in this exploration'):
+                utils.ValidationError,
+                r'The parameter myParam .* does not exist .*'):
             exp_services.update_exploration(
                 'fake@user.com', self.EXP_ID, None, None, None, None, {
                     self.init_state_name: {
@@ -829,7 +829,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.save_exploration('fake@user.com', exploration)
 
         self.param_changes[0]['generator_id'] = 'fake'
-        with self.assertRaisesRegexp(ValueError, 'Invalid generator id fake'):
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid generator id fake'):
             exp_services.update_exploration(
                 'fake@user.com', self.EXP_ID, None, None, None, None, {
                     self.init_state_name: {
@@ -855,6 +856,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             'fake@user.com', self.EXP_ID, None, None, None, None, {
                 self.init_state_name: {
+                    'widget_id': 'MultipleChoiceInput',
                     'widget_customization_args': {
                         'choices': {'value': ['Option A', 'Option B']}
                     }
@@ -896,8 +898,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_widget_sticky_type(self):
         """Test for error if widget_sticky is made non-Boolean."""
         with self.assertRaisesRegexp(
-                Exception,
-                'Expected widget_sticky to be a boolean, received 3'):
+                utils.ValidationError,
+                'Expected widget sticky flag to be a boolean, received 3'):
             exp_services.update_exploration(
                 'fake@user.com', self.EXP_ID, None, None, None, None, {
                     self.init_state_name: {'widget_sticky': 3}
@@ -937,7 +939,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that rule destination states cannot be non-existant."""
         self.widget_handlers['submit'][0]['dest'] = 'INVALID'
         with self.assertRaisesRegexp(
-                ValueError,
+                utils.ValidationError,
                 'The destination INVALID is not a valid state'):
             exp_services.update_exploration(
                 'fake@user.com', self.EXP_ID, None, None, None, None, {
@@ -960,25 +962,17 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }, None)
 
     def test_update_state_extra_keys(self):
-        """Test that all keys from rule definitions are recorded."""
+        """Test that extra keys in rule definitions are detected."""
         self.widget_handlers['submit'][0]['definition']['extra'] = 3
-        exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'widget_id': 'MultipleChoiceInput',
-                    'widget_handlers': self.widget_handlers
-                }
-            }, None)
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        rule_specs = exploration.init_state.widget.handlers[0].rule_specs
-        self.assertEqual(rule_specs[0].definition, {
-            'rule_type': 'atomic',
-            'name': 'Equals',
-            'inputs': {'x': 0},
-            'subject': 'answer',
-            'extra': 3
-        })
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'should conform to schema'):
+            exp_services.update_exploration(
+                'fake@user.com', self.EXP_ID, None, None, None, None, {
+                    self.init_state_name: {
+                        'widget_id': 'MultipleChoiceInput',
+                        'widget_handlers': self.widget_handlers
+                    }
+                }, None)
 
     def test_update_state_extra_default_rule(self):
         """Test that rules other than the last cannot be default."""

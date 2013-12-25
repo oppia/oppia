@@ -85,8 +85,8 @@ class Registry(object):
     def get_widget_by_id(cls, widget_type, widget_id):
         """Gets a widget instance by its type and id.
 
-        Refreshes once if the widget is not found; subsequently, throws an
-        error."""
+        Refreshes once if the widget is not found; subsequently, throws a
+        KeyError."""
         if widget_id not in cls.WIDGET_TYPE_MAPPING[widget_type][0]:
             cls.refresh()
         return cls.WIDGET_TYPE_MAPPING[widget_type][0][widget_id]

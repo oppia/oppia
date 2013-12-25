@@ -79,20 +79,25 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     if (!$scope.isValidEntityName(newStateName, true)) {
       return;
     }
+    if (newStateName.length > 50) {
+      warningsData.addWarning(
+        'State names should be at most 50 characters long.');
+      return;
+    }
     var latestStateNames = $scope.$parent.getLatestStateNames();
     if (newStateName != $scope.displayedStateName &&
         latestStateNames.hasOwnProperty(newStateName)) {
       warningsData.addWarning(
-          'The name \'' + newStateName + '\' is already in use.');
+        'The name \'' + newStateName + '\' is already in use.');
       return;
     }
 
     if ($scope.stateNameMemento !== newStateName) {
       $scope.addStateChange(
-          'state_name',
-          ['stateName', 'states.' + $scope.newStateName + '.name'],
-          newStateName,
-          $scope.stateNameMemento
+        'state_name',
+        ['stateName', 'states.' + $scope.newStateName + '.name'],
+        newStateName,
+        $scope.stateNameMemento
       );
       $scope.displayedStateName = newStateName;
     }

@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import feconf
 import re
+import utils
 
 from core.domain import obj_services
 from core.domain import value_generators_domain
@@ -28,10 +29,8 @@ from core.domain import value_generators_domain
 class ParamSpec(object):
     """Value object for an exploration parameter specification."""
     def __init__(self, obj_type):
-        # Ensure that this object class exists.
-        obj_services.Registry.get_object_class_by_type(obj_type)
-
         self.obj_type = obj_type
+        self.validate()
 
     def to_dict(self):
         return {
@@ -42,20 +41,15 @@ class ParamSpec(object):
     def from_dict(cls, param_spec_dict):
         return cls(param_spec_dict['obj_type'])
 
+    def validate(self):
+        # Ensure that this object class exists.
+        obj_services.Registry.get_object_class_by_type(self.obj_type)
+
 
 class ParamChange(object):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):
-        if not re.match(feconf.ALPHANUMERIC_REGEX, name):
-            raise ValueError(
-                'Only parameter names with characters in [a-zA-Z0-9] are '
-                'accepted.')
-
-        if not isinstance(customization_args, dict):
-            raise ValueError(
-                'Expected a dict of customization_args, received %s'
-                % customization_args)
 
         # TODO(sll): Check that all required args for customization exist in
         # customization_args.
@@ -63,16 +57,7 @@ class ParamChange(object):
         self._name = name
         self._generator_id = generator_id
         self._customization_args = customization_args
-
-        try:
-            self.generator
-        except KeyError:
-            raise ValueError('Invalid generator id %s' % generator_id)
-        except Exception:
-            raise ValueError('Generator %s is not a valid generator for '
-                             'exploration parameters. Valid generators must '
-                             'not require any initialization arguments.'
-                             % generator_id)
+        self.validate()
 
     @property
     def name(self):
@@ -111,3 +96,34 @@ class ParamChange(object):
         raw_value = self._get_value(context_params)
         return obj_services.Registry.get_object_class_by_type(
             obj_type).normalize(raw_value)
+
+    def validate(self):
+        if not isinstance(self.name, basestring):
+            raise utils.ValidationError(
+                'Expected param_change name to be a string, received %s'
+                % self.name)
+        if not re.match(feconf.ALPHANUMERIC_REGEX, self.name):
+            raise utils.ValidationError(
+                'Only parameter names with characters in [a-zA-Z0-9] are '
+                'accepted.')
+
+        try:
+            self.generator
+        except KeyError:
+            raise utils.ValidationError(
+                'Invalid generator id %s' % self._generator_id)
+        except Exception:
+            raise utils.ValidationError(
+                'Generator %s is not a valid generator for exploration '
+                'parameters. Valid generators must not require any '
+                'initialization arguments.' % self._generator_id)
+
+        if not isinstance(self.customization_args, dict):
+            raise utils.ValidationError(
+                'Expected a dict of customization_args, received %s'
+                % self.customization_args)
+        for arg_name in self.customization_args:
+            if not isinstance(arg_name, basestring):
+                raise Exception(
+                    'Invalid parameter change customization_arg name: %s'
+                    % arg_name)
