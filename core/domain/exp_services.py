@@ -38,7 +38,6 @@ from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import stats_domain
-from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import widget_registry
 from core.platform import models
@@ -46,7 +45,6 @@ import feconf
 import jinja_utils
 current_user_services = models.Registry.import_current_user_services()
 memcache_services = models.Registry.import_memcache_services()
-transaction_services = models.Registry.import_transaction_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
@@ -59,18 +57,13 @@ ALLOWED_CONTENT_TYPES = ['text']
 # The current version of the exploration schema. If any backward-incompatible
 # changes are made to the exploration schema in the YAML definitions, this
 # version number must be changed and a migration process put in place.
-CURRENT_EXPLORATION_SCHEMA_VERSION = 1
+CURRENT_EXPLORATION_SCHEMA_VERSION = 2
 
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id):
     """Returns a memcache key for an exploration."""
     return 'exploration:%s' % exploration_id
-
-
-def _get_state_memcache_key(exploration_id, state_id):
-    """Returns a memcache key for a state."""
-    return 'state:%s:%s' % (exploration_id, state_id)
 
 
 def get_exploration_by_id(exploration_id, strict=True):
@@ -89,26 +82,6 @@ def get_exploration_by_id(exploration_id, strict=True):
             memcache_services.set_multi({
                 exploration_memcache_key: exploration})
             return exploration
-        else:
-            return None
-
-
-def get_state_by_id(exploration_id, state_id, strict=True):
-    """Returns a domain object representing a state, given its id."""
-    # TODO(sll): Generalize this to handle multiple state_ids at a time.
-    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
-    memcached_state = memcache_services.get_multi(
-        [state_memcache_key]).get(state_memcache_key)
-
-    if memcached_state is not None:
-        return memcached_state
-    else:
-        state_model = exp_models.StateModel.get(
-            exploration_id, state_id, strict=strict)
-        if state_model:
-            state = exp_domain.State.from_dict(state_id, state_model.value)
-            memcache_services.set_multi({state_memcache_key: state})
-            return state
         else:
             return None
 
@@ -148,48 +121,24 @@ def count_explorations():
 
 
 # Methods for exporting states and explorations to other formats.
-def export_state_internals_to_dict(
-        exploration_id, state_id, human_readable_dests=False):
-    """Gets a Python dict of the internals of the state."""
-
-    state = get_state_by_id(exploration_id, state_id)
-    state_dict = copy.deepcopy(state.to_dict())
-
-    if human_readable_dests:
-        # Change the dest ids to human-readable names.
-        for handler in state_dict['widget']['handlers']:
-            for rule in handler['rule_specs']:
-                if rule['dest'] != feconf.END_DEST:
-                    dest_state = get_state_by_id(exploration_id, rule['dest'])
-                    rule['dest'] = dest_state.name
-    return state_dict
-
-
-def export_state_to_dict(exploration_id, state_id):
-    """Gets a Python dict representation of the state."""
-    state_dict = export_state_internals_to_dict(exploration_id, state_id)
-    state_dict.update({'id': state_id})
-    return state_dict
-
-
-def get_unresolved_answers_for_default_rule(exploration_id, state_id):
+def get_unresolved_answers_for_default_rule(exploration_id, state_name):
     """Gets the tally of unresolved answers that hit the default rule."""
     # TODO(sll): Add similar functionality for other rules? But then we have
     # to figure out what happens when those rules are edited/deleted.
     # TODO(sll): Should this return just the top N answers instead?
     return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_id, SUBMIT_HANDLER_NAME,
+        exploration_id, state_name, SUBMIT_HANDLER_NAME,
         exp_domain.DEFAULT_RULESPEC_STR).answers
 
 
-def export_state_to_verbose_dict(exploration_id, state_id):
+def export_state_to_verbose_dict(exploration_id, state_name):
     """Gets a state dict with rule descriptions and unresolved answers."""
     exploration = get_exploration_by_id(exploration_id)
 
-    state_dict = export_state_to_dict(exploration_id, state_id)
+    state_dict = exploration.states[state_name].to_dict()
 
     state_dict['unresolved_answers'] = get_unresolved_answers_for_default_rule(
-        exploration_id, state_id)
+        exploration_id, state_name)
 
     # TODO(sll): Fix the frontend and remove this line.
     state_dict['widget']['id'] = state_dict['widget']['widget_id']
@@ -250,11 +199,11 @@ def export_to_yaml(exploration_id):
 
     return utils.yaml_from_dict({
         'default_skin': exploration.default_skin,
+        'init_state_name': exploration.init_state_name,
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
-        'states': [export_state_internals_to_dict(
-            exploration_id, state_id, human_readable_dests=True)
-            for state_id in exploration.state_ids],
+        'states': {state_name: state.to_dict()
+                   for (state_name, state) in exploration.states.iteritems()},
         'schema_version': CURRENT_EXPLORATION_SCHEMA_VERSION
     })
 
@@ -299,90 +248,49 @@ def save_exploration(committer_id, exploration, commit_message=''):
         specified using names and not ids.
         """
         return {
+            'init_state_name': exploration.init_state_name,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
-            'states': [export_state_internals_to_dict(
-                exploration.id, state_id, human_readable_dests=True)
-                for state_id in exploration.state_ids]
+            'states': {
+                state_name: state.to_dict()
+                for (state_name, state) in exploration.states.iteritems()
+            }
         }
 
-    def _save_exploration_transaction(
-            committer_id, exploration, commit_message):
-        exploration_model = exp_models.ExplorationModel.get(exploration.id)
-        if exploration.version > exploration_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of exploration '
-                'from version %s. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
-        elif exploration.version < exploration_model.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
+    if exploration.version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+    elif exploration.version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
 
-        exploration_memcache_key = _get_exploration_memcache_key(
-            exploration.id)
-        memcache_services.delete(exploration_memcache_key)
+    properties_dict = {
+        'category': exploration.category,
+        'title': exploration.title,
+        'init_state_name': exploration.init_state_name,
+        'states': {
+            state_name: state.to_dict()
+            for (state_name, state) in exploration.states.iteritems()},
+        'param_specs': exploration.param_specs_dict,
+        'param_changes': exploration.param_change_dicts,
+        'default_skin': exploration.default_skin,
+        'version': exploration_model.version,
+    }
 
-        properties_dict = {
-            'category': exploration.category,
-            'title': exploration.title,
-            'state_ids': exploration.state_ids,
-            'param_specs': exploration.param_specs_dict,
-            'param_changes': exploration.param_change_dicts,
-            'default_skin': exploration.default_skin,
-            'version': exploration_model.version,
-        }
+    version_snapshot = feconf.NULL_SNAPSHOT
+    if rights_manager.is_exploration_public(exploration.id):
+        version_snapshot = export_to_versionable_dict(exploration)
+    exploration_model.put(
+        committer_id, properties_dict, version_snapshot, commit_message)
 
-        version_snapshot = feconf.NULL_SNAPSHOT
-
-        if rights_manager.is_exploration_public(exploration.id):
-            version_snapshot = export_to_versionable_dict(exploration)
-
-        # Create a snapshot for the version history.
-        exploration_model.put(
-            committer_id, properties_dict, version_snapshot, commit_message)
-
-    transaction_services.run_in_transaction(
-        _save_exploration_transaction, committer_id, exploration,
-        commit_message)
-
-
-def save_states(committer_id, exploration_id, states):
-    """Commits state domain objects to persistent storage.
-
-    It is the caller's responsibility to commit the exploration, if
-    appropriate. For safety, calls to save_states() should be in a transaction
-    with calls to save_exploration() (or with datastore operations on the
-    corresponding Explorations).
-    """
-    # TODO(sll): This should probably be refactored as follows: the exploration
-    # domain object would store a list that accumulates actions to perform
-    # when the exploration domain object is saved. This method would then not
-    # exist, so it cannot be called independently of save_exploration().
-    state_memcache_keys = [_get_state_memcache_key(exploration_id, state.id)
-                           for state in states]
-    memcache_services.delete_multi(state_memcache_keys)
-
-    for state in states:
-        state.validate()
-
-    def _save_states_transaction(committer_id, exploration_id, states):
-        state_ids = [state.id for state in states]
-        state_models = exp_models.StateModel.get_multi(
-            exploration_id, state_ids, strict=False)
-
-        for ind, state_model in enumerate(state_models):
-            # Craete a new state if it does not already exist.
-            if state_model is None:
-                state_models[ind] = exp_models.StateModel(
-                    id=states[ind].id, exploration_id=exploration_id)
-            state_models[ind].value = states[ind].to_dict()
-
-        exp_models.StateModel.put_multi(state_models)
-
-    transaction_services.run_in_transaction(
-        _save_states_transaction, committer_id, exploration_id, states)
+    exploration_memcache_key = _get_exploration_memcache_key(
+        exploration.id)
+    memcache_services.delete(exploration_memcache_key)
 
 
 def create_new(
@@ -393,14 +301,21 @@ def create_new(
     exploration_id = (exploration_id or
                       exp_models.ExplorationModel.get_new_id(title))
 
-    state_id = exp_models.StateModel.get_new_id(init_state_name)
-    new_state = exp_domain.State(
-        state_id, init_state_name, [exp_domain.Content('text', '')], [], None)
-    save_states(user_id, exploration_id, [new_state])
+    init_widget = exp_domain.WidgetInstance.create_default_widget(
+        init_state_name)
+    init_state = exp_domain.State(
+        [exp_domain.Content('text', '')], [], init_widget)
 
     exploration_model = exp_models.ExplorationModel(
         id=exploration_id, title=title, category=category,
-        state_ids=[state_id])
+        init_state_name=init_state_name,
+        states={
+            init_state_name: init_state.to_dict()
+        }
+    )
+
+    exp_domain.Exploration(exploration_model).validate()
+
     exploration_model.put(user_id, {})
 
     exploration_rights = rights_manager.ExplorationRights(
@@ -408,27 +323,6 @@ def create_new(
     rights_manager.save_exploration_rights(exploration_rights)
 
     return exploration_id
-
-
-def delete_state_model(exploration_id, state_id, force_deletion=False):
-    """Marks a state model as deleted and removes it from memcache.
-
-    IMPORTANT: Callers of this function should ensure that committer_id has
-    permissions to delete this state, prior to calling this function.
-
-    If force_deletion is True the state is fully deleted and is unrecoverable.
-    Otherwise, the state is marked as deleted, but the corresponding model is
-    still retained in the datastore. This latter option is the preferred one.
-    """
-    state_model = exp_models.StateModel.get(exploration_id, state_id)
-    if force_deletion:
-        state_model.delete()
-    else:
-        state_model.deleted = True
-        state_model.put()
-
-    state_memcache_key = _get_state_memcache_key(exploration_id, state_id)
-    memcache_services.delete(state_memcache_key)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -442,16 +336,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     marked as deleted, but the corresponding models are still retained in the
     datastore. This last option is the preferred one.
     """
-    exploration = get_exploration_by_id(exploration_id)
-
     # This must come after the exploration is retrieved. Otherwise the memcache
     # key will be reinstated.
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
-
-    for state_id in exploration.state_ids:
-        delete_state_model(
-            exploration_id, state_id, force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
     if force_deletion:
@@ -491,10 +379,10 @@ def get_init_params(exploration_id):
     return new_params
 
 
-def update_with_state_params(exploration_id, state_id, reader_params):
+def update_with_state_params(exploration_id, state_name, reader_params):
     """Updates a reader's params using the params for the given state."""
     exploration = get_exploration_by_id(exploration_id)
-    state = get_state_by_id(exploration_id, state_id)
+    state = exploration.states[state_name]
     new_params = copy.deepcopy(reader_params)
 
     # Note that the list of parameter changes is ordered. Parameter changes
@@ -526,58 +414,23 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
     current_version = exploration.version
     version_nums = range(current_version, oldest_version - 1, -1)
 
-    return [exp_models.ExplorationSnapshotModel.get_metadata(
+    snapshots_metadata = [exp_models.ExplorationSnapshotModel.get_metadata(
         exploration_id, version_num
     ) for version_num in version_nums]
+    return snapshots_metadata
 
 
 # Operations on states belonging to an exploration.
-def add_states(committer_id, exploration_id, state_names):
-    """Adds multiple states at a time. Commits changes.
-
-    Returns the corresponding list of state_ids.
-    """
-    exploration = get_exploration_by_id(exploration_id)
-    for state_name in state_names:
-        if exploration.has_state_named(state_name):
-            raise ValueError('Duplicate state name %s' % state_name)
-
-    state_ids = [
-        exp_models.StateModel.get_new_id(name) for name in state_names]
-    new_states = []
-    for ind, state_id in enumerate(state_ids):
-        new_states.append(exp_domain.State(
-            state_id, state_names[ind], [exp_domain.Content('text', '')],
-            [], None))
-
-    def _add_states_transaction(committer_id, exploration_id, new_states):
-        exploration_memcache_key = _get_exploration_memcache_key(
-            exploration_id)
-        memcache_services.delete(exploration_memcache_key)
-
-        save_states(committer_id, exploration_id, new_states)
-        exploration = get_exploration_by_id(exploration_id)
-        exploration.state_ids += state_ids
-
-        state_names = [state.name for state in new_states]
-        commit_message = 'Added new state(s): %s' % ', '.join(state_names)
-        save_exploration(committer_id, exploration, commit_message)
-
-    transaction_services.run_in_transaction(
-        _add_states_transaction, committer_id, exploration_id, new_states)
-
-    return state_ids
-
-
-def _update_state(exploration_id, state_id, new_state_name,
+def _update_state(exploration, state_name,
                   param_changes, widget_id, widget_customization_args,
                   widget_handlers, widget_sticky, content):
-    """Updates the given state and returns it. Does not commit changes.
+    """Updates the given state in the exploration and returns the exploration.
+
+    Does not commit changes.
 
     Args:
-    - exploration_id: str. The id of the exploration.
-    - state_id: str. The id of the state being updated.
-    - new_state_name: str or None. If present, the new name for the state.
+    - exploration_id: str. The exploration domain object.
+    - state_name: str. The name of the state being updated.
     - param_changes: list of dicts with keys ('name', 'generator_id',
         'customization_args'), or None. If present, represents parameter
         changes that should be applied when a reader enters the state.
@@ -601,14 +454,7 @@ def _update_state(exploration_id, state_id, new_state_name,
     """
     # TODO(sll): Add more documentation for widget_handlers, above.
 
-    exploration = get_exploration_by_id(exploration_id)
-    state = get_state_by_id(exploration_id, state_id)
-
-    if new_state_name:
-        if (state.name != new_state_name and
-                exploration.has_state_named(new_state_name)):
-            raise ValueError('Duplicate state name: %s' % new_state_name)
-        state.name = new_state_name
+    state = exploration.states[state_name]
 
     if param_changes:
         if not isinstance(param_changes, list):
@@ -687,9 +533,9 @@ def _update_state(exploration_id, state_id, new_state_name,
                     % rule['feedback'])
 
             if rule.get('dest') not in (
-                    [feconf.END_DEST] + exploration.state_ids):
+                    exploration.states.keys() + [feconf.END_DEST]):
                 raise ValueError(
-                    'The destination %s is not a valid state id'
+                    'The destination %s is not a valid state'
                     % rule.get('dest'))
 
             state_rule = exp_domain.RuleSpec(
@@ -768,7 +614,7 @@ def _update_state(exploration_id, state_id, new_state_name,
         state.content = [exp_domain.Content(
             content[0]['type'], html_cleaner.clean(content[0]['value']))]
 
-    return state
+    return exploration
 
 
 def update_exploration(
@@ -824,10 +670,8 @@ def update_exploration(
             for param_change in param_changes
         ]
 
-    modified_states = []
     if states:
-        for (state_id, state_data) in states.iteritems():
-            state_name = state_data.get('state_name')
+        for (state_name, state_data) in states.iteritems():
             param_changes = state_data.get('param_changes')
             widget_id = state_data.get('widget_id')
             widget_customization_args = state_data.get(
@@ -836,72 +680,57 @@ def update_exploration(
             widget_sticky = state_data.get('widget_sticky')
             content = state_data.get('content')
 
-            modified_state = _update_state(
-                exploration_id, state_id, state_name, param_changes, widget_id,
+            if state_name not in exploration.states:
+                exploration.add_states([state_name])
+
+            exploration = _update_state(
+                exploration, state_name, param_changes, widget_id,
                 widget_customization_args, widget_handlers, widget_sticky,
                 content
             )
 
-            modified_states.append(modified_state)
+            if 'state_name' in state_data:
+                # Rename this state.
+                exploration.rename_state(state_name, state_data['state_name'])
 
-    def _update_exploration_transaction(
-            committer_id, exploration, states, commit_message):
-        save_states(committer_id, exploration.id, states)
-        save_exploration(committer_id, exploration, commit_message)
-
-    transaction_services.run_in_transaction(
-        _update_exploration_transaction, committer_id, exploration,
-        modified_states, commit_message)
+    save_exploration(committer_id, exploration, commit_message)
 
 
-def delete_state(committer_id, exploration_id, state_id):
+def delete_state(committer_id, exploration_id, state_name):
     """Deletes the given state. Commits changes."""
     exploration = get_exploration_by_id(exploration_id)
-    if state_id not in exploration.state_ids:
-        raise ValueError('Invalid state id %s for exploration %s' %
-                         (state_id, exploration.id))
+    if state_name not in exploration.states:
+        raise ValueError('Invalid state name %s for exploration %s' %
+                         (state_name, exploration.id))
 
     # Do not allow deletion of initial states.
-    if exploration.state_ids[0] == state_id:
+    if exploration.init_state_name == state_name:
         raise ValueError('Cannot delete initial state of an exploration.')
 
-    def _delete_state_transaction(committer_id, exploration_id, state_id):
-        exploration = get_exploration_by_id(exploration_id)
+    # Find all destinations in the exploration which equal the deleted
+    # state, and change them to loop back to their containing state.
+    for other_state_name in exploration.states:
+        other_state = exploration.states[other_state_name]
+        for handler in other_state.widget.handlers:
+            for rule in handler.rule_specs:
+                if rule.dest == state_name:
+                    rule.dest = other_state_name
 
-        # Find all destinations in the exploration which equal the deleted
-        # state, and change them to loop back to their containing state.
-        for other_state_id in exploration.state_ids:
-            other_state = get_state_by_id(exploration_id, other_state_id)
-            changed = False
-            for handler in other_state.widget.handlers:
-                for rule in handler.rule_specs:
-                    if rule.dest == state_id:
-                        rule.dest = other_state_id
-                        changed = True
-            if changed:
-                save_states(committer_id, exploration_id, [other_state])
+    # Delete the state with name state_name.
+    del exploration.states[state_name]
 
-        state_name = get_state_by_id(exploration_id, state_id).name
-
-        # Delete the state with id state_id.
-        exploration_memcache_key = _get_exploration_memcache_key(
-            exploration_id)
-        memcache_services.delete(exploration_memcache_key)
-
-        delete_state_model(exploration_id, state_id)
-        exploration.state_ids.remove(state_id)
-        save_exploration(
-            committer_id, exploration, 'Deleted state: %s' % state_name)
-
-    transaction_services.run_in_transaction(
-        _delete_state_transaction, committer_id, exploration_id, state_id)
+    exploration_memcache_key = _get_exploration_memcache_key(
+        exploration_id)
+    memcache_services.delete(exploration_memcache_key)
+    save_exploration(
+        committer_id, exploration, 'Deleted state: %s' % state_name)
 
 
-def classify(exploration_id, state_id, handler_name, answer, params):
+def classify(exploration_id, state_name, handler_name, answer, params):
     """Return the first rule that is satisfied by a reader's answer."""
 
     exploration = get_exploration_by_id(exploration_id)
-    state = get_state_by_id(exploration_id, state_id)
+    state = exploration.states[state_name]
 
     # Get the widget to determine the input type.
     generic_handler = widget_registry.Registry.get_widget_by_id(
@@ -926,6 +755,20 @@ def classify(exploration_id, state_id, handler_name, answer, params):
 
 
 # Creation and deletion methods.
+def convert_v1_dict_to_v2_dict(exploration_dict):
+    """Converts a v1 exploration dict into a v2 exploration dict."""
+    exploration_dict['schema_version'] = 2
+    exploration_dict['init_state_name'] = exploration_dict['states'][0]['name']
+
+    states_dict = {}
+    for state in exploration_dict['states']:
+        states_dict[state['name']] = state
+        del states_dict[state['name']]['name']
+    exploration_dict['states'] = states_dict
+
+    return exploration_dict
+
+
 def create_from_yaml(
         yaml_content, user_id, title, category, exploration_id=None,
         cloned_from=None):
@@ -933,20 +776,19 @@ def create_from_yaml(
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
     exploration_schema_version = exploration_dict.get('schema_version')
+    if not (1 <= exploration_schema_version
+            <= CURRENT_EXPLORATION_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1 and v2 YAML files at present.')
+    if exploration_schema_version == 1:
+        exploration_dict = convert_v1_dict_to_v2_dict(exploration_dict)
 
-    if exploration_schema_version != CURRENT_EXPLORATION_SCHEMA_VERSION:
-        raise Exception('Sorry, we can only process v1 YAML files at present.')
-
-    state_names_to_ids = {}
-
-    init_state_name = exploration_dict['states'][0]['name']
-
+    init_state_name = exploration_dict['init_state_name']
     exploration_id = create_new(
         user_id, title, category, exploration_id=exploration_id,
         init_state_name=init_state_name, cloned_from=cloned_from)
 
     exploration = get_exploration_by_id(exploration_id)
-    state_names_to_ids[init_state_name] = exploration.state_ids[0]
 
     try:
         exploration_param_specs = {
@@ -954,20 +796,12 @@ def create_from_yaml(
             (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
         }
 
-        other_state_names = [
-            sdict['name'] for sdict in exploration_dict['states']
-            if sdict['name'] != init_state_name]
-        other_state_ids = add_states(
-            user_id, exploration_id, other_state_names)
+        exploration.add_states([
+            state_name for state_name in exploration_dict['states']
+            if state_name != init_state_name])
 
-        for ind, other_state_id in enumerate(other_state_ids):
-            state_names_to_ids[other_state_names[ind]] = other_state_id
-
-        all_states = []
-
-        for sdict in exploration_dict['states']:
-            state = get_state_by_id(
-                exploration_id, state_names_to_ids[sdict['name']])
+        for (state_name, sdict) in exploration_dict['states'].iteritems():
+            state = exploration.states[state_name]
 
             state.content = [
                 exp_domain.Content(
@@ -990,10 +824,7 @@ def create_from_yaml(
                 'name': handler['name'],
                 'rule_specs': [{
                     'definition': rule_spec['definition'],
-                    'dest': (
-                        feconf.END_DEST if rule_spec['dest'] == feconf.END_DEST
-                        else state_names_to_ids[rule_spec['dest']]
-                    ),
+                    'dest': rule_spec['dest'],
                     'feedback': [html_cleaner.clean(feedback)
                                  for feedback in rule_spec['feedback']],
                     'param_changes': rule_spec.get('param_changes', []),
@@ -1004,11 +835,8 @@ def create_from_yaml(
                 wdict['widget_id'], wdict['customization_args'],
                 widget_handlers, wdict['sticky'])
 
-            all_states.append(state)
+            exploration.states[state_name] = state
 
-        save_states(user_id, exploration_id, all_states)
-
-        exploration = get_exploration_by_id(exploration_id)
         exploration.default_skin = exploration_dict['default_skin']
         exploration.param_changes = [param_domain.ParamChange(
             pc['name'], pc['generator_id'], pc['customization_args']

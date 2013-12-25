@@ -22,7 +22,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.$on('guiTabSelected', function(event, stateData) {
-    $scope.stateName = stateData.name;
+    $scope.stateName = $scope.stateId;
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 

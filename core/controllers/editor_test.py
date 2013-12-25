@@ -70,8 +70,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         self.assertDictContainsSubset({'version': 1}, response_dict)
         self.assertTrue('stateData' in response_dict)
-        self.assertDictContainsSubset(
-            {'name': 'New valid state name'}, response_dict['stateData'])
+        self.assertEqual(response_dict['stateName'], 'New valid state name')
 
         self.logout()
 
@@ -132,17 +131,17 @@ class EditorTest(test_utils.GenericTestBase):
         exploration_dict = self.get_json('/learnhandler/init/0')
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
-        state_id = exploration_dict['state_id']
+        state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_id, {
+            '/learnhandler/transition/0/%s' % state_name, {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
 
-        state_id = exploration_dict['state_id']
+        state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_id, {
+            '/learnhandler/transition/0/%s' % state_name, {
                 'answer': 'blah', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
@@ -150,7 +149,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         for _ in range(2):
             exploration_dict = self.post_json(
-                '/learnhandler/transition/0/%s' % state_id,
+                '/learnhandler/transition/0/%s' % state_name,
                 {
                     'answer': 'blah2', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
@@ -159,7 +158,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         for _ in range(3):
             exploration_dict = self.post_json(
-                '/learnhandler/transition/0/%s' % state_id,
+                '/learnhandler/transition/0/%s' % state_name,
                 {
                     'answer': 'blah3', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
@@ -172,11 +171,11 @@ class EditorTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/createhandler/resolved_answers/0/%s' % state_id)
+        url = str('/createhandler/resolved_answers/0/%s' % state_name)
 
         def _get_unresolved_answers():
             return exp_services.get_unresolved_answers_for_default_rule(
-                '0', state_id)
+                '0', state_name)
 
         self.assertEqual(
             _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})
@@ -237,15 +236,15 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         exploration_dict = self.get_json('/learnhandler/init/0')
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
-        state_id = exploration_dict['state_id']
+        state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_id, {
+            '/learnhandler/transition/0/%s' % state_name, {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
-        state_id = exploration_dict['state_id']
-        self.post_json('/learnhandler/transition/0/%s' % state_id, {
+        state_name = exploration_dict['state_name']
+        self.post_json('/learnhandler/transition/0/%s' % state_name, {
             'answer': 'blah', 'block_number': 0, 'handler': 'submit',
             'state_history': exploration_dict['state_history']
         })

@@ -77,7 +77,7 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
 
 # Register the URL with the responsible classes
 urls = [
-    webapp2.Route(r'/', pages.SplashPage, name="home"),
+    webapp2.Route(r'/', pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/feedback', pages.FeedbackPage, 'feedback_page'),
@@ -119,10 +119,10 @@ urls = [
         r'/learnhandler/init/<exploration_id>', reader.ExplorationHandler,
         'exploration_handler'),
     get_redirect_route(
-        r'/learnhandler/transition/<exploration_id>/<state_id>',
+        r'/learnhandler/transition/<exploration_id>/<escaped_state_name>',
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
-        r'/learnhandler/give_feedback/<exploration_id>/<state_id>',
+        r'/learnhandler/give_feedback/<exploration_id>/<escaped_state_name>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(
@@ -132,7 +132,7 @@ urls = [
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
     get_redirect_route(
-        r'/createhandler/delete_state/<exploration_id>/<state_id>',
+        r'/createhandler/delete_state/<exploration_id>/<escaped_state_name>',
         editor.DeleteStateHandler, 'delete_state_handler'),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
@@ -141,10 +141,10 @@ urls = [
         r'/createhandler/imageupload/<exploration_id>', editor.ImageUploadHandler,
         'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<state_id>',
+        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_feedback/<exploration_id>/<state_id>',
+        r'/createhandler/resolved_feedback/<exploration_id>/<escaped_state_name>',
         editor.ResolvedFeedbackHandler, 'resolved_feedback_handler'),
     get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
@@ -159,7 +159,7 @@ urls = [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<state_id>',
+        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
 
     get_redirect_route(

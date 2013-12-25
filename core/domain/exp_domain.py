@@ -22,10 +22,10 @@ should therefore be independent of the specific storage models used."""
 
 __author__ = 'Sean Lip'
 
+import copy
 import re
 
 from core.domain import param_domain
-from core.domain import rights_manager
 from core.domain import rule_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
@@ -125,8 +125,8 @@ class RuleSpec(object):
             return '%s(%s)' % (self.definition['name'], ','.join(param_list))
 
     @classmethod
-    def get_default_rule_spec(cls, state_id):
-        return RuleSpec({'rule_type': 'default'}, state_id, [], [])
+    def get_default_rule_spec(cls, state_name):
+        return RuleSpec({'rule_type': 'default'}, state_name, [], [])
 
 
 DEFAULT_RULESPEC = RuleSpec.get_default_rule_spec(feconf.END_DEST)
@@ -169,8 +169,8 @@ class AnswerHandlerInstance(object):
         return self.rule_specs[-1]
 
     @classmethod
-    def get_default_handler(cls, state_id):
-        return cls('submit', [RuleSpec.get_default_rule_spec(state_id)])
+    def get_default_handler(cls, state_name):
+        return cls('submit', [RuleSpec.get_default_rule_spec(state_name)])
 
 
 class WidgetInstance(object):
@@ -214,33 +214,20 @@ class WidgetInstance(object):
         self.sticky = sticky
 
     @classmethod
-    def create_default_widget(cls, state_id):
+    def create_default_widget(cls, state_name):
         return cls(feconf.DEFAULT_WIDGET_ID, {},
-                   [AnswerHandlerInstance.get_default_handler(state_id)])
+                   [AnswerHandlerInstance.get_default_handler(state_name)])
 
 
 class State(object):
     """Domain object for a state."""
 
-    @classmethod
-    def require_valid_state_name(cls, name):
-        for c in feconf.INVALID_NAME_CHARS:
-            if c in name:
-                raise utils.ValidationError(
-                    'Invalid character %s in state name %s' % (c, name))
-
-        if name == feconf.END_DEST:
-            raise utils.ValidationError(
-                'Invalid state name: %s' % feconf.END_DEST)
-
     def validate(self):
-        State.require_valid_state_name(self.name)
-
-        # TODO(sll): Add more validation.
+        # TODO(sll): Add validation.
+        pass
 
     def to_dict(self):
         return {
-            'name': self.name,
             'content': [item.to_dict() for item in self.content],
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
@@ -248,26 +235,17 @@ class State(object):
         }
 
     @classmethod
-    def from_dict(cls, state_id, state_dict):
-        if state_dict['widget']:
-            widget = WidgetInstance.from_dict(state_dict['widget'])
-        else:
-            widget = WidgetInstance.create_default_widget(state_id)
+    def from_dict(cls, state_dict):
+        widget = WidgetInstance.from_dict(state_dict['widget'])
 
         return cls(
-            state_id,
-            state_dict.get('name', feconf.DEFAULT_STATE_NAME),
             [Content.from_dict(item) for item in state_dict['content']],
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             widget
         )
 
-    def __init__(self, id, name, content, param_changes, widget):
-        # Id of the state.
-        self.id = id
-        # Human-readable name for the state.
-        self.name = name or feconf.DEFAULT_STATE_NAME
+    def __init__(self, content, param_changes, widget):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
@@ -275,23 +253,33 @@ class State(object):
             param_change.name, param_change.generator.id,
             param_change.customization_args)
             for param_change in param_changes]
-        # The interactive widget instance associated with this state. Set to be
-        # the default widget if not explicitly specified by the caller.
-        if widget is None:
-            self.widget = WidgetInstance.create_default_widget(self.id)
-        else:
-            self.widget = WidgetInstance(
-                widget.widget_id, widget.customization_args, widget.handlers,
-                widget.sticky)
+        # The interactive widget instance associated with this state.
+        self.widget = WidgetInstance(
+            widget.widget_id, widget.customization_args, widget.handlers,
+            widget.sticky)
+
+    @classmethod
+    def create_default_state(cls, default_dest_state_name):
+        return cls(
+            [Content('text', '')], [],
+            WidgetInstance.create_default_widget(default_dest_state_name))
 
 
 class Exploration(object):
     """Domain object for an Oppia exploration."""
+
     def __init__(self, exploration_model):
+        # TODO(sll): Change this to take in parameters, rather than the whole
+        # model.
         self.id = exploration_model.id
         self.category = exploration_model.category
         self.title = exploration_model.title
-        self.state_ids = exploration_model.state_ids
+        self.init_state_name = exploration_model.init_state_name
+
+        self.states = {}
+        for (state_name, state_dict) in exploration_model.states.iteritems():
+            self.states[state_name] = State.from_dict(state_dict)
+
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
             for (ps_name, ps_val) in exploration_model.param_specs.iteritems()
@@ -302,23 +290,27 @@ class Exploration(object):
         self.default_skin = exploration_model.default_skin
         self.version = exploration_model.version
 
+    @classmethod
+    def _require_valid_state_name(cls, name):
+        # This check is needed because state names are used in URLs and as ids
+        # for statistics, so the name length should be bounded above.
+        if len(name) > 50:
+            raise utils.ValidationError(
+                'State name should have a length of at most 50 characters.')
+
+        for c in feconf.INVALID_NAME_CHARS:
+            if c in name:
+                raise utils.ValidationError(
+                    'Invalid character %s in state name %s' % (c, name))
+
+        if name == feconf.END_DEST:
+            raise utils.ValidationError(
+                'Invalid state name: %s' % feconf.END_DEST)
+
     def validate(self):
         """Validates the exploration before it is committed to storage."""
-        if not self.state_ids:
-            raise utils.ValidationError('This exploration has no states.')
-
-        # TODO(sll): Check that the template path pointed to by default_skin
-        # exists.
-
-        # TODO(sll): We may not need this once appropriate tests are in
-        # place and all state deletion operations are guarded against. Then
-        # we can remove it if speed becomes an issue.
-        for state_id in self.state_ids:
-            # This raises an exception if the state_id does not exist.
-            try:
-                exp_models.StateModel.get(self.id, state_id)
-            except base_models.BaseModel.EntityNotFoundError:
-                raise utils.ValidationError('Invalid state_id %s' % state_id)
+        if not self.title:
+            raise utils.ValidationError('This exploration has no title.')
 
         for c in feconf.INVALID_NAME_CHARS:
             if c in self.title:
@@ -326,24 +318,57 @@ class Exploration(object):
                     'Invalid character %s in exploration title %s'
                     % (c, self.title))
 
+        if not self.category:
+            raise utils.ValidationError('This exploration has no category.')
+
+        if not self.init_state_name:
+            raise utils.ValidationError(
+                'This exploration has no initial state name specified.')
+
+        if not self.states:
+            raise utils.ValidationError('This exploration has no states.')
+
+        if not isinstance(self.states, dict):
+            raise utils.ValidationError(
+                'Expected states to be a dict, received %s' % self.states)
+
+        for state_name in self.states:
+            self._require_valid_state_name(state_name)
+            self.states[state_name].validate()
+
+        if self.init_state_name not in self.states:
+            raise utils.ValidationError(
+                'There is no state corresponding to the exploration\'s '
+                'initial state name.')
+
+        # TODO(sll): Check that the template path pointed to by default_skin
+        # exists.
+
+        if not isinstance(self.param_specs, dict):
+            raise utils.ValidationError(
+                'Expected param_specs to be a dict, received %s'
+                % self.param_specs)
+
         for param_name in self.param_specs:
+            if not isinstance(param_name, basestring):
+                raise utils.ValidationError(
+                    'Expected parameter name to be a string, received %s (%s).'
+                    % param_name, type(param_name))
             if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
-                raise ValueError(
+                raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
                     'accepted.')
+            if not isinstance(
+                    self.param_specs[param_name], param_domain.ParamSpec):
+                raise utils.ValidationError(
+                    'Expected a ParamSpec, received %s'
+                    % self.param_specs[param_name])
 
-    # Derived attributes of an exploration.
-    @property
-    def init_state_id(self):
-        """The id of the starting state of this exploration."""
-        return self.state_ids[0]
-
+    # Derived attributes of an exploration
     @property
     def init_state(self):
         """The state which forms the start of this exploration."""
-        return State.from_dict(
-            self.init_state_id, exp_models.StateModel.get(
-                self.id, self.init_state_id).value)
+        return self.states[self.init_state_name]
 
     @property
     def param_specs_dict(self):
@@ -370,22 +395,39 @@ class Exploration(object):
         return self.id.isdigit() and (
             0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
 
-    # Methods relating to owners and editors.
-    def is_editable_by(self, user_id):
-        """Whether the given user has rights to edit this exploration."""
-        return rights_manager.Actor(user_id).can_edit(self.id)
+    # Methods relating to states.
+    def add_states(self, state_names):
+        """Adds multiple states to the exploration."""
+        for state_name in state_names:
+            if state_name in self.states:
+                raise ValueError('Duplicate state name %s' % state_name)
 
-    # Methods relating to states comprising this exploration.
-    def has_state_named(self, state_name):
-        """Whether the exploration contains a state with the given name."""
-        # TODO(sll): Do a projection query here to get just the state names.
-        # For this to work, though, the state name needs to be stored in a
-        # separate model field.
-        state_models = exp_models.StateModel.get_multi(self.id, self.state_ids)
+        for state_name in state_names:
+            self.states[state_name] = State.create_default_state(state_name)
 
-        for (ind, state_model) in enumerate(state_models):
-            state = State.from_dict(self.state_ids[ind], state_model.value)
-            if state.name == state_name:
-                return True
+    def rename_state(self, old_state_name, new_state_name):
+        """Renames the given state."""
+        if (old_state_name != new_state_name and
+                new_state_name in self.states):
+            raise ValueError('Duplicate state name: %s' % new_state_name)
 
-        return False
+        if old_state_name == new_state_name:
+            return
+
+        self._require_valid_state_name(new_state_name)
+
+        if self.init_state_name == old_state_name:
+            self.init_state_name = new_state_name
+
+        self.states[new_state_name] = copy.deepcopy(
+            self.states[old_state_name])
+        del self.states[old_state_name]
+
+        # Find all destinations in the exploration which equal the renamed
+        # state, and change the name appropriately.
+        for other_state_name in self.states:
+            other_state = self.states[other_state_name]
+            for handler in other_state.widget.handlers:
+                for rule in handler.rule_specs:
+                    if rule.dest == old_state_name:
+                        rule.dest = new_state_name

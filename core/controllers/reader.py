@@ -89,7 +89,7 @@ class ExplorationHandler(base.BaseHandler):
         init_params = exp_services.get_init_params(exploration_id)
         reader_params = exp_services.update_with_state_params(
             exploration_id,
-            exploration.init_state_id,
+            exploration.init_state_name,
             reader_params=init_params
         )
 
@@ -107,14 +107,14 @@ class ExplorationHandler(base.BaseHandler):
             'interactive_html': interactive_html,
             'oppia_html': init_html,
             'params': reader_params,
-            'state_history': [exploration.init_state_id],
-            'state_id': exploration.init_state_id,
+            'state_history': [exploration.init_state_name],
+            'state_name': exploration.init_state_name,
             'title': exploration.title,
         })
         self.render_json(self.values)
 
         stats_services.EventHandler.record_state_hit(
-            exploration_id, exploration.init_state_id, True)
+            exploration_id, exploration.init_state_name, True)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -123,7 +123,7 @@ class FeedbackHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_id,
+            self, old_state, answer, exploration_id, old_state_name,
             old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_registry.Registry.get_widget_by_id(
@@ -134,7 +134,7 @@ class FeedbackHandler(base.BaseHandler):
             old_state.widget.customization_args, old_params, answer)
 
         stats_services.EventHandler.record_answer_submitted(
-            exploration_id, old_state_id, handler, str(rule), recorded_answer)
+            exploration_id, old_state_name, handler, str(rule), recorded_answer)
 
     def _get_feedback(self, exploration_id, feedback, params):
         """Gets the HTML with Oppia's feedback."""
@@ -148,14 +148,15 @@ class FeedbackHandler(base.BaseHandler):
                 params)
 
     def _append_content(self, exploration_id, sticky, finished, old_params,
-                        new_state, state_has_changed, html_output):
+                        new_state, new_state_name, state_has_changed,
+                        html_output):
         """Appends content for the new state to the output variables."""
         if finished:
             return {}, html_output, ''
         else:
             # Populate new parameters.
             new_params = exp_services.update_with_state_params(
-                exploration_id, new_state.id, reader_params=old_params)
+                exploration_id, new_state_name, reader_params=old_params)
 
             if state_has_changed:
                 # Append the content for the new state.
@@ -175,11 +176,14 @@ class FeedbackHandler(base.BaseHandler):
 
             return (new_params, html_output, interactive_html)
 
-    def post(self, exploration_id, state_id):
+    def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
+        old_state_name = self.unescape_state_name(escaped_state_name)
+
         values = {}
 
-        old_state = exp_services.get_state_by_id(exploration_id, state_id)
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        old_state = exploration.states[old_state_name]
 
         # The reader's answer.
         answer = self.payload.get('answer')
@@ -194,16 +198,17 @@ class FeedbackHandler(base.BaseHandler):
         state_history = self.payload['state_history']
 
         rule = exp_services.classify(
-            exploration_id, state_id, handler, answer, old_params)
+            exploration_id, old_state_name, handler, answer, old_params)
         feedback = rule.get_feedback_string()
-        new_state_id = rule.dest
+        new_state_name = rule.dest
         new_state = (
-            None if new_state_id == feconf.END_DEST
-            else exp_services.get_state_by_id(exploration_id, new_state_id))
+            None if new_state_name == feconf.END_DEST
+            else exploration.states[new_state_name])
 
         stats_services.EventHandler.record_state_hit(
-            exploration_id, new_state_id, (new_state_id not in state_history))
-        state_history.append(new_state_id)
+            exploration_id, new_state_name,
+            (new_state_name not in state_history))
+        state_history.append(new_state_name)
 
         # If the new state widget is the same as the old state widget, and the
         # new state widget is sticky, do not render the reader response. The
@@ -214,13 +219,13 @@ class FeedbackHandler(base.BaseHandler):
         # case we should call a frontend method named appendFeedback() or
         # similar.
         sticky = (
-            new_state_id != feconf.END_DEST and
+            new_state_name != feconf.END_DEST and
             new_state.widget.sticky and
             new_state.widget.widget_id == old_state.widget.widget_id
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, state_id, old_params,
+            old_state, answer, exploration_id, old_state_name, old_params,
             handler, rule)
 
         # Append the reader's answer to the response HTML.
@@ -240,17 +245,17 @@ class FeedbackHandler(base.BaseHandler):
         html_output = self._get_feedback(exploration_id, feedback, old_params)
 
         # Add the content for the new state to the response HTML.
-        finished = (new_state_id == feconf.END_DEST)
-        state_has_changed = (old_state.id != new_state_id)
+        finished = (new_state_name == feconf.END_DEST)
+        state_has_changed = (old_state_name != new_state_name)
         new_params, html_output, interactive_html = (
             self._append_content(
                 exploration_id, sticky, finished, old_params, new_state,
-                state_has_changed, html_output))
+                new_state_name, state_has_changed, html_output))
 
         values.update({
             'interactive_html': interactive_html,
             'exploration_id': exploration_id,
-            'state_id': new_state_id,
+            'state_name': new_state_name,
             'oppia_html': html_output,
             'block_number': block_number,
             'params': new_params,
@@ -266,12 +271,13 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def post(self, exploration_id, state_id):
+    def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
+        state_name = self.unescape_state_name(escaped_state_name)
 
         feedback = self.payload.get('feedback')
         state_history = self.payload.get('state_history')
         # TODO(sll): Add the reader's history log here.
         stats_services.EventHandler.record_state_feedback_from_reader(
-            exploration_id, state_id, feedback,
+            exploration_id, state_name, feedback,
             {'state_history': state_history})

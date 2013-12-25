@@ -19,37 +19,27 @@ __author__ = 'Sean Lip'
 import test_utils
 
 from core.domain import exp_domain
-from core.domain import exp_services
 import utils
 
 
 class FakeExploration(exp_domain.Exploration):
     """Allows dummy explorations to be created and commited."""
 
-    def __init__(self, exp_id='fake_exploration_id', owner_id=None):
+    def __init__(self, exp_id='fake_exploration_id'):
         """Creates a dummy exploration."""
+        # TODO(sll): Add tests to validate param_changes, default_skin and
+        # version.
         self.id = exp_id
-        self.title = 'title'
-        self.category = 'category'
-        self.state_ids = []
+        self.title = ''
+        self.category = ''
+        self.init_state_name = ''
+        self.states = {}
         self.parameters = []
+        self.param_specs = {}
 
     def put(self):
         """The put() method is patched to make no commits to the datastore."""
         self._pre_put_hook()
-
-
-class StateDomainUnitTests(test_utils.GenericTestBase):
-    """Test the state domain object."""
-
-    def test_validation(self):
-        """Test validation of states."""
-        state = exp_domain.State('id', 'name', [], [], None)
-
-        state.name = '_INVALID_'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character _ in state name'):
-            state.validate()
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -58,50 +48,80 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_validation(self):
         """Test validation of explorations."""
         exploration = FakeExploration()
-        USER_ID = 'user_id'
 
-        # The 'state_ids property must be a non-empty list of strings
-        # representing State ids.
-        exploration.state_ids = []
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'exploration has no states'):
-            exp_services.save_exploration(USER_ID, exploration)
-        exploration.state_ids = ['A string']
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid state_id'):
-            exp_services.save_exploration(USER_ID, exploration)
-
-        new_state = exp_domain.State(
-            'Initial state id', 'name', [], [], None)
-        exp_services.save_states(USER_ID, exploration.id, [new_state])
-        exploration.state_ids = ['Initial state id']
+                utils.ValidationError, 'exploration has no title'):
+            exploration.validate()
 
         exploration.title = 'Hello #'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid character #'):
-            exp_services.save_exploration(USER_ID, exploration)
+            exploration.validate()
 
-    def test_init_state_property(self):
-        """Test the init_state property."""
-        exploration = FakeExploration(owner_id='owner@example.com')
-        USER_ID = 'user_id'
+        exploration.title = 'Title'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'exploration has no category'):
+            exploration.validate()
 
-        INIT_STATE_ID = 'init_state_id'
-        INIT_STATE_NAME = 'init state name'
-        init_state = exp_domain.State(
-            INIT_STATE_ID, INIT_STATE_NAME, [], [], None)
-        exp_services.save_states(USER_ID, exploration.id, [init_state])
+        exploration.category = 'Category'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'has no initial state name'):
+            exploration.validate()
 
-        exploration.state_ids = [INIT_STATE_ID]
-        self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
-        self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
+        exploration.init_state_name = 'initname'
 
-        second_state = exp_domain.State(
-            'unused_second_state', 'unused name', [], [], None)
-        exp_services.save_states(USER_ID, exploration.id, [second_state])
-        exploration.state_ids.append(second_state.id)
-        self.assertEqual(exploration.init_state_id, INIT_STATE_ID)
-        self.assertEqual(exploration.init_state.name, INIT_STATE_NAME)
+        new_state = exp_domain.State(
+            [], [], exp_domain.WidgetInstance.create_default_widget('name'))
+
+        # The 'states' property must be a non-empty dict of states.
+        exploration.states = {}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'exploration has no states'):
+            exploration.validate()
+        exploration.states = {'A string #': new_state}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character # in state name'):
+            exploration.validate()
+        exploration.states = {'A string _': new_state}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character _ in state name'):
+            exploration.validate()
+
+        exploration.states = {'Initial state name': new_state}
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                r'There is no state corresponding to .* initial state name.'):
+            exploration.validate()
+
+        exploration.states = {exploration.init_state_name: new_state}
+        exploration.validate()
+
+        exploration.param_specs = 'A string'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'param_specs to be a dict'):
+            exploration.validate()
+
+        exploration.param_specs = {
+            '@': {
+                'obj_type': 'Int'
+            }
+        }
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Only parameter names with characters'):
+            exploration.validate()
+
+        exploration.param_specs = {
+            'notAParamSpec': {
+                'obj_type': 'Int'
+            }
+        }
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected a ParamSpec'):
+            exploration.validate()
+
+        exploration.param_specs = {}
+        exploration.validate()
 
     def test_is_demo_property(self):
         """Test the is_demo property."""

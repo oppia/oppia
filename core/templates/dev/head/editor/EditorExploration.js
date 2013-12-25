@@ -664,10 +664,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       };
       for (var j = 0; j < data.imp.length; j++) {
         if (data.imp[j].type == 'default') {
-          $scope.highlightStates[data.imp[j].state_id] = '#EE8800';
+          $scope.highlightStates[data.imp[j].state_name] = '#EE8800';
         }
         if (data.imp[j].type == 'incomplete') {
-          $scope.highlightStates[data.imp[j].state_id] = 'brown';
+          $scope.highlightStates[data.imp[j].state_name] = 'brown';
         }
       }
     });
@@ -683,7 +683,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.explorationTitle = data.title;
       $scope.explorationCategory = data.category;
       $scope.explorationEditors = data.editors;
-      $scope.initStateId = data.init_state_id;
+      $scope.initStateId = data.init_state_name;
       $scope.isPublic = data.is_public;
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
@@ -727,9 +727,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       reachable: false,
       reachableFromEnd: false
     };
-    for (state in states) {
-      nodes[state] = {
-        name: states[state].name,
+    for (stateName in states) {
+      nodes[stateName] = {
+        name: stateName,
         depth: SENTINEL_DEPTH,
         reachable: false,
         reachableFromEnd: false
@@ -1016,8 +1016,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
     }
-    for (var id in $scope.states) {
-      if (id != $scope.stateId && $scope.states[id]['name'] == newStateName) {
+    for (var stateName in $scope.states) {
+      if (stateName == newStateName) {
         warningsData.addWarning('A state with this name already exists.');
         return;
       }
@@ -1032,11 +1032,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               $scope.newStateDesc = '';
-              $scope.states[data.stateData.id] = data.stateData;
-              $scope.drawGraph();
+              explorationData.data.states[data.stateName] = data.stateData;
               explorationData.data.version = data.version;
+              $scope.initExplorationPage();
               if (successCallback) {
-                successCallback(data.stateData.id);
+                successCallback(data.stateName);
               }
             }).error(function(data) {
               // TODO(sll): Actually force a refresh, since the data on the
@@ -1047,7 +1047,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.getStateName = function(stateId) {
-    return stateId ? explorationData.data.states[stateId].name : NONEXISTENT_STATE;
+    if (stateId in $scope.states) {
+      return stateId;
+    }
+    return NONEXISTENT_STATE;
   };
 
   // Deletes the state with id stateId. This action cannot be undone.
@@ -1069,7 +1072,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
-    $http['delete']($scope.deleteStateUrlPrefix + '/' + stateId)
+    $http['delete']($scope.deleteStateUrlPrefix + '/' + encodeURIComponent(stateId))
     .success(function(data) {
       // Reloads the page.
       explorationData.data.version = data.version;

@@ -20,7 +20,9 @@
 
 oppia.factory('warningsData', [function() {
   var warningsData = {warnings: []};
-  var MAX_WARNINGS = 5;
+  // This is to prevent infinite loops.
+  var MAX_TOTAL_WARNINGS = 100;
+  var warningsSoFar = 0;
 
   /**
    * Adds a warning message to the butterbar.
@@ -28,9 +30,12 @@ oppia.factory('warningsData', [function() {
    */
   warningsData.addWarning = function(warning) {
     console.log('WARNING: ' + warning);
-    if (warningsData.warnings.length < MAX_WARNINGS) {
-      warningsData.warnings.push(warning);
+    warningsSoFar++;
+    if (warningsSoFar > MAX_TOTAL_WARNINGS) {
+      return;
     }
+
+    warningsData.warnings = [warning];
   };
 
   /**

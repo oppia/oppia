@@ -17,9 +17,11 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import imghdr
+import logging
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -79,13 +81,13 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 def require_editor(handler):
     """Decorator that checks if the user can edit the given entity."""
-    def test_editor(self, exploration_id, state_id=None, **kwargs):
+    def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
 
         Args:
             self: the handler instance
             exploration_id: the exploration id
-            state_id: the state id, if it exists
+            escaped_state_name: the URL-escaped state name, if it exists
             **kwargs: any other arguments passed to the handler
 
         Returns:
@@ -138,19 +140,21 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if (not current_user_services.is_current_user_admin(self.request) and
-                not exploration.is_editable_by(self.user_id)):
+        if not rights_manager.Actor(self.user_id).can_edit(exploration_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)
 
-        if not state_id:
+        if not escaped_state_name:
             return handler(self, exploration_id, **kwargs)
-        try:
-            exp_services.get_state_by_id(exploration_id, state_id)
-        except:
+
+        state_name = self.unescape_state_name(escaped_state_name)
+        if state_name not in exploration.states:
+            logging.error('Could not find state: %s' % state_name)
+            logging.error('Available states: %s' % exploration.states.keys())
             raise self.PageNotFoundException
-        return handler(self, exploration_id, state_id, **kwargs)
+
+        return handler(self, exploration_id, state_name, **kwargs)
 
     return test_editor
 
@@ -193,9 +197,9 @@ class ExplorationHandler(EditorHandler):
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
         state_list = {}
-        for state_id in exploration.state_ids:
-            state_list[state_id] = exp_services.export_state_to_verbose_dict(
-                exploration_id, state_id)
+        for state_name in exploration.states:
+            state_list[state_name] = exp_services.export_state_to_verbose_dict(
+                exploration_id, state_name)
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -212,7 +216,7 @@ class ExplorationHandler(EditorHandler):
 
         self.values.update({
             'exploration_id': exploration_id,
-            'init_state_id': exploration.init_state_id,
+            'init_state_name': exploration.init_state_name,
             'is_public': rights_manager.is_exploration_public(exploration_id),
             'category': exploration.category,
             'title': exploration.title,
@@ -236,17 +240,23 @@ class ExplorationHandler(EditorHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
+        new_states = {
+            state_name: exp_domain.State.create_default_state(
+                state_name).to_dict()
+        }
         try:
-            state_id = exp_services.add_states(
-                self.user_id, exploration_id, [state_name])[0]
+            exp_services.update_exploration(
+                self.user_id, exploration_id, None, None, None, None,
+                new_states, 'Added state \'%s\'' % state_name)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
             'version': exploration.version,
+            'stateName': state_name,
             'stateData': exp_services.export_state_to_verbose_dict(
-                exploration_id, state_id)
+                exploration_id, state_name)
         })
 
     @require_editor
@@ -269,10 +279,10 @@ class ExplorationHandler(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         updated_states = {}
-        for state_id in states:
-            updated_states[state_id] = (
+        for state_name in states:
+            updated_states[state_name] = (
                 exp_services.export_state_to_verbose_dict(
-                    exploration_id, state_id)
+                    exploration_id, state_name)
             )
 
         self.render_json({
@@ -358,13 +368,13 @@ class DeleteStateHandler(EditorHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
-    def delete(self, exploration_id, state_id):
-        """Deletes the state with id state_id."""
+    def delete(self, exploration_id, state_name):
+        """Deletes the state with name state_name."""
         # TODO(sll): Add a version check here. This probably involves NOT using
         # delete(), but regarding this as an exploration put() instead. Or the
         # param can be passed via the URL.
 
-        exp_services.delete_state(self.user_id, exploration_id, state_id)
+        exp_services.delete_state(self.user_id, exploration_id, state_name)
         exploration = exp_services.get_exploration_by_id(exploration_id)
         self.render_json({
             'version': exploration.version
@@ -377,9 +387,8 @@ class ResolvedAnswersHandler(EditorHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
-    def put(self, exploration_id, state_id):
+    def put(self, exploration_id, state_name):
         """Marks readers' answers as resolved."""
-
         resolved_answers = self.payload.get('resolved_answers')
 
         if not isinstance(resolved_answers, list):
@@ -389,7 +398,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
         if 'resolved_answers' in self.payload:
             stats_services.EventHandler.resolve_answers_for_default_rule(
-                exploration_id, state_id, 'submit', resolved_answers)
+                exploration_id, state_name, 'submit', resolved_answers)
 
         self.render_json({})
 
@@ -400,9 +409,8 @@ class ResolvedFeedbackHandler(EditorHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
-    def put(self, exploration_id, state_id):
+    def put(self, exploration_id, state_name):
         """Marks readers' feedback as resolved."""
-
         feedback_id = self.payload.get('feedback_id')
         new_status = self.payload.get('new_status')
 
@@ -488,11 +496,11 @@ class StateRulesStatsHandler(EditorHandler):
     """Returns detailed reader answer statistics for a state."""
 
     @require_editor
-    def get(self, exploration_id, state_id):
+    def get(self, exploration_id, state_name):
         """Handles GET requests."""
         self.render_json({
             'rules_stats': stats_services.get_state_rules_stats(
-                exploration_id, state_id)
+                exploration_id, state_name)
         })
 
 

@@ -93,10 +93,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.getStateNameForRule = function(stateId) {
     return (
-        stateId === $scope.stateId  ? '⟳' :
+        stateId === $scope.stateId  ? '⟳ ' + stateId :
         stateId === END_DEST        ? END_DEST :
         !$scope.states              ? '' :
-        $scope.states[stateId].name
+        stateId
     );
   };
 
@@ -275,8 +275,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
             return (
                 stateId === '?'            ? 'Add New State...' :
                 stateId === END_DEST       ? END_DEST :
-                stateId === $scope.stateId ? $scope.states[stateId].name + ' ⟳' :
-                $scope.states[stateId].name
+                stateId === $scope.stateId ? stateId + ' ⟳' :
+                stateId
             );
           };
 
@@ -447,7 +447,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     } else {
       // Look for the id in states.
       for (var id in $scope.states) {
-        if ($scope.states[id].name == destName) {
+        if (id == destName) {
           found = true;
           destId = id;
           break;

@@ -108,7 +108,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def _submit_answer(self, answer):
         """Action representing submission of an answer to the backend."""
         url = '/learnhandler/transition/%s/%s' % (
-            self.exploration_id, self.last_state_id)
+            self.exploration_id, self.last_state_name)
         reader_dict = self.post_json(url, {
             'answer': answer, 'block_number': self.last_block_number,
             'handler': 'submit', 'params': self.last_params,
@@ -117,8 +117,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
-        self.last_state_id = reader_dict['state_id']
-        self.state_history += [self.last_state_id]
+        self.last_state_name = reader_dict['state_name']
+        self.state_history += [self.last_state_name]
         self.assertEqual(reader_dict['state_history'], self.state_history)
 
         return reader_dict
@@ -148,8 +148,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
-        self.last_state_id = reader_dict['state_id']
-        self.state_history = [self.last_state_id]
+        self.last_state_name = reader_dict['state_name']
+        self.state_history = [self.last_state_name]
 
         self.assertEqual(reader_dict['state_history'], self.state_history)
         self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
@@ -168,7 +168,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
-            '6', 'Parametrized Adventure', 'Hello, brave adventurer')
+            '6', 'Parameterized Adventure', 'Hello, brave adventurer')
         self.submit_and_compare(
             'My Name', 'Hello, I\'m My Name!.*get a pretty red')
         self.submit_and_compare(0, 'fork in the road')

@@ -21,56 +21,10 @@ __author__ = 'Sean Lip'
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from google.appengine.ext import db
 from google.appengine.ext import ndb
 
 
 QUERY_LIMIT = 100
-
-
-class StateModel(base_models.BaseModel):
-    """A state, represented as a JSON blob."""
-
-    @classmethod
-    def _get_exploration_key(cls, exploration_id):
-        return ndb.Key(ExplorationModel._get_kind(), exploration_id)
-
-    def __init__(self, **kwargs):
-        exploration_id = kwargs.get('exploration_id')
-        exploration_key = None
-        if exploration_id:
-            exploration_key = StateModel._get_exploration_key(exploration_id)
-            del kwargs['exploration_id']
-        super(StateModel, self).__init__(parent=exploration_key, **kwargs)
-
-    @classmethod
-    def get(cls, exploration_id, state_id, strict=True):
-        """Gets a state by id."""
-        exploration_key = cls._get_exploration_key(exploration_id)
-        return super(StateModel, cls).get(
-            state_id, strict=strict, parent=exploration_key)
-
-    @classmethod
-    def _get_state_key(cls, exploration_id, state_id):
-        return ndb.Key(
-            ExplorationModel._get_kind(), exploration_id,
-            StateModel._get_kind(), state_id)
-
-    @classmethod
-    def get_multi(cls, exploration_id, state_ids, strict=True):
-        """Gets states by ids."""
-        state_keys = [cls._get_state_key(exploration_id, state_id)
-                      for state_id in state_ids]
-        results = ndb.get_multi(state_keys)
-        if strict:
-            for ind, result in enumerate(results):
-                if result is None:
-                    raise Exception(
-                        'Could not find state with id %s' % state_ids[ind])
-        return results
-
-    # JSON representation of a state.
-    value = ndb.JsonProperty(required=True, indexed=False)
 
 
 class ExplorationModel(base_models.BaseModel):
@@ -91,13 +45,16 @@ class ExplorationModel(base_models.BaseModel):
     # at 1.
     version = ndb.IntegerProperty(default=0)
 
+    # What this exploration is called.
+    title = ndb.StringProperty(required=True)
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True, indexed=True)
-    # What this exploration is called.
-    title = ndb.StringProperty(default='New exploration')
-    # The list of state ids this exploration consists of. This list should not
-    # be empty.
-    state_ids = ndb.StringProperty(repeated=True, indexed=False)
+
+    # The name of the initial state of this exploration.
+    init_state_name = ndb.StringProperty(required=True, indexed=False)
+    # A dict representing the states of this exploration. This dict should
+    # not be empty.
+    states = ndb.JsonProperty(default={}, indexed=False)
     # The dict of parameter specifications associated with this exploration.
     # Each specification is a dict whose keys are param names and whose values
     # are each dicts with a single key, 'obj_type', whose value is a string.
@@ -148,20 +105,6 @@ class ExplorationModel(base_models.BaseModel):
             else:
                 raise Exception(
                     'Invalid key for exploration properties dict: %s' % key)
-
-        # Do validation.
-        try:
-            assert isinstance(self.param_specs, dict)
-            for param_name in self.param_specs:
-                assert isinstance(param_name, basestring)
-                assert len(self.param_specs[param_name]) == 1
-                assert 'obj_type' in self.param_specs[param_name]
-
-        except AssertionError:
-            raise db.BadValueError(
-                'The \'param_specs\' property must be a dict of param_specs; '
-                'received %s' % self.param_specs
-            )
 
         if snapshot and snapshot != feconf.NULL_SNAPSHOT:
             self.version += 1

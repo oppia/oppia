@@ -50,9 +50,9 @@ class StateCounter(object):
                 - self.resolved_answer_count - self.active_answer_count)
 
     @classmethod
-    def get(cls, exploration_id, state_id):
+    def get(cls, exploration_id, state_name):
         state_counter_model = stats_models.StateCounterModel.get_or_create(
-            exploration_id, state_id)
+            exploration_id, state_name)
         return cls(
             state_counter_model.first_entry_count,
             state_counter_model.subsequent_entries_count,
@@ -90,7 +90,7 @@ class StateRuleAnswerLog(object):
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
-                (state_id, handler_name, rule_str).
+                (state_name, handler_name, rule_str).
         """
         # TODO(sll): Should each rule_str be unicode instead?
         answer_log_models = (
@@ -100,10 +100,10 @@ class StateRuleAnswerLog(object):
                 for answer_log_model in answer_log_models]
 
     @classmethod
-    def get(cls, exploration_id, state_id, handler_name, rule_str):
+    def get(cls, exploration_id, state_name, handler_name, rule_str):
         # TODO(sll): Deprecate this method.
         return cls.get_multi(exploration_id, [{
-            'state_id': state_id,
+            'state_name': state_name,
             'handler_name': handler_name,
             'rule_str': rule_str
         }])[0]
@@ -145,16 +145,16 @@ class FeedbackItem(object):
                 target_id)]
 
     @classmethod
-    def _get_target_id_for_state(cls, exploration_id, state_id):
-        return 'state:%s.%s' % (exploration_id, state_id)
+    def _get_target_id_for_state(cls, exploration_id, state_name):
+        return 'state:%s.%s' % (exploration_id, state_name)
 
     @classmethod
     def _get_target_id_for_exploration(cls, exploration_id):
         return 'exploration:%s' % (exploration_id)
 
     @classmethod
-    def get_feedback_items_for_state(cls, exploration_id, state_id):
-        target_id = cls._get_target_id_for_state(exploration_id, state_id)
+    def get_feedback_items_for_state(cls, exploration_id, state_name):
+        target_id = cls._get_target_id_for_state(exploration_id, state_name)
         return cls._get_feedback_items_for_target(target_id)
 
     @classmethod
@@ -171,9 +171,9 @@ class FeedbackItem(object):
 
     @classmethod
     def create_feedback_for_state(
-            cls, exploration_id, state_id, content, additional_data=None,
+            cls, exploration_id, state_name, content, additional_data=None,
             submitter_id=None):
-        target_id = cls._get_target_id_for_state(exploration_id, state_id)
+        target_id = cls._get_target_id_for_state(exploration_id, state_name)
         return cls._create_feedback_for_target(
             target_id, content, additional_data, submitter_id)
 

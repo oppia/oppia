@@ -25,6 +25,7 @@ import os
 import sys
 import time
 import traceback
+import urllib
 
 from core import counters
 from core.domain import config_domain
@@ -130,6 +131,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = json.loads(self.request.get('payload'))
         else:
             self.payload = None
+
+    def unescape_state_name(self, escaped_state_name):
+        """Unescape a state name that is encoded with encodeURIComponent."""
+        return urllib.unquote(str(escaped_state_name)).decode('utf-8')
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""

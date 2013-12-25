@@ -174,7 +174,7 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
 
     resolveAnswers: function(stateId, resolvedAnswersList) {
       $http.put(
-          resolvedAnswersUrlPrefix + '/' + stateId,
+          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateId),
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
@@ -189,7 +189,7 @@ oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http,
 
     resolveReaderFeedback: function(stateId, feedbackId, newStatus) {
       $http.put(
-          resolvedFeedbackUrlPrefix + '/' + stateId,
+          resolvedFeedbackUrlPrefix + '/' + encodeURIComponent(stateId),
           $.param({
             csrf_token: GLOBALS.csrf_token,
             payload: JSON.stringify({'feedback_id': feedbackId, 'new_status': newStatus})

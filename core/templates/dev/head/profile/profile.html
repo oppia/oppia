@@ -48,7 +48,7 @@
             <ol>
               <li ng-repeat="state in improvable">
                 <small><em>(score: <[state.rank]>)</em></small>
-                <a href="create/<[state.exp_id]>#/gui/<[state.state_id]>">
+                <a href="create/<[state.exp_id]>#/gui/<[state.state_name]>">
                    <[state.exp_name]>: <[state.state_name]>
                 </a>
                 <span ng-show="state.type == 'incomplete'">

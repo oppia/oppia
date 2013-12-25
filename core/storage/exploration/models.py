@@ -20,7 +20,6 @@ __author__ = 'Tarashish Mishra'
 
 from core.storage.exploration import django_models
 
-StateModel = django_models.StateModel
 ExplorationModel = django_models.ExplorationModel
 ExplorationSnapshotModel = django_models.ExplorationSnapshotModel
 ExplorationSnapshotContentModel = django_models.ExplorationSnapshotContentModel

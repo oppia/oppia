@@ -38,34 +38,34 @@ class EventHandler(object):
     """Records events."""
 
     @classmethod
-    def record_state_hit(cls, exploration_id, state_id, first_time):
+    def record_state_hit(cls, exploration_id, state_name, first_time):
         """Record an event when a state is encountered by the reader."""
         stats_models.StateCounterModel.inc(
-            exploration_id, state_id, first_time)
+            exploration_id, state_name, first_time)
 
     @classmethod
     def record_answer_submitted(
-            cls, exploration_id, state_id, handler_name, rule_str, answer):
+            cls, exploration_id, state_name, handler_name, rule_str, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
-            exploration_id, state_id, handler_name, rule_str, answer)
+            exploration_id, state_name, handler_name, rule_str, answer)
 
     @classmethod
     def resolve_answers_for_default_rule(
-            cls, exploration_id, state_id, handler_name, answers):
+            cls, exploration_id, state_name, handler_name, answers):
         """Resolves a list of answers for the default rule of this state."""
         # TODO(sll): Escape these args?
         stats_models.resolve_answers(
-            exploration_id, state_id, handler_name,
+            exploration_id, state_name, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
     @classmethod
     def record_state_feedback_from_reader(
-            cls, exploration_id, state_id, feedback, history):
+            cls, exploration_id, state_name, feedback, history):
         """Records user feedback for a particular state."""
         stats_domain.FeedbackItem.create_feedback_for_state(
-            exploration_id, state_id, feedback,
+            exploration_id, state_name, feedback,
             additional_data={'history': history})
 
     @classmethod
@@ -114,7 +114,7 @@ def get_exploration_visit_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
     return stats_domain.StateCounter.get(
-        exploration_id, exploration.init_state_id).first_entry_count
+        exploration_id, exploration.init_state_name).first_entry_count
 
 
 def get_exploration_completed_count(exploration_id):
@@ -124,7 +124,7 @@ def get_exploration_completed_count(exploration_id):
         exploration_id, feconf.END_DEST).first_entry_count
 
 
-def get_state_rules_stats(exploration_id, state_id):
+def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the handlers and rules of this state.
 
     Returns:
@@ -132,7 +132,8 @@ def get_state_rules_stats(exploration_id, state_id):
         values are the corresponding stats_domain.StateRuleAnswerLog
         instances.
     """
-    state = exp_services.get_state_by_id(exploration_id, state_id)
+    exploration = exp_services.get_exploration_by_id(exploration_id)
+    state = exploration.states[state_name]
 
     rule_keys = []
     for handler in state.widget.handlers:
@@ -141,7 +142,7 @@ def get_state_rules_stats(exploration_id, state_id):
 
     answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
-            'state_id': state.id,
+            'state_name': state_name,
             'handler_name': rule_key[0],
             'rule_str': rule_key[1]
         } for rule_key in rule_keys]
@@ -162,12 +163,13 @@ def get_state_stats_for_exploration(exploration_id):
     exploration = exp_services.get_exploration_by_id(exploration_id)
 
     state_stats = {}
-    for state_id in exploration.state_ids:
-        state_counts = stats_domain.StateCounter.get(exploration_id, state_id)
+    for state_name in exploration.states:
+        state_counts = stats_domain.StateCounter.get(
+            exploration_id, state_name)
 
         feedback_items = (
             stats_domain.FeedbackItem.get_feedback_items_for_state(
-                exploration_id, state_id))
+                exploration_id, state_name))
         reader_feedback = {}
         for fi in feedback_items:
             reader_feedback[fi.id] = {
@@ -178,9 +180,8 @@ def get_state_stats_for_exploration(exploration_id):
         first_entry_count = state_counts.first_entry_count
         total_entry_count = state_counts.total_entry_count
 
-        state = exp_services.get_state_by_id(exploration_id, state_id)
-        state_stats[state_id] = {
-            'name': state.name,
+        state_stats[state_name] = {
+            'name': state_name,
             'firstEntryCount': first_entry_count,
             'totalEntryCount': total_entry_count,
             'readerFeedback': reader_feedback,
@@ -203,18 +204,19 @@ def get_top_improvable_states(exploration_ids, N):
     ranked_states = []
     for exploration_id in exploration_ids:
         exploration = exp_services.get_exploration_by_id(exploration_id)
+        state_list = exploration.states.keys()
 
         answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
             exploration_id, [{
-                'state_id': state_id,
+                'state_name': state_name,
                 'handler_name': SUBMIT_HANDLER_NAME,
                 'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-            } for state_id in exploration.state_ids]
+            } for state_name in state_list]
         )
 
-        for ind, state_id in enumerate(exploration.state_ids):
+        for ind, state_name in enumerate(state_list):
             state_counts = stats_domain.StateCounter.get(
-                exploration_id, state_id)
+                exploration_id, state_name)
             default_rule_answer_log = answer_logs[ind]
 
             total_entry_count = state_counts.total_entry_count
@@ -226,10 +228,10 @@ def get_top_improvable_states(exploration_ids, N):
 
             eligible_flags = []
 
-            state = exp_services.get_state_by_id(exploration_id, state_id)
+            state = exploration.states[state_name]
             if (default_count > 0.2 * total_entry_count and
                     state.widget.handlers[0].default_rule_spec.dest ==
-                    state.id):
+                    state_name):
                 eligible_flags.append({
                     'rank': default_count,
                     'improve_type': IMPROVE_TYPE_DEFAULT})
@@ -250,8 +252,7 @@ def get_top_improvable_states(exploration_ids, N):
             ranked_states.append({
                 'exp_id': exploration_id,
                 'exp_name': exploration.title,
-                'state_id': state_id,
-                'state_name': state.name,
+                'state_name': state_name,
                 'rank': state_rank,
                 'type': improve_type,
                 'top_default_answers': default_rule_answer_log.get_top_answers(

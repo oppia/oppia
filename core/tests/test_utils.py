@@ -62,7 +62,6 @@ class TestBase(unittest.TestCase):
 
     def _delete_all_explorations(self):
         classes = frozenset([
-            exp_models.StateModel,
             exp_models.ExplorationModel,
             exp_models.ExplorationSnapshotModel,
             exp_models.ExplorationSnapshotContentModel,

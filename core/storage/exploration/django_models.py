@@ -22,38 +22,10 @@ from core import django_utils
 import core.storage.base_model.models as base_models
 
 from django.db import models
-from django.core.exceptions import ValidationError
 
 import feconf
 
 QUERY_LIMIT = 100
-
-
-class StateModel(base_models.BaseModel):
-    """A state, represented as a JSON blob."""
-
-    def __init__(self, *args, **kwargs):
-        exploration_id = kwargs.get('exploration_id')
-        if exploration_id:
-            del kwargs['exploration_id']
-        super(StateModel, self).__init__(*args, **kwargs)
-
-    @classmethod
-    def get(cls, exploration_id, state_id, strict=True):
-        """Gets a state by id."""
-        return super(StateModel, cls).get(state_id, strict=strict)
-
-    @classmethod
-    def get_multi(cls, exploration_id, state_ids, strict=True):
-        """Gets states by ids."""
-        results = []
-        for state_id in state_ids:
-            results.append(cls.get(exploration_id, state_id, strict=strict))
-        return results
-
-    # JSON representation of a state.
-    # TODO(sll): Prepend the exploration id to the id of this entity.
-    value = django_utils.JSONField(default={}, isdict=True)
 
 
 class ExplorationModel(base_models.BaseModel):
@@ -67,42 +39,25 @@ class ExplorationModel(base_models.BaseModel):
     # stored as an ExplorationSnapshotModel.
     version = models.IntegerField(default=0)
 
+    # What this exploration is called.
+    title = models.CharField(max_length=100)
     # The category this exploration belongs to.
     category = models.CharField(max_length=100)
-    # What this exploration is called.
-    title = models.CharField(max_length=100, default='New exploration')
-    # The list of state ids this exploration consists of. This list should not
-    # be empty.
-    state_ids = django_utils.ListField(default=[], blank=True)
 
-    def validate_param_specs(value):
-        """Validator for the param_specs property."""
-        try:
-            assert isinstance(value, dict)
-            for key in value:
-                assert isinstance(key, basestring)
-                assert len(value[key]) == 1
-                assert 'obj_type' in value[key]
-        except AssertionError:
-            raise ValidationError(
-                'The \'param_specs\' property must be a dict of param_specs; '
-                'received %s' % value
-            )
-
+    # The name of the initial state of this exploration.
+    init_state_name = models.CharField(max_length=100)
+    # A dict representing the states of this exploration. This dict should
+    # not be empty.
+    states = django_utils.JSONField(default={}, primitivelist=True)
     # The dict of parameter specifications associated with this exploration.
     # Each specification is a dict whose keys are param names and whose values
     # are each dicts with a single key, 'obj_type', whose value is a string.
     param_specs = django_utils.JSONField(
-        blank=True, default={}, primitivelist=True,
-        validators=[validate_param_specs]
-    )
-
+        blank=True, default={}, primitivelist=True)
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = django_utils.JSONField(
-        blank=True, default=[], primitivelist=True, validators=[]
-    )
-
+        blank=True, default=[], primitivelist=True)
     # The default HTML template to use for displaying the exploration to the
     # reader. This is a filename in data/skins (without the .html suffix).
     default_skin = models.CharField(max_length=100, default='conversation_v1')
