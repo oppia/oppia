@@ -56,29 +56,76 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   // TODO(sll): Allow the user to view the list of changes made so far, as well
   // as the list of changes in the undo stack.
 
-  $scope.addStateChange = function(backendName, frontendNames, newValue, oldValue) {
+  var CMD_ADD_STATE = 'add_state';
+  var CMD_RENAME_STATE = 'rename_state';
+  var CMD_DELETE_STATE = 'delete_state';
+  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+  var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+
+  $scope.STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
+    'widget_customization_args': 'widgetCustomizationArgs',
+    'widget_id': 'widgetId',
+    'widget_handlers': 'widgetHandlers',
+    'widget_sticky': 'widgetSticky',
+    'state_name': 'stateName',
+    'content': 'content',
+    'param_changes': 'stateParamChanges'
+  };
+
+  $scope.EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
+    'title': 'explorationTitle',
+    'category': 'explorationCategory',
+    'param_specs': 'paramSpecs',
+    'param_changes': 'explorationParamChanges'
+  };
+
+  $scope.addStateChange = function(backendName, newValue, oldValue) {
+    if (!$scope.explorationFullyLoaded || angular.equals(newValue, oldValue)) {
+      return;
+    }
+
     if (!$scope.stateName) {
       warningsData.addWarning('Unexpected error: a state property was saved ' +
           'outside the context of a state. We would appreciate it if you ' +
           'reported this bug here: https://code.google.com/p/oppia/issues/list.');
       return;
     }
+    if (!$scope.STATE_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      warningsData.addWarning('Invalid state property: ' + backendName);
+      return;
+    }
+
     $scope.explorationChangeList.push({
-      stateName: $scope.stateName,
-      backendName: backendName,
-      frontendNames: frontendNames,
-      newValue: newValue,
-      oldValue: oldValue
+      cmd: CMD_EDIT_STATE_PROPERTY,
+      state_name: $scope.stateName,
+      property_name: backendName,
+      new_value: newValue,
+      old_value: oldValue
     });
     $scope.undoneChangeStack = [];
   };
 
-  $scope.addExplorationChange = function(backendName, frontendNames, newValue, oldValue) {
+  /**
+   * Saves a property of an exploration (e.g. title, category, etc.)
+   * @param {string} backendName The backend name of the property (e.g. title, category)
+   * @param {string} newValue The new value of the property
+   * @param {string} oldValue The previous value of the property
+   */
+  $scope.addExplorationChange = function(backendName, newValue, oldValue) {
+    if (!$scope.explorationFullyLoaded || angular.equals(newValue, oldValue)) {
+      return;
+    }
+
+    if (!$scope.EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      warningsData.addWarning('Invalid exploration property: ' + backendName);
+      return;
+    }
+
     $scope.explorationChangeList.push({
-      backendName: backendName,
-      frontendNames: frontendNames,
-      newValue: newValue,
-      oldValue: oldValue
+      cmd: CMD_EDIT_EXPLORATION_PROPERTY,
+      property_name: backendName,
+      new_value: newValue,
+      old_value: oldValue
     });
     $scope.undoneChangeStack = [];
   };
@@ -328,27 +375,29 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // Identifies the net changes made to each property.
     for (var i = 0; i < $scope.explorationChangeList.length; i++) {
       var change = $scope.explorationChangeList[i];
-      if (change.stateName) {
-        var stateName = change.stateName;
+      if (change.cmd == CMD_EDIT_STATE_PROPERTY) {
+        var stateName = change.state_name;
 
         if (!rawStateChanges.hasOwnProperty(stateName)) {
           rawStateChanges[stateName] = {};
         }
 
-        if (!rawStateChanges[stateName][change.backendName]) {
-          rawStateChanges[stateName][change.backendName] = {
-            oldValue: change.oldValue
+        if (!rawStateChanges[stateName][change.property_name]) {
+          rawStateChanges[stateName][change.property_name] = {
+            oldValue: change.old_value
           };
         }
-        rawStateChanges[stateName][change.backendName].newValue = change.newValue;
-      } else {
+        rawStateChanges[stateName][change.property_name].newValue = change.new_value;
+      } else if (change.cmd == CMD_EDIT_EXPLORATION_PROPERTY) {
         // This is a change to an exploration property.
-        if (!rawExplorationChanges[change.backendName]) {
-          rawExplorationChanges[change.backendName] = {
-            oldValue: change.oldValue
+        if (!rawExplorationChanges[change.property_name]) {
+          rawExplorationChanges[change.property_name] = {
+            oldValue: change.old_value
           };
         }
-        rawExplorationChanges[change.backendName].newValue = change.newValue;
+        rawExplorationChanges[change.property_name].newValue = change.new_value;
+      } else {
+        warningsData.addWarning('Unexpected change command: ' + change.cmd);
       }
     }
 
@@ -862,16 +911,34 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.$watch('explorationTitle', function(newValue, oldValue) {
     // Do not save on the initial data load.
     if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      $scope.saveExplorationProperty(
-          'explorationTitle', 'title', newValue, oldValue);
+      newValue = $scope.normalizeWhitespace(newValue);
+      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
+        $scope.explorationTitle = oldValue;
+        return;
+      }
+      $scope.addExplorationChange('title', newValue, oldValue);
     }
   });
 
   $scope.$watch('explorationCategory', function(newValue, oldValue) {
     // Do not save on the initial data load.
     if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      $scope.saveExplorationProperty(
-          'explorationCategory', 'category', newValue, oldValue);
+      newValue = $scope.normalizeWhitespace(newValue);
+      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
+        $scope.explorationCategory = oldValue;
+        return;
+      }
+      $scope.addExplorationChange('category', newValue, oldValue);
+    }
+  });
+
+  $scope.saveExplorationParamChanges = function(newValue, oldValue) {
+    $scope.addExplorationChange('param_changes', newValue, oldValue);
+  };
+
+  $scope.$watch('paramSpecs', function(newValue, oldValue) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
+      $scope.addExplorationChange('param_specs', newValue, oldValue);
     }
   });
 
@@ -885,13 +952,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     $scope.paramSpecs[name] = {obj_type: type};
   };
-
-  $scope.$watch('paramSpecs', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      $scope.saveExplorationProperty(
-        'paramSpecs', 'param_specs', newValue, oldValue);
-    }
-  });
 
   $scope.openAddNewEditorForm = function() {
     activeInputData.name = 'explorationMetadata.addNewEditor';
@@ -936,42 +996,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   $scope.makePublic = function() {
     $scope.saveExplorationRightsChange('isPublic', 'is_public', true, false);
-  };
-
-  $scope.saveExplorationParamChanges = function(newValue, oldValue) {
-    $scope.saveExplorationProperty(
-        'explorationParamChanges', 'param_changes', newValue, oldValue);
-  };
-
-  /**
-   * Saves a property of an exploration (e.g. title, category, etc.)
-   * @param {string} frontendName The frontend name of the property to save
-   *     (e.g. explorationTitle, explorationCategory)
-   * @param {string} backendName The backend name of the property (e.g. title, category)
-   * @param {string} newValue The new value of the property
-   * @param {string} oldValue The previous value of the property
-   */
-  $scope.saveExplorationProperty = function(frontendName, backendName, newValue, oldValue) {
-    if (!$scope.explorationFullyLoaded) {
-      return;
-    }
-    if (angular.equals(newValue, oldValue)) {
-      return;
-    }
-    newValue = $scope.normalizeWhitespace(newValue);
-    if (backendName == 'title' || backendName == 'category') {
-      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
-        $scope[frontendName] = oldValue;
-        return;
-      }
-    }
-
-    if ($scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES.hasOwnProperty(backendName)) {
-      // This is an exploration property and will only be saved when the
-      // 'Save changes' button is clicked.
-      $scope.addExplorationChange(backendName, [frontendName], newValue, oldValue);
-      return;
-    }
   };
 
   $scope.saveExplorationRightsChange = function(frontendName, backendName, newValue, oldValue) {

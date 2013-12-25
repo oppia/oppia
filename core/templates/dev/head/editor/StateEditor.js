@@ -94,11 +94,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
     if ($scope.stateNameMemento !== newStateName) {
       $scope.addStateChange(
-        'state_name',
-        ['stateName', 'states.' + $scope.newStateName + '.name'],
-        newStateName,
-        $scope.stateNameMemento
-      );
+        'state_name', newStateName, $scope.stateNameMemento);
       $scope.displayedStateName = newStateName;
     }
 
@@ -119,9 +115,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       // values from the RTE are captured.
       // TODO(sll): Do we need to update math?
       $scope.addStateChange(
-          'content',
-          ['content'],
-          angular.copy($scope.content),
+          'content', angular.copy($scope.content),
           angular.copy($scope.contentMemento)
       );
     }
@@ -177,8 +171,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.saveStateParamChanges = function(newValue, oldValue) {
     if (!angular.equals(newValue, oldValue)) {
-      $scope.addStateChange(
-          'param_changes', ['stateParamChanges'], newValue, oldValue);
+      $scope.addStateChange('param_changes', newValue, oldValue);
     }
   };
 

@@ -466,7 +466,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
     if (newValue !== undefined && oldValue !== undefined) {
-      $scope.addStateChange('widget_sticky', 'widgetSticky', newValue, oldValue);
+      $scope.addStateChange('widget_sticky', newValue, oldValue);
     }
   });
 
@@ -529,8 +529,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       if (!angular.equals($scope.widgetCustomizationArgs, widgetCustomizationArgsMemento)) {
         $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
         $scope.addStateChange(
-          'widget_customization_args', 'widgetCustomizationArgs',
-          $scope.widgetCustomizationArgs, widgetCustomizationArgsMemento
+          'widget_customization_args', $scope.widgetCustomizationArgs,
+          widgetCustomizationArgsMemento
         );
       }
       console.log('Interactive customization modal saved.');
@@ -581,10 +581,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         };
       }
 
-      $scope.addStateChange('widget_id', 'widgetId', $scope.widgetId, widgetIdMemento);
+      $scope.addStateChange('widget_id', $scope.widgetId, widgetIdMemento);
       $scope.addStateChange(
-        'widget_customization_args', 'widgetCustomizationArgs',
-        $scope.widgetCustomizationArgs, widgetCustomizationArgsMemento
+        'widget_customization_args', $scope.widgetCustomizationArgs,
+        widgetCustomizationArgsMemento
       );
       $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
 
@@ -595,8 +595,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
-    $scope.addStateChange(
-        'widget_handlers', 'widgetHandlers', newHandlers, oldHandlers);
+    $scope.addStateChange('widget_handlers', newHandlers, oldHandlers);
     $scope.updateStatesData();
     $scope.drawGraph();
   };
