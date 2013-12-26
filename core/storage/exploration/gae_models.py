@@ -27,23 +27,25 @@ from google.appengine.ext import ndb
 QUERY_LIMIT = 100
 
 
-class ExplorationModel(base_models.BaseModel):
-    """Storage model for the Oppia exploration at HEAD.
+class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for an exploration snapshot."""
+    pass
 
-    Previous versions of this exploration are stored, in serialized form, using
-    ExplorationSnapshotModels.
+
+class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of an exploration snapshot."""
+    pass
+
+
+class ExplorationModel(base_models.VersionedModel):
+    """Versioned storage model for an Oppia exploration.
 
     This class should only be imported by the exploration domain file, the
     exploration services file, and the Exploration model test file.
     """
-    # TODO(sll): Write a test that ensures that the only files that are
-    # allowed to import this class are the ones described above.
-
-    # The current version number of this exploration. In each PUT operation,
-    # this number is incremented and a snapshot of the modified exploration is
-    # stored as an ExplorationSnapshotModel. The snapshot version number starts
-    # at 1.
-    version = ndb.IntegerProperty(default=0)
+    SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
+    ALLOW_REVERT = True
 
     # What this exploration is called.
     title = ndb.StringProperty(required=True)
@@ -85,7 +87,7 @@ class ExplorationModel(base_models.BaseModel):
         return cls.get_all().count()
 
     def put(self, committer_id, properties_dict, snapshot=None,
-            commit_message=''):
+            commit_message='', commit_cmds=None):
         """Updates the exploration using the properties dict, then saves it.
 
         If snapshot is not None, increments the exploration version and saves
@@ -106,139 +108,31 @@ class ExplorationModel(base_models.BaseModel):
                 raise Exception(
                     'Invalid key for exploration properties dict: %s' % key)
 
-        if snapshot and snapshot != feconf.NULL_SNAPSHOT:
-            self.version += 1
-            ExplorationSnapshotModel.save_snapshot(
-                self.id, self.version, committer_id,
-                ExplorationSnapshotContentModel.FORMAT_TYPE_FULL,
-                snapshot, commit_message)
+        if commit_cmds is None:
+            commit_cmds = []
 
-        super(ExplorationModel, self).put()
+        self.save(committer_id, commit_message, commit_cmds)
 
 
-class ExplorationSnapshotModel(base_models.BaseModel):
-    """Storage model for an Oppia exploration snapshot."""
-
-    @classmethod
-    def _get_snapshot_id(cls, exploration_id, version_number):
-        return '%s-%s' % (exploration_id, version_number)
-
-    @property
-    def exploration_id(self):
-        return self.id.split('-')[0]
-
-    @property
-    def version_number(self):
-        return self.id.split('-')[1]
-
-    # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True)
-    # A brief commit message.
-    # TODO(sll): Make this a required property?
-    commit_message = ndb.TextProperty(indexed=False)
-
-    @classmethod
-    def get_metadata(cls, exploration_id, version_number):
-        """Returns a dict representing an exploration snapshot."""
-        snapshot_id = cls._get_snapshot_id(exploration_id, version_number)
-
-        snapshot = cls.get(snapshot_id)
-        # TODO(sll): Do a projection query so that the serialized exploration
-        # or the diff are only fetched on demand from the datastore.
-        return {
-            'committer_id': snapshot.committer_id,
-            'commit_message': snapshot.commit_message,
-            'created_on': snapshot.created_on.strftime(
-                feconf.HUMAN_READABLE_DATETIME_FORMAT),
-            'version_number': version_number,
-        }
-
-    @classmethod
-    def save_snapshot(cls, exploration_id, version_number, committer_id,
-                      snapshot_format, json_blob, commit_message):
-        """Saves a new snapshot for the given exploration."""
-
-        if not isinstance(version_number, int) or version_number < 0:
-            raise Exception('Invalid version number: %s' % version_number)
-
-        snapshot_id = cls._get_snapshot_id(exploration_id, version_number)
-
-        # Ensure that this id has not been used.
-        if cls.get(snapshot_id, strict=False) is not None:
-            raise Exception(
-                'Snapshot with exploration id %s and version number %s '
-                'already exists' % (exploration_id, version_number))
-
-        # Save the snapshot content.
-        ExplorationSnapshotContentModel.save_snapshot_content(
-            snapshot_id, snapshot_format, json_blob)
-
-        snapshot_model = cls(id=snapshot_id, committer_id=committer_id,
-                             commit_message=commit_message)
-        snapshot_model.put()
+class ExpRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for an exploration rights snapshot."""
+    pass
 
 
-class ExplorationSnapshotContentModel(base_models.BaseModel):
-    """Storage model for the content of an exploration snapshot."""
-
-    @classmethod
-    def _get_snapshot_id(cls, exploration_id, version_number):
-        return '%s-%s' % (exploration_id, version_number)
-
-    @property
-    def exploration_id(self):
-        return self.id.split('-')[0]
-
-    @property
-    def version_number(self):
-        return self.id.split('-')[1]
-
-    FORMAT_TYPE_FULL = 'full'
-    FORMAT_TYPE_DIFF = 'diff'
-
-    def _pre_put_hook(self):
-        if self.format not in [self.FORMAT_TYPE_FULL, self.FORMAT_TYPE_DIFF]:
-            raise Exception('Invalid snapshot format: %s' % self.format)
-
-    # The format of the snapshot (the full serialization, or a diff from the
-    # previous snapshot; these correspond to the possible values
-    # FORMAT_TYPE_FULL or FORMAT_TYPE_DIFF, respectively).
-    format = ndb.StringProperty()
-    # The snapshot content, as a JSON blob.
-    content = ndb.JsonProperty(indexed=False)
-
-    @classmethod
-    def get_snapshot_content(cls, exploration_id, version_number):
-        """Returns the exploration snapshot content."""
-        snapshot_id = cls._get_snapshot_id(exploration_id, version_number)
-
-        snapshot = cls.get(snapshot_id)
-        return {
-            'format': snapshot.format,
-            'content': snapshot.content
-        }
-
-    @classmethod
-    def save_snapshot_content(cls, snapshot_id, snapshot_format, json_blob):
-        """Saves a new snapshot content for the given exploration.
-
-        This method should only be called from ExplorationSnapshotModel.
-        """
-
-        if not json_blob:
-            raise Exception(
-                'Empty content submitted for exploration snapshot.')
-
-        snapshot_content_model = cls(
-            id=snapshot_id, format=snapshot_format, content=json_blob)
-        snapshot_content_model.put()
+class ExpRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of an exploration rights snapshot."""
+    pass
 
 
-class ExplorationRightsModel(base_models.BaseModel):
+class ExplorationRightsModel(base_models.VersionedModel):
     """Storage model for rights related to an exploration.
 
     The id of each instance is the id of the corresponding exploration.
     """
+
+    SNAPSHOT_METADATA_CLASS = ExpRightsSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = ExpRightsSnapshotContentModel
+    ALLOW_REVERT = False
 
     # The user_ids of owners of this exploration.
     owner_ids = ndb.StringProperty(repeated=True)
@@ -257,3 +151,6 @@ class ExplorationRightsModel(base_models.BaseModel):
     status = ndb.StringProperty(
         default='private', choices=['private', 'public', 'publicized']
     )
+
+    def put(self, committer_id, commit_message, commit_cmds):
+        self.save(committer_id, commit_message, commit_cmds)

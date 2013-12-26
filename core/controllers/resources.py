@@ -69,10 +69,11 @@ class ImageHandler(base.BaseHandler):
         """
         try:
             filepath = urllib.unquote(encoded_filepath)
-            format = filepath[(filepath.rfind('.') + 1):]
+            file_format = filepath[(filepath.rfind('.') + 1):]
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = str('image/%s' % format)
+            self.response.headers['Content-Type'] = str(
+                'image/%s' % file_format)
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.ExplorationFileSystem(exploration_id))

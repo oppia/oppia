@@ -58,8 +58,13 @@ def get_exploration_rights(exploration_id):
         model.community_owned, model.cloned_from, model.status)
 
 
-def save_exploration_rights(exploration_rights):
+def save_exploration_rights(
+        committer_id, exploration_rights, commit_message='', commit_cmds=None):
     """Saves an ExplorationRights domain object to the datastore."""
+    # TODO(sll): Make commit_message and commit_cmds non-optional.
+    if commit_cmds is None:
+        commit_cmds = []
+
     model = exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
         owner_ids=exploration_rights.owner_ids,
@@ -69,7 +74,7 @@ def save_exploration_rights(exploration_rights):
         cloned_from=exploration_rights.cloned_from,
         status=exploration_rights.status
     )
-    model.put()
+    model.put(committer_id, commit_message, commit_cmds)
 
 
 def is_exploration_public(exploration_id):
@@ -233,7 +238,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
         if assignee_id in exp_rights.editor_ids:
             exp_rights.editor_ids.remove(assignee_id)
 
-        save_exploration_rights(exp_rights)
+        save_exploration_rights(committer_id, exp_rights)
 
     elif new_role == ROLE_EDITOR:
         if Actor(assignee_id).can_edit(exploration_id):
@@ -245,7 +250,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
         if assignee_id in exp_rights.viewer_ids:
             exp_rights.viewer_ids.remove(assignee_id)
 
-        save_exploration_rights(exp_rights)
+        save_exploration_rights(committer_id, exp_rights)
 
     elif new_role == ROLE_VIEWER:
         if Actor(assignee_id).can_view(exploration_id):
@@ -253,7 +258,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
         exp_rights = get_exploration_rights(exploration_id)
         exp_rights.viewer_ids.append(assignee_id)
-        save_exploration_rights(exp_rights)
+        save_exploration_rights(committer_id, exp_rights)
 
     logging.info(
         'User %s successfully made user %s into a(n) %s of exploration %s' % (
@@ -277,7 +282,7 @@ def publish_exploration(committer_id, exploration_id):
 
     exp_rights = get_exploration_rights(exploration_id)
     exp_rights.status = EXPLORATION_STATUS_PUBLIC
-    save_exploration_rights(exp_rights)
+    save_exploration_rights(committer_id, exp_rights)
 
     logging.info(
         'User %s published exploration %s' % (committer_id, exploration_id))
@@ -296,7 +301,7 @@ def unpublish_exploration(committer_id, exploration_id):
 
     exp_rights = get_exploration_rights(exploration_id)
     exp_rights.status = EXPLORATION_STATUS_PRIVATE
-    save_exploration_rights(exp_rights)
+    save_exploration_rights(committer_id, exp_rights)
 
     logging.info(
         'User %s unpublished exploration %s' % (committer_id, exploration_id))

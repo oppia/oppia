@@ -21,7 +21,6 @@ import logging
 
 from core.controllers import base
 from core.domain import config_domain
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -470,8 +469,8 @@ class ImageUploadHandler(EditorHandler):
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
-        format = imghdr.what(None, h=raw)
-        if format not in feconf.ACCEPTED_IMAGE_FORMATS:
+        file_format = imghdr.what(None, h=raw)
+        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS:
             allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
             raise Exception('Image file not recognized: it should be in '
                             'one of the following formats: %s.' %
@@ -487,14 +486,14 @@ class ImageUploadHandler(EditorHandler):
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
             extension = filename[dot_index+1:]
-            if extension != format:
+            if extension != file_format:
                 raise self.InvalidInputException(
                     'Expected a filename ending in .%s; received %s' %
-                    (format, filename))
+                    (file_format, filename))
         else:
             primary_name = filename
 
-        filepath = '%s.%s' % (primary_name, format)
+        filepath = '%s.%s' % (primary_name, file_format)
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))

@@ -421,8 +421,16 @@ def get_summary_of_change_list(exploration_id, change_list):
     }
 
 
-def save_exploration(committer_id, exploration, commit_message=''):
-    """Commits an exploration domain object to persistent storage."""
+def save_exploration(
+        committer_id, exploration, commit_message='', change_list=None):
+    """Commits an exploration domain object to persistent storage.
+
+    If successful, increments the version number of the incoming exploration
+    domain object by 1.
+    """
+    if change_list is None:
+        change_list = []
+
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
         warnings = exploration.validate(strict=True)
@@ -482,15 +490,13 @@ def save_exploration(committer_id, exploration, commit_message=''):
         'version': exploration_model.version,
     }
 
-    version_snapshot = feconf.NULL_SNAPSHOT
-    if rights_manager.is_exploration_public(exploration.id):
-        version_snapshot = export_to_versionable_dict(exploration)
+    version_snapshot = export_to_versionable_dict(exploration)
     exploration_model.put(
-        committer_id, properties_dict, version_snapshot, commit_message)
+        committer_id, properties_dict, version_snapshot, commit_message,
+        change_list)
+    memcache_services.delete(_get_exploration_memcache_key(exploration.id))
 
-    exploration_memcache_key = _get_exploration_memcache_key(
-        exploration.id)
-    memcache_services.delete(exploration_memcache_key)
+    exploration.version += 1
 
 
 def create_new(
@@ -516,11 +522,12 @@ def create_new(
 
     exp_domain.Exploration(exploration_model).validate()
 
-    exploration_model.put(user_id, {})
+    exploration_model.put(
+        user_id, {}, commit_message='Exploration first created.')
 
     exploration_rights = rights_manager.ExplorationRights(
         exploration_id, [user_id], [], [], cloned_from=cloned_from)
-    rights_manager.save_exploration_rights(exploration_rights)
+    rights_manager.save_exploration_rights(user_id, exploration_rights)
 
     return exploration_id
 
@@ -542,26 +549,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    if force_deletion:
-        exploration_model.delete()
-    else:
-        exploration_model.put(committer_id, {'deleted': True})
-
-    for snapshot in exp_models.ExplorationSnapshotModel.get_all():
-        if snapshot.exploration_id == exploration_id:
-            if force_deletion:
-                snapshot.delete()
-            else:
-                snapshot.deleted = True
-                snapshot.put()
-
-    for snapshot in exp_models.ExplorationSnapshotContentModel.get_all():
-        if snapshot.exploration_id == exploration_id:
-            if force_deletion:
-                snapshot.delete()
-            else:
-                snapshot.deleted = True
-                snapshot.put()
+    exploration_model.delete(committer_id, '', force_deletion=force_deletion)
 
 
 # Operations involving exploration parameters.
@@ -604,19 +592,18 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
 
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
-        following keys: committer_id, commit_message, created_on,
-        version_number. The version numbers are consecutive and in descending
-        order. There are max(limit, exploration.version_number) items in the
-        returned list.
+        following keys: committer_id, commit_message, commit_cmds, commit_type,
+        created_on, version_number. The version numbers are consecutive and in
+        descending order. There are max(limit, exploration.version_number)
+        items in the returned list.
     """
     exploration = get_exploration_by_id(exploration_id)
     oldest_version = max(exploration.version - limit, 0) + 1
     current_version = exploration.version
     version_nums = range(current_version, oldest_version - 1, -1)
 
-    snapshots_metadata = [exp_models.ExplorationSnapshotModel.get_metadata(
-        exploration_id, version_num
-    ) for version_num in version_nums]
+    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+        exploration_id, version_nums)
     return snapshots_metadata
 
 
@@ -642,7 +629,7 @@ def update_exploration(
             'received none.')
 
     exploration = apply_change_list(exploration_id, change_list)
-    save_exploration(committer_id, exploration, commit_message)
+    save_exploration(committer_id, exploration, commit_message, change_list)
 
 
 def classify(exploration_id, state_name, handler_name, answer, params):
@@ -831,22 +818,26 @@ def delete_demo(exploration_id):
 
 
 def load_demo(exploration_id):
-    """Loads a demo exploration."""
+    """Loads a demo exploration.
+
+    The resulting exploration will have version 2 (one for its initial
+    creation and one for its subsequent modification.)
+    """
     # TODO(sll): Speed this method up. It is too slow.
     delete_demo(exploration_id)
 
     if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
-    exploration = feconf.DEMO_EXPLORATIONS[int(exploration_id)]
+    exploration_info = feconf.DEMO_EXPLORATIONS[int(exploration_id)]
 
-    if len(exploration) == 3:
-        (exp_filename, title, category) = exploration
+    if len(exploration_info) == 3:
+        (exp_filename, title, category) = exploration_info
     else:
-        raise Exception('Invalid demo exploration: %s' % exploration)
+        raise Exception('Invalid demo exploration: %s' % exploration_info)
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
-    exploration_id = create_from_yaml(
+    create_from_yaml(
         yaml_content, ADMIN_COMMITTER_ID, title, category,
         exploration_id=exploration_id)
 
@@ -854,9 +845,6 @@ def load_demo(exploration_id):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
         fs.put(asset_filename, asset_content)
-
-    exploration = get_exploration_by_id(exploration_id)
-    save_exploration(ADMIN_COMMITTER_ID, exploration)
 
     rights_manager.publish_exploration(ADMIN_COMMITTER_ID, exploration_id)
 

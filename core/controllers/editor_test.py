@@ -84,6 +84,7 @@ class EditorTest(test_utils.GenericTestBase):
         """Test the error cases for adding a new state to an exploration."""
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
+        CURRENT_VERSION = 2
 
         # Register and log in as an admin.
         self.register('editor@example.com')
@@ -119,41 +120,49 @@ class EditorTest(test_utils.GenericTestBase):
         self.assertIn('which is too old', response_dict['error'])
 
         # A request with an empty state name is invalid.
-        response_dict = _put_and_expect_400_error(_get_payload('', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('', CURRENT_VERSION))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a really long state name is invalid.
-        response_dict = _put_and_expect_400_error(_get_payload('a' * 100, 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('a' * 100, CURRENT_VERSION))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a state name containing invalid characters is
         # invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('[Bad State Name]', 0))
+            _get_payload('[Bad State Name]', CURRENT_VERSION))
         self.assertIn('Invalid character [', response_dict['error'])
 
         # A request with a state name of feconf.END_DEST is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload(feconf.END_DEST, 0))
+            _get_payload(feconf.END_DEST, CURRENT_VERSION))
         self.assertIn('Invalid state name', response_dict['error'])
 
         # Even if feconf.END_DEST is mixed case, it is still invalid.
-        response_dict = _put_and_expect_400_error(_get_payload('eNd', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('eNd', CURRENT_VERSION))
         self.assertEqual('eNd'.lower(), feconf.END_DEST.lower())
         self.assertIn('Invalid state name', response_dict['error'])
 
         # A name cannot have spaces at the front or back.
-        response_dict = _put_and_expect_400_error(_get_payload('  aa', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('  aa', CURRENT_VERSION))
         self.assertIn('start or end with whitespace', response_dict['error'])
-        response_dict = _put_and_expect_400_error(_get_payload('aa\t', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('aa\t', CURRENT_VERSION))
         self.assertIn('end with whitespace', response_dict['error'])
-        response_dict = _put_and_expect_400_error(_get_payload('\n', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('\n', CURRENT_VERSION))
         self.assertIn('end with whitespace', response_dict['error'])
 
         # A name cannot have consecutive whitespace.
-        response_dict = _put_and_expect_400_error(_get_payload('The   B', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('The   B', CURRENT_VERSION))
         self.assertIn('Adjacent whitespace', response_dict['error'])
-        response_dict = _put_and_expect_400_error(_get_payload('The\t\tB', 0))
+        response_dict = _put_and_expect_400_error(
+            _get_payload('The\t\tB', CURRENT_VERSION))
         self.assertIn('Adjacent whitespace', response_dict['error'])
 
         self.logout()

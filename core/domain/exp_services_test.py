@@ -1098,52 +1098,107 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_snapshots_metadata(self):
         eid = 'exp_id'
-        exploration = exp_services.get_exploration_by_id(
+        v1_exploration = exp_services.get_exploration_by_id(
             exp_services.create_new(
                 'committer_id_1', 'A title', 'A category', eid,
                 default_dest_is_end_state=True))
-
-        self.assertEqual(
-            exp_services.get_exploration_snapshots_metadata(eid, 3), [])
-
-        # Publish the exploration so that version snapshots start getting
-        # recorded.
-        rights_manager.publish_exploration('committer_id_1', eid)
-
-        exploration = exp_services.get_exploration_by_id(eid)
-        exploration.title = 'First title'
-        exp_services.save_exploration(
-            'committer_id_1', exploration, 'Changed title.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 3)
         self.assertEqual(len(snapshots_metadata), 1)
         self.assertDictContainsSubset({
+            'commit_cmds': [],
             'committer_id': 'committer_id_1',
-            'commit_message': 'Changed title.',
-            'version_number': 1,
+            'commit_message': 'Exploration first created.',
+            'commit_type': 'create',
+            'version_number': 1
         }, snapshots_metadata[0])
+        self.assertIn('created_on', snapshots_metadata[0])
 
-        # Using the old version of the exploration should raise an error.
-        with self.assertRaisesRegexp(Exception, 'version 0, which is too old'):
-            exp_services.save_exploration('committer_id_2', exploration)
+        # Publish the exploration. This does not affect the exploration version
+        # history.
+        rights_manager.publish_exploration('committer_id_1', eid)
 
-        exploration = exp_services.get_exploration_by_id(eid)
-        exploration.title = 'New title'
-        exp_services.save_exploration('committer_id_2', exploration)
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 3)
+        self.assertEqual(len(snapshots_metadata), 1)
+        self.assertDictContainsSubset({
+            'commit_cmds': [],
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first created.',
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
+        self.assertIn('created_on', snapshots_metadata[0])
+
+        # Modify the exploration. This affects the exploration version history.
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'First title'
+        }]
+        exp_services.update_exploration(
+            'committer_id_1', eid, change_list, 'Changed title.')
+
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 3)
         self.assertEqual(len(snapshots_metadata), 2)
+        self.assertIn('created_on', snapshots_metadata[0])
         self.assertDictContainsSubset({
-            'committer_id': 'committer_id_2',
-            'commit_message': '',
+            'commit_cmds': change_list,
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
             'version_number': 2,
         }, snapshots_metadata[0])
         self.assertDictContainsSubset({
+            'commit_cmds': [],
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first created.',
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[1])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])
+
+        # Using the old version of the exploration should raise an error.
+        with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
+            exp_services.save_exploration('committer_id_2', v1_exploration)
+
+        # Another person modifies the exploration.
+        new_change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        exp_services.update_exploration(
+            'committer_id_2', eid, new_change_list, 'Second commit.')
+
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            eid, 5)
+        self.assertEqual(len(snapshots_metadata), 3)
+        self.assertDictContainsSubset({
+            'commit_cmds': new_change_list,
+            'committer_id': 'committer_id_2',
+            'commit_message': 'Second commit.',
+            'commit_type': 'edit',
+            'version_number': 3,
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list,
             'committer_id': 'committer_id_1',
             'commit_message': 'Changed title.',
-            'version_number': 1,
+            'commit_type': 'edit',
+            'version_number': 2,
         }, snapshots_metadata[1])
+        self.assertDictContainsSubset({
+            'commit_cmds': [],
+            'committer_id': 'committer_id_1',
+            'commit_message': 'Exploration first created.',
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[2])
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
@@ -1154,43 +1209,40 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             exp_services.create_new(
                 'committer_id_1', 'A title', 'A category', eid,
                 default_dest_is_end_state=True))
+        commit_dict_1 = {
+            'committer_id': 'committer_id_1',
+            'commit_message': '',
+            'version_number': 1,
+        }
 
-        # Publish the exploration so that version snapshots start getting
-        # recorded.
-        rights_manager.publish_exploration('committer_id_1', eid)
-
-        # TODO(sll): Reinstate the following when state add/delete operations
-        # can be done as part of a larger commit.
-        """
-        exploration = exp_services.get_exploration_by_id(eid)
         exploration.title = 'First title'
         exp_services.save_exploration(
             'committer_id_1', exploration, 'Changed title.')
-        commit_dict_1 = {
+        commit_dict_2 = {
             'committer_id': 'committer_id_1',
             'commit_message': 'Changed title.',
-            'version_number': 1,
+            'version_number': 2,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 5)
-        self.assertEqual(len(snapshots_metadata), 1)
+        self.assertEqual(len(snapshots_metadata), 2)
 
         exploration = exp_services.get_exploration_by_id(eid)
         exploration.add_states(['New state'])
         exp_services.save_exploration(
             'committer_id_2', exploration, 'Added new state')
 
-        commit_dict_2 = {
+        commit_dict_3 = {
             'committer_id': 'committer_id_2',
             'commit_message': 'Added new state',
-            'version_number': 2,
+            'version_number': 3,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 5)
-        self.assertEqual(len(snapshots_metadata), 2)
+        self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset(
-            commit_dict_2, snapshots_metadata[0])
-        self.assertDictContainsSubset(commit_dict_1, snapshots_metadata[1])
+            commit_dict_3, snapshots_metadata[0])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
@@ -1202,17 +1254,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Now delete the new state.
         exploration.delete_state('New state')
-        commit_dict_3 = {
+        exp_services.save_exploration(
+            'committer_id_3', exploration, 'Deleted state: New state')
+
+        commit_dict_4 = {
             'committer_id': 'committer_id_3',
             'commit_message': 'Deleted state: New state',
-            'version_number': 3,
+            'version_number': 4,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             eid, 5)
-        self.assertEqual(len(snapshots_metadata), 3)
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[0])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        self.assertDictContainsSubset(commit_dict_1, snapshots_metadata[2])
+        self.assertEqual(len(snapshots_metadata), 4)
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[0])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[1])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[2])
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
@@ -1223,4 +1278,3 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(eid)
         self.assertEqual(len(exploration.states), 1)
-        """

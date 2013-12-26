@@ -100,8 +100,6 @@ for ind in range(32):
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A sentinel value to indicate that no exploration snapshot should be saved.
-NULL_SNAPSHOT = {}
 
 # Whether to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
