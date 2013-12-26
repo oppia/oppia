@@ -135,14 +135,14 @@ urls = [
         r'/createhandler/change_list_summary/<exploration_id>',
         editor.ChangeListSummaryHandler, 'change_list_summary'),
     get_redirect_route(
-        r'/createhandler/delete_state/<exploration_id>/<escaped_state_name>',
-        editor.DeleteStateHandler, 'delete_state_handler'),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
     get_redirect_route(
-        r'/createhandler/imageupload/<exploration_id>', editor.ImageUploadHandler,
-        'image_upload_handler'),
+        r'/createhandler/imageupload/<exploration_id>',
+        editor.ImageUploadHandler, 'image_upload_handler'),
+    get_redirect_route(
+        r'/createhandler/new_state_template/<exploration_id>',
+        editor.NewStateTemplateHandler, 'new_state_template'),
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),

@@ -344,9 +344,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(new_fs.get('abc.png'), raw_image)
 
     def test_create_new_exploration_error_cases(self):
-        with self.assertRaisesRegexp(Exception, 'has no title'):
+        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
             exp_services.create_new(self.owner_id, '', '')
-        with self.assertRaisesRegexp(Exception, 'has no category'):
+        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
             exp_services.create_new(self.owner_id, 'title', '')
         exp_services.create_new(self.owner_id, 'title', 'category')
 
@@ -652,25 +652,25 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_unresolved_answers(self):
         self.assertEquals(
-            exp_services.get_unresolved_answers_for_default_rule(
+            exp_services._get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
-            exp_services.get_unresolved_answers_for_default_rule(
+            exp_services._get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 1})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
-            exp_services.get_unresolved_answers_for_default_rule(
+            exp_services._get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 2})
 
         stats_services.EventHandler.resolve_answers_for_default_rule(
             'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
         self.assertEquals(
-            exp_services.get_unresolved_answers_for_default_rule(
+            exp_services._get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
     def test_delete_state(self):

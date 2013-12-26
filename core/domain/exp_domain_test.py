@@ -53,7 +53,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = FakeExploration()
 
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'exploration has no title'):
+                utils.ValidationError, 'between 1 and 50 characters'):
             exploration.validate()
 
         exploration.title = 'Hello #'
@@ -63,7 +63,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.title = 'Title'
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'exploration has no category'):
+                utils.ValidationError, 'between 1 and 50 characters'):
             exploration.validate()
 
         exploration.category = 'Category'
@@ -77,11 +77,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
         exploration.states = {'A string #': new_state}
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character # in state name'):
+                utils.ValidationError, 'Invalid character # in a state name'):
             exploration.validate()
         exploration.states = {'A string _': new_state}
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid character _ in state name'):
+                utils.ValidationError, 'Invalid character _ in a state name'):
             exploration.validate()
 
         exploration.states = {'ABC': new_state}

@@ -14,10 +14,11 @@
 
 __author__ = 'Sean Lip'
 
-import json
 import unittest
 
+from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import stats_domain
 from core.domain import rights_manager
 import feconf
 import test_utils
@@ -51,8 +52,8 @@ class EditorTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_add_new_state(self):
-        """Test adding a new state to an exploration."""
+    def test_request_new_state_template(self):
+        """Test requesting a new state template when adding a new state."""
         # Register and log in as an admin.
         self.register('editor@example.com')
         self.login('editor@example.com', is_admin=True)
@@ -66,18 +67,21 @@ class EditorTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Add a new state called 'New valid state name'.
-        response_dict = self.post_json('/createhandler/data/%s' % EXP_ID, {
-            'state_name': 'New valid state name', 'version': 0
-        }, csrf_token)
+        response_dict = self.post_json(
+            '/createhandler/new_state_template/%s' % EXP_ID, {
+                'state_name': 'New valid state name'
+            }, csrf_token)
 
-        self.assertDictContainsSubset({'version': 0}, response_dict)
-        self.assertTrue('stateData' in response_dict)
-        self.assertEqual(response_dict['stateName'], 'New valid state name')
+        self.assertDictContainsSubset({
+            'content': [{'type': 'text', 'value': ''}],
+            'unresolved_answers': {}
+        }, response_dict['new_state'])
+        self.assertTrue('widget' in response_dict['new_state'])
 
         self.logout()
 
     def test_add_new_state_error_cases(self):
-        """Test the error cases for adding a new state."""
+        """Test the error cases for adding a new state to an exploration."""
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
@@ -88,39 +92,69 @@ class EditorTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        def _post_and_expect_400_error(payload):
-            return self.post_json(
+        def _get_payload(new_state_name, version=None):
+            result = {
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': new_state_name
+                }],
+                'commit_message': 'Add new state',
+            }
+            if version is not None:
+                result['version'] = version
+            return result
+
+        def _put_and_expect_400_error(payload):
+            return self.put_json(
                 '/createhandler/data/0', payload, csrf_token,
                 expect_errors=True, expected_status_int=400)
 
-        # A POST request with no version number is invalid.
-        response_dict = _post_and_expect_400_error({'state_name': 'New state'})
+        # A request with no version number is invalid.
+        response_dict = _put_and_expect_400_error(_get_payload('New state'))
         self.assertIn('a version must be specified', response_dict['error'])
 
-        # A POST request with the wrong version number is invalid.
-        response_dict = _post_and_expect_400_error({
-            'state_name': 'New state', 'version': 123})
+        # A request with the wrong version number is invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('New state', 123))
         self.assertIn('which is too old', response_dict['error'])
 
-        # A POST request with no state name is invalid.
-        response_dict = _post_and_expect_400_error({'version': 0})
-        self.assertIn('Please specify a state name.', response_dict['error'])
+        # A request with an empty state name is invalid.
+        response_dict = _put_and_expect_400_error(_get_payload('', 0))
+        self.assertIn('should be between 1 and 50', response_dict['error'])
 
-        # A POST request with an empty state name is invalid.
-        response_dict = _post_and_expect_400_error({
-            'state_name': '', 'version': 0})
-        self.assertIn('Please specify a state name.', response_dict['error'])
+        # A request with a really long state name is invalid.
+        response_dict = _put_and_expect_400_error(_get_payload('a' * 100, 0))
+        self.assertIn('should be between 1 and 50', response_dict['error'])
 
-        # A POST request with a state name containing invalid characters is
+        # A request with a state name containing invalid characters is
         # invalid.
-        response_dict = _post_and_expect_400_error({
-            'state_name': '[Bad State Name]', 'version': 0})
+        response_dict = _put_and_expect_400_error(
+            _get_payload('[Bad State Name]', 0))
         self.assertIn('Invalid character [', response_dict['error'])
 
-        # A POST request with a state name of feconf.END_DEST is invalid.
-        response_dict = _post_and_expect_400_error({
-            'state_name': feconf.END_DEST, 'version': 0})
+        # A request with a state name of feconf.END_DEST is invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload(feconf.END_DEST, 0))
         self.assertIn('Invalid state name', response_dict['error'])
+
+        # Even if feconf.END_DEST is mixed case, it is still invalid.
+        response_dict = _put_and_expect_400_error(_get_payload('eNd', 0))
+        self.assertEqual('eNd'.lower(), feconf.END_DEST.lower())
+        self.assertIn('Invalid state name', response_dict['error'])
+
+        # A name cannot have spaces at the front or back.
+        response_dict = _put_and_expect_400_error(_get_payload('  aa', 0))
+        self.assertIn('start or end with whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(_get_payload('aa\t', 0))
+        self.assertIn('end with whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(_get_payload('\n', 0))
+        self.assertIn('end with whitespace', response_dict['error'])
+
+        # A name cannot have consecutive whitespace.
+        response_dict = _put_and_expect_400_error(_get_payload('The   B', 0))
+        self.assertIn('Adjacent whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(_get_payload('The\t\tB', 0))
+        self.assertIn('Adjacent whitespace', response_dict['error'])
 
         self.logout()
 
@@ -176,8 +210,10 @@ class EditorTest(test_utils.GenericTestBase):
         url = str('/createhandler/resolved_answers/0/%s' % state_name)
 
         def _get_unresolved_answers():
-            return exp_services.get_unresolved_answers_for_default_rule(
-                '0', state_name)
+            return stats_domain.StateRuleAnswerLog.get(
+                '0', state_name, exp_services.SUBMIT_HANDLER_NAME,
+                exp_domain.DEFAULT_RULESPEC_STR
+            ).answers
 
         self.assertEqual(
             _get_unresolved_answers(), {'blah': 1, 'blah2': 2, 'blah3': 3})

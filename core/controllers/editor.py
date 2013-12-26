@@ -223,7 +223,7 @@ class ExplorationHandler(EditorHandler):
             'states': state_list,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
-            'version': exploration.version,
+            'version': exploration.version
         }
 
     @require_editor
@@ -231,33 +231,6 @@ class ExplorationHandler(EditorHandler):
         """Gets the data for the exploration overview page."""
         self.values.update(self._get_exploration_data(exploration_id))
         self.render_json(self.values)
-
-    @require_editor
-    def post(self, exploration_id):
-        """Adds a new state to the given exploration."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-
-        version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
-
-        state_name = self.payload.get('state_name')
-        if not state_name:
-            raise self.InvalidInputException('Please specify a state name.')
-
-        try:
-            exploration.add_states([state_name])
-            exp_services.save_exploration(
-                self.user_id, exploration, 'Added state \'%s\'' % state_name)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        self.render_json({
-            'version': exploration.version,
-            'stateName': state_name,
-            'stateData': exp_services.export_state_to_verbose_dict(
-                exploration_id, state_name)
-        })
 
     @require_editor
     def put(self, exploration_id):
@@ -353,28 +326,6 @@ class ExplorationRightsHandler(EditorHandler):
         self.render_json({
             'version': exploration.version,
             'editors': editors,
-        })
-
-
-class DeleteStateHandler(EditorHandler):
-    """Handles state deletions."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    @require_editor
-    def delete(self, exploration_id, state_name):
-        """Deletes the state with name state_name."""
-        # TODO(sll): Add a version check here. This probably involves NOT using
-        # delete(), but regarding this as an exploration put() instead. Or the
-        # param can be passed via the URL.
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        exploration.delete_state(state_name)
-        exp_services.save_exploration(
-            self.user_id, exploration, 'Deleted state: %s' % state_name)
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        self.render_json({
-            'version': exploration.version
         })
 
 
@@ -583,3 +534,20 @@ class ChangeListSummaryHandler(EditorHandler):
                 'summary': summary,
                 'warnings': warnings
             })
+
+
+class NewStateTemplateHandler(EditorHandler):
+    """Returns the template for a newly-added state."""
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        new_state_name = self.payload.get('state_name')
+
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration.add_states([new_state_name])
+        new_state = exploration.export_state_to_frontend_dict(new_state_name)
+        new_state['unresolved_answers'] = {}
+        self.render_json({
+            'new_state': new_state
+        })

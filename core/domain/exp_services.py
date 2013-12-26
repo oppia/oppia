@@ -119,43 +119,22 @@ def count_explorations():
 
 
 # Methods for exporting states and explorations to other formats.
-def get_unresolved_answers_for_default_rule(exploration_id, state_name):
-    """Gets the tally of unresolved answers that hit the default rule."""
-    # TODO(sll): Add similar functionality for other rules? But then we have
-    # to figure out what happens when those rules are edited/deleted.
-    # TODO(sll): Should this return just the top N answers instead?
+def _get_unresolved_answers_for_default_rule(exploration_id, state_name):
     return stats_domain.StateRuleAnswerLog.get(
         exploration_id, state_name, SUBMIT_HANDLER_NAME,
-        exp_domain.DEFAULT_RULESPEC_STR).answers
+        exp_domain.DEFAULT_RULESPEC_STR
+    ).answers
 
 
 def export_state_to_verbose_dict(exploration_id, state_name):
     """Gets a state dict with rule descriptions and unresolved answers."""
     exploration = get_exploration_by_id(exploration_id)
 
-    state_dict = exploration.states[state_name].to_dict()
+    state_frontend_dict = exploration.export_state_to_frontend_dict(state_name)
+    state_frontend_dict['unresolved_answers'] = (
+        _get_unresolved_answers_for_default_rule(exploration_id, state_name))
 
-    state_dict['unresolved_answers'] = get_unresolved_answers_for_default_rule(
-        exploration_id, state_name)
-
-    # TODO(sll): Fix the frontend and remove this line.
-    state_dict['widget']['id'] = state_dict['widget']['widget_id']
-
-    for handler in state_dict['widget']['handlers']:
-        for rule_spec in handler['rule_specs']:
-
-            widget = widget_registry.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX,
-                state_dict['widget']['widget_id']
-            )
-
-            input_type = widget.get_handler_by_name(handler['name']).input_type
-
-            rule_spec['description'] = rule_domain.get_rule_description(
-                rule_spec['definition'], exploration.param_specs, input_type
-            )
-
-    return state_dict
+    return state_frontend_dict
 
 
 def export_content_to_html(exploration_id, content_array, params=None):
@@ -352,9 +331,7 @@ def get_summary_of_change_list(exploration_id, change_list):
           has changed but we do not know what the changes are. This can happen
           for complicated operations like removing a state and later adding a
           new state with the same name as the removed state.
-        added_states: a dict, where each key is a state name, and the
-          corresponding values are dicts describing the states (these are
-          dictionary representations of exp_domain.State).
+        added_states: a list of added state names.
         deleted_states: a list of deleted state names.
     """
     # TODO(sll): This really needs tests, especially the diff logic. Probably
@@ -366,7 +343,7 @@ def get_summary_of_change_list(exploration_id, change_list):
     exploration_property_changes = {}
     state_property_changes = {}
     changed_states = []
-    added_states = {}
+    added_states = []
     deleted_states = []
 
     original_state_names = {
@@ -382,8 +359,7 @@ def get_summary_of_change_list(exploration_id, change_list):
                 del state_property_changes[change.state_name]
                 deleted_states.remove(change.state_name)
             else:
-                added_states[change.state_name] = (
-                    exploration.states[change.state_name].to_dict())
+                added_states.append(change.state_name)
                 original_state_names[change.state_name] = change.state_name
         elif change.cmd == 'rename_state':
             orig_state_name = original_state_names[change.old_state_name]
@@ -405,7 +381,7 @@ def get_summary_of_change_list(exploration_id, change_list):
             if orig_state_name in changed_states:
                 continue
             elif orig_state_name in added_states:
-                del added_states[orig_state_name]
+                added_states.remove(orig_state_name)
             else:
                 deleted_states.append(orig_state_name)
         elif change.cmd == 'edit_state_property':
@@ -470,7 +446,7 @@ def save_exploration(committer_id, exploration, commit_message=''):
     if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
         warnings = exploration.validate(strict=True)
         if warnings:
-            raise Exception(warnings)
+            raise utils.ValidationError(warnings)
     else:
         exploration.validate()
 

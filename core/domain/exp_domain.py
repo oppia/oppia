@@ -24,6 +24,7 @@ __author__ = 'Sean Lip'
 
 import copy
 import re
+import string
 
 from core.domain import html_cleaner
 from core.domain import param_domain
@@ -530,19 +531,39 @@ class Exploration(object):
         self.version = exploration_model.version
 
     @classmethod
-    def _require_valid_state_name(cls, name):
+    def _require_valid_name(cls, name, name_type):
+        """Generic name validation.
+
+        Args:
+          name: the name to validate.
+          name_type: a human-readable string, like 'the exploration title' or
+            'a state name'. This will be shown in error messages.
+        """
         # This check is needed because state names are used in URLs and as ids
         # for statistics, so the name length should be bounded above.
         if len(name) > 50 or len(name) < 1:
             raise utils.ValidationError(
-                'State name should have a length of at most 50 characters.')
+                'The length of %s should be between 1 and 50 '
+                'characters; received %s' % (name_type, name))
+
+        if name[0] in string.whitespace or name[-1] in string.whitespace:
+            raise utils.ValidationError(
+                'Names should not start or end with whitespace.')
+
+        if re.search('\s\s+', name):
+            raise utils.ValidationError(
+                'Adjacent whitespace in %s should be collapsed.' % name_type)
 
         for c in feconf.INVALID_NAME_CHARS:
             if c in name:
                 raise utils.ValidationError(
-                    'Invalid character %s in state name %s' % (c, name))
+                    'Invalid character %s in %s: %s' % (c, name_type, name))
 
-        if name == feconf.END_DEST:
+    @classmethod
+    def _require_valid_state_name(cls, name):
+        cls._require_valid_name(name, 'a state name')
+
+        if name.lower() == feconf.END_DEST.lower():
             raise utils.ValidationError(
                 'Invalid state name: %s' % feconf.END_DEST)
 
@@ -555,25 +576,13 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        if not self.title:
-            raise utils.ValidationError('This exploration has no title.')
-        for c in feconf.INVALID_NAME_CHARS:
-            if c in self.title:
-                raise utils.ValidationError(
-                    'Invalid character %s in exploration title %s'
-                    % (c, self.title))
+        self._require_valid_name(self.title, 'the exploration title')
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        if not self.category:
-            raise utils.ValidationError('This exploration has no category.')
-        for c in feconf.INVALID_NAME_CHARS:
-            if c in self.category:
-                raise utils.ValidationError(
-                    'Invalid character %s in exploration category %s'
-                    % (c, self.category))
+        self._require_valid_name(self.category, 'the exploration category')
 
         if not isinstance(self.default_skin, basestring):
             raise utils.ValidationError(
@@ -584,13 +593,11 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected a default_skin to be specified.')
 
-        if not self.states:
-            raise utils.ValidationError('This exploration has no states.')
-
         if not isinstance(self.states, dict):
             raise utils.ValidationError(
                 'Expected states to be a dict, received %s' % self.states)
-
+        if not self.states:
+            raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
             self.states[state_name].validate()
@@ -874,3 +881,27 @@ class Exploration(object):
                         rule.dest = other_state_name
 
         del self.states[state_name]
+
+    def export_state_to_frontend_dict(self, state_name):
+        """Gets a state dict with rule descriptions."""
+        state_dict = self.states[state_name].to_dict()
+
+        # TODO(sll): Fix the frontend and remove this line.
+        state_dict['widget']['id'] = state_dict['widget']['widget_id']
+
+        for handler in state_dict['widget']['handlers']:
+            for rule_spec in handler['rule_specs']:
+
+                widget = widget_registry.Registry.get_widget_by_id(
+                    feconf.INTERACTIVE_PREFIX,
+                    state_dict['widget']['widget_id']
+                )
+
+                input_type = widget.get_handler_by_name(
+                    handler['name']).input_type
+
+                rule_spec['description'] = rule_domain.get_rule_description(
+                    rule_spec['definition'], self.param_specs, input_type
+                )
+
+        return state_dict

@@ -208,7 +208,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         !$.isEmptyObject(explorationPropertyChanges) ||
         !$.isEmptyObject(statePropertyChanges) ||
         changedStates.length > 0 ||
-        !$.isEmptyObject(addedStates) ||
+        addedStates.length > 0 ||
         deletedStates.length > 0);
 
       if (!changesExist) {
@@ -478,7 +478,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $rootScope.explorationId = pathnameArray[2];
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
-  $scope.deleteStateUrlPrefix = '/createhandler/delete_state/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
@@ -839,12 +838,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
-    if ($scope.isExplorationLockedForEditing()) {
-      warningsData.addWarning(
-        'You need to save or discard your existing changes before adding a state.');
-      return;
-    }
-
     newStateName = $scope.normalizeWhitespace(newStateName);
     if (!$scope.isValidEntityName(newStateName, true)) {
       return;
@@ -860,62 +853,26 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
     }
 
+    $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
     $http.post(
-        $scope.explorationDataUrl,
-        oppiaRequestCreator.createRequest({
-          state_name: newStateName,
-          version: explorationData.data.version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              $scope.newStateDesc = '';
-              explorationData.data.states[data.stateName] = data.stateData;
-              explorationData.data.version = data.version;
-              $scope.initExplorationPage();
-              if (successCallback) {
-                successCallback(data.stateName);
-              }
-            }).error(function(data) {
-              // TODO(sll): Actually force a refresh, since the data on the
-              // page may be out of date.
-              warningsData.addWarning(
-                  'Server error when adding state: ' + data.error + '. ');
-            });
-  };
+      $scope.newStateTemplateUrl,
+      oppiaRequestCreator.createRequest({
+        state_name: newStateName
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+    .then(function(response) {
+      var data = response.data;
+      $scope.states[newStateName] = data.new_state;
 
-  // Deletes the state with name stateName. This action cannot be undone.
-  $scope.deleteState = function(stateName) {
-    if (stateName == $scope.initStateName) {
-      warningsData.addWarning('Deleting the initial state of a question is not ' +
-          'supported. Perhaps edit it instead?');
-      return;
-    }
+      $scope.explorationChangeList.push({
+        cmd: CMD_ADD_STATE,
+        state_name: newStateName
+      });
 
-    if ($scope.isExplorationLockedForEditing()) {
-      warningsData.addWarning(
-        'You need to save or discard your existing changes before deleting a state.');
-      return;
-    }
-
-    if (!$scope.states[stateName]) {
-      warningsData.addWarning('No state with name ' + stateName + ' exists.');
-      return;
-    }
-
-    $http['delete']($scope.deleteStateUrlPrefix + '/' + encodeURIComponent(stateName))
-    .success(function(data) {
-      // Reloads the page.
-      explorationData.data.version = data.version;
-      $window.location = $scope.explorationUrl;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error communicating with server.');
-    });
-  };
-
-  $scope.deleteExploration = function() {
-    $http['delete']($scope.explorationDataUrl)
-    .success(function(data) {
-      $window.location = '/gallery/';
+      $scope.drawGraph();
+      if (successCallback) {
+        successCallback(newStateName);
+      }
     });
   };
 
@@ -945,42 +902,36 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
   };
 
-  $scope.showDeleteExplorationModal = function() {
+  $scope.deleteExploration = function() {
     warningsData.clear();
 
     var modalInstance = $modal.open({
       templateUrl: 'modals/deleteExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope['delete'] = function() {
-            $modalInstance.close();
-          };
+        $scope.reallyDelete = function() {
+          $modalInstance.close();
+        };
 
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
     });
 
     modalInstance.result.then(function() {
-      $scope.deleteExploration();
-    }, function () {
-      console.log('Delete exploration modal dismissed.');
+      $http['delete']($scope.explorationDataUrl)
+      .success(function(data) {
+        $window.location = '/gallery/';
+      });
     });
   };
 
-  $scope.showDeleteStateModal = function(deleteStateName) {
-    if ($scope.isExplorationLockedForEditing()) {
-      warningsData.addWarning(
-        'You need to save or discard your existing changes before deleting a state.');
-      return;
-    }
-
+  $scope.deleteState = function(deleteStateName) {
     warningsData.clear();
 
-    var modalInstance = $modal.open({
+    $modal.open({
       templateUrl: 'modals/deleteState',
       backdrop: 'static',
       resolve: {
@@ -993,8 +944,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         function($scope, $modalInstance, deleteStateName) {
           $scope.deleteStateName = deleteStateName;
 
-          $scope['delete'] = function() {
-            $modalInstance.close({deleteStateName: deleteStateName});
+          $scope.reallyDelete = function() {
+            $modalInstance.close(deleteStateName);
           };
 
           $scope.cancel = function() {
@@ -1003,12 +954,42 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           };
         }
       ]
-    });
+    }).result.then(function(deleteStateName) {
+      if (deleteStateName == $scope.initStateName) {
+        warningsData.addWarning(
+          'Deleting the initial state of a question is not supported. ' +
+          'Perhaps edit it instead?');
+        return;
+      }
 
-    modalInstance.result.then(function(result) {
-      $scope.deleteState(result.deleteStateName);
-    }, function () {
-      console.log('Delete state modal dismissed.');
+      if (!$scope.states[deleteStateName]) {
+        warningsData.addWarning('No state with name ' + deleteStateName + ' exists.');
+        return;
+      }
+
+      delete $scope.states[deleteStateName];
+      for (var otherStateName in $scope.states) {
+        var handlers = $scope.states[otherStateName].widget.handlers;
+        for (var i = 0; i < handlers.length; i++) {
+          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+            if (handlers[i].rule_specs[j].dest === deleteStateName) {
+              handlers[i].rule_specs[j].dest = otherStateName;
+            }
+          }
+        }
+      }
+
+      if ($scope.stateName == deleteStateName) {
+        $scope.stateName = '';
+        $scope.selectMainTab();
+      }
+
+      $scope.explorationChangeList.push({
+        cmd: CMD_DELETE_STATE,
+        state_name: deleteStateName
+      });
+
+      $scope.drawGraph();
     });
   };
 }

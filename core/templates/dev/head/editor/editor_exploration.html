@@ -67,7 +67,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="delete()">Delete</button>
+        <button class="btn" ng-click="reallyDelete()">Delete</button>
         <button class="btn" ng-click="cancel()">Close</button>
       </div>
     </script>
@@ -84,7 +84,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="delete()">Delete</button>
+        <button class="btn" ng-click="reallyDelete()">Delete</button>
         <button class="btn" ng-click="cancel()">Close</button>
       </div>
     </script>
@@ -165,7 +165,7 @@
               &nbsp;&nbsp;&nbsp;
 
               <button type="button" class="btn btn-danger"
-                      ng-click="showDeleteExplorationModal()"
+                      ng-click="deleteExploration()"
                       title="Delete this exploration">
                 <i class="icon-trash" title="Delete Exploration"></i>
               </button>
