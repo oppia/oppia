@@ -225,26 +225,120 @@ def export_to_zip_file(exploration_id):
 
 
 # Repository SAVE and DELETE methods.
+class _Change(object):
+
+    STATE_PROPERTIES = (
+        'param_changes', 'content', 'widget_id',
+        'widget_customization_args', 'widget_sticky', 'widget_handlers')
+
+    EXPLORATION_PROPERTIES = (
+        'title', 'category', 'param_specs', 'param_changes')
+
+    def __init__(self, change_dict):
+        """Initializes a _Change object from a dict.
+
+        change_dict represents a command. It should have a 'cmd' key, and one
+        or more other keys. The possible values for 'cmd' are listed below,
+        together with the other keys in the dict:
+        - 'add_state' (with state_name)
+        - 'rename_state' (with old_state_name and new_state_name)
+        - 'delete_state' (with state_name)
+        - 'edit_state_property' (with state_name, property_name, new_value and,
+            optionally, old_value)
+        - 'edit_exploration_property' (with property_name, new_value and,
+            optionally, old_value)
+
+        For a state, property_name must be one of STATE_PROPERTIES. For an
+        exploration, property_name must be one of EXPLORATION_PROPERTIES.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == 'add_state':
+            self.state_name = change_dict['state_name']
+        elif self.cmd == 'rename_state':
+            self.old_state_name = change_dict['old_state_name']
+            self.new_state_name = change_dict['new_state_name']
+        elif self.cmd == 'delete_state':
+            self.state_name = change_dict['state_name']
+        elif self.cmd == 'edit_state_property':
+            if change_dict['property_name'] not in self.STATE_PROPERTIES:
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.state_name = change_dict['state_name']
+            self.property_name = change_dict['property_name']
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict.get('old_value')
+        elif self.cmd == 'edit_exploration_property':
+            if (change_dict['property_name'] not in
+                    self.EXPLORATION_PROPERTIES):
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.property_name = change_dict['property_name']
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict.get('old_value')
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
 
-    Each entry in change_list is a dict that represents a command. Each command
-    has a 'cmd' key, and one or more other keys.
-
-    The possible values for 'cmd' are listed below, together with the other
-    keys in the dict:
-    - 'add_state' (with state_name)
-    - 'rename_state' (with old_state_name and new_state_name)
-    - 'delete_state' (with state_name)
-    - 'edit_state_property' (with state_name, property_name and new_value)
-    - 'edit_exploration_property' (with property_name and new_value)
-
-    For a state, property_name must be one of _Change.STATE_PROPERTIES. For an
-    exploration, property_name must be one of _Change.EXPLORATION_PROPERTIES.
+    Each entry in change_list is a dict that represents a _Change object.
 
     Returns:
-      a dict with seven keys:
-        exploration: the resulting exploration domain object.
+      the resulting exploration domain object.
+    """
+    exploration = get_exploration_by_id(exploration_id)
+    try:
+        changes = [_Change(change_dict) for change_dict in change_list]
+
+        for change in changes:
+            if change.cmd == 'add_state':
+                exploration.add_states([change.state_name])
+            elif change.cmd == 'rename_state':
+                exploration.rename_state(
+                    change.old_state_name, change.new_state_name)
+            elif change.cmd == 'delete_state':
+                exploration.delete_state(change.state_name)
+            elif change.cmd == 'edit_state_property':
+                state = exploration.states[change.state_name]
+                if change.property_name == 'param_changes':
+                    state.update_param_changes(change.new_value)
+                elif change.property_name == 'content':
+                    state.update_content(change.new_value)
+                elif change.property_name == 'widget_id':
+                    state.update_widget_id(change.new_value)
+                elif change.property_name == 'widget_customization_args':
+                    state.update_widget_customization_args(change.new_value)
+                elif change.property_name == 'widget_sticky':
+                    state.update_widget_sticky(change.new_value)
+                elif change.property_name == 'widget_handlers':
+                    state.update_widget_handlers(change.new_value)
+            elif change.cmd == 'edit_exploration_property':
+                if change.property_name == 'title':
+                    exploration.update_title(change.new_value)
+                elif change.property_name == 'category':
+                    exploration.update_category(change.new_value)
+                elif change.property_name == 'param_specs':
+                    exploration.update_param_specs(change.new_value)
+                elif change.property_name == 'param_changes':
+                    exploration.update_param_changes(change.new_value)
+        return exploration
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, exploration_id, change_list)
+        )
+        raise
+
+
+def get_summary_of_change_list(exploration_id, change_list):
+    """Applies a changelist to a pristine exploration and returns a summary.
+
+    Each entry in change_list is a dict that represents a _Change object.
+
+    Returns:
+      a dict with five keys:
         exploration_property_changes: a dict, where each key is a property_name
           of the exploration, and the corresponding values are dicts with keys
           old_value and new_value.
@@ -262,46 +356,9 @@ def apply_change_list(exploration_id, change_list):
           corresponding values are dicts describing the states (these are
           dictionary representations of exp_domain.State).
         deleted_states: a list of deleted state names.
-        warnings: a list of warnings corresponding to failed checks in
-          strict validation of the resulting exploration.
     """
-    # TODO(sll): This really needs tests, especially the diff logic.
-
-    class _Change(object):
-
-        STATE_PROPERTIES = (
-            'param_changes', 'content', 'widget_id',
-            'widget_customization_args', 'widget_sticky', 'widget_handlers')
-
-        EXPLORATION_PROPERTIES = (
-            'title', 'category', 'param_specs', 'param_changes')
-
-        def __init__(self, change_dict):
-            if 'cmd' not in change_dict:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.cmd = change_dict['cmd']
-
-            if self.cmd == 'add_state':
-                self.state_name = change_dict['state_name']
-            elif self.cmd == 'rename_state':
-                self.old_state_name = change_dict['old_state_name']
-                self.new_state_name = change_dict['new_state_name']
-            elif self.cmd == 'delete_state':
-                self.state_name = change_dict['state_name']
-            elif self.cmd == 'edit_state_property':
-                if change_dict['property_name'] not in self.STATE_PROPERTIES:
-                    raise Exception('Invalid change_dict: %s' % change_dict)
-                self.state_name = change_dict['state_name']
-                self.property_name = change_dict['property_name']
-                self.new_value = change_dict['new_value']
-            elif self.cmd == 'edit_exploration_property':
-                if (change_dict['property_name'] not in
-                        self.EXPLORATION_PROPERTIES):
-                    raise Exception('Invalid change_dict: %s' % change_dict)
-                self.property_name = change_dict['property_name']
-                self.new_value = change_dict['new_value']
-            else:
-                raise Exception('Invalid change_dict: %s' % change_dict)
+    # TODO(sll): This really needs tests, especially the diff logic. Probably
+    # worth comparing with the actual changed exploration.
 
     exploration = get_exploration_by_id(exploration_id)
     changes = [_Change(change_dict) for change_dict in change_list]
@@ -318,8 +375,6 @@ def apply_change_list(exploration_id, change_list):
 
     for change in changes:
         if change.cmd == 'add_state':
-            exploration.add_states([change.state_name])
-
             if change.state_name in changed_states:
                 continue
             elif change.state_name in deleted_states:
@@ -331,9 +386,6 @@ def apply_change_list(exploration_id, change_list):
                     exploration.states[change.state_name].to_dict())
                 original_state_names[change.state_name] = change.state_name
         elif change.cmd == 'rename_state':
-            exploration.rename_state(
-                change.old_state_name, change.new_state_name)
-
             orig_state_name = original_state_names[change.old_state_name]
             original_state_names[change.new_state_name] = orig_state_name
 
@@ -349,8 +401,6 @@ def apply_change_list(exploration_id, change_list):
             state_property_changes[orig_state_name]['name']['new_value'] = (
                 change.new_state_name)
         elif change.cmd == 'delete_state':
-            exploration.delete_state(change.state_name)
-
             orig_state_name = original_state_names[change.state_name]
             if orig_state_name in changed_states:
                 continue
@@ -359,21 +409,7 @@ def apply_change_list(exploration_id, change_list):
             else:
                 deleted_states.append(orig_state_name)
         elif change.cmd == 'edit_state_property':
-            state = exploration.states[change.state_name]
-            if change.property_name == 'param_changes':
-                state.update_param_changes(change.new_value)
-            elif change.property_name == 'content':
-                state.update_content(change.new_value)
-            elif change.property_name == 'widget_id':
-                state.update_widget_id(change.new_value)
-            elif change.property_name == 'widget_customization_args':
-                state.update_widget_customization_args(change.new_value)
-            elif change.property_name == 'widget_sticky':
-                state.update_widget_sticky(change.new_value)
-            elif change.property_name == 'widget_handlers':
-                state.update_widget_handlers(change.new_value)
-
-            orig_state_name = original_state_names[change.old_state_name]
+            orig_state_name = original_state_names[change.state_name]
             if orig_state_name in changed_states:
                 continue
 
@@ -383,42 +419,48 @@ def apply_change_list(exploration_id, change_list):
                 state_property_changes[orig_state_name] = {}
             if property_name not in state_property_changes[orig_state_name]:
                 state_property_changes[orig_state_name][property_name] = {
-                    # TODO(sll): Fix this.
-                    'old_value': None
+                    'old_value': change.old_value
                 }
             state_property_changes[orig_state_name][property_name][
                 'new_value'] = change.new_value
         elif change.cmd == 'edit_exploration_property':
-            old_value = None
-            if change.property_name == 'title':
-                old_value = exploration.title
-                exploration.update_title(change.new_value)
-            elif change.property_name == 'title':
-                old_value = exploration.category
-                exploration.update_category(change.new_value)
-            elif change.property_name == 'param_specs':
-                exploration.update_param_specs(change.new_value)
-            elif change.property_name == 'param_changes':
-                exploration.update_param_changes(change.new_value)
-
             if property_name not in exploration_property_changes:
                 exploration_property_changes[property_name] = {
-                    # TODO(sll): Fix this.
-                    'old_value': old_value
+                    'old_value': change.old_value
                 }
             exploration_property_changes[property_name]['new_value'] = (
                 change.new_value)
 
-    warnings = exploration.validate(strict=True)
+    unchanged_exploration_properties = []
+    for property_name in exploration_property_changes:
+        if (exploration_property_changes[property_name]['old_value'] ==
+                exploration_property_changes[property_name]['new_value']):
+            unchanged_exploration_properties.append(property_name)
+    for property_name in unchanged_exploration_properties:
+        del exploration_property_changes[property_name]
+
+    unchanged_state_names = []
+    for state_name in state_property_changes:
+        unchanged_state_properties = []
+        changes = state_property_changes[state_name]
+        for property_name in changes:
+            if (changes[property_name]['old_value'] ==
+                    changes[property_name]['new_value']):
+                unchanged_state_properties.append(property_name)
+        for property_name in unchanged_state_properties:
+            del changes[property_name]
+
+        if len(changes) == 0:
+            unchanged_state_names.append(state_name)
+    for state_name in unchanged_state_names:
+        del state_property_changes[state_name]
 
     return {
-        'exploration': exploration,
         'exploration_property_changes': exploration_property_changes,
         'state_property_changes': state_property_changes,
         'changed_states': changed_states,
         'added_states': added_states,
         'deleted_states': deleted_states,
-        'warnings': warnings
     }
 
 
@@ -621,130 +663,28 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
     return snapshots_metadata
 
 
-# Operations on states belonging to an exploration.
-def _update_state(exploration, state_name, param_change_dicts, widget_id,
-                  widget_customization_args,  widget_handlers_dict,
-                  widget_sticky, content_list):
-    """Updates the given state in the exploration and returns the exploration.
-
-    Does not commit changes.
-
-    Args:
-    - exploration_id: str. The exploration domain object.
-    - state_name: str. The name of the state being updated.
-    - param_change_dicts: list of dicts with keys ('name', 'generator_id',
-        'customization_args'), or None. If present, represents parameter
-        changes that should be applied when a reader enters the state.
-    - widget_id: str or None. If present, the id of the interactive widget for
-        this state.
-    - widget_customization_args: dict or None. If present, the
-        customization_args used to render the interactive widget for this
-        state.
-    - widget_handlers_dict: dict or None. If present, it represents the handler
-        and rule specifications for this state.
-    - widget_sticky: bool or None. If present, the setting for whether the
-        interactive widget for this state should be preserved when the reader
-        navigates to another state that uses the same interactive widget. For
-        example, we might want a textarea containing user-entered code to
-        retain that code in a state transition, rather than being overwritten
-        with a brand-new textarea.
-    - content_list: None, or a list of dicts, where each dict has keys ('type',
-        'value'). Currently we expect this list to have exactly one element
-        with type 'text'. If present, this list represents the non-interactive
-        content for the state.
-    """
-    # TODO(sll): Add more documentation for widget_handlers, above.
-
-    state = exploration.states[state_name]
-
-    if content_list:
-        state.update_content(content_list)
-
-    if param_change_dicts:
-        state.update_param_changes(param_change_dicts)
-
-    if widget_id:
-        state.update_widget_id(widget_id)
-
-    if widget_customization_args is not None:
-        state.update_widget_customization_args(widget_customization_args)
-
-    if widget_sticky is not None:
-        state.update_widget_sticky(widget_sticky)
-
-    if widget_handlers_dict:
-        utils.recursively_remove_key(widget_handlers_dict, u'$$hashKey')
-        state.update_widget_handlers(widget_handlers_dict)
-
-    return exploration
-
-
 def update_exploration(
-        committer_id, exploration_id, title, category, param_specs,
-        param_changes, states, commit_message):
+        committer_id, exploration_id, change_list, commit_message):
     """Update an exploration. Commits changes.
 
     Args:
     - committer_id: str. The id of the user who is performing the update
         action.
     - exploration_id: str. The exploration id.
-    - title: str or None. The title of the exploration.
-    - category: str or None. The category for this exploration in the gallery.
-    - param_specs: dict or None. If the former, a dict specifying the types of
-        parameters used in this exploration. The keys of the dict are the
-        parameter names, and the values are their object types.
-    - param_changes: list or None. If the former, a list of dicts, each
-        representing a parameter change.
-    - states: dict or None. If the former, a dict of states, keyed by the state
-        id, whose values are dicts containing new values for the fields of the
-        state. See the documentation of _update_state() for more information
-        on how these fields are defined.
+    - change_list: list of dicts, each representing a _Change object. These
+        changes are applied in sequence to produce the resulting exploration.
     - commit_message: str or None. A description of changes made to the state.
         For published explorations, this must be present; for unpublished
         explorations, it should be equal to None.
     """
-    # TODO(sll): Add tests to ensure that the parameters are of the correct
-    # types, etc.
-    exploration = get_exploration_by_id(exploration_id)
     is_public = rights_manager.is_exploration_public(exploration_id)
 
-    if is_public and commit_message is None:
+    if is_public and not commit_message:
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
 
-    if title:
-        exploration.update_title(title)
-    if category:
-        exploration.update_category(category)
-    if param_specs is not None:
-        exploration.update_param_specs(param_specs)
-    if param_changes is not None:
-        exploration.update_param_changes(param_changes)
-
-    if states:
-        for (state_name, state_data) in states.iteritems():
-            param_changes = state_data.get('param_changes')
-            widget_id = state_data.get('widget_id')
-            widget_customization_args = state_data.get(
-                'widget_customization_args')
-            widget_handlers = state_data.get('widget_handlers')
-            widget_sticky = state_data.get('widget_sticky')
-            content = state_data.get('content')
-
-            if state_name not in exploration.states:
-                exploration.add_states([state_name])
-
-            exploration = _update_state(
-                exploration, state_name, param_changes, widget_id,
-                widget_customization_args, widget_handlers, widget_sticky,
-                content
-            )
-
-            if 'state_name' in state_data:
-                # Rename this state.
-                exploration.rename_state(state_name, state_data['state_name'])
-
+    exploration = apply_change_list(exploration_id, change_list)
     save_exploration(committer_id, exploration, commit_message)
 
 

@@ -19,172 +19,105 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('explorationData', ['$http', 'warningsData', '$q', function($http, warningsData, $q) {
-  // Valid state properties that can be saved.
-  var validStateProperties = [
-    'content',
-    'widget_id',
-    'widget_customization_args',
-    'widget_handlers',
-    'widget_sticky',
-    'param_changes',
-    'state_name'
-  ];
+oppia.factory('explorationData', [
+  '$http', 'warningsData', '$q', 'oppiaRequestCreator',
+  function($http, warningsData, $q, oppiaRequestCreator) {
+    // The pathname (without the hash) should be: .../create/{exploration_id}
+    var explorationUrl = '/create/' + pathnameArray[2];
+    var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
+    var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + pathnameArray[2];
+    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + pathnameArray[2];
 
-  // The pathname (without the hash) should be: .../create/{exploration_id}
-  var explorationUrl = '/create/' + pathnameArray[2];
-  var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
-  var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + pathnameArray[2];
-  var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + pathnameArray[2];
+    // TODO(sll): Find a fix for multiple users editing the same exploration
+    // concurrently.
 
-  // TODO(sll): Find a fix for multiple users editing the same exploration
-  // concurrently.
+    // Put exploration variables here.
+    var explorationData = {
+      // Returns a promise that supplies the data for the current exploration.
+      getData: function() {
+        if (explorationData.data) {
+          console.log('Found exploration data in cache.');
 
-  // Put exploration variables here.
-  var explorationData = {
-    // Returns a promise that supplies the data for the current exploration.
-    getData: function() {
-      if (explorationData.data) {
-        console.log('Found exploration data in cache.');
+          var deferred = $q.defer();
+          deferred.resolve(explorationData.data);
+          return deferred.promise;
+        } else {
+          // Retrieve data from the server.
+          return $http.get(explorationDataUrl).then(function(response) {
+            console.log('Retrieved exploration data.');
+            console.log(response.data);
 
-        var deferred = $q.defer();
-        deferred.resolve(explorationData.data);
-        return deferred.promise;
-      } else {
-        // Retrieve data from the server.
-        return $http.get(explorationDataUrl).then(function(response) {
-          console.log('Retrieved exploration data.');
-          console.log(response.data);
-
-          explorationData.data = response.data;
-          return response.data;
-        });
-      }
-    },
-
-    // Returns a promise that supplies the data for the given state.
-    getStateData: function(stateName) {
-      if (!stateName) {
-        return;
-      }
-
-      console.log('Getting state data for state ' + stateName);
-      explorationData.stateName = stateName;
-      console.log(explorationData.data);
-
-      if (explorationData.data && 'states' in explorationData.data &&
-          stateName in explorationData.data.states) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(explorationData.data.states[stateName]));
-        return deferred.promise;
-      } else {
-        return explorationData.getData().then(function(response) {
-          return angular.copy(explorationData.data.states[stateName]);
-        });
-      }
-    },
-
-    /**
-     * Saves the exploration to the backend, and, on a success callback,
-     * updates the data for the updated states in the frontend.
-     * @param {object} explorationChanges Represents changes to the exploration,
-     *     keyed by property name. The values are the most up-to-date values
-     *     for the corresponding exploration properties.
-     * @param {object} stateChanges Contains one key-value pair for each state
-     *     that is modified. Each key is a state name, and each value is an
-     *     object whose meaning is similar to that of explorationChanges.
-     * @param {string} commitMessage The full commit message for this save
-     *     operation.
-     */
-    save: function(explorationChanges, stateChanges, commitMessage,
-        successCallback, errorCallback) {
-      // TODO(sll): Update the frontend data immediately, where possible; do
-      //              not wait for the server round-trip.
-      // TODO(sll): Handle explorationChanges too.
-
-      var statesForBackend = {};
-      for (var stateName in stateChanges) {
-        var changeMap = {};
-        for (var property in stateChanges[stateName]) {
-          if (validStateProperties.indexOf(property) < 0) {
-            warningsData.addWarning('Invalid property name: ' + property);
-            return;
-          }
-          changeMap[property] = stateChanges[stateName][property].newValue;
+            explorationData.data = response.data;
+            return response.data;
+          });
         }
-        statesForBackend[stateName] = changeMap;
-      }
+      },
 
-      var propertyValueMap = {
-        states: statesForBackend,
-        version: explorationData.data.version,
-      };
-
-      for (var property in explorationChanges) {
-        propertyValueMap[property] = explorationChanges[property].newValue;
-      }
-
-      if (commitMessage !== '') {
-        propertyValueMap['commit_message'] = commitMessage;
-      }
-
-      $http.put(
+      /**
+       * Saves the exploration to the backend, and, on a success callback,
+       * updates the data for the updated states in the frontend.
+       * @param {object} explorationChangeList Represents the change list for
+       *     this save. Each element of the list is a command representing an
+       *     editing action (such as add state, delete state, etc.). See the
+       *     _Change class in exp_services.py for full documentation.
+       * @param {string} commitMessage The user-entered commit message for this
+       *     save operation.
+       */
+      save: function(
+          explorationChangeList, commitMessage, successCallback, errorCallback) {
+        $http.put(
           explorationDataUrl,
-          $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify(propertyValueMap)
-          }, true),
+          oppiaRequestCreator.createRequest({
+            change_list: explorationChangeList,
+            commit_message: commitMessage,
+            version: explorationData.data.version,
+          }),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      ).success(function(data) {
-        warningsData.clear();
-        console.log('Changes to this exploration were saved successfully.');
-        explorationData.data.version = data.version;
-        explorationData.data.states = data.updatedStates;
-        explorationData.data.init_state_name = data.initStateName;
-        for (var property in explorationChanges) {
-          explorationData.data[property] = data[property];
-        }
-        if (successCallback) {
-          successCallback();
-        }
-      }).error(function(data) {
-        warningsData.addWarning(data.error || 'Error communicating with server.');
-        if (errorCallback) {
-          errorCallback();
-        }
-      });
-    },
+        ).success(function(data) {
+          warningsData.clear();
+          console.log('Changes to this exploration were saved successfully.');
+          explorationData.data = data;
+          if (successCallback) {
+            successCallback();
+          }
+        }).error(function(data) {
+          warningsData.addWarning(data.error || 'Error communicating with server.');
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+      },
 
-    resolveAnswers: function(stateName, resolvedAnswersList) {
-      $http.put(
+      resolveAnswers: function(stateName, resolvedAnswersList) {
+        $http.put(
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
-          $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({'resolved_answers': resolvedAnswersList})
-          }, true),
+          oppiaRequestCreator.createRequest({
+            resolved_answers: resolvedAnswersList
+          }),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      ).error(function(data) {
-        warningsData.addWarning(data.error || 'Error communicating with server.');
-      });
+        ).error(function(data) {
+          warningsData.addWarning(data.error || 'Error communicating with server.');
+        });
 
-      warningsData.clear();
-    },
+        warningsData.clear();
+      },
 
-    resolveReaderFeedback: function(stateName, feedbackId, newStatus) {
-      $http.put(
+      resolveReaderFeedback: function(stateName, feedbackId, newStatus) {
+        $http.put(
           resolvedFeedbackUrlPrefix + '/' + encodeURIComponent(stateName),
-          $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({'feedback_id': feedbackId, 'new_status': newStatus})
-          }, true),
+          oppiaRequestCreator.createRequest({
+            feedback_id: feedbackId,
+            new_status: newStatus
+          }),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      ).error(function(data) {
-        warningsData.addWarning(data.error || 'Error communicating with server.');
-      });
+        ).error(function(data) {
+          warningsData.addWarning(data.error || 'Error communicating with server.');
+        });
 
-      warningsData.clear();
-    }
-  };
+        warningsData.clear();
+      }
+    };
 
-  return explorationData;
-}]);
+    return explorationData;
+  }
+]);

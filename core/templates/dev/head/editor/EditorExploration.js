@@ -79,6 +79,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     'param_changes': 'explorationParamChanges'
   };
 
+  $scope.addRenameStateChange = function(newStateName, oldStateName) {
+    $scope.explorationChangeList.push({
+      cmd: CMD_RENAME_STATE,
+      old_state_name: oldStateName,
+      new_state_name: newStateName
+    });
+  };
+
   $scope.addStateChange = function(backendName, newValue, oldValue) {
     if (!$scope.explorationFullyLoaded || angular.equals(newValue, oldValue)) {
       return;
@@ -130,26 +138,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.undoneChangeStack = [];
   };
 
-  $scope.saveChanges = function(explorationChanges, stateChanges, commitMessage) {
-    $scope.isSaveInProgress = true;
-
-    var latestStateNames = $scope.getLatestStateNames();
-
-    explorationData.save(
-      explorationChanges, stateChanges, commitMessage, function() {
-        $scope.explorationChangeList = [];
-        $scope.initExplorationPage();
-        if ($scope.stateName) {
-          // Navigate to the new page for the state.
-          $scope.stateName = latestStateNames[$scope.stateName];
-          $scope.selectGuiTab();
-        }
-        $scope.isSaveInProgress = false;
-      }, function() {
-        $scope.isSaveInProgress = false;
-      });
-  };
-
   $scope.discardChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
@@ -160,10 +148,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.undoneChangeStack = [];
 
       $scope.initExplorationPage(function() {
-        if ($scope.stateName) {
-          $scope.initStateData();
-          $scope.selectGuiTab();
-        }
+        $scope.selectMainTab();
 
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
@@ -194,48 +179,149 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     }
   });
 
-  $scope.showSaveExplorationModal = function() {
-    var netExplorationChanges = $scope.getNetExplorationChanges();
-    var explorationChanges = netExplorationChanges.explorationChanges;
-    var stateChanges = netExplorationChanges.stateChanges;
+  $scope.saveChanges = function() {
+    $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
-    var changesExist = (
-      !$.isEmptyObject(explorationChanges) || !$.isEmptyObject(stateChanges));
-    if (!changesExist) {
-      warningsData.addWarning('Your changes cancel each other out, ' +
-        'so nothing has been saved.');
-      return;
-    }
+    $http.post(
+      $scope.changeListSummaryUrl,
+      oppiaRequestCreator.createRequest({
+        change_list: $scope.explorationChangeList,
+        version: explorationData.data.version
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+    .then(function(response) {
+      var data = response.data;
 
-    warningsData.clear();
+      if (data.error) {
+        warningsData.addWarning(data.error);
+        return;
+      }
 
-    // Create the save-confirmation and commit-message request dialogue.
-    if (!$scope.isPublic) {
-      // For unpublished explorations no commit message is needed.
-      $scope.saveChanges(explorationChanges, stateChanges, '');
-    } else {
-      $scope.changeSummaries = $scope.createChangeSummaries(
-        explorationChanges, stateChanges);
+      var explorationPropertyChanges = data.summary.exploration_property_changes;
+      var statePropertyChanges = data.summary.state_property_changes;
+      var changedStates = data.summary.changed_states;
+      var addedStates = data.summary.added_states;
+      var deletedStates = data.summary.deleted_states;
+      var warnings = data.warnings;
+
+      var changesExist = (
+        !$.isEmptyObject(explorationPropertyChanges) ||
+        !$.isEmptyObject(statePropertyChanges) ||
+        changedStates.length > 0 ||
+        !$.isEmptyObject(addedStates) ||
+        deletedStates.length > 0);
+
+      if (!changesExist) {
+        warningsData.addWarning('Your changes cancel each other out, ' +
+          'so nothing has been saved.');
+        return;
+      }
+
+      if ($scope.isPublic && warnings.length > 0) {
+        console.log(warnings);
+        // Warnings should be fixed before an exploration is published.
+        warningsData.addWarning(
+          'Some warnings were triggered by the changed exploration; please ' +
+          'fix them before saving. They are: ' + warnings.join(' '));
+        return;
+      }
+
+      warningsData.clear();
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
         backdrop: 'static',
         resolve: {
-          changeSummaries: function() {
-            return $scope.changeSummaries;
+          explorationPropertyChanges: function() {
+            return explorationPropertyChanges;
+          },
+          statePropertyChanges: function() {
+            return statePropertyChanges;
+          },
+          changedStates: function() {
+            return changedStates;
+          },
+          addedStates: function() {
+            return addedStates;
+          },
+          deletedStates: function() {
+            return deletedStates;
+          },
+          commitMessageIsOptional: function() {
+            return !$scope.isPublic;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'changeSummaries',
-          function($scope, $modalInstance, changeSummaries) {
-            $scope.changeSummary = changeSummaries['MODAL_FORMAT'];
+          '$scope', '$modalInstance', 'explorationPropertyChanges',
+          'statePropertyChanges', 'changedStates', 'addedStates',
+          'deletedStates', 'commitMessageIsOptional',
+          function($scope, $modalInstance, explorationPropertyChanges,
+                   statePropertyChanges, changedStates, addedStates,
+                   deletedStates, commitMessageIsOptional) {
+            $scope.explorationPropertyChanges = explorationPropertyChanges;
+            $scope.statePropertyChanges = statePropertyChanges;
+            $scope.changedStates = changedStates;
+            $scope.addedStates = addedStates;
+            $scope.deletedStates = deletedStates;
+            $scope.commitMessageIsOptional = commitMessageIsOptional;
+
+            $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES = {
+              'title': 'Title',
+              'category': 'Category',
+              'param_specs': 'Parameter specifications',
+              'param_changes': 'Initial parameter changes'
+            };
+
+            $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
+              'name': 'State name',
+              'param_changes': 'Parameter changes',
+              'content': 'Content',
+              'widget_id': 'Interaction type',
+              'widget_customization_args': 'Interaction customizations',
+              'widget_sticky': 'Whether to reuse the previous interaction',
+              'widget_handlers': 'Reader submission rules'
+            }
+
+            // An ordered list of state properties that determines the order in which
+            // to show them in the save confirmation modal.
+            // TODO(sll): Implement this fully. Currently there is no sorting.
+            $scope.ORDERED_STATE_PROPERTIES = [
+              'name', 'param_changes', 'content', 'widget_id',
+              'widget_customization_args', 'widget_sticky', 'widget_handlers'
+            ];
 
             $scope.explorationChangesExist = !$.isEmptyObject(
-              $scope.changeSummary.exploration);
+              $scope.explorationPropertyChanges);
             $scope.stateChangesExist = !$.isEmptyObject(
-              $scope.changeSummary.states);
+              $scope.statePropertyChanges);
 
-            $scope.publish = function(commitMessage) {
+            $scope._getLongFormPropertyChange = function(humanReadableName, changeInfo) {
+              return (
+                humanReadableName + ' (from \'' + changeInfo.old_value +
+                '\' to \'' + changeInfo.new_value + '\')');
+            }
+
+            $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
+              if (propertyName == 'title' || propertyName == 'category') {
+                return $scope._getLongFormPropertyChange(
+                  $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
+                  changeInfo);
+              } else {
+                return $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
+              }
+            }
+
+            $scope.formatStatePropertyChange = function(propertyName, changeInfo) {
+              if (propertyName == 'name') {
+                return $scope._getLongFormPropertyChange(
+                  $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
+                  changeInfo);
+              } else {
+                return $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
+              }
+            }
+
+            $scope.save = function(commitMessage) {
               $modalInstance.close(commitMessage);
             };
             $scope.cancel = function() {
@@ -247,304 +333,19 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       });
 
       modalInstance.result.then(function(commitMessage) {
-        var fullCommitMessage = $scope.neatJoin(
-          commitMessage, $scope.changeSummaries['VERSION_LOG_FORMAT']
-        );
-        $scope.saveChanges(explorationChanges, stateChanges, fullCommitMessage);
+        $scope.isSaveInProgress = true;
+
+        explorationData.save(
+          $scope.explorationChangeList, commitMessage, function() {
+            $scope.explorationChangeList = [];
+            $scope.undoneChangeStack = [];
+            $scope.initExplorationPage();
+            $scope.isSaveInProgress = false;
+          }, function() {
+            $scope.isSaveInProgress = false;
+          });
       });
-    }
-  };
-
-  $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES = {
-    'title': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Title (from \'' + oldValue + '\' to \'' + newValue + '\')';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'title';
-      }
-    },
-    'category': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Category (from \'' + oldValue + '\' to \'' + newValue + '\')';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'category';
-      }
-    },
-    'param_specs': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Parameter specifications';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'parameter specifications';
-      }
-    },
-    'param_changes': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Initial parameter changes';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'initial parameter changes';
-      }
-    }
-  };
-
-  $scope.getExplorationPropertyChangeSummary = function(
-      propertyName, format, values) {
-    return $scope.EXPLORATION_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
-      values['newValue'], values['oldValue']);
-  };
-
-  $scope.STATE_PROPERTY_CHANGE_SUMMARIES = {
-    // In future these will be elaborated to describe the changes made to each
-    // state property.
-    'state_name': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'State name (from \'' + oldValue + '\' to \'' + newValue + '\')';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'state name';
-      }
-    },
-    'param_changes': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Parameter changes';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'parameter changes';
-      }
-    },
-    'content': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Content';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'content';
-      }
-    },
-    'widget_id': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Interaction type';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'interaction type';
-      }
-    },
-    'widget_customization_args': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Interaction customizations';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'interaction customizations';
-      }
-    },
-    'widget_sticky': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Whether to reuse the previous interaction';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'whether to reuse the previous interaction';
-      }
-    },
-    'widget_handlers': {
-      MODAL_FORMAT: function(newValue, oldValue) {
-        return 'Reader submission rules';
-      },
-      VERSION_LOG_FORMAT: function(newValue, oldValue) {
-        return 'reader submission rules';
-      }
-    }
-  };
-
-  $scope.getStatePropertyChangeSummary = function(
-      propertyName, format, values) {
-    return $scope.STATE_PROPERTY_CHANGE_SUMMARIES[propertyName][format](
-      values['newValue'], values['oldValue']);
-  };
-
-  // Returns whether any net changes have occurred.
-  $scope.getNetExplorationChanges = function() {
-    // This object is keyed by the name of the property that has changed.
-    var rawExplorationChanges = {};
-    // This object is keyed by the state name. The value of each property is
-    // another object that is keyed by the name of the property for that state
-    // that has changed.
-    var rawStateChanges = {};
-
-    // Identifies the net changes made to each property.
-    for (var i = 0; i < $scope.explorationChangeList.length; i++) {
-      var change = $scope.explorationChangeList[i];
-      if (change.cmd == CMD_EDIT_STATE_PROPERTY) {
-        var stateName = change.state_name;
-
-        if (!rawStateChanges.hasOwnProperty(stateName)) {
-          rawStateChanges[stateName] = {};
-        }
-
-        if (!rawStateChanges[stateName][change.property_name]) {
-          rawStateChanges[stateName][change.property_name] = {
-            oldValue: change.old_value
-          };
-        }
-        rawStateChanges[stateName][change.property_name].newValue = change.new_value;
-      } else if (change.cmd == CMD_EDIT_EXPLORATION_PROPERTY) {
-        // This is a change to an exploration property.
-        if (!rawExplorationChanges[change.property_name]) {
-          rawExplorationChanges[change.property_name] = {
-            oldValue: change.old_value
-          };
-        }
-        rawExplorationChanges[change.property_name].newValue = change.new_value;
-      } else {
-        warningsData.addWarning('Unexpected change command: ' + change.cmd);
-      }
-    }
-
-    // Remove changes with zero net effect.
-    var explorationChanges = {};
-    var stateChanges = {};
-    for (var key in rawExplorationChanges) {
-      if (!angular.equals(rawExplorationChanges[key].newValue,
-                          rawExplorationChanges[key].oldValue)) {
-        explorationChanges[key] = rawExplorationChanges[key];
-      }
-    }
-
-    for (var stateName in rawStateChanges) {
-      var stateChangeObj = {};
-      for (var key in rawStateChanges[stateName]) {
-        if (!angular.equals(rawStateChanges[stateName][key].newValue,
-                            rawStateChanges[stateName][key].oldValue)) {
-          stateChangeObj[key] = rawStateChanges[stateName][key];
-        }
-      }
-      if (!$.isEmptyObject(stateChangeObj)) {
-        stateChanges[stateName] = stateChangeObj;
-      }
-    }
-
-    return {
-      explorationChanges: explorationChanges,
-      stateChanges: stateChanges
-    };
-  };
-
-  // An ordered list of state properties that determines the order in which
-  // to show them in the save confirmation modal.
-  $scope.ORDERED_STATE_PROPERTIES = [
-    'state_name', 'param_changes', 'content', 'widget_id',
-    'widget_customization_args', 'widget_sticky', 'widget_handlers'
-  ];
-
-  // Gets the latest state name after all pending changes have been applied.
-  $scope.getLatestStateNames = function() {
-    var netExplorationChanges = $scope.getNetExplorationChanges();
-    var stateChanges = netExplorationChanges.stateChanges;
-
-    var latestStateNames = {};
-    for (var stateName in $scope.states) {
-      latestStateNames[stateName] = stateName;
-    }
-
-    for (var stateName in stateChanges) {
-      if (stateChanges[stateName].hasOwnProperty('state_name')) {
-        latestStateNames[stateName] = stateChanges[stateName].state_name.newValue;
-      }
-    }
-
-    return latestStateNames;
-  };
-
-  // Returns summaries of the changes to display in the save dialogue and
-  // include in the version log.
-  $scope.createChangeSummaries = function(explorationChanges, stateChanges) {
-    // Get the most up-to-date state names.
-    var latestStateNames = $scope.getLatestStateNames();
-
-    // Construct the summary for the save confirmation dialogue.
-    var modalSummaryForExploration = {};
-    for (var property in explorationChanges) {
-      modalSummaryForExploration[property] = (
-        $scope.getExplorationPropertyChangeSummary(
-          property, 'MODAL_FORMAT', explorationChanges[property]));
-    }
-
-    var modalSummaryForStates = {};
-    for (stateName in stateChanges) {
-      var changes = [];
-      for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
-        var property = $scope.ORDERED_STATE_PROPERTIES[i];
-        if (stateChanges[stateName].hasOwnProperty(property)) {
-          changes.push($scope.getStatePropertyChangeSummary(
-            property, 'MODAL_FORMAT', stateChanges[stateName][property]));
-        }
-      }
-      modalSummaryForStates[latestStateNames[stateName]] = changes;
-    }
-
-    // Construct the summary to be included in the commit message for the
-    // version log.
-    var versionLogSummaryForExploration = '';
-    if (!$.isEmptyObject(explorationChanges)) {
-      var explorationChangeStrings = [];
-      for (var property in explorationChanges) {
-        explorationChangeStrings.push(
-          $scope.getExplorationPropertyChangeSummary(
-            property, 'VERSION_LOG_FORMAT', explorationChanges[property]
-          )
-        );
-      }
-
-      versionLogSummaryForExploration = (
-        'Exploration properties that were changed: ' +
-        explorationChangeStrings.join(', '));
-    }
-
-    var versionLogSummaryForStates = '';
-    if (!$.isEmptyObject(stateChanges)) {
-      versionLogSummaryForStates = 'States that were changed: ';
-
-      var stateChangeStrings = [];
-      for (stateName in stateChanges) {
-        var humanReadablePropertyChanges = [];
-        for (var i = 0; i < $scope.ORDERED_STATE_PROPERTIES.length; i++) {
-          var property = $scope.ORDERED_STATE_PROPERTIES[i];
-          if (stateChanges[stateName].hasOwnProperty(property)) {
-            humanReadablePropertyChanges.push(
-              $scope.getStatePropertyChangeSummary(
-                property, 'VERSION_LOG_FORMAT', stateChanges[stateName][property]
-              )
-            );
-          }
-        }
-
-        stateChangeStrings.push(latestStateNames[stateName] + ' (' +
-          humanReadablePropertyChanges.join(', ') + ')');
-      }
-
-      versionLogSummaryForStates += stateChangeStrings.join(', ');
-    }
-    var versionLogSummary = '';
-    if (versionLogSummaryForExploration && versionLogSummaryForStates) {
-      versionLogSummary = (
-        versionLogSummaryForExploration + '; ' + versionLogSummaryForStates);
-    } else {
-      versionLogSummary = (
-        versionLogSummaryForExploration + versionLogSummaryForStates);
-    }
-
-    if (versionLogSummary) {
-      versionLogSummary += '.';
-    }
-
-    return {
-      MODAL_FORMAT: {
-        exploration: modalSummaryForExploration,
-        states: modalSummaryForStates
-      },
-      VERSION_LOG_FORMAT: versionLogSummary
-    };
+    });
   };
 
   /********************************************
@@ -587,14 +388,41 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     if (path.indexOf('/gui/') != -1) {
       $scope.stateName = path.substring('/gui/'.length);
-      if (!$scope.stateName) {
-        $location.path('/');
-        return;
+
+      var callback = function() {
+        var stateData = $scope.states[$scope.stateName];
+        if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
+          // This state does not exist. Redirect to the exploration page.
+          warningsData.addWarning('State ' + $scope.stateName + ' does not exist.');
+          $location.path('/');
+          return;
+        } else {
+          $scope.guiTabActive = true;
+          $scope.statsTabActive = false;
+          $scope.mainTabActive = false;
+          $scope.$broadcast('guiTabSelected', $scope.stateName);
+          // Scroll to the relevant element (if applicable).
+          // TODO(sfederwisch): Change the trigger so that there is exactly one
+          // scroll action that occurs when the page finishes loading.
+          setTimeout(function () {
+            if ($location.hash()) {
+              $anchorScroll();
+            }
+            if (firstLoad) {
+              firstLoad = false;
+            }
+          }, 1000);
+        }
+      };
+
+      if (!$.isEmptyObject($scope.states)) {
+        callback();
+      } else {
+        $scope.initExplorationPage(callback);
       }
-      $scope.initStateData();
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
-      explorationData.stateName = '';
+      $scope.stateName = '';
       $scope.stateName = '';
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
@@ -605,7 +433,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     } else {
       $location.path('/');
       $location.hash('');
-      explorationData.stateName = '';
+      $scope.stateName = '';
       $scope.stateName = '';
       $scope.mainTabActive = true;
       $scope.guiTabActive = false;
@@ -615,36 +443,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
     }
   });
-
-  $scope.initStateData = function() {
-    var promise = explorationData.getStateData($scope.stateName);
-    if (!promise) {
-      return;
-    }
-    promise.then(function(stateData) {
-      if (!stateData) {
-        // This state does not exist. Redirect to the exploration page.
-        $location.path('/');
-        return;
-      } else {
-        $scope.guiTabActive = true;
-        $scope.statsTabActive = false;
-        $scope.mainTabActive = false;
-        $scope.$broadcast('guiTabSelected', stateData);
-        // Scroll to the relevant element (if applicable).
-        // TODO(sfederwisch): Change the trigger so that there is exactly one
-        // scroll action that occurs when the page finishes loading.
-        setTimeout(function () {
-          if ($location.hash()) {
-            $anchorScroll();
-          }
-          if (firstLoad) {
-            firstLoad = false;
-          }
-        }, 1000);
-      }
-    });
-  };
 
   /********************************************
   * Methods affecting the graph visualization.
@@ -750,7 +548,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
       $scope.currentUserIsAdmin = data.is_admin;
-      $scope.stateName = explorationData.stateName;
       $scope.states = angular.copy(data.states);
       $scope.explorationTitle = data.title;
       $scope.explorationCategory = data.category;
@@ -793,8 +590,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     var HORIZ_OFFSET = 100;
     var nodes = {};
 
-    var latestStateNames = $scope.getLatestStateNames();
-
     var state;
     nodes[END_DEST] = {
       name: END_DEST,
@@ -804,7 +599,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     };
     for (stateName in states) {
       nodes[stateName] = {
-        name: (stateName == END_DEST ? END_DEST : latestStateNames[stateName]),
+        name: (stateName == END_DEST ? END_DEST : stateName),
         depth: SENTINEL_DEPTH,
         reachable: false,
         reachableFromEnd: false

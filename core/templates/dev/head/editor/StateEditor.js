@@ -21,14 +21,20 @@
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
                    warningsData, activeInputData, oppiaRequestCreator) {
 
-  $scope.$on('guiTabSelected', function(event, stateData) {
-    $scope.displayedStateName = $scope.$parent.getLatestStateNames()[$scope.stateName];
+  $scope.$on('guiTabSelected', function(event, stateName) {
+    $scope.stateName = stateName;
+    $scope.initStateEditor();
+  });
+
+  $scope.initStateEditor = function() {
+    var stateData = $scope.$parent.states[$scope.stateName];
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 
-    $scope.$broadcast('stateEditorInitialized', $scope.stateName);
-    console.log('Content updated.');
-  });
+    if ($scope.stateName && stateData) {
+      $scope.$broadcast('stateEditorInitialized', stateData);
+    }
+  }
 
   $scope.getIncomingStates = function(stateName) {
     var incomingStates = {},
@@ -71,7 +77,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   $scope.stateNameMemento = null;
 
   $scope.openStateNameEditor = function() {
-    $scope.stateNameMemento = $scope.displayedStateName;
+    $scope.stateNameMemento = $scope.stateName;
+    $scope.tmpStateName = $scope.stateName;
   };
 
   $scope.saveStateName = function(newStateName) {
@@ -84,21 +91,51 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
         'State names should be at most 50 characters long.');
       return;
     }
-    var latestStateNames = $scope.$parent.getLatestStateNames();
-    if (newStateName != $scope.displayedStateName &&
-        latestStateNames.hasOwnProperty(newStateName)) {
+    if (newStateName !== $scope.stateName &&
+        $scope.states.hasOwnProperty(newStateName)) {
       warningsData.addWarning(
         'The name \'' + newStateName + '\' is already in use.');
       return;
     }
 
-    if ($scope.stateNameMemento !== newStateName) {
-      $scope.addStateChange(
-        'state_name', newStateName, $scope.stateNameMemento);
-      $scope.displayedStateName = newStateName;
+    if ($scope.stateNameMemento === newStateName) {
+      $scope.stateNameMemento = null;
+      return;
     }
 
-    $scope.stateNameMemento = null;
+    if ($scope.stateNameMemento !== newStateName) {
+      // Tidy up the rest of the states.
+      if ($scope.$parent.initStateName == $scope.stateName) {
+        $scope.$parent.initStateName = newStateName;
+      }
+
+      $scope.states[newStateName] = angular.copy(
+        $scope.states[$scope.stateName]);
+      delete $scope.states[$scope.stateName];
+      for (var otherStateName in $scope.states) {
+        var handlers = $scope.states[otherStateName].widget.handlers;
+        for (var i = 0; i < handlers.length; i++) {
+          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+            if (handlers[i].rule_specs[j].dest === $scope.stateName) {
+              handlers[i].rule_specs[j].dest = newStateName;
+            }
+          }
+        }
+      }
+
+      $scope.stateName = newStateName;
+      $scope.$parent.stateName = newStateName;
+      $scope.$parent.selectGuiTab();
+
+      $scope.$parent.addRenameStateChange(
+        newStateName, $scope.stateNameMemento);
+
+      $scope.initStateEditor();
+      $scope.stateNameMemento = null;
+      $scope.drawGraph();
+      // Refresh the location hash.
+      $scope.selectGuiTab();
+    }
   };
 
   // This should only be non-null when the content editor is open.

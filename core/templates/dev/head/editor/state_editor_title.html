@@ -7,11 +7,11 @@
 {% block center %}
   <h3>
     <span ng-if="!stateNameMemento">
-      <[displayedStateName]>
+      <[stateName]>
     </span>
     <span ng-if="!!stateNameMemento">
-      <input type="text" ng-model="displayedStateName">
-      <button ng-click="saveStateName(displayedStateName)">Close</button>
+      <input type="text" ng-model="tmpStateName">
+      <button ng-click="saveStateName(tmpStateName)">Close</button>
     </span>
   </h3>
 {% endblock %}

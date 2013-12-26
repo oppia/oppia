@@ -21,8 +21,8 @@
 
 function StateReaderFeedback($scope, warningsData, explorationData) {
 
-  $scope.$on('stateEditorInitialized', function(evt, stateName) {
-    $scope.stateName = stateName;
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    $scope.stateName = $scope.$parent.stateName;
     $scope.initReaderFeedback();
   });
 

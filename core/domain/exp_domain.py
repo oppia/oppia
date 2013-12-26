@@ -671,17 +671,17 @@ class Exploration(object):
             try:
                 self._verify_no_self_loops()
             except utils.ValidationError as e:
-                warnings.append(e)
+                warnings.append(unicode(e))
 
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings.append(e)
+                warnings.append(unicode(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings.append(e)
+                warnings.append(unicode(e))
 
         return warnings
 

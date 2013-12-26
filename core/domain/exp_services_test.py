@@ -747,6 +747,16 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
         self.assertIn('State 2', exploration.states)
 
 
+def _get_change_list(state_name, property_name, new_value):
+    """Generates a change list for a single state change."""
+    return [{
+        'cmd': 'edit_state_property',
+        'state_name': state_name,
+        'property_name': property_name,
+        'new_value': new_value
+    }]
+
+
 class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
 
@@ -797,11 +807,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration.param_specs = {'myParam': param_domain.ParamSpec('Int')}
         exp_services.save_exploration('fake@user.com', exploration)
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'param_changes': self.param_changes
-                }
-            }, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'param_changes', self.param_changes), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         param_changes = exploration.init_state.param_changes[0]
@@ -817,11 +824,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 utils.ValidationError,
                 r'The parameter myParam .* does not exist .*'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'param_changes': self.param_changes
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'param_changes', self.param_changes),
+                '')
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
@@ -833,20 +838,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'Invalid generator id fake'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'param_changes': self.param_changes
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'param_changes', self.param_changes),
+                '')
 
     def test_update_widget_id(self):
         """Test updating of widget_id."""
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'widget_id': 'MultipleChoiceInput'
-                }
-            }, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_id', 'MultipleChoiceInput'), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -855,14 +856,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_widget_customization_args(self):
         """Test updating of widget_customization_args."""
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'widget_id': 'MultipleChoiceInput',
-                    'widget_customization_args': {
-                        'choices': {'value': ['Option A', 'Option B']}
-                    }
-                }
-            }, None)
+            'fake@user.com', self.EXP_ID,
+            _get_change_list(
+                self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name, 'widget_customization_args', {
+                    'choices': {'value': ['Option A', 'Option B']}
+                }),
+            '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -872,26 +873,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_widget_sticky(self):
         """Test updating of widget_sticky."""
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {'widget_sticky': False}
-            }, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', False), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.init_state.widget.sticky, False)
 
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {'widget_sticky': True}
-            }, None)
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.widget.sticky, True)
-
-        # widget_sticky is left unchanged if it is not supplied as an argument.
-
-        exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None,
-            {self.init_state_name: {}}, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', True), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.init_state.widget.sticky, True)
@@ -902,9 +892,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 utils.ValidationError,
                 'Expected widget sticky flag to be a boolean, received 3'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {'widget_sticky': 3}
-                }, None)
+                'fake@user.com', self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'widget_sticky', 3), '')
 
     def test_update_widget_handlers(self):
         """Test updating of widget_handlers."""
@@ -917,12 +906,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.widget_handlers['submit'][1]['dest'] = 'State 2'
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'widget_id': 'MultipleChoiceInput',
-                    'widget_handlers': self.widget_handlers
-                }
-            }, None)
+            'fake@user.com', self.EXP_ID,
+            _get_change_list(
+                self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name, 'widget_handlers', self.widget_handlers),
+            '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         rule_specs = exploration.init_state.widget.handlers[0].rule_specs
@@ -943,24 +932,26 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 utils.ValidationError,
                 'The destination INVALID is not a valid state'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'MultipleChoiceInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_state_missing_keys(self):
         """Test that missing keys in widget_handlers produce an error."""
         del self.widget_handlers['submit'][0]['definition']['inputs']
         with self.assertRaisesRegexp(KeyError, 'inputs'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'NumericInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'NumericInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_state_extra_keys(self):
         """Test that extra keys in rule definitions are detected."""
@@ -968,12 +959,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'should conform to schema'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'MultipleChoiceInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_state_extra_default_rule(self):
         """Test that rules other than the last cannot be default."""
@@ -983,12 +975,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 ValueError, 'Invalid ruleset: rules other than the last one '
                             'should not be default rules.'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'MultipleChoiceInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_state_missing_default_rule(self):
         """Test that the last rule must be default."""
@@ -997,12 +990,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 ValueError,
                 'Invalid ruleset: the last rule should be a default rule'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'MultipleChoiceInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
@@ -1011,25 +1005,24 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 Exception,
                 'abc has the wrong type. It should be a NonnegativeInt.'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'widget_id': 'MultipleChoiceInput',
-                        'widget_handlers': self.widget_handlers
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID,
+                _get_change_list(
+                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name, 'widget_handlers',
+                    self.widget_handlers),
+                '')
 
     def test_update_content(self):
         """Test updating of content."""
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None, {
-                self.init_state_name: {
-                    'content': [{
-                        'type': 'text',
-                        'value': '<b>Test content</b>',
-                        '$$hashKey': '014'
-                    }]
-                }
-            }, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'content', [{
+                    'type': 'text',
+                    'value': '<b>Test content</b>',
+                    '$$hashKey': '014'
+                }]),
+            '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.init_state.content[0].type, 'text')
@@ -1040,14 +1033,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that missing keys in content yield an error."""
         with self.assertRaisesRegexp(KeyError, 'type'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None, {
-                    self.init_state_name: {
-                        'content': [{
-                            'value': '<b>Test content</b>',
-                            '$$hashKey': '014'
-                        }]
-                    }
-                }, None)
+                'fake@user.com', self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'content', [{
+                        'value': '<b>Test content</b>',
+                        '$$hashKey': '014'
+                    }]),
+                '')
 
 
 class CommitMessageHandlingTests(test_utils.GenericTestBase):
@@ -1067,9 +1058,8 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration('fake@user.com', self.EXP_ID)
 
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None,
-            {self.init_state_name: {'widget_sticky': False}},
-            'A message')
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', False), 'A message')
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
@@ -1084,20 +1074,23 @@ class CommitMessageHandlingTests(test_utils.GenericTestBase):
                 ValueError, 'Exploration is public so expected a commit '
                             'message but received none.'):
             exp_services.update_exploration(
-                'fake@user.com', self.EXP_ID, None, None, None, None,
-                {self.init_state_name: {'widget_sticky': False}}, None)
+                'fake@user.com', self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'widget_sticky', False), '')
 
     def test_unpublished_explorations_can_accept_commit_message(self):
         """Test unpublished explorations can accept optional commit messages"""
 
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None,
-            {self.init_state_name: {'widget_sticky': False}},
-            'A message')
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', False), 'A message')
 
         exp_services.update_exploration(
-            'fake@user.com', self.EXP_ID, None, None, None, None,
-            {self.init_state_name: {'widget_sticky': True}}, None)
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', True), '')
+
+        exp_services.update_exploration(
+            'fake@user.com', self.EXP_ID, _get_change_list(
+                self.init_state_name, 'widget_sticky', True), None)
 
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):

@@ -298,7 +298,6 @@ oppia.directive('stateGraphViz', [
             })
             .on('click', function(d) {
               if (d.hashId != END_DEST) {
-                explorationData.getStateData(d.hashId);
                 scope.$parent.stateName = d.hashId;
                 if (!stateStats) {
                   scope.$parent.stateName = d.hashId;

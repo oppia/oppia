@@ -191,9 +191,8 @@ class ExplorationHandler(EditorHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @require_editor
-    def get(self, exploration_id):
-        """Gets the data for the exploration overview page."""
+    def _get_exploration_data(self, exploration_id):
+        """Returns a description of the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
         state_list = {}
@@ -214,7 +213,7 @@ class ExplorationHandler(EditorHandler):
             else:
                 editors.append('[Awaiting response]')
 
-        self.values.update({
+        return {
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'is_public': rights_manager.is_exploration_public(exploration_id),
@@ -225,7 +224,12 @@ class ExplorationHandler(EditorHandler):
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
             'version': exploration.version,
-        })
+        }
+
+    @require_editor
+    def get(self, exploration_id):
+        """Gets the data for the exploration overview page."""
+        self.values.update(self._get_exploration_data(exploration_id))
         self.render_json(self.values)
 
     @require_editor
@@ -240,14 +244,10 @@ class ExplorationHandler(EditorHandler):
         if not state_name:
             raise self.InvalidInputException('Please specify a state name.')
 
-        new_states = {
-            state_name: exp_domain.State.create_default_state(
-                state_name).to_dict()
-        }
         try:
-            exp_services.update_exploration(
-                self.user_id, exploration_id, None, None, None, None,
-                new_states, 'Added state \'%s\'' % state_name)
+            exploration.add_states([state_name])
+            exp_services.save_exploration(
+                self.user_id, exploration, 'Added state \'%s\'' % state_name)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -266,35 +266,17 @@ class ExplorationHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        param_specs = self.payload.get('param_specs')
-        param_changes = self.payload.get('param_changes')
-        states = self.payload.get('states')
         commit_message = self.payload.get('commit_message')
+        change_list = self.payload.get('change_list')
 
-        exp_services.update_exploration(
-            self.user_id, exploration_id, title, category,
-            param_specs, param_changes, states, commit_message)
+        try:
+            exp_services.update_exploration(
+                self.user_id, exploration_id, change_list, commit_message)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        updated_states = {}
-        for state_name in exploration.states:
-            updated_states[state_name] = (
-                exp_services.export_state_to_verbose_dict(
-                    exploration_id, state_name)
-            )
-
-        self.render_json({
-            'version': exploration.version,
-            # This is needed if the name of the initial state is changed.
-            'initStateName': exploration.init_state_name,
-            'updatedStates': updated_states,
-            'title': exploration.title,
-            'category': exploration.category,
-            'param_specs': exploration.param_specs_dict,
-            'param_changes': exploration.param_change_dicts
-        })
+        self.values.update(self._get_exploration_data(exploration_id))
+        self.render_json(self.values)
 
     @require_editor
     def delete(self, exploration_id):
@@ -356,11 +338,21 @@ class ExplorationRightsHandler(EditorHandler):
                 'No change was made to this exploration.')
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        # TODO(sll): Also add information about is_public and editors.
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        editors = []
+        for editor_id in (
+                exploration_rights.owner_ids + exploration_rights.editor_ids):
+            username = user_services.get_username(editor_id)
+            if username:
+                editors.append(username)
+            else:
+                editors.append('[Awaiting response]')
+
+        # TODO(sll): Also add information about is_public.
         self.render_json({
             'version': exploration.version,
-            'editors': exp_services.get_human_readable_editor_list(
-                exploration_id),
+            'editors': editors,
         })
 
 
@@ -558,3 +550,36 @@ class ImageUploadHandler(EditorHandler):
         fs.put(filepath, raw)
 
         self.render_json({'filepath': filepath})
+
+
+class ChangeListSummaryHandler(EditorHandler):
+    """Returns a summary of a changelist applied to a given exploration."""
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        change_list = self.payload.get('change_list')
+        version = self.payload.get('version')
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
+
+        if version != current_exploration.version:
+            self.render_json({
+                'error': (
+                    'Sorry, someone else has edited and committed changes to '
+                    'this exploration while you were editing it. (Trying to '
+                    'edit version %s, but the current version is %s.). Please '
+                    'reload the page and try again.'
+                    % (version, current_exploration.version)
+                )
+            })
+        else:
+            summary = exp_services.get_summary_of_change_list(
+                exploration_id, change_list)
+            updated_exploration = exp_services.apply_change_list(
+                exploration_id, change_list)
+            warnings = updated_exploration.validate(strict=True)
+            self.render_json({
+                'summary': summary,
+                'warnings': warnings
+            })

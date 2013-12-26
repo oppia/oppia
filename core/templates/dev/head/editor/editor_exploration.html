@@ -80,7 +80,6 @@
       <div class="modal-body">
         <p>
           Are you sure you want to delete the state "<[deleteStateName]>"?
-          <strong>This action cannot be reversed.</strong>
         </p>
       </div>
 
@@ -96,9 +95,10 @@
       </div>
       <div class="modal-body">
         <p>
-          You are about to save changes to this exploration. These changes will immediately be publicly visible.
+          You are about to save changes to this exploration. These changes will immediately be visible to other viewers.
         </p>
         <p>
+          <span ng-if="commitMessageIsOptional">(Optional)</span>
           Please enter a brief description of what you have changed:
           <textarea rows="3" cols="50" ng-model="commitMessage"></textarea>
         </p>
@@ -108,8 +108,8 @@
             You changed the following properties of the exploration:
           </em>
           <ul>
-            <li ng-repeat="(property, changeInfo) in changeSummary.exploration">
-              <[changeInfo]>
+            <li ng-repeat="(propertyName, changeInfo) in explorationPropertyChanges">
+              <[formatExplorationPropertyChange(propertyName, changeInfo)]>
             </li>
           </ul>
         </div>
@@ -118,18 +118,18 @@
           <em>
             You made the following changes to states:
           </em>
-          <div ng-repeat="(stateName, stateChanges) in changeSummary.states">
+          <div ng-repeat="(stateName, stateChanges) in statePropertyChanges">
             <h5><[stateName]></h5>
             <ul>
-              <li ng-repeat="entry in stateChanges track by $index">
-                <[entry]>
+              <li ng-repeat="(propertyName, changeInfo) in stateChanges">
+                <[formatStatePropertyChange(propertyName, changeInfo)]>
               </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn" ng-disabled = "!commitMessage" ng-click="publish(commitMessage)">Save</button>
+        <button class="btn" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save</button>
         <button class="btn" ng-click="cancel()">Cancel</button>
       </div>
     </script>
@@ -190,7 +190,7 @@
           <div ng-show="!!explorationTitle">
             <div style="float: right;">
               <button class="btn oppia-save-exploration-button pull-right" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
-              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="showSaveExplorationModal()" ng-disabled="!isExplorationSaveable()">save changes</button>
+              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
             </div>
 
             <tabset>
@@ -205,7 +205,7 @@
               </tab>
 
               <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive" select="selectGuiTab()">
-                <div ng-controller="StateEditor" ng-if="currentlyInStateContext()">
+                <div ng-controller="StateEditor" ng-show="currentlyInStateContext()">
                   {% include 'editor/state_editor.html' %}
                 </div>
               </tab>

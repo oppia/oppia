@@ -75,20 +75,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateName) {
-    $scope.stateName = stateName;
-    if ($scope.stateName) {
-      var dataOrPromise = explorationData.getStateData($scope.stateName);
-      if (dataOrPromise) {
-        if ('then' in dataOrPromise) {
-          dataOrPromise.then($scope.initInteractiveWidget);
-        } else {
-          $scope.initInteractiveWidget(dataOrPromise);
-        }
-      } else {
-        console.log('No state data exists for state ' + $scope.stateName);
-      }
-    }
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    $scope.stateName = $scope.$parent.stateName;
+    $scope.initInteractiveWidget(stateData);
   });
 
   // Returns a list of all states, as well as 'END' and 'Add New State' options.
@@ -411,7 +400,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.isRuleConfusing = function(rule) {
-    return rule.feedback.length === 0 && stateName === $scope.stateName;
+    return rule.feedback.length === 0 && rule.dest === $scope.stateName;
   };
 
   $scope.getCssClassForRule = function(rule) {

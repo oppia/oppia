@@ -132,6 +132,9 @@ urls = [
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
     get_redirect_route(
+        r'/createhandler/change_list_summary/<exploration_id>',
+        editor.ChangeListSummaryHandler, 'change_list_summary'),
+    get_redirect_route(
         r'/createhandler/delete_state/<exploration_id>/<escaped_state_name>',
         editor.DeleteStateHandler, 'delete_state_handler'),
     get_redirect_route(

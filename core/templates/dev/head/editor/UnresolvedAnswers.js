@@ -26,20 +26,9 @@ function UnresolvedAnswers($scope, warningsData, explorationData) {
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateName) {
-    $scope.stateName = stateName;
-    if ($scope.stateName) {
-      var dataOrPromise = explorationData.getStateData($scope.stateName);
-      if (dataOrPromise) {
-        if ('then' in dataOrPromise) {
-          dataOrPromise.then($scope.initUnresolvedAnswers);
-        } else {
-          $scope.initUnresolvedAnswers(data);
-        }
-      } else {
-        console.log('No state data exists for state ' + $scope.stateName);
-      }
-    }
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    $scope.stateName = $scope.$parent.stateName;
+    $scope.initUnresolvedAnswers(stateData);
   });
 
   $scope.generateUnresolvedAnswersMap = function() {
