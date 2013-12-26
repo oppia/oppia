@@ -36,7 +36,6 @@ from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
-from core.domain import stats_domain
 from core.domain import widget_registry
 from core.platform import models
 import feconf
@@ -119,24 +118,6 @@ def count_explorations():
 
 
 # Methods for exporting states and explorations to other formats.
-def _get_unresolved_answers_for_default_rule(exploration_id, state_name):
-    return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_name, SUBMIT_HANDLER_NAME,
-        exp_domain.DEFAULT_RULESPEC_STR
-    ).answers
-
-
-def export_state_to_verbose_dict(exploration_id, state_name):
-    """Gets a state dict with rule descriptions and unresolved answers."""
-    exploration = get_exploration_by_id(exploration_id)
-
-    state_frontend_dict = exploration.export_state_to_frontend_dict(state_name)
-    state_frontend_dict['unresolved_answers'] = (
-        _get_unresolved_answers_for_default_rule(exploration_id, state_name))
-
-    return state_frontend_dict
-
-
 def export_content_to_html(exploration_id, content_array, params=None):
     """Takes a Content array and transforms it into HTML.
 
@@ -693,24 +674,25 @@ def classify(exploration_id, state_name, handler_name, answer, params):
 
 
 # Creation and deletion methods.
-def convert_v1_dict_to_v2_dict(exploration_dict):
-    """Converts a v1 exploration dict into a v2 exploration dict."""
-    exploration_dict['schema_version'] = 2
-    exploration_dict['init_state_name'] = exploration_dict['states'][0]['name']
-
-    states_dict = {}
-    for state in exploration_dict['states']:
-        states_dict[state['name']] = state
-        del states_dict[state['name']]['name']
-    exploration_dict['states'] = states_dict
-
-    return exploration_dict
-
-
 def create_from_yaml(
         yaml_content, user_id, title, category, exploration_id=None,
         cloned_from=None):
     """Creates an exploration from a YAML text string."""
+
+    def convert_v1_dict_to_v2_dict(exploration_dict):
+        """Converts a v1 exploration dict into a v2 exploration dict."""
+        exploration_dict['schema_version'] = 2
+        exploration_dict['init_state_name'] = (
+            exploration_dict['states'][0]['name'])
+
+        states_dict = {}
+        for state in exploration_dict['states']:
+            states_dict[state['name']] = state
+            del states_dict[state['name']]['name']
+        exploration_dict['states'] = states_dict
+
+        return exploration_dict
+
     exploration_dict = utils.dict_from_yaml(yaml_content)
 
     exploration_schema_version = exploration_dict.get('schema_version')
@@ -841,7 +823,6 @@ def delete_demo(exploration_id):
     """Deletes a single demo exploration."""
     exploration = get_exploration_by_id(exploration_id, strict=False)
     if not exploration:
-        # This exploration does not exist, so it cannot be deleted.
         logging.info('Exploration with id %s was not deleted, because it '
                      'does not exist.' % exploration_id)
     else:

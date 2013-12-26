@@ -886,9 +886,6 @@ class Exploration(object):
         """Gets a state dict with rule descriptions."""
         state_dict = self.states[state_name].to_dict()
 
-        # TODO(sll): Fix the frontend and remove this line.
-        state_dict['widget']['id'] = state_dict['widget']['widget_id']
-
         for handler in state_dict['widget']['handlers']:
             for rule_spec in handler['rule_specs']:
 

@@ -85,6 +85,13 @@ class EventHandler(object):
         _save_feedback_item(feedback_item)
 
 
+def get_unresolved_answers_for_default_rule(exploration_id, state_name):
+    return stats_domain.StateRuleAnswerLog.get(
+        exploration_id, state_name, SUBMIT_HANDLER_NAME,
+        exp_domain.DEFAULT_RULESPEC_STR
+    ).answers
+
+
 def get_feedback_item_by_id(feedback_item_id, strict=True):
     """Returns a domain object representing a feedback item."""
     feedback_item_model = stats_models.FeedbackItemModel.get(

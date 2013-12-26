@@ -36,7 +36,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       $scope.widgetHandlerSpecs = data.widget.handlers;
       $scope.widgetParamSpecs = data.widget.params;
 
-      $scope.widgetId = data.widget.id;
+      $scope.widgetId = data.widget.widget_id;
       $scope.widgetCustomizationArgs = data.widget.customization_args;
 
       $scope.addContentToIframeWithId($scope.previewIframeId, data.widget.raw);
@@ -72,7 +72,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     $scope.$apply();
     $scope.widgetSticky = data.widget.sticky;
 
-    $scope.generateWidgetPreview(data.widget.id, data.widget.customization_args);
+    $scope.generateWidgetPreview(data.widget.widget_id, data.widget.customization_args);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -334,9 +334,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         // The user has added a new state.
         if (!tmpRule.destNew) {
           warningsData.addWarning('Error: destination state is empty.');
-        } else if ($scope.convertDestToId(tmpRule.destNew, true)) {
+        } else if (
+            $scope.$parent.states.hasOwnProperty(tmpRule.destNew) ||
+            tmpRule.destNew == END_DEST) {
           // The new state already exists.
-          extendedRule.dest = $scope.convertDestToId(tmpRule.destNew);
+          extendedRule.dest = tmpRule.destNew;
         } else {
           extendedRule.dest = tmpRule.destNew;
           // Adds the new state, then saves the rule.
@@ -405,37 +407,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
   $scope.getCssClassForRule = function(rule) {
     return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
-  };
-
-  $scope.convertDestToId = function(destName, hideWarnings) {
-    if (!destName) {
-      warningsData.addWarning('Please choose a destination.');
-      return;
-    }
-
-    var found = false;
-    var destId = '';
-
-    if (destName.toUpperCase() == END_DEST) {
-      found = true;
-      destId = END_DEST;
-    } else {
-      // Look for the id in states.
-      for (var id in $scope.states) {
-        if (id == destName) {
-          found = true;
-          destId = id;
-          break;
-        }
-      }
-    }
-
-    if (!found && !hideWarnings) {
-      warningsData.addWarning('Invalid destination name: ' + destName);
-      return;
-    }
-
-    return destId;
   };
 
   window.addEventListener('message', function(evt) {
@@ -561,8 +532,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
         };
       }]
     }).result.then(function(arg) {
-      if (!$scope.widgetId || $scope.widgetId != arg.data.widget.id) {
-        $scope.widgetId = arg.data.widget.id;
+      if (!$scope.widgetId || $scope.widgetId != arg.data.widget.widget_id) {
+        $scope.widgetId = arg.data.widget.widget_id;
         $scope.widgetCustomizationArgs = arg.data.widget.customization_args;
         // Preserve the old default rule.
         $scope.widgetHandlers = {

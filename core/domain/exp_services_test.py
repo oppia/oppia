@@ -652,25 +652,25 @@ class StateServicesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_unresolved_answers(self):
         self.assertEquals(
-            exp_services._get_unresolved_answers_for_default_rule(
+            stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
-            exp_services._get_unresolved_answers_for_default_rule(
+            stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 1})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
-            exp_services._get_unresolved_answers_for_default_rule(
+            stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 2})
 
         stats_services.EventHandler.resolve_answers_for_default_rule(
             'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
         self.assertEquals(
-            exp_services._get_unresolved_answers_for_default_rule(
+            stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
     def test_delete_state(self):

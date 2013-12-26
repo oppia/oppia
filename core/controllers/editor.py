@@ -195,10 +195,14 @@ class ExplorationHandler(EditorHandler):
         """Returns a description of the given exploration."""
         exploration = exp_services.get_exploration_by_id(exploration_id)
 
-        state_list = {}
+        states = {}
         for state_name in exploration.states:
-            state_list[state_name] = exp_services.export_state_to_verbose_dict(
-                exploration_id, state_name)
+            state_frontend_dict = exploration.export_state_to_frontend_dict(
+                state_name)
+            state_frontend_dict['unresolved_answers'] = (
+                stats_services.get_unresolved_answers_for_default_rule(
+                    exploration_id, state_name))
+            states[state_name] = state_frontend_dict
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -220,7 +224,7 @@ class ExplorationHandler(EditorHandler):
             'category': exploration.category,
             'title': exploration.title,
             'editors': editors,
-            'states': state_list,
+            'states': states,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
             'version': exploration.version
