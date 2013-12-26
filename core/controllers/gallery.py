@@ -61,8 +61,9 @@ class GalleryHandler(base.BaseHandler):
 
         for exploration in explorations:
             categories[exploration.category].append({
+                'can_clone': rights_manager.Actor(self.user_id).can_clone(
+                    exploration.id),
                 'can_edit': exploration.id in editable_exploration_ids,
-                'can_fork': self.user_id and exploration.is_demo,
                 # TODO(sll): Replace this with a query that gets all viewable
                 # explorations for this user.
                 'can_view': (
@@ -106,8 +107,8 @@ class NewExploration(base.BaseHandler):
         self.render_json({'explorationId': exploration_id})
 
 
-class ForkExploration(base.BaseHandler):
-    """Forks an existing exploration."""
+class CloneExploration(base.BaseHandler):
+    """Clones an existing exploration."""
 
     PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
 

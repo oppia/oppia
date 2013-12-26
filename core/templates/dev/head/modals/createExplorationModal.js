@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function CreateExplorationModal($scope, $http, $modal, warningsData, oppiaRequestCreator) {
+function CreateExplorationModal($scope, $http, $rootScope, $modal, warningsData, oppiaRequestCreator) {
 
   $scope.showCreateExplorationModal = function(categoryList) {
     warningsData.clear();
@@ -68,31 +68,25 @@ function CreateExplorationModal($scope, $http, $modal, warningsData, oppiaReques
     });
 
     modalInstance.result.then(function(result) {
-      $scope.createNewExploration(
-        result.title,
-        result.category,
-        result.includeYamlFile,
-        result.yamlFile
-      );
-    }, function () {
-      console.log('Create modal dismissed.');
-    });
-  };
+      var title = result.title;
+      var category = $scope.normalizeWhitespace(result.category);
+      var includeYamlFile = result.includeYamlFile;
+      var yamlFile = result.yamlFile;
 
-  $scope.createNewExploration = function(title, category, includeYamlFile, yamlFile) {
-    category = $scope.normalizeWhitespace(category);
-    if (!$scope.isValidEntityName(category, true)) {
-      return;
-    }
+      if (!$scope.isValidEntityName(category, true)) {
+        return;
+      }
 
-    if (yamlFile && includeYamlFile) {
-      // A yaml file was uploaded.
-      var form = new FormData();
-      form.append('yaml', yamlFile);
-      form.append('category', category);
-      form.append('title', title);
+      $rootScope.loadingMessage = 'Creating exploration';
 
-      $.ajax({
+      if (yamlFile && includeYamlFile) {
+        // A yaml file was uploaded.
+        var form = new FormData();
+        form.append('yaml', yamlFile);
+        form.append('category', category);
+        form.append('title', title);
+
+        $.ajax({
           url: '/create_new',
           data: form,
           processData: false,
@@ -103,26 +97,29 @@ function CreateExplorationModal($scope, $http, $modal, warningsData, oppiaReques
           },
           error: function(data) {
             warningsData.addWarning(
-                JSON.parse(data.responseText).error ||
-                'Error communicating with server.');
+              JSON.parse(data.responseText).error ||
+              'Error communicating with server.');
+            $rootScope.loadingMessage = '';
           }
-      });
-    } else {
-      $http.post(
+        });
+      } else {
+        $http.post(
           '/create_new',
           oppiaRequestCreator.createRequest({title: title, category: category}),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-              success(function(data) {
-                window.location = '/create/' + data.explorationId;
-              }).error(function(data) {
-                warningsData.addWarning(data.error ? data.error :
-                    'Error: Could not add new exploration.');
-              });
-    }
+            success(function(data) {
+              window.location = '/create/' + data.explorationId;
+            }).error(function(data) {
+              warningsData.addWarning(data.error ? data.error :
+                'Error: Could not add new exploration.');
+              $rootScope.loadingMessage = '';
+            });
+      }
+    });
   };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-CreateExplorationModal.$inject = ['$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator'];
+CreateExplorationModal.$inject = ['$scope', '$http', '$rootScope', '$modal', 'warningsData', 'oppiaRequestCreator'];

@@ -26,6 +26,9 @@ function Base($scope, $http, $rootScope, $window, warningsData, activeInputData,
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
+  // If this is nonempty, the whole page goes into 'Loading...' mode.
+  $rootScope.loadingMessage = '';
+
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
   // TODO(sll): This is wrong; it should only happen for the reader app.

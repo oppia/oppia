@@ -117,7 +117,18 @@
               </p>
             </div>
           </div>
-          {% block content %}{% endblock %}
+
+          <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+            <center>
+              <[loadingMessage]>
+              <span class="oppia-loading-dot-one">.</span>
+              <span class="oppia-loading-dot-two">.</span>
+              <span class="oppia-loading-dot-three">.</span>
+            </center>
+          </div>
+          <div ng-show="!loadingMessage">
+            {% block content %}{% endblock %}
+          </div>
         </div>
         <br><br>
       </div>

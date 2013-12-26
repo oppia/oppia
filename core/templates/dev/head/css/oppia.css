@@ -33,7 +33,7 @@ h3 {
 }
 
 /*
-  Override the Bootstrap default (which had the horizontal padding set to 20px 
+  Override the Bootstrap default (which had the horizontal padding set to 20px
   on both sides, leading to alignment issues when nesting container-fluid
   elements in the exploration editor).
 */
@@ -121,6 +121,37 @@ textarea {
 
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
+}
+
+.oppia-loading-fullpage {
+  border: 1px;
+  border-radius: 5px;
+  font-size: 200%;
+  height: 100%;
+  position: fixed;
+  top: 35%;
+  width: 100%;
+  z-index: 1000;
+}
+.oppia-loading-dot-one {
+  opacity: 0;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.0s;
+}
+.oppia-loading-dot-two {
+  opacity: 0;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.3s;
+}
+.oppia-loading-dot-three {
+  opacity: 0;
+  -webkit-animation: dot 1.5s infinite;
+  -webkit-animation-delay: 0.6s;
+}
+@-webkit-keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 .oppia-gallery {
@@ -585,7 +616,7 @@ textarea {
   font: 40px open sans,sans-serif;
   font-weight: bold;
 }
-  
+
 .oppia-splash-subtitle {
   color: black;
   font: 20px open sans,sans-serif;

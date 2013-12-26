@@ -40,6 +40,7 @@ function ReaderExploration(
   $scope.$on('pageLoaded', function(event, data) {
     // Show content when the page is loaded.
     $scope.showPage = true;
+    // This is necessary to load used versions of the interactive map.
     $scope.$apply();
   });
 

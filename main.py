@@ -97,10 +97,12 @@ urls = [
 
     get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(
-        r'/gallery/data', gallery.GalleryHandler, 'gallery_handler'),
+        r'/galleryhandler/data', gallery.GalleryHandler, 'gallery_handler'),
+
     get_redirect_route(
         r'/create_new', gallery.NewExploration, 'new_exploration'),
-    get_redirect_route(r'/fork', gallery.ForkExploration, 'fork_exploration'),
+    get_redirect_route(
+        r'/clone', gallery.CloneExploration, 'clone_exploration'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(

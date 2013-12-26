@@ -88,7 +88,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.addStateChange = function(backendName, newValue, oldValue) {
-    if (!$scope.explorationFullyLoaded || angular.equals(newValue, oldValue)) {
+    if ($rootScope.loadingMessage || angular.equals(newValue, oldValue)) {
       return;
     }
 
@@ -120,7 +120,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
    * @param {string} oldValue The previous value of the property
    */
   $scope.addExplorationChange = function(backendName, newValue, oldValue) {
-    if (!$scope.explorationFullyLoaded || angular.equals(newValue, oldValue)) {
+    if ($rootScope.loadingMessage || angular.equals(newValue, oldValue)) {
       return;
     }
 
@@ -427,9 +427,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
       $scope.guiTabActive = false;
-      if ($scope.explorationFullyLoaded) {
-        $scope.drawGraph();
-      }
     } else {
       $location.path('/');
       $location.hash('');
@@ -438,9 +435,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.mainTabActive = true;
       $scope.guiTabActive = false;
       $scope.statsTabActive = false;
-      if ($scope.explorationFullyLoaded) {
-        $scope.drawGraph();
-      }
     }
   });
 
@@ -468,7 +462,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   /**********************************************************
    * Called on initial load of the exploration editor page.
    *********************************************************/
-  $scope.explorationFullyLoaded = false;
+  $rootScope.loadingMessage = 'Loading';
 
   // The pathname should be: .../create/{exploration_id}
   $scope.explorationId = pathnameArray[2];
@@ -560,7 +554,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.drawGraph();
       $scope.refreshVersionHistory();
 
-      $scope.explorationFullyLoaded = true;
+      $rootScope.loadingMessage = '';
 
       $scope.refreshExplorationStatistics();
 

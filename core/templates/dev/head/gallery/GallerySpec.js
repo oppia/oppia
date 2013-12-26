@@ -4,8 +4,8 @@ describe('Gallery controller', function() {
     var scope, ctrl, $httpBackend;
 
     var geographyExploration = {
+      can_clone: false,
       can_edit: false,
-      can_fork: false,
       data: {
         category: 'Geography',
         editors: [],
@@ -16,8 +16,8 @@ describe('Gallery controller', function() {
     };
 
     var myExploration = {
+      can_clone: true,
       can_edit: true,
-      can_fork: true,
       data: {
         category: 'Personal',
         editors: [],
@@ -33,7 +33,7 @@ describe('Gallery controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/gallery/data/').respond({
+      $httpBackend.expectGET('/galleryhandler/data').respond({
         allow_yaml_file_upload: false,
         categories: {
           Geography: [geographyExploration],

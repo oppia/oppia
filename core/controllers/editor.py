@@ -519,13 +519,18 @@ class ChangeListSummaryHandler(EditorHandler):
             exploration_id)
 
         if version != current_exploration.version:
+            # TODO(sll): Improve this.
             self.render_json({
                 'error': (
-                    'Sorry, someone else has edited and committed changes to '
-                    'this exploration while you were editing it. (Trying to '
-                    'edit version %s, but the current version is %s.). Please '
-                    'reload the page and try again.'
-                    % (version, current_exploration.version)
+                    'Sorry! Someone else has edited and committed changes to '
+                    'this exploration while you were editing it. We suggest '
+                    'opening another browser tab -- which will load the new '
+                    'version of the exploration -- then transferring your '
+                    'changes there. We will try to make this easier in the '
+                    'future -- we have not done it yet because figuring out '
+                    'how to merge different people\'s changes is hard. '
+                    '(Trying to edit version %s, but the current version is '
+                    '%s.).' % (version, current_exploration.version)
                 )
             })
         else:

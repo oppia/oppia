@@ -9,7 +9,6 @@
 
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
-
         <h3 class="oppia-page-title">
           Gallery
         </h3>
@@ -51,8 +50,8 @@
 
                       <div class="oppia-gallery-tile-bottom">
                         <div>
-                          <span ng-if="exploration.can_fork">
-                            <a href="" ng-click="forkExploration(exploration.id)">
+                          <span ng-if="exploration.can_clone">
+                            <a href="" ng-click="cloneExploration(exploration.id)">
                               <i class="icon-share oppia-icon" title="Copy this exploration">
                               </i>
                               <span class="oppia-small-font">Copy</span>

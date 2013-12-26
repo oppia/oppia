@@ -94,6 +94,7 @@ class Actor(object):
     """
 
     def __init__(self, user_id):
+        # Note that this may be None.
         self.user_id = user_id
 
     def _is_super_admin(self):

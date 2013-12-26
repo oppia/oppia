@@ -18,11 +18,13 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
+function Gallery($scope, $http, $modal, $rootScope, warningsData, oppiaRequestCreator) {
   $scope.currentUrl = document.URL;
   $scope.root = location.protocol + '//' + location.host;
-  $scope.galleryDataUrl = '/gallery/data/';
+  $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.categoryList = [];
+
+  $rootScope.loadingMessage = 'Loading';
 
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(galleryData) {
@@ -32,6 +34,8 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
     for (var category in $scope.categories) {
       $scope.categoryList.push(category);
     }
+
+    $rootScope.loadingMessage = '';
   });
 
   /**
@@ -69,9 +73,10 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
     });
   };
 
-  $scope.forkExploration = function(explorationId) {
+  $scope.cloneExploration = function(explorationId) {
+    $rootScope.loadingMessage = 'Cloning exploration';
     $http.post(
-      '/fork',
+      '/clone',
       oppiaRequestCreator.createRequest({exploration_id: explorationId}),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
         success(function(data) {
@@ -79,6 +84,7 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
         }).error(function(data) {
           warningsData.addWarning(data.error ? data.error :
             'Error: Could not add new exploration.');
+          $rootScope.loadingMessage = '';
         });
   };
 
@@ -93,4 +99,4 @@ function Gallery($scope, $http, $modal, warningsData, oppiaRequestCreator) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Gallery.$inject = ['$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator'];
+Gallery.$inject = ['$scope', '$http', '$modal', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
