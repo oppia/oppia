@@ -547,6 +547,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.explorationEditors = data.editors;
       $scope.initStateName = data.init_state_name;
       $scope.isPublic = data.is_public;
+      $scope.isCloned = data.is_cloned;
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
@@ -798,6 +799,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
               explorationData.data.version = data.version;
+              $scope[frontendName] = newValue;
             }).
             error(function(data) {
               warningsData.addWarning(
@@ -806,8 +808,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               //     $watch to trigger.
               // $scope[frontendName] = oldValue;
             });
-
-    $scope[frontendName] = newValue;
   };
 
   $scope.initializeNewActiveInput = function(newActiveInput) {

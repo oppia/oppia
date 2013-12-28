@@ -18,9 +18,15 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function EditorPrerequisites($scope, $http, warningsData, oppiaRequestCreator) {
-  $scope.urlParams = $scope.getUrlParams();
-  $scope.hasUsername = $scope.urlParams.has_username == 'true' ? true : false;
+function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+  $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
+  $rootScope.loadingMessage = 'Loading';
+
+  $http.get($scope.editorPrerequisitesDataUrl).success(function(data) {
+    $rootScope.loadingMessage = '';
+    $scope.username = data.username;
+    $scope.agreedToTerms = data.has_agreed_to_terms;
+  });
 
   $scope.submitPrerequisitesForm = function(agreedToTerms, username) {
     if (!agreedToTerms) {
@@ -36,7 +42,7 @@ function EditorPrerequisites($scope, $http, warningsData, oppiaRequestCreator) {
     }
 
     $http.post(
-      '/profile/editor_prerequisites',
+      '/editor_prerequisites_handler/data',
       oppiaRequestCreator.createRequest({
         agreed_to_terms: agreedToTerms,
         username: username
@@ -53,4 +59,4 @@ function EditorPrerequisites($scope, $http, warningsData, oppiaRequestCreator) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorPrerequisites.$inject = ['$scope', '$http', 'warningsData', 'oppiaRequestCreator'];
+EditorPrerequisites.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];

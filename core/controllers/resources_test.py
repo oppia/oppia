@@ -36,7 +36,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
     def _initialize(self):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        self.register(self.EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
 
     def test_image_upload_and_download(self):
         """Test image uploading and downloading."""

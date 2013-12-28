@@ -30,15 +30,11 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([
-    models.NAMES.user
-])
 import feconf
 import utils
 
 import jinja2
 
-EDITOR_MODE = 'editor'
 # The number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 10
 
@@ -104,31 +100,9 @@ def require_editor(handler):
                 self.request.uri))
             return
 
-        user_settings_model = None
-        redirect_url = '/profile/editor_prerequisites'
-        must_redirect = False
+        redirect_url = feconf.EDITOR_PREREQUISITES_URL
 
-        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
-            if user_settings_model is None:
-                user_settings_model = (
-                    user_models.UserSettingsModel.get_or_create(self.user_id))
-
-            if not user_settings_model.username:
-                must_redirect = True
-                redirect_url = utils.set_url_query_parameter(
-                    redirect_url, 'has_username', 'false')
-
-        if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
-            if user_settings_model is None:
-                user_settings_model = (
-                    user_models.UserSettingsModel.get_or_create(self.user_id))
-
-            if not user_settings_model.agreed_to_terms:
-                must_redirect = True
-                redirect_url = utils.set_url_query_parameter(
-                    redirect_url, 'agreed_to_terms', 'false')
-
-        if must_redirect:
+        if not user_services.has_user_registered_as_editor(self.user_id):
             redirect_url = utils.set_url_query_parameter(
                 redirect_url, 'return_url', self.request.uri)
             self.redirect(redirect_url)
@@ -177,7 +151,8 @@ class ExplorationPage(EditorHandler):
         value_generators_js = VALUE_GENERATORS_JS.value
 
         self.values.update({
-            'nav_mode': EDITOR_MODE,
+            'can_publish': rights_manager.Actor(self.user_id).can_publish(
+                exploration_id),
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value)
@@ -207,19 +182,15 @@ class ExplorationHandler(EditorHandler):
             exploration_id)
 
         # TODO(sll): Tidy this up; show owners, editors and viewers.
-        editors = []
-        for editor_id in (
-                exploration_rights.owner_ids + exploration_rights.editor_ids):
-            username = user_services.get_username(editor_id)
-            if username:
-                editors.append(username)
-            else:
-                editors.append('[Awaiting response]')
+        editor_ids = (
+            exploration_rights.owner_ids + exploration_rights.editor_ids)
+        editors = user_services.get_human_readable_user_ids(editor_ids)
 
         return {
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'is_public': rights_manager.is_exploration_public(exploration_id),
+            'is_cloned': rights_manager.is_exploration_cloned(exploration_id),
             'category': exploration.category,
             'title': exploration.title,
             'editors': editors,
@@ -289,7 +260,7 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add new editors.')
 
-            new_editor_id = current_user_services.get_user_id_from_email(
+            new_editor_id = user_services.get_user_id_from_email(
                 new_editor_email)
 
             if new_editor_id is None:
@@ -301,14 +272,9 @@ class ExplorationRightsHandler(EditorHandler):
                 rights_manager.ROLE_EDITOR)
 
         elif is_public:
-            # TODO(sll): If this is the case, don't show the 'publish' button
-            # in the first place.
-            if not rights_manager.Actor(self.user_id).can_publish(
-                    exploration_id):
-                raise self.UnauthorizedUserException(
-                    'This exploration cannot be published.')
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exp_services.require_pass_strict_validation(exploration)
             rights_manager.publish_exploration(self.user_id, exploration_id)
-
         else:
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
@@ -414,11 +380,10 @@ class ExplorationSnapshotsHandler(EditorHandler):
             exploration_id, DEFAULT_NUM_SNAPSHOTS)
 
         # Patch `snapshots` to use the editor's display name.
-        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
-            for snapshot in snapshots:
-                if snapshot['committer_id'] != 'admin':
-                    snapshot['committer_id'] = user_services.get_username(
-                        snapshot['committer_id'])
+        for snapshot in snapshots:
+            if snapshot['committer_id'] != 'admin':
+                snapshot['committer_id'] = user_services.get_username(
+                    snapshot['committer_id'])
 
         self.render_json({
             'snapshots': snapshots,

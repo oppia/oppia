@@ -40,7 +40,7 @@ class EditorTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
 
         # Register and login as an admin.
-        self.register('editor@example.com')
+        self.register_editor('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         # Check that it is now possible to access the editor page.
@@ -55,7 +55,7 @@ class EditorTest(test_utils.GenericTestBase):
     def test_request_new_state_template(self):
         """Test requesting a new state template when adding a new state."""
         # Register and log in as an admin.
-        self.register('editor@example.com')
+        self.register_editor('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         EXP_ID = 'eid'
@@ -87,7 +87,7 @@ class EditorTest(test_utils.GenericTestBase):
         CURRENT_VERSION = 2
 
         # Register and log in as an admin.
-        self.register('editor@example.com')
+        self.register_editor('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -211,7 +211,7 @@ class EditorTest(test_utils.GenericTestBase):
             )
 
         # Register and log in as an editor.
-        self.register('editor@example.com')
+        self.register_editor('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         response = self.testapp.get('/create/0')
@@ -271,7 +271,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
 
         # Check, from the editor perspective, that no stats have been recorded.
-        self.register('editor@example.com')
+        self.register_editor('editor@example.com')
         self.login('editor@example.com', is_admin=True)
 
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
@@ -321,10 +321,10 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.viewer_email = 'viewer@example.com'
 
         # Usernames containing the string 'admin' are reserved.
-        self.register(self.admin_email, username='adm')
-        self.register(self.owner_email, username='owner')
-        self.register(self.editor_email, username='editor')
-        self.register(self.viewer_email, username='viewer')
+        self.register_editor(self.admin_email, username='adm')
+        self.register_editor(self.owner_email, username='owner')
+        self.register_editor(self.editor_email, username='editor')
+        self.register_editor(self.viewer_email, username='viewer')
 
         self.admin_id = self.get_user_id_from_email(self.admin_email)
         self.owner_id = self.get_user_id_from_email(self.owner_email)

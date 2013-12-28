@@ -23,30 +23,21 @@ from core.platform import models
 
 from google.appengine.ext import ndb
 
-QUERY_LIMIT = 100
-
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
 
-    The id/key of instances of this class has the form
-        [USER_ID].
+    Instances of this class are keyed by the user id.
     """
-    # Identifiable username to display in the UI
+    # Email address of the user.
+    email = ndb.StringProperty(required=True, indexed=True)
+
+    # Identifiable username to display in the UI.
     username = ndb.StringProperty(indexed=True)
-
-    # Normalized username
+    # Normalized username (for catching duplicates).
     normalized_username = ndb.StringProperty(indexed=True)
-
-    # Whether the user has agreed to the terms of the site.
-    agreed_to_terms = ndb.BooleanProperty(default=False)
-
-    @classmethod
-    def get_or_create(cls, user_id):
-        user_settings = cls.get(user_id, strict=False)
-        if not user_settings:
-            user_settings = cls(id=user_id)
-        return user_settings
+    # When the user last agreed to the terms of the site.
+    last_agreed_to_terms = ndb.DateTimeProperty(default=None)
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

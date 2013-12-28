@@ -38,6 +38,70 @@ import feconf
 import utils
 
 
+class ExplorationChange(object):
+    """Domain object class for an exploration change.
+
+    IMPORTANT: Ensure that all changes to this class (and how these cmds are
+    interpreted in general) preserve backward-compatibility with the
+    exploration snapshots in the datastore. Do not modify the definitions of
+    cmd keys that already exist.
+    """
+
+    STATE_PROPERTIES = (
+        'param_changes', 'content', 'widget_id',
+        'widget_customization_args', 'widget_sticky', 'widget_handlers')
+
+    EXPLORATION_PROPERTIES = (
+        'title', 'category', 'param_specs', 'param_changes')
+
+    def __init__(self, change_dict):
+        """Initializes an ExplorationChange object from a dict.
+
+        change_dict represents a command. It should have a 'cmd' key, and one
+        or more other keys. The keys depend on what the value for 'cmd' is.
+
+        The possible values for 'cmd' are listed below, together with the other
+        keys in the dict:
+        - 'add_state' (with state_name)
+        - 'rename_state' (with old_state_name and new_state_name)
+        - 'delete_state' (with state_name)
+        - 'edit_state_property' (with state_name, property_name, new_value and,
+            optionally, old_value)
+        - 'edit_exploration_property' (with property_name, new_value and,
+            optionally, old_value)
+
+        For a state, property_name must be one of STATE_PROPERTIES. For an
+        exploration, property_name must be one of EXPLORATION_PROPERTIES.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == 'add_state':
+            self.state_name = change_dict['state_name']
+        elif self.cmd == 'rename_state':
+            self.old_state_name = change_dict['old_state_name']
+            self.new_state_name = change_dict['new_state_name']
+        elif self.cmd == 'delete_state':
+            self.state_name = change_dict['state_name']
+        elif self.cmd == 'edit_state_property':
+            if change_dict['property_name'] not in self.STATE_PROPERTIES:
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.state_name = change_dict['state_name']
+            self.property_name = change_dict['property_name']
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict.get('old_value')
+        elif self.cmd == 'edit_exploration_property':
+            if (change_dict['property_name'] not in
+                    self.EXPLORATION_PROPERTIES):
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.property_name = change_dict['property_name']
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict.get('old_value')
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+
 class Content(object):
     """Value object representing non-interactive content."""
 
@@ -799,11 +863,16 @@ class Exploration(object):
             raise Exception('Exploration %s has no parameter named %s' %
                             (self.title, param_name))
 
+    @classmethod
+    def is_demo_exploration_id(cls, exploration_id):
+        """Whether the exploration id is that of a demo exploration."""
+        return exploration_id.isdigit() and (
+            0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS))
+
     @property
     def is_demo(self):
         """Whether the exploration is one of the demo explorations."""
-        return self.id.isdigit() and (
-            0 <= int(self.id) < len(feconf.DEMO_EXPLORATIONS))
+        return self.is_demo_exploration_id(self.id)
 
     def update_title(self, title):
         self.title = title

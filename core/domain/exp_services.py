@@ -40,7 +40,6 @@ from core.domain import widget_registry
 from core.platform import models
 import feconf
 import jinja_utils
-current_user_services = models.Registry.import_current_user_services()
 memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
@@ -185,72 +184,19 @@ def export_to_zip_file(exploration_id):
 
 
 # Repository SAVE and DELETE methods.
-class _Change(object):
-
-    STATE_PROPERTIES = (
-        'param_changes', 'content', 'widget_id',
-        'widget_customization_args', 'widget_sticky', 'widget_handlers')
-
-    EXPLORATION_PROPERTIES = (
-        'title', 'category', 'param_specs', 'param_changes')
-
-    def __init__(self, change_dict):
-        """Initializes a _Change object from a dict.
-
-        change_dict represents a command. It should have a 'cmd' key, and one
-        or more other keys. The possible values for 'cmd' are listed below,
-        together with the other keys in the dict:
-        - 'add_state' (with state_name)
-        - 'rename_state' (with old_state_name and new_state_name)
-        - 'delete_state' (with state_name)
-        - 'edit_state_property' (with state_name, property_name, new_value and,
-            optionally, old_value)
-        - 'edit_exploration_property' (with property_name, new_value and,
-            optionally, old_value)
-
-        For a state, property_name must be one of STATE_PROPERTIES. For an
-        exploration, property_name must be one of EXPLORATION_PROPERTIES.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == 'add_state':
-            self.state_name = change_dict['state_name']
-        elif self.cmd == 'rename_state':
-            self.old_state_name = change_dict['old_state_name']
-            self.new_state_name = change_dict['new_state_name']
-        elif self.cmd == 'delete_state':
-            self.state_name = change_dict['state_name']
-        elif self.cmd == 'edit_state_property':
-            if change_dict['property_name'] not in self.STATE_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.state_name = change_dict['state_name']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == 'edit_exploration_property':
-            if (change_dict['property_name'] not in
-                    self.EXPLORATION_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
 
-    Each entry in change_list is a dict that represents a _Change object.
+    Each entry in change_list is a dict that represents an ExplorationChange
+    object.
 
     Returns:
       the resulting exploration domain object.
     """
     exploration = get_exploration_by_id(exploration_id)
     try:
-        changes = [_Change(change_dict) for change_dict in change_list]
+        changes = [exp_domain.ExplorationChange(change_dict)
+                   for change_dict in change_list]
 
         for change in changes:
             if change.cmd == 'add_state':
@@ -295,7 +241,8 @@ def apply_change_list(exploration_id, change_list):
 def get_summary_of_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns a summary.
 
-    Each entry in change_list is a dict that represents a _Change object.
+    Each entry in change_list is a dict that represents an ExplorationChange
+    object.
 
     Returns:
       a dict with five keys:
@@ -319,7 +266,9 @@ def get_summary_of_change_list(exploration_id, change_list):
     # worth comparing with the actual changed exploration.
 
     exploration = get_exploration_by_id(exploration_id)
-    changes = [_Change(change_dict) for change_dict in change_list]
+    changes = [
+        exp_domain.ExplorationChange(change_dict)
+        for change_dict in change_list]
 
     exploration_property_changes = {}
     state_property_changes = {}
@@ -421,6 +370,16 @@ def get_summary_of_change_list(exploration_id, change_list):
     }
 
 
+def require_pass_strict_validation(exploration):
+    """Ensures that the exploration passes strict validation.
+
+    Raises a utils.ValidationError if strict validation fails.
+    """
+    warnings = exploration.validate(strict=True)
+    if warnings:
+        raise utils.ValidationError(warnings)
+
+
 def save_exploration(
         committer_id, exploration, commit_message='', change_list=None):
     """Commits an exploration domain object to persistent storage.
@@ -433,9 +392,7 @@ def save_exploration(
 
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
-        warnings = exploration.validate(strict=True)
-        if warnings:
-            raise utils.ValidationError(warnings)
+        require_pass_strict_validation(exploration)
     else:
         exploration.validate()
 
@@ -525,9 +482,8 @@ def create_new(
     exploration_model.put(
         user_id, {}, commit_message='Exploration first created.')
 
-    exploration_rights = rights_manager.ExplorationRights(
-        exploration_id, [user_id], [], [], cloned_from=cloned_from)
-    rights_manager.save_exploration_rights(user_id, exploration_rights)
+    rights_manager.create_new_exploration_rights(
+        exploration_id, user_id, cloned_from)
 
     return exploration_id
 

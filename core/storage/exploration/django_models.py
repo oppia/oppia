@@ -23,8 +23,6 @@ import core.storage.base_model.models as base_models
 
 from django.db import models
 
-import feconf
-
 QUERY_LIMIT = 100
 
 

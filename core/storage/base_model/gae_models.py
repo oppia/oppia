@@ -85,6 +85,11 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).put()
 
     @classmethod
+    def get_multi(cls, entity_ids):
+        entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
+        return ndb.get_multi(entity_keys)
+
+    @classmethod
     def put_multi(cls, entities):
         return ndb.put_multi(entities)
 

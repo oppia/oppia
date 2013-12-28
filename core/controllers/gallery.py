@@ -22,8 +22,6 @@ import feconf
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 
 
 class GalleryPage(base.BaseHandler):
@@ -33,9 +31,6 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': 'gallery',
-        })
         self.render_template('gallery/gallery.html')
 
 
@@ -44,28 +39,18 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if current_user_services.is_current_user_admin(self.request):
-            explorations = exp_services.get_all_explorations()
-            editable_exploration_ids = [e.id for e in explorations]
-        elif self.user_id:
-            explorations = exp_services.get_viewable_explorations(self.user_id)
-            editable_exploration_ids = [
-                e.id for e in exp_services.get_editable_explorations(
-                    self.user_id)
-            ]
-        else:
-            explorations = exp_services.get_public_explorations()
-            editable_exploration_ids = []
+        # TODO(sll): Instead of doing all this, make three queries that get
+        # all viewable/clonable/editable explorations for this user. Get only
+        # the metadata and implement paging.
+        explorations = exp_services.get_viewable_explorations(self.user_id)
 
         categories = collections.defaultdict(list)
-
         for exploration in explorations:
             categories[exploration.category].append({
                 'can_clone': rights_manager.Actor(self.user_id).can_clone(
                     exploration.id),
-                'can_edit': exploration.id in editable_exploration_ids,
-                # TODO(sll): Replace this with a query that gets all viewable
-                # explorations for this user.
+                'can_edit': rights_manager.Actor(self.user_id).can_edit(
+                    exploration.id),
                 'can_view': (
                     rights_manager.Actor(self.user_id).can_view(exploration.id)
                 ),

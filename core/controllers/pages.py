@@ -19,8 +19,6 @@ __author__ = 'sll@google.com (Sean Lip)'
 import feconf
 from core.controllers import base
 from core.domain import exp_services
-from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import utils
 
 

@@ -4,6 +4,10 @@
   Editor View
 {% endblock subtitle %}
 
+{% block nav_setup %}
+  {% set nav_mode = 'reader' %}
+{% endblock nav_setup %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -139,15 +143,15 @@
         <div class="span12">
 
           <span class="pull-right" style="margin: 10px 50px 0 0">
-
-            <button ng-hide="isPublic" type="button" ng-click="showPublishExplorationModal()">
-              Publish
-            </button>
-            <img class="oppia-help" src="/images/help.png" ng-hide="isPublic"
-                 tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
-                 tooltip-placement="bottom">
-
-            &nbsp;&nbsp;&nbsp;
+            {% if can_publish %}
+              <button ng-hide="isPublic" type="button" ng-click="showPublishExplorationModal()">
+                Publish
+              </button>
+              <img class="oppia-help" src="/images/help.png" ng-hide="isPublic"
+                   tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
+                   tooltip-placement="bottom">
+              &nbsp;&nbsp;&nbsp;
+            {% endif %}
 
             <a class="btn" target="_blank" href="/learn/<[explorationId]>"
                title="Play this exploration in a new window.">
@@ -176,6 +180,9 @@
             <[explorationTitle]>
             <span ng-if="isPublic" class="label label-info">
               Published
+            </span>
+            <span ng-if="isCloned" class="label label-info">
+              Cloned
             </span>
           </h3>
 

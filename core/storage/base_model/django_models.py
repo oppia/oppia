@@ -63,6 +63,10 @@ class BaseModel(models.Model):
         return self
 
     @classmethod
+    def get_multi(cls, entity_ids):
+        return [cls.get(entity_id) for entity_id in entity_ids]
+
+    @classmethod
     def put_multi(cls, entities):
         for entity in entities:
             entity.put()

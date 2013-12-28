@@ -16,15 +16,11 @@
 
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
-import feconf
-import re
-
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import stats_services
-from core.platform import models
 from core.domain import user_services
-current_user_services = models.Registry.import_current_user_services()
+import utils
 
 
 class ProfilePage(base.BaseHandler):
@@ -35,9 +31,6 @@ class ProfilePage(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': 'profile',
-        })
         self.render_template('profile/profile.html')
 
 
@@ -47,10 +40,7 @@ class ProfileHandler(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        if current_user_services.is_current_user_admin(self.request):
-            exps = exp_services.get_all_explorations()
-        else:
-            exps = exp_services.get_editable_explorations(self.user_id)
+        exps = exp_services.get_editable_explorations(self.user_id)
 
         # Make each entry of the category list unique.
         category_list = list(set([exp.category for exp in exps]))
@@ -75,10 +65,22 @@ class EditorPrerequisitesPage(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': 'profile',
-        })
         self.render_template('profile/editor_prerequisites.html')
+
+
+class EditorPrerequisitesHandler(base.BaseHandler):
+    """Provides data for the editor prerequisites page."""
+
+    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        self.render_json({
+            'username': user_settings.username,
+            'has_agreed_to_terms': bool(user_settings.last_agreed_to_terms),
+        })
 
     @base.require_user
     def post(self):
@@ -86,32 +88,21 @@ class EditorPrerequisitesPage(base.BaseHandler):
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
 
-        if feconf.REQUIRE_EDITORS_TO_ACCEPT_TERMS:
-            if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
-                raise self.InvalidInputException(
-                    'In order to edit explorations on this site, you will '
-                    'need to accept the license terms.')
-            else:
-                user_services.mark_agreed_to_terms(self.user_id)
+        if not isinstance(agreed_to_terms, bool) or not agreed_to_terms:
+            raise self.InvalidInputException(
+                'In order to edit explorations on this site, you will '
+                'need to accept the license terms.')
+        else:
+            user_services.record_agreement_to_terms(self.user_id)
 
-        if feconf.REQUIRE_EDITORS_TO_SET_USERNAMES:
-            if user_services.get_username(self.user_id):
-                self.render_json({})
-                return
+        if user_services.get_username(self.user_id):
+            # A username has already been set for this user.
+            self.render_json({})
+            return
 
-            if not username:
-                raise self.InvalidInputException('No username supplied.')
-            if not re.match(feconf.ALPHANUMERIC_REGEX, username):
-                raise self.InvalidInputException(
-                    'Usernames can only have alphanumeric characters.')
-            if 'admin' in username.lower().strip():
-                raise self.InvalidInputException(
-                    'This username is already taken.')
-            if not user_services.is_username_taken(username):
-                user_services.set_username(self.user_id, username)
-            else:
-                raise self.InvalidInputException(
-                    'Sorry, the username \"%s\" is already taken! Please pick '
-                    'a different one.' % username)
+        try:
+            user_services.set_username(self.user_id, username)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         self.render_json({})

@@ -103,10 +103,6 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Whether to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
-# Whether or not to require editors to have usernames.
-REQUIRE_EDITORS_TO_SET_USERNAMES = True
-# Whether or not to require editors to agree to terms before contributing.
-REQUIRE_EDITORS_TO_ACCEPT_TERMS = True
 
 
 # Ids and locations of the permitted widgets.
@@ -210,3 +206,7 @@ DEMO_EXPLORATIONS = [
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
 ]
+
+# TODO(sll): Add all other URLs here.
+EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
+EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'

@@ -4,6 +4,10 @@
   Gallery
 {% endblock subtitle %}
 
+{% block nav_setup %}
+  {% set nav_mode = 'gallery' %}
+{% endblock nav_setup %}
+
 {% block content %}
   <div ng-controller="Gallery">
 
@@ -83,7 +87,7 @@
         <br>
         <br>
 
-        {% if user %}
+        {% if user_email %}
           <p ng-controller="CreateExplorationModal">
             {% include 'modals/create_exploration_modal.html' %}
             <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">

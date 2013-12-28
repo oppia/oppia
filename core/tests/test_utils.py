@@ -155,23 +155,23 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
-    def register(self, email, username=None, is_admin=True):
-        """Register a user with the given username."""
+    def register_editor(self, email, username=None, is_admin=True):
+        """Register a user with the given username as an editor."""
         if username is None:
             username = self.DEFAULT_USERNAME
 
         self.login(email, is_admin=is_admin)
 
-        response = self.testapp.get('/profile/editor_prerequisites')
+        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post('/profile/editor_prerequisites', {
+        response = self.testapp.post(feconf.EDITOR_PREREQUISITES_DATA_URL, {
             'csrf_token': csrf_token,
             'payload': json.dumps({
                 'username': username,
                 'agreed_to_terms': True
             })
-        }, expect_errors=True)
+        })
         self.assertEqual(response.status_int, 200)
 
         self.logout()

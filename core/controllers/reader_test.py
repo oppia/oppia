@@ -35,7 +35,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.first_editor_id = self.get_user_id_from_email(
             self.first_editor_email)
 
-        self.register(self.first_editor_email)
+        self.register_editor(self.first_editor_email)
 
         self.exploration_id = 'eid'
         self.exploration = exp_services.get_exploration_by_id(

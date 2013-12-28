@@ -106,10 +106,13 @@ urls = [
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
-        r'/profile/data', profile.ProfileHandler, 'profile_handler'),
+        r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
     get_redirect_route(
-        r'/profile/editor_prerequisites', profile.EditorPrerequisitesPage,
+        r'/editor_prerequisites', profile.EditorPrerequisitesPage,
         'editor_prerequisites_page'),
+    get_redirect_route(
+        r'/editor_prerequisites_handler/data',
+        profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
 
     get_redirect_route(
         r'/learn/<exploration_id>', reader.ExplorationPage,

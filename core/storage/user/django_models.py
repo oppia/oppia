@@ -24,23 +24,19 @@ from django.db import models
 
 
 class UserSettingsModel(base_models.BaseModel):
-    """A settings and preferences for a particular user.
+    """Settings and preferences for a particular user.
 
-    The id/key of instances of this class has the form
-        [USER_ID].
+    Instances of this class are keyed by the user id.
     """
+    # Email address of the user.
+    email = models.CharField(max_length=100)
+
     # Identifiable username to display in the UI
-    username = models.CharField(max_length=100)
-
+    username = models.CharField(max_length=100, blank=True)
     # Normalized username
-    normalized_username = models.CharField(max_length=100)
-
-    @classmethod
-    def get_or_create(cls, user_id):
-        user_prefs = cls.get(user_id, strict=False)
-        if not user_prefs:
-            user_prefs = cls(id=user_id)
-        return user_prefs
+    normalized_username = models.CharField(max_length=100, blank=True)
+    # When the user last agreed to the terms of the site.
+    last_updated = models.DateTimeField(blank=True)
 
     @classmethod
     def is_normalized_username_taken(cls, username):

@@ -26,12 +26,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationRightsTests, self).setUp()
-        self.register('a@example.com', 'A')
-        self.register('b@example.com', 'B')
-        self.register('c@example.com', 'C')
-        self.register('d@example.com', 'D')
-        self.register('e@example.com', 'E')
-        self.register('admin@example.com', 'adm')
+        self.register_editor('a@example.com', 'A')
+        self.register_editor('b@example.com', 'B')
+        self.register_editor('c@example.com', 'C')
+        self.register_editor('d@example.com', 'D')
+        self.register_editor('e@example.com', 'E')
+        self.register_editor('admin@example.com', 'adm')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')

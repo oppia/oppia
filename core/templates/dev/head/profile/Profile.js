@@ -19,11 +19,11 @@
  */
 
 function Profile($scope, $http, warningsData, oppiaRequestCreator) {
-  $scope.profileUrl = '/profile/data/';
+  $scope.profileDataUrl = '/profilehandler/data/';
   $scope.pageLoaded = false;
 
   // Retrieves profile data from the server.
-  $http.get($scope.profileUrl).success(function(profileData) {
+  $http.get($scope.profileDataUrl).success(function(profileData) {
     $scope.explorations = profileData.explorations;
     $scope.exploration_rows = [];
     var i = 0;

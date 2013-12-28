@@ -21,10 +21,18 @@ __author__ = 'Sean Lip'
 
 import logging
 
+from core.domain import exp_domain
+from core.domain import user_services
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
+
+# IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
+# backward-compatibility with previous exploration snapshots in the datastore.
+# Do not modify the definitions of CMD keys that already exist.
+CMD_CREATE_NEW = 'create_new'
+CMD_CHANGE_ROLE = 'change_role'
+CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
@@ -33,6 +41,7 @@ EXPLORATION_STATUS_PUBLICIZED = 'publicized'
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
 ROLE_VIEWER = 'viewer'
+ROLE_NONE = 'none'
 
 
 class ExplorationRights(object):
@@ -58,10 +67,9 @@ def get_exploration_rights(exploration_id):
         model.community_owned, model.cloned_from, model.status)
 
 
-def save_exploration_rights(
-        committer_id, exploration_rights, commit_message='', commit_cmds=None):
+def _save_exploration_rights(
+        committer_id, exploration_rights, commit_message, commit_cmds):
     """Saves an ExplorationRights domain object to the datastore."""
-    # TODO(sll): Make commit_message and commit_cmds non-optional.
     if commit_cmds is None:
         commit_cmds = []
 
@@ -77,18 +85,51 @@ def save_exploration_rights(
     model.put(committer_id, commit_message, commit_cmds)
 
 
+def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
+    exploration_rights = ExplorationRights(
+        exploration_id, [committer_id], [], [], cloned_from=cloned_from)
+    commit_cmds = [{'cmd': CMD_CREATE_NEW}]
+    _save_exploration_rights(
+        committer_id, exploration_rights, 'Created new exploration',
+        commit_cmds)
+
+
 def is_exploration_public(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
     return exploration_rights.status == EXPLORATION_STATUS_PUBLIC
 
 
-def get_exploration_members(exploration_id):
+def is_exploration_cloned(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
-    return {
-        'owners': exploration_rights.owner_ids,
-        'editors': exploration_rights.editor_ids,
-        'viewers': exploration_rights.viewer_ids
-    }
+    return bool(exploration_rights.cloned_from)
+
+
+def _get_exploration_members(exploration_id):
+    exploration_rights = get_exploration_rights(exploration_id)
+    if exploration_rights.community_owned:
+        return {
+            'community_owned': True,
+            'owners': [],
+            'editors': [],
+            'viewers': []
+        }
+    else:
+        return {
+            'community_owned': False,
+            'owners': exploration_rights.owner_ids,
+            'editors': exploration_rights.editor_ids,
+            'viewers': exploration_rights.viewer_ids
+        }
+
+
+def get_human_readable_exploration_members(exploration_id):
+    """Returns the exploration members, changing user_ids to usernames."""
+    exploration_members = _get_exploration_members(exploration_id)
+    for member_category in ['owners', 'editors', 'viewers']:
+        exploration_members[member_category] = [
+            user_services.convert_user_ids_to_username(member_category)
+        ]
+    return exploration_members
 
 
 class Actor(object):
@@ -103,7 +144,7 @@ class Actor(object):
         self.user_id = user_id
 
     def _is_super_admin(self):
-        return current_user_services.is_current_user_admin(None)
+        return user_services.is_current_user_admin(None)
 
     def _is_admin(self):
         return self._is_super_admin()
@@ -142,7 +183,7 @@ class Actor(object):
             return True
 
     def can_clone(self, exploration_id):
-        return self.can_view(exploration_id)
+        return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
         return (self._is_editor(exploration_id) or
@@ -161,6 +202,10 @@ class Actor(object):
 
     def can_publish(self, exploration_id):
         if self._is_admin():
+            return True
+
+        if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
+            # Demo explorations are public by default.
             return True
 
         exp_rights = get_exploration_rights(exploration_id)
@@ -218,13 +263,17 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
     - new_role: str. The name of the new role: either 'owner', 'editor' or
         'viewer'.
     """
+
     if not Actor(committer_id).can_modify_roles(exploration_id):
+        logging.error(
+            'User %s tried to allow user %s to be a(n) %s of exploration %s '
+            'but was refused permission.' % (
+                committer_id, assignee_id, new_role, exploration_id))
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
-    logging.info(
-        'User %s tried to allow user %s to be a(n) %s of exploration %s' % (
-            committer_id, assignee_id, new_role, exploration_id))
+    assignee_username = user_services.get_username(assignee_id)
+    old_role = ROLE_NONE
 
     if new_role == ROLE_OWNER:
         if Actor(assignee_id).is_owner(exploration_id):
@@ -235,10 +284,10 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
         if assignee_id in exp_rights.viewer_ids:
             exp_rights.viewer_ids.remove(assignee_id)
+            old_role = ROLE_VIEWER
         if assignee_id in exp_rights.editor_ids:
             exp_rights.editor_ids.remove(assignee_id)
-
-        save_exploration_rights(committer_id, exp_rights)
+            old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
         if Actor(assignee_id).can_edit(exploration_id):
@@ -249,8 +298,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
         if assignee_id in exp_rights.viewer_ids:
             exp_rights.viewer_ids.remove(assignee_id)
-
-        save_exploration_rights(committer_id, exp_rights)
+            old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
         if Actor(assignee_id).can_view(exploration_id):
@@ -258,50 +306,69 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
         exp_rights = get_exploration_rights(exploration_id)
         exp_rights.viewer_ids.append(assignee_id)
-        save_exploration_rights(committer_id, exp_rights)
 
-    logging.info(
-        'User %s successfully made user %s into a(n) %s of exploration %s' % (
-            committer_id, assignee_id, new_role, exploration_id))
+    commit_message = 'Changed role of %s from %s to %s' % (
+        assignee_username, old_role, new_role)
+    commit_cmds = [{
+        'cmd': CMD_CHANGE_ROLE,
+        'assignee_id': assignee_id,
+        'old_role': old_role,
+        'new_role': new_role
+    }]
 
-    # TODO(sll): Add a version log here so that the rights history of an
-    # exploration can be viewed.
+    _save_exploration_rights(
+        committer_id, exp_rights, commit_message, commit_cmds)
+
+
+def _change_exploration_status(
+        committer_id, exploration_id, new_status, commit_message):
+    """Change the status of an exploration. Commits changes.
+
+    Args:
+    - committer_id: str. The id of the user who is performing the update
+        action.
+    - exploration_id: str. The exploration id.
+    - new_status: str. The new status of the exploration.
+    - commit_message: str. The human-written commit message for this change.
+    """
+    exploration_rights = get_exploration_rights(exploration_id)
+    old_status = exploration_rights.status
+    exploration_rights.status = new_status
+    commit_cmds = [{
+        'cmd': 'change_exploration_status',
+        'old_status': old_status,
+        'new_status': new_status
+    }]
+
+    _save_exploration_rights(
+        committer_id, exploration_rights, commit_message, commit_cmds)
 
 
 def publish_exploration(committer_id, exploration_id):
     """Publish an exploration. Commits changes.
 
-    Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - exploration_id: str. The exploration id.
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publication.
     """
-    # TODO(sll): Before publishing this exploration, validate it strictly.
     if not Actor(committer_id).can_publish(exploration_id):
-        raise Exception('Could not publish exploration.')
+        logging.error(
+            'User %s tried to publish exploration %s but was refused '
+            'permission.' % (committer_id, exploration_id))
+        raise Exception('This exploration cannot be published.')
 
-    exp_rights = get_exploration_rights(exploration_id)
-    exp_rights.status = EXPLORATION_STATUS_PUBLIC
-    save_exploration_rights(committer_id, exp_rights)
-
-    logging.info(
-        'User %s published exploration %s' % (committer_id, exploration_id))
+    _change_exploration_status(
+        committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
+        'Exploration published.')
 
 
 def unpublish_exploration(committer_id, exploration_id):
-    """Unpublishes an exploration. Commits changes.
-
-    Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - exploration_id: str. The exploration id.
-    """
+    """Unpublishes an exploration. Commits changes."""
     if not Actor(committer_id).can_unpublish(exploration_id):
-        raise Exception('Could not unpublish exploration.')
+        logging.error(
+            'User %s tried to unpublish exploration %s but was refused '
+            'permission.' % (committer_id, exploration_id))
+        raise Exception('This exploration cannot be unpublished.')
 
-    exp_rights = get_exploration_rights(exploration_id)
-    exp_rights.status = EXPLORATION_STATUS_PRIVATE
-    save_exploration_rights(committer_id, exp_rights)
-
-    logging.info(
-        'User %s unpublished exploration %s' % (committer_id, exploration_id))
+    _change_exploration_status(
+        committer_id, exploration_id, EXPLORATION_STATUS_PRIVATE,
+        'Unpublished exploration.')

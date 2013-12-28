@@ -4,6 +4,10 @@
   Reader View
 {% endblock subtitle %}
 
+{% block nav_setup %}
+  {% set nav_mode = 'reader' %}
+{% endblock nav_setup %}
+
 {% block content %}
     {% if not is_public %}
       <center>

@@ -114,16 +114,25 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = self.user.user_id() if self.user else None
         self.is_admin = False
+
         if self.user_id:
             self.values['logout_url'] = (
                 current_user_services.create_logout_url(self.request.uri))
-            self.values['user'] = user_services.get_username(self.user_id)
+
+            user_settings = user_services.get_user_settings(self.user_id)
+            if not user_settings.is_known_user:
+                user_settings = user_services.create_user(
+                    self.user_id, self.user.email())
+
+            self.values['user_email'] = user_settings.email
+            self.values['username'] = user_settings.username
             self.is_admin = current_user_services.is_current_user_admin(
                 self.request)
         else:
             self.values['login_url'] = current_user_services.create_login_url(
                 self.request.uri)
 
+        self.values['user_id'] = self.user_id
         self.values['is_admin'] = self.is_admin
 
         if self.request.get('payload'):
