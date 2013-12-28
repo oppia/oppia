@@ -93,7 +93,6 @@ class AdminHandler(base.BaseHandler):
     @base.require_admin
     def post(self):
         """Handles POST requests."""
-
         if self.payload.get('action') == 'reload_exploration':
             exploration_id = self.payload.get('explorationId')
             logging.info(
@@ -107,7 +106,7 @@ class AdminHandler(base.BaseHandler):
             logging.info('[ADMIN] %s saved config property values: %s' %
                          (self.user_id, new_config_property_values))
             for (name, value) in new_config_property_values.iteritems():
-                config_services.set_property(name, value)
+                config_services.set_property(self.user_id, name, value)
         elif self.payload.get('action') == 'refresh_computed_property':
             computed_property_name = self.payload.get('computed_property_name')
             config_domain.Registry.get_config_property(

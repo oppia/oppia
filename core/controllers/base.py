@@ -329,7 +329,8 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            CSRF_SECRET.name, base64.urlsafe_b64encode(os.urandom(20)))
+            feconf.ADMIN_COMMITTER_ID, CSRF_SECRET.name,
+            base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod
     def _create_token(cls, user_id, page_name, issued_on):

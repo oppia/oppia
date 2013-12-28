@@ -271,8 +271,3 @@ def get_top_improvable_states(exploration_ids, N):
         key=lambda state: state['rank'],
         reverse=True)
     return problem_states[:N]
-
-
-def delete_all_stats():
-    """Deletes all statistics."""
-    stats_models.delete_all_stats()

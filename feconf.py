@@ -104,6 +104,9 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # Whether to allow file uploads via YAML in the gallery and editor pages.
 ALLOW_YAML_FILE_UPLOAD = False
 
+# Committer id for system actions.
+ADMIN_COMMITTER_ID = 'admin'
+
 
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {

@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import core.storage.base_model.gae_models as base_models
-import feconf
 
 from google.appengine.ext import ndb
 

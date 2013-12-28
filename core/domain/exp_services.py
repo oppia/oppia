@@ -47,7 +47,6 @@ import utils
 
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
-ADMIN_COMMITTER_ID = 'admin'
 ALLOWED_CONTENT_TYPES = ['text']
 
 # The current version of the exploration schema. If any backward-incompatible
@@ -770,7 +769,7 @@ def delete_demo(exploration_id):
                      'does not exist.' % exploration_id)
     else:
         delete_exploration(
-            ADMIN_COMMITTER_ID, exploration_id, force_deletion=True)
+            feconf.ADMIN_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
 def load_demo(exploration_id):
@@ -794,7 +793,7 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     create_from_yaml(
-        yaml_content, ADMIN_COMMITTER_ID, title, category,
+        yaml_content, feconf.ADMIN_COMMITTER_ID, title, category,
         exploration_id=exploration_id)
 
     for (asset_filename, asset_content) in assets_list:
@@ -802,6 +801,7 @@ def load_demo(exploration_id):
             fs_domain.ExplorationFileSystem(exploration_id))
         fs.put(asset_filename, asset_content)
 
-    rights_manager.publish_exploration(ADMIN_COMMITTER_ID, exploration_id)
+    rights_manager.publish_exploration(
+        feconf.ADMIN_COMMITTER_ID, exploration_id)
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)

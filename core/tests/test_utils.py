@@ -18,11 +18,13 @@ import re
 import unittest
 import webtest
 
-from core.domain import stats_services
 from core.platform import models
-(exp_models, file_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.file, models.NAMES.user
-])
+(exp_models, file_models, stats_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.exploration, models.NAMES.file, models.NAMES.statistics,
+        models.NAMES.user
+    ])
+)
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 
@@ -84,7 +86,15 @@ class TestBase(unittest.TestCase):
                 entity.delete()
 
     def _delete_all_stats(self):
-        stats_services.delete_all_stats()
+        classes = frozenset([
+            stats_models.StateCounterModel,
+            stats_models.StateRuleAnswerLogModel,
+            stats_models.FeedbackItemModel,
+        ])
+
+        for clazz in classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete()
 
     def _delete_all_user_settings(self):
         all_user_settings = user_models.UserSettingsModel.get_all()

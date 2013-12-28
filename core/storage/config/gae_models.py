@@ -23,10 +23,26 @@ import core.storage.base_model.gae_models as base_models
 from google.appengine.ext import ndb
 
 
-class ConfigPropertyModel(base_models.BaseModel):
+class ConfigSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a config property snapshot."""
+    pass
+
+
+class ConfigSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a config property snapshot."""
+    pass
+
+
+class ConfigPropertyModel(base_models.VersionedModel):
     """A class that represents a named configuration property.
 
     The id is the name of the property.
     """
+    SNAPSHOT_METADATA_CLASS = ConfigSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = ConfigSnapshotContentModel
+
     # The property value.
     value = ndb.JsonProperty(indexed=False)
+
+    def put(self, committer_id, commit_message, commit_cmds):
+        self.save(committer_id, commit_message, commit_cmds)

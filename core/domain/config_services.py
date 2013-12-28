@@ -19,17 +19,26 @@ __author__ = 'Sean Lip'
 
 from core.domain import config_domain
 from core.domain import obj_services
+from core.domain import user_services
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
+import feconf
+
+CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
-def set_property(name, value):
-    """Sets a property value. The property must already exist."""
+def set_property(committer_id, name, value):
+    """Sets a property value. The property must already be registered."""
 
     config_property = config_domain.Registry.get_config_property(name)
     if config_property is None:
         raise Exception('No config property with name %s found.')
+
+    if (committer_id != feconf.ADMIN_COMMITTER_ID and not
+            user_services.is_current_user_admin(None)):
+        raise Exception(
+            'Only an admin can set config property datastore overrides.')
 
     value = obj_services.Registry.get_object_class_by_type(
         config_property.obj_type).normalize(value)
@@ -41,7 +50,10 @@ def set_property(name, value):
         datastore_item = config_models.ConfigPropertyModel(
             id=config_property.name)
     datastore_item.value = value
-    datastore_item.put()
+    datastore_item.put(committer_id, '', [{
+        'cmd': CMD_CHANGE_PROPERTY_VALUE,
+        'new_value': value
+    }])
 
     # Set value in memcache.
     memcache_services.set_multi({

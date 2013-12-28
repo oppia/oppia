@@ -230,11 +230,3 @@ def resolve_answers(exploration_id, state_name, handler_name, rule_str, answers)
     counter.active_answer_count -= resolved_count
     counter.resolved_answer_count += resolved_count
     counter.put()
-
-
-def delete_all_stats():
-    """Deletes all stats for all explorations."""
-    classes = [StateCounterModel, StateRuleAnswerLogModel]
-    for cls in classes:
-        for item in cls.get_all():
-            item.key.delete()
