@@ -107,6 +107,9 @@ ALLOW_YAML_FILE_UPLOAD = False
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 
+# The maximum size of an uploaded file, in bytes.
+MAX_FILE_SIZE_BYTES = 1048576
+
 
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {

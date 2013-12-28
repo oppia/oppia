@@ -27,16 +27,23 @@ from google.appengine.ext import ndb
 QUERY_LIMIT = 1000
 
 
-class FileMetadataModel(base_models.BaseModel):
-    """File metadata model, keyed by exploration id and absolute file name.
+class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Class for storing the file metadata snapshot commit history."""
+    pass
 
-    This stores the content of the latest, most up-to-date version of the file
-    metadata.
-    """
+
+class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Class for storing the content of the file metadata snapshots."""
+    pass
+
+
+class FileMetadataModel(base_models.VersionedModel):
+    """File metadata model, keyed by exploration id and absolute file name."""
+    SNAPSHOT_METADATA_CLASS = FileMetadataSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = FileMetadataSnapshotContentModel
+
     # The size of the file.
     size = ndb.IntegerProperty(indexed=False)
-    # The current version of the file.
-    version = ndb.IntegerProperty(indexed=False)
 
     def get_new_id(cls, entity_name):
         raise NotImplementedError
@@ -56,49 +63,47 @@ class FileMetadataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, strict=False):
-        return super(FileMetadataModel, cls).get(
-            cls._construct_id(exploration_id, filepath), strict=strict)
-
-
-class FileMetadataHistoryModel(base_models.BaseModel):
-    """Model for old versions of the file metadata.
-
-    Instances of this class are keyed by exploration id, absolute file name and
-    version number.
-    """
-    # The size of the file.
-    size = ndb.IntegerProperty(indexed=False)
-
-    def get_new_id(cls, entity_name):
-        raise NotImplementedError
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath, version):
-        """The id is formatted as [EXP_ID]/[FILEPATH]#[VERSION]."""
-        return '#'.join([
-            os.path.join('/', exploration_id, filepath), str(version)])
+    def get_version(cls, exploration_id, filepath, version_number):
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileMetadataModel, cls).get_version(
+            model_id, version_number)
 
-    @classmethod
-    def create(cls, exploration_id, filepath, version):
-        model_id = cls._construct_id(exploration_id, filepath, version)
-        return cls(id=model_id, deleted=False)
-
-    @classmethod
-    def get(cls, exploration_id, filepath, version, strict=False):
-        return super(FileMetadataHistoryModel, cls).get(
-            cls._construct_id(exploration_id, filepath, version),
-            strict=strict)
+    def put(self, committer_id, commit_cmds):
+        return self.save(committer_id, '', commit_cmds)
 
 
-class FileDataModel(base_models.BaseModel):
-    """File data model, keyed by exploration id and absolute file name.
+class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Class for storing the file snapshot commit history."""
+    pass
 
-    This stores the content of the latest, most up-to-date version of the file.
-    """
+
+class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Class for storing the content of the file snapshots."""
+
+    # Overwrite the superclass member to use a BlobProperty for raw strings.
+    content = ndb.BlobProperty(indexed=False)
+
+
+class FileModel(base_models.VersionedModel):
+    """File data model, keyed by exploration id and absolute file name."""
+    SNAPSHOT_METADATA_CLASS = FileSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = FileSnapshotContentModel
+
     # The contents of the file.
     content = ndb.BlobProperty(indexed=False)
-    # The current version of the file.
-    version = ndb.IntegerProperty(indexed=False)
+
+    def _reconstitute(self, snapshot_blob):
+        """Manually overwrite the superclass method."""
+        self.content = snapshot_blob
+        return self
+
+    def _compute_snapshot(self):
+        """Manually overwrite the superclass method."""
+        return self.content
 
     def get_new_id(cls, entity_name):
         raise NotImplementedError
@@ -114,35 +119,13 @@ class FileDataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, strict=False):
-        return super(FileDataModel, cls).get(
-            cls._construct_id(exploration_id, filepath), strict=strict)
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileModel, cls).get(model_id, strict=strict)
 
-
-class FileDataHistoryModel(base_models.BaseModel):
-    """Model for old versions of the file data.
-
-    Instances of this class are keyed by exploration id, absolute filename and
-    version.
-    """
-    # The contents of the file.
-    content = ndb.BlobProperty(indexed=False)
-
-    def get_new_id(cls, entity_name):
-        raise NotImplementedError
+    def put(self, committer_id, commit_cmds):
+        return self.save(committer_id, '', commit_cmds)
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath, version):
-        """The id is formatted as [EXP_ID]/[FILEPATH]#[VERSION]."""
-        return '#'.join([
-            os.path.join('/', exploration_id, filepath), str(version)])
-
-    @classmethod
-    def create(cls, exploration_id, filepath, version):
-        model_id = cls._construct_id(exploration_id, filepath, version)
-        return cls(id=model_id, deleted=False)
-
-    @classmethod
-    def get(cls, exploration_id, filepath, version, strict=False):
-        return super(FileDataHistoryModel, cls).get(
-            cls._construct_id(exploration_id, filepath, version),
-            strict=strict)
+    def get_version(cls, exploration_id, filepath, version_number):
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileModel, cls).get_version(model_id, version_number)

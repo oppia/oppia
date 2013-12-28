@@ -22,10 +22,27 @@ from core import django_utils
 import core.storage.base_model.models as base_models
 
 
-class ConfigPropertyModel(base_models.BaseModel):
+class ConfigPropertySnapshotMetadataModel(
+        base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a config property snapshot."""
+    pass
+
+
+class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a config property snapshot."""
+    pass
+
+
+class ConfigPropertyModel(base_models.VersionedModel):
     """A class that represents a named configuration property.
 
     The id is the name of the property.
     """
+    SNAPSHOT_METADATA_CLASS = ConfigPropertySnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
+
     # The property value.
     value = django_utils.JSONField(default={})
+
+    def put(self, committer_id, commit_cmds):
+        self.save(committer_id, '', commit_cmds)

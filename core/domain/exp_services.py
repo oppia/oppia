@@ -733,7 +733,7 @@ def clone_exploration(committer_id, old_exploration_id):
     dir_list = old_fs.listdir('')
     for filepath in dir_list:
         file_content = old_fs.get(filepath)
-        new_fs.put(filepath, file_content)
+        new_fs.put(feconf.ADMIN_COMMITTER_ID, filepath, file_content)
 
     return new_exploration_id
 
@@ -799,7 +799,7 @@ def load_demo(exploration_id):
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        fs.put(asset_filename, asset_content)
+        fs.put(feconf.ADMIN_COMMITTER_ID, asset_filename, asset_content)
 
     rights_manager.publish_exploration(
         feconf.ADMIN_COMMITTER_ID, exploration_id)

@@ -29,16 +29,20 @@ from django.db import models
 QUERY_LIMIT = 1000
 
 
-class FileMetadataModel(base_models.BaseModel):
-    """File metadata model, keyed by exploration id and absolute file name.
+class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Class for storing the file metadata snapshot commit history."""
+    pass
 
-    This stores the content of the latest, most up-to-date version of the file
-    metadata.
-    """
+
+class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Class for storing the content of the file metadata snapshots."""
+    pass
+
+
+class FileMetadataModel(base_models.BaseModel):
+    """File metadata model, keyed by exploration id and absolute file name."""
     # The size of the file.
     size = models.IntegerField()
-    # The current version of the file.
-    version = models.IntegerField()
 
     def get_new_id(cls, entity_name):
         raise NotImplementedError
@@ -65,51 +69,33 @@ class FileMetadataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, strict=False):
-        return super(FileMetadataModel, cls).get(
-            cls._construct_id(exploration_id, filepath), strict=strict)
-
-
-class FileMetadataHistoryModel(base_models.BaseModel):
-    """Model for old versions of the file metadata.
-
-    Instances of this class are keyed by exploration id, absolute file name and
-    version number.
-    """
-    # The size of the file.
-    size = models.IntegerField()
-
-    def get_new_id(cls, entity_name):
-        raise NotImplementedError
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath, version):
-        """The id is formatted as [EXP_ID]/[FILEPATH]#[VERSION]."""
-        return '#'.join([
-            os.path.join('/', exploration_id, filepath), str(version)])
+    def get_version(cls, exploration_id, filepath, version_number):
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileMetadataModel, cls).get_version(
+            model_id, version_number)
 
-    @classmethod
-    def create(cls, exploration_id, filepath, version):
-        model = cls.get(exploration_id, filepath, version)
-        if model is not None:
-            model.deleted = False
-        else:
-            model_id = cls._construct_id(exploration_id, filepath, version)
-            model = cls(id=model_id, deleted=False)
-        return model
-
-    @classmethod
-    def get(cls, exploration_id, filepath, version, strict=False):
-        return super(FileMetadataHistoryModel, cls).get(
-            cls._construct_id(exploration_id, filepath, version),
-            strict=strict)
+    def put(self, committer_id, commit_cmds):
+        return self.save(committer_id, '', commit_cmds)
 
 
-class FileDataModel(base_models.BaseModel):
-    """File data model, keyed by absolute file name."""
+class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Class for storing the file snapshot commit history."""
+    pass
+
+
+class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Class for storing the content of the file snapshots."""
+    pass
+
+
+class FileModel(base_models.BaseModel):
+    """File data model, keyed by exploration id and absolute file name."""
     # The contents of the file.
     content = models.TextField()
-    # The current version of the file.
-    version = models.IntegerField()
 
     def get_new_id(cls, entity_name):
         raise NotImplementedError
@@ -130,8 +116,8 @@ class FileDataModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, exploration_id, filepath, strict=False):
-        result = super(FileDataModel, cls).get(
-            cls._construct_id(exploration_id, filepath), strict=strict)
+        model_id = cls._construct_id(exploration_id, filepath)
+        result = super(FileModel, cls).get(model_id, strict=strict)
         if result is not None:
             result.content = base64.decodestring(result.content)
         return result
@@ -140,48 +126,9 @@ class FileDataModel(base_models.BaseModel):
         # Django does not accept raw byte strings, so we need to encode them.
         # Internally, it stores strings as unicode.
         self.content = base64.encodestring(self.content)
-        super(FileDataModel, self).put()
-
-
-class FileDataHistoryModel(base_models.BaseModel):
-    """Model for old versions of the file data.
-
-    Instances of this class are keyed by exploration id, absolute filename and
-    version.
-    """
-    # The contents of the file.
-    content = models.TextField()
-
-    def get_new_id(cls, entity_name):
-        raise NotImplementedError
+        super(FileModel, self).put()
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath, version):
-        """The id is formatted as [EXP_ID]/[FILEPATH]#[VERSION]."""
-        return '#'.join([
-            os.path.join('/', exploration_id, filepath), str(version)])
-
-    @classmethod
-    def create(cls, exploration_id, filepath, version):
-        model = cls.get(exploration_id, filepath, version)
-        if model is not None:
-            model.deleted = False
-        else:
-            model_id = cls._construct_id(exploration_id, filepath, version)
-            model = cls(id=model_id, deleted=False)
-        return model
-
-    @classmethod
-    def get(cls, exploration_id, filepath, version, strict=False):
-        result = super(FileDataHistoryModel, cls).get(
-            cls._construct_id(exploration_id, filepath, version),
-            strict=strict)
-        if result is not None:
-            result.content = base64.decodestring(result.content)
-        return result
-
-    def put(self):
-        # Django does not accept raw byte strings, so we need to encode them.
-        # Internally, it stores strings as unicode.
-        self.content = base64.encodestring(self.content)
-        super(FileDataHistoryModel, self).put()
+    def get_version(cls, exploration_id, filepath, version_number):
+        model_id = cls._construct_id(exploration_id, filepath)
+        return super(FileModel, cls).get_version(model_id, version_number)

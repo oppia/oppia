@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import logging
 import os
 
 from core.platform import models
@@ -25,7 +26,10 @@ from core.platform import models
     models.NAMES.file
 ])
 transaction_services = models.Registry.import_transaction_services()
+import feconf
 import utils
+
+CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 
 
 class FileMetadata(object):
@@ -90,52 +94,54 @@ class ExplorationFileSystem(object):
         return self._exploration_id
 
     def _get_file_metadata(self, filepath, version):
-        """Return the desired file metadata."""
+        """Return the desired file metadata.
+
+        Returns None if the file does not exist.
+        """
         if version is None:
             return file_models.FileMetadataModel.get(
                 self._exploration_id, 'assets/%s' % filepath)
         else:
-            return file_models.FileMetadataHistoryModel.get(
+            return file_models.FileMetadataModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
 
     def _get_file_data(self, filepath, version):
-        """Return the desired file data."""
+        """Return the desired file content.
+
+        Returns None if the file does not exist.
+        """
         if version is None:
-            return file_models.FileDataModel.get(
+            return file_models.FileModel.get(
                 self._exploration_id, 'assets/%s' % filepath)
         else:
-            return file_models.FileDataHistoryModel.get(
+            return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
 
-    def _create_file(self, filepath, version, raw_bytes):
+    def _put_file(self, user_id, filepath, raw_bytes):
         """Create or update a file."""
-        metadata = file_models.FileMetadataModel.create(
-            self._exploration_id, 'assets/%s' % filepath)
+        if len(raw_bytes) > feconf.MAX_FILE_SIZE_BYTES:
+            raise Exception('The maximum allowed file size is 1 MB.')
+
+        metadata = self._get_file_metadata(filepath, None)
+        if not metadata:
+            metadata = file_models.FileMetadataModel.create(
+                self._exploration_id, 'assets/%s' % filepath)
         metadata.size = len(raw_bytes)
-        metadata.version = version
 
-        metadata_history = file_models.FileMetadataHistoryModel.create(
-            self._exploration_id, 'assets/%s' % filepath, version)
-        metadata_history.size = len(raw_bytes)
-
-        data = file_models.FileDataModel.create(
-            self._exploration_id, 'assets/%s' % filepath)
+        data = self._get_file_data(filepath, None)
+        if not data:
+            data = file_models.FileModel.create(
+                self._exploration_id, 'assets/%s' % filepath)
         data.content = raw_bytes
-        data.version = version
 
-        data_history = file_models.FileDataHistoryModel.create(
-            self._exploration_id, 'assets/%s' % filepath, version)
-        data_history.content = raw_bytes
-
-        data.put()
-        data_history.put()
-        metadata.put()
-        metadata_history.put()
+        data.put(user_id, CHANGE_LIST_SAVE)
+        metadata.put(user_id, CHANGE_LIST_SAVE)
 
     def get(self, filepath, version=None):
         """Gets a file as an unencoded stream of raw bytes.
 
-        If `version` is not supplied, the latest version is retrieved.
+        If `version` is not supplied, the latest version is retrieved. If the
+        file does not exist, None is returned.
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -144,36 +150,28 @@ class ExplorationFileSystem(object):
                 if version is None:
                     version = data.version
                 return FileStreamWithMetadata(data.content, version, metadata)
+            else:
+                logging.error(
+                    'Metadata and data for file %s (version %s) are out of '
+                    'sync.' % (filepath, version))
+                return None
+        else:
+            return None
 
-    def put(self, filepath, raw_bytes):
-        """Saves a raw bytestring as a file in the database.
+    def put(self, user_id, filepath, raw_bytes):
+        """Saves a raw bytestring as a file in the database."""
+        self._put_file(user_id, filepath, raw_bytes)
 
-        Calling this method creates a new version of the file.
-        """
-
-        def _put_in_transaction(filepath, raw_bytes):
-            metadata = self._get_file_metadata(filepath, None)
-
-            new_version = (metadata.version + 1 if metadata else
-                           self._DEFAULT_VERSION_NUMBER)
-
-            self._create_file(filepath, new_version, raw_bytes)
-
-        transaction_services.run_in_transaction(
-            _put_in_transaction, filepath, raw_bytes)
-
-    def delete(self, filepath):
+    def delete(self, user_id, filepath):
         """Marks the current version of a file as deleted."""
 
         metadata = self._get_file_metadata(filepath, None)
         if metadata:
-            metadata.deleted = True
-            metadata.put()
+            metadata.delete(user_id, '')
 
         data = self._get_file_data(filepath, None)
         if data:
-            data.deleted = True
-            data.put()
+            data.delete(user_id, '')
 
     def isfile(self, filepath):
         """Checks the existence of a file."""
@@ -237,10 +235,10 @@ class DiskBackedFileSystem(object):
             os.path.join(self._root, filepath), raw_bytes=True)
         return FileStreamWithMetadata(content, None, None)
 
-    def put(self, filepath, raw_bytes):
+    def put(self, user_id, filepath, raw_bytes):
         raise NotImplementedError
 
-    def delete(self, filepath):
+    def delete(self, user_id, filepath):
         raise NotImplementedError
 
     def listdir(self, dir_name):
@@ -279,18 +277,23 @@ class AbstractFileSystem(object):
 
     def get(self, filepath, version=None):
         """Returns a bytestring with the file content, but no metadata."""
-        self._check_filepath(filepath)
-        return self._impl.get(filepath, version=version).read()
+        file_stream = self.open(filepath, version=version)
+        if file_stream is None:
+            raise IOError(
+                'File %s (version %s) not found.'
+                % (filepath, version if version else 'latest'))
+        return file_stream.read()
 
-    def put(self, filepath, raw_bytes):
+    def put(self, user_id, filepath, raw_bytes):
         """Replaces the contents of the file with the given bytestring."""
+        raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
-        self._impl.put(filepath, raw_bytes)
+        self._impl.put(user_id, filepath, raw_bytes)
 
-    def delete(self, filepath):
+    def delete(self, user_id, filepath):
         """Deletes a file and the metadata associated with it."""
         self._check_filepath(filepath)
-        self._impl.delete(filepath)
+        self._impl.delete(user_id, filepath)
 
     def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...)."""

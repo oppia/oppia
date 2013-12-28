@@ -332,7 +332,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration.id))
-        fs.put('abc.png', raw_image)
+        fs.put(self.owner_id, 'abc.png', raw_image)
 
         new_eid = exp_services.clone_exploration(self.owner_id, exploration.id)
         new_fs = fs_domain.AbstractFileSystem(
@@ -492,7 +492,7 @@ states:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration.id))
-        fs.put('abc.png', raw_image)
+        fs.put(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(exploration.id)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))

@@ -21,3 +21,7 @@ __author__ = 'Tarashish Mishra'
 from core.storage.config import django_models
 
 ConfigPropertyModel = django_models.ConfigPropertyModel
+ConfigPropertySnapshotMetadataModel = (
+    django_models.ConfigPropertySnapshotMetadataModel)
+ConfigPropertySnapshotContentModel = (
+    django_models.ConfigPropertySnapshotContentModel)
