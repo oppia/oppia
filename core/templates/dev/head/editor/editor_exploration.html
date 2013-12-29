@@ -144,13 +144,15 @@
 
           <span class="pull-right" style="margin: 10px 50px 0 0">
             {% if can_publish %}
-              <button type="button" ng-click="showPublishExplorationModal()">
-                Publish
-              </button>
-              <img class="oppia-help" src="/images/help.png" ng-hide="isPublic"
-                   tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
-                   tooltip-placement="bottom">
-              &nbsp;&nbsp;&nbsp;
+              <span ng-hide="isPublic">
+                <button type="button" ng-click="showPublishExplorationModal()">
+                  Publish
+                </button>
+                <img class="oppia-help" src="/images/help.png""
+                     tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
+                     tooltip-placement="bottom">
+                &nbsp;&nbsp;&nbsp;
+              </span>
             {% endif %}
 
             <a class="btn" target="_blank" href="/learn/<[explorationId]>"

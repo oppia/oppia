@@ -270,7 +270,7 @@ class BaseWidget(object):
             'name': self.name,
             'category': self.category,
             'description': self.description,
-            'id': self.id,
+            'widget_id': self.id,
             'raw': self.get_raw_code(
                 customization_args, context_params, preview_mode=preview_mode),
         }
