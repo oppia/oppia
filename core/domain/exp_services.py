@@ -365,16 +365,6 @@ def get_summary_of_change_list(exploration_id, change_list):
     }
 
 
-def require_pass_strict_validation(exploration):
-    """Ensures that the exploration passes strict validation.
-
-    Raises a utils.ValidationError if strict validation fails.
-    """
-    warnings = exploration.validate(strict=True)
-    if warnings:
-        raise utils.ValidationError(warnings)
-
-
 def _save_exploration(
         committer_id, exploration, commit_message, change_list):
     """Commits an exploration domain object to persistent storage.
@@ -387,7 +377,7 @@ def _save_exploration(
 
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
-        require_pass_strict_validation(exploration)
+        exploration.validate(strict=True)
     else:
         exploration.validate()
 

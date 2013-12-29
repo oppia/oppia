@@ -70,7 +70,7 @@
 
   <div class="modal-footer">
     <span ng-show="tmpRule.description">
-      <button type="button" class="btn" ng-click="save()">
+      <button type="button" class="btn" ng-click="save()" ng-disabled="!tmpRule.dest || (tmpRule.dest == '?' && !tmpRule.destNew)">
         Use this rule
       </button>
     </span>

@@ -202,7 +202,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       var changedStates = data.summary.changed_states;
       var addedStates = data.summary.added_states;
       var deletedStates = data.summary.deleted_states;
-      var warnings = data.warnings;
+      var warningMessage = data.warning_message;
 
       var changesExist = (
         !$.isEmptyObject(explorationPropertyChanges) ||
@@ -217,12 +217,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         return;
       }
 
-      if ($scope.isPublic && warnings.length > 0) {
-        console.log(warnings);
+      if ($scope.isPublic && warningMessage) {
+        console.log(warningMessage);
         // Warnings should be fixed before an exploration is published.
-        warningsData.addWarning(
-          'Some warnings were triggered by the changed exploration; please ' +
-          'fix them before saving. They are: ' + warnings.join(' '));
+        warningsData.addWarning(warningMessage);
         return;
       }
 
@@ -769,7 +767,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             }).
             error(function(data) {
               warningsData.addWarning(
-                  'Error modifying exploration rights: ' + data.error);
+                  data.error || 'Error communicating with server.');
               // TODO(sll): Reinstate the following line without causing the
               //     $watch to trigger.
               // $scope[frontendName] = oldValue;
@@ -803,7 +801,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             }).
             error(function(data) {
               warningsData.addWarning(
-                  'Error modifying exploration rights: ' + data.error);
+                data.error || 'Error communicating with server.');
               // TODO(sll): Reinstate the following line without causing the
               //     $watch to trigger.
               // $scope[frontendName] = oldValue;

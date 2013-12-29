@@ -642,8 +642,7 @@ class Exploration(object):
     def validate(self, strict=False):
         """Validates the exploration before it is committed to storage.
 
-        If strict is True, performs advanced checks and returns a list of
-        warnings.
+        If strict is True, performs advanced validation.
         """
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
@@ -745,24 +744,30 @@ class Exploration(object):
                                 'does not exist in this exploration'
                                 % param_change.name)
 
-        warnings = []
         if strict:
+            warnings_list = []
             try:
                 self._verify_no_self_loops()
             except utils.ValidationError as e:
-                warnings.append(unicode(e))
+                warnings_list.append(unicode(e))
 
             try:
                 self._verify_all_states_reachable()
             except utils.ValidationError as e:
-                warnings.append(unicode(e))
+                warnings_list.append(unicode(e))
 
             try:
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
-                warnings.append(unicode(e))
+                warnings_list.append(unicode(e))
 
-        return warnings
+            if len(warnings_list) > 0:
+                warning_str = ''
+                for ind, warning in enumerate(warnings_list):
+                    warning_str += '%s. %s ' % (ind + 1, warning)
+                raise utils.ValidationError(
+                    'Please fix the following issues before saving this '
+                    'exploration: %s' % warning_str)
 
     def _verify_no_self_loops(self):
         """Verify that there are no self-loops."""

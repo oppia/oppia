@@ -273,7 +273,11 @@ class ExplorationRightsHandler(EditorHandler):
 
         elif is_public:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            exp_services.require_pass_strict_validation(exploration)
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
             rights_manager.publish_exploration(self.user_id, exploration_id)
         else:
             raise self.InvalidInputException(
@@ -502,10 +506,15 @@ class ChangeListSummaryHandler(EditorHandler):
                 exploration_id, change_list)
             updated_exploration = exp_services.apply_change_list(
                 exploration_id, change_list)
-            warnings = updated_exploration.validate(strict=True)
+            warning_message = ''
+            try:
+                updated_exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                warning_message = str(e)
+
             self.render_json({
                 'summary': summary,
-                'warnings': warnings
+                'warning_message': warning_message
             })
 
 

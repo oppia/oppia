@@ -69,3 +69,16 @@ oppia.directive('mathjaxBind', [function() {
     }]
   };
 }]);
+
+
+// Highlights the text of an input field when it is clicked.
+oppia.directive('selectOnClick', [function() {
+  return {
+    restrict: 'A',
+    link: function(scope, elm, attrs) {
+      elm.bind('click', function() {
+        this.select();
+      });
+    }
+  };
+}]);

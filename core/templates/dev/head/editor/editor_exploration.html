@@ -33,19 +33,21 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to publish an exploration! This will
-          enable it to be played by anyone, and you will also be able to view
-          statistics on readers' attempts at the exploration. Thank you for
-          your contribution to the Oppia community, and for helping students
-          to learn!
+          Congratulations, you are about to publish an exploration!
         </p>
 
         <p>
-          Once you publish an exploration, you cannot unpublish it. Deletion
-          of a published exploration may only occur with the approval of the
-          site moderators. You will still be able to edit the exploration, and
-          in the future we we plan to make it possible for other people to
-          improve it too.
+          This means that this exploration will be added to the public gallery,
+          so that others can play through it. It will also be possible to view
+          statistics on readers' attempts at the exploration, so that the
+          exploration can be improved over time.
+        </p>
+
+        <p>
+          Please note that publishing an exploration is currently a
+          <strong>one-way</strong> action, since, once you publish the
+          exploration, the Oppia community will be able to contribute feedback
+          and suggest improvements to it.
         </p>
 
         <p>
@@ -142,10 +144,10 @@
       <div class="oppia-content row-fluid">
         <div class="span12">
 
-          <span class="pull-right" style="margin: 10px 50px 0 0">
+          <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
             {% if can_publish %}
               <span ng-hide="isPublic">
-                <button type="button" ng-click="showPublishExplorationModal()">
+                <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
                   Publish
                 </button>
                 <img class="oppia-help" src="/images/help.png""
