@@ -107,6 +107,11 @@ class AdminHandler(base.BaseHandler):
                          (self.user_id, new_config_property_values))
             for (name, value) in new_config_property_values.iteritems():
                 config_services.set_property(self.user_id, name, value)
+        elif self.payload.get('action') == 'revert_config_property':
+            config_property_id = self.payload.get('config_property_id')
+            logging.info('[ADMIN] %s reverted config property: %s' %
+                         (self.user_id, config_property_id))
+            config_services.revert_property(self.user_id, config_property_id)
         elif self.payload.get('action') == 'refresh_computed_property':
             computed_property_name = self.payload.get('computed_property_name')
             config_domain.Registry.get_config_property(

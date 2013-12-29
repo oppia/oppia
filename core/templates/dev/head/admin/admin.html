@@ -36,8 +36,13 @@
 
     <div ng-if="isNonemptyObject(configProperties)">
       <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-        <em><[configPropertyData.description]></em>
-        <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
+        <p>
+          <strong><[configPropertyData.description]></strong>
+          <button ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
+        </p>
+        <p style="border: 1px solid black; padding: 5px;">
+          <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
+        </p>
       </div>
 
       <button ng-click="saveConfigProperties()">Save</button>

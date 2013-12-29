@@ -75,6 +75,16 @@ NONINTERACTIVE_WIDGET_COUNT = 4
 # The total number of interactive widgets. Used as a sanity check.
 INTERACTIVE_WIDGET_COUNT = 12
 
+
+DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
+I understand and agree that any contributions I make to this site will be
+licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
+will not contribute material to the site (including images and files that are
+part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
+"""
+DEFAULT_EDITOR_PREREQUISITES_PREAMBLE_LOCATION = (
+    'messages/editor_prerequisites_preamble.html')
+
 # Static file url to path mapping
 PATH_MAP = {
     '/css': 'core/templates/dev/head/css',

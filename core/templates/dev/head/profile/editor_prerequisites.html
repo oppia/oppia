@@ -13,40 +13,12 @@
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
         <h3 class="oppia-page-title">A few notes before you start editing</h3>
-        <p>
-          In the long term, we would like all explorations on this site to
-          be collectively owned by the Oppia community, so that everyone
-          (students as well as teachers!) would feel welcome to contribute to,
-          reuse and redistribute them. Therefore, all explorations on this
-          site, and contributions to them, are deemed to be licensed under
-          the <a href="http://creativecommons.org/choose/zero/" target="_blank">CC0 license</a>. This means that you waive all rights to
-          contributions made to the site, thus effectively
-          placing the work in the public domain. The intent here is to
-          maximize the reach and positive impact of the explorations hosted on
-          the site, since anyone would then be able to use them to help others
-          learn, copy and redistribute them without needing to ask permission
-          or satisfy any conditions.
-        </p>
 
-        <p>
-          Please note that contributions you make to an exploration will still
-          be displayed in the commit logs for each exploration, though the CC0
-          license doesn't require attribution by others.
-        </p>
+        <div>
+          {{preamble}}
+        </div>
 
-        <p>
-          If you aren't happy with this, please do not continue past this page!
-        </p>
-
-        <h3 class="oppia-page-title">Citizenship</h3>
-        <p>
-          This site exists to foster the creation and continual improvement
-          of a set of high-quality learning explorations that are freely
-          available to everyone. We hope you won't mind taking a little time
-          out to read our <a href="/pages/community">community guidelines</a>,
-          which explain how you can contribute to the site, and some basic do's
-          and don'ts.
-        </p>
+        <br><br>
 
         <h3 class="oppia-page-title">Paperwork</h3>
 
@@ -55,12 +27,7 @@
             <div>
               <label>
                 <input type="checkbox" ng-model="agreedToTerms">
-                I agree that any contributions I make to this site will
-                be licensed under CC0, and to waive all rights to
-                contributions I make to this site. I will not contribute
-                material to the site that I don't own the rights to, and
-                whose licensing is not compatible with the CC0 license
-                (including images and files that are part of an exploration).
+                {{agreement}}
               </label>
             </div>
 

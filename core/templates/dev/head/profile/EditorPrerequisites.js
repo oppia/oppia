@@ -32,7 +32,7 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
     if (!agreedToTerms) {
       warningsData.addWarning(
           'In order to edit explorations on this site, you will need to ' +
-          'agree to the terms of the license.');
+          'agree to the site terms.');
       return;
     }
 

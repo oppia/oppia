@@ -58,3 +58,13 @@ def set_property(committer_id, name, value):
     # Set value in memcache.
     memcache_services.set_multi({
         datastore_item.id: datastore_item.value})
+
+
+def revert_property(committer_id, name):
+    """Reverts a property value to the default value."""
+
+    config_property = config_domain.Registry.get_config_property(name)
+    if config_property is None:
+        raise Exception('No config property with name %s found.')
+
+    set_property(committer_id, name, config_property.default_value)

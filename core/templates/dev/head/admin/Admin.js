@@ -40,6 +40,27 @@ function Admin($scope, $http) {
 
   $scope.reloadConfigProperties();
 
+  $scope.revertToDefaultConfigPropertyValue = function(configPropertyId) {
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'revert_config_property',
+        config_property_id: configPropertyId
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+      $scope.message = 'Config property reverted successfully.';
+      $scope.reloadConfigProperties();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
   $scope.refreshComputedProperty = function(computedPropertyId) {
     var request = $.param({
       csrf_token: GLOBALS.csrf_token,

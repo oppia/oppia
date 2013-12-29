@@ -17,10 +17,28 @@
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import stats_services
 from core.domain import user_services
+import feconf
 import utils
+
+import jinja2
+
+
+EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
+    'editor_prerequisites_agreement', 'UnicodeString',
+    'The agreement that editors are asked to accept before making any '
+    'contributions.',
+    default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT
+)
+EDITOR_PREREQUISITES_PREAMBLE = config_domain.ConfigProperty(
+    'editor_prerequisites_preamble', 'Html',
+    'The preamble text for the editor prerequisites page.',
+    default_value=utils.get_file_contents(
+        feconf.DEFAULT_EDITOR_PREREQUISITES_PREAMBLE_LOCATION)
+)
 
 
 class ProfilePage(base.BaseHandler):
@@ -65,6 +83,11 @@ class EditorPrerequisitesPage(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
+        self.values.update({
+            'agreement': EDITOR_PREREQUISITES_AGREEMENT.value,
+            'preamble': jinja2.utils.Markup(
+                EDITOR_PREREQUISITES_PREAMBLE.value)
+        })
         self.render_template('profile/editor_prerequisites.html')
 
 
