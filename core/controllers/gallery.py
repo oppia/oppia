@@ -20,6 +20,7 @@ import collections
 import feconf
 
 from core.controllers import base
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 
@@ -82,14 +83,17 @@ class NewExploration(base.BaseHandler):
 
         yaml_content = self.request.get('yaml')
 
+        new_exploration_id = exp_services.get_new_exploration_id()
         if yaml_content and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exploration_id = exp_services.create_from_yaml(
-                yaml_content, self.user_id, title, category)
+            exp_services.save_new_exploration_from_zip_file(
+                self.user_id, yaml_content, title, category,
+                new_exploration_id)
         else:
-            exploration_id = exp_services.create_new(
-                self.user_id, title, category)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                new_exploration_id, title, category)
+            exp_services.save_new_exploration(self.user_id, exploration)
 
-        self.render_json({'explorationId': exploration_id})
+        self.render_json({'explorationId': exploration.id})
 
 
 class CloneExploration(base.BaseHandler):

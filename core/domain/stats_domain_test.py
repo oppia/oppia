@@ -28,10 +28,10 @@ class StateCounterUnitTests(test_utils.GenericTestBase):
     """Test the state counter domain object."""
 
     def test_state_entry_counts(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'user_id', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'title', 'category')
         exp.add_states(['State 2'])
-        exp_services.save_exploration('user_id', exp)
+        exp_services.save_new_exploration('user_id', exp)
 
         state1_name = exp.init_state_name
         state2_name = 'State 2'
@@ -81,8 +81,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'user_id', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'title', 'category')
+        exp_services.save_new_exploration('user_id', exp)
+
         state_name = exp.init_state_name
 
         stats_services.EventHandler.record_state_hit(
@@ -138,8 +140,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             answer_log.get_top_answers(2), [('answer2', 3), ('answer1', 2)])
 
     def test_recording_answer_for_different_rules(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'user_id', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'title', 'category')
+        exp_services.save_new_exploration('user_id', exp)
+
         state_name = exp.init_state_name
 
         stats_services.EventHandler.record_answer_submitted(
@@ -160,8 +164,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
     def test_resolving_answers(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'user_id', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'title', 'category')
+        exp_services.save_new_exploration('user_id', exp)
+
         state_name = exp.init_state_name
 
         answer_log = stats_domain.StateRuleAnswerLog.get(

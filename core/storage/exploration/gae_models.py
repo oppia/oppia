@@ -85,13 +85,8 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def put(self, committer_id, properties_dict, snapshot=None,
-            commit_message='', commit_cmds=None):
-        """Updates the exploration using the properties dict, then saves it.
-
-        If snapshot is not None, increments the exploration version and saves
-        a serialized copy or a diff in the history log.
-        """
+    def put(self, committer_id, properties_dict, commit_message, commit_cmds):
+        """Updates the exploration using the properties dict, then saves it."""
         if not isinstance(committer_id, basestring):
             raise Exception('Invalid committer id: %s' % committer_id)
 
@@ -107,18 +102,17 @@ class ExplorationModel(base_models.VersionedModel):
                 raise Exception(
                     'Invalid key for exploration properties dict: %s' % key)
 
-        if commit_cmds is None:
-            commit_cmds = []
-
         self.save(committer_id, commit_message, commit_cmds)
 
 
-class ExpRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+class ExplorationRightsSnapshotMetadataModel(
+        base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
     pass
 
 
-class ExpRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
+class ExplorationRightsSnapshotContentModel(
+        base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
     pass
 
@@ -129,8 +123,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     The id of each instance is the id of the corresponding exploration.
     """
 
-    SNAPSHOT_METADATA_CLASS = ExpRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = ExpRightsSnapshotContentModel
+    SNAPSHOT_METADATA_CLASS = ExplorationRightsSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = ExplorationRightsSnapshotContentModel
     ALLOW_REVERT = False
 
     # The user_ids of owners of this exploration.

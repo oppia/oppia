@@ -171,11 +171,13 @@ def get_human_readable_user_ids(user_ids):
     users_settings = get_users_settings(user_ids)
     usernames = []
     for user_settings in users_settings:
-        if not user_settings.is_known_user:
+        if user_settings.user_id == feconf.ADMIN_COMMITTER_ID:
+            usernames.append('admin')
+        elif not user_settings.is_known_user:
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_settings.user_id, user_ids))
             raise Exception('User not found.')
-        if user_settings.username:
+        elif user_settings.username:
             usernames.append(user_settings.username)
         else:
             usernames.append(

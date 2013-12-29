@@ -59,9 +59,11 @@ class EditorTest(test_utils.GenericTestBase):
         self.login('editor@example.com', is_admin=True)
 
         EXP_ID = 'eid'
-        exp_services.create_new(
-            'editor@example.com', 'A title', 'A category',
-            exploration_id=EXP_ID, default_dest_is_end_state=True)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'A title', 'A category')
+        exploration.states[exploration.init_state_name].widget.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+        exp_services.save_new_exploration('editor@example.com', exploration)
 
         response = self.testapp.get('/create/%s' % EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -84,7 +86,7 @@ class EditorTest(test_utils.GenericTestBase):
         """Test the error cases for adding a new state to an exploration."""
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        CURRENT_VERSION = 2
+        CURRENT_VERSION = 1
 
         # Register and log in as an admin.
         self.register_editor('editor@example.com')
@@ -334,8 +336,9 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
         UNPUBLISHED_EXP_ID = 'unpublished_eid'
-        exp_services.create_new(
-            self.owner_id, 'A title', 'A category', UNPUBLISHED_EXP_ID)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            UNPUBLISHED_EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role(
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
@@ -362,8 +365,9 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
     def test_deletion_rights_for_published_exploration(self):
         """Test rights management for deletion of published explorations."""
         PUBLISHED_EXP_ID = 'published_eid'
-        exp_services.create_new(
-            self.owner_id, 'A title', 'A category', PUBLISHED_EXP_ID)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            PUBLISHED_EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role(
             self.owner_id, PUBLISHED_EXP_ID, self.editor_id,

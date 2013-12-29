@@ -16,6 +16,7 @@ __author__ = 'Sean Lip'
 
 import unittest
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 import feconf
@@ -37,61 +38,58 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.register_editor(self.first_editor_email)
 
-        self.exploration_id = 'eid'
-        self.exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                self.first_editor_id, 'A title', 'A category',
-                self.exploration_id, default_dest_is_end_state=True))
+        self.EXP_ID = 'eid'
 
-        exp_services.save_exploration(self.first_editor_id, self.exploration)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exploration.states[exploration.init_state_name].widget.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+        exp_services.save_new_exploration(self.first_editor_id, exploration)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
-            '/learn/%s' % self.exploration_id, expect_errors=True)
+            '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
         self.login('person@example.com', is_admin=False)
         response = self.testapp.get(
-            '/learn/%s' % self.exploration_id, expect_errors=True)
+            '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        another_editor = 'another@example.com'
+        other_editor = 'another@example.com'
 
-        another_exploration = exp_services.get_exploration_by_id(
-            exp_services.create_new(
-                another_editor, 'A title', 'A category', 'eid2'))
-        exp_services.save_exploration(another_editor, another_exploration)
+        other_exploration = exp_domain.Exploration.create_default_exploration(
+            'eid2', 'A title', 'A category')
+        exp_services.save_new_exploration(other_editor, other_exploration)
 
-        self.login(another_editor, is_admin=False)
+        self.login(other_editor, is_admin=False)
         response = self.testapp.get(
-            '/learn/%s' % self.exploration_id, expect_errors=True)
+            '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
         self.login(self.first_editor_email, is_admin=False)
-        response = self.testapp.get('/learn/%s' % self.exploration_id)
+        response = self.testapp.get('/learn/%s' % self.EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
         self.login('admin@example.com', is_admin=True)
-        response = self.testapp.get('/learn/%s' % self.exploration_id)
+        response = self.testapp.get('/learn/%s' % self.EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
-        rights_manager.publish_exploration(
-            self.first_editor_id, self.exploration_id)
-        exp_services.save_exploration(self.first_editor_id, self.exploration)
+        rights_manager.publish_exploration(self.first_editor_id, self.EXP_ID)
 
         response = self.testapp.get(
-            '/learn/%s' % self.exploration_id, expect_errors=True)
+            '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assertNotIn('This is a preview', response.body)
 
@@ -107,7 +105,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def _submit_answer(self, answer):
         """Action representing submission of an answer to the backend."""
         url = '/learnhandler/transition/%s/%s' % (
-            self.exploration_id, self.last_state_name)
+            self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
             'answer': answer, 'block_number': self.last_block_number,
             'handler': 'submit', 'params': self.last_params,
@@ -140,10 +138,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         exp_services.delete_demo(exploration_id)
         exp_services.load_demo(exploration_id)
 
-        self.exploration_id = exploration_id
+        self.EXP_ID = exploration_id
 
         reader_dict = self.get_json(
-            '/learnhandler/init/%s' % self.exploration_id)
+            '/learnhandler/init/%s' % self.EXP_ID)
 
         self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']

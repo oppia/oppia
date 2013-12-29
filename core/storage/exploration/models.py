@@ -21,6 +21,11 @@ __author__ = 'Tarashish Mishra'
 from core.storage.exploration import django_models
 
 ExplorationModel = django_models.ExplorationModel
-ExplorationSnapshotMetadataModel = django_models.ExplorationSnapshotMetadataModel
+ExplorationSnapshotMetadataModel = (
+    django_models.ExplorationSnapshotMetadataModel)
 ExplorationSnapshotContentModel = django_models.ExplorationSnapshotContentModel
 ExplorationRightsModel = django_models.ExplorationRightsModel
+ExplorationRightsSnapshotMetadataModel = (
+    django_models.ExplorationRightsSnapshotMetadataModel)
+ExplorationRightsSnapshotContentModel = (
+    django_models.ExplorationRightsSnapshotContentModel)

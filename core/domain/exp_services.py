@@ -32,8 +32,6 @@ import zipfile
 
 from core.domain import exp_domain
 from core.domain import fs_domain
-from core.domain import html_cleaner
-from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import widget_registry
@@ -44,21 +42,29 @@ memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
+# This takes an additional 'source_id' parameter.
+CMD_CLONE = 'clone'
 
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 ALLOWED_CONTENT_TYPES = ['text']
-
-# The current version of the exploration schema. If any backward-incompatible
-# changes are made to the exploration schema in the YAML definitions, this
-# version number must be changed and a migration process put in place.
-CURRENT_EXPLORATION_SCHEMA_VERSION = 2
 
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id):
     """Returns a memcache key for an exploration."""
     return 'exploration:%s' % exploration_id
+
+
+def get_exploration_from_model(exploration_model):
+    return exp_domain.Exploration(
+        exploration_model.id, exploration_model.title,
+        exploration_model.category, exploration_model.default_skin,
+        exploration_model.init_state_name, exploration_model.states,
+        exploration_model.param_specs, exploration_model.param_changes,
+        exploration_model.version)
 
 
 def get_exploration_by_id(exploration_id, strict=True):
@@ -73,7 +79,7 @@ def get_exploration_by_id(exploration_id, strict=True):
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict)
         if exploration_model:
-            exploration = exp_domain.Exploration(exploration_model)
+            exploration = get_exploration_from_model(exploration_model)
             memcache_services.set_multi({
                 exploration_memcache_key: exploration})
             return exploration
@@ -81,16 +87,21 @@ def get_exploration_by_id(exploration_id, strict=True):
             return None
 
 
+def get_new_exploration_id():
+    """Returns a new exploration id."""
+    return exp_models.ExplorationModel.get_new_id('')
+
+
 # Query methods.
 def get_all_explorations():
     """Returns a list of domain objects representing all explorations."""
-    return [exp_domain.Exploration(e) for e in
+    return [get_exploration_from_model(e) for e in
             exp_models.ExplorationModel.get_all()]
 
 
 def get_public_explorations():
     """Returns a list of domain objects representing public explorations."""
-    return [exp_domain.Exploration(e) for e in
+    return [get_exploration_from_model(e) for e in
             exp_models.ExplorationModel.get_public_explorations()]
 
 
@@ -98,7 +109,7 @@ def get_viewable_explorations(user_id):
     """Returns domain objects for explorations viewable by the given user."""
     actor = rights_manager.Actor(user_id)
     all_explorations = exp_models.ExplorationModel.get_all()
-    return [exp_domain.Exploration(e) for e in all_explorations if
+    return [get_exploration_from_model(e) for e in all_explorations if
             actor.can_view(e.id)]
 
 
@@ -106,7 +117,7 @@ def get_editable_explorations(user_id):
     """Returns domain objects for explorations editable by the given user."""
     actor = rights_manager.Actor(user_id)
     all_explorations = exp_models.ExplorationModel.get_all()
-    return [exp_domain.Exploration(e) for e in all_explorations if
+    return [get_exploration_from_model(e) for e in all_explorations if
             actor.can_edit(e.id)]
 
 
@@ -149,25 +160,10 @@ def export_content_to_html(exploration_id, content_array, params=None):
     return html
 
 
-def export_to_yaml(exploration_id):
-    """Returns a YAML version of the exploration."""
-    exploration = get_exploration_by_id(exploration_id)
-
-    return utils.yaml_from_dict({
-        'default_skin': exploration.default_skin,
-        'init_state_name': exploration.init_state_name,
-        'param_changes': exploration.param_change_dicts,
-        'param_specs': exploration.param_specs_dict,
-        'states': {state_name: state.to_dict()
-                   for (state_name, state) in exploration.states.iteritems()},
-        'schema_version': CURRENT_EXPLORATION_SCHEMA_VERSION
-    })
-
-
 def export_to_zip_file(exploration_id):
     """Returns a ZIP archive of the exploration."""
-    yaml_repr = export_to_yaml(exploration_id)
     exploration = get_exploration_by_id(exploration_id)
+    yaml_repr = exploration.to_yaml()
 
     o = StringIO.StringIO()
     with zipfile.ZipFile(o, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
@@ -379,8 +375,8 @@ def require_pass_strict_validation(exploration):
         raise utils.ValidationError(warnings)
 
 
-def save_exploration(
-        committer_id, exploration, commit_message='', change_list=None):
+def _save_exploration(
+        committer_id, exploration, commit_message, change_list):
     """Commits an exploration domain object to persistent storage.
 
     If successful, increments the version number of the incoming exploration
@@ -395,43 +391,21 @@ def save_exploration(
     else:
         exploration.validate()
 
-    def export_to_versionable_dict(exploration):
-        """Returns a serialized version of this exploration for versioning.
-
-        The criterion for whether an item is included in the return dict is:
-        "suppose I am currently at v10 (say) and want to revert to v4; is this
-        property something I would be happy with being overwritten?". Thus, the
-        following properties are excluded for explorations:
-
-            ['category', 'default_skin', 'title']
-
-        The exploration id will be used to name the object in the history log,
-        so it does not need to be saved within the returned dict.
-
-        For states, all properties except 'id' are versioned. State dests are
-        specified using names and not ids.
-        """
-        return {
-            'init_state_name': exploration.init_state_name,
-            'param_changes': exploration.param_change_dicts,
-            'param_specs': exploration.param_specs_dict,
-            'states': {
-                state_name: state.to_dict()
-                for (state_name, state) in exploration.states.iteritems()
-            }
-        }
-
-    exploration_model = exp_models.ExplorationModel.get(exploration.id)
-    if exploration.version > exploration_model.version:
-        raise Exception(
-            'Unexpected error: trying to update version %s of exploration '
-            'from version %s. Please reload the page and try again.'
-            % (exploration_model.version, exploration.version))
-    elif exploration.version < exploration_model.version:
-        raise Exception(
-            'Trying to update version %s of exploration from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (exploration_model.version, exploration.version))
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration.id, strict=False)
+    if exploration_model is None:
+        exploration_model = exp_models.ExplorationModel(id=exploration.id)
+    else:
+        if exploration.version > exploration_model.version:
+            raise Exception(
+                'Unexpected error: trying to update version %s of exploration '
+                'from version %s. Please reload the page and try again.'
+                % (exploration_model.version, exploration.version))
+        elif exploration.version < exploration_model.version:
+            raise Exception(
+                'Trying to update version %s of exploration from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (exploration_model.version, exploration.version))
 
     properties_dict = {
         'category': exploration.category,
@@ -443,48 +417,35 @@ def save_exploration(
         'param_specs': exploration.param_specs_dict,
         'param_changes': exploration.param_change_dicts,
         'default_skin': exploration.default_skin,
-        'version': exploration_model.version,
     }
 
-    version_snapshot = export_to_versionable_dict(exploration)
     exploration_model.put(
-        committer_id, properties_dict, version_snapshot, commit_message,
-        change_list)
+        committer_id, properties_dict, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
 
     exploration.version += 1
 
 
-def create_new(
-    user_id, title, category, exploration_id=None,
-        init_state_name=feconf.DEFAULT_STATE_NAME,
-        default_dest_is_end_state=False, cloned_from=None):
-    """Creates and saves a new exploration; returns its id."""
-    # Generate a new exploration id, if one wasn't passed in.
-    exploration_id = (exploration_id or
-                      exp_models.ExplorationModel.get_new_id(title))
+def _create_exploration(
+        committer_id, exploration, commit_message, commit_cmds, cloned_from):
+    """Ensures that rights for a new exploration are saved first.
 
-    default_dest = (
-        feconf.END_DEST if default_dest_is_end_state else init_state_name)
-    init_state = exp_domain.State.create_default_state(default_dest)
-
-    exploration_model = exp_models.ExplorationModel(
-        id=exploration_id, title=title, category=category,
-        init_state_name=init_state_name,
-        states={
-            init_state_name: init_state.to_dict()
-        }
-    )
-
-    exp_domain.Exploration(exploration_model).validate()
-
-    exploration_model.put(
-        user_id, {}, commit_message='Exploration first created.')
-
+    This is because _save_exploration() depends on the rights object being
+    present to tell it whether to do strict validation or not.
+    """
     rights_manager.create_new_exploration_rights(
-        exploration_id, user_id, cloned_from)
+        exploration.id, committer_id, cloned_from)
+    _save_exploration(committer_id, exploration, commit_message, commit_cmds)
 
-    return exploration_id
+
+def save_new_exploration(committer_id, exploration):
+    commit_message = (
+        'New exploration created with title \'%s\'.' % exploration.title)
+    _create_exploration(committer_id, exploration, commit_message, [{
+        'cmd': CMD_CREATE_NEW,
+        'title': exploration.title,
+        'category': exploration.category,
+    }], None)
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -584,7 +545,7 @@ def update_exploration(
             'received none.')
 
     exploration = apply_change_list(exploration_id, change_list)
-    save_exploration(committer_id, exploration, commit_message, change_list)
+    _save_exploration(committer_id, exploration, commit_message, change_list)
 
 
 def classify(exploration_id, state_name, handler_name, answer, params):
@@ -616,100 +577,20 @@ def classify(exploration_id, state_name, handler_name, answer, params):
 
 
 # Creation and deletion methods.
-def create_from_yaml(
-        yaml_content, user_id, title, category, exploration_id=None,
-        cloned_from=None):
-    """Creates an exploration from a YAML text string."""
+def save_new_exploration_from_zip_file(
+        committer_id, yaml_content, title, category, exploration_id):
+    exploration = exp_domain.Exploration.from_yaml(
+        exploration_id, title, category, yaml_content)
 
-    def convert_v1_dict_to_v2_dict(exploration_dict):
-        """Converts a v1 exploration dict into a v2 exploration dict."""
-        exploration_dict['schema_version'] = 2
-        exploration_dict['init_state_name'] = (
-            exploration_dict['states'][0]['name'])
+    commit_message = (
+        'New exploration created from zip file with title \'%s\'.'
+        % exploration.title)
 
-        states_dict = {}
-        for state in exploration_dict['states']:
-            states_dict[state['name']] = state
-            del states_dict[state['name']]['name']
-        exploration_dict['states'] = states_dict
-
-        return exploration_dict
-
-    exploration_dict = utils.dict_from_yaml(yaml_content)
-
-    exploration_schema_version = exploration_dict.get('schema_version')
-    if not (1 <= exploration_schema_version
-            <= CURRENT_EXPLORATION_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1 and v2 YAML files at present.')
-    if exploration_schema_version == 1:
-        exploration_dict = convert_v1_dict_to_v2_dict(exploration_dict)
-
-    init_state_name = exploration_dict['init_state_name']
-    exploration_id = create_new(
-        user_id, title, category, exploration_id=exploration_id,
-        init_state_name=init_state_name, cloned_from=cloned_from)
-
-    exploration = get_exploration_by_id(exploration_id)
-
-    try:
-        exploration_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val) for
-            (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
-        }
-
-        exploration.add_states([
-            state_name for state_name in exploration_dict['states']
-            if state_name != init_state_name])
-
-        for (state_name, sdict) in exploration_dict['states'].iteritems():
-            state = exploration.states[state_name]
-
-            state.content = [
-                exp_domain.Content(
-                    item['type'], html_cleaner.clean(item['value']))
-                for item in sdict['content']
-            ]
-
-            state.param_changes = [param_domain.ParamChange(
-                pc['name'], pc['generator_id'], pc['customization_args']
-            ) for pc in sdict['param_changes']]
-
-            for pc in state.param_changes:
-                if pc.name not in exploration_param_specs:
-                    raise Exception('Parameter %s was used in a state but not '
-                                    'declared in the exploration param_specs.'
-                                    % pc.name)
-
-            wdict = sdict['widget']
-            widget_handlers = [exp_domain.AnswerHandlerInstance.from_dict({
-                'name': handler['name'],
-                'rule_specs': [{
-                    'definition': rule_spec['definition'],
-                    'dest': rule_spec['dest'],
-                    'feedback': [html_cleaner.clean(feedback)
-                                 for feedback in rule_spec['feedback']],
-                    'param_changes': rule_spec.get('param_changes', []),
-                } for rule_spec in handler['rule_specs']],
-            }) for handler in wdict['handlers']]
-
-            state.widget = exp_domain.WidgetInstance(
-                wdict['widget_id'], wdict['customization_args'],
-                widget_handlers, wdict['sticky'])
-
-            exploration.states[state_name] = state
-
-        exploration.default_skin = exploration_dict['default_skin']
-        exploration.param_specs = exploration_param_specs
-        exploration.param_changes = [
-            param_domain.ParamChange.from_dict(pc)
-            for pc in exploration_dict['param_changes']]
-        save_exploration(user_id, exploration)
-    except Exception:
-        delete_exploration(user_id, exploration_id, force_deletion=True)
-        raise
-
-    return exploration_id
+    _create_exploration(committer_id, exploration, commit_message, [{
+        'cmd': CMD_CREATE_NEW,
+        'title': exploration.title,
+        'category': exploration.category,
+    }], None)
 
 
 def clone_exploration(committer_id, old_exploration_id):
@@ -718,17 +599,23 @@ def clone_exploration(committer_id, old_exploration_id):
     if not rights_manager.Actor(committer_id).can_clone(old_exploration_id):
         raise Exception('You cannot copy this exploration.')
 
-    new_exploration_id = create_from_yaml(
-        export_to_yaml(old_exploration_id), committer_id,
-        'Copy of %s' % old_exploration.title, old_exploration.category,
-        cloned_from=old_exploration_id
-    )
+    new_exploration_id = get_new_exploration_id()
+    new_exploration = exp_domain.Exploration.from_yaml(
+        new_exploration_id, 'Copy of %s' % old_exploration.title,
+        old_exploration.category, old_exploration.to_yaml())
+
+    commit_message = 'Cloned from exploration with id %s.' % old_exploration_id
+
+    _create_exploration(committer_id, new_exploration, commit_message, [{
+        'cmd': CMD_CLONE,
+        'source_id': old_exploration_id
+    }], old_exploration_id)
 
     # Duplicate the assets of the old exploration.
     old_fs = fs_domain.AbstractFileSystem(
         fs_domain.ExplorationFileSystem(old_exploration_id))
     new_fs = fs_domain.AbstractFileSystem(
-        fs_domain.ExplorationFileSystem(new_exploration_id))
+        fs_domain.ExplorationFileSystem(new_exploration.id))
 
     dir_list = old_fs.listdir('')
     for filepath in dir_list:
@@ -791,10 +678,22 @@ def load_demo(exploration_id):
     else:
         raise Exception('Invalid demo exploration: %s' % exploration_info)
 
+    # TODO(sll): Try to use the import_from_zip_file() method instead.
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
-    create_from_yaml(
-        yaml_content, feconf.ADMIN_COMMITTER_ID, title, category,
-        exploration_id=exploration_id)
+    exploration = exp_domain.Exploration.from_yaml(
+        exploration_id, title, category, yaml_content)
+    commit_message = (
+        'New demo exploration created with title \'%s\'.'
+        % exploration.title)
+    commit_cmds = [{
+        'cmd': CMD_CREATE_NEW,
+        'title': exploration.title,
+        'category': exploration.category,
+    }]
+
+    _create_exploration(
+        feconf.ADMIN_COMMITTER_ID, exploration, commit_message, commit_cmds,
+        None)
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(

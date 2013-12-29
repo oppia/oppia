@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 import test_utils
@@ -40,6 +41,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
 
+        self.EXP_ID = 'exp_id'
+
     def test_demo_exploration(self):
         exp_services.load_demo('0')
 
@@ -57,130 +60,178 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_ownership(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_EDITOR)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_EDITOR)
 
-        self.assertTrue(rights_manager.Actor(self.user_id_a).is_owner(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).is_owner(eid))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).is_owner(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).is_owner(self.EXP_ID))
 
         self.login('admin@example.com', is_admin=True)
         self.assertFalse(
-            rights_manager.Actor(self.user_id_admin).is_owner(eid))
+            rights_manager.Actor(self.user_id_admin).is_owner(self.EXP_ID))
         self.logout()
 
     def test_newly_created_exploration(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_view(eid))
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit(eid))
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_delete(eid))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_edit(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
         self.login('admin@example.com', is_admin=True)
-        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view(eid))
-        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit(eid))
         self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_delete(eid))
+            rights_manager.Actor(self.user_id_admin).can_view(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_admin).can_edit(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_admin).can_delete(self.EXP_ID))
         self.logout()
 
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_view(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_edit(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_delete(eid))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(self.EXP_ID))
 
     def test_inviting_collaborator(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_EDITOR)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_EDITOR)
 
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_view(eid))
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_edit(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_delete(eid))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(self.EXP_ID))
 
     def test_inviting_playtester(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_view(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_edit(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_delete(eid))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(self.EXP_ID))
 
         rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_VIEWER)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_VIEWER)
 
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_view(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_edit(eid))
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_delete(eid))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_delete(self.EXP_ID))
 
     def test_setting_rights(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_VIEWER)
-
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
-            rights_manager.assign_role(
-                self.user_id_b, eid, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
-
-        rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_EDITOR)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_VIEWER)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role(
-                self.user_id_b, eid, self.user_id_c,
+                self.user_id_b, self.EXP_ID, self.user_id_c,
                 rights_manager.ROLE_VIEWER)
 
         rights_manager.assign_role(
-            self.user_id_a, eid, self.user_id_b, rights_manager.ROLE_OWNER)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_EDITOR)
+
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+            rights_manager.assign_role(
+                self.user_id_b, self.EXP_ID, self.user_id_c,
+                rights_manager.ROLE_VIEWER)
 
         rights_manager.assign_role(
-            self.user_id_b, eid, self.user_id_c, rights_manager.ROLE_OWNER)
+            self.user_id_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_OWNER)
+
         rights_manager.assign_role(
-            self.user_id_b, eid, self.user_id_d, rights_manager.ROLE_EDITOR)
+            self.user_id_b, self.EXP_ID, self.user_id_c,
+            rights_manager.ROLE_OWNER)
         rights_manager.assign_role(
-            self.user_id_b, eid, self.user_id_e, rights_manager.ROLE_VIEWER)
+            self.user_id_b, self.EXP_ID, self.user_id_d,
+            rights_manager.ROLE_EDITOR)
+        rights_manager.assign_role(
+            self.user_id_b, self.EXP_ID, self.user_id_e,
+            rights_manager.ROLE_VIEWER)
 
     def test_publishing_exploration(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
-        rights_manager.publish_exploration(self.user_id_a, eid)
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_view(eid))
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
-        rights_manager.unpublish_exploration(self.user_id_a, eid)
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_view(eid))
+        rights_manager.unpublish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
     def test_cannot_delete_published_exploration(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
-        rights_manager.publish_exploration(self.user_id_a, eid)
-        self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete(eid))
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
     def test_can_unpublish_and_delete_published_exploration(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
-        rights_manager.publish_exploration(self.user_id_a, eid)
-        rights_manager.unpublish_exploration(self.user_id_a, eid)
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_delete(eid))
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
     def test_cloned_explorations_cannot_be_published(self):
-        eid = exp_services.create_new(
-            self.user_id_a, 'New exploration', 'A category')
-        rights_manager.publish_exploration(self.user_id_a, eid)
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
-        new_eid = exp_services.clone_exploration(self.user_id_b, eid)
-        self.assertFalse(rights_manager.Actor(self.user_id_b).can_edit(eid))
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
 
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_view(new_eid))
-        self.assertTrue(rights_manager.Actor(self.user_id_b).can_edit(new_eid))
+        new_exp_id = exp_services.clone_exploration(
+            self.user_id_b, self.EXP_ID)
         self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_publish(new_eid))
+            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
+
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_view(new_exp_id))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_edit(new_exp_id))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_publish(new_exp_id))
 
     def test_cannot_unpublish_exploration_after_edited(self):
         # User A creates an exploration, marks it private.

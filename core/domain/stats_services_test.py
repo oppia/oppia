@@ -185,8 +185,9 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_get_top_improvable_states(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 
         for _ in range(5):
@@ -211,8 +212,9 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_single_default_rule_hit(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 
         stats_services.EventHandler.record_state_hit('eid', state_name, True)
@@ -230,8 +232,9 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(expected_top_state, states[0])
 
     def test_no_improvement_flag_hit(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exp_services.save_new_exploration('fake@user.com', exp)
 
         not_default_rule_spec = exp_domain.RuleSpec({
             'rule_type': rule_domain.ATOMIC_RULE_TYPE,
@@ -242,7 +245,7 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         exp.init_state.widget.handlers[0].rule_specs = [
             not_default_rule_spec, exp_domain.DEFAULT_RULESPEC
         ]
-        exp_services.save_exploration('fake@user.com', exp)
+        exp_services._save_exploration('fake@user.com', exp, '', [])
 
         stats_services.EventHandler.record_state_hit(
             'eid', exp.init_state_name, True)
@@ -254,8 +257,10 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         self.assertEquals(len(states), 0)
 
     def test_incomplete_and_default_flags(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exp_services.save_new_exploration('fake@user.com', exp)
+
         state_name = exp.init_state_name
 
         # Hit the default rule once, and fail to answer twice. The result
@@ -290,12 +295,14 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
         self.assertEquals(states[0]['type'], 'default')
 
     def test_two_state_default_hit(self):
-        exp = exp_services.get_exploration_by_id(exp_services.create_new(
-            'fake@user.com', 'exploration', 'category', 'eid'))
+        exp = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exp_services.save_new_exploration('fake@user.com', exp)
+
         FIRST_STATE_NAME = exp.init_state_name
         SECOND_STATE_NAME = 'State 2'
         exp.add_states([SECOND_STATE_NAME])
-        exp_services.save_exploration('fake@user.com', exp)
+        exp_services._save_exploration('fake@user.com', exp, '', [])
 
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.
@@ -355,3 +362,33 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
             'type': 'default',
             'state_name': FIRST_STATE_NAME
         }, states[0])
+
+
+class UnresolvedAnswersTests(test_utils.GenericTestBase):
+    """Test the unresolved answers methods."""
+
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
+
+    def test_get_unresolved_answers(self):
+        self.assertEquals(
+            stats_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {})
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {'a1': 1})
+
+        stats_services.EventHandler.record_answer_submitted(
+            'eid', 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {'a1': 2})
+
+        stats_services.EventHandler.resolve_answers_for_default_rule(
+            'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
+        self.assertEquals(
+            stats_services.get_unresolved_answers_for_default_rule(
+                'eid', 'sid'), {})

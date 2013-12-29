@@ -30,10 +30,6 @@ from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import widget_registry
-from core.platform import models
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration
-])
 import feconf
 import utils
 
@@ -571,28 +567,40 @@ class State(object):
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 
-    def __init__(self, exploration_model):
-        # TODO(sll): Change this to take in parameters, rather than the whole
-        # model.
-        self.id = exploration_model.id
-        self.category = exploration_model.category
-        self.title = exploration_model.title
-        self.default_skin = exploration_model.default_skin
+    def __init__(self, exploration_id, title, category, default_skin,
+                 init_state_name, states_dict, param_specs_dict,
+                 param_changes_list, version):
+        self.id = exploration_id
+        self.title = title
+        self.category = category
+        self.default_skin = default_skin
+        self.init_state_name = init_state_name
 
-        self.init_state_name = exploration_model.init_state_name
         self.states = {}
-        for (state_name, state_dict) in exploration_model.states.iteritems():
+        for (state_name, state_dict) in states_dict.iteritems():
             self.states[state_name] = State.from_dict(state_dict)
 
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exploration_model.param_specs.iteritems()
+            for (ps_name, ps_val) in param_specs_dict.iteritems()
         }
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in exploration_model.param_changes]
+            for param_change_dict in param_changes_list]
 
-        self.version = exploration_model.version
+        self.version = version
+
+    @classmethod
+    def create_default_exploration(cls, exploration_id, title, category):
+        init_state_dict = State.create_default_state(
+            feconf.DEFAULT_STATE_NAME).to_dict()
+        states_dict = {
+            feconf.DEFAULT_STATE_NAME: init_state_dict
+        }
+
+        return cls(
+            exploration_id, title, category, 'conversation_v1',
+            feconf.DEFAULT_STATE_NAME, states_dict, {}, [], 0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):
@@ -971,3 +979,105 @@ class Exploration(object):
                 )
 
         return state_dict
+
+    # The current version of the exploration schema. If any backward-
+    # incompatible changes are made to the exploration schema in the YAML
+    # definitions, this version number must be changed and a migration process
+    # put in place.
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 2
+
+    @classmethod
+    def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
+        """Converts a v1 exploration dict into a v2 exploration dict."""
+        exploration_dict['schema_version'] = 2
+        exploration_dict['init_state_name'] = (
+            exploration_dict['states'][0]['name'])
+
+        states_dict = {}
+        for state in exploration_dict['states']:
+            states_dict[state['name']] = state
+            del states_dict[state['name']]['name']
+        exploration_dict['states'] = states_dict
+
+        return exploration_dict
+
+    @classmethod
+    def from_yaml(cls, exploration_id, title, category, yaml_content):
+        """Creates and returns exploration from a YAML text string."""
+        exploration_dict = utils.dict_from_yaml(yaml_content)
+
+        exploration_schema_version = exploration_dict.get('schema_version')
+        if not (1 <= exploration_schema_version
+                <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
+            raise Exception(
+                'Sorry, we can only process v1 and v2 YAML files at present.')
+        if exploration_schema_version == 1:
+            exploration_dict = cls._convert_v1_dict_to_v2_dict(
+                exploration_dict)
+
+        exploration = cls.create_default_exploration(
+            exploration_id, title, category)
+        exploration.param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val) for
+            (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
+        }
+
+        init_state_name = exploration_dict['init_state_name']
+        exploration.rename_state(exploration.init_state_name, init_state_name)
+        exploration.add_states([
+            state_name for state_name in exploration_dict['states']
+            if state_name != init_state_name])
+
+        for (state_name, sdict) in exploration_dict['states'].iteritems():
+            state = exploration.states[state_name]
+
+            state.content = [
+                Content(item['type'], html_cleaner.clean(item['value']))
+                for item in sdict['content']
+            ]
+
+            state.param_changes = [param_domain.ParamChange(
+                pc['name'], pc['generator_id'], pc['customization_args']
+            ) for pc in sdict['param_changes']]
+
+            for pc in state.param_changes:
+                if pc.name not in exploration.param_specs:
+                    raise Exception('Parameter %s was used in a state but not '
+                                    'declared in the exploration param_specs.'
+                                    % pc.name)
+
+            wdict = sdict['widget']
+            widget_handlers = [AnswerHandlerInstance.from_dict({
+                'name': handler['name'],
+                'rule_specs': [{
+                    'definition': rule_spec['definition'],
+                    'dest': rule_spec['dest'],
+                    'feedback': [html_cleaner.clean(feedback)
+                                 for feedback in rule_spec['feedback']],
+                    'param_changes': rule_spec.get('param_changes', []),
+                } for rule_spec in handler['rule_specs']],
+            }) for handler in wdict['handlers']]
+
+            state.widget = WidgetInstance(
+                wdict['widget_id'], wdict['customization_args'],
+                widget_handlers, wdict['sticky'])
+
+            exploration.states[state_name] = state
+
+        exploration.default_skin = exploration_dict['default_skin']
+        exploration.param_changes = [
+            param_domain.ParamChange.from_dict(pc)
+            for pc in exploration_dict['param_changes']]
+
+        return exploration
+
+    def to_yaml(self):
+        return utils.yaml_from_dict({
+            'default_skin': self.default_skin,
+            'init_state_name': self.init_state_name,
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+            'states': {state_name: state.to_dict()
+                       for (state_name, state) in self.states.iteritems()},
+            'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
+        })

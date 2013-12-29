@@ -59,14 +59,6 @@ class ExplorationRights(object):
         self.status = status
 
 
-def get_exploration_rights(exploration_id):
-    """Retrieves the rights for this exploration from the datastore."""
-    model = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
-    return ExplorationRights(
-        model.id, model.owner_ids, model.editor_ids, model.viewer_ids,
-        model.community_owned, model.cloned_from, model.status)
-
-
 def _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds):
     """Saves an ExplorationRights domain object to the datastore."""
@@ -92,6 +84,14 @@ def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
     _save_exploration_rights(
         committer_id, exploration_rights, 'Created new exploration',
         commit_cmds)
+
+
+def get_exploration_rights(exploration_id):
+    """Retrieves the rights for this exploration from the datastore."""
+    model = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
+    return ExplorationRights(
+        model.id, model.owner_ids, model.editor_ids, model.viewer_ids,
+        model.community_owned, model.cloned_from, model.status)
 
 
 def is_exploration_public(exploration_id):
@@ -201,29 +201,26 @@ class Actor(object):
                 self._is_owner(exploration_id))
 
     def can_publish(self, exploration_id):
-        if self._is_admin():
-            return True
-
         if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
             # Demo explorations are public by default.
             return True
 
         exp_rights = get_exploration_rights(exploration_id)
+        if exp_rights.status != EXPLORATION_STATUS_PRIVATE:
+            return False
         if exp_rights.cloned_from:
             return False
-        return (exp_rights.status == EXPLORATION_STATUS_PRIVATE and
-                self._is_owner(exploration_id))
+
+        return self._is_owner(exploration_id) or self._is_admin()
 
     def can_unpublish(self, exploration_id):
-        if self._is_admin():
-            return True
-
         exp_rights = get_exploration_rights(exploration_id)
+        if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
+            return False
         # TODO(sll): Deny unpublishing of the exploration if an
         # external user has edited or submitted feedback for it since
         # it was published.
-        return (exp_rights.status == EXPLORATION_STATUS_PUBLIC and
-                self._is_owner(exploration_id))
+        return self._is_owner(exploration_id) or self._is_admin()
 
     def can_modify_roles(self, exploration_id):
         return self._is_admin() or self._is_owner(exploration_id)

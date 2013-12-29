@@ -16,33 +16,11 @@
 
 __author__ = 'Sean Lip'
 
-import test_utils
-
 from core.domain import exp_domain
 from core.domain import param_domain
+import feconf
+import test_utils
 import utils
-
-
-class FakeExploration(exp_domain.Exploration):
-    """Allows dummy explorations to be created and commited."""
-
-    def __init__(self, exp_id='fake_exploration_id'):
-        """Creates a dummy exploration."""
-        # TODO(sll): Add tests to validate param_changes, default_skin and
-        # version.
-        self.id = exp_id
-        self.title = ''
-        self.category = ''
-        self.init_state_name = ''
-        self.states = {}
-        self.parameters = []
-        self.param_specs = {}
-        self.param_changes = []
-        self.default_skin = 'default_skin'
-
-    def put(self):
-        """The put() method is patched to make no commits to the datastore."""
-        self._pre_put_hook()
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -50,7 +28,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation(self):
         """Test validation of explorations."""
-        exploration = FakeExploration()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', '', '')
+        exploration.init_state_name = ''
+        exploration.states = {}
 
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'between 1 and 50 characters'):
@@ -130,11 +111,289 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
-        demo = FakeExploration(exp_id='0')
+        demo = exp_domain.Exploration.create_default_exploration(
+            '0', 'title', 'category')
         self.assertEqual(demo.is_demo, True)
 
-        notdemo1 = FakeExploration(exp_id='a')
+        notdemo1 = exp_domain.Exploration.create_default_exploration(
+            'a', 'title', 'category')
         self.assertEqual(notdemo1.is_demo, False)
 
-        notdemo2 = FakeExploration(exp_id='abcd')
+        notdemo2 = exp_domain.Exploration.create_default_exploration(
+            'abcd', 'title', 'category')
         self.assertEqual(notdemo2.is_demo, False)
+
+
+class StateExportUnitTests(test_utils.GenericTestBase):
+    """Test export of states."""
+
+    def test_export_state_to_dict(self):
+        """Test exporting a state to a dict."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'A different exploration_id', 'A title', 'A category')
+        exploration.add_states(['New state'])
+
+        state_dict = exploration.states['New state'].to_dict()
+        expected_dict = {
+            'content': [{
+                'type': 'text',
+                'value': u''
+            }],
+            'param_changes': [],
+            'widget': {
+                'widget_id': u'TextInput',
+                'customization_args': {},
+                'sticky': False,
+                'handlers': [{
+                    'name': u'submit',
+                    'rule_specs': [{
+                        'definition': {
+                            u'rule_type': u'default'
+                        },
+                        'dest': 'New state',
+                        'feedback': [],
+                        'param_changes': [],
+
+                    }]
+                }]
+            },
+        }
+        self.assertEqual(expected_dict, state_dict)
+
+
+class YamlCreationUnitTests(test_utils.GenericTestBase):
+    """Test creation of explorations from YAML files."""
+
+    SAMPLE_YAML_CONTENT = (
+"""default_skin: conversation_v1
+init_state_name: (untitled state)
+param_changes: []
+param_specs: {}
+schema_version: 2
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  New state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
+    def test_yaml_import_and_export(self):
+        """Test the from_yaml() and to_yaml() methods."""
+        EXP_ID = 'An exploration_id'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'A title', 'A category')
+        exploration.add_states(['New state'])
+        self.assertEqual(len(exploration.states), 2)
+
+        yaml_content = exploration.to_yaml()
+        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
+
+        exploration2 = exp_domain.Exploration.from_yaml(
+            'exp2', 'Title', 'Category', yaml_content)
+        self.assertEqual(len(exploration2.states), 2)
+        yaml_content_2 = exploration2.to_yaml()
+        self.assertEqual(yaml_content_2, yaml_content)
+
+        with self.assertRaises(Exception):
+            exp_domain.Exploration.from_yaml(
+                'exp3', 'Title', 'Category', 'No_initial_state_name')
+
+        with self.assertRaises(Exception):
+            exp_domain.Exploration.from_yaml(
+                'exp4', 'Title', 'Category',
+                'Invalid\ninit_state_name:\nMore stuff')
+
+        with self.assertRaises(Exception):
+            exp_domain.Exploration.from_yaml(
+                'exp4', 'Title', 'Category', 'State1:\n(\nInvalid yaml')
+
+
+class SchemaMigrationUnitTests(test_utils.GenericTestBase):
+    """Test migration methods for yaml content."""
+
+    YAML_CONTENT_V1 = (
+"""default_skin: conversation_v1
+param_changes: []
+param_specs: {}
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: ''
+  name: (untitled state)
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: ''
+  name: New state
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: New state
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+""")
+
+    YAML_CONTENT_V2 = (
+"""default_skin: conversation_v1
+init_state_name: (untitled state)
+param_changes: []
+param_specs: {}
+schema_version: 2
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  New state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
+    def test_load_from_v1(self):
+        """Test direct loading from a v1 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V1)
+        v2_yaml = exploration.to_yaml()
+        self.assertEqual(v2_yaml, self.YAML_CONTENT_V2)
+
+    def test_load_from_v2(self):
+        """Test direct loading from a v2 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V2)
+        v2_yaml = exploration.to_yaml()
+        self.assertEqual(v2_yaml, self.YAML_CONTENT_V2)
+
+
+class StateOperationsUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on states."""
+
+    def test_delete_state(self):
+        """Test deletion of states."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        exploration.add_states(['first state'])
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Cannot delete initial state'):
+            exploration.delete_state(exploration.init_state_name)
+
+        exploration.add_states(['second state'])
+        exploration.delete_state('second state')
+
+        with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
+            exploration.delete_state('fake state')
+
+    def test_state_operations(self):
+        """Test adding, updating and checking existence of states."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', 'A title', 'A category')
+        with self.assertRaises(KeyError):
+            exploration.states['invalid_state_name']
+
+        self.assertEqual(len(exploration.states), 1)
+
+        default_state_name = exploration.init_state_name
+        exploration.rename_state(default_state_name, 'Renamed state')
+        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(exploration.init_state_name, 'Renamed state')
+
+        # Add a new state.
+        exploration.add_states(['State 2'])
+        self.assertEqual(len(exploration.states), 2)
+
+        # It is OK to rename a state to the same name.
+        exploration.rename_state('State 2', 'State 2')
+
+        # But it is not OK to add or rename a state using a name that already
+        # exists.
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exploration.add_states(['State 2'])
+        with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
+            exploration.rename_state('State 2', 'Renamed state')
+
+        # And it is not OK to rename a state to the END_DEST.
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid state name'):
+            exploration.rename_state('State 2', feconf.END_DEST)
+
+        # The exploration now has exactly two states.
+        self.assertNotIn(default_state_name, exploration.states)
+        self.assertIn('Renamed state', exploration.states)
+        self.assertIn('State 2', exploration.states)
