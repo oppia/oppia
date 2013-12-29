@@ -39,7 +39,7 @@ describe('Editor prerequisites controller', function() {
       scope.submitPrerequisitesForm(false, null);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to agree ' +
-        'to the terms of the license.');
+        'to the site terms.');
     });
 
     it('should get data correctly from the server', function() {
@@ -58,7 +58,7 @@ describe('Editor prerequisites controller', function() {
       scope.submitPrerequisitesForm(false, '');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to ' +
-        'agree to the terms of the license.');
+        'agree to the site terms.');
     });
 
     it('should show warning if no username provided', function($http) {
