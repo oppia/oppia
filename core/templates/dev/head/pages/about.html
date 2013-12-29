@@ -12,48 +12,97 @@
     <div class="oppia-wide-panel">
       <div class="oppia-wide-panel-content">
         <h1>What is Oppia?</h1>
+
         <p>
-          Oppia is a web-based tool for creating interactive online activities that enable students to learn by doing. The authors of Oppia believe that this is a more effective and efficient way of learning than either watching videos or reading texts, since it allows the student to engage more deeply with the activity in a way that videos or books often do not.
+          Oppia is a web-based tool for creating interactive online activities that enable students to learn by doing. Its authors believe that this is a more effective and efficient way of learning than either watching videos or reading texts, since it allows the student to engage more deeply with the activity in a way that videos or books often do not.
         </p>
 
         <p>
-          Oppia aims to simulate the one-on-one interaction that a student has with a teacher by capturing and generalizing “interaction dialogues.” For instance, a teacher might ask the student a question, and the student then responds in some way -- by either volunteering an answer, or saying that he/she is stuck. The teacher then responds in a way that would be as helpful to the student as possible. However, the teacher will often not have time to address every individual student’s misconceptions. Furthermore, it usually takes significant effort to figure out an appropriate response that helps the student get unstuck without denying him/her the experience of working through the problem and coming to terms with his/her own misunderstanding. In many cases this effort will have already been expended by another teacher in a different school who is faced with the same question.
+          Oppia aims to simulate the one-on-one interaction that a student has with a teacher by capturing and generalizing “interaction dialogues.” For instance, a teacher might ask the student a question, and the student then responds in some way -- by either volunteering an answer, or saying that he/she is stuck. The teacher then responds in a way that would be as helpful to the student as possible. However, the teacher will often not have time to address every individual misconception. Furthermore, it usually takes significant effort to figure out an appropriate response that helps a student get unstuck without denying them the experience of working through the problem and coming to terms with their misunderstanding. In many cases this effort will have already been expended by another teacher in a different school who is faced with the same question. If teachers use Oppia to record such interactions, they can share their knowledge with more students without duplicated effort.
         </p>
 
         <p>
-          If teachers use Oppia to record such interactions, they can share their knowledge with more students without duplicated effort. Oppia aims to allow any student to experience the benefits of one-on-one teaching by aggregating common interactions and automatically playing the role of the teacher when it can. The teacher is still vital, though: there are still many questions that students will ask which Oppia will not be able to address satisfactorily in the short term. But we hope that having some of the student’s work addressed automatically will lighten the teacher’s load and help him/her focus on the student questions that require a human’s response. Over time, as Oppia becomes able to answer more questions and understand more varied student inputs, we hope that it will become a more useful and valuable resource for students and teachers worldwide.
+          Oppia aims to allow any student to experience the benefits of one-on-one teaching by aggregating common interactions and automatically playing the role of the teacher when it can. The teacher is still vital, though: there are still many questions that students will ask which Oppia will not be able to address satisfactorily in the short term. But we hope that having some of the student’s work addressed automatically will lighten the teacher’s load and help them focus on the questions that require a human’s response. Over time, as Oppia becomes able to answer more questions and understand more varied student inputs, we hope that it will become a more useful and valuable resource for students and teachers worldwide.
         </p>
       </div>
     </div>
+
     <br>
 
     <div class="oppia-wide-panel">
       <div class="oppia-wide-panel-content">
-        <h2>Get in touch!</h2>
+        <h1>About this website</h1>
         <p>
-          Have a question about Oppia? You can find us via our Google group
-          <a href="https://groups.google.com/forum/#!forum/oppia">here</a>.
-          If you are interested in playing around with the code, then please check
-          out our <a href="https://code.google.com/p/oppia/">Google code site</a>.
+          This site ({{SITE_NAME}}) is a hosted version of the <a href="https://code.google.com/p/oppia">Oppia codebase</a>. It is designed to foster the creation of a set of really good explorations that are freely available to anyone and that include a wide range of topics.
         </p>
 
-        <h2>Credits</h2>
         <p>
-          Oppia was (and is still being) built by a small group of contributors, some of whom work on it in 20% time at Google. These include:
-          <ul>
-            {% for name in code_contributors_list %}
-              <li> {{name}} </li>
-            {% endfor %}
-          </ul>
+          Creators, editors, and readers of explorations as well as developers of the codebase are recognized as the Oppia community. In the spirit of maintaining {{SITE_NAME}} as a service for learners by learners, community members are encouraged to participate in the discussion <a href="{{SITE_FORUM_URL}}">forum</a> and to peruse the community guidelines (see below).
         </p>
 
-        {% if idea_contributors_str %}
-          <p>
-            We are also very grateful for feedback, ideas and suggestions from the following people: {{ idea_contributors_str }}.
-          </p>
-        {% endif %}
+        <p>
+          Please be aware that this site is maintained by a group of volunteers in their spare time. Things may go wrong, and we apologize in advance if they do. If you want to take backups of your work, you can do so by downloading the explorations as zip files from the exploration editor pages. Also, if you want to help, let us know! You can email the site admins at <u>{{ADMIN_EMAIL_ADDRESS}}</u>.
+        </p>
+
+        <p>
+          Much of the code that powers this site was written as an open-source project by a group of Google engineers in their 20% time. However, {{SITE_NAME}} is not a Google product, and Google bears no responsibility for the content of this website.
+        </p>
       </div>
     </div>
 
+    <br>
+
+    <div class="oppia-wide-panel">
+      <div class="oppia-wide-panel-content">
+        <h2>Using Oppia</h2>
+
+        <p>
+          The main units of learning in Oppia are called explorations. These are multi-stage interactive activities that attempt to engage readers in a learning conversation and provide formative feedback along the way.
+        </p>
+
+        <p>
+          Any user of Oppia, logged-in or otherwise, can play through, browse, and search for any public explorations in the <a href="/gallery">gallery</a>. To create or edit explorations, a user will need to be logged-in and to author his/her work under a stable username.
+        </p>
+
+        <p>
+          Responses submitted to explorations are stored anonymously. The anonymized responses are surfaced to exploration creators and editors, so that the explorations can be improved over time.
+        </p>
+
+        <h2 id="community">Community Guidelines</h2>
+
+        <ol>
+          <li style="line-height: 25px;">
+            Ownership of explorations is temporary and eventually reverts to the Oppia community (see <a href="#lifecycle" target="_self">Lifecycle of an Exploration</a> for more details). The idea is to make it easy for the explorations on this site to improve continuously.
+          </li>
+          <li style="line-height: 25px;">
+            Cloning explorations in order to publish them is discouraged -- it is better to suggest improvements or give feedback on the original exploration. However, you are welcome to privately clone an exploration to see how it's made.
+          </li>
+          <li style="line-height: 25px;">
+            Please exercise judgement before publishing an exploration. Every exploration on this site should have educational value, and should not contain advertising, spam, vandalism or abuse.
+          </li>
+          <li style="line-height: 25px;">
+            Creating multiple usernames, using explorations to trick users, or circumventing site features that are meant to encourage the improvement of explorations are examples of antisocial behavior that may result in account suspension.
+          </li>
+          <li style="line-height: 25px;">
+            For contentious topics and clarifications on guidelines, please use the Oppia discussion forum.
+          </li>
+          <li style="line-height: 25px;">
+            The governance model for Oppia comprises site admins and moderators. Site admins manage and have overall responsibility for the site; they are the final arbitrators on any dispute. Moderators suggest and review major edits for explorations, and enforce the behavioral norms described within these community guidelines.
+          </li>
+        </ol>
+
+        <h2 id="lifecycle">Lifecycle of an Exploration</h2>
+
+        <p>
+          All explorations start off as private, which means that they can only be viewed by the exploration editors, invited playtesters, and site admins. When an exploration is in a good enough state for general use, any owner of the exploration may decide to publish it. Currently, publishing is a one-way process. After an exploration is published, it will show up in the public gallery and anyone will be able to play it, give feedback, and suggest edits.
+        </p>
+
+        <p>
+          The editors of an exploration can retain exclusive editing rights as long as they continue to maintain the exploration and respond to feedback and change suggestions in a timely manner. Otherwise, the exploration will be considered 'orphaned' and ownership of it will revert to the community, who will then be able to collectively improve the exploration over time. The owner(s) of an exploration may also release ownership to the community at any time.
+        </p>
+
+      </div>
+
+    </div>
   </div>
 {% endblock %}

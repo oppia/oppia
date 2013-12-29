@@ -164,8 +164,8 @@ class EscapingTest(test_utils.GenericTestBase):
         def get(self):
             """Handles GET requests."""
             self.values.update({
-                'code_contributors_list': ['<[angular_tag]>'],
-                'idea_contributors_str': '{{51 * 3}}',
+                'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
+                'SITE_NAME': '{{51 * 3}}',
             })
             self.render_template('pages/about.html')
 

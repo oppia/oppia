@@ -16,10 +16,19 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import feconf
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_services
-import utils
+
+
+ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
+    'admin_email_address', 'UnicodeString', 'The admin email address',
+    default_value='ADMIN_EMAIL_ADDRESS')
+SITE_FORUM_URL = config_domain.ConfigProperty(
+    'site_forum_url', 'UnicodeString', 'The site forum URL',
+    default_value='https://site/forum/url')
+SITE_NAME = config_domain.ConfigProperty(
+    'site_name', 'UnicodeString', 'The site name', default_value='SITE_NAME')
 
 
 class SplashPage(base.BaseHandler):
@@ -39,27 +48,24 @@ class AboutPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'code_contributors_list': feconf.CODE_CONTRIBUTORS,
-            'idea_contributors_str': utils.get_comma_sep_string_from_list(
-                feconf.IDEA_CONTRIBUTORS),
+            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'SITE_NAME': SITE_NAME.value,
         })
         self.render_template('pages/about.html')
 
 
-class TermsPage(base.BaseHandler):
-    """Page with terms and conditions."""
+class LicensePage(base.BaseHandler):
+    """Page with license information."""
 
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/terms.html')
+        self.render_template('pages/license.html')
 
 
-class FeedbackPage(base.BaseHandler):
+class ContactPage(base.BaseHandler):
     """Page with feedback."""
 
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'nav_mode': 'feedback',
-        })
-        self.render_template('pages/feedback.html')
+        self.render_template('pages/contact.html')

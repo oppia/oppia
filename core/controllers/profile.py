@@ -33,12 +33,6 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
     'contributions.',
     default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT
 )
-EDITOR_PREREQUISITES_PREAMBLE = config_domain.ConfigProperty(
-    'editor_prerequisites_preamble', 'Html',
-    'The preamble text for the editor prerequisites page.',
-    default_value=utils.get_file_contents(
-        feconf.DEFAULT_EDITOR_PREREQUISITES_PREAMBLE_LOCATION)
-)
 
 
 class ProfilePage(base.BaseHandler):
@@ -85,8 +79,6 @@ class EditorPrerequisitesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'agreement': EDITOR_PREREQUISITES_AGREEMENT.value,
-            'preamble': jinja2.utils.Markup(
-                EDITOR_PREREQUISITES_PREAMBLE.value)
         })
         self.render_template('profile/editor_prerequisites.html')
 

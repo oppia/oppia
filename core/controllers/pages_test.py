@@ -35,11 +35,5 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        self.assertIn('Reinaldo', response)
-
-    def testTermsPage(self):
-        """Test the Terms page."""
-        response = self.testapp.get('/terms')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.content_type, 'text/html')
-        self.assertIn('an open source project', response)
+        self.assertIn('Community Guidelines', response)
+        self.assertIn('Lifecycle', response)

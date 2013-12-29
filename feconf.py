@@ -82,8 +82,6 @@ licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
 will not contribute material to the site (including images and files that are
 part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
 """
-DEFAULT_EDITOR_PREREQUISITES_PREAMBLE_LOCATION = (
-    'messages/editor_prerequisites_preamble.html')
 
 # Static file url to path mapping
 PATH_MAP = {
@@ -173,34 +171,6 @@ ALLOWED_WIDGETS = {
         },
     }
 }
-
-# Code contributors, in alphabetical order.
-CODE_CONTRIBUTORS = [
-    'Jacob Davis',
-    'Jeremy Emerson',
-    'Koji Ashida',
-    'Manas Tungare',
-    'Reinaldo Aguiar',
-    'Sean Lip',
-    'Stephanie Federwisch',
-    'Tarashish Mishra',
-    'Wilson Hong',
-    'Yana Malysheva',
-]
-
-# Idea contributors, in alphabetical order.
-IDEA_CONTRIBUTORS = [
-    'Albert Gural',
-    'Alex Kauffmann',
-    'Catherine Colman',
-    'John Cox',
-    'John Orr',
-    'Neil Fraser',
-    'Pavel Simakov',
-    'Peter Norvig',
-    'Phil Wagner',
-    'Philip Guo',
-]
 
 # Demo explorations to load on startup. The id assigned to each exploration
 # is based on the index of the exploration in this list, so if you want to
