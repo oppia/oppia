@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import user_services
 from core.platform import models
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import utils
 
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
@@ -58,12 +59,65 @@ class ExplorationRights(object):
         self.cloned_from = cloned_from
         self.status = status
 
+    def validate(self):
+        """Validates an ExplorationRights object.
+
+        Raises:
+          utils.ValidationError: if any of the owners, editors and viewers
+          lists overlap, or if a community-owned exploration has owners,
+          editors or viewers specified.
+        """
+        if self.community_owned:
+            if self.owner_ids or self.editor_ids or self.viewer_ids:
+                raise utils.ValidationError(
+                    'Community-owned explorations should have no owners, '
+                    'editors or viewers specified.')
+
+        owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
+        owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
+        editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
+        if owner_editor:
+            raise utils.ValidationError(
+                'A user cannot be both an owner and an editor: %s' %
+                owner_editor)
+        if owner_viewer:
+            raise utils.ValidationError(
+                'A user cannot be both an owner and a viewer: %s' %
+                owner_viewer)
+        if editor_viewer:
+            raise utils.ValidationError(
+                'A user cannot be both an owner and an editor: %s' %
+                editor_viewer)
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend."""
+        if self.community_owned:
+            return {
+                'cloned_from': self.cloned_from,
+                'status': self.status,
+                'community_owned': True,
+                'owner_names': [],
+                'editor_names': [],
+                'viewer_names': []
+            }
+        else:
+            return {
+                'cloned_from': self.cloned_from,
+                'status': self.status,
+                'community_owned': False,
+                'owner_names': user_services.get_human_readable_user_ids(
+                    self.owner_ids),
+                'editor_names': user_services.get_human_readable_user_ids(
+                    self.editor_ids),
+                'viewer_names': user_services.get_human_readable_user_ids(
+                    self.viewer_ids),
+            }
+
 
 def _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds):
     """Saves an ExplorationRights domain object to the datastore."""
-    if commit_cmds is None:
-        commit_cmds = []
+    exploration_rights.validate()
 
     model = exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
@@ -102,34 +156,6 @@ def is_exploration_public(exploration_id):
 def is_exploration_cloned(exploration_id):
     exploration_rights = get_exploration_rights(exploration_id)
     return bool(exploration_rights.cloned_from)
-
-
-def _get_exploration_members(exploration_id):
-    exploration_rights = get_exploration_rights(exploration_id)
-    if exploration_rights.community_owned:
-        return {
-            'community_owned': True,
-            'owners': [],
-            'editors': [],
-            'viewers': []
-        }
-    else:
-        return {
-            'community_owned': False,
-            'owners': exploration_rights.owner_ids,
-            'editors': exploration_rights.editor_ids,
-            'viewers': exploration_rights.viewer_ids
-        }
-
-
-def get_human_readable_exploration_members(exploration_id):
-    """Returns the exploration members, changing user_ids to usernames."""
-    exploration_members = _get_exploration_members(exploration_id)
-    for member_category in ['owners', 'editors', 'viewers']:
-        exploration_members[member_category] = [
-            user_services.convert_user_ids_to_username(member_category)
-        ]
-    return exploration_members
 
 
 class Actor(object):
@@ -172,6 +198,16 @@ class Actor(object):
 
     def is_owner(self, exploration_id):
         return self._is_owner(exploration_id)
+
+    def is_editor(self, exploration_id):
+        return self._is_editor(exploration_id) or self._is_owner(
+            exploration_id)
+
+    def is_viewer(self, exploration_id):
+        return (
+            self._is_viewer(exploration_id) or
+            self._is_editor(exploration_id) or
+            self._is_owner(exploration_id))
 
     def can_view(self, exploration_id):
         exp_rights = get_exploration_rights(exploration_id)
@@ -223,7 +259,16 @@ class Actor(object):
         return self._is_owner(exploration_id) or self._is_admin()
 
     def can_modify_roles(self, exploration_id):
+        exp_rights = get_exploration_rights(exploration_id)
+        if exp_rights.community_owned or exp_rights.cloned_from:
+            return False
         return self._is_admin() or self._is_owner(exploration_id)
+
+    def can_release_ownership(self, exploration_id):
+        exp_rights = get_exploration_rights(exploration_id)
+        if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
+            return False
+        return self.can_modify_roles(exploration_id)
 
     def can_submit_change_for_review(self, exploration_id):
         exp_rights = get_exploration_rights(exploration_id)
@@ -252,6 +297,9 @@ class Actor(object):
 
 def assign_role(committer_id, exploration_id, assignee_id, new_role):
     """Assign `assignee_id` to the given role.
+
+    The caller should ensure that assignee_id corresponds to a valid user in
+    the system.
 
     Args:
     - committer_id: str. The user_id of the user who is performing the action.
@@ -287,7 +335,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
             old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
-        if Actor(assignee_id).can_edit(exploration_id):
+        if Actor(assignee_id).is_editor(exploration_id):
             raise Exception('This user already can edit this exploration.')
 
         exp_rights = get_exploration_rights(exploration_id)
@@ -298,11 +346,14 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if Actor(assignee_id).can_view(exploration_id):
+        if Actor(assignee_id).is_viewer(exploration_id):
             raise Exception('This user already can view this exploration.')
 
         exp_rights = get_exploration_rights(exploration_id)
         exp_rights.viewer_ids.append(assignee_id)
+
+    else:
+        raise Exception('Invalid role: %s' % new_role)
 
     commit_message = 'Changed role of %s from %s to %s' % (
         assignee_username, old_role, new_role)
@@ -315,6 +366,32 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
     _save_exploration_rights(
         committer_id, exp_rights, commit_message, commit_cmds)
+
+
+def release_ownership(committer_id, exploration_id):
+    """Releases ownership of an exploration to the community.
+
+    Commits changes.
+    """
+    if not Actor(committer_id).can_release_ownership(exploration_id):
+        logging.error(
+            'User %s tried to release ownership ofexploration %s but was '
+            'refused permission.' % (committer_id, exploration_id))
+        raise Exception(
+            'The ownership of this exploration cannot be released.')
+
+    exploration_rights = get_exploration_rights(exploration_id)
+    exploration_rights.community_owned = True
+    exploration_rights.owner_ids = []
+    exploration_rights.editor_ids = []
+    exploration_rights.viewer_ids = []
+    commit_cmds = [{
+        'cmd': 'release_ownership',
+    }]
+
+    _save_exploration_rights(
+        committer_id, exploration_rights,
+        'Exploration ownership released to the community.', commit_cmds)
 
 
 def _change_exploration_status(

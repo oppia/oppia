@@ -22,39 +22,58 @@
     </div>
 
     <div class="span6">
-      <div ng-show="explorationEditors">
-        <strong>Collaborator List</strong>
-        <span ng-show="canEditEditorList()">
-          <button type="button" ng-click="openAddNewEditorForm()"
-                  ng-hide="activeInputData.name == 'explorationMetadata.addNewEditor'">
-            Add New
-          </button>
-        </span>
-
+      <div ng-show="ownerNames.length > 0 && !isCloned">
+        <strong>Owners</strong>
         <ul>
-          <li ng-repeat="editor in explorationEditors track by $index">
-            <span ng-show="$index == 0">
-              <em><[editor]></em>
-            </span>
-            <span ng-hide="$index == 0">
-              <[editor]>
-            </span>
+          <li ng-repeat="ownerName in ownerNames track by $index">
+            <[ownerName]>
           </li>
         </ul>
+      </div>
 
-        <div ng-show="canEditEditorList()">
-          <form ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'"
-                ng-submit="addNewEditor(newEditorEmail)">
-            <input type="text" ng-model="newEditorEmail"
-                   placeholder="New editor's email address">
-            <input type="submit" value="Add Editor">
-            <button type="button" ng-click="closeAddNewEditorForm()"
-              ng-show="activeInputData.name == 'explorationMetadata.addNewEditor'">
+      <div ng-show="editorNames.length > 0 && !isCloned">
+        <strong>Collaborators</strong>
+        <ul>
+          <li ng-repeat="editorName in editorNames track by $index">
+            <[editorName]>
+          </li>
+        </ul>
+      </div>
+
+      <div ng-show="viewerNames.length > 0 && !isCloned">
+        <strong>Playtesters</strong>
+        <ul>
+          <li ng-repeat="viewerName in viewerNames track by $index">
+            <[viewerName]>
+          </li>
+        </ul>
+      </div>
+
+      {% if can_modify_roles %}
+        <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
+          <button type="button" ng-click="openEditRolesForm()">
+            Add or Change Roles
+          </button>
+        </div>
+
+        <div>
+          <form ng-show="activeInputData.name == 'explorationMetadata.editRoles'"
+                ng-submit="editRole(newMemberEmail, newMemberRole.value)">
+            Email: <input type="text" ng-model="newMemberEmail"
+                   placeholder="Email address">
+            <br>
+            Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES">
+            </select>
+            <br>
+            <em>Please note that assigning roles is irreversible.</em>
+            <input type="submit" value="Save">
+            <button type="button" ng-click="closeEditRolesForm()"
+              ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
               Cancel
             </button>
           </form>
         </div>
-      </div>
+      {% endif %}
     </div>
   </div>
   <br>

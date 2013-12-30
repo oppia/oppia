@@ -114,6 +114,7 @@ ALLOW_YAML_FILE_UPLOAD = False
 
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
+ADMIN_EMAIL_ADDRESS = 'admin@oppia'
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576

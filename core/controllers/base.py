@@ -30,6 +30,7 @@ import urllib
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -104,35 +105,20 @@ class BaseHandler(webapp2.RequestHandler):
         self.start_time = datetime.datetime.utcnow()
 
         # Initializes the return dict for the handlers.
-        self.values = {
-            'debug': feconf.DEBUG,
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
-            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
-            'DEV_MODE': feconf.DEV_MODE,
-        }
+        self.values = {}
 
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = self.user.user_id() if self.user else None
         self.is_admin = False
 
         if self.user_id:
-            self.values['logout_url'] = (
-                current_user_services.create_logout_url(self.request.uri))
-
-            user_settings = user_services.get_user_settings(self.user_id)
-            if not user_settings.is_known_user:
-                user_settings = user_services.create_user(
-                    self.user_id, self.user.email())
-
+            user_settings = user_services.get_or_create_user(
+                self.user_id, self.user.email())
             self.values['user_email'] = user_settings.email
             self.values['username'] = user_settings.username
             self.is_admin = current_user_services.is_current_user_admin(
                 self.request)
-        else:
-            self.values['login_url'] = current_user_services.create_login_url(
-                self.request.uri)
 
-        self.values['user_id'] = self.user_id
         self.values['is_admin'] = self.is_admin
 
         if self.request.get('payload'):
@@ -211,6 +197,26 @@ class BaseHandler(webapp2.RequestHandler):
             self, filename, values=None, iframe_restriction='DENY'):
         if values is None:
             values = self.values
+
+        values.update({
+            'debug': feconf.DEBUG,
+            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
+            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
+            'DEV_MODE': feconf.DEV_MODE,
+            'EXPLORATION_STATUS_PRIVATE': (
+                rights_manager.EXPLORATION_STATUS_PRIVATE),
+            'EXPLORATION_STATUS_PUBLIC': (
+                rights_manager.EXPLORATION_STATUS_PUBLIC),
+            'EXPLORATION_STATUS_PUBLICIZED': (
+                rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+        })
+
+        if self.user_id:
+            values['logout_url'] = (
+                current_user_services.create_logout_url(self.request.uri))
+        else:
+            values['login_url'] = (
+                current_user_services.create_login_url(self.request.uri))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler

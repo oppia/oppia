@@ -32,7 +32,7 @@ import json
 
 
 CSRF_REGEX = (
-    r'GLOBALS\.csrf_token = JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\);')
+    r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
 
 
 def empty_environ():

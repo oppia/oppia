@@ -28,15 +28,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_set_and_get_username(self):
         user_id = 'someUser'
         username = 'username'
-        with self.assertRaisesRegexp(Exception, 'not known to the system'):
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services.create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'email@email.com')
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
 
+    def test_get_username_for_nonexistent_user(self):
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
+            user_services.get_username('fakeUser')
+
     def test_get_username_none(self):
+        user_services._create_user('fakeUser', 'email@email.com')
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -45,22 +50,41 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services.create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'email@email.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services.create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'email@email.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services.create_user(user_id, 'email@email.com')
+        user_services._create_user(user_id, 'email@email.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
             with self.assertRaises(utils.ValidationError):
                 user_services.set_username(user_id, username)
+
+    def test_invalid_emails(self):
+        bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
+        for email in bad_email_addresses:
+            with self.assertRaises(utils.ValidationError):
+                user_services.get_or_create_user('user_id', email)
+
+    def test_email_truncation(self):
+        email_addresses = [
+            ('a@b.c', '..@b.c'),
+            ('ab@c.d', 'a..@c.d'),
+            ('abc@def.gh', 'a..@def.gh'),
+            ('abcd@efg.h', 'a..@efg.h'),
+            ('abcdefgh@efg.h', 'abcde..@efg.h'),
+        ]
+        for ind, (actual_email, expected_email) in enumerate(email_addresses):
+            user_settings = user_services.get_or_create_user(
+                str(ind), actual_email)
+            self.assertEqual(user_settings.truncated_email, expected_email)

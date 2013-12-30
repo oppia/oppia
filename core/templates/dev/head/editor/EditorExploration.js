@@ -534,6 +534,24 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
   };
 
+  $scope.ROLES = [
+    {name: 'Owner', value: 'owner'},
+    {name: 'Collaborator', value: 'editor'},
+    {name: 'Playtester', value: 'viewer'}
+  ];
+
+  // Initializes the exploration rights information using the rights dict from
+  // the backend.
+  $scope.initExplorationRights = function(rightsData) {
+    $scope.ownerNames = rightsData.owner_names;
+    $scope.editorNames = rightsData.editor_names;
+    $scope.viewerNames = rightsData.viewer_names;
+    $scope.isPublic = Boolean(
+      rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
+    $scope.isCloned = Boolean(rightsData.cloned_from);
+    $scope.isCommunityOwned = rightsData.community_owned;
+  };
+
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -542,13 +560,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.states = angular.copy(data.states);
       $scope.explorationTitle = data.title;
       $scope.explorationCategory = data.category;
-      $scope.explorationEditors = data.editors;
       $scope.initStateName = data.init_state_name;
-      $scope.isPublic = data.is_public;
-      $scope.isCloned = data.is_cloned;
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
+
+      $scope.initExplorationRights(data.rights);
 
       $scope.drawGraph();
       $scope.refreshVersionHistory();
@@ -564,15 +581,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.initExplorationPage();
-
-  $scope.canEditEditorList = function() {
-    return (
-        $scope.explorationEditors && (
-            $scope.currentUser == $scope.explorationEditors[0] ||
-            $scope.currentUserIsAdmin
-        )
-    );
-  };
 
   $scope.reformatResponse = function(states, initStateName) {
     var SENTINEL_DEPTH = 3000;
@@ -740,40 +748,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.paramSpecs[name] = {obj_type: type};
   };
 
-  $scope.openAddNewEditorForm = function() {
-    activeInputData.name = 'explorationMetadata.addNewEditor';
-  };
-
-  $scope.closeAddNewEditorForm = function() {
-    $scope.newEditorEmail = '';
-    activeInputData.name = 'explorationMetadata';
-  };
-
-  $scope.addNewEditor = function(newEditorEmail) {
-    activeInputData.name = 'explorationMetadata';
-
-    var requestParameters = {
-      version: explorationData.data.version,
-      new_editor_email: newEditorEmail
-    };
-
-    $http.put(
-        $scope.explorationRightsUrl,
-        oppiaRequestCreator.createRequest(requestParameters),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              explorationData.data.version = data.version;
-              $scope.explorationEditors = data.editors;
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                  data.error || 'Error communicating with server.');
-              // TODO(sll): Reinstate the following line without causing the
-              //     $watch to trigger.
-              // $scope[frontendName] = oldValue;
-            });
-  };
-
   /**
    * Downloads the YAML representation of an exploration.
    */
@@ -781,30 +755,46 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     document.location = $scope.explorationDownloadUrl;
   };
 
-  $scope.makePublic = function() {
-    $scope.saveExplorationRightsChange('isPublic', 'is_public', true, false);
+  /********************************************
+  * Methods for rights management.
+  ********************************************/
+  $scope.openEditRolesForm = function() {
+    activeInputData.name = 'explorationMetadata.editRoles';
+    $scope.newMemberEmail = '';
+    $scope.newMemberRole = $scope.ROLES[0];
   };
 
-  $scope.saveExplorationRightsChange = function(frontendName, backendName, newValue, oldValue) {
-    var requestParameters = {
-      version: explorationData.data.version
-    };
-    requestParameters[backendName] = newValue;
+  $scope.closeEditRolesForm = function() {
+    $scope.newMemberEmail = '';
+    $scope.newMemberRole = $scope.ROLES[0];
+    activeInputData.name = 'explorationMetadata';
+  };
 
+  $scope.editRole = function(newMemberEmail, newMemberRole) {
+    activeInputData.name = 'explorationMetadata';
+    $scope._saveExplorationRightsChange({
+      new_member_email: newMemberEmail,
+      new_member_role: newMemberRole
+    });
+  };
+
+  $scope.makePublic = function() {
+    $scope._saveExplorationRightsChange({is_public: true});
+  };
+
+  $scope._saveExplorationRightsChange = function(requestParameters) {
+    requestParameters['version'] = explorationData.data.version;
     $http.put(
         $scope.explorationRightsUrl,
         oppiaRequestCreator.createRequest(requestParameters),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
-              explorationData.data.version = data.version;
-              $scope[frontendName] = newValue;
+              warningsData.clear();
+              $scope.initExplorationRights(data.rights);
             }).
             error(function(data) {
               warningsData.addWarning(
                 data.error || 'Error communicating with server.');
-              // TODO(sll): Reinstate the following line without causing the
-              //     $watch to trigger.
-              // $scope[frontendName] = oldValue;
             });
   };
 

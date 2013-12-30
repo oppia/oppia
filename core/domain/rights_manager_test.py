@@ -47,7 +47,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('0'))
-        self.assertFalse(rights_manager.Actor(self.user_id_a).can_edit('0'))
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('0'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('0'))
 
         # TODO(sll): Rewrite things so that this and other logins are not

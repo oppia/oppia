@@ -27,6 +27,7 @@ from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
+from core.domain import user_services
 from core.platform import models
 (base_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration
@@ -96,6 +97,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_viewable_explorations(self):
         self.save_new_default_exploration(self.EXP_ID)
+        user_services.get_or_create_user(self.EDITOR_ID, 'email@email.com')
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
@@ -119,6 +121,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_editable_explorations(self):
         self.save_new_default_exploration(self.EXP_ID)
+        user_services.get_or_create_user(self.EDITOR_ID, 'email@email.com')
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)

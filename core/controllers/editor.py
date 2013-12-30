@@ -152,6 +152,8 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
+            'can_modify_roles': rights_manager.Actor(
+                self.user_id).can_modify_roles(exploration_id),
             'can_publish': rights_manager.Actor(self.user_id).can_publish(
                 exploration_id),
             'nav_mode': feconf.NAV_MODE_EDITOR,
@@ -179,26 +181,17 @@ class ExplorationHandler(EditorHandler):
                     exploration_id, state_name))
             states[state_name] = state_frontend_dict
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
-
-        # TODO(sll): Tidy this up; show owners, editors and viewers.
-        editor_ids = (
-            exploration_rights.owner_ids + exploration_rights.editor_ids)
-        editors = user_services.get_human_readable_user_ids(editor_ids)
-
         return {
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
-            'is_public': rights_manager.is_exploration_public(exploration_id),
-            'is_cloned': rights_manager.is_exploration_cloned(exploration_id),
             'category': exploration.category,
             'title': exploration.title,
-            'editors': editors,
             'states': states,
             'param_changes': exploration.param_change_dicts,
             'param_specs': exploration.param_specs_dict,
-            'version': exploration.version
+            'version': exploration.version,
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict(),
         }
 
     @require_editor
@@ -253,24 +246,27 @@ class ExplorationRightsHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         is_public = self.payload.get('is_public')
-        new_editor_email = self.payload.get('new_editor_email')
+        new_member_email = self.payload.get('new_member_email')
+        new_member_role = self.payload.get('new_member_role')
 
-        if new_editor_email:
+        if new_member_email:
             if not rights_manager.Actor(self.user_id).can_modify_roles(
                     exploration_id):
                 raise self.UnauthorizedUserException(
-                    'Only an owner of this exploration can add new editors.')
+                    'Only an owner of this exploration can add or change '
+                    'roles.')
 
-            new_editor_id = user_services.get_user_id_from_email(
-                new_editor_email)
+            new_member_id = user_services.get_user_id_from_email(
+                new_member_email)
 
-            if new_editor_id is None:
+            if new_member_id is None:
                 raise Exception(
                     'Sorry, we could not find a user with this email address.')
 
+            user_services.get_or_create_user(new_member_id, new_member_email)
+
             rights_manager.assign_role(
-                self.user_id, exploration_id, new_editor_id,
-                rights_manager.ROLE_EDITOR)
+                self.user_id, exploration_id, new_member_id, new_member_role)
 
         elif is_public:
             exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -284,22 +280,9 @@ class ExplorationRightsHandler(EditorHandler):
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
-        editors = []
-        for editor_id in (
-                exploration_rights.owner_ids + exploration_rights.editor_ids):
-            username = user_services.get_username(editor_id)
-            if username:
-                editors.append(username)
-            else:
-                editors.append('[Awaiting response]')
-
-        # TODO(sll): Also add information about is_public.
         self.render_json({
-            'version': exploration.version,
-            'editors': editors,
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
         })
 
 

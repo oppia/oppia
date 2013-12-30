@@ -9,29 +9,22 @@
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}
 
+    <script>
+      var GLOBALS = {
+        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
+        EXPLORATION_STATUS_PRIVATE: JSON.parse(
+          '{{EXPLORATION_STATUS_PRIVATE|js_string}}'),
+        EXPLORATION_STATUS_PUBLIC: JSON.parse(
+          '{{EXPLORATION_STATUS_PUBLIC|js_string}}'),
+        EXPLORATION_STATUS_PUBLICIZED: JSON.parse(
+          '{{EXPLORATION_STATUS_PUBLICIZED|js_string}}')
+      };
+    </script>
+
     {% block header_js %}
       {% include 'header_js_libs.html' %}
     {% endblock header_js %}
-
-    <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        skipStartupTypeset: true,
-        messageStyle: 'none',
-        'HTML-CSS': {
-          showMathMenu: false
-        }
-      });
-      MathJax.Hub.Configured();
-    </script>
-
-    <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-    <script>
-      var GLOBALS = {};
-      GLOBALS.INVALID_NAME_CHARS = JSON.parse('{{INVALID_NAME_CHARS|js_string}}');
-      GLOBALS.csrf_token = JSON.parse('{{csrf_token|js_string}}');
-    </script>
   </head>
 
   <body ng-controller="Base" onload="onBodyLoad()">

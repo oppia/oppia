@@ -8,9 +8,13 @@
   <div ng-controller="Profile">
     <div class="oppia-content">
       <div class="oppia-gallery-frame">
-        <h3 class="oppia-page-title">
+        <div>
+          <strong>Email address</strong>: {{user_email}}
+        </div>
+
+        <h4>
           My Explorations
-        </h3>
+        </h4>
 
         <center ng-hide="pageLoaded">
           <img src="/images/loading.gif" alt="Loading..." width="50px">

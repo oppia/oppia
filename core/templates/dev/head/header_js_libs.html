@@ -22,3 +22,18 @@
 {% endif %}
 
 <script src="/third_party/static/select2-3.4.1/select2.js"></script>
+
+<!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    skipStartupTypeset: true,
+    messageStyle: 'none',
+    'HTML-CSS': {
+      showMathMenu: false
+    }
+  });
+  MathJax.Hub.Configured();
+</script>
+
+<script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
