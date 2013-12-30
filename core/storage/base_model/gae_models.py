@@ -154,6 +154,9 @@ class VersionedModel(BaseModel):
     the Python list of dicts, 'commit_cmds'. The latter must contain the JSON
     field 'content'. The item that is being versioned must be serializable to a
     JSON blob.
+
+    Note that save() should be used for VersionedModels, as opposed to put()
+    for direct subclasses of BaseModel.
     """
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.

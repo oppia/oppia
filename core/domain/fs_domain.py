@@ -117,7 +117,7 @@ class ExplorationFileSystem(object):
             return file_models.FileModel.get_version(
                 self._exploration_id, 'assets/%s' % filepath, version)
 
-    def _put_file(self, user_id, filepath, raw_bytes):
+    def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file."""
         if len(raw_bytes) > feconf.MAX_FILE_SIZE_BYTES:
             raise Exception('The maximum allowed file size is 1 MB.')
@@ -134,8 +134,8 @@ class ExplorationFileSystem(object):
                 self._exploration_id, 'assets/%s' % filepath)
         data.content = raw_bytes
 
-        data.put(user_id, CHANGE_LIST_SAVE)
-        metadata.put(user_id, CHANGE_LIST_SAVE)
+        data.save(user_id, CHANGE_LIST_SAVE)
+        metadata.save(user_id, CHANGE_LIST_SAVE)
 
     def get(self, filepath, version=None):
         """Gets a file as an unencoded stream of raw bytes.
@@ -158,9 +158,9 @@ class ExplorationFileSystem(object):
         else:
             return None
 
-    def put(self, user_id, filepath, raw_bytes):
+    def save(self, user_id, filepath, raw_bytes):
         """Saves a raw bytestring as a file in the database."""
-        self._put_file(user_id, filepath, raw_bytes)
+        self._save_file(user_id, filepath, raw_bytes)
 
     def delete(self, user_id, filepath):
         """Marks the current version of a file as deleted."""
@@ -235,7 +235,7 @@ class DiskBackedFileSystem(object):
             os.path.join(self._root, filepath), raw_bytes=True)
         return FileStreamWithMetadata(content, None, None)
 
-    def put(self, user_id, filepath, raw_bytes):
+    def save(self, user_id, filepath, raw_bytes):
         raise NotImplementedError
 
     def delete(self, user_id, filepath):
@@ -284,11 +284,11 @@ class AbstractFileSystem(object):
                 % (filepath, version if version else 'latest'))
         return file_stream.read()
 
-    def put(self, user_id, filepath, raw_bytes):
+    def save(self, user_id, filepath, raw_bytes):
         """Replaces the contents of the file with the given bytestring."""
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
-        self._impl.put(user_id, filepath, raw_bytes)
+        self._impl.save(user_id, filepath, raw_bytes)
 
     def delete(self, user_id, filepath):
         """Deletes a file and the metadata associated with it."""

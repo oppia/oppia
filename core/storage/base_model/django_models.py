@@ -20,6 +20,9 @@ import base64
 import feconf
 import hashlib
 
+from core import django_utils
+from core.platform import models
+transaction_services = models.Registry.import_transaction_services()
 import utils
 
 from django.db import models
@@ -180,6 +183,9 @@ class VersionedModel(BaseModel):
     the Python list of dicts, 'commit_cmds'. The latter must contain the JSON
     field 'content'. The item that is being versioned must be serializable to a
     JSON blob.
+
+    Note that save() should be used for VersionedModels, as opposed to put()
+    for direct subclasses of BaseModel.
     """
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
@@ -293,10 +299,6 @@ class VersionedModel(BaseModel):
             self._trusted_save(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message, [])
 
-    def put(self, *args, **kwargs):
-        """For VersionedModels, this method is replaced with save()."""
-        raise NotImplementedError
-
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.
 
@@ -353,7 +355,7 @@ class VersionedModel(BaseModel):
             for version_number in version_numbers]
 
         returned_models = [
-            self.SNAPSHOT_METADATA_CLASS.get(snapshot_id)
+            cls.SNAPSHOT_METADATA_CLASS.get(snapshot_id)
             for snapshot_id in snapshot_ids]
 
         for ind, model in enumerate(returned_models):

@@ -44,5 +44,5 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # The property value.
     value = django_utils.JSONField(default={})
 
-    def put(self, committer_id, commit_cmds):
-        self.save(committer_id, '', commit_cmds)
+    def save(self, committer_id, commit_cmds):
+        super(ConfigPropertyModel, self).save(committer_id, '', commit_cmds)

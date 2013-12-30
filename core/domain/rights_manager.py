@@ -74,7 +74,7 @@ def _save_exploration_rights(
         cloned_from=exploration_rights.cloned_from,
         status=exploration_rights.status
     )
-    model.put(committer_id, commit_message, commit_cmds)
+    model.save(committer_id, commit_message, commit_cmds)
 
 
 def create_new_exploration_rights(exploration_id, committer_id, cloned_from):

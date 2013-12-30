@@ -83,7 +83,7 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.objects.all().count()
 
-    def put(self, committer_id, properties_dict, commit_message, commit_cmds):
+    def save(self, committer_id, properties_dict, commit_message, commit_cmds):
         """Updates the exploration using the properties dict, then saves it."""
         if not isinstance(committer_id, basestring):
             raise Exception('Invalid committer id: %s' % committer_id)
@@ -98,7 +98,8 @@ class ExplorationModel(base_models.VersionedModel):
                 raise Exception(
                     'Invalid key for exploration properties dict: %s' % key)
 
-        self.save(committer_id, commit_message, commit_cmds)
+        super(ExplorationModel, self).save(
+            committer_id, commit_message, commit_cmds)
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -143,5 +144,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         max_length=20, default='private', choices=STATUS_CHOICES
     )
 
-    def put(self, committer_id, commit_message, commit_cmds):
-        self.save(committer_id, commit_message, commit_cmds)
+    def save(self, committer_id, commit_message, commit_cmds):
+        super(ExplorationRightsModel, self).save(
+            committer_id, commit_message, commit_cmds)

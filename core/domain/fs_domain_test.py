@@ -29,17 +29,17 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         super(ExplorationFileSystemUnitTests, self).setUp()
         self.user_id = 'abc@example.com'
 
-    def test_get_and_put(self):
+    def test_get_and_save(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('eid'))
-        fs.put(self.user_id, 'abc.png', 'file_contents')
+        fs.save(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
 
     def test_delete(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('eid'))
         self.assertFalse(fs.isfile('abc.png'))
-        fs.put(self.user_id, 'abc.png', 'file_contents')
+        fs.save(self.user_id, 'abc.png', 'file_contents')
         self.assertTrue(fs.isfile('abc.png'))
 
         fs.delete(self.user_id, 'abc.png')
@@ -53,10 +53,10 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
     def test_listdir(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('eid'))
-        fs.put(self.user_id, 'abc.png', 'file_contents')
-        fs.put(self.user_id, 'abcd.png', 'file_contents_2')
-        fs.put(self.user_id, 'abc/abcd.png', 'file_contents_3')
-        fs.put(self.user_id, 'bcd/bcde.png', 'file_contents_4')
+        fs.save(self.user_id, 'abc.png', 'file_contents')
+        fs.save(self.user_id, 'abcd.png', 'file_contents_2')
+        fs.save(self.user_id, 'abc/abcd.png', 'file_contents_3')
+        fs.save(self.user_id, 'bcd/bcde.png', 'file_contents_4')
 
         self.assertEqual(
             fs.listdir(''),
@@ -77,13 +77,13 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
     def test_versioning(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('eid'))
-        fs.put(self.user_id, 'abc.png', 'file_contents')
+        fs.save(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
         file_stream = fs.open('abc.png')
         self.assertEqual(file_stream.version, 1)
         self.assertEqual(file_stream.metadata.size, len('file_contents'))
 
-        fs.put(self.user_id, 'abc.png', 'file_contents_2_abcdefg')
+        fs.save(self.user_id, 'abc.png', 'file_contents_2_abcdefg')
         self.assertEqual(fs.get('abc.png'), 'file_contents_2_abcdefg')
         file_stream = fs.open('abc.png')
         self.assertEqual(file_stream.version, 2)
@@ -98,7 +98,7 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
     def test_independence_of_file_systems(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem('eid'))
-        fs.put(self.user_id, 'abc.png', 'file_contents')
+        fs.save(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
@@ -141,7 +141,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.get(filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-                fs.put(self.user_id, filepath, 'raw_file')
+                fs.save(self.user_id, filepath, 'raw_file')
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.delete(self.user_id, filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
