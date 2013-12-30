@@ -32,6 +32,9 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_GALLERY,
+        })
         self.render_template('gallery/gallery.html')
 
 

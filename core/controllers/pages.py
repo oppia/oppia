@@ -68,4 +68,8 @@ class ContactPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        self.values.update({
+            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+        })
         self.render_template('pages/contact.html')

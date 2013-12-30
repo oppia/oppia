@@ -86,12 +86,11 @@ def require_editor(handler):
             **kwargs: any other arguments passed to the handler
 
         Returns:
-            The user and exploration instance, if the user is authorized to
-            edit this exploration. Also, the state instance, if one is
-            supplied.
+            The relevant handler, if the user is authorized to edit this
+            exploration.
 
         Raises:
-            self.NotLoggedInException: if there is no current user.
+            self.PageNotFoundException: if no such exploration or state exists.
             self.UnauthorizedUserException: if the user exists but does not
                 have the right credentials.
         """
@@ -151,11 +150,13 @@ class ExplorationPage(EditorHandler):
         value_generators_js = VALUE_GENERATORS_JS.value
 
         self.values.update({
+            'announcement': jinja2.utils.Markup(
+                EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_publish': rights_manager.Actor(self.user_id).can_publish(
                 exploration_id),
+            'nav_mode': feconf.NAV_MODE_EDITOR,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'announcement': jinja2.utils.Markup(EDITOR_PAGE_ANNOUNCEMENT.value)
         })
         self.render_template('editor/editor_exploration.html')
 

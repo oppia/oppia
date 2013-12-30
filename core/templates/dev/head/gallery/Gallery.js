@@ -27,8 +27,8 @@ function Gallery($scope, $http, $modal, $rootScope, warningsData, oppiaRequestCr
   $rootScope.loadingMessage = 'Loading';
 
   // Retrieves gallery data from the server.
-  $http.get($scope.galleryDataUrl).success(function(galleryData) {
-    $scope.categories = galleryData.categories;
+  $http.get($scope.galleryDataUrl).success(function(data) {
+    $scope.categories = data.categories;
 
     // Put the category names in a list.
     for (var category in $scope.categories) {
@@ -36,6 +36,8 @@ function Gallery($scope, $http, $modal, $rootScope, warningsData, oppiaRequestCr
     }
 
     $rootScope.loadingMessage = '';
+  }).error(function(data) {
+    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 
   /**

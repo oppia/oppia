@@ -24,8 +24,6 @@ from core.domain import user_services
 import feconf
 import utils
 
-import jinja2
-
 
 EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
     'editor_prerequisites_agreement', 'UnicodeString',
@@ -43,6 +41,9 @@ class ProfilePage(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_PROFILE,
+        })
         self.render_template('profile/profile.html')
 
 
@@ -58,13 +59,13 @@ class ProfileHandler(base.BaseHandler):
         category_list = list(set([exp.category for exp in exps]))
 
         self.values.update({
+            'category_list': list(category_list),
             'explorations': [{
                 'id': exp.id,
                 'name': exp.title,
             } for exp in exps],
             'improvable': stats_services.get_top_improvable_states(
                 [exp.id for exp in exps], 10),
-            'category_list': list(category_list)
         })
         self.render_json(self.values)
 
@@ -79,6 +80,7 @@ class EditorPrerequisitesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'agreement': EDITOR_PREREQUISITES_AGREEMENT.value,
+            'nav_mode': feconf.NAV_MODE_PROFILE,
         })
         self.render_template('profile/editor_prerequisites.html')
 
@@ -93,8 +95,8 @@ class EditorPrerequisitesHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
-            'username': user_settings.username,
             'has_agreed_to_terms': bool(user_settings.last_agreed_to_terms),
+            'username': user_settings.username,
         })
 
     @base.require_user

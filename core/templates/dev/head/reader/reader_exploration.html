@@ -4,18 +4,14 @@
   Reader View
 {% endblock subtitle %}
 
-{% block nav_setup %}
-  {% set nav_mode = 'reader' %}
-{% endblock nav_setup %}
-
 {% block content %}
-    {% if not is_public %}
-      <center>
-        <div class="oppia-warning">
-          <strong>Note:</strong> This is a preview of an unpublished exploration.
-        </div>
-      </center>
-    {% endif %}
+  {% if not is_public %}
+    <center>
+      <div class="oppia-warning">
+        <strong>Note:</strong> This is a preview of an unpublished exploration.
+      </div>
+    </center>
+  {% endif %}
   {{ content }}
 {% endblock %}
 

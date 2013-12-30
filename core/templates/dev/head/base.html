@@ -34,10 +34,6 @@
     </script>
   </head>
 
-  {% block nav_setup %}
-    {% set nav_mode = '' %}
-  {% endblock nav_setup %}
-
   <body ng-controller="Base" onload="onBodyLoad()">
     <div id="wrapper">
       <div class="oppia-main-body">
@@ -52,10 +48,11 @@
                   <span class="icon-bar"></span>
                 </a>
 
-                <a class="brand" href="/">Oppia</a>
+                <a class="brand" href="/">
+                  Oppia&nbsp;<sup>(beta version)</sup>
+                </a>
 
                 <div class="nav-collapse collapse">
-
                   <ul class="nav">
                     <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
                       <a href="/gallery">Gallery</a>
@@ -74,7 +71,7 @@
                   <ul class="nav pull-right">
                     {% if user_email %}
                       <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
-                        <a href="/profile">My Explorations</a>
+                        <a href="/profile">Profile</a>
                       </li>
                     {% endif %}
                     {% if user_email %}

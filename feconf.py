@@ -196,3 +196,8 @@ DEMO_EXPLORATIONS = [
 # TODO(sll): Add all other URLs here.
 EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
 EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
+
+NAV_MODE_EDITOR = 'editor'
+NAV_MODE_GALLERY = 'gallery'
+NAV_MODE_PROFILE = 'profile'
+NAV_MODE_READER = 'reader'
