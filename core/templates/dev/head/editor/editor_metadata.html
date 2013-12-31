@@ -56,16 +56,18 @@
           </button>
         </div>
 
-        <div>
-          <form ng-show="activeInputData.name == 'explorationMetadata.editRoles'"
-                ng-submit="editRole(newMemberEmail, newMemberRole.value)">
+        <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+          <strong>Add or Change Role</strong>
+          <br><br>
+          <form ng-submit="editRole(newMemberEmail, newMemberRole.value)">
             Email: <input type="text" ng-model="newMemberEmail"
                    placeholder="Email address">
             <br>
-            Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES">
+            Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
             </select>
             <br>
-            <em>Please note that assigning roles is irreversible.</em>
+            <em>Note that owners also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
+            <br>
             <input type="submit" value="Save">
             <button type="button" ng-click="closeEditRolesForm()"
               ng-show="activeInputData.name == 'explorationMetadata.editRoles'">

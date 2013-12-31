@@ -156,6 +156,8 @@ class ExplorationPage(EditorHandler):
                 self.user_id).can_modify_roles(exploration_id),
             'can_publish': rights_manager.Actor(self.user_id).can_publish(
                 exploration_id),
+            'can_release_ownership': rights_manager.Actor(
+                self.user_id).can_release_ownership(exploration_id),
             'nav_mode': feconf.NAV_MODE_EDITOR,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
@@ -250,6 +252,7 @@ class ExplorationRightsHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         is_public = self.payload.get('is_public')
+        is_community_owned = self.payload.get('is_community_owned')
         new_member_email = self.payload.get('new_member_email')
         new_member_role = self.payload.get('new_member_role')
 
@@ -280,6 +283,16 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(e)
 
             rights_manager.publish_exploration(self.user_id, exploration_id)
+
+        elif is_community_owned:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+            rights_manager.release_ownership(self.user_id, exploration_id)
+
         else:
             raise self.InvalidInputException(
                 'No change was made to this exploration.')

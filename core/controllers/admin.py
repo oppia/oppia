@@ -24,9 +24,28 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import rights_manager
+from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
 import feconf
 
 import jinja2
+
+
+def require_admin(handler):
+    """Decorator that checks if the current user is an admin."""
+    def test_admin(self, **kwargs):
+        """Checks if the user is logged in and is an admin."""
+        if not self.user_id:
+            self.redirect(
+                current_user_services.create_login_url(self.request.uri))
+            return
+        if not rights_manager.Actor(self.user_id).is_super_admin():
+            raise self.UnauthorizedUserException(
+                '%s is not an admin of this application', self.user_id)
+        return handler(self, **kwargs)
+
+    return test_admin
 
 
 class AdminPage(base.BaseHandler):
@@ -34,7 +53,7 @@ class AdminPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'admin'
 
-    @base.require_admin
+    @require_admin
     def get(self):
         """Handles GET requests."""
         self.values['counters'] = [{
@@ -79,7 +98,7 @@ class AdminHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'admin'
 
-    @base.require_admin
+    @require_admin
     def get(self):
         """Handles GET requests."""
 
@@ -90,7 +109,7 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_computed_property_names()),
         })
 
-    @base.require_admin
+    @require_admin
     def post(self):
         """Handles POST requests."""
         try:

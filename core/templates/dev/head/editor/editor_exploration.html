@@ -57,6 +57,38 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/releaseExplorationOwnership">
+      <div class="modal-header">
+        <h3>Release Exploration Ownership</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          You are about to release ownership of this exploration to the
+          community! This will allow anyone to freely edit and improve
+          the exploration. Your previous contributions will still be visible
+          in the version history logs, and you will still be able to view and
+          edit the exploration.
+        </p>
+
+        <p>
+          Please note that after an exploration is released to the community, it will
+          no longer have an explicit list of owners,
+          so this action is <strong>not reversible</strong>.
+        </p>
+
+        <p>
+          Would you like to release ownership of this exploration to the
+          community?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn" ng-click="release()">Release Ownership</button>
+        <button class="btn" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/deleteExploration">
       <div class="modal-header">
         <h3>Delete Exploration</h3>
@@ -148,6 +180,18 @@
                 </button>
                 <img class="oppia-help" src="/images/help.png""
                      tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
+                     tooltip-placement="bottom">
+                &nbsp;&nbsp;&nbsp;
+              </span>
+            {% endif %}
+
+            {% if can_release_ownership %}
+              <span ng-hide="isCommunityOwned">
+                <button type="button" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+                  Release Ownership
+                </button>
+                <img class="oppia-help" src="/images/help.png""
+                     tooltip="Click this button to release ownership of this exploration to the community."
                      tooltip-placement="bottom">
                 &nbsp;&nbsp;&nbsp;
               </span>

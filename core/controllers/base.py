@@ -64,22 +64,6 @@ def require_user(handler):
     return test_login
 
 
-def require_admin(handler):
-    """Decorator that checks if the current user is an admin."""
-    def test_admin(self, **kwargs):
-        """Checks if the user is logged in and is an admin."""
-        if not self.user_id:
-            self.redirect(
-                current_user_services.create_login_url(self.request.uri))
-            return
-        if not current_user_services.is_current_user_admin(self.request):
-            raise self.UnauthorizedUserException(
-                '%s is not an admin of this application', self.user_id)
-        return handler(self, **kwargs)
-
-    return test_admin
-
-
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 

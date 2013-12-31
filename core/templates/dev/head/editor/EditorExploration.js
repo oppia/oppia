@@ -534,10 +534,23 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
   };
 
+  $scope.initializeNewActiveInput = function(newActiveInput) {
+    // TODO(sll): Rework this so that in general it saves the current active
+    // input, if any, first. If it is bad input, display a warning and cancel
+    // the effects of the old change. But, for now, each case is handled
+    // specially.
+    console.log('Current Active Input: ' + activeInputData.name);
+
+    var inputArray = newActiveInput.split('.');
+
+    activeInputData.name = (newActiveInput || '');
+    // TODO(sll): Initialize the newly displayed field.
+  };
+
   $scope.ROLES = [
-    {name: 'Owner', value: 'owner'},
-    {name: 'Collaborator', value: 'editor'},
-    {name: 'Playtester', value: 'viewer'}
+    {name: 'Owner (can edit permissions)', value: 'owner'},
+    {name: 'Collaborator (can make changes)', value: 'editor'},
+    {name: 'Playtester (can give feedback)', value: 'viewer'}
   ];
 
   // Initializes the exploration rights information using the rights dict from
@@ -778,10 +791,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
   };
 
-  $scope.makePublic = function() {
-    $scope._saveExplorationRightsChange({is_public: true});
-  };
-
   $scope._saveExplorationRightsChange = function(requestParameters) {
     requestParameters['version'] = explorationData.data.version;
     $http.put(
@@ -798,19 +807,77 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             });
   };
 
-  $scope.initializeNewActiveInput = function(newActiveInput) {
-    // TODO(sll): Rework this so that in general it saves the current active
-    // input, if any, first. If it is bad input, display a warning and cancel
-    // the effects of the old change. But, for now, each case is handled
-    // specially.
-    console.log('Current Active Input: ' + activeInputData.name);
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = function() {
+            $modalInstance.close();
+          };
 
-    var inputArray = newActiveInput.split('.');
-
-    activeInputData.name = (newActiveInput || '');
-    // TODO(sll): Initialize the newly displayed field.
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      $scope._saveExplorationRightsChange({is_public: true});
+    });
   };
 
+  $scope.showReleaseExplorationOwnershipModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/releaseExplorationOwnership',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.release = function() {
+            $modalInstance.close();
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      $scope._saveExplorationRightsChange({is_community_owned: true});
+    });
+  };
+
+  $scope.deleteExploration = function() {
+    warningsData.clear();
+
+    var modalInstance = $modal.open({
+      templateUrl: 'modals/deleteExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.reallyDelete = function() {
+          $modalInstance.close();
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    });
+
+    modalInstance.result.then(function() {
+      $http['delete']($scope.explorationDataUrl)
+      .success(function(data) {
+        $window.location = '/gallery/';
+      });
+    });
+  };
+
+  /********************************************
+  * Methods for operations on states.
+  ********************************************/
   $scope.isNewStateNameValid = function(newStateName) {
     return (
       $scope.isValidEntityName(newStateName) &&
@@ -855,58 +922,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       if (successCallback) {
         successCallback(newStateName);
       }
-    });
-  };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = function() {
-            $modalInstance.close();
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    });
-
-    modalInstance.result.then(function() {
-      $scope.makePublic();
-    }, function () {
-      console.log('Publish exploration modal dismissed.');
-    });
-  };
-
-  $scope.deleteExploration = function() {
-    warningsData.clear();
-
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/deleteExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.reallyDelete = function() {
-          $modalInstance.close();
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    });
-
-    modalInstance.result.then(function() {
-      $http['delete']($scope.explorationDataUrl)
-      .success(function(data) {
-        $window.location = '/gallery/';
-      });
     });
   };
 
