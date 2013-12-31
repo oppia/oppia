@@ -5,103 +5,60 @@
 {% endblock subtitle %}
 
 {% block content %}
-  <div class="oppia-splash">
-    <carousel>
-      <slide align="left">
-        <div class="oppia-carousel-slide">
-          <div class="oppia-splash-header">
-            Create interactive activities that help people to learn by doing.
-          </div>
 
-          <br><br>
-
-          <div class="oppia-splash-subtitle">
-            With Oppia, you can create interactive educational explorations. Think of these as bite-sized learning journeys that can be created by anyone for everyone. Here's an example:
-          </div>
-
-          <br><br>
-
-          <oppia oppia-id="0" height="700"></oppia>
-        </div>
-      </slide>
-
-      <slide align="left">
-        <div class="oppia-carousel-slide">
-          <center>
-            <div class="oppia-splash-header">
-              Learn. Create. Contribute.
-            </div>
-          </center>
-
-          <br><br>
-
-          <div class="oppia-splash-subtitle">
-            You can:
-          </div>
-
-          <br><br>
-
-          <div class="oppia-splash-subtitle" style="width: 650px;">
-            <p>
-              <img class="oppia-splash-image" src="/images/learn.png">
-              <a href="/gallery">learn</a> from explorations,
-            </p>
-
-            <p class="pull-right">
-              <a href="/profile">create</a> new explorations or improve existing ones,
-              <img class="oppia-splash-image" src="/images/create.png">
-            </p>
-
-            <div style="clear: both;"></div>
-
-            <p>
-              <img src="/images/computer.png" class="oppia-splash-image">
-              contribute to the
-              <a href="https://code.google.com/p/oppia" target="_blank">codebase</a> ... and more!
-            </p>
-          </div>
-        </div>
-      </slide>
-
-      <slide align="left">
-        <div class="oppia-carousel-slide">
-          <center>
-            <div class="oppia-splash-header">
-              All for free.
-            </div>
-          </center>
-
-          <br><br>
-
-          <div class="oppia-splash-subtitle">
-            Feel free to use Oppia explorations in your courses and websites.
-
-            <br><br>
-
-            If you can, please try to give back, or pay it forward. Help someone else learn something new today!
-
-            <br><br>
-
-            To finish, here's another exploration we picked for you at random:
-
-            <br><br>
-
-            <div>
-              <iframe src="/learn_random?iframed=true" width="100%" seamless="true" height="600px">
-              </iframe>
-            </div>
-          </div>
-        </div>
-      </slide>
-    </carousel>
-
-    <center>
-      <div class="oppia-splash-button-container">
-        <button type="button" class="btn btn-large" onclick="window.open('/gallery')">
-          Start Exploring Oppia
-        </button>
+  <div class="container">
+    <div class="row oppia-splash">
+      <div class="span12">
+        <h1>Bite-sized learning journeys, by anyone and for everyone</h1>
       </div>
-    </center>
+      <div class="span8">
+        <p>It's hard to learn to play the piano just by watching a video of a great pianist. Interactive learning is much more effective! Oppia.org helps you make <strong>embeddable interactive educational "explorations"</strong> that let people learn by doing!</p>
+        <p>Oppia is flexible enough that it can be used to tutor any subject and teach any tool.</p>
+        <p>
+          <a class="btn btn-large btn-primary" href="#sample-exploration">Try a sample exploration!</a>
+        {% if user %}
+          <a class="btn btn-large btn-primary" href="/gallery">Create an exploration</a>
+          <a class="btn btn-large" href="/about">Learn more</a>
+        {% else %}
+          <a class="btn btn-large" href="/about">Learn more</a>
+          <a class="btn btn-large" href="/login">Join Oppia</a>
+        {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+<div class="oppia-splash-highlight">
+  <div id="learn-more" class="container">
+    <div class="row">
+      <div class="span4">
+        <h2><img src="/images/yarn.svg" class="icon"> Free as in kittens</h2>
+        <p>No trial periods, no freemium plans, no advertisements. Writing, editing, or learning from explorations on Oppia.org is 100% free of cost!</p>
+      </div>
+      <div class="span4">
+        <h2><img src="/images/megaphone.svg" class="icon"> Free as in speech</h2>
+        <p>Oppia.org is a free commons. All lessons on Oppia.org are licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA</a>, which means that you can copy, modify, and reuse lesson content freely.</p>
+        <p>Want to host an Oppia instance yourself, or make modifications to it? The <a href="https://code.google.com/p/oppia/">code behind Oppia.org</a> is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License 2.0</a>. You are encouraged to download, modify, and reuse Oppia to your heart's content!</p>
+      </div>
+      <div class="span4">
+        <h2><img src="/images/handshake.svg" class="icon"> You can help!</h2>
+        <p>Oppia is the work of a small group of open-source volunteers who want to see education improve. Want to add a feature or fix a bug? <a href="https://code.google.com/p/oppia/wiki/Contributing">Here's how to get started contributing to Oppia's code</a>.</p>
+        <p>Want to collaborate with others in writing an Oppia exploration? <a href="http://groups.google.com/group/oppia">Join the Oppia users group</a>!</p>
+        <p>When you are <a href="/gallery">learning from an Oppia exploration</a>, click the Feedback tab to give suggestions on how to improve it!</p>
+      </div>
+      <div class="span4 pull-right">
+        <h4><a href="/about">Learn even more about Oppia &raquo;</a></h4>
+      </div>
+    </div>
+  </div>
+</div>
+  <div id="sample-exploration" class="container">
+    <div class="row">
+      <div class="span12">
+        <h2>Try a sample exploration:</h2>
+        <oppia oppia-id="0" width="90%" height="700"></oppia>
+      </div>
+    </div>
   </div>
 
 {% endblock %}

@@ -34,6 +34,7 @@
           <!-- nav bar -->
           <div class="navbar navbar-static-top">
             <div class="navbar-inner">
+<<<<<<< HEAD
               <div class="container oppia-content">
                 <a href="#" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                   <span class="icon-bar"></span>
@@ -47,6 +48,12 @@
 
                 <div class="nav-collapse collapse">
                   <ul class="nav">
+=======
+              <div class="container">
+                <a class="brand" href="/">Oppia</a>
+
+                <ul class="nav">
+>>>>>>> Design changes
                     <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
                       <a href="/gallery">Gallery</a>
                     </li>
@@ -59,46 +66,47 @@
                         <a href="">Create</a>
                       </li>
                     {% endif %}
-                  </ul>
+                    <li>
+                     <a href="/about">About</a>
+                    </li>
+                    <li>
+                      <a href="/feedback">Contact</a>
+                    </li>
+                </ul>
 
-                  <ul class="nav pull-right">
-                    {% if user_email %}
-                      <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
-                        <a href="/profile">Profile</a>
-                      </li>
-                    {% endif %}
-                    {% if user_email %}
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                          {% if username %}
-                            {{username}}
-                          {% else %}
-                            {{user_email}}
-                          {% endif %}
-                          {% if is_admin %} (Admin) {% endif %}
-                          <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                          <li>
-                            <a href="{{logout_url}}">Logout</a>
+                <ul class="nav pull-right">
+                  {% if user %}
+                    <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
+                      <a href="/profile">Profile</a>
+                    </li>
+                  {% endif %}
+                  {% if user %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        {{user}}
+                        {% if is_admin %} (Admin) {% endif %}
+                        <b class="caret"></b>
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li>
+                          <a href="{{logout_url}}">Logout</a>
+                        </li>
+
+                        {% if is_admin %}
+                          <li class="dropdown">
+                            <a href="/admin" target="_blank">
+                              Admin Page
+                            </a>
                           </li>
-
-                          {% if is_admin %}
-                            <li class="dropdown">
-                              <a href="/admin" target="_blank">
-                                Admin Page
-                              </a>
-                            </li>
-                          {% endif %}
-                        </ul>
-                      </li>
-                    {% else %}
-                      <li>
-                        <a href="{{login_url}}">Login</a>
-                      </li>
-                    {% endif %}
-                  </ul>
-                </div>
+                        {% endif %}
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li>
+                      <a href="{{login_url}}">Login</a>
+                    </li>
+                  {% endif %}
+                </ul>
 
               </div>
             </div>
@@ -128,15 +136,24 @@
             {% block content %}{% endblock %}
           </div>
         </div>
-        <br><br>
       </div>
 
       {% if not iframed %}
-        <div class="navbar oppia-footer">
-          <div class="oppia-content">
+        <div class="oppia-footer">
+          <div class="container">
             <ul class="nav">
               <li>
+<<<<<<< HEAD
                <a href="/about">About</a>
+=======
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/gallery">Gallery</a>
+              </li>
+              <li>
+               <a href="/about">About Oppia</a>
+>>>>>>> Design changes
               </li>
               <li>
                 <a href="/license">License</a>
