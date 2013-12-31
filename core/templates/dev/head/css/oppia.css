@@ -459,7 +459,7 @@ textarea {
   width: 100%;
 }
 
-.oppia-wide-panel-content {
+.oppia-wide-panel-content, .oppia-about {
   font-size: large;
   margin: 5px auto;
   min-height: 400px;

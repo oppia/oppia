@@ -5,12 +5,12 @@
 {% endblock subtitle %}
 
 {% block content %}
-  <div class="oppia-content">
+  <div class="container">
 
-    <br>
+    <div class="row">
 
-    <div class="oppia-wide-panel">
-      <div class="oppia-wide-panel-content">
+    <div class="span12">
+      <div class="oppia-about">
         <h1>What is Oppia?</h1>
 
         <p>
@@ -26,11 +26,11 @@
         </p>
       </div>
     </div>
+    </div>
 
-    <br>
-
-    <div class="oppia-wide-panel">
-      <div class="oppia-wide-panel-content">
+    <div class="row">
+    <div class="span12">
+      <div class="oppia-about">
         <h1>About this website</h1>
         <p>
           This site ({{SITE_NAME}}) is a hosted version of the <a href="https://code.google.com/p/oppia">Oppia codebase</a>. It is designed to foster the creation of a set of really good explorations that are freely available to anyone and that include a wide range of topics.
@@ -50,10 +50,11 @@
       </div>
     </div>
 
-    <br>
+    </div>
 
-    <div class="oppia-wide-panel">
-      <div class="oppia-wide-panel-content">
+    <div class="row">
+    <div class="span12">
+      <div class="oppia-about">
         <h2>Using Oppia</h2>
 
         <p>
@@ -103,10 +104,11 @@
       </div>
     </div>
 
-    <br><br>
+    </div>
 
-    <div class="oppia-wide-panel">
-      <div class="oppia-wide-panel-content">
+    <div class="row">
+    <div class="span12">
+      <div class="oppia-about">
         <h2>Credits</h2>
 
         <p>
@@ -132,4 +134,5 @@
       </div>
     </div>
   </div>
+</div>
 {% endblock %}
