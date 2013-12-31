@@ -148,7 +148,7 @@ textarea {
 }
 
 .navbar-static-top .navbar-inner {
-  background: rgb(24, 68, 126);
+  background: #18447E;
   border-bottom: 1pt solid #2f2f3f;
   box-shadow: 0 1px 5px rgba(12,12,24, .3);
 }
@@ -663,9 +663,9 @@ textarea {
 }
 
 .oppia-splash-highlight {
-  margin-top: -20px;
-  padding-top: 10px;
+  padding: 10px 0;
   background: #dde0FF;
+  margin-bottom: 20px;
 }
 
 .help {
