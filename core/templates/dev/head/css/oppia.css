@@ -466,6 +466,10 @@ textarea {
   padding: 20px;
 }
 
+.oppia-about {
+  margin-top: 0;
+}
+
 .oppia-wide-panel-title {
   color: #062770;
   font-family: verdana, arial, helvetica, sans-serif;
@@ -695,4 +699,8 @@ textarea {
 
 .icon {
   height: 1.6em;
+}
+
+.about-tabs {
+  margin-bottom: 0;
 }
