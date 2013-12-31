@@ -133,6 +133,10 @@ textarea {
   text-shadow: 0 1px 2px #000;
 }
 
+.brand sup {
+  font-size: .6em;
+}
+
 .navbar .nav > li > a:hover {
   background: rgb(10, 48, 106);
   color: white;
