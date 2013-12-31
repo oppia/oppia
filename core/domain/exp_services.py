@@ -93,32 +93,85 @@ def get_new_exploration_id():
 
 
 # Query methods.
-def get_all_explorations():
-    """Returns a list of domain objects representing all explorations."""
-    return [get_exploration_from_model(e) for e in
-            exp_models.ExplorationModel.get_all()]
+def _get_explorations_summary_dict(exploration_rights):
+    """Returns exploration summaries corresponding to the given rights objects.
+
+    The summary is a dict that is  keyed by exploration id. Each of the
+    corresponding values is a dict with the following keys: title, category
+    and rights. The value for 'rights' is the rights object, represented as a
+    dict.
+    """
+    exp_ids = [rights.id for rights in exploration_rights]
+    explorations = [
+        get_exploration_from_model(e) for e in
+        exp_models.ExplorationModel.get_multi(exp_ids)]
+
+    result = {}
+    for ind, exploration in enumerate(explorations):
+        result[exploration.id] = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'rights': exploration_rights[ind].to_dict()
+        }
+    return result
 
 
-def get_public_explorations():
-    """Returns a list of domain objects representing public explorations."""
-    return [get_exploration_from_model(e) for e in
-            exp_models.ExplorationModel.get_public_explorations()]
+def get_public_explorations_summary_dict():
+    """Returns a summary of public explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_public_exploration_rights())
 
 
-def get_viewable_explorations(user_id):
-    """Returns domain objects for explorations viewable by the given user."""
-    actor = rights_manager.Actor(user_id)
-    all_explorations = exp_models.ExplorationModel.get_all()
-    return [get_exploration_from_model(e) for e in all_explorations if
-            actor.can_view(e.id)]
+def get_community_owned_explorations_summary_dict():
+    """Returns a summary of community-owned explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_community_owned_exploration_rights())
 
 
-def get_editable_explorations(user_id):
-    """Returns domain objects for explorations editable by the given user."""
-    actor = rights_manager.Actor(user_id)
-    all_explorations = exp_models.ExplorationModel.get_all()
-    return [get_exploration_from_model(e) for e in all_explorations if
-            actor.can_edit(e.id)]
+def get_explicit_viewer_explorations_summary_dict(user_id):
+    """Returns a summary of some viewable explorations for this user.
+
+    These explorations have the user explicitly listed in the viewer_ids field.
+    This means that the user can view this exploration, but is not an owner of
+    it, and cannot edit it.
+
+    There may be other explorations that this user can view -- namely, those
+    that he/she owns or is allowed to edit -- that are not returned by this
+    query.
+    """
+    return _get_explorations_summary_dict(
+        rights_manager.get_viewable_exploration_rights(user_id))
+
+
+def get_explicit_editor_explorations_summary_dict(user_id):
+    """Returns a summary of some editable explorations for this user.
+
+    These explorations have the user explicitly listed in the editor_ids field.
+    This means that the user can edit and view this exploration, but does not
+    own it.
+
+    There may be other explorations that this user can edit -- namely, those
+    that he/she owns -- that are not returned by this query.
+    """
+    return _get_explorations_summary_dict(
+        rights_manager.get_editable_exploration_rights(user_id))
+
+
+def get_owned_explorations_summary_dict(user_id):
+    """Returns a summary of explorations owned by this user.
+
+    Such a user can also view and edit these explorations.
+    """
+    return _get_explorations_summary_dict(
+        rights_manager.get_owned_exploration_rights(user_id))
+
+
+def get_editable_explorations_summary_dict(user_id):
+    """Returns a summary of all explorations editable by this user."""
+    result = get_community_owned_explorations_summary_dict()
+    result.update(get_explicit_editor_explorations_summary_dict(user_id))
+    result.update(get_owned_explorations_summary_dict(user_id))
+    return result
 
 
 def count_explorations():
@@ -449,13 +502,18 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     marked as deleted, but the corresponding models are still retained in the
     datastore. This last option is the preferred one.
     """
+    exploration_rights_model = exp_models.ExplorationRightsModel.get(
+        exploration_id)
+    exploration_rights_model.delete(
+        committer_id, '', force_deletion=force_deletion)
+
+    exploration_model = exp_models.ExplorationModel.get(exploration_id)
+    exploration_model.delete(committer_id, '', force_deletion=force_deletion)
+
     # This must come after the exploration is retrieved. Otherwise the memcache
     # key will be reinstated.
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
-
-    exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_model.delete(committer_id, '', force_deletion=force_deletion)
 
 
 # Operations involving exploration parameters.

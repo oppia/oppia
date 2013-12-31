@@ -68,17 +68,9 @@ class ExplorationModel(base_models.VersionedModel):
     default_skin = ndb.StringProperty(default='conversation_v1')
 
     @classmethod
-    def get_public_explorations(cls):
-        """Returns an iterable containing publicly-available explorations."""
-        qo = ndb.QueryOptions(keys_only=True)
-        exp_rights_keys = ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status == 'public'
-        ).fetch(QUERY_LIMIT, options=qo)
-
-        exploration_keys = [
-            ndb.Key(cls, exp_rights_key.id())
-            for exp_rights_key in exp_rights_keys]
-        return ndb.get_multi(exploration_keys)
+    def get_multi(cls, exp_ids):
+        """Returns a list of exploration models, given a list of ids."""
+        return super(ExplorationModel, cls).get_multi(exp_ids)
 
     @classmethod
     def get_exploration_count(cls):
@@ -129,23 +121,78 @@ class ExplorationRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of owners of this exploration.
-    owner_ids = ndb.StringProperty(repeated=True)
+    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editor_ids = ndb.StringProperty(repeated=True)
+    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
-    viewer_ids = ndb.StringProperty(repeated=True)
+    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     # Whether this exploration is owned by the community.
-    community_owned = ndb.BooleanProperty(default=False)
+    community_owned = ndb.BooleanProperty(indexed=True, default=False)
     # The exploration id which this exploration was cloned from. If None, this
     # exploration was created from scratch.
     cloned_from = ndb.StringProperty()
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default='private', choices=['private', 'public', 'publicized']
+        default='private', indexed=True,
+        choices=['private', 'public', 'publicized']
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).save(
             committer_id, commit_message, commit_cmds)
+
+    @classmethod
+    def get_public(cls):
+        """Returns an iterable with publicly-available exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == 'public'
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_community_owned(cls):
+        """Returns an iterable with community-owned exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.community_owned == True
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_viewable(cls, user_id):
+        """Returns an iterable with exp rights viewable by the given user.
+
+        All such explorations will have a status of 'private'.
+        """
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.viewer_ids == user_id
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_editable(cls, user_id):
+        """Returns an iterable with exp rights editable by the given user.
+
+        This includes both private and public explorations.
+        """
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.editor_ids == user_id
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_owned(cls, user_id):
+        """Returns an iterable with exp rights owned by the given user.
+
+        This includes both private and public explorations.
+        """
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.owner_ids == user_id
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)

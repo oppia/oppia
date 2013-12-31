@@ -64,13 +64,16 @@ class ExplorationPage(base.BaseHandler):
 
 
 class RandomExplorationPage(base.BaseHandler):
-    """Returns the page for a random exploration."""
+    """Returns the page for a random exploration.
+
+    This class is DEPRECATED and will be removed shortly.
+    """
 
     def get(self):
         """Handles GET requests."""
         iframed = (self.request.get('iframed') == 'true')
 
-        explorations = exp_services.get_public_explorations()
+        explorations = exp_services.get_public_explorations_summary_dict()
         if len(explorations) <= 1:
             exp_services.delete_demo('1')
             exp_services.load_demo('1')

@@ -10,69 +10,52 @@
       <div class="oppia-gallery-frame">
         <div>
           <strong>Email address</strong>: {{user_email}}
+          <br><br>
+          <strong>Username</strong>:
+          {% if username %}
+            {{username}}
+          {% else %}
+            <em>Not yet selected</em>
+          {% endif %}
         </div>
 
-        <h4>
-          My Explorations
-        </h4>
+        <hr>
 
-        <center ng-hide="pageLoaded">
-          <img src="/images/loading.gif" alt="Loading..." width="50px">
-        </center>
-
-        <table>
-        <tr ng-repeat="row in exploration_rows">
-           <td ng-repeat="exp in row track by $index" style="border: 1px solid #CCC; width: 200px;">
-            <span class="oppia-gallery-block">
-              <center>
-                <a href="/create/<[exp.id]>">
-                  <h4 class="oppia-gallery-title"><[exp.name]></h4>
-                </a>
-              </center>
-            </span>
-           </td>
-          </tr>
-        </table>
-        <div ng-show="explorations.length == 0">
-          <em>You don't have any explorations yet.</em>
+        <div ng-show="!isEmpty(ownedExplorations)">
+          <h5>Explorations I manage</h5>
+          <ul>
+            <li ng-repeat="(expId, expData) in ownedExplorations">
+              <span ng-if="expData.rights.status == 'private'">
+                (Private)
+              </span>
+              <a href="/create/<[expId]>"><[expData.title]></a>
+            </li>
+          </ul>
         </div>
 
-        <br>
-        <div ng-controller="CreateExplorationModal">
-          {% include 'modals/create_exploration_modal.html' %}
-          <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
-            Create New Exploration
-          </a>
+        <div ng-show="!isEmpty(editableExplorations)">
+          <h5>Explorations I collaborate on</h5>
+          <ul>
+            <li ng-repeat="(expId, expData) in editableExplorations">
+              <span ng-if="expData.rights.status == 'private'">
+                (Private)
+              </span>
+              <a href="/create/<[expId]>"><[expData.title]></a>
+            </li>
+          </ul>
         </div>
 
-        <div ng-show="explorations.length > 0">
-          <h4>States that may need a little help</h4>
-          <small><em>sorted by priority score, higher scores indicate larger impact</em></small>
-          <div ng-show="improvable.length > 0">
-            <ol>
-              <li ng-repeat="state in improvable">
-                <small><em>(score: <[state.rank]>)</em></small>
-                <a href="create/<[state.exp_id]>#/gui/<[state.state_name]>">
-                   <[state.exp_name]>: <[state.state_name]>
-                </a>
-                <span ng-show="state.type == 'incomplete'">
-                   may be confusing. Students often quit when they get to this state.
-                </span>
-                <span ng-show="state.type == 'default'">
-                   may need a bit more feedback. Students seem to keep hitting a no feedback state.
-                   <br> Common answers:
-                   <ul>
-                     <li ng-repeat="answer in state.top_default_answers">
-                       <[answer[0]]> <em>(<[answer[1]]> time<span ng-show="answer[1] > 1">s</span>)</em>
-                     </li>
-                   </ul>
-                </span>
-               </li>
-            </ol>
-          </div>
-          <div ng-show="improvable.length == 0">
-            <em>All your explorations are doing well!</em>
-          </div>
+        <div ng-show="!isEmpty(viewableExplorations)">
+          <h5>Explorations I can playtest</h5>
+          <ul>
+            <li ng-repeat="(expId, expData) in viewableExplorations">
+              <a href="/create/<[expId]>"><[expData.title]></a>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
+          <em>No explorations here yet!</em>
         </div>
       </div>
     </div>

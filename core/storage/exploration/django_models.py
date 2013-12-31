@@ -70,13 +70,9 @@ class ExplorationModel(base_models.VersionedModel):
     default_skin = models.CharField(max_length=100, default='conversation_v1')
 
     @classmethod
-    def get_public_explorations(cls):
-        """Returns an iterable containing publicly-available explorations."""
-        public_rights_models = ExplorationRightsModel.objects.all().filter(
-            status='public')
-        exploration_ids = [model.id for model in public_rights_models]
-
-        return [cls.get_by_id(eid) for eid in exploration_ids]
+    def get_multi(cls, exp_ids):
+        """Returns a list of exploration models, given a list of ids."""
+        return super(ExplorationModel, cls).get_multi(exp_ids)
 
     @classmethod
     def get_exploration_count(cls):
@@ -132,6 +128,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # Whether this exploration is owned by the community.
     community_owned = models.BooleanField(default=False)
+    # The exploration id which this exploration was cloned from. If None, this
+    # exploration was created from scratch.
+    cloned_from = models.CharField(max_length=20, blank=True)
 
     STATUS_CHOICES = (
         ('private', 'private'),
@@ -147,3 +146,39 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def save(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).save(
             committer_id, commit_message, commit_cmds)
+
+    @classmethod
+    def get_public(cls):
+        """Returns an iterable with publicly-available exp rights models."""
+        return ExplorationRightsModel.objects.all().filter(
+            status='public').filter(deleted=False)
+
+    @classmethod
+    def get_community_owned(cls):
+        """Returns an iterable with community-owned exp rights models."""
+        return ExplorationRightsModel.objects.all().filter(
+            community_owned=True).filter(deleted=False)
+
+    @classmethod
+    def get_viewable(cls, user_id):
+        """Returns an iterable with exp rights viewable by the given user.
+
+        All such explorations will have a status of 'private'.
+        """
+        # TODO(sunu0000): Implement this.
+
+    @classmethod
+    def get_editable(cls, user_id):
+        """Returns an iterable with exp rights editable by the given user.
+
+        This includes both private and public explorations.
+        """
+        # TODO(sunu0000): Implement this.
+
+    @classmethod
+    def get_owned(cls, user_id):
+        """Returns an iterable with exp rights owned by the given user.
+
+        This includes both private and public explorations.
+        """
+        # TODO(sunu0000): Implement this.

@@ -231,7 +231,10 @@ class ExplorationHandler(EditorHandler):
                 'User %s does not have permissions to delete exploration %s' %
                 (self.user_id, exploration_id))
 
-        exp_services.delete_exploration(self.user_id, exploration_id)
+        is_exploration_cloned = rights_manager.is_exploration_cloned(
+            exploration_id)
+        exp_services.delete_exploration(
+            self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
 
 class ExplorationRightsHandler(EditorHandler):

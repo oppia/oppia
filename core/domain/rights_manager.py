@@ -75,6 +75,10 @@ class ExplorationRights(object):
                     'Community-owned explorations should have no owners, '
                     'editors or viewers specified.')
 
+        if self.status != EXPLORATION_STATUS_PRIVATE and self.viewer_ids:
+            raise utils.ValidationError(
+                'Public explorations should have no viewers specified.')
+
         owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
         owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
         editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
@@ -116,6 +120,18 @@ class ExplorationRights(object):
             }
 
 
+def _get_exploration_rights_from_model(exploration_rights_model):
+    return ExplorationRights(
+        exploration_rights_model.id,
+        exploration_rights_model.owner_ids,
+        exploration_rights_model.editor_ids,
+        exploration_rights_model.viewer_ids,
+        community_owned=exploration_rights_model.community_owned,
+        cloned_from=exploration_rights_model.cloned_from,
+        status=exploration_rights_model.status
+    )
+
+
 def _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds):
     """Saves an ExplorationRights domain object to the datastore."""
@@ -147,9 +163,57 @@ def get_exploration_rights(exploration_id):
     model = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
     if model is None:
         raise Exception('This exploration does not exist.')
-    return ExplorationRights(
-        model.id, model.owner_ids, model.editor_ids, model.viewer_ids,
-        model.community_owned, model.cloned_from, model.status)
+    return _get_exploration_rights_from_model(model)
+
+
+def get_public_exploration_rights():
+    """Returns a list of rights domain objects for public explorations."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_public()]
+
+
+def get_community_owned_exploration_rights():
+    """Returns a list of rights objects for community-owned explorations."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_community_owned()]
+
+
+def get_viewable_exploration_rights(user_id):
+    """Returns rights objects for some explorations viewable by this user.
+
+    These explorations have the user explicitly listed in the viewer_ids field.
+    This means that the user can view this exploration, but is not an owner of
+    it, and cannot edit it.
+
+    There may be other explorations that this user can view -- namely, those
+    that he/she owns or is allowed to edit -- that are not returned by this
+    query.
+    """
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_viewable(user_id)]
+
+
+def get_editable_exploration_rights(user_id):
+    """Returns rights objects for some explorations editable by this user.
+
+    These explorations have the user explicitly listed in the editor_ids field.
+    This means that the user can edit and view this exploration, but does not
+    own it.
+
+    There may be other explorations that this user can edit -- namely, those
+    that he/she owns -- that are not returned by this query.
+    """
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_editable(user_id)]
+
+
+def get_owned_exploration_rights(user_id):
+    """Returns rights objects for explorations owned by this user.
+
+    Such a user can also view and edit these explorations.
+    """
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_owned(user_id)]
 
 
 def is_exploration_public(exploration_id):
@@ -467,6 +531,9 @@ def _change_exploration_status(
         'old_status': old_status,
         'new_status': new_status
     }]
+
+    if new_status != EXPLORATION_STATUS_PRIVATE:
+        exploration_rights.viewer_ids = []
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)

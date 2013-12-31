@@ -53,19 +53,19 @@ class ProfileHandler(base.BaseHandler):
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        exps = exp_services.get_editable_explorations(self.user_id)
-
-        # Make each entry of the category list unique.
-        category_list = list(set([exp.category for exp in exps]))
+        viewable_exps = (
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.user_id))
+        editable_exps = (
+            exp_services.get_explicit_editor_explorations_summary_dict(
+                self.user_id))
+        owned_exps = exp_services.get_owned_explorations_summary_dict(
+            self.user_id)
 
         self.values.update({
-            'category_list': list(category_list),
-            'explorations': [{
-                'id': exp.id,
-                'name': exp.title,
-            } for exp in exps],
-            'improvable': stats_services.get_top_improvable_states(
-                [exp.id for exp in exps], 10),
+            'viewable': viewable_exps,
+            'editable': editable_exps,
+            'owned': owned_exps
         })
         self.render_json(self.values)
 

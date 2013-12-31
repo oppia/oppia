@@ -18,30 +18,23 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function Profile($scope, $http, warningsData, oppiaRequestCreator) {
+function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
   $scope.profileDataUrl = '/profilehandler/data/';
-  $scope.pageLoaded = false;
+  $rootScope.loadingMessage = 'Loading';
 
   // Retrieves profile data from the server.
-  $http.get($scope.profileDataUrl).success(function(profileData) {
-    $scope.explorations = profileData.explorations;
-    $scope.exploration_rows = [];
-    var i = 0;
-    while ((i * 3) < $scope.explorations.length) {
-        $scope.exploration_rows[i] = [
-          $scope.explorations[i*3],
-          $scope.explorations[(i*3)+1],
-          $scope.explorations[(i*3)+2]
-        ];
-        i++;
-    }
-    $scope.improvable = profileData.improvable;
-    $scope.categoryList = profileData.category_list;
-    $scope.pageLoaded = true;
+  $http.get($scope.profileDataUrl).success(function(data) {
+    $scope.ownedExplorations = data.owned;
+    $scope.editableExplorations = data.editable;
+    $scope.viewableExplorations = data.viewable;
+
+    $rootScope.loadingMessage = '';
+  }).error(function(data) {
+    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Profile.$inject = ['$scope', '$http', 'warningsData', 'oppiaRequestCreator'];
+Profile.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];

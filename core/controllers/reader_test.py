@@ -16,6 +16,7 @@ __author__ = 'Sean Lip'
 
 import unittest
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -52,7 +53,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
-        self.login('person@example.com', is_admin=False)
+        self.login('person@example.com')
         response = self.testapp.get(
             '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 404)
@@ -65,21 +66,24 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             'eid2', 'A title', 'A category')
         exp_services.save_new_exploration(other_editor, other_exploration)
 
-        self.login(other_editor, is_admin=False)
+        self.login(other_editor)
         response = self.testapp.get(
             '/learn/%s' % self.EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
-        self.login(self.first_editor_email, is_admin=False)
+        self.login(self.first_editor_email)
         response = self.testapp.get('/learn/%s' % self.EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
-        self.login('admin@example.com', is_admin=True)
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+
+        self.login('admin@example.com')
         response = self.testapp.get('/learn/%s' % self.EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)

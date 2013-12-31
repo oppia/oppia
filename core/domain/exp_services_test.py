@@ -40,10 +40,31 @@ import utils
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
-    OWNER_ID = 'owner'
-    EDITOR_ID = 'editor'
-    VIEWER_ID = 'viewer'
-    EXP_ID = 'An exploration_id'
+    def setUp(self):
+        """Before each individual test, create a dummy exploration."""
+        super(ExplorationServicesUnitTests, self).setUp()
+
+        self.EXP_ID = 'An exploration_id'
+
+        self.OWNER_EMAIL = 'owner@example.com'
+        self.EDITOR_EMAIL = 'editor@example.com'
+        self.VIEWER_EMAIL = 'viewer@example.com'
+
+        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.OWNER_NAME = 'owner'
+        self.EDITOR_NAME = 'editor'
+        self.VIEWER_NAME = 'viewer'
+
+        user_services.get_or_create_user(self.OWNER_ID, self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
+        user_services.get_or_create_user(self.VIEWER_ID, self.VIEWER_EMAIL)
+
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_NAME)
+        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_NAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_NAME)
 
     def save_new_default_exploration(self, exploration_id):
         """Saves a new default exploration written by self.OWNER_ID.
@@ -71,75 +92,101 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_all_explorations(self):
-        """Test get_all_explorations()."""
+    def test_get_public_explorations_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID)
-        self.assertItemsEqual(
-            [e.id for e in exp_services.get_all_explorations()],
-            [self.EXP_ID]
-        )
-
-        self.save_new_default_exploration('New exploration_id')
-        self.assertItemsEqual(
-            [e.id for e in exp_services.get_all_explorations()],
-            [self.EXP_ID, 'New exploration_id']
-        )
-
-    def test_get_public_explorations(self):
-        self.save_new_default_exploration(self.EXP_ID)
-        self.assertEqual(exp_services.get_public_explorations(), [])
+        self.assertEqual(
+            exp_services.get_public_explorations_summary_dict(), {})
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-        self.assertEqual(
-            [e.id for e in exp_services.get_public_explorations()],
-            [self.EXP_ID]
-        )
+        self.assertEqual(exp_services.get_public_explorations_summary_dict(), {
+            self.EXP_ID: {
+                'title': 'A title',
+                'category': 'A category',
+                'rights': {
+                    'owner_names': [self.OWNER_NAME],
+                    'editor_names': [],
+                    'viewer_names': [],
+                    'community_owned': False,
+                    'cloned_from': None,
+                    'status': rights_manager.EXPLORATION_STATUS_PUBLIC
+                }
+            }
+        })
 
-    def test_get_viewable_explorations(self):
+    def test_get_explicit_viewer_explorations_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID)
-        user_services.get_or_create_user(self.EDITOR_ID, 'email@email.com')
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.VIEWER_ID),
+            {
+                self.EXP_ID: {
+                    'title': 'A title',
+                    'category': 'A category',
+                    'rights': {
+                        'owner_names': [self.OWNER_NAME],
+                        'editor_names': [],
+                        'viewer_names': [self.VIEWER_NAME],
+                        'community_owned': False,
+                        'cloned_from': None,
+                        'status': rights_manager.EXPLORATION_STATUS_PRIVATE
+                    }
+                }
+            }
+        )
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.EDITOR_ID), {})
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.OWNER_ID), {})
+
+        # Set the exploration's status to published. This removes all viewer
+        # ids.
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.VIEWER_ID), {})
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.EDITOR_ID), {})
+        self.assertEqual(
+            exp_services.get_explicit_viewer_explorations_summary_dict(
+                self.OWNER_ID), {})
+
+    def test_get_editable_explorations_summary_dict(self):
+        self.save_new_default_exploration(self.EXP_ID)
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
 
-        def get_viewable_ids(user_id):
-            return [
-                e.id for e in exp_services.get_viewable_explorations(user_id)
-            ]
+        exp_dict = {
+            'title': 'A title',
+            'category': 'A category',
+            'rights': {
+                'owner_names': [self.OWNER_NAME],
+                'editor_names': [self.EDITOR_NAME],
+                'viewer_names': [],
+                'community_owned': False,
+                'cloned_from': None,
+                'status': rights_manager.EXPLORATION_STATUS_PRIVATE
+            }
+        }
 
-        self.assertEqual(get_viewable_ids(self.OWNER_ID), [self.EXP_ID])
-        self.assertEqual(get_viewable_ids(self.VIEWER_ID), [])
-        self.assertEqual(get_viewable_ids(None), [])
-
-        # Set the exploration's status to published.
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-
-        self.assertEqual(get_viewable_ids(self.OWNER_ID), [self.EXP_ID])
         self.assertEqual(
-            get_viewable_ids(self.VIEWER_ID), [self.EXP_ID])
-        self.assertEqual(get_viewable_ids(None), [self.EXP_ID])
-
-    def test_get_editable_explorations(self):
-        self.save_new_default_exploration(self.EXP_ID)
-        user_services.get_or_create_user(self.EDITOR_ID, 'email@email.com')
-        rights_manager.assign_role(
-            self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
-            rights_manager.ROLE_EDITOR)
-
-        def get_editable_ids(user_id):
-            return [
-                e.id for e in exp_services.get_editable_explorations(user_id)
-            ]
-
-        self.assertEqual(get_editable_ids(self.OWNER_ID), [self.EXP_ID])
-        self.assertEqual(get_editable_ids(self.VIEWER_ID), [])
-        self.assertEqual(get_editable_ids(None), [])
-
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-
-        self.assertEqual(get_editable_ids(self.OWNER_ID), [self.EXP_ID])
-        self.assertEqual(get_editable_ids(self.VIEWER_ID), [])
-        self.assertEqual(get_editable_ids(None), [])
+            exp_services.get_editable_explorations_summary_dict(self.OWNER_ID),
+            {self.EXP_ID: exp_dict})
+        self.assertEqual(
+            exp_services.get_editable_explorations_summary_dict(
+                self.EDITOR_ID),
+            {self.EXP_ID: exp_dict})
+        self.assertEqual(
+            exp_services.get_editable_explorations_summary_dict(
+                self.VIEWER_ID), {})
 
     def test_count_explorations(self):
         """Test count_explorations()."""
@@ -250,7 +297,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.get_exploration_by_id(self.EXP_ID)
 
         # The deleted exploration does not show up in any queries.
-        self.assertEqual(exp_services.get_all_explorations(), [])
+        self.assertEqual(
+            exp_services.get_owned_explorations_summary_dict(self.OWNER_ID),
+            {})
 
         # But the models still exist in the backend.
         self.assertIn(
@@ -269,7 +318,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.get_exploration_by_id(self.EXP_ID)
 
         # The deleted exploration does not show up in any queries.
-        self.assertEqual(exp_services.get_all_explorations(), [])
+        self.assertEqual(
+            exp_services.get_owned_explorations_summary_dict(self.OWNER_ID),
+            {})
 
         # The exploration model has been purged from the backend.
         self.assertNotIn(

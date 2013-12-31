@@ -43,23 +43,17 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Instead of doing all this, make three queries that get
-        # all viewable/clonable/editable explorations for this user. Get only
-        # the metadata and implement paging.
-        explorations = exp_services.get_viewable_explorations(self.user_id)
+        # TODO(sll): Implement paging.
+        explorations_dict = exp_services.get_public_explorations_summary_dict()
 
         categories = collections.defaultdict(list)
-        for exploration in explorations:
-            categories[exploration.category].append({
-                'can_clone': rights_manager.Actor(self.user_id).can_clone(
-                    exploration.id),
-                'can_edit': rights_manager.Actor(self.user_id).can_edit(
-                    exploration.id),
-                'can_view': (
-                    rights_manager.Actor(self.user_id).can_view(exploration.id)
-                ),
-                'id': exploration.id,
-                'title': exploration.title,
+        for (eid, exploration_data) in explorations_dict.iteritems():
+            categories[exploration_data['category']].append({
+                'id': eid,
+                'title': exploration_data['title'],
+                'can_clone': rights_manager.Actor(self.user_id).can_clone(eid),
+                'can_edit': rights_manager.Actor(self.user_id).can_edit(eid),
+                'can_view': True,
             })
 
         self.values.update({

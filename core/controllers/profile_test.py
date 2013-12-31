@@ -25,7 +25,7 @@ import test_utils
 class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
     def test_redirect_to_prerequisites_page_happens(self):
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
@@ -42,7 +42,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
     def test_accepting_terms_is_handled_correctly(self):
         self.register_editor('editor@example.com')
 
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -68,7 +68,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_username_is_handled_correctly(self):
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)

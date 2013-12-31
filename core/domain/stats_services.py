@@ -206,7 +206,12 @@ def get_state_stats_for_exploration(exploration_id):
 
 
 def get_top_improvable_states(exploration_ids, N):
-    """Returns the top N improvable states across the given explorations."""
+    """Returns the top N improvable states across the given explorations.
+
+
+    NOTE: This method is temporarily retired from the profile page controller
+    until we can find a way to make it faster.
+    """
 
     ranked_states = []
     for exploration_id in exploration_ids:
