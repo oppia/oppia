@@ -584,10 +584,12 @@ def save_new_exploration_from_zip_file(
 
 
 def clone_exploration(committer_id, old_exploration_id):
-    """Clones an exploration and returns the new exploration's id."""
-    old_exploration = get_exploration_by_id(old_exploration_id)
-    if not rights_manager.Actor(committer_id).can_clone(old_exploration_id):
-        raise Exception('You cannot copy this exploration.')
+    """Clones an exploration and returns the new exploration's id.
+
+    The caller is responsible for checking that the committer is allowed to
+    clone the given exploration.
+    """
+    old_exploration = get_exploration_by_id(old_exploration_id, strict=True)
 
     new_exploration_id = get_new_exploration_id()
     new_exploration = exp_domain.Exploration.from_yaml(

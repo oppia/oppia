@@ -22,7 +22,8 @@ from core.domain import exp_services
 
 
 ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
-    'admin_email_address', 'UnicodeString', 'The admin email address',
+    'admin_email_address', 'UnicodeString',
+    'The admin email address to display on the About pages',
     default_value='ADMIN_EMAIL_ADDRESS')
 SITE_FORUM_URL = config_domain.ConfigProperty(
     'site_forum_url', 'UnicodeString', 'The site forum URL',

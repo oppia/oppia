@@ -16,6 +16,7 @@ __author__ = 'Sean Lip'
 
 import unittest
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -56,14 +57,15 @@ class EditorTest(test_utils.GenericTestBase):
         """Test requesting a new state template when adding a new state."""
         # Register and log in as an admin.
         self.register_editor('editor@example.com')
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         EXP_ID = 'eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'A title', 'A category')
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration('editor@example.com', exploration)
+        exp_services.save_new_exploration(
+            self.get_current_logged_in_user_id(), exploration)
 
         response = self.testapp.get('/create/%s' % EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -332,6 +334,9 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.owner_email)
         self.editor_id = self.get_user_id_from_email(self.editor_email)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""

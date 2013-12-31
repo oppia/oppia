@@ -41,6 +41,10 @@ function Admin($scope, $http) {
   $scope.reloadConfigProperties();
 
   $scope.revertToDefaultConfigPropertyValue = function(configPropertyId) {
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
     var request = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
@@ -86,6 +90,10 @@ function Admin($scope, $http) {
       return;
     }
 
+    if (!confirm('This action is irreversible. Are you sure?')) {
+      return;
+    }
+
     $scope.message = 'Saving...';
 
     var newConfigPropertyValues = {};
@@ -114,6 +122,10 @@ function Admin($scope, $http) {
 
   $scope.reloadExploration = function(explorationId) {
     if ($scope.message == 'Processing...') {
+      return;
+    }
+
+    if (!confirm('This action is irreversible. Are you sure?')) {
       return;
     }
 

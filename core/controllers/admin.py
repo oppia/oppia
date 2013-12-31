@@ -93,28 +93,34 @@ class AdminHandler(base.BaseHandler):
     @base.require_admin
     def post(self):
         """Handles POST requests."""
-        if self.payload.get('action') == 'reload_exploration':
-            exploration_id = self.payload.get('explorationId')
-            logging.info(
-                '[ADMIN] %s reloaded exploration %s' %
-                (self.user_id, exploration_id))
-            exp_services.delete_demo(str(exploration_id))
-            exp_services.load_demo(str(exploration_id))
-        elif self.payload.get('action') == 'save_config_properties':
-            new_config_property_values = self.payload.get(
-                'new_config_property_values')
-            logging.info('[ADMIN] %s saved config property values: %s' %
-                         (self.user_id, new_config_property_values))
-            for (name, value) in new_config_property_values.iteritems():
-                config_services.set_property(self.user_id, name, value)
-        elif self.payload.get('action') == 'revert_config_property':
-            config_property_id = self.payload.get('config_property_id')
-            logging.info('[ADMIN] %s reverted config property: %s' %
-                         (self.user_id, config_property_id))
-            config_services.revert_property(self.user_id, config_property_id)
-        elif self.payload.get('action') == 'refresh_computed_property':
-            computed_property_name = self.payload.get('computed_property_name')
-            config_domain.Registry.get_config_property(
-                computed_property_name).refresh_default_value()
+        try:
+            if self.payload.get('action') == 'reload_exploration':
+                exploration_id = self.payload.get('explorationId')
+                logging.info(
+                    '[ADMIN] %s reloaded exploration %s' %
+                    (self.user_id, exploration_id))
+                exp_services.delete_demo(str(exploration_id))
+                exp_services.load_demo(str(exploration_id))
+            elif self.payload.get('action') == 'save_config_properties':
+                new_config_property_values = self.payload.get(
+                    'new_config_property_values')
+                logging.info('[ADMIN] %s saved config property values: %s' %
+                             (self.user_id, new_config_property_values))
+                for (name, value) in new_config_property_values.iteritems():
+                    config_services.set_property(self.user_id, name, value)
+            elif self.payload.get('action') == 'revert_config_property':
+                config_property_id = self.payload.get('config_property_id')
+                logging.info('[ADMIN] %s reverted config property: %s' %
+                             (self.user_id, config_property_id))
+                config_services.revert_property(
+                    self.user_id, config_property_id)
+            elif self.payload.get('action') == 'refresh_computed_property':
+                computed_property_name = self.payload.get(
+                    'computed_property_name')
+                config_domain.Registry.get_config_property(
+                    computed_property_name).refresh_default_value()
 
-        self.render_json({})
+            self.render_json({})
+        except Exception as e:
+            self.render_json({'error': str(e)})
+            raise

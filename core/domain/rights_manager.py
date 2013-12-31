@@ -21,9 +21,11 @@ __author__ = 'Sean Lip'
 
 import logging
 
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import user_services
 from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
@@ -143,6 +145,8 @@ def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
 def get_exploration_rights(exploration_id):
     """Retrieves the rights for this exploration from the datastore."""
     model = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
+    if model is None:
+        raise Exception('This exploration does not exist.')
     return ExplorationRights(
         model.id, model.owner_ids, model.editor_ids, model.viewer_ids,
         model.community_owned, model.cloned_from, model.status)
@@ -170,28 +174,43 @@ class Actor(object):
         self.user_id = user_id
 
     def _is_super_admin(self):
-        return user_services.is_current_user_admin(None)
+        return (self.user_id == current_user_services.get_current_user(None)
+                and current_user_services.is_current_user_admin(None))
 
     def _is_admin(self):
-        return self._is_super_admin()
+        return (self._is_super_admin() or
+                self.user_id in config_domain.ADMIN_IDS.value)
 
     def _is_moderator(self):
-        return self._is_admin()
+        return (self._is_admin() or
+                self.user_id in config_domain.MODERATOR_IDS.value)
 
     def _is_owner(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.community_owned or self.user_id in exp_rights.owner_ids:
             return True
         return False
 
     def _is_editor(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.community_owned or self.user_id in exp_rights.editor_ids:
             return True
         return False
 
     def _is_viewer(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.community_owned or self.user_id in exp_rights.viewer_ids:
             return True
         return False
@@ -199,22 +218,25 @@ class Actor(object):
     def is_owner(self, exploration_id):
         return self._is_owner(exploration_id)
 
-    def is_editor(self, exploration_id):
+    def has_explicit_editing_rights(self, exploration_id):
         return self._is_editor(exploration_id) or self._is_owner(
             exploration_id)
 
-    def is_viewer(self, exploration_id):
+    def has_explicit_viewing_rights(self, exploration_id):
         return (
             self._is_viewer(exploration_id) or
             self._is_editor(exploration_id) or
             self._is_owner(exploration_id))
 
     def can_view(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
-            return (self._is_viewer(exploration_id) or
-                    self._is_editor(exploration_id) or
-                    self._is_owner(exploration_id) or self._is_admin())
+            return (self.has_explicit_viewing_rights(exploration_id)
+                    or self._is_admin())
         else:
             return True
 
@@ -222,8 +244,8 @@ class Actor(object):
         return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
-        return (self._is_editor(exploration_id) or
-                self._is_owner(exploration_id) or self._is_admin())
+        return (self.has_explicit_editing_rights(exploration_id)
+                or self._is_admin())
 
     def can_accept_submitted_change(self, exploration_id):
         return self.can_edit(exploration_id)
@@ -232,7 +254,11 @@ class Actor(object):
         if self._is_admin():
             return True
 
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         return (exp_rights.status == EXPLORATION_STATUS_PRIVATE and
                 self._is_owner(exploration_id))
 
@@ -241,7 +267,11 @@ class Actor(object):
             # Demo explorations are public by default.
             return True
 
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status != EXPLORATION_STATUS_PRIVATE:
             return False
         if exp_rights.cloned_from:
@@ -250,7 +280,11 @@ class Actor(object):
         return self._is_owner(exploration_id) or self._is_admin()
 
     def can_unpublish(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
             return False
         # TODO(sll): Deny unpublishing of the exploration if an
@@ -259,19 +293,31 @@ class Actor(object):
         return self._is_owner(exploration_id) or self._is_admin()
 
     def can_modify_roles(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.community_owned or exp_rights.cloned_from:
             return False
         return self._is_admin() or self._is_owner(exploration_id)
 
     def can_release_ownership(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
             return False
         return self.can_modify_roles(exploration_id)
 
     def can_submit_change_for_review(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
             return self.can_edit(exploration_id)
         return True
@@ -283,13 +329,21 @@ class Actor(object):
         return True
 
     def can_publicize(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
             return False
         return self._is_admin()
 
     def can_unpublicize(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
+        try:
+            exp_rights = get_exploration_rights(exploration_id)
+        except Exception:
+            return False
+
         if exp_rights.status != EXPLORATION_STATUS_PUBLICIZED:
             return False
         return self._is_admin()
@@ -335,7 +389,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
             old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
-        if Actor(assignee_id).is_editor(exploration_id):
+        if Actor(assignee_id).has_explicit_editing_rights(exploration_id):
             raise Exception('This user already can edit this exploration.')
 
         exp_rights = get_exploration_rights(exploration_id)
@@ -346,7 +400,7 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if Actor(assignee_id).is_viewer(exploration_id):
+        if Actor(assignee_id).has_explicit_viewing_rights(exploration_id):
             raise Exception('This user already can view this exploration.')
 
         exp_rights = get_exploration_rights(exploration_id)

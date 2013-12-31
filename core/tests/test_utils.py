@@ -165,12 +165,12 @@ class TestBase(unittest.TestCase):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
 
-    def register_editor(self, email, username=None, is_admin=True):
+    def register_editor(self, email, username=None):
         """Register a user with the given username as an editor."""
         if username is None:
             username = self.DEFAULT_USERNAME
 
-        self.login(email, is_admin=is_admin)
+        self.login(email)
 
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -186,6 +186,9 @@ class TestBase(unittest.TestCase):
 
         self.logout()
 
+    def get_current_logged_in_user_id(self):
+        return os.environ['USER_ID']
+
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
 
@@ -195,8 +198,7 @@ class AppEngineTestBase(TestBase):
 
     def login(self, email, is_admin=False):
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = current_user_services.get_user_id_from_email(
-            email)
+        os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_admin else '0'
 
     def logout(self):

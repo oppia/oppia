@@ -36,7 +36,8 @@ def set_property(committer_id, name, value):
         raise Exception('No config property with name %s found.')
 
     if (committer_id != feconf.ADMIN_COMMITTER_ID and not
-            user_services.is_current_user_admin(None)):
+            user_services.is_current_user_admin(None) and not
+            committer_id in config_domain.ADMIN_IDS.value):
         raise Exception(
             'Only an admin can set config property datastore overrides.')
 
@@ -58,6 +59,10 @@ def set_property(committer_id, name, value):
     # Set value in memcache.
     memcache_services.set_multi({
         datastore_item.id: datastore_item.value})
+
+    # Call post_set_hook, if it exists.
+    if config_property.post_set_hook:
+        config_property.post_set_hook()
 
 
 def revert_property(committer_id, name):

@@ -27,9 +27,22 @@ from core.domain import widget_registry
 import utils
 
 
+def require_viewer(handler):
+    """Decorator that checks if the user can view the given exploration."""
+    def test_can_view(self, exploration_id, **kwargs):
+        """Checks if the user for the current session is logged in."""
+        if rights_manager.Actor(self.user_id).can_view(exploration_id):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    return test_can_view
+
+
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
+    @require_viewer
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
@@ -132,7 +145,8 @@ class FeedbackHandler(base.BaseHandler):
             old_state.widget.customization_args, old_params, answer)
 
         stats_services.EventHandler.record_answer_submitted(
-            exploration_id, old_state_name, handler, str(rule), recorded_answer)
+            exploration_id, old_state_name, handler, str(rule),
+            recorded_answer)
 
     def _get_feedback(self, exploration_id, feedback, params):
         """Gets the HTML with Oppia's feedback."""
@@ -174,6 +188,7 @@ class FeedbackHandler(base.BaseHandler):
 
             return (new_params, html_output, interactive_html)
 
+    @require_viewer
     def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
         old_state_name = self.unescape_state_name(escaped_state_name)
@@ -269,6 +284,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    @require_viewer
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
         state_name = self.unescape_state_name(escaped_state_name)

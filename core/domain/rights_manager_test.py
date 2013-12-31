@@ -16,9 +16,11 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+import feconf
 import test_utils
 
 
@@ -41,6 +43,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
 
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+
         self.EXP_ID = 'exp_id'
 
     def test_demo_exploration(self):
@@ -50,14 +55,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('0'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('0'))
 
-        # TODO(sll): Rewrite things so that this and other logins are not
-        # needed.
-        self.login('admin@example.com', is_admin=True)
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('0'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('0'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete('0'))
-        self.logout()
 
     def test_ownership(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -73,10 +74,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).is_owner(self.EXP_ID))
 
-        self.login('admin@example.com', is_admin=True)
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).is_owner(self.EXP_ID))
-        self.logout()
 
     def test_newly_created_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -90,14 +89,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
-        self.login('admin@example.com', is_admin=True)
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_edit(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete(self.EXP_ID))
-        self.logout()
 
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))

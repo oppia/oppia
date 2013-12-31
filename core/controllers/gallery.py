@@ -109,6 +109,10 @@ class CloneExploration(base.BaseHandler):
         """Handles POST requests."""
         exploration_id = self.payload.get('exploration_id')
 
+        if not rights_manager.Actor(self.user_id).can_clone(
+                exploration_id):
+            raise Exception('You cannot copy this exploration.')
+
         self.render_json({
             'explorationId': exp_services.clone_exploration(
                 self.user_id, exploration_id)

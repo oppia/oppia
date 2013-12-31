@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 
 from core.domain import obj_services
+from core.domain import user_services
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
@@ -29,12 +30,13 @@ COMPUTED_PROPERTY_PREFIX = 'computed:'
 class ConfigProperty(object):
     """A property with a name and a default value."""
 
-    ALLOWED_TYPES = frozenset(['UnicodeString', 'Html'])
+    ALLOWED_TYPES = frozenset(['UnicodeString', 'Html', 'SetOfUnicodeString'])
 
     def refresh_default_value(self, default_value):
         pass
 
-    def __init__(self, name, obj_type, description, default_value=None):
+    def __init__(self, name, obj_type, description, default_value,
+                 post_set_hook=None):
         if not obj_type in self.ALLOWED_TYPES:
             raise Exception('Bad config property obj_type: %s' % obj_type)
 
@@ -46,6 +48,7 @@ class ConfigProperty(object):
         self._description = description
         self._default_value = obj_services.Registry.get_object_class_by_type(
             self.obj_type).normalize(default_value)
+        self._post_set_hook = post_set_hook
 
         Registry._config_registry[self.name] = self
 
@@ -64,6 +67,11 @@ class ConfigProperty(object):
     @property
     def default_value(self):
         return self._default_value
+
+    @property
+    def post_set_hook(self):
+        """This is a function that is called when the ConfigProperty is set."""
+        return self._post_set_hook
 
     @property
     def value(self):
@@ -142,3 +150,49 @@ class Registry(object):
                 }
 
         return computed_properties
+
+
+def update_admin_ids():
+    admin_emails_config = Registry.get_config_property(
+        'admin_emails')
+    if not admin_emails_config:
+        return []
+
+    admin_ids = []
+    for email in admin_emails_config.value:
+        user_id = user_services.get_user_id_from_email(email)
+        if user_id is not None:
+            admin_ids.append(user_id)
+        else:
+            raise Exception('Bad admin email: %s' % email)
+    return admin_ids
+
+
+def update_moderator_ids():
+    moderator_emails_config = Registry.get_config_property(
+        'moderator_emails')
+    if not moderator_emails_config:
+        return []
+
+    moderator_ids = []
+    for email in moderator_emails_config.value:
+        user_id = user_services.get_user_id_from_email(email)
+        if user_id is not None:
+            moderator_ids.append(user_id)
+        else:
+            raise Exception('Bad moderator email: %s' % email)
+    return moderator_ids
+
+
+ADMIN_IDS = ComputedProperty(
+    'admin_ids', 'SetOfUnicodeString', 'Admin ids', update_admin_ids)
+MODERATOR_IDS = ComputedProperty(
+    'moderator_ids', 'SetOfUnicodeString', 'Moderator ids',
+    update_moderator_ids)
+
+ADMIN_EMAILS = ConfigProperty(
+    'admin_emails', 'SetOfUnicodeString', 'Email addresses of admins', [],
+    post_set_hook=ADMIN_IDS.refresh_default_value)
+MODERATOR_EMAILS = ConfigProperty(
+    'moderator_emails', 'SetOfUnicodeString', 'Email addresses of moderators',
+    [], post_set_hook=MODERATOR_IDS.refresh_default_value)

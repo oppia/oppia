@@ -160,6 +160,7 @@ class ExplorationPage(EditorHandler):
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
         })
+
         self.render_template('editor/editor_exploration.html')
 
 
