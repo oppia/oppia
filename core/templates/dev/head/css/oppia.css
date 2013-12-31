@@ -658,8 +658,18 @@ textarea {
   width: 20%;
 }
 
+.oppia-splash-image {
+  margin-top: -20px;
+}
+
 .oppia-splash p {
   font-size: 1.4em;
+  margin-top: .5em;
+}
+
+.oppia-splash .btn {
+  margin-top: .5em;
+  display: block;
 }
 
 .oppia-splash-highlight {
@@ -684,5 +694,5 @@ textarea {
 }
 
 .icon {
-  height: 1.8em;
+  height: 1.6em;
 }

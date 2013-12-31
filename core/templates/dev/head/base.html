@@ -48,14 +48,10 @@
 
                 <ul class="nav">
                     <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
-                      <a href="/gallery">Gallery</a>
+                      <a href="/gallery">Learn</a>
                     </li>
-                    {% if nav_mode == 'reader' %}
-                      <li class="active">
-                        <a href="">Learn</a>
-                      </li>
-                    {% elif nav_mode == 'editor' %}
-                      <li class="active">
+                    {% if user %}
+                      <li {% if nav_mode == 'editor' %}class="active"{% endif %}>
                         <a href="">Create</a>
                       </li>
                     {% endif %}
