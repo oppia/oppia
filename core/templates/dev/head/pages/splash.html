@@ -23,8 +23,8 @@
       <div class="span6">
         <p>
           <a class="btn btn-large btn-primary" href="#sample-exploration">Try a sample exploration!</a>
-        {% if user %}
-          <a class="btn btn-large btn-primary" href="/create">Create an exploration</a>
+        {% if user_email %}
+          <a class="btn btn-large btn-primary" href="/contribute">Create an exploration</a>
           <a class="btn btn-large" href="/about">Learn more</a>
         {% else %}
           <a class="btn btn-large" href="/about">Learn more</a>
