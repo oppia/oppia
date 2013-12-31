@@ -427,6 +427,7 @@ textarea {
 
 .oppia-footer .nav {
   margin-bottom: 0;
+  border-top: 1pt solid #dde0FF;
 }
 
 .oppia-footer .nav li {
@@ -630,8 +631,12 @@ textarea {
   transform-origin: 35px 65px;
 }
 
+.label-info {
+  background-color: #18447E;
+}
+
 .oppia-rule-bubble {
-  background: steelblue;
+  background: #18447E;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 3px;
