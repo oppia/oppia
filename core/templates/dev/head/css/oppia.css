@@ -25,11 +25,32 @@ body {
   margin: 0 auto;
   padding: 0;
   width: 100%;
+  color: #222;
+}
+
+h1, h2 {
+  color: #000;
 }
 
 h3 {
   color: #222;
   line-height: 1.1;
+}
+
+a {
+  color: #092c66;
+}
+
+a:hover {
+  color: #3f2c76;
+}
+
+.btn-primary {
+  background: #092c66;
+}
+
+.btn-primary:hover {
+  background: #3f2c76;
 }
 
 /*
@@ -61,19 +82,11 @@ h3 {
 }
 
 p {
-  color: #444;
   line-height: 1.5;
   /* The following should be the same as the line-height (1.5). */
   margin: 1.5em 0;
   text-align: left;
   word-spacing: 0;
-}
-
-.navbar-static-top .container,
-.navbar-fixed-top .container,
-.navbar-fixed-bottom .container {
-  margin: 0 auto;
-  width: 98%;
 }
 
 #wrapper {
@@ -99,8 +112,45 @@ textarea {
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
-.nav, .pagination, .carousel a {
+.nav, .pagination {
   cursor: pointer;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+.navbar .nav > li > a, .navbar .brand {
+  color: white;
+  text-shadow: 0 1px 0 #092c66;
+}
+
+.navbar .brand {
+  font-weight: bold;
+}
+
+.navbar .brand:hover {
+  text-shadow: 0 1px 2px #000;
+}
+
+.brand sup {
+  font-size: .6em;
+}
+
+.navbar .nav > li > a:hover {
+  background: rgb(10, 48, 106);
+  color: white;
+}
+
+.navbar .nav > li.active > a, .navbar .nav > li.active > a:hover {
+  color: white;
+  background: rgb(2, 38, 86);
+}
+
+.navbar-static-top .navbar-inner {
+  background: #18447E;
+  border-bottom: 1pt solid #2f2f3f;
+  box-shadow: 0 1px 5px rgba(12,12,24, .3);
 }
 
 .oppia-editor-header {
@@ -286,7 +336,6 @@ textarea {
   background-image: -webkit-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   background-image: -moz-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   background-image: linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
-  color: #444;
   border-radius: 3px;
   font: bold 14px/20px Arial, sans-serif;
   padding: 4px 10px;
@@ -373,13 +422,25 @@ textarea {
 }
 
 .oppia-footer {
-  border-top: 1px solid #DDD;
-  bottom: 0;
-  height: 3em;
-  max-height: 3em;
-  margin: auto;
-  position: absolute;
-  width: 100%;
+  margin-top: 30px;
+}
+
+.oppia-footer .nav {
+  margin-bottom: 0;
+  border-top: 1pt solid #dde0FF;
+}
+
+.oppia-footer .nav li {
+  display: inline-block;
+}
+
+.oppia-footer .nav a {
+  padding: 10px 20px 10px 0;
+}
+
+.oppia-footer .nav a:hover {
+  background: none;
+  text-decoration: underline;
 }
 
 .oppia-exploration-header {
@@ -394,16 +455,20 @@ textarea {
 }
 
 .oppia-wide-panel {
-  border: 1px solid black;
+  border: 1px solid #dde0FF;
   border-radius: 20px;
   width: 100%;
 }
 
-.oppia-wide-panel-content {
+.oppia-wide-panel-content, .oppia-about {
   font-size: large;
   margin: 5px auto;
   min-height: 400px;
   padding: 20px;
+}
+
+.oppia-about {
+  margin-top: 0;
 }
 
 .oppia-wide-panel-title {
@@ -566,8 +631,12 @@ textarea {
   transform-origin: 35px 65px;
 }
 
+.label-info {
+  background-color: #18447E;
+}
+
 .oppia-rule-bubble {
-  background: steelblue;
+  background: #18447E;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 3px;
@@ -598,32 +667,45 @@ textarea {
   width: 20%;
 }
 
-.oppia-splash {
-  background: hsla(210, 75%, 75%, 1.0);
-}
-
-.oppia-carousel-slide {
-  height: 800px;
-  padding: 50px 90px 0 90px;
-}
-
-.oppia-splash-button-container {
-  font-size: 200%;
-  height: 100px;
-}
-
-.oppia-splash-header {
-  color: black;
-  font: 40px open sans,sans-serif;
-  font-weight: bold;
-}
-
-.oppia-splash-subtitle {
-  color: black;
-  font: 20px open sans,sans-serif;
-}
-
 .oppia-splash-image {
-  height: 130px;
-  padding: 0 20px;
+  margin-top: -20px;
+}
+
+.oppia-splash p {
+  font-size: 1.4em;
+  margin-top: .5em;
+}
+
+.oppia-splash .btn {
+  margin-top: .5em;
+  display: block;
+}
+
+.oppia-splash-highlight {
+  padding: 10px 0;
+  background: #dde0FF;
+  margin-bottom: 20px;
+}
+
+.help {
+  font-size: .85em;
+  color: #999;
+}
+
+.row {
+  margin-bottom: 10px;
+}
+
+#sample-exploration iframe {
+  border: 2pt solid #dde0FF;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+}
+
+.icon {
+  height: 1.6em;
+}
+
+.about-tabs {
+  margin-bottom: 0;
 }
