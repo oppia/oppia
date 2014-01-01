@@ -108,6 +108,12 @@ class BaseHandler(webapp2.RequestHandler):
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
+        # If the request is to the old demo server, redirect it permanently to
+        # the new demo server.
+        if request.uri.startswith('https://oppiaserver.appspot.com'):
+            self.redirect('https://oppiatestserver.appspot.com', True)
+            return
+
         self.start_time = datetime.datetime.utcnow()
 
         # Initializes the return dict for the handlers.

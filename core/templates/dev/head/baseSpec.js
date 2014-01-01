@@ -10,10 +10,6 @@ describe('Base controller', function() {
         messengerService: null});
     }));
 
-    it('should check that the current URL is not the demo server', function() {
-      expect(scope.isDemoServer()).toBe(false);
-    });
-
     it('should clone an object', function() {
       var a = {'a': 'b'};
       var b = scope.cloneObject(a);
