@@ -43,55 +43,50 @@ class WidgetUnitTests(test_utils.GenericTestBase):
     def test_parameterized_widget(self):
         """Test that parameterized widgets are correctly handled."""
 
-        MUSIC_STAFF_ID = 'MusicStaff'
+        TEXT_INPUT_ID = 'TextInput'
 
         widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, MUSIC_STAFF_ID)
-        self.assertEqual(widget.id, MUSIC_STAFF_ID)
-        self.assertEqual(widget.name, 'Music staff')
+            feconf.INTERACTIVE_PREFIX, TEXT_INPUT_ID)
+        self.assertEqual(widget.id, TEXT_INPUT_ID)
+        self.assertEqual(widget.name, 'Text input')
 
         code = widget.get_raw_code({}, {})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"', code)
+        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"', code)
 
-        code = widget.get_raw_code({'noteToGuess': {'value': 'F4'}}, {})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
+        code = widget.get_raw_code({'placeholder': {'value': 'F4'}}, {})
+        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
 
         code = widget.get_raw_code(
-            {'noteToGuess': {'value': '{{ntg}}', 'parse_with_jinja': True}},
+            {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
             {'ntg': 'F4'})
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');', code)
+        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
-            {'noteToGuess': {'value': 'F4'}}, {}
+            {'placeholder': {'value': 'F4'}}, {}
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description', 'params',
             'handlers', 'raw', 'customization_args'])
         self.assertEqual(
-            parameterized_widget_dict['widget_id'], MUSIC_STAFF_ID)
-        self.assertIn('GLOBALS.noteToGuess = JSON.parse(\'\\"F4\\"\');',
+            parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
+        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');',
                       parameterized_widget_dict['raw'])
 
-        self.assertEqual(parameterized_widget_dict['params'], {
-            'noteToGuess': {
+        self.assertDictContainsSubset({
+            'placeholder': {
                 'value': 'F4',
-                'description': 'The note that the reader should guess.',
+                'description': 'The placeholder for the text input field.',
                 'obj_type': 'UnicodeString',
-                'generator_id': 'RestrictedCopier',
-                'init_args': {
-                    'choices': [
-                        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
-                        'E5', 'F5'
-                    ]
-                },
+                'generator_id': 'Copier',
+                'init_args': {},
                 'customization_args': {
                     'value': 'F4',
                 }
             }
-        })
+        }, parameterized_widget_dict['params'])
 
-        self.assertEqual(parameterized_widget_dict['customization_args'], {
-            'noteToGuess': {
+        self.assertDictContainsSubset({
+            'placeholder': {
                 'value': 'F4',
             }
-        })
+        }, parameterized_widget_dict['customization_args'])

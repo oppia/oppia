@@ -173,19 +173,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.submit_and_compare(
             'Finnish', 'Yes! Oppia is the Finnish word for learn.')
 
-    def test_parametrized_adventure(self):
-        """Test a reader's progression through the parametrized adventure."""
-        self.init_player(
-            '6', 'Parameterized Adventure', 'Hello, brave adventurer')
-        self.submit_and_compare(
-            'My Name', 'Hello, I\'m My Name!.*get a pretty red')
-        self.submit_and_compare(0, 'fork in the road')
-        self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')
-
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""
         self.init_player(
-            '8', 'The Lazy Magician', 'How does he do it?')
+            '2', 'The Lazy Magician', 'How does he do it?')
         self.submit_and_compare('Dont know', 'town square')
         self.submit_and_compare(0, 'Is it')
         self.submit_and_compare(2, 'Do you want to play again?')
@@ -196,3 +187,12 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.submit_and_compare(
             0, 'to be sure our strategy works in all cases')
         self.submit_and_compare(0, 'try to guess')
+
+    def test_parametrized_adventure(self):
+        """Test a reader's progression through the parametrized adventure."""
+        self.init_player(
+            '8', 'Parameterized Adventure', 'Hello, brave adventurer')
+        self.submit_and_compare(
+            'My Name', 'Hello, I\'m My Name!.*get a pretty red')
+        self.submit_and_compare(0, 'fork in the road')
+        self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')

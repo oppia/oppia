@@ -402,12 +402,6 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))
 
-        self.assertEqual(
-            exp_services.get_exploration_by_id('4').title, u'¡Hola!')
-        self.assertEqual(
-            exp_services.get_exploration_by_id('9').title,
-            u'Project Euler Problem 1')
-
         for ind in range(len(feconf.DEMO_EXPLORATIONS)):
             exp_services.delete_demo(str(ind))
         self.assertEqual(exp_services.count_explorations(), 0)

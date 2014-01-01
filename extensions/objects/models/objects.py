@@ -374,28 +374,6 @@ class SanitizedUrl(BaseObject):
                             (raw, e))
 
 
-class MusicNote(UnicodeString):
-    """String that represents a music note between C4 and F5."""
-    # TODO(sll): Make this more general -- i.e. an Enum.
-
-    description = 'A music note between C4 and F5.'
-    edit_html_filename = 'music_note_editor'
-    edit_js_filename = 'MusicNoteEditor'
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        try:
-            result = super(MusicNote, cls).normalize(raw)
-            assert result in [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
-                'F5'
-            ]
-            return result
-        except Exception:
-            raise TypeError('Cannot convert to MusicNote: %s' % raw)
-
-
 class TarFileString(BaseObject):
     """A unicode string with the base64-encoded content of a tar file"""
 

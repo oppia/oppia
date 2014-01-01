@@ -155,9 +155,6 @@ ALLOWED_WIDGETS = {
         'InteractiveMap': {
             'dir': 'extensions/widgets/interactive/InteractiveMap'
         },
-        'MusicStaff': {
-            'dir': 'extensions/widgets/interactive/MusicStaff'
-        },
         'SetInput': {
             'dir': 'extensions/widgets/interactive/SetInput'
         },
@@ -182,16 +179,15 @@ ALLOWED_WIDGETS = {
 # be the path to the directory WITHOUT a trailing '/'.
 DEMO_EXPLORATIONS = [
     ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
-    ('pitch.yaml', 'Pitch Perfect', 'Music'),
-    ('counting.yaml', 'Three Balls', 'Mathematics'),
-    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
-    ('hola.yaml', u'¡Hola!', 'Languages'),
-    ('cities.yaml', 'World Cities', 'Geography'),
-    ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
+    ('multiples.yaml', 'Project Euler Problem 1', 'Coding'),
+    ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('multiples.yaml', 'Project Euler Problem 1', 'Coding')
+    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('cities.yaml', 'World Cities', 'Geography'),
+    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
+    ('hola.yaml', u'¡Hola!', 'Languages'),
+    ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
 ]
 
 # TODO(sll): Add all other URLs here.

@@ -176,10 +176,3 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [u'http://¡Hola!.com']
 
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
-
-    def test_music_note_validation(self):
-        """Tests objects of type MusicNote."""
-        mappings = [('A4', 'A4'), ('B4', 'B4'), ]
-        invalid_values = ['D6', 'B3', 'CA4', 2, None]
-
-        self.check_normalization(objects.MusicNote, mappings, invalid_values)
