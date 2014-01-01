@@ -444,14 +444,10 @@ textarea {
 }
 
 .oppia-exploration-header {
-  margin: 10px auto;
-  padding: 6px 0;
-  text-align: center;
-  width: 80%;
+  padding-left: 7px;
 }
-.oppia-exploration-header a {
-  font-size: 200%;
-  text-decoration: none;
+.oppia-exploration-header-sublink {
+  padding-top: 5px;
 }
 
 .oppia-wide-panel {
@@ -522,7 +518,7 @@ textarea {
   border-left: 1px dashed #bbb;
   border-right: 1px dashed #bbb;
   margin: 0 0 2px 0;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 /* Styles for the state graph vizualization. */
@@ -699,4 +695,11 @@ textarea {
 
 .about-tabs {
   margin-bottom: 0;
+}
+
+.nav-pills#navTabs > .active > a,
+.nav-pills#navTabs > .active > a:hover,
+.nav-pills#navTabs > .active > a:focus {
+  color: #ffffff;
+  background-color: #18447E;
 }

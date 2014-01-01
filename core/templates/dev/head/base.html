@@ -46,18 +46,18 @@
                 </a>
 
                 <ul class="nav">
-                  <li {% if nav_mode == 'gallery' %} class="active" {% endif %}>
-                    <a href="/gallery">Learn</a>
+                  <li {% if nav_mode == 'learn' %} class="active" {% endif %}>
+                    <a href="/learn">Learn</a>
                   </li>
                   {% if user_email %}
-                    <li {% if nav_mode == 'editor' %}class="active"{% endif %}>
+                    <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
                       <a href="/contribute">Contribute</a>
                     </li>
                   {% endif %}
-                  <li>
-                   <a href="/about">About</a>
+                  <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+                    <a href="/about">About</a>
                   </li>
-                  <li>
+                  <li {% if nav_mode == 'contact' %}class="active"{% endif %}>
                     <a href="/contact">Contact</a>
                   </li>
                 </ul>
@@ -136,7 +136,7 @@
                 <a href="/">Home</a>
               </li>
               <li>
-                <a href="/gallery">Gallery</a>
+                <a href="/learn">Gallery</a>
               </li>
               <li>
                <a href="/about">About</a>

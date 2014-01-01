@@ -1,6 +1,6 @@
 describe('Gallery controller', function() {
 
-  describe('GalleryCtrl', function() {
+  describe('ContributeGallery', function() {
     var scope, ctrl, $httpBackend;
 
     var geographyExploration = {
@@ -33,7 +33,7 @@ describe('Gallery controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/galleryhandler/data').respond({
+      $httpBackend.expectGET('/contributehandler/data').respond({
         allow_yaml_file_upload: false,
         categories: {
           Geography: [geographyExploration],
@@ -41,12 +41,8 @@ describe('Gallery controller', function() {
         }
       });
       scope = $rootScope.$new();
-      ctrl = $controller(Gallery, {$scope: scope, warningsData: null, oppiaRequestCreator: null});
+      ctrl = $controller(ContributeGallery, {$scope: scope, warningsData: null, oppiaRequestCreator: null});
     }));
-
-    it('should create current URL', function() {
-      expect(scope.currentUrl).toBe('http://localhost:9876/context.html');
-    });
 
     it('should show correct categories', function() {
       $httpBackend.flush();

@@ -49,13 +49,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
-            '/learn/%s' % self.EXP_ID, expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
         self.login('person@example.com')
         response = self.testapp.get(
-            '/learn/%s' % self.EXP_ID, expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
 
@@ -68,13 +70,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.login(other_editor)
         response = self.testapp.get(
-            '/learn/%s' % self.EXP_ID, expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
         self.assertEqual(response.status_int, 404)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
         self.login(self.first_editor_email)
-        response = self.testapp.get('/learn/%s' % self.EXP_ID)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
         self.logout()
@@ -84,7 +88,8 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
 
         self.login('admin@example.com')
-        response = self.testapp.get('/learn/%s' % self.EXP_ID)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('This is a preview', response.body)
         self.logout()
@@ -93,7 +98,8 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.first_editor_id, self.EXP_ID)
 
         response = self.testapp.get(
-            '/learn/%s' % self.EXP_ID, expect_errors=True)
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
+            expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assertNotIn('This is a preview', response.body)
 
@@ -108,7 +114,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
     def _submit_answer(self, answer):
         """Action representing submission of an answer to the backend."""
-        url = '/learnhandler/transition/%s/%s' % (
+        url = '%s/%s/%s' % (
+            feconf.EXPLORATION_TRANSITION_URL_PREFIX,
             self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
             'answer': answer, 'block_number': self.last_block_number,
@@ -145,7 +152,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.EXP_ID = exploration_id
 
         reader_dict = self.get_json(
-            '/learnhandler/init/%s' % self.EXP_ID)
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
 
         self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']

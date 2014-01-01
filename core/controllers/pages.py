@@ -19,6 +19,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
+import feconf
 
 
 ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
@@ -40,6 +41,10 @@ class SplashPage(base.BaseHandler):
             exp_services.delete_demo('0')
             exp_services.load_demo('0')
 
+        self.values.update({
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'SITE_NAME': SITE_NAME.value,
+        })
         self.render_template('pages/splash.html')
 
 
@@ -50,6 +55,7 @@ class AboutPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
+            'nav_mode': feconf.NAV_MODE_ABOUT,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'SITE_NAME': SITE_NAME.value,
         })
@@ -71,6 +77,7 @@ class ContactPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
+            'nav_mode': feconf.NAV_MODE_CONTACT,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
         })
         self.render_template('pages/contact.html')

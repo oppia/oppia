@@ -24,7 +24,6 @@ from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
-import utils
 
 
 def require_viewer(handler):
@@ -57,35 +56,9 @@ class ExplorationPage(base.BaseHandler):
             'content': skins_services.get_skin_html(exploration.default_skin),
             'iframed': (self.request.get('iframed') == 'true'),
             'is_public': rights_manager.is_exploration_public(exploration_id),
-            'nav_mode': feconf.NAV_MODE_READER,
         })
         self.render_template(
             'reader/reader_exploration.html', iframe_restriction=None)
-
-
-class RandomExplorationPage(base.BaseHandler):
-    """Returns the page for a random exploration.
-
-    This class is DEPRECATED and will be removed shortly.
-    """
-
-    def get(self):
-        """Handles GET requests."""
-        iframed = (self.request.get('iframed') == 'true')
-
-        explorations = exp_services.get_public_explorations_summary_dict()
-        if len(explorations) <= 1:
-            exp_services.delete_demo('1')
-            exp_services.load_demo('1')
-            selected_exploration_id = '1'
-        else:
-            selected_exploration_id = utils.get_random_choice(
-                explorations[1:]).id
-
-        dest_url = '/learn/%s' % selected_exploration_id
-        if iframed:
-            dest_url += '?iframed=true'
-        self.redirect(dest_url)
 
 
 class ExplorationHandler(base.BaseHandler):

@@ -23,7 +23,7 @@
 
     <div class="span6">
       <div ng-show="ownerNames.length > 0 && !isCloned">
-        <strong>Owners</strong>
+        <strong>Managers</strong>
         <ul>
           <li ng-repeat="ownerName in ownerNames track by $index">
             <[ownerName]>
@@ -66,7 +66,7 @@
             Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
             </select>
             <br>
-            <em>Note that owners also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
+            <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
             <br>
             <input type="submit" value="Save">
             <button type="button" ng-click="closeEditRolesForm()"

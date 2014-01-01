@@ -19,7 +19,6 @@ __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
-from core.domain import stats_services
 from core.domain import user_services
 import feconf
 import utils
@@ -36,7 +35,7 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
 class ProfilePage(base.BaseHandler):
     """The profile page."""
 
-    PAGE_NAME_FOR_CSRF = 'gallery_or_profile'
+    PAGE_NAME_FOR_CSRF = 'profile'
 
     @base.require_user
     def get(self):

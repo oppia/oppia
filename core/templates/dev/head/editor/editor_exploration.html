@@ -73,7 +73,7 @@
 
         <p>
           Please note that after an exploration is released to the community, it will
-          no longer have an explicit list of owners,
+          no longer have an explicit list of managers,
           so this action is <strong>not reversible</strong>.
         </p>
 
@@ -170,6 +170,12 @@
 
     <div class="container-fluid">
       <div class="oppia-content row-fluid">
+        <a href="/contribute" class="btn" ng-if="!iframed">
+          Return to the contributors' gallery
+        </a>
+      </div>
+      <br>
+      <div class="oppia-content row-fluid">
         <div class="span12">
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
@@ -197,7 +203,7 @@
               </span>
             {% endif %}
 
-            <a class="btn" target="_blank" href="/learn/<[explorationId]>"
+            <a class="btn" target="_blank" href="/explore/<[explorationId]>"
                title="Play this exploration in a new window.">
               <i class="icon-play"></i>
             </a>

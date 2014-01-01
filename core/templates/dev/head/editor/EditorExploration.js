@@ -548,7 +548,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.ROLES = [
-    {name: 'Owner (can edit permissions)', value: 'owner'},
+    {name: 'Manager (can edit permissions)', value: 'owner'},
     {name: 'Collaborator (can make changes)', value: 'editor'},
     {name: 'Playtester (can give feedback)', value: 'viewer'}
   ];

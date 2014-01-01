@@ -24,7 +24,7 @@ if feconf.PLATFORM == 'django':
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
-from core.controllers import gallery
+from core.controllers import galleries
 from core.controllers import pages
 from core.controllers import profile
 from core.controllers import reader
@@ -95,39 +95,47 @@ urls = [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/gallery', gallery.GalleryPage, 'gallery_page'),
     get_redirect_route(
-        r'/galleryhandler/data', gallery.GalleryHandler, 'gallery_handler'),
-
+        r'%s' % feconf.LEARN_GALLERY_URL, galleries.LearnPage,
+        'learn_gallery_page'),
     get_redirect_route(
-        r'/create_new', gallery.NewExploration, 'new_exploration'),
+        r'/learnhandler/data', galleries.LearnHandler,
+        'learn_gallery_handler'),
     get_redirect_route(
-        r'/clone', gallery.CloneExploration, 'clone_exploration'),
+        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
+        'contribute_gallery_page'),
+    get_redirect_route(
+        r'/contributehandler/data', galleries.ContributeHandler,
+        'contribute_gallery_handler'),
+    get_redirect_route(
+        r'/contributehandler/create_new',
+        galleries.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'/contributehandler/clone',
+        galleries.CloneExploration, 'clone_exploration'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
         r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
     get_redirect_route(
-        r'/editor_prerequisites', profile.EditorPrerequisitesPage,
-        'editor_prerequisites_page'),
+        r'%s' % feconf.EDITOR_PREREQUISITES_URL,
+        profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),
     get_redirect_route(
-        r'/editor_prerequisites_handler/data',
+        r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
         profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
 
     get_redirect_route(
-        r'/learn/<exploration_id>', reader.ExplorationPage,
-        'exploration_page'),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
+        reader.ExplorationPage, 'exploration_page'),
     get_redirect_route(
-        r'/learn_random', reader.RandomExplorationPage,
-        'random_exploration_page'),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
+        reader.ExplorationHandler, 'exploration_handler'),
     get_redirect_route(
-        r'/learnhandler/init/<exploration_id>', reader.ExplorationHandler,
-        'exploration_handler'),
-    get_redirect_route(
-        r'/learnhandler/transition/<exploration_id>/<escaped_state_name>',
+        (r'%s/<exploration_id>/<escaped_state_name>'
+         % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
-        r'/learnhandler/give_feedback/<exploration_id>/<escaped_state_name>',
+        r'/explorehandler/give_feedback/<exploration_id>/<escaped_state_name>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(

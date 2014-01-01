@@ -158,7 +158,6 @@ class ExplorationPage(EditorHandler):
                 exploration_id),
             'can_release_ownership': rights_manager.Actor(
                 self.user_id).can_release_ownership(exploration_id),
-            'nav_mode': feconf.NAV_MODE_EDITOR,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
         })

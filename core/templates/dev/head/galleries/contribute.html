@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Gallery
+  Contribute
 {% endblock subtitle %}
 
 {% block content %}
-  <div class="container" ng-controller="Gallery">
+  <div class="container" ng-controller="ContributeGallery">
 
     <div class="row">
     <div class="span8">
       <div class="oppia-gallery-frame">
         <h3 class="oppia-page-title">
-          Gallery
+          Contribute
         </h3>
 
         <div class="oppia-gallery" ng-if="categories">
@@ -21,7 +21,7 @@
               <div class="oppia-gallery-menu-title">
                 <strong>Categories</strong>
               </div>
-              <ul class="nav nav-pills nav-stacked" id="navTabs">
+              <ul class="nav nav-pills nav-stacked oppia-nav-pills" id="navTabs">
                 <li ng-repeat="(category, explorations) in categories"
                     ng-class="{active: $index == 0}">
                   <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
@@ -36,10 +36,10 @@
                 <div class="container-fluid">
                   <div class="row-fluid">
 
-                    <div ng-repeat="exploration in explorations | filter: canViewExploration" class="oppia-gallery-tile">
+                    <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
 
                       <div class="oppia-gallery-tile-top">
-                        <a href="/learn/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                        <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
                           <div class="oppia-gallery-tile-description">
                             <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                             <span class="oppia-gallery-tile-play">
@@ -51,23 +51,26 @@
 
                       <div class="oppia-gallery-tile-bottom">
                         <div>
-                          <span ng-if="exploration.can_clone">
-                            <a href="" ng-click="cloneExploration(exploration.id)">
-                              <i class="icon-share oppia-icon" title="Copy this exploration">
-                              </i>
-                              <span class="oppia-small-font">Copy</span>
-                            </a> |
-                          </span>
                           <span ng-if="exploration.can_edit">
                             <a href="/create/<[exploration.id]>">
                               <i class="icon-pencil" title="Edit this exploration"></i>
                               <span class="oppia-small-font">Edit</span>
                             </a> |
                           </span>
-                          <a href="" ng-click="showEmbedModal(exploration.id)">
-                            <i class="icon-share-alt" title="Embed this exploration"></i>
-                            <span class="oppia-small-font">Embed</span>
-                          </a>
+                          <span ng-if="exploration.can_clone">
+                            <a href="" ng-click="cloneExploration(exploration.id)">
+                              <i class="icon-share oppia-icon" title="Copy this exploration">
+                              </i>
+                              <span class="oppia-small-font">Copy</span>
+                            </a>
+                          </span>
+
+                          <span ng-if="exploration.is_cloned" class="label label-info pull-right">
+                            Cloned
+                          </span>
+                          <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info pull-right">
+                            Private
+                          </span>
                         </div>
                       </div>
 
@@ -86,7 +89,7 @@
 
         {% if user_email %}
           <p ng-controller="CreateExplorationModal">
-            {% include 'modals/create_exploration_modal.html' %}
+            {% include 'galleries/create_exploration_modal.html' %}
             <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
               Create New Exploration
             </a>
@@ -101,40 +104,12 @@
     </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/galleryEmbed">
-    <div class="modal-header">
-      <h3>Embed this exploration</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        You can embed this exploration in a webpage by copying and pasting
-        the following code snippet into the webpage's HTML:
-      </p>
-      <code>
-        &lt;iframe src="<[root]>/learn/<[currentId]>?iframed=true" width="100%"
-        <br>
-        height="400px" frameborder="0"&gt;&lt;/iframe&gt;
-      </code>
-
-      <br>
-
-      <p ng-if="isDemoServer">
-        <strong style="color: red">Warning</strong>: This version of Oppia runs on a demo server that may go down at any time. If you want to link to Oppia explorations from a different webpage, we strongly suggest that you <a href="https://code.google.com/p/oppia/wiki/GettingStarted">set up your own server</a>. If you have permission to edit this exploration, you can also download it from this server by clicking the download icon in the top-right of the exploration editor page, and then upload that file to your own server.
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn" ng-click="cancel()">Close</button>
-    </div>
-  </script>
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('gallery/Gallery.js') }}
-    {{ include_js_file('modals/createExplorationModal.js') }}
+    {{ include_js_file('galleries/ContributeGallery.js') }}
+    {{ include_js_file('galleries/createExplorationModal.js') }}
   </script>
 {% endblock footer_js %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Gallery
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container" ng-controller="LearnGallery">
+    <div class="row">
+      <div class="span8">
+        <div class="oppia-gallery-frame">
+          <h3 class="oppia-page-title">
+            Gallery
+          </h3>
+
+          <div class="oppia-gallery" ng-if="categories">
+            <div class="tabbable tabs-left">
+
+              <div class="oppia-gallery-menu">
+                <div class="oppia-gallery-menu-title">
+                  <strong>Categories</strong>
+                </div>
+                <ul class="nav nav-pills nav-stacked" id="navTabs">
+                  <li ng-repeat="(category, explorations) in categories"
+                      ng-class="{active: $index == 0}">
+                    <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
+                      <[category]>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="tab-content oppia-gallery-tiles-container">
+                <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                  <div class="container-fluid">
+                    <div class="row-fluid">
+
+                      <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
+
+                        <div class="oppia-gallery-tile-top">
+                          <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                            <div class="oppia-gallery-tile-description">
+                              <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                              <span class="oppia-gallery-tile-play">
+                                <i class="icon-play-circle"></i>
+                              </span>
+                            </div>
+                          </a>
+                          <span ng-if="exploration.to_playtest" class="label label-info pull-right">
+                            Invited to playtest
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('galleries/LearnGallery.js') }}
+  </script>
+{% endblock footer_js %}

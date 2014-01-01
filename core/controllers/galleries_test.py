@@ -14,6 +14,7 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
 import test_utils
 
 
@@ -21,6 +22,6 @@ class GalleryTest(test_utils.GenericTestBase):
 
     def test_gallery_page(self):
         """Test access to gallery page."""
-        response = self.testapp.get('/learn')
+        response = self.testapp.get(feconf.LEARN_GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         self.assertIn('Gallery', response.body)

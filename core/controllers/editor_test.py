@@ -177,12 +177,15 @@ class EditorTest(test_utils.GenericTestBase):
 
         # In the reader perspective, submit the first multiple-choice answer,
         # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
-        exploration_dict = self.get_json('/learnhandler/init/0')
+        # TODO(sll): Use the ExplorationPlayer in reader_test for this.
+        exploration_dict = self.get_json(
+            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_name, {
+            '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+            {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
@@ -190,7 +193,8 @@ class EditorTest(test_utils.GenericTestBase):
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_name, {
+            '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+            {
                 'answer': 'blah', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
@@ -198,8 +202,8 @@ class EditorTest(test_utils.GenericTestBase):
 
         for _ in range(2):
             exploration_dict = self.post_json(
-                '/learnhandler/transition/0/%s' % state_name,
-                {
+                '%s/0/%s' % (
+                    feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah2', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
                 }
@@ -207,8 +211,8 @@ class EditorTest(test_utils.GenericTestBase):
 
         for _ in range(3):
             exploration_dict = self.post_json(
-                '/learnhandler/transition/0/%s' % state_name,
-                {
+                '%s/0/%s' % (
+                    feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah3', 'block_number': 0, 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
                 }
@@ -284,21 +288,26 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         # Switch to the reader perspective. First submit the first
         # multiple-choice answer, then submit 'blah'.
-        exploration_dict = self.get_json('/learnhandler/init/0')
+        exploration_dict = self.get_json(
+            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
-            '/learnhandler/transition/0/%s' % state_name, {
+            '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+            {
                 'answer': '0', 'block_number': 0, 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
         state_name = exploration_dict['state_name']
-        self.post_json('/learnhandler/transition/0/%s' % state_name, {
-            'answer': 'blah', 'block_number': 0, 'handler': 'submit',
-            'state_history': exploration_dict['state_history']
-        })
+        self.post_json(
+            '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+            {
+                'answer': 'blah', 'block_number': 0, 'handler': 'submit',
+                'state_history': exploration_dict['state_history']
+            }
+        )
 
         # Now switch back to the editor perspective.
         self.login('editor@example.com', is_admin=True)

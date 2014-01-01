@@ -64,6 +64,28 @@ def require_user(handler):
     return test_login
 
 
+def require_registered_as_editor(handler):
+    """Decorator that checks if the user has registered as an editor."""
+    def test_registered_as_editor(self, **kwargs):
+        """Check that the user has registered as an editor."""
+        if not self.user_id:
+            self.redirect(current_user_services.create_login_url(
+                self.request.uri))
+            return
+
+        redirect_url = feconf.EDITOR_PREREQUISITES_URL
+
+        if not user_services.has_user_registered_as_editor(self.user_id):
+            redirect_url = utils.set_url_query_parameter(
+                redirect_url, 'return_url', self.request.uri)
+            self.redirect(redirect_url)
+            return
+
+        return handler(self, **kwargs)
+
+    return test_registered_as_editor
+
+
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 

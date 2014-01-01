@@ -180,7 +180,7 @@ function reloadOppiaTag(oppiaNode) {
   var versionString = explorationVersion ? '&v' + explorationVersion : '';
   iframe.setAttribute('src', encodeURI(
       (oppiaNode.getAttribute('src') || currLoc) +
-      '/learn/' + oppiaNode.getAttribute('oppia-id') +
+      '/explore/' + oppiaNode.getAttribute('oppia-id') +
       '?iframed=true&locale=en' + versionString +
       '#' + tagId + '&' + OPPIA_EMBED_GLOBALS.version));
   iframe.setAttribute('seamless', 'seamless');

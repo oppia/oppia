@@ -9,7 +9,7 @@
     <div class="modal-header">
       <h3>Give Feedback</h3>
     </div>
-  
+
     <div class="modal-body">
       <h4>Give feedback to the exploration editors</h4>
       <!-- TODO(sfederwisch): make this true<i> They will be given the exploration history already.</i><br />-->
@@ -23,7 +23,7 @@
       </em>
       <textarea ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
     </div>
-  
+
     <div class="modal-footer">
       <button class="btn" ng-click="submit(feedback)">Submit</button>
       <button class="btn" ng-click="cancel()">Cancel</button>
@@ -34,7 +34,7 @@
     <div class="modal-header">
       <h3>Thank you for giving feedback</h3>
     </div>
-  
+
     <div class="modal-body">
       <p>
         Your feedback has been successfully submitted, and the exploration creator will see it the next time he/she visits the exploration creation dashboard.
@@ -43,24 +43,27 @@
         Thank you for helping to improve this exploration!
       </p>
     </div>
-  
+
     <div class="modal-footer">
       <button class="btn" ng-click="cancel()">Close</button>
     </div>
   </script>
 
   <div class="oppia-content">
+    <a href="/learn" class="btn" ng-if="!iframed">
+      Return to the gallery
+    </a>
+
+    <br><br>
+
     <div class="oppia-exploration-header">
-      <h3><[title]></h3>
-    </div>
-    <div class="oppia-iframe-container oppia-exploration">
-      <a href="" ng-click="initializePage()" class="pull-right">
+      <a href="" ng-click="initializePage()" class="pull-right oppia-exploration-header-sublink">
         Clear history and restart
       </a>
+      <h3><[title]></h3>
+    </div>
 
-      <br>
-      <br>
-
+    <div class="oppia-iframe-container oppia-exploration">
       <div ng-repeat="response in responseLog track by $index">
         <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>" class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[$last && !finished]]>">
           <div angular-html-bind="response">

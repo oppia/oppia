@@ -87,7 +87,7 @@ function CreateExplorationModal($scope, $http, $rootScope, $modal, warningsData,
         form.append('title', title);
 
         $.ajax({
-          url: '/create_new',
+          url: 'contributeHandler/create_new',
           data: form,
           processData: false,
           contentType: false,
@@ -104,7 +104,7 @@ function CreateExplorationModal($scope, $http, $rootScope, $modal, warningsData,
         });
       } else {
         $http.post(
-          '/create_new',
+          '/contributehandler/create_new',
           oppiaRequestCreator.createRequest({title: title, category: category}),
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
             success(function(data) {
