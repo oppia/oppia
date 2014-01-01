@@ -136,16 +136,18 @@
                 <a href="/">Home</a>
               </li>
               <li>
-                <a href="/learn">Gallery</a>
+                <a href="/learn">Learn</a>
               </li>
+              {% if user_email %}
+                <li>
+                  <a href="/contribute">Contribute</a>
+                </li>
+              {% endif %}
               <li>
                <a href="/about">About</a>
               </li>
               <li>
-                <a href="/license">License</a>
-              </li>
-              <li>
-                <a href="/contact">Contact us</a>
+                <a href="/contact">Contact</a>
               </li>
             </ul>
           </div>

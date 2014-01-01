@@ -62,14 +62,6 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about.html')
 
 
-class LicensePage(base.BaseHandler):
-    """Page with license information."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('pages/license.html')
-
-
 class ContactPage(base.BaseHandler):
     """Page with feedback."""
 

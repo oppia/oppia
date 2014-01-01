@@ -363,6 +363,12 @@ textarea {
   margin-bottom: 10px;
 }
 
+.oppia-editor-reference {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 2px 10px;
+}
+
 /* Adds to existing Bootstrap CSS rule. */
 .alert-block {
   border: 1px solid black;
@@ -422,7 +428,13 @@ textarea {
 }
 
 .oppia-footer {
+  bottom: 0;
+  height: 3em;
   margin-top: 30px;
+  margin-bottom: 10px;
+  max-height: 3em;
+  position: absolute;
+  width: 100%;
 }
 
 .oppia-footer .nav {
