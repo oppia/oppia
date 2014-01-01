@@ -68,7 +68,7 @@ function CodeRepl($scope) {
   var sendResponse = function(evaluation, err) {
     $scope.evaluation = (evaluation || '');
     $scope.err = (err || '');
-    if (parent.location.pathname.indexOf('/learn') === 0) {
+    if (parent.location.pathname.indexOf('/explore') === 0) {
       window.parent.postMessage(
           JSON.stringify({
             'submit': {

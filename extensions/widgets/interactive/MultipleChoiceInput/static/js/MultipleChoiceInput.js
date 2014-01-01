@@ -19,7 +19,7 @@ function MultipleChoiceInput($scope) {
     if (!answer) {
       return;
     }
-    if (parent.location.pathname.indexOf('/learn') === 0) {
+    if (parent.location.pathname.indexOf('/explore') === 0) {
       window.parent.postMessage(
           JSON.stringify({'submit': answer}),
           window.location.protocol + '//' + window.location.host

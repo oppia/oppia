@@ -27,7 +27,7 @@ function initialize() {
       position: ll,
       map: map
     });
-    if (parent.location.pathname.indexOf('/learn') === 0) {
+    if (parent.location.pathname.indexOf('/explore') === 0) {
       window.parent.postMessage(
           JSON.stringify({'submit': ll.lat() + ',' + ll.lng()}),
           window.location.protocol + '//' + window.location.host);
