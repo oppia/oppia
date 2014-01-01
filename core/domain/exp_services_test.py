@@ -384,6 +384,10 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
         """Test loading, validation and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)
 
+        self.assertGreaterEqual(
+            len(feconf.DEMO_EXPLORATIONS), 1,
+            msg='There must be at least one demo exploration.')
+
         for ind in range(len(feconf.DEMO_EXPLORATIONS)):
             start_time = datetime.datetime.utcnow()
 

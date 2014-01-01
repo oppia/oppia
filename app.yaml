@@ -12,6 +12,9 @@ builtins:
 - appstats: on
 - remote_api: on
 
+inbound_services:
+- warmup
+
 admin_console:
   pages:
   - name: Oppia Admin Page

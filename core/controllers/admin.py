@@ -82,10 +82,15 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
-        self.values.update({
-            'demo_explorations': [
+        if feconf.DEV_MODE:
+            demo_explorations = [
                 (str(ind), exp[0]) for ind, exp in
-                enumerate(feconf.DEMO_EXPLORATIONS)],
+                enumerate(feconf.DEMO_EXPLORATIONS)]
+        else:
+            demo_explorations = [('0', feconf.DEMO_EXPLORATIONS[0][0])]
+
+        self.values.update({
+            'demo_explorations': demo_explorations,
             'object_editors_js': jinja2.utils.Markup(
                 editor.OBJECT_EDITORS_JS.value)
         })

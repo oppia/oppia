@@ -18,8 +18,13 @@
 
 __author__ = 'Sean Lip'
 
+import inspect
+import os
+import pkgutil
+
 from core.domain import rule_domain
 from extensions.objects.models import objects
+import feconf
 import test_utils
 
 
@@ -63,3 +68,34 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
             fake_rule._PARAMS,
             [('x', objects.Number), ('y', objects.UnicodeString)]
         )
+
+
+class RuleDataUnitTests(test_utils.GenericTestBase):
+    """Tests for the actual rules in extensions/."""
+
+    def test_that_all_rules_have_object_editor_templates(self):
+        rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
+
+        at_least_one_rule_found = False
+
+        clses = []
+
+        for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+            if name.endswith('_test') or name == 'base':
+                continue
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                param_list = rule_domain.get_param_list(clazz.description)
+
+                for (param_name, param_obj_type) in param_list:
+                    # TODO(sll): Get rid of this special case.
+                    if param_obj_type.__name__ == 'NonnegativeInt':
+                        continue
+
+                    self.assertTrue(
+                        param_obj_type.has_editor_js_template(),
+                        msg='(%s)' % clazz.description)
+                    at_least_one_rule_found = True
+                clses.append(clazz)
+
+        self.assertTrue(at_least_one_rule_found)

@@ -187,6 +187,9 @@ DEMO_EXPLORATIONS = [
     ('cities.yaml', 'World Cities', 'Geography'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', u'¡Hola!', 'Languages'),
+    # This exploration is included to show other applications of Oppia, but
+    # please note that Oppia lacks many of the features of a full interactive
+    # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
 ]
 
