@@ -194,13 +194,19 @@ DEMO_EXPLORATIONS = [
 ]
 
 # TODO(sll): Add all other URLs here.
+CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
+CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
 EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
 EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
+EDITOR_URL_PREFIX = '/create'
+EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
+LEARN_GALLERY_DATA_URL = '/learnhandler/data'
+NEW_EXPLORATION_URL = '/contributehandler/create_new'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'

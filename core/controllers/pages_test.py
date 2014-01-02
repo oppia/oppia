@@ -17,23 +17,47 @@ __author__ = 'Sean Lip'
 import test_utils
 
 
-class MainPageTest(test_utils.GenericTestBase):
+class SplashPageTest(test_utils.GenericTestBase):
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
-    def testMainPage(self):
+    def test_splash_page(self):
         """Test the main splash page."""
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Bite-sized learning journeys', response)
+        response.mustcontain(
+            'Bite-sized learning journeys',
+            'Try a sample exploration!', '100% free!',
+            'Learn', 'About', 'Contact',
+            # No navbar tabs should be highlighted.
+            no=['class="active"'])
+
+    def test_login_and_logout_on_splash_page(self):
+        """Test that the correct buttons/navbar show on login and logout."""
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(
+            'Login', 'Create an Oppia account',
+            self.get_expected_login_url('/'),
+            no=['Contribute', 'Profile', 'Logout', 'Create an exploration',
+                self.get_expected_logout_url('/')])
+
+        self.login('reader@example.com')
+
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(
+            'Contribute', 'Profile', 'Logout', 'Create an exploration',
+            self.get_expected_logout_url('/'),
+            no=['Login', 'Create an Oppia account',
+                self.get_expected_login_url('/')])
+
+        self.logout()
 
 
 class NoninteractivePagesTest(test_utils.GenericTestBase):
 
-    def testAboutPage(self):
+    def test_about_page(self):
         """Test the About page."""
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        self.assertIn('Community Guidelines', response)
-        self.assertIn('Lifecycle', response)
+        response.mustcontain('Community Guidelines', 'Lifecycle', 'License')

@@ -752,6 +752,9 @@ def load_demo(exploration_id):
 
     rights_manager.publish_exploration(
         feconf.ADMIN_COMMITTER_ID, exploration_id)
-    rights_manager.release_ownership(feconf.ADMIN_COMMITTER_ID, exploration_id)
+    # Release ownership of all explorations except the one on the splash page.
+    if exploration_id != '0':
+        rights_manager.release_ownership(
+            feconf.ADMIN_COMMITTER_ID, exploration_id)
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)

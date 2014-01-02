@@ -115,6 +115,14 @@ class TestBase(unittest.TestCase):
         # Suppress default logging of docstrings.
         return None
 
+    def get_expected_login_url(self, slug):
+        """Returns the expected login URL."""
+        return current_user_services.create_login_url(slug)
+
+    def get_expected_logout_url(self, slug):
+        """Returns the expected logout URL."""
+        return current_user_services.create_logout_url(slug)
+
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:

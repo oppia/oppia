@@ -17,6 +17,7 @@ __author__ = 'Sean Lip'
 import unittest
 
 from core.controllers import editor
+from core.controllers import pages
 
 import feconf
 import test_utils
@@ -94,3 +95,31 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         }, response_config_properties[editor.EDITOR_PAGE_ANNOUNCEMENT.name])
 
         self.logout()
+
+    def test_change_splash_page_config_property(self):
+        """Test that the correct variables show up on the splash page."""
+        ACTUAL_SITE_NAME = 'oppia.org'
+
+        # Navigate to the splash page. The site name is not set.
+        response = self.testapp.get('/')
+        self.assertIn('SITE_NAME', response.body)
+        self.assertNotIn(ACTUAL_SITE_NAME, response.body)
+
+        # Log in as an admin and customize the site name.
+        self.login('admin@example.com', is_admin=True)
+
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                pages.SITE_NAME.name: ACTUAL_SITE_NAME
+            }
+        }, csrf_token)
+
+        self.logout()
+
+        # Navigate to the splash page. The site name is set.
+        response = self.testapp.get('/')
+        self.assertNotIn('SITE_NAME', response.body)
+        self.assertIn(ACTUAL_SITE_NAME, response.body)

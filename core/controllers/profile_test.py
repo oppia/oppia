@@ -34,8 +34,9 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response = response.follow()
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('A few notes before you start editing')
-        response.mustcontain('My preferred Oppia username')
+        response.mustcontain(
+            'A few notes before you start editing',
+            'My preferred Oppia username')
 
         self.logout()
 

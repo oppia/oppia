@@ -25,6 +25,9 @@ from core.domain import exp_services
 from core.domain import rights_manager
 
 
+EXPLORATION_ID_KEY = 'explorationId'
+
+
 class LearnPage(base.BaseHandler):
     """The exploration gallery page for learners."""
 
@@ -140,7 +143,7 @@ class NewExploration(base.BaseHandler):
                 new_exploration_id, title, category)
             exp_services.save_new_exploration(self.user_id, exploration)
 
-        self.render_json({'explorationId': exploration.id})
+        self.render_json({EXPLORATION_ID_KEY: exploration.id})
 
 
 class CloneExploration(base.BaseHandler):
@@ -158,6 +161,6 @@ class CloneExploration(base.BaseHandler):
             raise Exception('You cannot copy this exploration.')
 
         self.render_json({
-            'explorationId': exp_services.clone_exploration(
+            EXPLORATION_ID_KEY: exp_services.clone_exploration(
                 self.user_id, exploration_id)
         })

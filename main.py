@@ -98,19 +98,19 @@ urls = [
         r'%s' % feconf.LEARN_GALLERY_URL, galleries.LearnPage,
         'learn_gallery_page'),
     get_redirect_route(
-        r'/learnhandler/data', galleries.LearnHandler,
+        r'%s' % feconf.LEARN_GALLERY_DATA_URL, galleries.LearnHandler,
         'learn_gallery_handler'),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'/contributehandler/data', galleries.ContributeHandler,
-        'contribute_gallery_handler'),
+        r'%s' % feconf.CONTRIBUTE_GALLERY_DATA_URL,
+        galleries.ContributeHandler, 'contribute_gallery_handler'),
     get_redirect_route(
-        r'/contributehandler/create_new',
+        r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
-        r'/contributehandler/clone',
+        r'%s' % feconf.CLONE_EXPLORATION_URL,
         galleries.CloneExploration, 'clone_exploration'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
@@ -138,8 +138,8 @@ urls = [
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(
-        r'/create/<exploration_id>', editor.ExplorationPage,
-        'editor_exploration_page'),
+        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
+        editor.ExplorationPage, 'editor_exploration_page'),
     get_redirect_route(
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
@@ -165,7 +165,7 @@ urls = [
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
     get_redirect_route(
-        r'/createhandler/rights/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler, 'exploration_rights_handler'),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
