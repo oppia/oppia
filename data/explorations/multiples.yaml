@@ -280,8 +280,6 @@ states:
   param_changes: []
   widget:
     customization_args:
-      columns:
-        value: 60
       language:
         value: python
       placeholder:
@@ -290,8 +288,6 @@ states:
         value: ''
       preCode:
         value: ''
-      rows:
-        value: 10
     handlers:
     - name: submit
       rule_specs:

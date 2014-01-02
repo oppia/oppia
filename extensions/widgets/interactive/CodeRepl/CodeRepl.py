@@ -44,31 +44,13 @@ class CodeRepl(widget_domain.BaseWidget):
         'obj_type': 'UnicodeString',
     }, {
         'name': 'placeholder',
-        'description': 'The placeholder for the code input field.',
+        'description': 'The initial code displayed in the code input field.',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
             'value': 'Type your code here.'
         },
         'obj_type': 'UnicodeString',
-    }, {
-        'name': 'rows',
-        'description': 'The number of rows for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 10
-        },
-        'obj_type': 'Int',
-    }, {
-        'name': 'columns',
-        'description': 'The number of columns for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 60
-        },
-        'obj_type': 'Int',
     }, {
         'name': 'preCode',
         'description': 'Code to prepend to the reader\'s submission.',

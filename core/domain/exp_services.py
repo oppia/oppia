@@ -502,6 +502,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     marked as deleted, but the corresponding models are still retained in the
     datastore. This last option is the preferred one.
     """
+    # TODO(sll): Delete the files too?
+
     exploration_rights_model = exp_models.ExplorationRightsModel.get(
         exploration_id)
     exploration_rights_model.delete(

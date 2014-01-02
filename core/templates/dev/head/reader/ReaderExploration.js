@@ -52,7 +52,7 @@ function ReaderExploration(
   // Initializes the story page using data from the server.
   $scope.initializePage = function() {
     $scope.responseLog = [];
-    $scope.changeInputTemplateIframeHeight(50);
+    $scope.changeInputTemplateIframeHeight(400);
     $http.get($scope.explorationDataUrl)
         .success(function(data) {
           $scope.explorationTitle = data.title;

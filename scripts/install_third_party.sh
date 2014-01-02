@@ -201,6 +201,26 @@ if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
   wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
 fi
 
+echo Checking whether CodeMirror is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/static/code-mirror-3.19.0" ]; then
+  echo Installing CodeMirror
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/marijnh/CodeMirror/archive/3.19.0.zip -O code-mirror-download.zip
+  unzip code-mirror-download.zip -d $THIRD_PARTY_DIR/static/
+  rm code-mirror-download.zip
+  mv $THIRD_PARTY_DIR/static/CodeMirror-3.19.0 $THIRD_PARTY_DIR/static/code-mirror-3.19.0
+fi
+
+echo Checking whether ui-codemirror is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/static/ui-codemirror-0.1.0" ]; then
+  echo Installing ui-codemirror
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/angular-ui/ui-codemirror/archive/src0.1.0.zip -O angular-ui-codemirror-download.zip
+  unzip angular-ui-codemirror-download.zip -d $THIRD_PARTY_DIR/static/
+  rm angular-ui-codemirror-download.zip
+  mv $THIRD_PARTY_DIR/static/ui-codemirror-src0.1.0 $THIRD_PARTY_DIR/static/ui-codemirror-0.1.0
+fi
+
 echo Checking whether bleach is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/bleach-1.2.2" ]; then
   echo Installing bleach

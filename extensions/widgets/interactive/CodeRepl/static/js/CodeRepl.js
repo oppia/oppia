@@ -1,4 +1,4 @@
-var repl = angular.module('repl', []);
+var repl = angular.module('repl', ['ui.codemirror']);
 
 // Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
 repl.config(function($interpolateProvider) {
@@ -8,16 +8,23 @@ repl.config(function($interpolateProvider) {
 
 function CodeRepl($scope) {
   $scope.language = GLOBALS.language;
-  $scope.placeholder = GLOBALS.placeholder;
-  $scope.rows = GLOBALS.rows;
-  $scope.cols = GLOBALS.columns;
   $scope.preCode = GLOBALS.preCode;
   $scope.postCode = GLOBALS.postCode;
 
   // Keep the code string given by the user and the stdout from the evaluation
   // until sending them back to the server.
-  $scope.code = '';
+  $scope.code = GLOBALS.placeholder;
   $scope.output = '';
+
+  // Options for the ui-codemirror display.
+  $scope.codemirrorOptions = {
+    lineNumbers: true,
+    indentWithTabs: true,
+    // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
+    // 'scheme' have CodeMirror-supported syntax highlighting. For other
+    // languages, highlighting will not happen.
+    mode: $scope.language
+  };
 
   // Set up the jsrepl instance with callbacks set.
   var jsrepl = new JSREPL({
