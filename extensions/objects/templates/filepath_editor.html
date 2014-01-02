@@ -24,9 +24,10 @@
     <button ng-click="openImageUploader()">Upload a new image</button>
   </div>
 
-  <div ng-show="imageUploaderIsActive">
-    <em>Upload an image</em>
-    <br><br>
+  <div ng-show="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
+    <div class="oppia-warning">
+      Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
+    </div>
     <input type="file" id="newImage">
     <br>
     Choose a filename: <input type="text" ng-model="newImageFilename">

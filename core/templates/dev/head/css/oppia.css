@@ -38,7 +38,7 @@ h3 {
 }
 
 a {
-  color: #092c66;
+  color: #0844aa;
 }
 
 a:hover {
@@ -437,20 +437,23 @@ textarea {
   width: 100%;
 }
 
-.oppia-footer .nav {
-  margin-bottom: 0;
+.oppia-footer-nav {
   border-top: 1pt solid #dde0FF;
+  list-style: none;
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-top: 10px;
 }
 
-.oppia-footer .nav li {
+.oppia-footer-nav li {
   display: inline-block;
 }
 
-.oppia-footer .nav a {
+.oppia-footer-nav a {
   padding: 10px 20px 10px 0;
 }
 
-.oppia-footer .nav a:hover {
+.oppia-footer-nav a:hover {
   background: none;
   text-decoration: underline;
 }
@@ -673,6 +676,8 @@ textarea {
 .oppia-splash p {
   font-size: 1.4em;
   margin-top: .5em;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .oppia-splash .btn {
@@ -684,6 +689,8 @@ textarea {
   padding: 10px 0;
   background: #dde0FF;
   margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .help {
@@ -695,6 +702,10 @@ textarea {
   margin-bottom: 10px;
 }
 
+#sample-exploration {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 #sample-exploration iframe {
   border: 2pt solid #dde0FF;
   -webkit-border-radius: 20px;
