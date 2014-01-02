@@ -52,10 +52,7 @@
                       <div class="oppia-gallery-tile-bottom">
                         <div>
                           <span ng-if="exploration.can_edit">
-                            <a href="/create/<[exploration.id]>">
-                              <i class="icon-pencil" title="Edit this exploration"></i>
-                              <span class="oppia-small-font">Edit</span>
-                            </a> |
+                            <a href="/create/<[exploration.id]>"><i class="icon-pencil" title="Edit this exploration"></i><span class="oppia-small-font">Edit</span></a> |
                           </span>
                           <span ng-if="exploration.can_clone">
                             <a href="" ng-click="cloneExploration(exploration.id)">

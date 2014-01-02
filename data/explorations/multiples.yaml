@@ -8,25 +8,37 @@ states:
     value: "<div>The aim of this exercise is to explain how to solve Problem #1 on\
       \ Project Euler (<oppia-noninteractive-link url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
       ></oppia-noninteractive-link>). Here is the problem:</div><div><br></div><div><i>\_\
-      \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</i></div><div><br></div><div>Before\
-      \ tackling this, let's check that we understand what this means in a smaller\
-      \ case, where 1000 is replaced by 10.</div>"
+      \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</i></div><div><br></div><div>We\
+      \ can tackle this directly, or we could also try to check that we understand\
+      \ the problem by answering the question for a smaller case. Which of these would\
+      \ you prefer?</div>"
   name: Intro
   param_changes: []
   widget:
     customization_args:
-      buttonText:
-        value: Continue
+      choices:
+        value:
+        - Solve the problem directly
+        - Start by trying a smaller case
     handlers:
     - name: submit
       rule_specs:
+      - definition:
+          inputs:
+            x: 0
+          name: Equals
+          rule_type: atomic
+          subject: answer
+        dest: Second Question
+        feedback: []
+        param_changes: []
       - definition:
           rule_type: default
         dest: First Question
         feedback: []
         param_changes: []
     sticky: false
-    widget_id: Continue
+    widget_id: MultipleChoiceInput
 - content:
   - type: text
     value: "<div><b>Question:</b>\_What is the sum of the multiples of 3 or 5 that\
@@ -124,8 +136,10 @@ states:
         dest: Numbers for first question
         feedback:
         - It does differ by country, but in this problem we use the traditional definition
-          that considers 0 not to be a natural number.
-        - In this problem, natural numbers start from 1.
+          that considers 0 not to be a natural number. (We consider 'multiples' in
+          this question to be positive integers.)
+        - Note that in this problem, we consider multiples to be natural numbers,
+          that is, integers that are greater than zero.
         param_changes: []
       - definition:
           inputs:
@@ -189,14 +203,15 @@ states:
         dest: Numbers for first question
         feedback:
         - Something about your list of numbers isn't quite right. Perhaps it contains
-          numbers that are more than 10?
-        - Remember, the question asked only for numbers less than 10...
+          numbers that are less than 1, or more than 10?
+        - Remember, the question asked only for numbers less than 10. (Also, the 'multiples'
+          here should be positive integers.)
         param_changes: []
     sticky: true
     widget_id: SetInput
 - content:
   - type: text
-    value: "Now let's try the actual Project Euler problem.<div><br></div><div><b>Question:</b>\_\
+    value: "OK, let's try the actual Project Euler problem.<div><br></div><div><b>Question:</b>\_\
       What is the sum of all the multiples of 3 or 5 below 1000?</div><div><br></div><div>1000\
       \ is a big number. Would you prefer to give an answer directly, or would you\
       \ instead like to write a small program allowing the computer to do the computational\
@@ -352,6 +367,18 @@ states:
         - Ooh, that's really big. I think you might actually just be adding every
           single number less than 1000. Is that what your program is doing? Remember,
           we only care about numbers that are multiples of either 3 or 5...
+        param_changes: []
+      - definition:
+          inputs:
+            x: ''
+          name: OutputEquals
+          rule_type: atomic
+          subject: answer
+        dest: Second Question Coding
+        feedback:
+        - Sorry, it doesn't look like your program prints any output. Could you get
+          it to print something? You can do this by using a statement like 'print
+          x'.
         param_changes: []
       - definition:
           rule_type: default
