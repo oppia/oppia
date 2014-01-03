@@ -79,7 +79,7 @@ class FileMetadataModel(base_models.BaseModel):
             model_id, version_number)
 
     def save(self, committer_id, commit_cmds):
-        return super(FileMetadataModel, self).save(
+        return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
 
@@ -127,7 +127,7 @@ class FileModel(base_models.BaseModel):
         # Django does not accept raw byte strings, so we need to encode them.
         # Internally, it stores strings as unicode.
         self.content = base64.encodestring(self.content)
-        return super(FileModel, self).save(committer_id, '', commit_cmds)
+        return super(FileModel, self).commit(committer_id, '', commit_cmds)
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):

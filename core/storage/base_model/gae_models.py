@@ -155,7 +155,7 @@ class VersionedModel(BaseModel):
     field 'content'. The item that is being versioned must be serializable to a
     JSON blob.
 
-    Note that save() should be used for VersionedModels, as opposed to put()
+    Note that commit() should be used for VersionedModels, as opposed to put()
     for direct subclasses of BaseModel.
     """
     # The class designated as the snapshot model. This should be a subclass of
@@ -218,7 +218,7 @@ class VersionedModel(BaseModel):
         return '%s%s%s' % (
             instance_id, cls._VERSION_DELIMITER, version_number)
 
-    def _trusted_save(
+    def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         if self.SNAPSHOT_METADATA_CLASS is None:
             raise Exception('No snapshot metadata class defined.')
@@ -279,15 +279,15 @@ class VersionedModel(BaseModel):
                 'cmd': CMD_DELETE
             }]
 
-            self._trusted_save(
+            self._trusted_commit(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message,
                 commit_cmds)
 
     def put(self, *args, **kwargs):
-        """For VersionedModels, this method is replaced with save()."""
+        """For VersionedModels, this method is replaced with commit()."""
         raise NotImplementedError
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    def commit(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.
 
         commit_cmds should give sufficient information to reconstruct the
@@ -308,7 +308,7 @@ class VersionedModel(BaseModel):
             self._COMMIT_TYPE_CREATE if self.version == 0 else
             self._COMMIT_TYPE_EDIT)
 
-        self._trusted_save(
+        self._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
     def revert(self, committer_id, commit_message, version_number):
@@ -328,7 +328,7 @@ class VersionedModel(BaseModel):
         snapshot_id = self._get_snapshot_id(self.id, version_number)
         self._reconstitute_from_snapshot_id(snapshot_id)
 
-        self._trusted_save(
+        self._trusted_commit(
             committer_id, self._COMMIT_TYPE_REVERT, commit_message,
             commit_cmds)
 

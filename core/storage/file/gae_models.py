@@ -73,7 +73,7 @@ class FileMetadataModel(base_models.VersionedModel):
             model_id, version_number)
 
     def save(self, committer_id, commit_cmds):
-        return super(FileMetadataModel, self).save(
+        return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
 
@@ -124,7 +124,7 @@ class FileModel(base_models.VersionedModel):
         return super(FileModel, cls).get(model_id, strict=strict)
 
     def save(self, committer_id, commit_cmds):
-        return super(FileModel, self).save(committer_id, '', commit_cmds)
+        return super(FileModel, self).commit(committer_id, '', commit_cmds)
 
     @classmethod
     def get_version(cls, exploration_id, filepath, version_number):

@@ -94,7 +94,7 @@ class ExplorationModel(base_models.VersionedModel):
                 raise Exception(
                     'Invalid key for exploration properties dict: %s' % key)
 
-        super(ExplorationModel, self).save(
+        super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
 
@@ -140,7 +140,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
-        super(ExplorationRightsModel, self).save(
+        super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
     @classmethod
