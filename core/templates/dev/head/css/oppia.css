@@ -669,8 +669,17 @@ textarea {
   width: 20%;
 }
 
-.oppia-splash-image {
+.oppia-logo {
+  height: 32px;
+  margin-top: -10px;
+  margin-bottom: -5px;
+}
+
+.oppia-splash-image-row {
   margin-top: -20px;
+}
+.oppia-splash-image {
+  width: 100%;
 }
 
 .oppia-splash p {

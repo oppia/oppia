@@ -31,6 +31,9 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
     default_value='https://site/forum/url')
 SITE_NAME = config_domain.ConfigProperty(
     'site_name', 'UnicodeString', 'The site name', default_value='SITE_NAME')
+BANNER_ALT_TEXT = config_domain.ConfigProperty(
+    'banner_alt_text', 'UnicodeString',
+    'The alt text for the site banner image', default_value='')
 
 
 class SplashPage(base.BaseHandler):
@@ -42,6 +45,7 @@ class SplashPage(base.BaseHandler):
             exp_services.load_demo('0')
 
         self.values.update({
+            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'SITE_NAME': SITE_NAME.value,
         })
