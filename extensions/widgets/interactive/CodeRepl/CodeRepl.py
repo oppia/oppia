@@ -32,9 +32,10 @@ class CodeRepl(widget_domain.BaseWidget):
         'generator': generators.RestrictedCopier,
         'init_args': {
             'choices': [
-                'bloop', 'brainfuck', 'coffeescript', 'emoticon', 'forth',
-                'javascript', 'kaffeine', 'lolcode', 'lua', 'move', 'python',
-                'qbasic', 'roy', 'ruby', 'scheme', 'traceur', 'unlambda'
+                'coffeescript', 'javascript', 'lua', 'python', 'ruby',
+                'scheme',
+                # 'bloop', 'brainfuck', 'emoticon', 'forth', 'kaffeine',
+                # 'lolcode', 'move', 'qbasic', 'roy', 'traceur', 'unlambda'
             ]
         },
         # These are the default args.
