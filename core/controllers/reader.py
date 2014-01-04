@@ -16,7 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-import feconf
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -24,6 +23,8 @@ from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
+import feconf
+import jinja_utils
 
 
 def require_viewer(handler):
@@ -44,8 +45,14 @@ class ExplorationPage(base.BaseHandler):
     @require_viewer
     def get(self, exploration_id):
         """Handles GET requests."""
+        version = self.request.get('v')
+        if not version:
+            # The default value for a missing parameter seems to be ''.
+            version = None
+
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(
+                exploration_id, version=version)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -54,9 +61,11 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update({
             'content': skins_services.get_skin_html(exploration.default_skin),
+            'exploration_version': version,
             'iframed': (self.request.get('iframed') == 'true'),
             'is_public': rights_manager.is_exploration_public(exploration_id),
         })
+
         self.render_template(
             'reader/reader_exploration.html', iframe_restriction=None)
 
@@ -68,21 +77,21 @@ class ExplorationHandler(base.BaseHandler):
         """Populates the data on the individual exploration page."""
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
+        version = self.request.get('v')
+        if not version:
+            version = None
+
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(
+                exploration_id, version=version)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_params = exp_services.get_init_params(exploration_id)
-        reader_params = exp_services.update_with_state_params(
-            exploration_id,
-            exploration.init_state_name,
-            reader_params=init_params
-        )
+        init_params = exploration.get_init_params()
+        reader_params = exploration.update_with_state_params(
+            exploration.init_state_name, init_params)
 
         init_state = exploration.init_state
-        init_html = exp_services.export_content_to_html(
-            exploration_id, init_state.content, reader_params)
 
         interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
@@ -91,8 +100,8 @@ class ExplorationHandler(base.BaseHandler):
 
         self.values.update({
             'block_number': 0,
+            'init_html': init_state.content[0].to_html(reader_params),
             'interactive_html': interactive_html,
-            'oppia_html': init_html,
             'params': reader_params,
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
@@ -114,8 +123,7 @@ class FeedbackHandler(base.BaseHandler):
             old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id
-        )
+            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
 
         recorded_answer = widget.get_stats_log_html(
             old_state.widget.customization_args, old_params, answer)
@@ -124,18 +132,7 @@ class FeedbackHandler(base.BaseHandler):
             exploration_id, old_state_name, handler, str(rule),
             recorded_answer)
 
-    def _get_feedback(self, exploration_id, feedback, params):
-        """Gets the HTML with Oppia's feedback."""
-        if not feedback:
-            return ''
-        else:
-            feedback_bits = feedback.split('\n')
-            return exp_services.export_content_to_html(
-                exploration_id,
-                [exp_domain.Content('text', '<br>'.join(feedback_bits))],
-                params)
-
-    def _append_content(self, exploration_id, sticky, finished, old_params,
+    def _append_content(self, exploration, sticky, finished, old_params,
                         new_state, new_state_name, state_has_changed,
                         html_output):
         """Appends content for the new state to the output variables."""
@@ -143,17 +140,16 @@ class FeedbackHandler(base.BaseHandler):
             return {}, html_output, ''
         else:
             # Populate new parameters.
-            new_params = exp_services.update_with_state_params(
-                exploration_id, new_state_name, reader_params=old_params)
+            new_params = exploration.update_with_state_params(
+                new_state_name, old_params)
 
             if state_has_changed:
                 # Append the content for the new state.
-                state_html = exp_services.export_content_to_html(
-                    exploration_id, new_state.content, new_params)
+                state_html = exploration.states[
+                    new_state_name].content[0].to_html(new_params)
 
                 if html_output and state_html:
                     html_output += '<br>'
-
                 html_output += state_html
 
             interactive_html = '' if sticky else (
@@ -168,12 +164,6 @@ class FeedbackHandler(base.BaseHandler):
     def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
         old_state_name = self.unescape_state_name(escaped_state_name)
-
-        values = {}
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        old_state = exploration.states[old_state_name]
-
         # The reader's answer.
         answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
@@ -185,9 +175,16 @@ class FeedbackHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The reader's state history.
         state_history = self.payload['state_history']
+        # The version of the exploration.
+        version = self.payload.get('version')
 
-        rule = exp_services.classify(
-            exploration_id, old_state_name, handler, answer, old_params)
+        values = {}
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, version=version)
+        old_state = exploration.states[old_state_name]
+
+        rule = exploration.classify(
+            old_state_name, handler, answer, old_params)
         feedback = rule.get_feedback_string()
         new_state_name = rule.dest
         new_state = (
@@ -231,14 +228,15 @@ class FeedbackHandler(base.BaseHandler):
         values['reader_response_iframe'] = reader_response_iframe
 
         # Add Oppia's feedback to the response HTML.
-        html_output = self._get_feedback(exploration_id, feedback, old_params)
+        html_output = '<div>%s</div>' % jinja_utils.parse_string(
+            feedback, old_params)
 
         # Add the content for the new state to the response HTML.
         finished = (new_state_name == feconf.END_DEST)
         state_has_changed = (old_state_name != new_state_name)
         new_params, html_output, interactive_html = (
             self._append_content(
-                exploration_id, sticky, finished, old_params, new_state,
+                exploration, sticky, finished, old_params, new_state,
                 new_state_name, state_has_changed, html_output))
 
         values.update({
@@ -267,6 +265,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
         feedback = self.payload.get('feedback')
         state_history = self.payload.get('state_history')
+        version = self.payload.get('version')
         # TODO(sll): Add the reader's history log here.
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,

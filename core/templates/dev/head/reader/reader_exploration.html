@@ -4,6 +4,15 @@
   Reader View
 {% endblock subtitle %}
 
+{% block header_js %}
+  {{ super() }}
+  {% if exploration_version %}
+    <script type="text/javascript">
+      GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
+    </script>
+  {% endif %}
+{% endblock header_js %}
+
 {% block content %}
   {% if not is_public %}
     <center>

@@ -53,9 +53,12 @@ ALLOWED_CONTENT_TYPES = ['text']
 
 
 # Repository GET methods.
-def _get_exploration_memcache_key(exploration_id):
+def _get_exploration_memcache_key(exploration_id, version=None):
     """Returns a memcache key for an exploration."""
-    return 'exploration:%s' % exploration_id
+    if version:
+        return 'exploration-version:%s:%s' % (exploration_id, version)
+    else:
+        return 'exploration:%s' % exploration_id
 
 
 def get_exploration_from_model(exploration_model):
@@ -67,9 +70,10 @@ def get_exploration_from_model(exploration_model):
         exploration_model.version)
 
 
-def get_exploration_by_id(exploration_id, strict=True):
+def get_exploration_by_id(exploration_id, strict=True, version=None):
     """Returns a domain object representing an exploration."""
-    exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
+    exploration_memcache_key = _get_exploration_memcache_key(
+        exploration_id, version=version)
     memcached_exploration = memcache_services.get_multi(
         [exploration_memcache_key]).get(exploration_memcache_key)
 
@@ -77,7 +81,7 @@ def get_exploration_by_id(exploration_id, strict=True):
         return memcached_exploration
     else:
         exploration_model = exp_models.ExplorationModel.get(
-            exploration_id, strict=strict)
+            exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
             memcache_services.set_multi({
@@ -180,39 +184,6 @@ def count_explorations():
 
 
 # Methods for exporting states and explorations to other formats.
-def export_content_to_html(exploration_id, content_array, params=None):
-    """Takes a Content array and transforms it into HTML.
-
-    Args:
-        exploration_id: the id of the exploration
-        content_array: an array, each of whose members is of type Content. This
-            object has two keys: type and value. Currently we expect the array
-            to contain exactly one entry with type 'text'. The value is an
-            HTML string.
-        params: any parameters used for templatizing text strings.
-
-    Returns:
-        the HTML string representing the array.
-
-    Raises:
-        InvalidInputException: if content has no 'type' attribute, or an
-            invalid 'type' attribute.
-    """
-    if params is None:
-        params = {}
-
-    html = ''
-    for content in content_array:
-        if content.type in ALLOWED_CONTENT_TYPES:
-            value = jinja_utils.parse_string(content.value, params)
-
-            html += '<div>%s</div>' % value
-        else:
-            raise utils.InvalidInputException(
-                'Invalid content type %s', content.type)
-    return html
-
-
 def export_to_zip_file(exploration_id):
     """Returns a ZIP archive of the exploration."""
     exploration = get_exploration_by_id(exploration_id)
@@ -518,36 +489,6 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
 
-# Operations involving exploration parameters.
-def get_init_params(exploration_id):
-    """Returns an initial set of exploration parameters for a reader."""
-    exploration = get_exploration_by_id(exploration_id)
-
-    # Note that the list of parameter changes is ordered. Parameter changes
-    # later in the list may depend on parameter changes that have been set
-    # earlier in the same list.
-    new_params = {}
-    for pc in exploration.param_changes:
-        obj_type = exploration.get_obj_type_for_param(pc.name)
-        new_params[pc.name] = pc.get_normalized_value(obj_type, new_params)
-    return new_params
-
-
-def update_with_state_params(exploration_id, state_name, reader_params):
-    """Updates a reader's params using the params for the given state."""
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.states[state_name]
-    new_params = copy.deepcopy(reader_params)
-
-    # Note that the list of parameter changes is ordered. Parameter changes
-    # later in the list may depend on parameter changes that have been set
-    # earlier in the same list.
-    for pc in state.param_changes:
-        obj_type = exploration.get_obj_type_for_param(pc.name)
-        new_params[pc.name] = pc.get_normalized_value(obj_type, new_params)
-    return new_params
-
-
 # Operations on exploration snapshots.
 def get_exploration_snapshots_metadata(exploration_id, limit):
     """Returns the most recent snapshots for this exploration, as dicts.
@@ -596,34 +537,6 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
-
-
-def classify(exploration_id, state_name, handler_name, answer, params):
-    """Return the first rule that is satisfied by a reader's answer."""
-
-    exploration = get_exploration_by_id(exploration_id)
-    state = exploration.states[state_name]
-
-    # Get the widget to determine the input type.
-    generic_handler = widget_registry.Registry.get_widget_by_id(
-        feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-    ).get_handler_by_name(handler_name)
-
-    handler = next(h for h in state.widget.handlers if h.name == handler_name)
-    fs = fs_domain.AbstractFileSystem(
-        fs_domain.ExplorationFileSystem(exploration_id))
-
-    if generic_handler.input_type is None:
-        return handler.rule_specs[0]
-    else:
-        for rule_spec in handler.rule_specs:
-            if rule_domain.evaluate_rule(
-                    rule_spec.definition, exploration.param_specs,
-                    generic_handler.input_type, params, answer, fs):
-                return rule_spec
-
-        raise Exception(
-            'No matching rule found for handler %s.' % handler.name)
 
 
 # Creation and deletion methods.

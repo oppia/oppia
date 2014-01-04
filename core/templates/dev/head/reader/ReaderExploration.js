@@ -26,6 +26,9 @@ function ReaderExploration(
   // The following is needed for image displaying to work.
   $rootScope.explorationId = pathnameArray[2];
   $scope.explorationDataUrl = '/explorehandler/init/' + $scope.explorationId;
+  if (GLOBALS.explorationVersion) {
+    $scope.explorationDataUrl += '?v=' + GLOBALS.explorationVersion;
+  }
 
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
@@ -116,7 +119,8 @@ function ReaderExploration(
   $scope.submitFeedback = function(feedback) {
     var requestMap = {
       feedback: feedback,
-      state_history: angular.copy($scope.stateHistory)
+      state_history: angular.copy($scope.stateHistory),
+      version: GLOBALS.explorationVersion
     };
 
     $http.post(
@@ -180,7 +184,7 @@ function ReaderExploration(
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [data.oppia_html];
+    $scope.responseLog = [data.init_html];
     $scope.params = data.params;
     $scope.stateName = data.state_name;
     $scope.title = data.title;
@@ -199,7 +203,8 @@ function ReaderExploration(
       block_number: $scope.blockNumber,
       handler: handler,
       params: $scope.params,
-      state_history: $scope.stateHistory
+      state_history: $scope.stateHistory,
+      version: GLOBALS.explorationVersion
     };
 
     $scope.answerIsBeingProcessed = true;
