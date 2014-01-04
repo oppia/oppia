@@ -177,7 +177,7 @@ function reloadOppiaTag(oppiaNode) {
   // TODO(sll): Properly handle the case where ids are manually set, but are
   // not unique.
   iframe.setAttribute('id', tagId);
-  var versionString = explorationVersion ? '&v' + explorationVersion : '';
+  var versionString = explorationVersion ? '&v=' + explorationVersion : '';
   iframe.setAttribute('src', encodeURI(
       (oppiaNode.getAttribute('src') || currLoc) +
       '/explore/' + oppiaNode.getAttribute('oppia-id') +

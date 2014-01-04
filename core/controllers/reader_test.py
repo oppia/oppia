@@ -160,7 +160,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.state_history = [self.last_state_name]
 
         self.assertEqual(reader_dict['state_history'], self.state_history)
-        self.assertRegexpMatches(reader_dict['oppia_html'], expected_response)
+        self.assertRegexpMatches(reader_dict['init_html'], expected_response)
         self.assertEqual(reader_dict['title'], expected_title)
 
     def test_welcome_exploration(self):

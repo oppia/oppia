@@ -341,6 +341,26 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
+    def get_version(cls, model_instance_id, version_number):
+        """Returns a model instance representing the given version.
+
+        The snapshot content is used to populate this model instance. The
+        snapshot metadata is not used.
+        """
+        cls.get_by_id(model_instance_id)._require_not_marked_deleted()
+
+        snapshot_id = cls._get_snapshot_id(model_instance_id, version_number)
+        return cls()._reconstitute_from_snapshot_id(snapshot_id)
+
+    @classmethod
+    def get(cls, entity_id, strict=True, version=None):
+        """Gets an entity by id. Fails noisily if strict == True."""
+        if version is None:
+            return super(VersionedModel, cls).get(entity_id, strict=strict)
+        else:
+            return cls.get_version(entity_id, version)
+
+    @classmethod
     def get_snapshots_metadata(cls, model_instance_id, version_numbers):
         """Returns a list of dicts, each representing a model snapshot.
 
