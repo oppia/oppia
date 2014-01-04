@@ -41,14 +41,18 @@ current_user_services = models.Registry.import_current_user_services()
 ])
 import utils
 
+import jinja2
 import webapp2
 
 
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
-
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', 'UnicodeString', 'Text used to encrypt CSRF tokens.',
     DEFAULT_CSRF_SECRET)
+
+BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
+    'before_end_head_tag_hook', 'UnicodeString',
+    'Code to insert just before the closing </head> tag in all pages.', '')
 
 
 def require_user(handler):
@@ -221,6 +225,8 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.EXPLORATION_STATUS_PUBLIC),
             'EXPLORATION_STATUS_PUBLICIZED': (
                 rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
+                BEFORE_END_HEAD_TAG_HOOK.value),
         })
 
         if self.user_id:
