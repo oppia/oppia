@@ -82,12 +82,9 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
-        if feconf.DEV_MODE:
-            demo_explorations = [
-                (str(ind), exp[0]) for ind, exp in
-                enumerate(feconf.DEMO_EXPLORATIONS)]
-        else:
-            demo_explorations = [('0', feconf.DEMO_EXPLORATIONS[0][0])]
+        demo_explorations = [
+            (str(ind), exp[0]) for ind, exp in
+            enumerate(feconf.DEMO_EXPLORATIONS)]
 
         self.values.update({
             'demo_explorations': demo_explorations,

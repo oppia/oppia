@@ -24,7 +24,6 @@ storage model to be changed without affecting this module and others above it.
 
 __author__ = 'Sean Lip'
 
-import copy
 import logging
 import os
 import StringIO
@@ -33,11 +32,8 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
-from core.domain import rule_domain
-from core.domain import widget_registry
 from core.platform import models
 import feconf
-import jinja_utils
 memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
@@ -49,7 +45,6 @@ CMD_CLONE = 'clone'
 
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
-ALLOWED_CONTENT_TYPES = ['text']
 
 
 # Repository GET methods.
@@ -100,23 +95,27 @@ def get_new_exploration_id():
 def _get_explorations_summary_dict(exploration_rights):
     """Returns exploration summaries corresponding to the given rights objects.
 
-    The summary is a dict that is  keyed by exploration id. Each of the
-    corresponding values is a dict with the following keys: title, category
-    and rights. The value for 'rights' is the rights object, represented as a
-    dict.
+    The summary is a dict that is keyed by exploration id. Each value is a dict
+    with the following keys: title, category and rights. The value for 'rights'
+    is the rights object, represented as a dict.
     """
     exp_ids = [rights.id for rights in exploration_rights]
     explorations = [
-        get_exploration_from_model(e) for e in
-        exp_models.ExplorationModel.get_multi(exp_ids)]
+        (get_exploration_from_model(e) if e else None)
+        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
 
     result = {}
     for ind, exploration in enumerate(explorations):
-        result[exploration.id] = {
-            'title': exploration.title,
-            'category': exploration.category,
-            'rights': exploration_rights[ind].to_dict()
-        }
+        if exploration is None:
+            logging.error(
+                'Could not find exploration corresponding to exploration '
+                'rights object with id %s' % exploration_rights[ind].id)
+        else:
+            result[exploration.id] = {
+                'title': exploration.title,
+                'category': exploration.category,
+                'rights': exploration_rights[ind].to_dict()
+            }
     return result
 
 
@@ -391,7 +390,7 @@ def get_summary_of_change_list(exploration_id, change_list):
 
 def _save_exploration(
         committer_id, exploration, commit_message, change_list):
-    """Commits an exploration domain object to persistent storage.
+    """Validates an exploration and commits it to persistent storage.
 
     If successful, increments the version number of the incoming exploration
     domain object by 1.
@@ -447,6 +446,9 @@ def _create_exploration(
     This is because _save_exploration() depends on the rights object being
     present to tell it whether to do strict validation or not.
     """
+    # This line is needed because otherwise a rights object will be created,
+    # but the creation of an exploration object will fail.
+    exploration.validate()
     rights_manager.create_new_exploration_rights(
         exploration.id, committer_id, cloned_from)
     _save_exploration(committer_id, exploration, commit_message, commit_cmds)

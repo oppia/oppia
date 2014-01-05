@@ -23,6 +23,7 @@ should therefore be independent of the specific storage models used."""
 __author__ = 'Sean Lip'
 
 import copy
+import logging
 import re
 import string
 
@@ -388,17 +389,23 @@ class WidgetInstance(object):
             raise utils.ValidationError(
                 'Expected widget customization args to be a dict, received %s'
                 % self.customization_args)
+
+        # Validate and clean up the customization args.
+        extra_args = []
         for (arg_name, arg_value) in self.customization_args.iteritems():
             if not isinstance(arg_name, basestring):
                 raise utils.ValidationError(
                     'Invalid widget customization arg name: %s' % arg_name)
             if arg_name not in widget_customization_arg_names:
-                raise Exception(
+                extra_args.append(arg_name)
+                logging.error(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
             # TODO(sll): Find a way to verify that the arg_values have the
             # correct type. Can we get sample values for the state context
             # parameters?
+        for extra_arg in extra_args:
+            del self.customization_args[extra_arg]
 
         # TODO(sll): Shouldn't this be a dict?
         if not isinstance(self.handlers, list):
