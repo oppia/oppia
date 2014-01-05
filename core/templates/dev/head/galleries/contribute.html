@@ -8,97 +8,103 @@
   <div class="container" ng-controller="ContributeGallery">
 
     <div class="row">
-    <div class="span8">
-      <div class="oppia-gallery-frame">
-        <h3 class="oppia-page-title">
-          Contribute
-        </h3>
+      <div class="span8">
+        <div class="oppia-gallery-frame">
+          <h3 class="oppia-page-title">
+            Contribute
+          </h3>
 
-        <div class="oppia-gallery" ng-if="categories">
-          <div class="tabbable tabs-left">
+          <div class="oppia-gallery" ng-if="categories">
+            <div class="tabbable tabs-left">
 
-            <div class="oppia-gallery-menu">
-              <div class="oppia-gallery-menu-title">
-                <strong>Categories</strong>
+              <div class="oppia-gallery-menu">
+                <div class="oppia-gallery-menu-title">
+                  <strong>Categories</strong>
+                </div>
+                <ul class="nav nav-pills nav-stacked" id="navTabs">
+                  <li ng-repeat="(category, explorations) in categories"
+                      ng-class="{active: $index == 0}">
+                    <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
+                      <[category]>
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <ul class="nav nav-pills nav-stacked" id="navTabs">
-                <li ng-repeat="(category, explorations) in categories"
-                    ng-class="{active: $index == 0}">
-                  <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
-                    <[category]>
-                  </a>
-                </li>
-              </ul>
-            </div>
 
-            <div class="tab-content oppia-gallery-tiles-container">
-              <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
-                <div class="container-fluid">
-                  <div class="row-fluid">
+              <div class="tab-content oppia-gallery-tiles-container">
+                <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                  <div class="container-fluid">
+                    <div class="row-fluid">
 
-                    <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
+                      <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
 
-                      <div class="oppia-gallery-tile-top">
-                        <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                          <div class="oppia-gallery-tile-description">
-                            <span class="oppia-gallery-tile-title"><[exploration.title]></span>
-                            <span class="oppia-gallery-tile-play">
-                              <i class="icon-play-circle"></i>
+                        <div class="oppia-gallery-tile-top">
+                          <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                            <div class="oppia-gallery-tile-description">
+                              <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                              <span class="oppia-gallery-tile-play">
+                                <i class="icon-play-circle"></i>
+                              </span>
+                            </div>
+                          </a>
+                        </div>
+
+                        <div class="oppia-gallery-tile-bottom">
+                          <div>
+                            <span ng-if="exploration.can_edit">
+                              <a href="/create/<[exploration.id]>"><i class="icon-pencil" title="Edit this exploration"></i><span class="oppia-small-font">Edit</span></a>
+                            </span>
+                            <span ng-if="exploration.can_edit && exploration.can_clone">
+                             |
+                            </span>
+                            <span ng-if="exploration.can_clone">
+                              <a href="" ng-click="cloneExploration(exploration.id)">
+                                <i class="icon-share oppia-icon" title="Copy this exploration">
+                                </i>
+                                <span class="oppia-small-font">Copy</span>
+                              </a>
+                              <img class="oppia-help" src="/images/help.png"
+                                   tooltip="Make a private copy of an exploration."
+                                   tooltip-placement="top">
+                            </span>
+
+                            <span ng-if="exploration.is_cloned" class="label label-info pull-right">
+                              Cloned
+                            </span>
+                            <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info pull-right">
+                              Private
                             </span>
                           </div>
-                        </a>
-                      </div>
-
-                      <div class="oppia-gallery-tile-bottom">
-                        <div>
-                          <span ng-if="exploration.can_edit">
-                            <a href="/create/<[exploration.id]>"><i class="icon-pencil" title="Edit this exploration"></i><span class="oppia-small-font">Edit</span></a> |
-                          </span>
-                          <span ng-if="exploration.can_clone">
-                            <a href="" ng-click="cloneExploration(exploration.id)">
-                              <i class="icon-share oppia-icon" title="Copy this exploration">
-                              </i>
-                              <span class="oppia-small-font">Copy</span>
-                            </a>
-                          </span>
-
-                          <span ng-if="exploration.is_cloned" class="label label-info pull-right">
-                            Cloned
-                          </span>
-                          <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info pull-right">
-                            Private
-                          </span>
                         </div>
+
                       </div>
 
                     </div>
-
                   </div>
                 </div>
               </div>
+
             </div>
-
           </div>
+
+          <br>
+          <br>
+
+          {% if user_email %}
+            <p ng-controller="CreateExplorationModal">
+              {% include 'galleries/create_exploration_modal.html' %}
+              <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
+                Create New Exploration
+              </a>
+            </p>
+          {% else %}
+            <h4>
+              To create new explorations or edit existing ones, you must <a href="{{login_url}}">log in</a>.
+            </h4>
+          {% endif %}
+
         </div>
-
-        <br>
-        <br>
-
-        {% if user_email %}
-          <p ng-controller="CreateExplorationModal">
-            {% include 'galleries/create_exploration_modal.html' %}
-            <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
-              Create New Exploration
-            </a>
-          </p>
-        {% else %}
-          <h4>
-            To create new explorations or edit existing ones, you must <a href="{{login_url}}">log in</a>.
-          </h4>
-        {% endif %}
-
       </div>
-    </div>
     </div>
   </div>
 {% endblock %}

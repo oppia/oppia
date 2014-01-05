@@ -300,6 +300,11 @@ class Actor(object):
             return True
 
     def can_clone(self, exploration_id):
+        exp_rights = get_exploration_rights(exploration_id)
+        if exp_rights.cloned_from:
+            return False
+        if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
+            return False
         return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):

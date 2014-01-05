@@ -169,6 +169,20 @@
     </script>
 
     <div class="container">
+      <div class="row" ng-if="isCloned">
+        <div class="span8">
+          <center>
+            <div class="oppia-warning">
+              <strong>Note:</strong> This is a private copy of a published exploration. If you would like to improve the
+              original exploration, please consider submitting feedback to it. (You can do this by
+              viewing it as a reader, and clicking the green Feedback button on the
+              left of the page.)
+            </div>
+            <br>
+          </center>
+        </div>
+      </div>
+
       <div class="row">
         <div class="span4">
           <a href="/contribute" class="btn" ng-if="!iframed">
@@ -199,7 +213,7 @@
                 <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
                   Publish
                 </button>
-                <img class="oppia-help" src="/images/help.png""
+                <img class="oppia-help" src="/images/help.png"
                      tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
                      tooltip-placement="bottom">
                 &nbsp;&nbsp;&nbsp;

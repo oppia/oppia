@@ -37,6 +37,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     return Boolean($scope.stateName);
   };
 
+  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+
   /**************************************************
   * Methods affecting the saving of explorations.
   **************************************************/
@@ -870,7 +872,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     modalInstance.result.then(function() {
       $http['delete']($scope.explorationDataUrl)
       .success(function(data) {
-        $window.location = '/gallery/';
+        $window.location = CONTRIBUTE_GALLERY_PAGE;
       });
     });
   };
