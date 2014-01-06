@@ -121,6 +121,14 @@ def preprocess_release():
     for filename in SPLASH_PAGE_FILES:
         src = os.path.join(DEPLOY_DATA_PATH, 'images', filename)
         dst = os.path.join(os.getcwd(), 'static', 'images', filename)
+        if not os.path.exists(src):
+            raise Exception(
+                'Could not find source path %s. Please check your deploy_data '
+                'folder.' % src)
+        if not os.path.exists(dst):
+            raise Exception(
+                'Could not find destination path %s. Has the code been '
+                'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
 
