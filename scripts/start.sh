@@ -18,10 +18,15 @@
 
 # INSTRUCTIONS:
 #
-# Run this script from the oppia root folder:
+# This script starts up a development server running Oppia. It installs any
+# missing third-party dependencies and starts up a local GAE development
+# server.
+#
+# Run the script from the oppia root folder:
+#
 #   bash scripts/start.sh
-# The root folder MUST be named 'oppia'.
-# It sets up the third-party files and the local GAE, and runs tests.
+#
+# Note that the root folder MUST be named 'oppia'.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -61,12 +66,6 @@ fi
 
 # Install third party dependencies
 bash scripts/install_third_party.sh
-
-# Do a build.
-python build.py
-
-# Run the tests.
-bash scripts/test.sh $@
 
 # Set up a local dev instance
 # TODO(sll): Do this in a new shell.

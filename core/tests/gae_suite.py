@@ -109,6 +109,12 @@ def create_test_suites(parsed_args):
     return [suite]
 
 
+def _require_dir_exists(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        raise Exception('Directory %s does not exist.' % d)
+
+
 def main():
     """Runs the tests."""
 
@@ -125,20 +131,32 @@ def main():
 
     feconf.PLATFORM = 'gae'
 
-    # TODO(sll): Check whether the following dirs exist.
-    sys.path.insert(0, os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.7.7', 'google_appengine'))
-    sys.path.insert(0, os.path.abspath(os.getcwd()))
-    sys.path.append(os.path.abspath(
-        os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2')))
-    sys.path.append(os.path.abspath(os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.7.7', 'google_appengine', 'lib',
-        'webob_0_9')
-    ))
-    sys.path.append(os.path.abspath(os.path.join(
-        os.getcwd(), 'third_party', 'bleach-1.2.2')))
-    sys.path.append(os.path.abspath(os.path.join(
-        os.getcwd(), 'third_party', 'html5lib-python-0.95')))
+    GAE_DIR = os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.8.8', 'google_appengine')
+    CURR_DIR = os.path.abspath(os.getcwd())
+    WEBTEST_DIR = os.path.abspath(
+        os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2'))
+    WEBOB_DIR = os.path.abspath(os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.8.8', 'google_appengine', 'lib',
+        'webob_0_9'))
+    BLEACH_DIR = os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'bleach-1.2.2'))
+    HTML5LIB_DIR = os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'html5lib-python-0.95'))
+
+    _require_dir_exists(GAE_DIR)
+    _require_dir_exists(CURR_DIR)
+    _require_dir_exists(WEBTEST_DIR)
+    _require_dir_exists(WEBOB_DIR)
+    _require_dir_exists(BLEACH_DIR)
+    _require_dir_exists(HTML5LIB_DIR)
+
+    sys.path.insert(0, GAE_DIR)
+    sys.path.insert(0, CURR_DIR)
+    sys.path.append(WEBTEST_DIR)
+    sys.path.append(WEBOB_DIR)
+    sys.path.append(BLEACH_DIR)
+    sys.path.append(HTML5LIB_DIR)
 
     import dev_appserver
     dev_appserver.fix_sys_path()

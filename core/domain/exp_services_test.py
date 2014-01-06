@@ -331,7 +331,7 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
             print 'Loaded and validated exploration %s (%.2f seconds)' % (
-                exploration.title, processing_time)
+                exploration.title.encode('utf-8'), processing_time)
 
         self.assertEqual(
             exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))
