@@ -23,7 +23,7 @@
       </div>
       <div class="span6">
         <p>
-          <a class="btn btn-large btn-primary" href="#sample-exploration">Try a sample exploration!</a>
+          <a class="btn btn-large btn-primary" href="/learn">Browse the explorations gallery</a>
           {% if user_email %}
             <a class="btn btn-large btn-primary" href="/contribute">Create an exploration</a>
             <a class="btn btn-large" href="/about">Learn more</a>
@@ -41,7 +41,7 @@
       <div class="row">
         <div class="span6">
           <h2><img src="/images/gift.svg" class="icon"> 100% free!</h2>
-          <p>No trial periods, no freemium plans, no advertisements. Writing, editing, or learning from explorations on {{SITE_NAME}} is <strong>100% free of cost!</strong></p>
+          <p>No trial periods, no freemium plans, no advertisements. Writing, editing, or learning from explorations on {{SITE_NAME}} is <strong>100% free of charge!</strong></p>
           <p>Additionally, all lessons on {{SITE_NAME}} are licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA</a>, which means that you are allowed to <strong>copy, modify, and reuse lesson content.</strong></p>
           <p>Want to host an Oppia instance yourself, or make modifications to it? The <a href="https://code.google.com/p/oppia/">code behind {{SITE_NAME}}</a> is licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache License 2.0</a>. You are encouraged to <strong>download, modify, and reuse Oppia's software</strong> to your heart's content!</p>
         </div>
@@ -59,14 +59,16 @@
     </div>
   </div>
 
-  <div id="sample-exploration" class="container">
-    <div class="row">
-      <div class="span12">
-        <h2>Try a sample exploration</h2>
-        <oppia oppia-id="0" width="90%" height="700"></oppia>
+  {% if SPLASH_PAGE_EXPLORATION_ID %}
+    <div id="sample-exploration" class="container">
+      <div class="row">
+        <div class="span12">
+          <h2>Try a sample exploration</h2>
+          <oppia oppia-id="{{SPLASH_PAGE_EXPLORATION_ID}}" width="90%" height="700"></oppia>
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 
 {% endblock %}
 

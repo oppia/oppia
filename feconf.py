@@ -58,7 +58,7 @@ END_DEST = 'END'
 # The default widget used for a new state.
 DEFAULT_WIDGET_ID = 'TextInput'
 
-# Default name for a state.
+# Default name for the initial state of an exploration.
 DEFAULT_STATE_NAME = '(untitled state)'
 
 # Name (and description) of the default rule.

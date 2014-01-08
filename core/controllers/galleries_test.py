@@ -15,6 +15,7 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import galleries
+from core.domain import exp_services
 import feconf
 import test_utils
 
@@ -42,8 +43,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
 
     def test_learn_gallery_handler(self):
         """Test access to the learners' gallery data handler."""
-        # Visit the splash page to make the demo exploration load.
-        self.testapp.get('/')
+        # Load a demo exploration.
+        exp_services.load_demo('0')
 
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({

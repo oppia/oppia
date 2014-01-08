@@ -25,7 +25,7 @@ class SplashPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Bite-sized learning journeys',
-            'Try a sample exploration!', '100% free!',
+            'Browse the explorations gallery', '100% free!',
             'Learn', 'About', 'Contact',
             # No navbar tabs should be highlighted.
             no=['class="active"'])
