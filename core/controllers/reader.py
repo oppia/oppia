@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import base
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import skins_services
@@ -64,6 +63,7 @@ class ExplorationPage(base.BaseHandler):
             'exploration_version': version,
             'iframed': (self.request.get('iframed') == 'true'),
             'is_public': rights_manager.is_exploration_public(exploration_id),
+            'nav_mode': feconf.NAV_MODE_EXPLORE,
         })
 
         self.render_template(

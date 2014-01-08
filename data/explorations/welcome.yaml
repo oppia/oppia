@@ -205,15 +205,15 @@ states:
         dest: Numeric input
         feedback:
         - If you got here, something's gone a bit wrong with this exploration. Sorry
-          about that. If you're wondering, the answer is 96721.
+          about that. If you're wondering, the answer is 121.
         param_changes: []
     sticky: false
     widget_id: NumericInput
 - content:
   - type: text
     value: "That's a very quick sample of Oppia. For more sample explorations, check\
-      \ out the gallery, which you can get to by clicking the 'Gallery' tab on the\
-      \ top.<div><br></div><div>If you want to add custom question types, or run your\
+      \ out the gallery\
+      \ .<div><br></div><div>If you want to add custom question types, or run your\
       \ own instance of Oppia, have a look at our code site:</div><div><br></div><div>\_\
       \ \_ \_<a href=\"https://code.google.com/p/oppia/\" target=\"_blank\">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You\
       \ can also create new explorations, like this one, by clicking on the \"Create\

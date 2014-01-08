@@ -428,7 +428,8 @@ textarea {
 }
 
 .oppia-footer {
-  bottom: 0;
+  border-top: 1pt solid #dde0FF;
+  bottom: 5px;
   height: 3em;
   margin-top: 30px;
   margin-bottom: 10px;
@@ -438,7 +439,6 @@ textarea {
 }
 
 .oppia-footer-nav {
-  border-top: 1pt solid #dde0FF;
   list-style: none;
   margin-left: 0;
   margin-bottom: 0;

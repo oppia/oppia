@@ -33,6 +33,11 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
+- url: /static/pages
+  static_dir: static/pages
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /scripts
   static_dir: static/scripts
   secure: always

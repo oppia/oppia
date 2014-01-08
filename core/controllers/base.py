@@ -49,6 +49,10 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', 'UnicodeString', 'Text used to encrypt CSRF tokens.',
     DEFAULT_CSRF_SECRET)
+FULL_SITE_URL = config_domain.ConfigProperty(
+    'full_site_url', 'UnicodeString',
+    'The full site URL, without a trailing slash',
+    default_value='https://FULL.SITE/URL')
 
 BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
     'before_end_head_tag_hook', 'UnicodeString',
@@ -227,6 +231,7 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.EXPLORATION_STATUS_PUBLICIZED),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
+            'FULL_SITE_URL': FULL_SITE_URL.value,
         })
 
         if self.user_id:

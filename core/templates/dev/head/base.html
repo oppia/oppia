@@ -136,7 +136,7 @@
       {% if not iframed %}
         <div class="oppia-footer">
           <div class="container">
-            <ul class="oppia-footer-nav">
+            <ul class="oppia-footer-nav span8">
               <li>
                 <a href="/">Home</a>
               </li>
@@ -154,6 +154,17 @@
               <li>
                 <a href="/contact">Contact</a>
               </li>
+            </ul>
+            {% if nav_mode in ['explore', 'create'] %}
+              <span class="span4" style="margin-top: 10px;">
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                  <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                </a>
+                <span style="font-size: 0.8em">
+                  <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                </span>
+              </span>
+            {% endif %}
             </ul>
           </div>
         </div>
