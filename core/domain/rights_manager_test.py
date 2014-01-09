@@ -49,28 +49,31 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.EXP_ID = 'exp_id'
 
     def test_splash_page_demo_exploration(self):
-        exp_services.load_demo('0')
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'splash_page_exploration_id', '1')
 
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('0'))
-        self.assertFalse(rights_manager.Actor(self.user_id_a).can_edit('0'))
-        self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('0'))
-
-        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('0'))
-        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('0'))
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_admin).can_delete('0'))
-
-    def test_non_splash_page_demo_exploration(self):
         exp_services.load_demo('1')
 
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('1'))
-        self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('1'))
+        self.assertFalse(rights_manager.Actor(self.user_id_a).can_edit('1'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('1'))
 
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('1'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('1'))
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_delete('1'))
+
+    def test_non_splash_page_demo_exploration(self):
+        exp_services.load_demo('3')
+
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('3'))
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('3'))
+        self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('3'))
+
+        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('3'))
+        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('3'))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_admin).can_delete('3'))
 
     def test_ownership(self):
         exp = exp_domain.Exploration.create_default_exploration(

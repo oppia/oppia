@@ -1094,6 +1094,8 @@ class Exploration(object):
         exploration_dict = utils.dict_from_yaml(yaml_content)
 
         exploration_schema_version = exploration_dict.get('schema_version')
+        if exploration_schema_version is None:
+            raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
             raise Exception(

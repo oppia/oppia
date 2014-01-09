@@ -87,6 +87,23 @@ class BaseObject(object):
             '%s.html' % cls.edit_html_filename))
 
 
+class Boolean(BaseObject):
+    """Class for booleans."""
+
+    description = 'A boolean.'
+    edit_html_filename = 'boolean_editor'
+    edit_js_filename = 'BooleanEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert raw in [True, False]
+            return raw
+        except Exception:
+            raise TypeError('Cannot convert to boolean: %s' % raw)
+
+
 class Number(BaseObject):
     """Generic number class."""
 

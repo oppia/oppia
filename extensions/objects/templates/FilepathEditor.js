@@ -80,8 +80,6 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       };
 
       $scope.uploadNewImage = function(filename) {
-        var input = angular.element(document.getElementById('newImage'));
-
         var file = document.getElementById('newImage').files[0];
         if (!file || !file.size) {
           warningsData.addWarning('Empty file detected.');
@@ -104,7 +102,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
         form.append('payload', JSON.stringify({filename: filename}));
         form.append('csrf_token', GLOBALS.csrf_token);
 
-        var request = $.ajax({
+        $.ajax({
           url: '/createhandler/imageupload/' + $scope.explorationId,
           data: form,
           processData: false,

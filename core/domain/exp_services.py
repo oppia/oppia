@@ -29,6 +29,7 @@ import os
 import StringIO
 import zipfile
 
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -542,22 +543,6 @@ def update_exploration(
 
 
 # Creation and deletion methods.
-def save_new_exploration_from_zip_file(
-        committer_id, yaml_content, title, category, exploration_id):
-    exploration = exp_domain.Exploration.from_yaml(
-        exploration_id, title, category, yaml_content)
-
-    commit_message = (
-        'New exploration created from zip file with title \'%s\'.'
-        % exploration.title)
-
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }], None)
-
-
 def clone_exploration(committer_id, old_exploration_id):
     """Clones an exploration and returns the new exploration's id.
 
@@ -615,6 +600,30 @@ def get_demo_exploration_components(demo_path):
         raise Exception('Unrecognized file path: %s' % demo_path)
 
 
+def save_new_exploration_from_yaml_and_assets(
+        committer_id, yaml_content, title, category, exploration_id,
+        assets_list):
+    if assets_list is None:
+        assets_list = []
+
+    exploration = exp_domain.Exploration.from_yaml(
+        exploration_id, title, category, yaml_content)
+    commit_message = (
+        'New exploration created from YAML file with title \'%s\'.'
+        % exploration.title)
+
+    _create_exploration(committer_id, exploration, commit_message, [{
+        'cmd': CMD_CREATE_NEW,
+        'title': exploration.title,
+        'category': exploration.category,
+    }], None)
+
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        fs.save(committer_id, asset_filename, asset_content)
+
+
 def delete_demo(exploration_id):
     """Deletes a single demo exploration."""
     exploration = get_exploration_by_id(exploration_id, strict=False)
@@ -645,32 +654,16 @@ def load_demo(exploration_id):
     else:
         raise Exception('Invalid demo exploration: %s' % exploration_info)
 
-    # TODO(sll): Try to use the import_from_zip_file() method instead.
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
-    exploration = exp_domain.Exploration.from_yaml(
-        exploration_id, title, category, yaml_content)
-    commit_message = (
-        'New demo exploration created with title \'%s\'.'
-        % exploration.title)
-    commit_cmds = [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }]
-
-    _create_exploration(
-        feconf.ADMIN_COMMITTER_ID, exploration, commit_message, commit_cmds,
-        None)
-
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        fs.save(feconf.ADMIN_COMMITTER_ID, asset_filename, asset_content)
+    save_new_exploration_from_yaml_and_assets(
+        feconf.ADMIN_COMMITTER_ID, yaml_content, title, category,
+        exploration_id, assets_list)
 
     rights_manager.publish_exploration(
         feconf.ADMIN_COMMITTER_ID, exploration_id)
     # Release ownership of all explorations except the one on the splash page.
-    if exploration_id != '0':
+    if exploration_id != config_domain.Registry.get_config_property(
+            'splash_page_exploration_id').value:
         rights_manager.release_ownership(
             feconf.ADMIN_COMMITTER_ID, exploration_id)
 

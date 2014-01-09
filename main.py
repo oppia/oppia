@@ -100,6 +100,7 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.LEARN_GALLERY_DATA_URL, galleries.LearnHandler,
         'learn_gallery_handler'),
+
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
         'contribute_gallery_page'),
@@ -109,6 +110,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
+        galleries.UploadExploration, 'upload_exploration'),
     get_redirect_route(
         r'%s' % feconf.CLONE_EXPLORATION_URL,
         galleries.CloneExploration, 'clone_exploration'),

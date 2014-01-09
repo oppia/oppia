@@ -109,9 +109,6 @@ XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
-# Whether to allow file uploads via YAML in the gallery and editor pages.
-ALLOW_YAML_FILE_UPLOAD = False
-
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'admin@oppia'
@@ -207,6 +204,7 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'

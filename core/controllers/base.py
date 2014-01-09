@@ -220,7 +220,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         values.update({
             'debug': feconf.DEBUG,
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'DEV_MODE': feconf.DEV_MODE,
             'EXPLORATION_STATUS_PRIVATE': (

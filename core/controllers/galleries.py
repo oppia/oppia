@@ -20,12 +20,18 @@ import collections
 import feconf
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 
 
 EXPLORATION_ID_KEY = 'explorationId'
+
+ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
+    'allow_yaml_file_upload', 'Boolean',
+    'Whether to allow file uploads via YAML in the gallery page.',
+    default_value=False)
 
 
 class LearnPage(base.BaseHandler):
@@ -82,6 +88,7 @@ class ContributePage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CONTRIBUTE,
+            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
         })
         self.render_template('galleries/contribute.html')
 
@@ -131,19 +138,40 @@ class NewExploration(base.BaseHandler):
         if not category:
             raise self.InvalidInputException('No category chosen.')
 
-        yaml_content = self.request.get('yaml')
+        new_exploration_id = exp_services.get_new_exploration_id()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            new_exploration_id, title, category)
+        exp_services.save_new_exploration(self.user_id, exploration)
+
+        self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
+
+
+class UploadExploration(base.BaseHandler):
+    """Uploads a new exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'contribute'
+
+    @base.require_registered_as_editor
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        yaml_content = self.request.get('yaml_file')
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if yaml_content and feconf.ALLOW_YAML_FILE_UPLOAD:
-            exp_services.save_new_exploration_from_zip_file(
+        if ALLOW_YAML_FILE_UPLOAD.value:
+            exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, title, category,
-                new_exploration_id)
+                new_exploration_id, [])
+            self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
         else:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                new_exploration_id, title, category)
-            exp_services.save_new_exploration(self.user_id, exploration)
-
-        self.render_json({EXPLORATION_ID_KEY: exploration.id})
+            raise self.InvalidInputException(
+                'This server does not allow file uploads.')
 
 
 class CloneExploration(base.BaseHandler):
