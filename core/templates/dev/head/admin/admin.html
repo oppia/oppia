@@ -19,7 +19,7 @@
 
     <br>
 
-    <div ng-if="message" style="background-color: lightyellow;">
+    <div ng-if="message" style="background-color: lightyellow; position: fixed; width: 30%; z-index: 3000; border: 1px solid brown; right: 5px;">
       <[message]>
     </div>
 
@@ -35,15 +35,17 @@
 
     <h3>Configuration</h3>
 
-    <div ng-if="isNonemptyObject(configProperties)">
-      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-        <p>
-          <strong><[configPropertyData.description]></strong>
-          <button ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
-        </p>
-        <p style="border: 1px solid black; padding: 5px;">
+    <div class="container-fluid" ng-if="isNonemptyObject(configProperties)">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties" class="row-fluid" style="padding-bottom: 10px;">
+        <span class="span2">
+          <em><[configPropertyData.description]></em>
+        </span>
+        <span class="span4">
           <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
-        </p>
+        </span>
+        <span class="span2">
+          <button ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
+        </span>
       </div>
 
       <button ng-click="saveConfigProperties()">Save</button>
