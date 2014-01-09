@@ -148,6 +148,10 @@
           </ul>
         </div>
 
+        <p ng-if="addedStates.length > 0">
+          <em>You added the following states</em>: <strong><[formatStateList(addedStates)]></strong>
+        </p>
+
         <div ng-if="stateChangesExist">
           <em>
             You made the following changes to states:
@@ -161,6 +165,14 @@
             </ul>
           </div>
         </div>
+
+        <p ng-if="deletedStates.length > 0">
+          <em>You deleted the following states:</em> <strong><[formatStateList(deletedStates)]></strong>
+        </p>
+
+        <p ng-if="changedStates.length > 0">
+          <em>You changed the following states:</em> <strong><[formatStateList(changedStates)]></strong>
+        </p>
       </div>
       <div class="modal-footer">
         <button class="btn" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save</button>

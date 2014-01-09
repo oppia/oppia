@@ -299,7 +299,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               return (
                 humanReadableName + ' (from \'' + changeInfo.old_value +
                 '\' to \'' + changeInfo.new_value + '\')');
-            }
+            };
 
             $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
               if (propertyName == 'title' || propertyName == 'category') {
@@ -309,7 +309,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               } else {
                 return $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
               }
-            }
+            };
 
             $scope.formatStatePropertyChange = function(propertyName, changeInfo) {
               if (propertyName == 'name') {
@@ -319,7 +319,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               } else {
                 return $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
               }
-            }
+            };
+
+            $scope.formatStateList = function(stateList) {
+              return stateList.join('; ');
+            };
 
             $scope.save = function(commitMessage) {
               $modalInstance.close(commitMessage);
@@ -904,6 +908,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
     }
 
+    warningsData.clear();
+
     $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
     $http.post(
       $scope.newStateTemplateUrl,
@@ -921,6 +927,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       });
 
       $scope.drawGraph();
+      $scope.newStateDesc = '';
+
       if (successCallback) {
         successCallback(newStateName);
       }
