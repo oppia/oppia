@@ -33,12 +33,10 @@ from core.domain import config_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 import feconf
 import jinja_utils
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([
-    models.NAMES.user
-])
 import utils
 
 import jinja2

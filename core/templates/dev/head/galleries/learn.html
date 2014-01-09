@@ -59,6 +59,18 @@
 
             </div>
           </div>
+
+          <br>
+
+          {% if user_email %}
+            <h4>
+              To create new explorations or edit existing ones, visit the <a href="/contribute">Contributors' Gallery</a>.
+            </h4>
+          {% else %}
+            <h4>
+              To create new explorations or edit existing ones, you must <a href="{{contribute_gallery_login_url}}">log in</a>.
+            </h4>
+          {% endif %}
         </div>
       </div>
     </div>

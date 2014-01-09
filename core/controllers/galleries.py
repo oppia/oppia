@@ -17,13 +17,15 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
-import feconf
 
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
+import feconf
 
 
 EXPLORATION_ID_KEY = 'explorationId'
@@ -41,6 +43,9 @@ class LearnPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_LEARN,
+            'contribute_gallery_login_url': (
+                current_user_services.create_login_url(
+                    feconf.CONTRIBUTE_GALLERY_URL))
         })
         self.render_template('galleries/learn.html')
 

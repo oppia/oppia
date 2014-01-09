@@ -15,6 +15,7 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import galleries
+from core.domain import config_services
 from core.domain import exp_services
 import feconf
 import test_utils
@@ -57,6 +58,27 @@ class LearnGalleryTest(test_utils.GenericTestBase):
                 }]
             }
         }, response_dict)
+
+    def test_login_message(self):
+        """Test that the login message appears when appropriate."""
+        response = self.testapp.get(feconf.LEARN_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(
+            'To create new explorations or edit existing ones, you must',
+            self.get_expected_login_url(feconf.CONTRIBUTE_GALLERY_URL),
+            no=['To create new explorations or edit existing ones, visit the'])
+
+        USER_EMAIL = 'user@example.com'
+        self.login(USER_EMAIL)
+
+        response = self.testapp.get(feconf.LEARN_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(
+            'To create new explorations or edit existing ones, visit the',
+            no=['To create new explorations or edit existing ones, you must',
+                self.get_expected_login_url(feconf.CONTRIBUTE_GALLERY_URL)])
+
+        self.logout()
 
     def test_can_see_explorations_to_playtest(self):
         """Test viewability of playtestable explorations."""
@@ -215,4 +237,22 @@ class ContributeGalleryTest(test_utils.GenericTestBase):
             'is_admin': False,
             'categories': {}
         }, response_dict)
+        self.logout()
+
+    def test_exploration_upload_button(self):
+        """Test that the exploration upload button appears when appropriate."""
+        self.register_editor('editor@example.com')
+        self.login('editor@example.com')
+
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(no=['Upload Existing Exploration'])
+
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'allow_yaml_file_upload', True)
+
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain('Upload Existing Exploration')
+
         self.logout()
