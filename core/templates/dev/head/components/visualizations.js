@@ -80,8 +80,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
                     scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
                     scope.highlightStates, scope.stateStats);
           for (var i = 0; i < document.getElementsByClassName('oppia-graph-viz').length; ++i) {
-            document.getElementsByClassName('oppia-graph-viz')[i].style.height = height;
-            document.getElementsByClassName('oppia-graph-viz')[i].style.width = width > 680 ? width : 680;
+            document.getElementsByClassName('oppia-graph-viz')[i].style.height = height + 'px';
+            document.getElementsByClassName('oppia-graph-viz')[i].style.width = (width > 680 ? width : 680) + 'px';
           }
         }
       });
