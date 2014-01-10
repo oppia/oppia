@@ -19,7 +19,10 @@
 __author__ = 'Sean Lip'
 
 
+from django.db import transaction
+
+
 def run_in_transaction(fn, *args, **kwargs):
     """Run a function in a transaction."""
-    # TODO(sll): Actually run the function in a transaction.
-    return fn(*args, **kwargs)
+    with transaction.commit_on_success():
+        return fn(*args, **kwargs)
