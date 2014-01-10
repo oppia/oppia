@@ -21,4 +21,8 @@ __author__ = 'Tarashish Mishra'
 from core.storage.base_model import django_models
 
 BaseModel = django_models.BaseModel
+DummyModel = django_models.DummyModel
 FakeModel = django_models.FakeModel
+VersionedModel = django_models.VersionedModel
+BaseSnapshotMetadataModel = django_models.BaseSnapshotMetadataModel
+BaseSnapshotContentModel = django_models.BaseSnapshotContentModel
