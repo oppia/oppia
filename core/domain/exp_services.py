@@ -349,6 +349,8 @@ def get_summary_of_change_list(exploration_id, change_list):
             state_property_changes[orig_state_name][property_name][
                 'new_value'] = change.new_value
         elif change.cmd == 'edit_exploration_property':
+            property_name = change.property_name
+
             if property_name not in exploration_property_changes:
                 exploration_property_changes[property_name] = {
                     'old_value': change.old_value

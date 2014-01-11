@@ -764,7 +764,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
+    var oldParamSpecs = angular.copy($scope.paramSpecs);
+
     $scope.paramSpecs[name] = {obj_type: type};
+    $scope.addExplorationChange(
+      'param_specs', angular.copy($scope.paramSpecs), oldParamSpecs);
   };
 
   /**
