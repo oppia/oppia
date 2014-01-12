@@ -79,21 +79,8 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.objects.all().count()
 
-    def save(self, committer_id, properties_dict, commit_message, commit_cmds):
+    def save(self, committer_id, commit_message, commit_cmds):
         """Updates the exploration using the properties dict, then saves it."""
-        if not isinstance(committer_id, basestring):
-            raise Exception('Invalid committer id: %s' % committer_id)
-
-        if properties_dict is None:
-            properties_dict = {}
-
-        for key in properties_dict:
-            if key in self.attr_list():
-                setattr(self, key, properties_dict[key])
-            else:
-                raise Exception(
-                    'Invalid key for exploration properties dict: %s' % key)
-
         super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)
 

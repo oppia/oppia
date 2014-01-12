@@ -421,20 +421,18 @@ def _save_exploration(
                 'which is too old. Please reload the page and try again.'
                 % (exploration_model.version, exploration.version))
 
-    properties_dict = {
-        'category': exploration.category,
-        'title': exploration.title,
-        'init_state_name': exploration.init_state_name,
-        'states': {
-            state_name: state.to_dict()
-            for (state_name, state) in exploration.states.iteritems()},
-        'param_specs': exploration.param_specs_dict,
-        'param_changes': exploration.param_change_dicts,
-        'default_skin': exploration.default_skin,
-    }
+    exploration_model.category = exploration.category
+    exploration_model.title = exploration.title
+    exploration_model.init_state_name = exploration.init_state_name
+    exploration_model.states = {
+        state_name: state.to_dict()
+        for (state_name, state) in exploration.states.iteritems()}
+    exploration_model.param_specs = exploration.param_specs_dict
+    exploration_model.param_changes = exploration.param_change_dicts
+    exploration_model.default_skin = exploration.default_skin
 
     exploration_model.save(
-        committer_id, properties_dict, commit_message, change_list)
+        committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
 
     exploration.version += 1
