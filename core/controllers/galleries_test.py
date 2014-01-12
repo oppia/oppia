@@ -50,6 +50,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_super_admin': False,
             'categories': {
                 'Welcome': [{
                     'to_playtest': False,
@@ -130,6 +131,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_super_admin': False,
             'categories': {}
         }, response_dict)
 
@@ -139,6 +141,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_super_admin': False,
             'categories': {
                 'Test Explorations': [{
                     'to_playtest': True,
@@ -156,6 +159,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
+            'is_super_admin': False,
             'categories': {},
         }, response_dict)
         self.logout()
@@ -235,6 +239,7 @@ class ContributeGalleryTest(test_utils.GenericTestBase):
         # Users may not edit the sample exploration for the splash page.
         self.assertDictContainsSubset({
             'is_admin': False,
+            'is_super_admin': False,
             'categories': {}
         }, response_dict)
         self.logout()

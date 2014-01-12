@@ -32,20 +32,20 @@ import feconf
 import jinja2
 
 
-def require_admin(handler):
-    """Decorator that checks if the current user is an admin."""
-    def test_admin(self, **kwargs):
-        """Checks if the user is logged in and is an admin."""
+def require_super_admin(handler):
+    """Decorator that checks if the current user is a super admin."""
+    def test_super_admin(self, **kwargs):
+        """Checks if the user is logged in and is a super admin."""
         if not self.user_id:
             self.redirect(
                 current_user_services.create_login_url(self.request.uri))
             return
         if not rights_manager.Actor(self.user_id).is_super_admin():
             raise self.UnauthorizedUserException(
-                '%s is not an admin of this application', self.user_id)
+                '%s is not a super admin of this application', self.user_id)
         return handler(self, **kwargs)
 
-    return test_admin
+    return test_super_admin
 
 
 class AdminPage(base.BaseHandler):
@@ -53,7 +53,7 @@ class AdminPage(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'admin'
 
-    @require_admin
+    @require_super_admin
     def get(self):
         """Handles GET requests."""
         self.values['counters'] = [{
@@ -100,7 +100,7 @@ class AdminHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'admin'
 
-    @require_admin
+    @require_super_admin
     def get(self):
         """Handles GET requests."""
 
@@ -111,7 +111,7 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_computed_property_names()),
         })
 
-    @require_admin
+    @require_super_admin
     def post(self):
         """Handles POST requests."""
         try:

@@ -36,8 +36,7 @@ class ConfigProperty(object):
     def refresh_default_value(self, default_value):
         pass
 
-    def __init__(self, name, obj_type, description, default_value,
-                 post_set_hook=None):
+    def __init__(self, name, obj_type, description, default_value):
         if not obj_type in self.ALLOWED_TYPES:
             raise Exception('Bad config property obj_type: %s' % obj_type)
 
@@ -49,7 +48,6 @@ class ConfigProperty(object):
         self._description = description
         self._default_value = obj_services.Registry.get_object_class_by_type(
             self.obj_type).normalize(default_value)
-        self._post_set_hook = post_set_hook
 
         Registry._config_registry[self.name] = self
 
@@ -68,11 +66,6 @@ class ConfigProperty(object):
     @property
     def default_value(self):
         return self._default_value
-
-    @property
-    def post_set_hook(self):
-        """This is a function that is called when the ConfigProperty is set."""
-        return self._post_set_hook
 
     @property
     def value(self):
@@ -107,6 +100,12 @@ class ComputedProperty(ConfigProperty):
         super(ComputedProperty, self).__init__(
             '%s%s' % (COMPUTED_PROPERTY_PREFIX, name),
             obj_type, description, default_value)
+
+    @property
+    def value(self):
+        """Compute the value on the fly."""
+        self.refresh_default_value()
+        return self.default_value
 
 
 class Registry(object):
@@ -192,8 +191,7 @@ MODERATOR_IDS = ComputedProperty(
     update_moderator_ids)
 
 ADMIN_EMAILS = ConfigProperty(
-    'admin_emails', 'SetOfUnicodeString', 'Email addresses of admins', [],
-    post_set_hook=ADMIN_IDS.refresh_default_value)
+    'admin_emails', 'SetOfUnicodeString', 'Email addresses of admins', [])
 MODERATOR_EMAILS = ConfigProperty(
     'moderator_emails', 'SetOfUnicodeString', 'Email addresses of moderators',
-    [], post_set_hook=MODERATOR_IDS.refresh_default_value)
+    [])
