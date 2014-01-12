@@ -50,6 +50,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_moderator': False,
             'is_super_admin': False,
             'categories': {
                 'Welcome': [{
@@ -131,6 +132,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_moderator': False,
             'is_super_admin': False,
             'categories': {}
         }, response_dict)
@@ -141,6 +143,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
+            'is_moderator': False,
             'is_super_admin': False,
             'categories': {
                 'Test Explorations': [{
@@ -159,6 +162,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
+            'is_moderator': False,
             'is_super_admin': False,
             'categories': {},
         }, response_dict)

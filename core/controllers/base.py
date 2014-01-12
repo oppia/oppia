@@ -128,6 +128,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.values['username'] = user_settings.username
 
+        self.values['is_moderator'] = rights_manager.Actor(
+            self.user_id).is_moderator()
         self.values['is_admin'] = rights_manager.Actor(self.user_id).is_admin()
         self.values['is_super_admin'] = rights_manager.Actor(
             self.user_id).is_super_admin()

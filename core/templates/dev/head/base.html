@@ -78,7 +78,12 @@
                           {% else %}
                             {{user_email}}
                           {% endif %}
-                          {% if is_admin %} (Admin) {% endif %}
+
+                          {% if is_admin %}
+                            (Admin)
+                          {% elif is_moderator %}
+                            (Moderator)
+                          {% endif %}
                           <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
