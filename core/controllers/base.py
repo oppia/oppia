@@ -233,8 +233,12 @@ class BaseHandler(webapp2.RequestHandler):
         })
 
         if self.user_id:
+            redirect_url = self.request.uri
+            if '/contribute' in redirect_url or '/create' in redirect_url:
+                redirect_url = ''
+
             values['logout_url'] = (
-                current_user_services.create_logout_url(self.request.uri))
+                current_user_services.create_logout_url(redirect_url))
         else:
             values['login_url'] = (
                 current_user_services.create_login_url(self.request.uri))

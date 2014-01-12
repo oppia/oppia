@@ -56,11 +56,9 @@
                     <li {% if nav_mode == 'learn' %}class="active"{% endif %}>
                       <a href="/learn">Learn</a>
                     </li>
-                    {% if user_email %}
-                      <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
-                        <a href="/contribute">Contribute</a>
-                      </li>
-                    {% endif %}
+                    <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
+                      <a href="/contribute">Contribute</a>
+                    </li>
                     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
                       <a href="/about">About</a>
                     </li>

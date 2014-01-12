@@ -35,9 +35,9 @@ class SplashPageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Login', 'Create an Oppia account',
+            'Login', 'Create an Oppia account', 'Contribute',
             self.get_expected_login_url('/'),
-            no=['Contribute', 'Profile', 'Logout', 'Create an exploration',
+            no=['Profile', 'Logout', 'Create an exploration',
                 self.get_expected_logout_url('/')])
 
         self.login('reader@example.com')

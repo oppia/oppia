@@ -77,7 +77,8 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
 
 # Register the URL with the responsible classes
 urls = [
-    webapp2.Route(r'/', pages.SplashPage, 'splash_page'),
+    webapp2.Route(
+        r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 

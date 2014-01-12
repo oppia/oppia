@@ -205,6 +205,7 @@ LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+SPLASH_PAGE_URL = '/'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'
