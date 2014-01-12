@@ -29,3 +29,11 @@ class OutputEquals(base.CodeEvaluationRule):
         normalized_result = ' '.join(subject['output'].split())
         normalized_expected_output = ' '.join(self.x.split())
         return normalized_result == normalized_expected_output
+
+
+class ResultsInError(base.CodeEvaluationRule):
+    description = 'results in an error when run'
+
+    def _evaluate(self, subject):
+        error = subject['error'].strip()
+        return bool(error)
