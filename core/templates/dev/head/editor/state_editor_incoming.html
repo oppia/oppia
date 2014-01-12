@@ -9,7 +9,7 @@
     <ul>
       <li ng-repeat="(incomingStateName, incomingState) in getIncomingStates(stateName)">
         <a ng-if="stateName != incomingStateName" href="/create/<[explorationId]>#/gui/<[incomingStateName]>">
-        <[incomingState.name]>
+        <[incomingStateName]>
         </a>
         <span ng-if="stateName == incomingStateName" title="This state points to itself." class="oppia-cursor-pointer">
           ⟳

@@ -1,17 +1,12 @@
 <h4>
-  <a ng-click="activeInputData.name = 'explorationMetadata'" ng-hide="activeInputData.name.indexOf('explorationMetadata') == 0">
-    <i class="icon-plus-sign oppia-cursor-pointer"></i>
+  <a ng-click="explorationMetadataIsShown = !explorationMetadataIsShown" class="oppia-editor-section-header">
+    <i class="icon-plus-sign" ng-hide="explorationMetadataIsShown"></i>
+    <i class="icon-minus-sign" ng-show="explorationMetadataIsShown"></i>
+    Exploration Metadata
   </a>
-  <a ng-click="activeInputData.clear()" ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
-    <i class="icon-minus-sign oppia-cursor-pointer"></i>
-  </a>
-  Exploration Metadata
-
-  <img class="oppia-help" src="/images/help.png" tooltip="Click '+' to open an editor for the exploration metadata, including its title and editors."
-       tooltip-placement="right">
 </h4>
 
-<div ng-show="activeInputData.name.indexOf('explorationMetadata') == 0">
+<div collapse="!explorationMetadataIsShown">
   <div class="row-fluid">
     <div class="span6">
       <div>
@@ -81,7 +76,7 @@
   <br>
 
   <div>
-    <h4>Parameters used in this exploration</h4>
+    <h5>Parameters used in this exploration</h5>
     <div ng-show="isEmpty(paramSpecs)">
       <em>No parameters used.</em>
     </div>
@@ -93,31 +88,17 @@
 
     <br>
 
-    <h4>
+    <h5>
       Parameters initialized at start of exploration
       <img class="oppia-help" src="/images/help.png"
            tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
            tooltip-placement="right">
-    </h4>
+    </h5>
 
     <param-change-editor param-changes="explorationParamChanges"
                          param-specs="paramSpecs"
                          save-param-changes="saveExplorationParamChanges"
                          add-exploration-param-spec="addExplorationParamSpec">
     </param-change-editor>
-  </div>
-
-  <br>
-
-  <div ng-show="explorationSnapshots.length > 0">
-    <h4>Version History</h4>
-    <ul>
-      <li ng-repeat="snapshot in explorationSnapshots">
-        [<[snapshot.versionNumber]>] (<[snapshot.createdOn]> by <[snapshot.committerId]>)
-        <em>
-          <[snapshot.commitMessage]>
-        </em>
-      </li>
-    </ul>
   </div>
 </div>

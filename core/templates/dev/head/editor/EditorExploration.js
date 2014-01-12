@@ -790,11 +790,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.closeEditRolesForm = function() {
     $scope.newMemberEmail = '';
     $scope.newMemberRole = $scope.ROLES[0];
-    activeInputData.name = 'explorationMetadata';
+    activeInputData.clear();
   };
 
   $scope.editRole = function(newMemberEmail, newMemberRole) {
-    activeInputData.name = 'explorationMetadata';
+    activeInputData.clear();
     $scope._saveExplorationRightsChange({
       new_member_email: newMemberEmail,
       new_member_role: newMemberRole
