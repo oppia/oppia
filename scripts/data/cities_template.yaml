@@ -98,7 +98,7 @@ states:
       rule_specs:
       - definition:
           inputs:
-            d: 3.0
+            d: 0.1
             p:
             - <%= cities[i].lat %>
             - <%= cities[i].lng %>
@@ -110,9 +110,114 @@ states:
         - Yes, that's where {{CityName}} is!
         param_changes: []
       - definition:
+          inputs:
+            d: 0.8
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Almost there. Try to click the center of {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 1.5
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Close. If you zoom in, the map might have the city label {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 3
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Kinda close. Look around the area for {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 6
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Getting there. Zoom into the map if you haven't. Find {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 10
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - You are probably in the right country. Find {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 30
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Hmmm, probably looking at the right region. Find {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 60
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Maybe the right continent, but pretty far. Find {{CityName}}.
+        param_changes: []
+      - definition:
+          inputs:
+            d: 90
+            p:
+            - <%= cities[i].lat %>
+            - <%= cities[i].lng %>
+          name: Within
+          rule_type: atomic
+          subject: answer
+        dest: <%= cities[i].id %>
+        feedback:
+        - Are you random guessing? Try again. Find {{CityName}}.
+        param_changes: []
+      - definition:
           rule_type: default
         dest: <%= cities[i].id %>
-        feedback: []
+        feedback:
+        - Way off. Perhaps looking at a wrong continent. Find {{CityName}}.
         param_changes: []
     sticky: true
     widget_id: InteractiveMap

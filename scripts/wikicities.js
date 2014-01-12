@@ -36,18 +36,27 @@ var _zlib = require('zlib');
 var host = 'http://en.wikipedia.org';
 
 var forPage = function(path, handler) {
-    _http.request(
-        host + path,
-        function(res) {
-            var stream = res.headers['content-encoding'] == 'gzip' ?
-                res.pipe(_zlib.createGunzip()) : res;
-            var data = '';
-            stream.setEncoding('utf8');
-            stream.on('data', function (chunk) { data += chunk; });
-            stream.on('end', function() {
-                handler(data);
-            });
-        }).end();
+    console.error('downloading: ' + path);
+    try {
+        _http.request(
+            host + path,
+            function(res) {
+                var stream = res.headers['content-encoding'] == 'gzip' ?
+                    res.pipe(_zlib.createGunzip()) : res;
+                var data = '';
+                stream.setEncoding('utf8');
+                stream.on('data', function (chunk) { data += chunk; });
+                stream.on('error', function (err) {
+                    console.error('stream err: ' + path);
+                });
+                stream.on('end', function() {
+                    handler(data);
+                });
+            }).end();
+    } catch (e) {
+      console.error('err on: ' + path);
+      console.error(e);
+    }
 };
 
 var forCity = function(path, country) {
