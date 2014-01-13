@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html ng-app="oppia">
   <head>
+    <noscript>
+      <meta http-equiv="refresh" content="1;url=/static/pages/noscript.txt">
+    </noscript>
     <meta charset=utf-8>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Oppia - {% block subtitle %}{% endblock %}</title>
@@ -53,11 +56,9 @@
                     <li {% if nav_mode == 'learn' %}class="active"{% endif %}>
                       <a href="/learn">Learn</a>
                     </li>
-                    {% if user_email %}
-                      <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
-                        <a href="/contribute">Contribute</a>
-                      </li>
-                    {% endif %}
+                    <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
+                      <a href="/contribute">Contribute</a>
+                    </li>
                     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
                       <a href="/about">About</a>
                     </li>
@@ -78,7 +79,12 @@
                           {% else %}
                             {{user_email}}
                           {% endif %}
-                          {% if is_admin %} (Admin) {% endif %}
+
+                          {% if is_admin %}
+                            (Admin)
+                          {% elif is_moderator %}
+                            (Moderator)
+                          {% endif %}
                           <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
@@ -86,7 +92,7 @@
                             <a href="{{logout_url}}">Logout</a>
                           </li>
 
-                          {% if is_admin %}
+                          {% if is_super_admin %}
                             <li class="dropdown">
                               <a href="/admin" target="_blank">
                                 Admin Page

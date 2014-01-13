@@ -47,9 +47,11 @@ class CodeRepl(widget_domain.BaseWidget):
         'name': 'placeholder',
         'description': 'The initial code displayed in the code input field.',
         'generator': generators.Copier,
-        'init_args': {},
+        'init_args': {
+            'largeInput': True
+        },
         'customization_args': {
-            'value': 'Type your code here.'
+            'value': '[Type your code here.]'
         },
         'obj_type': 'UnicodeString',
     }, {

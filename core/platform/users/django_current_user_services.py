@@ -36,8 +36,8 @@ def create_logout_url(slug):
     return ''
 
 
-def is_current_user_admin(request=None):
-    """Checks whether the current user is an admin."""
+def is_current_user_super_admin(request=None):
+    """Checks whether the current user owns this app."""
     user = get_current_user(request)
     if user:
         return user.is_superuser

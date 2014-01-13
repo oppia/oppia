@@ -158,6 +158,16 @@ textarea {
   font-variant: small-caps;
 }
 
+.oppia-editor-section-header {
+  color: black;
+  cursor: pointer;
+  text-decoration: none;
+}
+.oppia-editor-section-header:hover {
+  color: black;
+  text-decoration: none;
+}
+
 .oppia-no-scroll::-webkit-scrollbar {
   display: none;
 }

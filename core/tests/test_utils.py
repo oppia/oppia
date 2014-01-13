@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import main
 import os
 import re
 import unittest
@@ -28,6 +27,7 @@ from core.platform import models
 )
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import main
 
 import json
 

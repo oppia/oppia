@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import inspect
 import pkgutil
 
 import feconf
@@ -57,15 +56,15 @@ class Registry(object):
         # Crawl the directories and add new widget instances to the registries.
         for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
             module = loader.find_module(name).load_module(name)
-            for name, clazz in inspect.getmembers(module, inspect.isclass):
-                ancestor_names = [
-                    base_class.__name__ for base_class in clazz.__bases__]
-                if 'BaseWidget' in ancestor_names:
-                    if clazz.__name__ in registry_dict:
-                        raise Exception(
-                            'Duplicate widget name %s' % clazz.__name__)
+            clazz = getattr(module, name)
+            if clazz.__name__ in registry_dict:
+                raise Exception(
+                    'Duplicate widget name %s' % clazz.__name__)
 
-                    registry_dict[clazz.__name__] = clazz()
+            ancestor_names = [
+                base_class.__name__ for base_class in clazz.__bases__]
+            if 'BaseWidget' in ancestor_names:
+                registry_dict[clazz.__name__] = clazz()
 
     @classmethod
     def refresh(cls):
@@ -78,7 +77,8 @@ class Registry(object):
         """Get a list of widget classes whose id starts with widget_prefix."""
         assert widget_type in cls.WIDGET_TYPE_MAPPING
 
-        Registry.refresh()
+        if len(cls.WIDGET_TYPE_MAPPING[widget_type][0]) == 0:
+            Registry.refresh()
         return cls.WIDGET_TYPE_MAPPING[widget_type][0].values()
 
     @classmethod

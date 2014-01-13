@@ -221,7 +221,3 @@ def get_human_readable_user_ids(user_ids):
 
 def get_user_id_from_email(email):
     return current_user_services.get_user_id_from_email(email)
-
-
-def is_current_user_admin(request):
-    return current_user_services.is_current_user_admin(request)

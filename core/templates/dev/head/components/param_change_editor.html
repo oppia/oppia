@@ -48,7 +48,7 @@
           <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
             Edit
           </button>
-          <button type="button" ng-disabled="activeItem !== -1" ng-click="deleteParamChange($index)">
+          <button type="button" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
             &times;
           </button>
         </span>

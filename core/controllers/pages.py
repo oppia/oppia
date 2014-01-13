@@ -39,6 +39,11 @@ SPLASH_PAGE_EXPLORATION_ID = config_domain.ConfigProperty(
     ('The id for the exploration on the splash page '
      '(a blank value indicates that no exploration should be displayed)'),
     default_value='')
+SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
+    'splash_page_exploration_version', 'UnicodeString',
+    ('The version number for the exploration on the splash page '
+     '(a blank value indicates that the latest version should be used)'),
+    default_value='')
 
 
 class SplashPage(base.BaseHandler):
@@ -57,6 +62,8 @@ class SplashPage(base.BaseHandler):
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SPLASH_PAGE_EXPLORATION_ID': SPLASH_PAGE_EXPLORATION_ID.value,
+            'SPLASH_PAGE_EXPLORATION_VERSION': (
+                SPLASH_PAGE_EXPLORATION_VERSION.value),
         })
         self.render_template('pages/splash.html')
 

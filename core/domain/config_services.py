@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import config_domain
 from core.domain import obj_services
-from core.domain import user_services
+from core.domain import rights_manager
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
@@ -36,10 +36,9 @@ def set_property(committer_id, name, value):
         raise Exception('No config property with name %s found.')
 
     if (committer_id != feconf.ADMIN_COMMITTER_ID and not
-            user_services.is_current_user_admin(None) and not
-            committer_id in config_domain.ADMIN_IDS.value):
+            rights_manager.Actor(committer_id).is_super_admin()):
         raise Exception(
-            'Only an admin can set config property datastore overrides.')
+            'Only a super admin can set config property datastore overrides.')
 
     value = obj_services.Registry.get_object_class_by_type(
         config_property.obj_type).normalize(value)
@@ -59,10 +58,6 @@ def set_property(committer_id, name, value):
     # Set value in memcache.
     memcache_services.set_multi({
         datastore_item.id: datastore_item.value})
-
-    # Call post_set_hook, if it exists.
-    if config_property.post_set_hook:
-        config_property.post_set_hook()
 
 
 def revert_property(committer_id, name):

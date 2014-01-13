@@ -190,16 +190,16 @@ def dict_from_yaml(yaml_str):
         raise InvalidInputException(e)
 
 
-def recursively_remove_key(d, key_to_remove):
-    """Recursively removes keys from a dict."""
-    if isinstance(d, list):
-        for item in d:
+def recursively_remove_key(obj, key_to_remove):
+    """Recursively removes keys from a list or dict."""
+    if isinstance(obj, list):
+        for item in obj:
             recursively_remove_key(item, key_to_remove)
-    elif isinstance(d, dict):
-        if key_to_remove in d:
-            del d[key_to_remove]
-        for key, unused_value in d.items():
-            recursively_remove_key(d[key], key_to_remove)
+    elif isinstance(obj, dict):
+        if key_to_remove in obj:
+            del obj[key_to_remove]
+        for key, unused_value in obj.items():
+            recursively_remove_key(obj[key], key_to_remove)
 
 
 def get_random_int(upper_bound):

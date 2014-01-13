@@ -55,7 +55,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.load_demo('1')
 
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('1'))
-        self.assertFalse(rights_manager.Actor(self.user_id_a).can_edit('1'))
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('1'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('1'))
 
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('1'))
@@ -64,6 +64,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_delete('1'))
 
     def test_non_splash_page_demo_exploration(self):
+        # Note: there is no difference between permissions for demo
+        # explorations, whether or not they are on the splash page.
         exp_services.load_demo('3')
 
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('3'))

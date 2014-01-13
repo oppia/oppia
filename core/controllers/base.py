@@ -121,17 +121,18 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = self.user.user_id() if self.user else None
-        self.is_admin = False
 
         if self.user_id:
             user_settings = user_services.get_or_create_user(
                 self.user_id, self.user.email())
             self.values['user_email'] = user_settings.email
             self.values['username'] = user_settings.username
-            self.is_admin = current_user_services.is_current_user_admin(
-                self.request)
 
-        self.values['is_admin'] = self.is_admin
+        self.values['is_moderator'] = rights_manager.Actor(
+            self.user_id).is_moderator()
+        self.values['is_admin'] = rights_manager.Actor(self.user_id).is_admin()
+        self.values['is_super_admin'] = rights_manager.Actor(
+            self.user_id).is_super_admin()
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
@@ -232,8 +233,12 @@ class BaseHandler(webapp2.RequestHandler):
         })
 
         if self.user_id:
+            redirect_url = self.request.uri
+            if '/contribute' in redirect_url or '/create' in redirect_url:
+                redirect_url = ''
+
             values['logout_url'] = (
-                current_user_services.create_logout_url(self.request.uri))
+                current_user_services.create_logout_url(redirect_url))
         else:
             values['login_url'] = (
                 current_user_services.create_login_url(self.request.uri))

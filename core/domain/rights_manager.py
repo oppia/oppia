@@ -254,7 +254,7 @@ class Actor(object):
         if current_user is None:
             return False
         return (self.user_id == current_user.user_id()
-                and current_user_services.is_current_user_admin(None))
+                and current_user_services.is_current_user_super_admin(None))
 
     def is_admin(self):
         return (self.is_super_admin() or
@@ -303,7 +303,7 @@ class Actor(object):
 
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
             return (self.has_explicit_viewing_rights(exploration_id)
-                    or self.is_admin())
+                    or self.is_moderator())
         else:
             return True
 
@@ -317,7 +317,7 @@ class Actor(object):
 
     def can_edit(self, exploration_id):
         return (self.has_explicit_editing_rights(exploration_id)
-                or self.is_admin())
+                or self.is_moderator())
 
     def can_accept_submitted_change(self, exploration_id):
         return self.can_edit(exploration_id)
@@ -362,7 +362,7 @@ class Actor(object):
         # TODO(sll): Deny unpublishing of the exploration if an
         # external user has edited or submitted feedback for it since
         # it was published.
-        return self.is_owner(exploration_id) or self.is_admin()
+        return self.is_owner(exploration_id) or self.is_moderator()
 
     def can_modify_roles(self, exploration_id):
         try:
@@ -408,7 +408,7 @@ class Actor(object):
 
         if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
             return False
-        return self.is_admin()
+        return self.is_moderator()
 
     def can_unpublicize(self, exploration_id):
         try:
@@ -418,7 +418,7 @@ class Actor(object):
 
         if exp_rights.status != EXPLORATION_STATUS_PUBLICIZED:
             return False
-        return self.is_admin()
+        return self.is_moderator()
 
 
 def assign_role(committer_id, exploration_id, assignee_id, new_role):

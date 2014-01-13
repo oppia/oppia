@@ -18,6 +18,7 @@ import unittest
 
 from core.controllers import editor
 from core.controllers import pages
+from core.domain import config_domain
 
 import feconf
 import test_utils
@@ -35,13 +36,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/admin')
 
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Performance Counters', response.body)
-        self.assertIn(
-            'Total processing time for all JSON responses', response.body)
-        self.assertIn('Configuration', response.body)
-        self.assertIn('Actions', response.body)
-        self.assertIn('Reload a single exploration', response.body)
-        self.assertIn('counting.yaml', response.body)
+        response.mustcontain(
+            'Performance Counters',
+            'Total processing time for all JSON responses',
+            'Configuration',
+            'Actions',
+            'Reload a single exploration',
+            'counting.yaml')
 
         self.logout()
 
@@ -123,3 +124,51 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertNotIn('SITE_NAME', response.body)
         self.assertIn(ACTUAL_SITE_NAME, response.body)
+
+    def test_change_rights(self):
+        """Test that the correct role indicators show up on app pages."""
+        MODERATOR_EMAIL = 'moderator@example.com'
+        ADMIN_EMAIL = 'admin@example.com'
+        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+
+        # Navigate to any page. The role is not set.
+        response = self.testapp.get('/')
+        response.mustcontain(no=['Moderator', 'Admin'])
+
+        # Log in as a superadmin. The role is set.
+        self.login('superadmin@example.com', is_admin=True)
+        response = self.testapp.get('/')
+        response.mustcontain('Admin', no=['Moderator'])
+
+        # Add a moderator, an admin, and a person with both roles, then log
+        # out.
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.ADMIN_EMAILS.name: [
+                    ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+                config_domain.MODERATOR_EMAILS.name: [
+                    MODERATOR_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+            }
+        }, csrf_token)
+        self.logout()
+
+        # Log in as a moderator.
+        self.login(MODERATOR_EMAIL)
+        response = self.testapp.get('/learn')
+        response.mustcontain('Moderator', no=['Admin'])
+        self.logout()
+
+        # Log in as an admin.
+        self.login(ADMIN_EMAIL)
+        response = self.testapp.get('/learn')
+        response.mustcontain('Admin', no=['Moderator'])
+        self.logout()
+
+        # Log in as a both-moderator-and-admin.
+        self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
+        response = self.testapp.get('/learn')
+        response.mustcontain('Admin', no=['Moderator'])
+        self.logout()
