@@ -51,7 +51,7 @@ def set_property(committer_id, name, value):
         datastore_item = config_models.ConfigPropertyModel(
             id=config_property.name)
     datastore_item.value = value
-    datastore_item.save(committer_id, [{
+    datastore_item.commit(committer_id, [{
         'cmd': CMD_CHANGE_PROPERTY_VALUE,
         'new_value': value
     }])

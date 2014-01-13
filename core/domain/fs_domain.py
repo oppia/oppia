@@ -134,8 +134,8 @@ class ExplorationFileSystem(object):
                 self._exploration_id, 'assets/%s' % filepath)
         data.content = raw_bytes
 
-        data.save(user_id, CHANGE_LIST_SAVE)
-        metadata.save(user_id, CHANGE_LIST_SAVE)
+        data.commit(user_id, CHANGE_LIST_SAVE)
+        metadata.commit(user_id, CHANGE_LIST_SAVE)
 
     def get(self, filepath, version=None):
         """Gets a file as an unencoded stream of raw bytes.
@@ -158,7 +158,7 @@ class ExplorationFileSystem(object):
         else:
             return None
 
-    def save(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes):
         """Saves a raw bytestring as a file in the database."""
         self._save_file(user_id, filepath, raw_bytes)
 
@@ -235,7 +235,7 @@ class DiskBackedFileSystem(object):
             os.path.join(self._root, filepath), raw_bytes=True)
         return FileStreamWithMetadata(content, None, None)
 
-    def save(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes):
         raise NotImplementedError
 
     def delete(self, user_id, filepath):
@@ -284,11 +284,11 @@ class AbstractFileSystem(object):
                 % (filepath, version if version else 'latest'))
         return file_stream.read()
 
-    def save(self, user_id, filepath, raw_bytes):
+    def commit(self, user_id, filepath, raw_bytes):
         """Replaces the contents of the file with the given bytestring."""
         raw_bytes = str(raw_bytes)
         self._check_filepath(filepath)
-        self._impl.save(user_id, filepath, raw_bytes)
+        self._impl.commit(user_id, filepath, raw_bytes)
 
     def delete(self, user_id, filepath):
         """Deletes a file and the metadata associated with it."""

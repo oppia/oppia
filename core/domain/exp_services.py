@@ -398,7 +398,6 @@ def _save_exploration(
     """
     if change_list is None:
         change_list = []
-
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
         exploration.validate(strict=True)
@@ -431,7 +430,7 @@ def _save_exploration(
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.default_skin = exploration.default_skin
 
-    exploration_model.save(
+    exploration_model.commit(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
 
@@ -450,7 +449,20 @@ def _create_exploration(
     exploration.validate()
     rights_manager.create_new_exploration_rights(
         exploration.id, committer_id, cloned_from)
-    _save_exploration(committer_id, exploration, commit_message, commit_cmds)
+    model = exp_models.ExplorationModel(
+        id=exploration.id,
+        category=exploration.category,
+        title=exploration.title,
+        init_state_name=exploration.init_state_name,
+        states={
+            state_name: state.to_dict()
+            for (state_name, state) in exploration.states.iteritems()},
+        param_specs=exploration.param_specs_dict,
+        param_changes=exploration.param_change_dicts,
+        default_skin=exploration.default_skin
+    )
+    model.commit(committer_id, commit_message, commit_cmds)
+    exploration.version += 1
 
 
 def save_new_exploration(committer_id, exploration):
@@ -570,7 +582,7 @@ def clone_exploration(committer_id, old_exploration_id):
     dir_list = old_fs.listdir('')
     for filepath in dir_list:
         file_content = old_fs.get(filepath)
-        new_fs.save(feconf.ADMIN_COMMITTER_ID, filepath, file_content)
+        new_fs.commit(feconf.ADMIN_COMMITTER_ID, filepath, file_content)
 
     return new_exploration_id
 
@@ -619,7 +631,7 @@ def save_new_exploration_from_yaml_and_assets(
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(exploration_id))
-        fs.save(committer_id, asset_filename, asset_content)
+        fs.commit(committer_id, asset_filename, asset_content)
 
 
 def delete_demo(exploration_id):

@@ -19,8 +19,9 @@ import unittest
 import webtest
 
 from core.platform import models
-(exp_models, file_models, stats_models, user_models) = (
+(base_models, exp_models, file_models, stats_models, user_models) = (
     models.Registry.import_models([
+        models.NAMES.base_model,
         models.NAMES.exploration, models.NAMES.file, models.NAMES.statistics,
         models.NAMES.user
     ])
@@ -67,18 +68,30 @@ class TestBase(unittest.TestCase):
             exp_models.ExplorationModel,
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsModel
         ])
 
         for clazz in classes:
             for entity in clazz.get_all(include_deleted_entities=True):
-                entity.delete()
+                try:
+                    entity.delete()
+                except TypeError:
+                    try:
+                        entity.delete(
+                            feconf.ADMIN_COMMITTER_ID, '', force_deletion=True)
+                    except Exception:
+                        pass
 
     def _delete_all_files(self):
         classes = frozenset([
-            file_models.FileDataModel,
-            file_models.FileDataHistoryModel,
+            file_models.FileMetadataSnapshotMetadataModel,
+            file_models.FileMetadataSnapshotContentModel,
             file_models.FileMetadataModel,
-            file_models.FileMetadataHistoryModel,
+            file_models.FileSnapshotMetadataModel,
+            file_models.FileSnapshotContentModel,
+            file_models.FileModel
         ])
 
         for clazz in classes:

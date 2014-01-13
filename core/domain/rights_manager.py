@@ -141,6 +141,23 @@ def _save_exploration_rights(
     """Saves an ExplorationRights domain object to the datastore."""
     exploration_rights.validate()
 
+    model = exp_models.ExplorationRightsModel.get(
+        exploration_rights.id, strict=False)
+
+    model.owner_ids = exploration_rights.owner_ids
+    model.editor_ids = exploration_rights.editor_ids
+    model.viewer_ids = exploration_rights.viewer_ids
+    model.community_owned = exploration_rights.community_owned
+    model.cloned_from = exploration_rights.cloned_from
+    model.status = exploration_rights.status
+
+    model.commit(committer_id, commit_message, commit_cmds)
+
+
+def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
+    exploration_rights = ExplorationRights(
+        exploration_id, [committer_id], [], [], cloned_from=cloned_from)
+    commit_cmds = [{'cmd': CMD_CREATE_NEW}]
     model = exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
         owner_ids=exploration_rights.owner_ids,
@@ -150,21 +167,12 @@ def _save_exploration_rights(
         cloned_from=exploration_rights.cloned_from,
         status=exploration_rights.status
     )
-    model.save(committer_id, commit_message, commit_cmds)
-
-
-def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
-    exploration_rights = ExplorationRights(
-        exploration_id, [committer_id], [], [], cloned_from=cloned_from)
-    commit_cmds = [{'cmd': CMD_CREATE_NEW}]
-    _save_exploration_rights(
-        committer_id, exploration_rights, 'Created new exploration',
-        commit_cmds)
+    model.commit(committer_id, 'Created new exploration', commit_cmds)
 
 
 def get_exploration_rights(exploration_id):
     """Retrieves the rights for this exploration from the datastore."""
-    model = exp_models.ExplorationRightsModel.get_by_id(exploration_id)
+    model = exp_models.ExplorationRightsModel.get(exploration_id)
     if model is None:
         raise Exception('This exploration does not exist.')
     return _get_exploration_rights_from_model(model)

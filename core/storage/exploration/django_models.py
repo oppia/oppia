@@ -79,7 +79,7 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.objects.all().count()
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    def commit(self, committer_id, commit_message, commit_cmds):
         """Updates the exploration using the properties dict, then saves it."""
         super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)
@@ -117,7 +117,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     community_owned = models.BooleanField(default=False)
     # The exploration id which this exploration was cloned from. If None, this
     # exploration was created from scratch.
-    cloned_from = models.CharField(max_length=20, blank=True)
+    cloned_from = models.CharField(max_length=20, blank=True, null=True)
 
     STATUS_CHOICES = (
         ('private', 'private'),
@@ -130,7 +130,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         max_length=20, default='private', choices=STATUS_CHOICES
     )
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    def commit(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 

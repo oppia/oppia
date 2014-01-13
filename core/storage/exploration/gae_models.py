@@ -77,7 +77,7 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    def commit(self, committer_id, commit_message, commit_cmds):
         """Updates the exploration using the properties dict, then saves it."""
         super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)

@@ -20,12 +20,12 @@ import base64
 import feconf
 import hashlib
 
-from core import django_utils
-from core.platform import models
-transaction_services = models.Registry.import_transaction_services()
-import utils
-
 from django.db import models
+from django.utils import timezone
+from core.platform import models as coremodels
+transaction_services = coremodels.Registry.import_transaction_services()
+import utils
+from core import django_utils
 
 primitive = (basestring, bool, float, int)
 
@@ -36,7 +36,7 @@ class BaseModel(models.Model):
     All model instances have an id property.
     """
     # When this entity was first created.
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(default=timezone.now)
     # When this entity was last updated.
     last_updated = models.DateTimeField(auto_now=True)
     # Whether the current version of the file is deleted.
@@ -61,7 +61,6 @@ class BaseModel(models.Model):
 
     def put(self):
         self._pre_put_hook()
-        self.full_clean()
         self.save()
         return self
 
@@ -229,8 +228,8 @@ class VersionedModel(BaseModel):
 
     def _compute_snapshot(self):
         """Generates a snapshot (a Python dict) from the model fields."""
-        # TODO(sunu0000): Implement this.
-        raise NotImplementedError
+        return self.to_dict(
+            exclude=['created_on', 'last_updated', 'versionedmodel_ptr'])
 
     def _reconstitute_from_snapshot(self, snapshot_dict):
         """Makes this instance into a reconstitution of the given snapshot.
@@ -268,8 +267,10 @@ class VersionedModel(BaseModel):
         snapshot_id = self._get_snapshot_id(self.id, self.version)
 
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(
-            id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
-            commit_message=commit_message, commit_cmds=commit_cmds)
+            id=snapshot_id, committer_id=committer_id,
+            commit_type=commit_type, commit_message=commit_message,
+            commit_cmds=commit_cmds)
+
         snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS(
             id=snapshot_id, content=snapshot)
 
@@ -405,9 +406,10 @@ class BaseSnapshotMetadataModel(BaseModel):
     committer_id = models.CharField(max_length=30)
     # The type of the commit associated with this snapshot.
     commit_type = models.CharField(
-        max_length=30, choices=VersionedModel.COMMIT_TYPE_CHOICES)
+        max_length=30,
+        choices=[(x, x) for x in VersionedModel.COMMIT_TYPE_CHOICES])
     # The commit message associated with this snapshot.
-    commit_message = models.CharField(max_length=500)
+    commit_message = models.CharField(max_length=500, blank=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = django_utils.JSONField(

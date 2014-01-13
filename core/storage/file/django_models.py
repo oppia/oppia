@@ -39,8 +39,11 @@ class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
     pass
 
 
-class FileMetadataModel(base_models.BaseModel):
+class FileMetadataModel(base_models.VersionedModel):
     """File metadata model, keyed by exploration id and absolute file name."""
+    SNAPSHOT_METADATA_CLASS = FileMetadataSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = FileMetadataSnapshotContentModel
+
     # The size of the file.
     size = models.IntegerField()
 
@@ -78,7 +81,7 @@ class FileMetadataModel(base_models.BaseModel):
         return super(FileMetadataModel, cls).get_version(
             model_id, version_number)
 
-    def save(self, committer_id, commit_cmds):
+    def commit(self, committer_id, commit_cmds):
         return super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
@@ -93,8 +96,10 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     pass
 
 
-class FileModel(base_models.BaseModel):
+class FileModel(base_models.VersionedModel):
     """File data model, keyed by exploration id and absolute file name."""
+    SNAPSHOT_METADATA_CLASS = FileSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = FileSnapshotContentModel
     # The contents of the file.
     content = models.TextField()
 
@@ -123,7 +128,7 @@ class FileModel(base_models.BaseModel):
             result.content = base64.decodestring(result.content)
         return result
 
-    def save(self, committer_id, commit_cmds):
+    def commit(self, committer_id, commit_cmds):
         # Django does not accept raw byte strings, so we need to encode them.
         # Internally, it stores strings as unicode.
         self.content = base64.encodestring(self.content)

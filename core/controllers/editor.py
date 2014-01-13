@@ -471,7 +471,7 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filepath)
-        fs.save(self.user_id, filepath, raw)
+        fs.commit(self.user_id, filepath, raw)
 
         self.render_json({'filepath': filepath})
 
