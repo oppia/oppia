@@ -37,24 +37,6 @@ oppia.directive('angularHtmlBind', ['$compile', function($compile) {
 }]);
 
 
-// override the default input to update on blur
-oppia.directive('ngModelOnblur', [function() {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    link: function(scope, elm, attr, ngModelCtrl) {
-      if (attr.type === 'radio' || attr.type === 'checkbox') return;
-        elm.unbind('input').unbind('keydown').unbind('change');
-        elm.bind('blur', function() {
-          scope.$apply(function() {
-          ngModelCtrl.$setViewValue(elm.val());
-        });
-      });
-    }
-  };
-}]);
-
-
 oppia.directive('mathjaxBind', [function() {
   return {
     restrict: 'A',

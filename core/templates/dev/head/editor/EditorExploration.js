@@ -584,6 +584,9 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
 
+      $scope.explorationTitleMemento = data.title;
+      $scope.explorationCategoryMemento = data.category;
+
       $scope.initExplorationRights(data.rights);
 
       $scope.drawGraph();
@@ -722,29 +725,33 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     return {nodes: nodeList, links: links, initStateName: initStateName};
   };
 
-  $scope.$watch('explorationTitle', function(newValue, oldValue) {
-    // Do not save on the initial data load.
-    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      newValue = $scope.normalizeWhitespace(newValue);
-      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
-        $scope.explorationTitle = oldValue;
-        return;
-      }
-      $scope.addExplorationChange('title', newValue, oldValue);
+  $scope.saveExplorationTitle = function(newValue) {
+    newValue = $scope.normalizeWhitespace(newValue);
+    if (!$scope.isValidEntityName(newValue, true)) {
+      $scope.explorationTitle = $scope.explorationTitleMemento;
+      return;
     }
-  });
 
-  $scope.$watch('explorationCategory', function(newValue, oldValue) {
-    // Do not save on the initial data load.
-    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      newValue = $scope.normalizeWhitespace(newValue);
-      if (oldValue && !$scope.isValidEntityName(newValue, true)) {
-        $scope.explorationCategory = oldValue;
-        return;
-      }
-      $scope.addExplorationChange('category', newValue, oldValue);
+    warningsData.clear();
+    $scope.explorationTitle = newValue;
+    $scope.addExplorationChange(
+      'title', newValue, $scope.explorationTitleMemento);
+    $scope.explorationTitleMemento = $scope.explorationTitle;
+  }
+
+  $scope.saveExplorationCategory = function(newValue) {
+    newValue = $scope.normalizeWhitespace(newValue);
+    if (!$scope.isValidEntityName(newValue, true)) {
+      $scope.explorationCategory = $scope.explorationCategoryMemento;
+      return;
     }
-  });
+
+    warningsData.clear();
+    $scope.explorationCategory = newValue;
+    $scope.addExplorationChange(
+      'category', newValue, $scope.explorationCategoryMemento);
+    $scope.explorationCategoryMemento = $scope.explorationCategory;
+  }
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
     $scope.addExplorationChange('param_changes', newValue, oldValue);

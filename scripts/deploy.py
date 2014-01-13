@@ -136,6 +136,9 @@ def preprocess_release():
 if not os.getcwd().endswith('oppia'):
     raise Exception('Please run this script from the oppia/ directory.')
 
+CURRENT_GIT_VERSION = subprocess.check_output(
+    ['git', 'rev-parse', 'HEAD']).strip()
+
 print ''
 print 'Starting deployment process.'
 
@@ -173,8 +176,9 @@ with CD(RELEASE_DIR_PATH):
     # Writing log entry.
     ensure_directory_exists(LOG_FILE_PATH)
     with open(LOG_FILE_PATH, 'a') as log_file:
-        log_file.write('Successfully deployed to %s at %s\n' % (
-            APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S')))
+        log_file.write('Successfully deployed to %s at %s (version %s)\n' % (
+            APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
+            CURRENT_GIT_VERSION))
 
     print 'Returning to oppia/ root directory.'
 

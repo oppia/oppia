@@ -31,6 +31,9 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 
+    $scope.stateNameMemento = $scope.stateName;
+    $scope.uiStateName = $scope.stateName;
+
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
@@ -73,14 +76,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     return incomingStates;
   };
 
-  // This should only be non-null when the state name editor is open.
-  $scope.stateNameMemento = null;
-
-  $scope.openStateNameEditor = function() {
-    $scope.stateNameMemento = $scope.stateName;
-    $scope.tmpStateName = $scope.stateName;
-  };
-
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope.normalizeWhitespace(newStateName);
     if (!$scope.isValidEntityName(newStateName, true)) {
@@ -99,7 +94,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
 
     if ($scope.stateNameMemento === newStateName) {
-      $scope.stateNameMemento = null;
       return;
     }
 
@@ -131,7 +125,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
         newStateName, $scope.stateNameMemento);
 
       $scope.initStateEditor();
-      $scope.stateNameMemento = null;
+      $scope.stateNameMemento = newStateName;
+      $scope.uiStateName = newStateName;
       $scope.drawGraph();
       // Refresh the location hash.
       $scope.selectGuiTab();
