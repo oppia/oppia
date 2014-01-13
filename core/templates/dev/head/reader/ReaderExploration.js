@@ -43,8 +43,6 @@ function ReaderExploration(
   $scope.$on('pageLoaded', function(event, data) {
     // Show content when the page is loaded.
     $scope.showPage = true;
-    // This is necessary to load used versions of the interactive map.
-    $scope.$apply();
   });
 
   $scope.changeInputTemplateIframeHeight = function(height) {
@@ -238,6 +236,10 @@ function ReaderExploration(
     $scope.responseLog.push(
       data.reader_response_html, data.oppia_html
     );
+
+    // This is necessary to apply the changes to $scope.responseLog and
+    // make the `iframes` variable a few lines down show the correct length.
+    $scope.$apply();
 
     // We need to generate the HTML (with the iframe) before populating it.
     if ($scope.inputTemplate) {
