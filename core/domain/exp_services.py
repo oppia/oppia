@@ -663,10 +663,8 @@ def load_demo(exploration_id):
 
     rights_manager.publish_exploration(
         feconf.ADMIN_COMMITTER_ID, exploration_id)
-    # Release ownership of all explorations except the one on the splash page.
-    if exploration_id != config_domain.Registry.get_config_property(
-            'splash_page_exploration_id').value:
-        rights_manager.release_ownership(
-            feconf.ADMIN_COMMITTER_ID, exploration_id)
+    # Release ownership of all explorations.
+    rights_manager.release_ownership(
+        feconf.ADMIN_COMMITTER_ID, exploration_id)
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
