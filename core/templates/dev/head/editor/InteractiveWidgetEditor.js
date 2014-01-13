@@ -51,12 +51,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   $scope.initInteractiveWidget = function(data) {
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding handler name and the value has several keys:
+    // - 'definition' (the rule definition)
     // - 'description' (the rule description string)
-    // - 'inputs' (a list of parameters)
-    // - 'name' (stuff needed to build the Python classifier code)
     // - 'dest' (the destination for this rule)
     // - 'feedback' (list of feedback given for this rule)
-    // - 'paramChanges' (parameter changes associated with this rule)
+    // - 'param_changes' (parameter changes associated with this rule)
     $scope.widgetHandlers = {};
     for (var i = 0; i < data.widget.handlers.length; i++) {
       $scope.widgetHandlers[data.widget.handlers[i].name] = (
@@ -116,7 +115,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       dest: null,
       destNew: '',
       feedback: [],
-      paramChanges: null
+      param_changes: []
     };
   };
 
@@ -129,7 +128,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   $scope.openEditRuleModal = function(handlerName, index) {
     $scope.ruleModalHandlerName = handlerName;
 
-    var rule = $scope.widgetHandlers[handlerName][index];
+    var rule = angular.copy($scope.widgetHandlers[handlerName][index]);
     $scope.tmpRule = {
       index: index,
       description: rule.description,
@@ -140,7 +139,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       dest: rule.dest,
       destNew: '',
       feedback: rule.feedback,
-      paramChanges: rule.paramChanges
+      param_changes: rule.param_changes
     };
     $scope.showRuleEditorModal('Edit Rule');
   };
@@ -209,7 +208,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
               dest: null,
               destNew: '',
               feedback: [],
-              paramChanges: null
+              param_changes: []
             };
           };
 
@@ -322,7 +321,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           inputs: tmpRule.inputs
         },
         dest: tmpRule.dest,
-        feedback: tmpRule.feedback
+        feedback: tmpRule.feedback,
+        param_changes: []
       };
 
       if (extendedRule.definition.rule_type === 'atomic') {
@@ -555,9 +555,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
   };
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
-    $scope.addStateChange('widget_handlers', newHandlers, oldHandlers);
-    $scope.updateStatesData();
-    $scope.drawGraph();
+    if (!angular.equals(newHandlers, oldHandlers)) {
+      $scope.addStateChange('widget_handlers', newHandlers, oldHandlers);
+      $scope.updateStatesData();
+      $scope.drawGraph();
+    }
   };
 
   $scope.updateStatesData = function() {
