@@ -1,6 +1,40 @@
-This file contains a summary of changes to the Oppia code base. For a full changelog, please see 
+This file contains a summary of changes to the Oppia code base. For a full changelog, please see
 
     https://code.google.com/p/oppia/source/list
+
+
+v1.2.0 (13 Jan 2014)
+--------------------
+NOTE: This version of Oppia is not backwards-compatible with earlier versions, due to significant changes to the datastore models.
+
+User-facing changes:
+* Do a full revamp of the user interface, including significant changes to the splash page and the general theming.
+* Allow old versions of explorations to be explicitly linked to. This means that an exploration creator can embed a stable version of the exploration in another webpage, which will then continue to remain the same despite further changes to the latest version of the exploration on the Oppia site.
+* Add a 'strict validation' mode for explorations, which is called before an action that affects readers of a public exploration is performed.
+* Add interstitial "Loading..." pages.
+* Remove the feedback tab when an exploration is iframed in another webpage.
+* Add instructions for users with JavaScript disabled (to ask them to turn it on).
+* There is now a wiki article on exploration design patterns that is linked to from the exploration editor page.
+* Fix the YAML file upload flow, which was previously broken. This setting can now be toggled in the admin page.
+* Add roles for site admins and moderators.
+* Fix some bugs, including one where the graph visualization in Firefox was truncated, and another in which the 'sticky' bit was not working correctly for the InteractiveMap widget.
+
+Infrastructure changes:
+* Remove the model for States. The states of an exploration are now stored as a data blob. This simplifies a lot of things (e.g., we no longer use multiple unique identifiers for states) but is a backwards-incompatible change. States are now identified by their human-readable name, which is unique within an exploration.
+* Add a new ExplorationRights model, which stores rights information for the corresponding exploration and keeps track of things like the exploration's publication status, whether it is community-owned or not, and the list of people who can playtest it (if the exploration is private).
+* Implement full versioning of explorations, exploration rights, and files associated with explorations.
+* Handle exploration change lists on the server side, and add metadata about the atomic changes performed to each commit.
+* Use App Engine user_ids, as opposed to email addresses, for user management; this is because the former are guaranteed to stay the same even if the user's email address changes.
+* Minify JavaScript and CSS files.
+
+Changes to widgets:
+* Add a non-interactive LaTeX widget.
+* Remove the existing music note widget.
+* Improve the code REPL widget: add a CodeMirror display, a rule for catching errors, and a large input text field for entering the placeholder code. Remove some superfluous customization options.
+
+Changes affecting developers:
+* Remove the build/test requirement in the startup script. This script now just starts up a development server, without running tests.
+* Add a deploy script for making a deployment to an App Engine server running in production.
 
 
 v1.1.2 (17 Dec 2013)
@@ -148,7 +182,7 @@ v1.0.3 (13 Apr 2013)
 v1.0.2 (6 Apr 2013)
 -------------------
 * Add an interactive map widget, a classifier for 2D coordinates, and a simple exploration showcasing these.
-* Show exploration statistics directly in the state editor, so that it is easy to view and act on readers' answers for individual states. 
+* Show exploration statistics directly in the state editor, so that it is easy to view and act on readers' answers for individual states.
 * Add an 'unresolved answers' list which keeps track of answers that need to be acted on.
 * Add a warning to the editor UI when there are self-loops that do not give the reader any feedback.
 * Add more unit tests for the Exploration model.
