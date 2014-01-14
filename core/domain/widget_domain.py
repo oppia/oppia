@@ -217,7 +217,7 @@ class BaseWidget(object):
                 preview_mode=preview_mode))
 
     def get_reader_response_html(self, state_customization_args,
-                                 context_params, answer):
+                                 context_params, answer, sticky):
         """Gets the parameterized HTML and iframes for a reader response."""
         if not self.is_interactive:
             raise Exception(
@@ -226,6 +226,10 @@ class BaseWidget(object):
         parameters = self._get_widget_param_instances(
             state_customization_args, context_params)
         parameters['answer'] = answer
+
+        # The widget stays through the state transition because it is marked
+        # sticky in the exploration and the new state uses the same widget.
+        parameters['stateSticky'] = sticky
 
         html, iframe = self._response_template_and_iframe
         html = jinja_utils.parse_string(html, parameters)
