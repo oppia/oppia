@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import datetime
 import os
 import StringIO
+import unittest
 import zipfile
 
 from core.domain import exp_domain
@@ -89,6 +90,8 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         return exploration
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
@@ -200,6 +203,8 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.count_explorations(), 2)
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     """Test creation and deletion methods."""
 
@@ -306,6 +311,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
@@ -341,6 +348,8 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.count_explorations(), 0)
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
@@ -431,6 +440,8 @@ def _get_change_list(state_name, property_name, new_value):
     }]
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
 
@@ -711,6 +722,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 '')
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
 
@@ -760,6 +773,8 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
                 self.init_state_name, 'widget_sticky', True), None)
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
 

@@ -62,7 +62,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def create(cls, exploration_id, filepath):
-        model = cls.get(exploration_id, filepath)
+        model = cls.get_model(exploration_id, filepath)
         if model is not None:
             model.deleted = False
         else:
@@ -71,7 +71,7 @@ class FileMetadataModel(base_models.VersionedModel):
         return model
 
     @classmethod
-    def get(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, exploration_id, filepath, strict=False):
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
@@ -112,7 +112,7 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def create(cls, exploration_id, filepath):
-        model = cls.get(exploration_id, filepath)
+        model = cls.get_model(exploration_id, filepath)
         if model is not None:
             model.deleted = False
         else:
@@ -121,7 +121,7 @@ class FileModel(base_models.VersionedModel):
         return model
 
     @classmethod
-    def get(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, exploration_id, filepath, strict=False):
         model_id = cls._construct_id(exploration_id, filepath)
         result = super(FileModel, cls).get(model_id, strict=strict)
         if result is not None:

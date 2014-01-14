@@ -413,6 +413,8 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.logout()
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class VersioningIntegrationTest(test_utils.GenericTestBase):
     """Test retrieval of old exploration versions."""
 

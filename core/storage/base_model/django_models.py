@@ -66,7 +66,7 @@ class BaseModel(models.Model):
 
     @classmethod
     def get_multi(cls, entity_ids):
-        return [cls.get(entity_id) for entity_id in entity_ids]
+        return [cls.get(entity_id, strict=False) for entity_id in entity_ids]
 
     @classmethod
     def put_multi(cls, entities):
@@ -231,7 +231,7 @@ class VersionedModel(BaseModel):
         return self.to_dict(
             exclude=['created_on', 'last_updated', 'versionedmodel_ptr'])
 
-    def _reconstitute_from_snapshot(self, snapshot_dict):
+    def _reconstitute(self, snapshot_dict):
         """Makes this instance into a reconstitution of the given snapshot.
 
         The given snapshot is in the form of a Python dict produced by
@@ -239,6 +239,12 @@ class VersionedModel(BaseModel):
         """
         # TODO(sunu0000): Implement this.
         raise NotImplementedError
+
+    def _reconstitute_from_snapshot_id(self, snapshot_id):
+        """Makes this instance into a reconstitution of the given snapshot."""
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
+        snapshot_dict = snapshot_model.content
+        return self._reconstitute(snapshot_dict)
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):
@@ -279,8 +285,6 @@ class VersionedModel(BaseModel):
             [snapshot_metadata_instance, snapshot_content_instance, self])
 
     def delete(self, committer_id, commit_message, force_deletion=False):
-        self._require_not_marked_deleted()
-
         if force_deletion:
             current_version = self.version
 
@@ -290,12 +294,26 @@ class VersionedModel(BaseModel):
                 for version_number in version_numbers]
 
             for snapshot_id in snapshot_ids:
-                self.SNAPSHOT_METADATA_CLASS.get(snapshot_id).delete()
+                # This needs to be explicit, because otherwise get() will not
+                # return an object that has been marked deleted.
+                try:
+                    obj = self.SNAPSHOT_METADATA_CLASS.objects.get(
+                        id=snapshot_id)
+                    obj.delete()
+                except self.SNAPSHOT_METADATA_CLASS.DoesNotExist:
+                    pass
+
             for snapshot_id in snapshot_ids:
-                self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id).delete()
+                try:
+                    obj = self.SNAPSHOT_CONTENT_CLASS.objects.get(
+                        id=snapshot_id)
+                    obj.delete()
+                except self.SNAPSHOT_CONTENT_CLASS.DoesNotExist:
+                    pass
 
             super(VersionedModel, self).delete()
         else:
+            self._require_not_marked_deleted()
             self.deleted = True
             self._trusted_commit(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message, [])
@@ -334,8 +352,7 @@ class VersionedModel(BaseModel):
         }]
 
         snapshot_id = self._get_snapshot_id(self.id, version_number)
-        snapshot = self.snapshot_content_model_class.get_by_id(snapshot_id)
-        self._reconstitute_from_snapshot(snapshot)
+        self._reconstitute_from_snapshot_id(snapshot_id)
 
         self._trusted_commit(
             committer_id, self._COMMIT_TYPE_REVERT, commit_message,
@@ -348,10 +365,11 @@ class VersionedModel(BaseModel):
         The snapshot content is used to populate this model instance. The
         snapshot metadata is not used.
         """
-        cls.get_by_id(model_instance_id)._require_not_marked_deleted()
+        cls.get(model_instance_id)._require_not_marked_deleted()
 
         snapshot_id = cls._get_snapshot_id(model_instance_id, version_number)
-        return cls()._reconstitute_from_snapshot_id(snapshot_id)
+        return cls(id=model_instance_id)._reconstitute_from_snapshot_id(
+            snapshot_id)
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):
@@ -369,7 +387,7 @@ class VersionedModel(BaseModel):
         numbers requested. If any of the version numbers does not exist, an
         error is raised.
         """
-        cls.get_by_id(model_instance_id)._require_not_marked_deleted()
+        cls.get(model_instance_id)._require_not_marked_deleted()
 
         snapshot_ids = [
             cls._get_snapshot_id(model_instance_id, version_number)

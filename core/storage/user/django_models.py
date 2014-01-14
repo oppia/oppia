@@ -31,12 +31,13 @@ class UserSettingsModel(base_models.BaseModel):
     # Email address of the user.
     email = models.CharField(max_length=100)
 
-    # Identifiable username to display in the UI
-    username = models.CharField(max_length=100, blank=True)
-    # Normalized username
-    normalized_username = models.CharField(max_length=100, blank=True)
-    # When the user last agreed to the terms of the site.
-    last_agreed_to_terms = models.DateTimeField(blank=True)
+    # Identifiable username to display in the UI. May be None.
+    username = models.CharField(max_length=100, blank=True, null=True)
+    # Normalized username to use for duplicate-username queries. May be None.
+    normalized_username = models.CharField(
+        max_length=100, blank=True, null=True)
+    # When the user last agreed to the terms of the site. May be None.
+    last_agreed_to_terms = models.DateTimeField(blank=True, null=True)
 
     @classmethod
     def is_normalized_username_taken(cls, username):
