@@ -99,7 +99,7 @@ class ExplorationFileSystem(object):
         Returns None if the file does not exist.
         """
         if version is None:
-            return file_models.FileMetadataModel.get(
+            return file_models.FileMetadataModel.get_model(
                 self._exploration_id, 'assets/%s' % filepath)
         else:
             return file_models.FileMetadataModel.get_version(
@@ -111,7 +111,7 @@ class ExplorationFileSystem(object):
         Returns None if the file does not exist.
         """
         if version is None:
-            return file_models.FileModel.get(
+            return file_models.FileModel.get_model(
                 self._exploration_id, 'assets/%s' % filepath)
         else:
             return file_models.FileModel.get_version(

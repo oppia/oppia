@@ -63,65 +63,43 @@ class TestBase(unittest.TestCase):
 
     DEFAULT_USERNAME = 'defaultusername'
 
-    def _delete_all_explorations(self):
-        classes = frozenset([
+    def _delete_all_models(self):
+        versioned_model_classes = frozenset([
             exp_models.ExplorationModel,
+            exp_models.ExplorationRightsModel,
+            file_models.FileMetadataModel,
+            file_models.FileModel,
+        ])
+
+        unversioned_model_classes = frozenset([
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationSnapshotContentModel,
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
-            exp_models.ExplorationRightsModel
-        ])
-
-        for clazz in classes:
-            for entity in clazz.get_all(include_deleted_entities=True):
-                try:
-                    entity.delete()
-                except TypeError:
-                    try:
-                        entity.delete(
-                            feconf.ADMIN_COMMITTER_ID, '', force_deletion=True)
-                    except Exception:
-                        pass
-
-    def _delete_all_files(self):
-        classes = frozenset([
             file_models.FileMetadataSnapshotMetadataModel,
             file_models.FileMetadataSnapshotContentModel,
-            file_models.FileMetadataModel,
             file_models.FileSnapshotMetadataModel,
             file_models.FileSnapshotContentModel,
-            file_models.FileModel
-        ])
-
-        for clazz in classes:
-            for entity in clazz.get_all(include_deleted_entities=True):
-                entity.delete()
-
-    def _delete_all_stats(self):
-        classes = frozenset([
             stats_models.StateCounterModel,
             stats_models.StateRuleAnswerLogModel,
             stats_models.FeedbackItemModel,
+            user_models.UserSettingsModel,
         ])
 
-        for clazz in classes:
+        for clazz in versioned_model_classes:
+            for entity in clazz.get_all(include_deleted_entities=True):
+                entity.delete(
+                    feconf.ADMIN_COMMITTER_ID, '', force_deletion=True)
+
+        for clazz in unversioned_model_classes:
             for entity in clazz.get_all(include_deleted_entities=True):
                 entity.delete()
-
-    def _delete_all_user_settings(self):
-        all_user_settings = user_models.UserSettingsModel.get_all()
-        for user_setting in all_user_settings:
-            user_setting.delete()
 
     def setUp(self):
         self.testapp = webtest.TestApp(main.app)
 
     def tearDown(self):  # pylint: disable-msg=g-bad-name
-        self._delete_all_explorations()
-        self._delete_all_files()
-        self._delete_all_stats()
-        self._delete_all_user_settings()
+        self._delete_all_models()
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""

@@ -19,11 +19,14 @@ from core.domain import config_services
 from core.domain import exp_services
 import feconf
 import test_utils
+import unittest
 
 CAN_EDIT_STR = 'can_edit'
 CAN_CLONE_STR = 'can_clone'
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class LearnGalleryTest(test_utils.GenericTestBase):
 
     def test_learn_gallery_page(self):
@@ -169,6 +172,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         self.logout()
 
 
+@unittest.skipIf(feconf.PLATFORM != 'gae',
+                 'login not implemented for non-GAE platform')
 class ContributeGalleryTest(test_utils.GenericTestBase):
 
     def test_contribute_gallery_page(self):

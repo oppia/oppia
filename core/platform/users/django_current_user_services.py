@@ -62,4 +62,4 @@ def get_user_id_from_email(email):
 
     Returns None if the email address does not correspond to a valid user id.
     """
-    return None
+    return email

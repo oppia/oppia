@@ -32,11 +32,11 @@ class UserSettingsModel(base_models.BaseModel):
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
 
-    # Identifiable username to display in the UI.
+    # Identifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
-    # Normalized username (for catching duplicates).
+    # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = ndb.StringProperty(indexed=True)
-    # When the user last agreed to the terms of the site.
+    # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
 
     @classmethod

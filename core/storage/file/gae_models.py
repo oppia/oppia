@@ -62,7 +62,7 @@ class FileMetadataModel(base_models.VersionedModel):
         return cls(id=model_id, deleted=False)
 
     @classmethod
-    def get(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, exploration_id, filepath, strict=False):
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
@@ -119,7 +119,7 @@ class FileModel(base_models.VersionedModel):
         return cls(id=model_id, deleted=False)
 
     @classmethod
-    def get(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, exploration_id, filepath, strict=False):
         model_id = cls._construct_id(exploration_id, filepath)
         return super(FileModel, cls).get(model_id, strict=strict)
 
