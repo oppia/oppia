@@ -324,8 +324,13 @@ class VersionedModel(BaseModel):
             'version_number': version_number
         }]
 
+        # Do not overwrite the version number.
+        current_version = self.version
+
         snapshot_id = self._get_snapshot_id(self.id, version_number)
         self._reconstitute_from_snapshot_id(snapshot_id)
+
+        self.version = current_version
 
         self._trusted_commit(
             committer_id, self._COMMIT_TYPE_REVERT, commit_message,

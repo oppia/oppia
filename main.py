@@ -170,6 +170,9 @@ urls = [
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
     get_redirect_route(
+        r'/createhandler/revert/<exploration_id>',
+        editor.ExplorationRevertHandler, 'exploration_revert_handler'),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler, 'exploration_rights_handler'),
     get_redirect_route(

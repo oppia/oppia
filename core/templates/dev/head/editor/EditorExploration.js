@@ -344,6 +344,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             $scope.explorationChangeList = [];
             $scope.undoneChangeStack = [];
             $scope.initExplorationPage();
+            $scope.refreshVersionHistory();
             $scope.isSaveInProgress = false;
           }, function() {
             $scope.isSaveInProgress = false;
@@ -480,6 +481,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
+  $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.versionHistoryIsShown = false;
   $scope.explorationSnapshots = null;
@@ -507,6 +509,48 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           'autoSummary': data.snapshots[i].auto_summary
         });
       }
+    });
+  };
+
+  $scope.showRevertExplorationModal = function(version) {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/revertExploration',
+      backdrop: 'static',
+      resolve: {
+        version: function() {
+          return version;
+        }
+      },
+      controller: ['$scope', '$modalInstance', 'version',
+        function($scope, $modalInstance, version) {
+          $scope.version = version;
+
+          $scope.revert = function() {
+            $modalInstance.close(version);
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function(version) {
+      $http.post(
+        $scope.revertExplorationUrl,
+        oppiaRequestCreator.createRequest({
+          current_version: explorationData.data.version,
+          revert_to_version: version
+        }),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+      .success(function(response) {
+        location.reload(); 
+      }).error(function(data) {
+        console.log(data);
+        warningsData.addWarning(
+          data.error || 'Error communicating with server.');
+      });
     });
   };
 
@@ -595,6 +639,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
+      $scope.currentVersion = data.version;
 
       $scope.explorationTitleMemento = data.title;
       $scope.explorationCategoryMemento = data.category;

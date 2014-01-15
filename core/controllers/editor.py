@@ -395,6 +395,34 @@ class ExplorationSnapshotsHandler(EditorHandler):
         })
 
 
+class ExplorationRevertHandler(EditorHandler):
+    """Reverts an exploration to an older version."""
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        current_version = self.payload.get('current_version')
+        revert_to_version = self.payload.get('revert_to_version')
+
+        if not isinstance(revert_to_version, int):
+            raise self.InvalidInputException(
+                'Expected an integer version to revert to; received %s.' %
+                revert_to_version)
+        if not isinstance(current_version, int):
+            raise self.InvalidInputException(
+                'Expected an integer current version; received %s.' %
+                current_version)
+
+        if revert_to_version < 1 or revert_to_version >= current_version:
+            raise self.InvalidInputException(
+                'Cannot revert to version %s from version %s.' %
+                (revert_to_version, current_version))
+
+        exp_services.revert_exploration(
+            self.user_id, exploration_id, current_version, revert_to_version)
+        self.render_json({})
+
+
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 

@@ -970,3 +970,53 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # The final exploration should have exactly one state.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(len(exploration.states), 1)
+
+    def test_versioning_with_reverting(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.OWNER_ID)
+
+        # In version 1, the title was 'A title'.
+        # In version 2, the title becomes 'V2 title'.
+        exploration.title = 'V2 title'
+        exp_services._save_exploration(
+            self.OWNER_ID, exploration, 'Changed title.', [])
+
+        # In version 3, a new state is added.
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration.add_states(['New state'])
+        exp_services._save_exploration(
+            'committer_id_v3', exploration, 'Added new state', [])
+
+        # It is not possible to revert from anything other than the most
+        # current version.
+        with self.assertRaisesRegexp(Exception, 'too old'):
+            exp_services.revert_exploration(
+                'committer_id_v4', self.EXP_ID, 2, 1)
+
+        # Version 4 is a reversion to version 1.
+        exp_services.revert_exploration('committer_id_v4', self.EXP_ID, 3, 1)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exploration.title, 'A title')
+        self.assertEqual(len(exploration.states), 1)
+        self.assertEqual(exploration.version, 4)
+
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            self.EXP_ID, 5)
+
+        commit_dict_4 = {
+            'committer_id': 'committer_id_v4',
+            'commit_message': 'Reverted exploration to version 1',
+            'version_number': 4,
+        }
+        commit_dict_3 = {
+            'committer_id': 'committer_id_v3',
+            'commit_message': 'Added new state',
+            'version_number': 3,
+        }
+        self.assertEqual(len(snapshots_metadata), 4)
+        self.assertDictContainsSubset(
+            commit_dict_4, snapshots_metadata[0])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[1])
+        self.assertGreaterEqual(
+            snapshots_metadata[0]['created_on'],
+            snapshots_metadata[1]['created_on'])

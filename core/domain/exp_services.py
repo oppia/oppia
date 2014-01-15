@@ -516,7 +516,8 @@ def _get_simple_changelist_summary(
 
     base_exploration = get_exploration_by_id(
         exploration_id, version=version_number)
-    if len(change_list) == 1 and change_list[0]['cmd'] == 'create_new':
+    if (len(change_list) == 1 and change_list[0]['cmd'] in
+            ['create_new', 'AUTO_revert_version_number']):
         # An automatic summary is not needed here, because the original commit
         # message is sufficiently descriptive.
         return ''
@@ -599,6 +600,29 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+
+
+def revert_exploration(
+        committer_id, exploration_id, current_version, revert_to_version):
+    """Reverts an exploration to the given version number. Commits changes."""
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration_id, strict=False)
+
+    if current_version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, current_version))
+    elif current_version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, current_version))
+
+    exploration_model.revert(
+        committer_id, 'Reverted exploration to version %s' % revert_to_version,
+        revert_to_version)
+    memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
 
 # Creation and deletion methods.
