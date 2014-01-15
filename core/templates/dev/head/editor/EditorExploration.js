@@ -481,6 +481,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
 
+  $scope.versionHistoryIsShown = false;
+  $scope.explorationSnapshots = null;
+
+  $scope.toggleVersionHistoryDisplay = function() {
+    if (!$scope.versionHistoryIsShown && $scope.explorationSnapshots === null) {
+      // TODO(sll): Do this on-hover rather than on-click.
+      $scope.refreshVersionHistory();
+    }
+    $scope.versionHistoryIsShown = !$scope.versionHistoryIsShown;
+  };
+
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
@@ -492,7 +503,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           'committerId': data.snapshots[i].committer_id,
           'createdOn': data.snapshots[i].created_on,
           'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number
+          'versionNumber': data.snapshots[i].version_number,
+          'autoSummary': data.snapshots[i].auto_summary
         });
       }
     });
@@ -590,7 +602,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.initExplorationRights(data.rights);
 
       $scope.drawGraph();
-      $scope.refreshVersionHistory();
 
       $rootScope.loadingMessage = '';
 

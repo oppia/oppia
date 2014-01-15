@@ -24,6 +24,7 @@ storage model to be changed without affecting this module and others above it.
 
 __author__ = 'Sean Lip'
 
+import copy
 import logging
 import os
 import StringIO
@@ -257,7 +258,7 @@ def apply_change_list(exploration_id, change_list):
         raise
 
 
-def get_summary_of_change_list(exploration_id, change_list):
+def get_summary_of_change_list(base_exploration, change_list):
     """Applies a changelist to a pristine exploration and returns a summary.
 
     Each entry in change_list is a dict that represents an ExplorationChange
@@ -284,7 +285,9 @@ def get_summary_of_change_list(exploration_id, change_list):
     # TODO(sll): This really needs tests, especially the diff logic. Probably
     # worth comparing with the actual changed exploration.
 
-    exploration = get_exploration_by_id(exploration_id)
+    # Ensure that the original exploration does not get altered.
+    exploration = copy.deepcopy(base_exploration)
+
     changes = [
         exp_domain.ExplorationChange(change_dict)
         for change_dict in change_list]
@@ -505,6 +508,45 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
 
 # Operations on exploration snapshots.
+def _get_simple_changelist_summary(
+        exploration_id, version_number, change_list):
+    """Returns an auto-generated changelist summary for the history logs."""
+    # TODO(sll): Get this from memcache where possible. It won't change, so we
+    # can keep it there indefinitely.
+
+    base_exploration = get_exploration_by_id(
+        exploration_id, version=version_number)
+    if len(change_list) == 1 and change_list[0]['cmd'] == 'create_new':
+        # An automatic summary is not needed here, because the original commit
+        # message is sufficiently descriptive.
+        return ''
+    else:
+        full_summary = get_summary_of_change_list(
+            base_exploration, change_list)
+
+        short_summary_fragments = []
+        if full_summary['added_states']:
+            short_summary_fragments.append(
+                'added \'%s\'' % '\', \''.join(full_summary['added_states']))
+        if full_summary['deleted_states']:
+            short_summary_fragments.append(
+                'deleted \'%s\'' % '\', \''.join(
+                    full_summary['deleted_states']))
+        if (full_summary['changed_states'] or
+                full_summary['state_property_changes']):
+            affected_states = (
+                full_summary['changed_states'] +
+                full_summary['state_property_changes'].keys())
+            short_summary_fragments.append(
+                'edited \'%s\'' % '\', \''.join(affected_states))
+        if full_summary['exploration_property_changes']:
+            short_summary_fragments.append(
+                'edited exploration properties %s' % ', '.join(
+                    full_summary['exploration_property_changes'].keys()))
+
+        return '; '.join(short_summary_fragments)
+
+
 def get_exploration_snapshots_metadata(exploration_id, limit):
     """Returns the most recent snapshots for this exploration, as dicts.
 
@@ -526,6 +568,11 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
 
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums)
+
+    for ind, item in enumerate(snapshots_metadata):
+        item['auto_summary'] = _get_simple_changelist_summary(
+            exploration_id, item['version_number'] - 1, item['commit_cmds'])
+
     return snapshots_metadata
 
 

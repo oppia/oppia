@@ -506,7 +506,7 @@ class ChangeListSummaryHandler(EditorHandler):
             utils.recursively_remove_key(change_list, '$$hashKey')
 
             summary = exp_services.get_summary_of_change_list(
-                exploration_id, change_list)
+                current_exploration, change_list)
             updated_exploration = exp_services.apply_change_list(
                 exploration_id, change_list)
             warning_message = ''

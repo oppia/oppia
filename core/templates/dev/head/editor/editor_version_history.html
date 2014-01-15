@@ -1,5 +1,5 @@
 <h4>
-  <a ng-click="versionHistoryIsShown = !versionHistoryIsShown" class="oppia-editor-section-header">
+  <a ng-click="toggleVersionHistoryDisplay()" class="oppia-editor-section-header">
     <i class="icon-plus-sign" ng-hide="versionHistoryIsShown"></i>
     <i class="icon-minus-sign" ng-show="versionHistoryIsShown"></i>
     Version History
@@ -7,14 +7,12 @@
 </h4>
 
 <div collapse="!versionHistoryIsShown">
-  <div ng-show="explorationSnapshots.length > 0">
-    <ul>
-      <li ng-repeat="snapshot in explorationSnapshots">
-        [<[snapshot.versionNumber]>] (<[snapshot.createdOn]> by <[snapshot.committerId]>)
-        <em>
-          <[snapshot.commitMessage]>
-        </em>
-      </li>
-    </ul>
+  <div ng-repeat="snapshot in explorationSnapshots">
+    [<[snapshot.versionNumber]>]
+    <strong><[snapshot.committerId]></strong>
+    <[snapshot.commitMessage]>
+    <span class="pull-right">
+      <em><[snapshot.createdOn]></em>
+    </span>
   </div>
 </div>
