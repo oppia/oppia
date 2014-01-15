@@ -206,12 +206,38 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       };
 
       $scope.deleteParamChange = function(index) {
+        if (index < 0 || index >= $scope.paramChanges.length) {
+          warningsData.addWarning(
+            'Cannot delete parameter change at position ' + index +
+            ': index out of range');
+        }
         $scope.paramChangesMemento = angular.copy($scope.paramChanges);
         $scope.paramChanges.splice(index, 1);
         $scope.saveParamChanges(
             $scope.paramChanges, angular.copy($scope.paramChangesMemento));
         $scope.resetEditor();
       };
+
+      $scope.swapParamChanges = function(index1, index2) {
+        if (index1 < 0 || index1 >= $scope.paramChanges.length ||
+            index2 < 0 || index2 >= $scope.paramChanges.length) {
+          warningsData.addWarning(
+            'Cannot swap parameter changes at positions ' + index1 +
+            ' and ' + index2 + ': index out of range');
+        }
+
+        if (index1 === index2) {
+          return;
+        }
+
+        $scope.paramChangesMemento = angular.copy($scope.paramChanges);
+        var tmpChange = angular.copy($scope.paramChanges[index1]);
+        $scope.paramChanges[index1] = $scope.paramChanges[index2];
+        $scope.paramChanges[index2] = tmpChange;
+        $scope.saveParamChanges(
+            $scope.paramChanges, angular.copy($scope.paramChangesMemento));
+        $scope.resetEditor();
+      }
     }]
   };
 }]);

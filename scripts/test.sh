@@ -48,6 +48,6 @@ if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
 fi
 
 python $COVERAGE_HOME/coverage run ./core/tests/gae_suite.py $@
-python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/pyshared/*" --show-missing
+python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/*" --show-missing
 
 echo Done!

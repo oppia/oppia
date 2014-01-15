@@ -48,6 +48,13 @@
           <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
             Edit
           </button>
+
+          <button ng-show="$index != 0" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index - 1)">⇑</button>
+          <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
+
+          <button ng-show="$index < paramChanges.length - 1" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index + 1)">⇓</button>
+          <span ng-hide="$index < paramChanges.length - 1" class="oppia-grayed">⇓</span>
+
           <button type="button" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
             &times;
           </button>
