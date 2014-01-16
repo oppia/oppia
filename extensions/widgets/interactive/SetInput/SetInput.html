@@ -8,16 +8,16 @@
     <div ng-controller="SetInput">
     
       <ul>
-        <li ng-repeat="element in answer">
+        <li ng-repeat="element in answer track by $index">
           <[element]>
           <button type="button" ng-click="deleteElement($index)">
-            &times;
+            Delete
           </button>
         </li>
       </ul>
 
       <form ng-submit="addElement(newElement)">
-        <input type="text" ng-model="newElement" placeholder="Add Element" required>
+        <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
         <button type="submit">+</button>
       </form>
 
