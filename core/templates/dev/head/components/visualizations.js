@@ -304,7 +304,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         });
 
         nodeEnter.append('svg:text').text(
-          function(d) { return (highlightStates && d.hashId in highlightStates ? '⚠' : '' ); }
+          function(d) { return ((highlightStates && d.hashId in highlightStates) ||
+                                (stateStats[d.name] && Object.keys(stateStats[d.name].readerFeedback).length > 0) ? '⚠' : '' ); }
         ).attr({
           'fill': 'firebrick',
           'text-anchor': 'middle',
