@@ -582,15 +582,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.statsGraphOpacities[END_DEST] = Math.max(
           $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
 
-      $scope.highlightStates = {
-        legend: '#EE8800:Needs more feedback,brown:May be confusing'
-      };
+      $scope.highlightStates = {};
+
       for (var j = 0; j < data.imp.length; j++) {
         if (data.imp[j].type == 'default') {
-          $scope.highlightStates[data.imp[j].state_name] = '#EE8800';
+          $scope.highlightStates[data.imp[j].state_name] = 'Needs more feedback';
         }
         if (data.imp[j].type == 'incomplete') {
-          $scope.highlightStates[data.imp[j].state_name] = 'brown';
+          $scope.highlightStates[data.imp[j].state_name] = 'May be confusing';
         }
       }
     });

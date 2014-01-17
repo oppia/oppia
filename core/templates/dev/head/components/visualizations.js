@@ -132,7 +132,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           .attr({'offset': '100%'})
           .style({'stop-color': nodeFill, 'stop-opacity': 0.1});
 
-        if (opacityMap || highlightStates) {
+        if (opacityMap) {
             var legendWidth = 210;
             var x = 450;
             var legendHeight = 0;
@@ -159,32 +159,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               });
 
               legendHeight += 70;
-            }
-            if (highlightStates) {
-              var legendData = highlightStates['legend'].split(',');
-              for (var i = 0; i < legendData.length; i++) {
-                 legendHeight += 40;
-                 var color = legendData[i].split(':')[0];
-                 var desc = legendData[i].split(':')[1];
-                 var leg_y = (opacityMap ? 70 : 10) + (i * 40);
-                 vis.append('svg:rect').attr({
-                    'height': 30,
-                    'width': 30,
-                    'rx': 4,
-                    'ry': 4,
-                    'x': x + 10,
-                    'y': leg_y
-                  })
-                  .style({
-                    'stroke': color,
-                    'fill': 'transparent',
-                    'stroke-width': 3
-                  });
-                vis.append('svg:text').text(desc).attr({
-                  'x': x + 50,
-                  'y': leg_y + 17
-                });
-              }
             }
             legend.attr('height', legendHeight);
         }
@@ -273,13 +247,9 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             }
           })
           .style({
-            'stroke': function(d) {
-              return (highlightStates? (
-                d.hashId in highlightStates ? highlightStates[d.hashId] : '#CCCCCC'
-              ) : 'black');
-            },
+            'stroke': 'black',
             'stroke-width': function(d) {
-              return (d.hashId == initStateName || d.hashId == END_DEST || highlightStates) ? '3' : '2';
+              return (d.hashId == initStateName || d.hashId == END_DEST) ? '3' : '2';
             },
             'fill': function(d) {
               return (
@@ -305,15 +275,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
                 // tab change event on the parent controller.
                 scope.$apply();
               } else {
-                var legendList = highlightStates['legend'].split(',');
-                var improvementType = '';
-                for (var index in legendList) {
-                  if (legendList[index].indexOf(highlightStates[d.hashId]) === 0) {
-                    improvementType = legendList[index].split(':')[1];
-                    break;
-                  }
-                }
-                scope.$parent.showStateStatsModal(d.hashId, improvementType);
+                scope.$parent.showStateStatsModal(d.hashId, highlightStates[d.hashId]);
               }
             }
           })
@@ -339,6 +301,17 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           'text-anchor': 'middle',
           'x': function(d) { return d.x0 + (getTextWidth(d.name) / 2); },
           'y': function(d) { return d.y0 + 25; }
+        });
+
+        nodeEnter.append('svg:text').text(
+          function(d) { return (highlightStates && d.hashId in highlightStates ? '⚠' : '' ); }
+        ).attr({
+          'fill': 'firebrick',
+          'text-anchor': 'middle',
+          'x': function(d) { return d.x0 + 2; },
+          'y': function(d) { return d.y0 + 15; }
+        }).style({
+          'font-size': '18px',
         });
 
         if (!forbidNodeDeletion) {
