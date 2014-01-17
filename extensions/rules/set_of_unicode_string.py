@@ -23,6 +23,7 @@ from extensions.rules import base
 
 class Equals(base.SetOfUnicodeStringRule):
     description = 'is equal to {{x|SetOfUnicodeString}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return set(subject) == set(self.x)
@@ -30,6 +31,7 @@ class Equals(base.SetOfUnicodeStringRule):
 
 class IsSubsetOf(base.SetOfUnicodeStringRule):
     description = 'is a proper subset of {{x|SetOfUnicodeString}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return set(subject) < set(self.x)
@@ -37,6 +39,7 @@ class IsSubsetOf(base.SetOfUnicodeStringRule):
 
 class IsSupersetOf(base.SetOfUnicodeStringRule):
     description = 'is a proper superset of {{x|SetOfUnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return set(subject) > set(self.x)
@@ -44,6 +47,7 @@ class IsSupersetOf(base.SetOfUnicodeStringRule):
 
 class HasElementsIn(base.SetOfUnicodeStringRule):
     description = 'has elements in common with {{x|SetOfUnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return bool(set(subject).intersection(set(self.x)))
@@ -51,6 +55,7 @@ class HasElementsIn(base.SetOfUnicodeStringRule):
 
 class HasElementsNotIn(base.SetOfUnicodeStringRule):
     description = 'has elements not in {{x|SetOfUnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return bool(set(subject) - set(self.x))
@@ -58,6 +63,7 @@ class HasElementsNotIn(base.SetOfUnicodeStringRule):
 
 class OmitsElementsIn(base.SetOfUnicodeStringRule):
     description = 'omits some elements of {{x|SetOfUnicodeString}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return bool(set(self.x) - set(subject))
@@ -65,6 +71,7 @@ class OmitsElementsIn(base.SetOfUnicodeStringRule):
 
 class IsDisjointFrom(base.SetOfUnicodeStringRule):
     description = 'has no elements in common with {{x|SetOfUnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return not bool(set(subject).intersection(set(self.x)))

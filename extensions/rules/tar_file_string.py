@@ -23,6 +23,7 @@ from extensions.rules import base
 
 class ChecksWrapperDirName(base.TarFileStringRule):
     description = 'does not have a wrapper directory named {{x|UnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -34,6 +35,7 @@ class ChecksWrapperDirName(base.TarFileStringRule):
 
 class ChecksWrapperDirPresence(base.TarFileStringRule):
     description = 'does not have a wrapper directory.'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -45,6 +47,7 @@ class ChecksWrapperDirPresence(base.TarFileStringRule):
 
 class HasAppleDoubleFile(base.TarFileStringRule):
     description = 'contains an Apple Double file.'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -56,6 +59,7 @@ class HasAppleDoubleFile(base.TarFileStringRule):
 
 class HasUnexpectedFile(base.TarFileStringRule):
     description = 'contains a file not present in {{expected_files|List}}.'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -67,6 +71,7 @@ class HasUnexpectedFile(base.TarFileStringRule):
 
 class MissingExpectedFile(base.TarFileStringRule):
     description = 'omits one or more files in {{expected_files|List}}.'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()
@@ -81,6 +86,7 @@ class MissingExpectedFile(base.TarFileStringRule):
 
 class HasUnexpectedContent(base.TarFileStringRule):
     description = 'contains file not present in {{file_list|List}}.'
+    is_generic = True
 
     def _evaluate(self, subject):
         members = subject.getmembers()

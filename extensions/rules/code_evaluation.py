@@ -24,6 +24,7 @@ from extensions.rules import base
 class OutputEquals(base.CodeEvaluationRule):
     description = (
         'has output equal to {{x|NormalizedString}} (collapsing spaces)')
+    is_generic = False
 
     def _evaluate(self, subject):
         normalized_result = ' '.join(subject['output'].split())
@@ -33,6 +34,7 @@ class OutputEquals(base.CodeEvaluationRule):
 
 class ResultsInError(base.CodeEvaluationRule):
     description = 'results in an error when run'
+    is_generic = False
 
     def _evaluate(self, subject):
         error = subject['error'].strip()

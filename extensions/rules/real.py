@@ -23,6 +23,7 @@ from extensions.rules import base
 
 class Equals(base.RealRule):
     description = 'is equal to {{x|Real}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -30,6 +31,7 @@ class Equals(base.RealRule):
 
 class IsLessThan(base.RealRule):
     description = 'is less than {{x|Real}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject < self.x
@@ -37,6 +39,7 @@ class IsLessThan(base.RealRule):
 
 class IsGreaterThan(base.RealRule):
     description = 'is greater than {{x|Real}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject > self.x
@@ -44,6 +47,7 @@ class IsGreaterThan(base.RealRule):
 
 class IsLessThanOrEqualTo(base.RealRule):
     description = 'is less than or equal to {{x|Real}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject <= self.x
@@ -51,6 +55,7 @@ class IsLessThanOrEqualTo(base.RealRule):
 
 class IsGreaterThanOrEqualTo(base.RealRule):
     description = 'is greater than or equal to {{x|Real}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject >= self.x
@@ -58,6 +63,7 @@ class IsGreaterThanOrEqualTo(base.RealRule):
 
 class IsInclusivelyBetween(base.RealRule):
     description = 'is between {{a|Real}} and {{b|Real}}, inclusive'
+    is_generic = False
 
     def _validate_params(self):
         assert self.a <= self.b
@@ -68,6 +74,7 @@ class IsInclusivelyBetween(base.RealRule):
 
 class IsWithinTolerance(base.RealRule):
     description = 'is within {{tol|Real}} of {{x|Real}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return IsInclusivelyBetween(

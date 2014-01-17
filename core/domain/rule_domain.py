@@ -107,6 +107,8 @@ class Rule(object):
     # Description of the rule, e.g. "is equal to {{x|Int}}". Should be
     # overridden by subclasses.
     description = ''
+    # Flags a rule as generic or not.
+    is_generic = False
 
     _PARAMS = None
     _fs = None

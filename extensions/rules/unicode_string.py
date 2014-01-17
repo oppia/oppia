@@ -25,6 +25,7 @@ from extensions.rules import base
 
 class Equals(base.UnicodeStringRule):
     description = 'is equal to {{x|UnicodeString}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return subject.lower() == self.x.lower()
@@ -32,6 +33,7 @@ class Equals(base.UnicodeStringRule):
 
 class CaseSensitiveEquals(base.UnicodeStringRule):
     description = 'is equal to {{x|UnicodeString}}, taking case into account'
+    is_generic = False
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -39,6 +41,7 @@ class CaseSensitiveEquals(base.UnicodeStringRule):
 
 class StartsWith(base.UnicodeStringRule):
     description = 'starts with {{x|UnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject.lower().startswith(self.x.lower())
@@ -46,6 +49,7 @@ class StartsWith(base.UnicodeStringRule):
 
 class Contains(base.UnicodeStringRule):
     description = 'contains {{x|UnicodeString}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return subject.lower().find(self.x.lower()) != -1
@@ -54,6 +58,7 @@ class Contains(base.UnicodeStringRule):
 class MatchesBase64EncodedFile(base.UnicodeStringRule):
     description = """has same content as the file located at
     {{filepath|UnicodeString}}"""
+    is_generic = False
 
     def _evaluate(self, subject):
         return base64.b64decode(subject) == self.fs.get(self.filepath)

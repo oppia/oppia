@@ -23,6 +23,7 @@ from extensions.rules import base
 
 class Equals(base.NonnegativeIntRule):
     description = 'is equal to {{x|NonnegativeInt}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         return subject == self.x

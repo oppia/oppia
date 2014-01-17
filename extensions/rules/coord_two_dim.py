@@ -23,6 +23,7 @@ from extensions.rules import base
 
 class Within(base.CoordTwoDimRule):
     description = 'is within {{d|Real}} of {{p|CoordTwoDim}}'
+    is_generic = False
 
     def _evaluate(self, subject):
         dx = subject[0] - self.p[0]
@@ -32,6 +33,7 @@ class Within(base.CoordTwoDimRule):
 
 class NotWithin(base.CoordTwoDimRule):
     description = 'is not within {{d|Real}} of {{p|CoordTwoDim}}'
+    is_generic = True
 
     def _evaluate(self, subject):
         return not Within(self.d, self.p)._evaluate(subject)
