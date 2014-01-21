@@ -318,13 +318,12 @@ textarea {
 }
 
 .oppia-reader-response-container {
-  margin: 20px 0;
-}
-.oppia-reader-response-container:before {
-  content: "\2767";
+  background-color: #c8e7f7;
+  border-radius: 6px;
+  margin: 15px 0;
+  padding: 5px 0;
 }
 .oppia-reader-response {
-  border-radius: 6px;
   font-style: italic;
   margin: 5px 20px;
 }
