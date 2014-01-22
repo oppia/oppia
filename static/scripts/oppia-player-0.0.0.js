@@ -36,6 +36,7 @@ window.addEventListener('message', function(evt) {
   // Allow only requests from oppiaserver or the server that this container is
   // running on.
   if (evt.origin == 'https://oppiaserver.appspot.com' ||
+      evt.origin == 'https://www.oppia.org' ||
       evt.origin == window.location.protocol + '//' + window.location.host) {
     console.log(evt.data);
     var iframeNode = document.getElementById(evt.data.sourceTagId);
@@ -168,8 +169,9 @@ function reloadOppiaTag(oppiaNode) {
   }
 
   if (!width || width == 'auto') {
-    // The default width is 100%.
-    width = '100%';
+    // The default width is 98%. This leaves room for the vert scrollbar
+    // (otherwise we get a horiz scrollbar when there's a vert scrollbar).
+    width = '98%';
   } else {
     fixedWidth = 'true';
   }
@@ -216,8 +218,10 @@ window.OPPIA_PLAYER = {
   onHeightChange: function(iframeNode, newHeight) {
     console.log('onHeightChange event triggered on ' + iframeNode + '.');
 
-    if (iframeNode.fixedHeight === 'false') {
-      iframeNode.height = parseInt(newHeight, 10) + 'px';
+    if (iframeNode.getAttribute('fixedheight') === 'false') {
+      // Sometimes setting iframe hight to the exact content height still
+      // produces scrollbar, so adding 10 extra px.
+      iframeNode.height = Math.floor(newHeight + 10) + 'px';
     }
 
     window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
