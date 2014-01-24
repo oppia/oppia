@@ -309,6 +309,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           'height': '16',
           'x': function(d) { return d.x0 - 10; },
           'y': function(d) { return d.y0 - 5; },
+          'transform': function(d) { return 'rotate(-10,' + (d.x0 - 10) + ',' + (d.y0 - 5) + ')'; },
         }).style({
           'fill': '#FFFFC2',
           'stroke-width': '1',
@@ -341,9 +342,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           'fill': 'firebrick',
           'text-anchor': 'middle',
           'x': function(d) { return d.x0 - 2; },
-          'y': function(d) { return d.y0 + 8; }
+          'y': function(d) { return d.y0 + 8; },
+          'transform': function(d) { return 'rotate(-10,' + (d.x0 - 10) + ',' + (d.y0 - 5) + ')'; },
         }).style({
-          'font-size': '14px',
+          'font-size': '16px',
         });
 
         if (!forbidNodeDeletion) {
