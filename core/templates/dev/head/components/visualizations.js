@@ -303,16 +303,32 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           'y': function(d) { return d.y0 + 25; }
         });
 
+        nodeEnter.append('svg:rect'
+        ).attr({
+          'width': '16',
+          'height': '16',
+          'x': function(d) { return d.x0 - 10; },
+          'y': function(d) { return d.y0 - 5; },
+        }).style({
+          'fill': '#FFFFC2',
+          'stroke-width': '1',
+          'stroke': '#DDDDDD',
+          'fill-opacity': function(d) { return ((highlightStates && d.hashId in highlightStates) ||
+                                (stateStats[d.name] && Object.keys(stateStats[d.name].readerFeedback).length > 0) ? '1' : '0' ); },
+          'stroke-opacity': function(d) { return ((highlightStates && d.hashId in highlightStates) ||
+                                (stateStats[d.name] && Object.keys(stateStats[d.name].readerFeedback).length > 0) ? '1' : '0' ); },
+        });
+
         nodeEnter.append('svg:text').text(
           function(d) { return ((highlightStates && d.hashId in highlightStates) ||
                                 (stateStats[d.name] && Object.keys(stateStats[d.name].readerFeedback).length > 0) ? '⚠' : '' ); }
         ).attr({
           'fill': 'firebrick',
           'text-anchor': 'middle',
-          'x': function(d) { return d.x0 + 2; },
-          'y': function(d) { return d.y0 + 15; }
+          'x': function(d) { return d.x0 - 3; },
+          'y': function(d) { return d.y0 + 8; }
         }).style({
-          'font-size': '18px',
+          'font-size': '14px',
         });
 
         if (!forbidNodeDeletion) {
