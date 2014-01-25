@@ -118,8 +118,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       }
 
       $scope.stateName = newStateName;
-      $scope.$parent.stateName = newStateName;
-      $scope.$parent.selectGuiTab();
+      $scope.$parent.showStateEditor(newStateName);
 
       $scope.$parent.addRenameStateChange(
         newStateName, $scope.stateNameMemento);
@@ -129,7 +128,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       $scope.uiStateName = newStateName;
       $scope.drawGraph();
       // Refresh the location hash.
-      $scope.selectGuiTab();
+      $scope.$parent.showStateEditor(newStateName);
     }
   };
 

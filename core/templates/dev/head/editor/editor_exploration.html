@@ -299,7 +299,7 @@
                 {% include 'editor/stats_viewer.html' %}
               </tab>
 
-              <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive" select="selectGuiTab()">
+              <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive">
                 <div ng-controller="StateEditor" ng-show="currentlyInStateContext()">
                   {% include 'editor/state_editor.html' %}
                 </div>

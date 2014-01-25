@@ -381,7 +381,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $location.path('/stats');
   };
 
-  $scope.selectGuiTab = function() {
+  $scope.showStateEditor = function(stateName) {
+    $scope.stateName = stateName;
     $location.path('/gui/' + $scope.stateName);
   };
 
@@ -438,8 +439,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.stateName = '';
       $scope.stateName = '';
       $scope.mainTabActive = true;
-      $scope.guiTabActive = false;
       $scope.statsTabActive = false;
+      $scope.guiTabActive = false;
     }
   });
 
@@ -447,7 +448,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   * Methods affecting the graph visualization.
   ********************************************/
   $scope.drawGraph = function() {
-    $scope.graphData = $scope.reformatResponse(
+    $scope.graphData = $scope.getNodesAndLinks(
       $scope.states, $scope.initStateName);
   };
 
@@ -545,7 +546,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         }),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
       .success(function(response) {
-        location.reload(); 
+        location.reload();
       }).error(function(data) {
         console.log(data);
         warningsData.addWarning(
@@ -659,125 +660,38 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
   $scope.initExplorationPage();
 
-  $scope.reformatResponse = function(states, initStateName) {
-    var SENTINEL_DEPTH = 3000;
-    var VERT_OFFSET = 20;
-    var HORIZ_SPACING = 150;
-    var VERT_SPACING = 100;
-    var HORIZ_OFFSET = 100;
-    var nodes = {};
-
-    var state;
-    nodes[END_DEST] = {
-      name: END_DEST,
-      depth: SENTINEL_DEPTH,
-      reachable: false,
-      reachableFromEnd: false
-    };
-    for (stateName in states) {
-      nodes[stateName] = {
-        name: (stateName == END_DEST ? END_DEST : stateName),
-        depth: SENTINEL_DEPTH,
-        reachable: false,
-        reachableFromEnd: false
-      };
-    }
-    nodes[initStateName].depth = 0;
-
-    var maxDepth = 0;
-    var seenNodes = [initStateName];
-    var queue = [initStateName];
-    var maxXDistPerLevel = {0: HORIZ_OFFSET};
-    nodes[initStateName].y0 = VERT_OFFSET;
-    nodes[initStateName].x0 = HORIZ_OFFSET;
-
-    var handlers, ruleSpecs, h, i;
-
-    while (queue.length > 0) {
-      var currNode = queue[0];
-      queue.shift();
-      nodes[currNode].reachable = true;
-      if (currNode in states) {
-        handlers = states[currNode].widget.handlers;
-        for (h = 0; h < handlers.length; h++) {
-          ruleSpecs = handlers[h].rule_specs;
-          for (i = 0; i < ruleSpecs.length; i++) {
-            // Assign levels to nodes only when they are first encountered.
-            if (seenNodes.indexOf(ruleSpecs[i].dest) == -1) {
-              seenNodes.push(ruleSpecs[i].dest);
-              nodes[ruleSpecs[i].dest].depth = nodes[currNode].depth + 1;
-              nodes[ruleSpecs[i].dest].y0 = (nodes[currNode].depth + 1) * VERT_SPACING + VERT_OFFSET;
-              if (nodes[currNode].depth + 1 in maxXDistPerLevel) {
-                nodes[ruleSpecs[i].dest].x0 = maxXDistPerLevel[nodes[currNode].depth + 1] + HORIZ_SPACING;
-                maxXDistPerLevel[nodes[currNode].depth + 1] += HORIZ_SPACING;
-              } else {
-                nodes[ruleSpecs[i].dest].x0 = HORIZ_OFFSET;
-                maxXDistPerLevel[nodes[currNode].depth + 1] = HORIZ_OFFSET;
-              }
-              maxDepth = Math.max(maxDepth, nodes[currNode].depth + 1);
-              queue.push(ruleSpecs[i].dest);
-            }
-          }
-        }
-      }
-    }
-
-    // Handle nodes that have not been visited in the forward traversal.
-    var horizPositionForLastRow = HORIZ_OFFSET;
-    var node;
-    for (node in nodes) {
-      if (nodes[node].depth == SENTINEL_DEPTH) {
-        nodes[node].depth = maxDepth + 1;
-        nodes[node].y0 = VERT_OFFSET + nodes[node].depth * VERT_SPACING;
-        nodes[node].x0 = horizPositionForLastRow;
-        horizPositionForLastRow += HORIZ_SPACING;
-      }
-    }
-
-    // Assign unique IDs to each node.
-    var idCount = 0;
+  // Returns an object which can be treated as the input to a visualization
+  // for a directed graph. The returned object has the following keys:
+  //   - nodes: a list of node names
+  //   - links: a list of objects. Each object represents a directed link between
+  //      two notes, and has keys 'source' and 'target', the values of which are
+  //      the names of the corresponding nodes.
+  //   - initStateName: the name of the initial state.
+  //   - finalStateName: the name of the final state.
+  $scope.getNodesAndLinks = function(states, initStateName) {
     var nodeList = [];
-    for (node in nodes) {
-      var nodeMap = nodes[node];
-      nodeMap['hashId'] = node;
-      nodeMap['id'] = idCount;
-      nodes[node]['id'] = idCount;
-      idCount++;
-      nodeList.push(nodeMap);
+    for (stateName in states) {
+      nodeList.push(stateName);
     }
+    nodeList.push(END_DEST);
 
     var links = [];
-    for (state in states) {
-      handlers = states[state].widget.handlers;
+    for (var stateName in states) {
+      handlers = states[stateName].widget.handlers;
       for (h = 0; h < handlers.length; h++) {
         ruleSpecs = handlers[h].rule_specs;
         for (i = 0; i < ruleSpecs.length; i++) {
           links.push({
-            source: nodeList[nodes[state].id],
-            target: nodeList[nodes[ruleSpecs[i].dest].id],
-            name: $filter('parameterizeRuleDescription')(ruleSpecs[i])
+            source: stateName,
+            target: ruleSpecs[i].dest,
           });
         }
       }
     }
 
-    // Mark nodes that are reachable from the END state via backward links.
-    queue = [END_DEST];
-    nodes[END_DEST].reachableFromEnd = true;
-    while (queue.length > 0) {
-      var currNodeId = queue[0];
-      queue.shift();
-
-      for (i = 0; i < links.length; i++) {
-        if (links[i].target.hashId == currNodeId &&
-            !links[i].source.reachableFromEnd) {
-          links[i].source.reachableFromEnd = true;
-          queue.push(links[i].source.hashId);
-        }
-      }
-    }
-
-    return {nodes: nodeList, links: links, initStateName: initStateName};
+    return {
+      nodes: nodeList, links: links, initStateName: initStateName,
+      finalStateName: END_DEST};
   };
 
   $scope.saveExplorationTitle = function(newValue) {

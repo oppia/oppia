@@ -560,7 +560,7 @@ textarea {
 }
 
 .oppia-graph-viz text {
-  font: 15px sans-serif;
+  font: 12px sans-serif;
   pointer-events: none;
 }
 
@@ -571,7 +571,6 @@ textarea {
 }
 
 .oppia-graph-viz .node rect {
-  cursor: pointer;
   fill: #fff;
   fill-opacity: .5;
   stroke-width: 0px;
