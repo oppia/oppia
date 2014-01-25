@@ -35,7 +35,8 @@ window.OPPIA_EMBED_GLOBALS = {
 window.addEventListener('message', function(evt) {
   // Allow only requests from oppiaserver or the server that this container is
   // running on.
-  if (evt.origin == 'https://oppiaserver.appspot.com' ||
+  if (evt.origin == 'http://localhost:8181' ||
+      evt.origin == 'https://oppiaserver.appspot.com' ||
       evt.origin == 'https://www.oppia.org' ||
       evt.origin == window.location.protocol + '//' + window.location.host) {
     console.log(evt.data);
@@ -216,7 +217,8 @@ window.OPPIA_PLAYER = {
    * @param {int} newHeight The new height of the embedded iframe.
    */
   onHeightChange: function(iframeNode, newHeight) {
-    console.log('onHeightChange event triggered on ' + iframeNode + '.');
+    console.log(
+        'onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
 
     if (iframeNode.getAttribute('fixedheight') === 'false') {
       // Sometimes setting iframe hight to the exact content height still

@@ -264,6 +264,9 @@ function ReaderExploration(
           'slow', 'swing');
     }
 
+    messengerService.sendMessage(
+      messengerService.HEIGHT_CHANGE, document.body.scrollHeight);
+
     if ($scope.finished) {
       messengerService.sendMessage(
         messengerService.EXPLORATION_COMPLETED, null);
