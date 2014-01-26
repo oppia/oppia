@@ -221,10 +221,9 @@ window.OPPIA_PLAYER = {
         'onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
 
     if (iframeNode.getAttribute('fixedheight') === 'false') {
-      // Sometimes setting iframe hight to the exact content height still
-      // produces scrollbar, so adding 10 extra px.
-      iframeNode.height = Math.floor(newHeight + 10) + 'px';
+      iframeNode.height = newHeight + 'px';
     }
+    iframeNode.scrollIntoView(false);
 
     window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
   }

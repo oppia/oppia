@@ -34,10 +34,23 @@ function Base($scope, $http, $rootScope, $window, warningsData, activeInputData,
   // TODO(sll): This is wrong; it should only happen for the reader app.
   // Otherwise the iframed widget repository also causes a sent message and
   // broadcast.
-  $window.onBodyLoad = function() {
+  var lastRequestedHeight = 0;
+  var adjustPageHeight = function() {
+    var newHeight = document.body.scrollHeight;
+    console.log('=== ' + lastRequestedHeight + ':' + newHeight);
+    if (lastRequestedHeight == newHeight) {
+      return;
+    }
+    // Sometimes setting iframe hight to the exact content height still
+    // produces scrollbar, so adding 10 extra px.
+    newHeight += 10;
     messengerService.sendMessage(
-      messengerService.HEIGHT_CHANGE, document.body.scrollHeight);
-
+        messengerService.HEIGHT_CHANGE, newHeight);
+    lastRequestedHeight = newHeight;
+  };
+  $window.onresize = adjustPageHeight;
+  $window.onBodyLoad = function() {
+    adjustPageHeight();
     $scope.$broadcast('pageLoaded', null);
   };
 
