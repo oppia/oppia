@@ -414,11 +414,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       return;
     }
 
-    if (event.data.hasOwnProperty('widgetHeight')) {
+    if (evt.data.hasOwnProperty('widgetHeight')) {
       console.log('Resize event received for widget preview.');
       console.log(evt.data);
       // Change the height of the included iframe.
-      var height = parseInt(event.data.widgetHeight, 10) + 20;
+      var height = parseInt(evt.data.widgetHeight, 10) + 20;
       var iframe = document.getElementById($scope.previewIframeId);
       iframe.height = height + 'px';
     }

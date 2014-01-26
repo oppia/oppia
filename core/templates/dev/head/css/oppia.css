@@ -503,6 +503,10 @@ textarea {
   padding: 10px;
 }
 
+.oppia-useful-references {
+  padding-right: 10px;
+}
+
 .oppia-warning {
   background: #F9EDBE;
   width: 80%;
@@ -527,6 +531,35 @@ textarea {
 
 .oppia-placeholder {
   color: gray;
+}
+
+.oppia-state-editor-container {
+  position: relative;
+}
+
+.oppia-state-editor {
+  background-color: white;
+  border: 3px solid black;
+  border-radius: 5px;
+  height: 90%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 70%;
+  z-index: 100;
+}
+
+.oppia-state-editor-header {
+  background: #ddd;
+  max-height: 10%;
+  padding: 3px 10px;
+}
+
+.oppia-state-editor-body {
+  max-height: 90%;
+  overflow-y: scroll;
+  padding: 10px;
+  position: relative;
 }
 
 .oppia-state-content {

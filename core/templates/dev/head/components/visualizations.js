@@ -57,7 +57,9 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       nodeFill: '@',
       opacityMap: '=',
       forbidNodeDeletion: '@',
-      stateStats: '='
+      stateStats: '=',
+      allowPanning: '@',
+      currentStateName: '='
     },
     link: function(scope, element, attrs) {
       // The maximum number of nodes to show in a row.
@@ -77,10 +79,20 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           drawGraph(
             newVal.nodes, newVal.links, newVal.initStateName, newVal.finalStateName,
             scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
-            scope.highlightStates, scope.stateStats
+            scope.highlightStates, scope.stateStats, scope.allowPanning,
+            scope.currentStateName
           );
         }
       });
+
+      scope.$watch('currentStateName', function(newStateName, oldStateName) {
+        drawGraph(
+          scope.val.nodes, scope.val.links, scope.val.initStateName,
+          scope.val.finalStateName, scope.nodeFill, scope.opacityMap,
+          scope.forbidNodeDeletion, scope.highlightStates, scope.stateStats,
+          scope.allowPanning, scope.currentStateName
+        );
+      })
 
       // Returns an object representing the nodes of the graph. The keys of the
       // object are the node labels. The corresponding values are objects with
@@ -279,7 +291,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       }
 
       function drawGraph(nodes, links, initStateName, finalStateName, nodeFill,
-                         opacityMap, forbidNodeDeletion, highlightStates, stateStats) {
+                         opacityMap, forbidNodeDeletion, highlightStates, stateStats,
+                         allowPanning, currentStateName) {
         // Clear all SVG elements on the canvas.
         d3.select(element[0]).selectAll('svg').remove();
 
@@ -291,13 +304,34 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         }
 
         var VIEWPORT_HEIGHT = 100.0 * (maxDepth + 1);
-        var VIEWPORT_WIDTH = 650.0;
+        var VIEWPORT_WIDTH = 800.0;
 
-        var vis = d3.select(element[0]).append('svg:svg').attr({
-          'class': 'oppia-graph-viz',
-          'height': VIEWPORT_HEIGHT,
-          'width': VIEWPORT_WIDTH
-        });
+        var vis = d3.select(element[0]).append('svg:svg')
+          .attr({
+            'class': 'oppia-graph-viz',
+            'height': VIEWPORT_HEIGHT,
+            'width': VIEWPORT_WIDTH
+          });
+
+        if (allowPanning) {
+          vis = vis.append('g')
+            .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+              vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            }))
+          .append('g');
+
+          vis.append('rect')
+            .attr({
+              'width': VIEWPORT_WIDTH,
+              'height': VIEWPORT_HEIGHT
+            })
+            .style({
+              'fill-opacity': 0,
+              'fill': 'none',
+              'pointer-events': 'all',
+              'cursor': 'move'
+            });
+        }
 
         // Change the position values in nodeData to use pixels.
         for (var nodeName in nodeData) {
@@ -352,30 +386,28 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         if (opacityMap) {
           var legendWidth = 210;
-          var x = 450;
-          var legendHeight = 0;
+          var legendHeight = 70;
+          var x = 400;
           var legend = vis.append('svg:rect')
             .attr({'width': legendWidth, 'x': x})
             .style({'fill': 'transparent', 'stroke': 'black'});
 
-          vis.append('svg:rect').attr({
-            'width': legendWidth - 20,
-            'height': 20,
-            'x': x + 10,
-            'y': 10
-          })
-          .style({
-            'stroke-width': 0.5,
-            'stroke': 'black',
-            'fill': 'url(#nodeGradient)'
-          });
+          vis.append('svg:rect')
+            .attr({
+              'width': legendWidth - 20,
+              'height': 20,
+              'x': x + 10,
+              'y': 10
+            })
+            .style({
+              'stroke-width': 0.5,
+              'stroke': 'black',
+              'fill': 'url(#nodeGradient)'
+            });
 
-          vis.append('svg:text').text(opacityMap['legend']).attr({
-            'x': x + 10,
-            'y': 50
-          });
-
-          legendHeight += 70;
+          vis.append('svg:text')
+            .text(opacityMap['legend'])
+            .attr({'x': x + 10, 'y': 50});
 
           legend.attr('height', legendHeight);
         }
@@ -392,6 +424,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
                 return 'url(#arrowhead)';
               },
               'd': function(d) {
+                if (d.source == d.target) {
+                  return;
+                }
+
                 var sourcex = d.source.xLabel;
                 var sourcey = d.source.yLabel;
                 var targetx = d.target.xLabel;
@@ -401,12 +437,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
                 var sourceHeight = d.source.height;
                 var targetWidth = d.target.width;
                 var targetHeight = d.target.height;
-
-                var sourceLeft = d.source.x0;
-
-                if (d.source == d.target) {
-                  return;
-                }
 
                 var dx = targetx - sourcex,
                     dy = targety - sourcey;
@@ -463,9 +493,13 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             }
           })
           .style({
-            'stroke': 'black',
+            'stroke': function(d) {
+              return '#000';
+            },
             'stroke-width': function(d) {
-              return (d.name == initStateName || d.name == END_DEST) ? '3' : '2';
+              return (
+                d.name == currentStateName ? '4' :
+                (d.name == initStateName || d.name == END_DEST) ? '2' : '1');
             },
             'fill': function(d) {
               return (
@@ -575,8 +609,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           // TODO(sll): Do not add this handler at all for the start or END nodes.
           nodeEnter.append('svg:rect')
             .attr({
-              'height': '15px',
-              'width': '15px',
+              'height': 15,
+              'width': 15,
               'opacity': 0,  // developers: comment out this line to see the delete target
               'stroke-width': '0',
               'x': function(d) { return (d.x0 + d.width); },
@@ -607,6 +641,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               return (d.name !== initStateName && d.name !== END_DEST) ? 'x' : '';
             });
         }
+
 
       }
     }

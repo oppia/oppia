@@ -358,7 +358,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   ********************************************/
   $scope.mainTabActive = false;
   $scope.statsTabActive = false;
-  $scope.guiTabActive = false;
 
   $scope.location = $location;
 
@@ -403,9 +402,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           $location.path('/');
           return;
         } else {
-          $scope.guiTabActive = true;
           $scope.statsTabActive = false;
-          $scope.mainTabActive = false;
+          $scope.mainTabActive = true;
           $scope.$broadcast('guiTabSelected', $scope.stateName);
           // Scroll to the relevant element (if applicable).
           // TODO(sfederwisch): Change the trigger so that there is exactly one
@@ -432,7 +430,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.stateName = '';
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
-      $scope.guiTabActive = false;
     } else {
       $location.path('/');
       $location.hash('');
@@ -440,7 +437,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.stateName = '';
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
-      $scope.guiTabActive = false;
     }
   });
 
@@ -484,6 +480,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
+  $scope.usefulReferencesIsShown = false;
   $scope.versionHistoryIsShown = false;
   $scope.explorationSnapshots = null;
 

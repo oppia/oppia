@@ -182,7 +182,7 @@
 
     <div class="container">
       <div class="row" ng-if="isCloned">
-        <div class="span8">
+        <div class="span12">
           <center>
             <div class="oppia-warning">
               <strong>Note:</strong> This is a private copy of a published exploration. If you would like to improve the
@@ -202,22 +202,29 @@
           </a>
         </div>
 
-        <div class="span4 oppia-editor-reference">
-          <h5>Useful References</h5>
-          <ul>
-            <li>
-              <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">Planning Your Exploration</a>
-            </li>
-            <li>
-              <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">Exploration Design Tips</a>
-            </li>
-          </ul>
-          </span>
+        <div class="pull-right oppia-editor-reference">
+          <h5>
+            <a ng-click="usefulReferencesIsShown = !usefulReferencesIsShown" class="oppia-editor-section-header">
+              <i class="icon-plus-sign" ng-hide="usefulReferencesIsShown"></i>
+              <i class="icon-minus-sign" ng-show="usefulReferencesIsShown"></i>
+              Useful References
+            </a>
+          </h5>
+          <div collapse="!usefulReferencesIsShown" class="oppia-useful-references">
+            <ul>
+              <li>
+                <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">Planning Your Exploration</a>
+              </li>
+              <li>
+                <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">Exploration Design Tips</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-      <br>
+
       <div class="row">
-        <div class="span8">
+        <div class="span12">
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
             {% if can_publish %}
@@ -288,21 +295,31 @@
 
             <tabset>
               <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
-                {% include 'editor/editor_metadata.html' %}
-                <hr>
-                {% include 'editor/editor_version_history.html' %}
-                <hr>
-                {% include 'editor/editor_viz.html' %}
+                <div class="oppia-state-editor-container">
+                  {% include 'editor/editor_metadata.html' %}
+                  <hr>
+                  {% include 'editor/editor_version_history.html' %}
+                  <hr>
+                  {% include 'editor/editor_viz.html' %}
+                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor">
+                    <div class="oppia-state-editor-header">
+                      <button class="pull-right" ng-click="selectMainTab()">
+                        &times;
+                      </button>
+                      <h5>
+                        State Editor
+                      </h5>
+                    </div>
+
+                    <div class="oppia-state-editor-body">
+                      {% include 'editor/state_editor.html' %}
+                    </div>
+                  </div>
+                </div>
               </tab>
 
               <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
                 {% include 'editor/stats_viewer.html' %}
-              </tab>
-
-              <tab heading="State Editor" disabled="!currentlyInStateContext()" active="guiTabActive">
-                <div ng-controller="StateEditor" ng-show="currentlyInStateContext()">
-                  {% include 'editor/state_editor.html' %}
-                </div>
               </tab>
             </tabset>
           </div>
