@@ -39,7 +39,7 @@
                   <em>This rule provides no feedback.</em>
                 </span>
                 <span ng-repeat="fb in rule.feedback">
-                    • <span ng-bind-html="fb|truncate"></span><br>
+                    • <span angular-html-bind="fb"></span><br>
                 </span>
               </td>
               <td class="oppia-dest-bubble">
@@ -119,7 +119,7 @@
                 <em>This rule provides no feedback.</em>
               </span>
               <span ng-repeat="fb in getDefaultRule(handlerName).feedback">
-                • <span ng-bind-html="fb|truncate"></span><br>
+                • <span angular-html-bind="fb"></span><br>
               </span>
             </td>
             <td class="oppia-dest-bubble">

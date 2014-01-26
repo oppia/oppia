@@ -1,12 +1,12 @@
 <div ng-if="!active && !alwaysEditable">
   <div>
-    <span class="oppia-rte-inactive" ng-bind-html="localValue.label"></span>
+    <span angular-html-bind="localValue.label"></span>
     (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
   </div>
 </div>
 
 <div ng-if="active || alwaysEditable">
-  <rich-text-editor html-content="localValue.label" disallow-oppia-widgets="true">
+  <rich-text-editor html-content="localValue.label">
   </rich-text-editor>
   <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
     Close
