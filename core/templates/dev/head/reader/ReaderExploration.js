@@ -292,7 +292,7 @@ function ReaderExploration(
   $scope.adjustPageHeight = function() {
     var newHeight = document.body.scrollHeight;
     console.log('=== ' + $scope.lastRequestedHeight + ':' + newHeight);
-    if ($scope.lastRequestedHeight == newHeight || $scope.lastRequestedHeight == newHeight + 10) {
+    if (Math.abs($scope.lastRequestedHeight - newHeight) <= 10.5) {
       return;
     }
     // Sometimes setting iframe height to the exact content height still

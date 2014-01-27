@@ -85,8 +85,16 @@
         which it is the only element. For more information, please
         see the ReaderExploration.js file. -->
 
+        <script>
+          window.tryRegisteringIframeLoad = function() {
+            if (window.onIframeLoad) {
+              window.onIframeLoad();
+            }
+          };
+        </script>
+
         <iframe id="inputTemplate" width="100%" seamless="seamless"
-                frameborder="0" onload="onIframeLoad()"></iframe>
+                frameborder="0" onload="tryRegisteringIframeLoad()"></iframe>
       </div>
     </div>
   </div>
