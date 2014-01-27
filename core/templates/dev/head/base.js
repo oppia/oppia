@@ -29,31 +29,6 @@ function Base($scope, $http, $rootScope, $window, warningsData, activeInputData,
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
 
-  // If the exploration is iframed, send data to its parent about its height so
-  // that the parent can be resized as necessary.
-  // TODO(sll): This is wrong; it should only happen for the reader app.
-  // Otherwise the iframed widget repository also causes a sent message and
-  // broadcast.
-  var lastRequestedHeight = 0;
-  var adjustPageHeight = function() {
-    var newHeight = document.body.scrollHeight;
-    console.log('=== ' + lastRequestedHeight + ':' + newHeight);
-    if (lastRequestedHeight == newHeight) {
-      return;
-    }
-    // Sometimes setting iframe hight to the exact content height still
-    // produces scrollbar, so adding 10 extra px.
-    newHeight += 10;
-    messengerService.sendMessage(
-        messengerService.HEIGHT_CHANGE, newHeight);
-    lastRequestedHeight = newHeight;
-  };
-  $window.onresize = adjustPageHeight;
-  $window.onBodyLoad = function() {
-    adjustPageHeight();
-    $scope.$broadcast('pageLoaded', null);
-  };
-
   // Gets URL parameter values.
   $scope.getUrlParams = function() {
     var params = {};

@@ -76,7 +76,7 @@ oppia.factory('messengerService', [function() {
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: function(messageTitle, messageData) {
       // Only send a message if the oppia window is iframed.
-      if (window.parent != window &&
+      if (window.parent !== window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
         var idAndVersionHash = window.location.hash.substring(1);
         if (!idAndVersionHash) {

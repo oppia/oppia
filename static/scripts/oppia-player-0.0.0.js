@@ -40,6 +40,12 @@ function _log(message) {
  * a payload. The structure of the payload depends on what the title is:
  *   - 'heightChange': The payload is an Object with a single key-value pair.
  *         The key is 'height', and the value is a positive integer.
+ *   - 'explorationLoaded': The payload is an empty Object.
+ *   - 'stateTransition': The payload is an Object with three keys:
+ *         'oldStateName', 'jsonAnswer' and 'newStateName'. All three of these
+ *         have values of type String.
+ *   - 'explorationReset': The payload is an Object with a single key-value
+ *         pair. The key is 'stateName', and the value is of type String.
  *   - 'explorationCompleted': The payload is an empty Object.
  */
 window.addEventListener('message', function(evt) {
@@ -69,6 +75,9 @@ window.addEventListener('message', function(evt) {
           evt.data.payload.newStateName);
         break;
       case 'explorationReset':
+        // This needs to be set in order to allow the scrollHeight of the iframe
+        // content to be calculated accurately within the iframe's JS.
+        iframeNode.style.height = 'auto';
         window.OPPIA_PLAYER.onExplorationReset(
           iframeNode, evt.data.payload.stateName);
         break;
@@ -240,6 +249,11 @@ window.OPPIA_PLAYER = {
    */
   onHeightChange: function(iframeNode, newHeight) {
     _log('onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
+
+    // This is set to 'auto' when the exploration is reset. If this is not
+    // removed, the iframe height will not change even if iframeNode.height
+    // is set.
+    iframeNode.style.height = '';
 
     if (iframeNode.getAttribute('fixedheight') === 'false') {
       iframeNode.height = newHeight + 'px';

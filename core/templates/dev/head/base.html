@@ -32,10 +32,10 @@
     {{BEFORE_END_HEAD_TAG_HOOK}}
   </head>
 
-  <body ng-controller="Base" onload="onBodyLoad()">
-    <div id="wrapper">
-      <div class="oppia-main-body">
-        {% if not iframed %}
+  <body ng-controller="Base">
+    {% if not iframed %}
+      <div id="wrapper">
+        <div class="oppia-main-body">
           <!-- nav bar -->
           <div class="navbar navbar-static-top">
             <div class="navbar-inner">
@@ -112,34 +112,35 @@
               </div>
             </div>
           </div>
-        {% endif %}
+    {% endif %}
 
-        <div ng-cloak>
-          <div class="oppia-alert-blocks">
-            <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
-              <p class="alert alert-block">
-                <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-                <strong>Warning!</strong>
-                <[warning]>
-              </p>
-            </div>
-          </div>
-
-          <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-            <center>
-              <[loadingMessage]>
-              <span class="oppia-loading-dot-one">.</span>
-              <span class="oppia-loading-dot-two">.</span>
-              <span class="oppia-loading-dot-three">.</span>
-            </center>
-          </div>
-          <div ng-show="!loadingMessage">
-            {% block content %}{% endblock %}
-          </div>
+    <div ng-cloak>
+      <div class="oppia-alert-blocks">
+        <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
+          <p class="alert alert-block">
+            <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+            <strong>Warning!</strong>
+            <[warning]>
+          </p>
         </div>
       </div>
 
-      {% if not iframed %}
+      <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+        <center>
+          <[loadingMessage]>
+          <span class="oppia-loading-dot-one">.</span>
+          <span class="oppia-loading-dot-two">.</span>
+          <span class="oppia-loading-dot-three">.</span>
+        </center>
+      </div>
+      <div ng-show="!loadingMessage">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    {% if not iframed %}
+        </div>
+
         <div class="oppia-footer">
           <div class="container">
             <ul class="oppia-footer-nav span8">
@@ -174,8 +175,8 @@
             </ul>
           </div>
         </div>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
 
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}

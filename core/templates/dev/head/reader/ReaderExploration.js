@@ -19,7 +19,7 @@
  */
 
 function ReaderExploration(
-    $scope, $http, $rootScope, $sce, $timeout, $modal, warningsData,
+    $scope, $http, $rootScope, $sce, $timeout, $modal, $window, warningsData,
     messengerService, oppiaRequestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
@@ -30,6 +30,12 @@ function ReaderExploration(
     $scope.explorationDataUrl += '?v=' + GLOBALS.explorationVersion;
   }
 
+  $window.onIframeLoad = function() {
+    // Show content when the page is loaded.
+    $scope.showPage = true;
+    $scope.adjustPageHeight();
+  };
+
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
                     $scope.urlParams['iframed']);
@@ -39,11 +45,6 @@ function ReaderExploration(
   $scope.getStyle = function() {
     return $scope.showPage ? {} : {opacity: 0};
   };
-
-  $scope.$on('pageLoaded', function(event, data) {
-    // Show content when the page is loaded.
-    $scope.showPage = true;
-  });
 
   $scope.changeInputTemplateIframeHeight = function(height) {
     var iframe = document.getElementById('inputTemplate');
@@ -64,7 +65,7 @@ function ReaderExploration(
         .success(function(data) {
           $scope.explorationTitle = data.title;
           $scope.loadPage(data);
-          window.scrollTo(0, 0);
+          $window.scrollTo(0, 0);
         }).error(function(data) {
           warningsData.addWarning(
               data.error || 'There was an error loading the exploration.');
@@ -99,8 +100,6 @@ function ReaderExploration(
       } else {
         warningsData.addWarning('No feedback was submitted.');
       }
-    }, function () {
-      console.log('Reader feedback modal dismissed.');
     });
   };
 
@@ -279,8 +278,7 @@ function ReaderExploration(
           'slow', 'swing');
     }
 
-    messengerService.sendMessage(
-      messengerService.HEIGHT_CHANGE, document.body.scrollHeight);
+    $scope.adjustPageHeight();
 
     if ($scope.finished) {
       messengerService.sendMessage(
@@ -288,11 +286,29 @@ function ReaderExploration(
     }
   };
 
-  window.addEventListener('message', function(evt) {
+  // If the exploration is iframed, send data to its parent about its height so
+  // that the parent can be resized as necessary.
+  $scope.lastRequestedHeight = 0;
+  $scope.adjustPageHeight = function() {
+    var newHeight = document.body.scrollHeight;
+    console.log('=== ' + $scope.lastRequestedHeight + ':' + newHeight);
+    if ($scope.lastRequestedHeight == newHeight || $scope.lastRequestedHeight == newHeight + 10) {
+      return;
+    }
+    // Sometimes setting iframe height to the exact content height still
+    // produces scrollbar, so adding 10 extra px.
+    newHeight += 10;
+    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, newHeight);
+    $scope.lastRequestedHeight = newHeight;
+  };
+
+  $window.onresize = $scope.adjustPageHeight;
+
+  $window.addEventListener('message', function(evt) {
     console.log('Event received.');
     console.log(evt.data);
 
-    if (evt.origin != window.location.protocol + '//' + window.location.host) {
+    if (evt.origin != $window.location.protocol + '//' + $window.location.host) {
       return;
     }
 
@@ -311,5 +327,5 @@ function ReaderExploration(
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', 'warningsData', 'messengerService', 'oppiaRequestCreator'
+  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', '$window', 'warningsData', 'messengerService', 'oppiaRequestCreator'
 ];

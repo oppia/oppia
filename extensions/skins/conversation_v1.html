@@ -85,16 +85,6 @@
         which it is the only element. For more information, please
         see the ReaderExploration.js file. -->
 
-        <!-- If the exploration is iframed, send data to the parent about the
-        iframe height.-->
-        <script>
-          window.onIframeLoad = function() {
-            if (window.onBodyLoad) {
-              window.onBodyLoad();
-            }
-          };
-        </script>
-
         <iframe id="inputTemplate" width="100%" seamless="seamless"
                 frameborder="0" onload="onIframeLoad()"></iframe>
       </div>
