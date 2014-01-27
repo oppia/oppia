@@ -24,6 +24,16 @@ window.OPPIA_EMBED_GLOBALS = {
 };
 
 /**
+ * Logs a message in the console only if the embedding page is on localhost.
+ * @param {string} The message to log.
+ */
+function _log(message) {
+  if (window.location.host.indexOf('localhost') !== -1) {
+    console.log(message);
+  }
+}
+
+/**
  * [THIS SPECIFICATION IS ONLY VALID FOR VERSION 0.0.0 OF THIS SCRIPT]
  *
  * Receives messages from embedded Oppia iframes. Each message has a title and
@@ -39,7 +49,7 @@ window.addEventListener('message', function(evt) {
       evt.origin == 'https://oppiaserver.appspot.com' ||
       evt.origin == 'https://www.oppia.org' ||
       evt.origin == window.location.protocol + '//' + window.location.host) {
-    console.log(evt.data);
+    _log(evt.data);
     var iframeNode = document.getElementById(evt.data.sourceTagId);
 
     switch(evt.data.title) {
@@ -49,6 +59,18 @@ window.addEventListener('message', function(evt) {
         // TODO(sll): These should pass the iframe source, too (in case there are
         // multiple oppia iframes on a page).
         window.OPPIA_PLAYER.onHeightChange(iframeNode, evt.data.payload.height);
+        break;
+      case 'explorationLoaded':
+        window.OPPIA_PLAYER.onExplorationLoaded(iframeNode);
+        break;
+      case 'stateTransition':
+        window.OPPIA_PLAYER.onStateTransition(
+          iframeNode, evt.data.payload.oldStateName, evt.data.payload.jsonAnswer,
+          evt.data.payload.newStateName);
+        break;
+      case 'explorationReset':
+        window.OPPIA_PLAYER.onExplorationReset(
+          iframeNode, evt.data.payload.stateName);
         break;
       case 'explorationCompleted':
         window.OPPIA_PLAYER.onExplorationCompleted(iframeNode);
@@ -217,8 +239,7 @@ window.OPPIA_PLAYER = {
    * @param {int} newHeight The new height of the embedded iframe.
    */
   onHeightChange: function(iframeNode, newHeight) {
-    console.log(
-        'onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
+    _log('onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
 
     if (iframeNode.getAttribute('fixedheight') === 'false') {
       iframeNode.height = newHeight + 'px';
@@ -238,7 +259,46 @@ window.OPPIA_PLAYER = {
  */
 window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
   // FIXME: This function can be overwritten.
-  console.log('onHeightChangePostHook event triggered on ' + iframeNode + '.');
+  _log('onHeightChangePostHook event triggered on ' + iframeNode + '.');
+  _log(newHeight);
+};
+
+/**
+ * Called when the exploration is loaded.
+ * @param {object} iframeNode The iframe node that is the source of the
+ *     postMessage call.
+ */
+window.OPPIA_PLAYER.onExplorationLoaded = function(iframeNode) {
+  // FIXME: This function can be overwritten.
+  _log('onExplorationLoaded event triggered on ' + iframeNode + '.');
+};
+
+/**
+ * Called when a new state is encountered.
+ * @param {object} iframeNode The iframe node that is the source of the
+ *     postMessage call.
+ * @param {string} oldStateName The name of the previous state.
+ * @param {string} jsonAnswer A JSON representation of the reader's answer.
+ * @param {string} newStateName The name of the destination state.
+ */
+window.OPPIA_PLAYER.onStateTransition = function(iframeNode, oldStateName, jsonAnswer, newStateName) {
+  // FIXME: This function can be overwritten.
+  _log('onStateTransition event triggered on ' + iframeNode + '.');
+  _log(oldStateName);
+  _log(jsonAnswer);
+  _log(newStateName);
+};
+
+/**
+ * Called when the exploration is reset.
+ * @param {object} iframeNode The iframe node that is the source of the
+ *     postMessage call.
+ * @param {string} stateName The reader's current state, before the reset.
+ */
+window.OPPIA_PLAYER.onExplorationReset = function(iframeNode, stateName) {
+  // FIXME: This function can be overwritten.
+  _log('onExplorationReset event triggered on ' + iframeNode + '.');
+  _log(stateName);
 };
 
 /**
@@ -248,5 +308,5 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
  */
 window.OPPIA_PLAYER.onExplorationCompleted = function(iframeNode) {
   // FIXME: This function can be overwritten.
-  console.log('onExplorationCompleted event triggered on ' + iframeNode + '.');
+  _log('onExplorationCompleted event triggered on ' + iframeNode + '.');
 };

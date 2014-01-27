@@ -50,6 +50,12 @@ function ReaderExploration(
     iframe.height = height + 'px';
   };
 
+  $scope.resetPage = function() {
+    messengerService.sendMessage(
+      messengerService.EXPLORATION_RESET, $scope.stateName);
+    $scope.initializePage();
+  };
+
   // Initializes the story page using data from the server.
   $scope.initializePage = function() {
     $scope.responseLog = [];
@@ -189,6 +195,8 @@ function ReaderExploration(
     $scope.stateHistory = data.state_history;
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.reloadInteractiveIframe($scope.inputTemplate);
+
+    messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -211,7 +219,14 @@ function ReaderExploration(
         '/explorehandler/transition/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateName),
         oppiaRequestCreator.createRequest(requestMap),
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success($scope.refreshPage)
+    ).success(function(data) {
+      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        oldStateName: $scope.stateName,
+        jsonAnswer: JSON.stringify(answer),
+        newStateName: data.state_name
+      });
+      $scope.refreshPage(data);
+    })
     .error(function(data) {
       $scope.answerIsBeingProcessed = false;
       warningsData.addWarning(

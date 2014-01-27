@@ -30,6 +30,15 @@ oppia.factory('messengerService', [function() {
     'heightChange': function(payload) {
       return isPositiveInteger(payload.height);
     },
+    'explorationLoaded': function(payload) {
+      return true;
+    },
+    'stateTransition': function(payload) {
+      return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
+    },
+    'explorationReset': function(payload) {
+      return Boolean(payload.stateName);
+    },
     'explorationCompleted': function(payload) {
       return true;
     }
@@ -39,13 +48,31 @@ oppia.factory('messengerService', [function() {
     'heightChange': function(data) {
       return {height: data};
     },
+    'explorationLoaded': function(data) {
+      return {};
+    },
+    'stateTransition': function(data) {
+      return {
+        oldStateName: data.oldStateName,
+        jsonAnswer: data.jsonAnswer,
+        newStateName: data.newStateName
+      };
+    },
+    'explorationReset': function(data) {
+      return {
+        stateName: data
+      };
+    },
     'explorationCompleted': function(data) {
       return {};
-    }
+    },
   };
 
   var messenger = {
     HEIGHT_CHANGE: 'heightChange',
+    EXPLORATION_LOADED: 'explorationLoaded',
+    STATE_TRANSITION: 'stateTransition',
+    EXPLORATION_RESET: 'explorationReset',
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: function(messageTitle, messageData) {
       // Only send a message if the oppia window is iframed.
