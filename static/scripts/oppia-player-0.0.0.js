@@ -38,8 +38,9 @@ function _log(message) {
  *
  * Receives messages from embedded Oppia iframes. Each message has a title and
  * a payload. The structure of the payload depends on what the title is:
- *   - 'heightChange': The payload is an Object with a single key-value pair.
- *         The key is 'height', and the value is a positive integer.
+ *   - 'heightChange': The payload is an Object with the following fields:
+ *         height: a positive integer, and
+ *         scroll: boolean -- scroll down to bottom if true.
  *   - 'explorationLoaded': The payload is an empty Object.
  *   - 'stateTransition': The payload is an Object with three keys:
  *         'oldStateName', 'jsonAnswer' and 'newStateName'. All three of these
@@ -64,7 +65,8 @@ window.addEventListener('message', function(evt) {
         // whose key is 'height' and whose value is a positive integer.
         // TODO(sll): These should pass the iframe source, too (in case there are
         // multiple oppia iframes on a page).
-        window.OPPIA_PLAYER.onHeightChange(iframeNode, evt.data.payload.height);
+        window.OPPIA_PLAYER.onHeightChange(iframeNode,
+            evt.data.payload.height, evt.data.payload.scroll);
         break;
       case 'explorationLoaded':
         window.OPPIA_PLAYER.onExplorationLoaded(iframeNode);
@@ -246,8 +248,10 @@ window.OPPIA_PLAYER = {
    * @param {object} iframeNode The iframe node that is the source of the
    *     postMessage call.
    * @param {int} newHeight The new height of the embedded iframe.
+   * @param {boolean} doScroll Scroll down to show the bottom of iframe after
+   *     changing the height.
    */
-  onHeightChange: function(iframeNode, newHeight) {
+  onHeightChange: function(iframeNode, newHeight, doScroll) {
     _log('onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
 
     // This is set to 'auto' when the exploration is reset. If this is not
@@ -258,7 +262,9 @@ window.OPPIA_PLAYER = {
     if (iframeNode.getAttribute('fixedheight') === 'false') {
       iframeNode.height = newHeight + 'px';
     }
-    iframeNode.scrollIntoView(false);
+    if (doScroll) {
+      iframeNode.scrollIntoView(false);
+    }
 
     window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
   }

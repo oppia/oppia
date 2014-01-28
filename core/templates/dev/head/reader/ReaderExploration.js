@@ -33,7 +33,7 @@ function ReaderExploration(
   $window.onIframeLoad = function() {
     // Show content when the page is loaded.
     $scope.showPage = true;
-    $scope.adjustPageHeight();
+    $scope.adjustPageHeight(false);
   };
 
   $scope.urlParams = $scope.getUrlParams();
@@ -277,8 +277,7 @@ function ReaderExploration(
           {'scrollTop': document.getElementById('response').offsetTop},
           'slow', 'swing');
     }
-
-    $scope.adjustPageHeight();
+    $scope.adjustPageHeight(true);
 
     if ($scope.finished) {
       messengerService.sendMessage(
@@ -289,20 +288,23 @@ function ReaderExploration(
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
   $scope.lastRequestedHeight = 0;
-  $scope.adjustPageHeight = function() {
+  $scope.lastRequestedScroll = false;
+  $scope.adjustPageHeight = function(scroll) {
     var newHeight = document.body.scrollHeight;
-    console.log('=== ' + $scope.lastRequestedHeight + ':' + newHeight);
-    if (Math.abs($scope.lastRequestedHeight - newHeight) <= 10.5) {
+    if (Math.abs($scope.lastRequestedHeight - newHeight) <= 10.5 &&
+        (!scroll || $scope.lastRequestedScroll)) {
       return;
     }
     // Sometimes setting iframe height to the exact content height still
     // produces scrollbar, so adding 10 extra px.
     newHeight += 10;
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, newHeight);
+    messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
+        {height: newHeight, scroll: scroll});
     $scope.lastRequestedHeight = newHeight;
+    $scope.lastRequestedScroll = scroll;
   };
 
-  $window.onresize = $scope.adjustPageHeight;
+  $window.onresize = $scope.adjustPageHeight.bind(null, false);
 
   $window.addEventListener('message', function(evt) {
     console.log('Event received.');

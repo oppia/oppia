@@ -25,10 +25,14 @@ oppia.factory('messengerService', [function() {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };
+  var isBoolean = function(b) {
+    return typeof b === 'boolean';
+  };
+
 
   MESSAGE_VALIDATORS = {
     'heightChange': function(payload) {
-      return isPositiveInteger(payload.height);
+      return isPositiveInteger(payload.height) && isBoolean(payload.scroll);
     },
     'explorationLoaded': function(payload) {
       return true;
@@ -46,7 +50,7 @@ oppia.factory('messengerService', [function() {
 
   var getPayload = {
     'heightChange': function(data) {
-      return {height: data};
+      return {height: data.height, scroll: data.scroll};
     },
     'explorationLoaded': function(data) {
       return {};
