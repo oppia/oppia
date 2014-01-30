@@ -21,7 +21,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('messengerService', [function() {
+oppia.factory('messengerService', ['$log', function($log) {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };
@@ -88,8 +88,8 @@ oppia.factory('messengerService', [function() {
         }
 
         if (idAndVersionHash.indexOf('&') === -1) {
-          console.log(
-              'Embedding error: Invalid id/version hash: ' + idAndVersionHash);
+          $log.error(
+              'Invalid id/version hash for embedding: ' + idAndVersionHash);
         }
 
         var separatorLocation = idAndVersionHash.indexOf('&');
@@ -98,11 +98,11 @@ oppia.factory('messengerService', [function() {
         var version = idAndVersionHash.substring(separatorLocation + 1);
 
         if (version == '0.0.0') {
-          console.log('Posting message to parent: ' + messageTitle);
+          $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
           if (!MESSAGE_VALIDATORS[messageTitle](payload)) {
-            console.log('Error validating payload: ' + payload);
+            $log.error('Error validating payload: ' + payload);
           }
 
           // The targetOrigin needs to be * because any page can iframe an

@@ -130,7 +130,6 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
         for (var j = 0; j < customizationArgsKeys.length; j++) {
           if (!$scope._inArray($scope.ALLOWED_KEYS[generatorId],
                               customizationArgsKeys[j])) {
-            console.log(customizationArgsKeys[j]);
             delete newCustomizationArgs[customizationArgsKeys[j]];
           }
         }

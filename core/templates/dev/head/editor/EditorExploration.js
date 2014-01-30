@@ -21,7 +21,6 @@
 var END_DEST = 'END';
 
 // TODO(sll): Move all strings to the top of the file and internationalize them.
-// TODO(sll): console.log is not supported in IE.
 
 // Receive events from the iframed widget repository.
 oppia.run(['$rootScope', function($rootScope) {
@@ -31,7 +30,7 @@ oppia.run(['$rootScope', function($rootScope) {
 }]);
 
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
-    $filter, $rootScope, explorationData, warningsData, activeInputData, oppiaRequestCreator) {
+    $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.currentlyInStateContext = function() {
     return Boolean($scope.stateName);
@@ -220,7 +219,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
 
       if ($scope.isPublic && warningMessage) {
-        console.log(warningMessage);
+        $log.error(warningMessage);
         // Warnings should be fixed before an exploration is published.
         warningsData.addWarning(warningMessage);
         return;
@@ -389,7 +388,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     return $location.path();
   }, function(newPath, oldPath) {
     var path = newPath;
-    console.log('Path is now ' + path);
+    $log.info('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
       $scope.stateName = path.substring('/gui/'.length);
@@ -545,7 +544,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       .success(function(response) {
         location.reload();
       }).error(function(data) {
-        console.log(data);
+        $log.error(data);
         warningsData.addWarning(
           data.error || 'Error communicating with server.');
       });
@@ -598,7 +597,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     // input, if any, first. If it is bad input, display a warning and cancel
     // the effects of the old change. But, for now, each case is handled
     // specially.
-    console.log('Current Active Input: ' + activeInputData.name);
+    $log.info('Current Active Input: ' + activeInputData.name);
 
     var inputArray = newActiveInput.split('.');
 
@@ -730,7 +729,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   });
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
-    console.log("adding parameter to exploration");
+    $log.info('Adding a param spec to the exploration.');
     if (name in $scope.paramSpecs) {
       warningsData.addWarning(
         'Parameter ' + name + ' already exists, so it was not added.');
@@ -983,6 +982,6 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
  */
 EditorExploration.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
-  '$filter', '$rootScope', 'explorationData', 'warningsData', 'activeInputData',
-  'oppiaRequestCreator'
+  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
+  'activeInputData', 'oppiaRequestCreator'
 ];

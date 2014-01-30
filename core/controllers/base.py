@@ -218,9 +218,8 @@ class BaseHandler(webapp2.RequestHandler):
             values = self.values
 
         values.update({
-            'debug': feconf.DEBUG,
-            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'DEV_MODE': feconf.DEV_MODE,
+            'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'EXPLORATION_STATUS_PRIVATE': (
                 rights_manager.EXPLORATION_STATUS_PRIVATE),
             'EXPLORATION_STATUS_PUBLIC': (

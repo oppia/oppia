@@ -90,8 +90,6 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
       modalInstance.result.then(function(result) {
         $location.hash(result.locationHash);
         $scope.$parent.showStateEditor(stateName);
-      }, function () {
-        console.log('State stats modal dismissed.');
       });
     });
   };

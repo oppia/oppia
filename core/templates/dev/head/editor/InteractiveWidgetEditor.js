@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor($scope, $http, $modal, warningsData, explorationData, oppiaRequestCreator) {
+function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, explorationData, oppiaRequestCreator) {
   // The id of the widget preview iframe.
   $scope.previewIframeId = 'interactiveWidgetPreview';
 
@@ -222,7 +222,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
             var finalInputArray = newValue.split(pattern);
             if (finalInputArray.length % 3 !== 1) {
-              console.log('Error: could not process rule description.');
+              $log.error('Could not process rule description.');
             }
 
             var result = [];
@@ -306,8 +306,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 
     modalInstance.result.then(function(result) {
       $scope.saveRule(result.tmpRule);
-    }, function () {
-      console.log('Rule editor modal dismissed.');
     });
   };
 
@@ -415,8 +413,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
     }
 
     if (evt.data.hasOwnProperty('widgetHeight')) {
-      console.log('Resize event received for widget preview.');
-      console.log(evt.data);
+      $log.info('Resize event received for widget preview.');
+      $log.info(evt.data);
       // Change the height of the included iframe.
       var height = parseInt(evt.data.widgetHeight, 10) + 20;
       var iframe = document.getElementById($scope.previewIframeId);
@@ -493,9 +491,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
           widgetCustomizationArgsMemento
         );
       }
-      console.log('Interactive customization modal saved.');
-    }, function() {
-      console.log('Interactive customization modal dismissed.');
+      $log.info('Interactive customization modal saved.');
     });
   };
 
@@ -549,8 +545,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
       $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
 
       $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
-    }, function () {
-      console.log('Choose interactive widget modal dismissed.');
     });
   };
 
@@ -573,5 +567,5 @@ function InteractiveWidgetEditor($scope, $http, $modal, warningsData, exploratio
 }
 
 InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaRequestCreator'
+  '$scope', '$http', '$modal', '$log', 'warningsData', 'explorationData', 'oppiaRequestCreator'
 ];

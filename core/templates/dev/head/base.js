@@ -22,7 +22,7 @@ var editorUrl = '/editor/';
 var pathnameArray = window.location.pathname.split('/');
 
 // Global utility methods.
-function Base($scope, $http, $rootScope, $window, warningsData, activeInputData, messengerService) {
+function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
@@ -60,7 +60,7 @@ function Base($scope, $http, $rootScope, $window, warningsData, activeInputData,
       iframe = document.getElementById(iframe);
     }
     if (!iframe) {
-      console.log('No iframe found.');
+      $log.error('Could not add content to iframe: no iframe found.');
       return;
     }
     if (iframe.contentDocument) {
@@ -186,4 +186,4 @@ function Base($scope, $http, $rootScope, $window, warningsData, activeInputData,
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$http', '$rootScope', '$window', 'warningsData', 'activeInputData', 'messengerService'];
+Base.$inject = ['$scope', '$http', '$rootScope', '$window', '$log', 'warningsData', 'activeInputData', 'messengerService'];

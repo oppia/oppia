@@ -19,8 +19,8 @@
  */
 
 oppia.directive('richTextEditor', [
-  '$modal', '$http', 'oppiaHtmlEscaper', 'oppiaRequestCreator',
-  function($modal, $http, oppiaHtmlEscaper, oppiaRequestCreator) {
+  '$modal', '$http', '$log', 'oppiaHtmlEscaper', 'oppiaRequestCreator',
+  function($modal, $http, $log, oppiaHtmlEscaper, oppiaRequestCreator) {
     return {
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
@@ -56,7 +56,7 @@ oppia.directive('richTextEditor', [
             }
             var separatorLocation = attr.name.indexOf('-with-');
             if (separatorLocation === -1) {
-              console.log('Error: invalid customization attribute ' + attr.name);
+              $log.error('RTE Error: invalid customization attribute ' + attr.name);
             }
             var paramName = attr.name.substring(0, separatorLocation);
             var argName = attr.name.substring(separatorLocation + 6);
@@ -179,7 +179,7 @@ oppia.directive('richTextEditor', [
               var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
               insertionPoint.className = insertionPoint.className.replace(
                   /\binsertionPoint\b/, '');
-              console.log('Modal customizer dismissed.');
+              $log.info('Modal customizer dismissed.');
             });
 
             return modalInstance;

@@ -20,8 +20,8 @@
  */
 
 oppia.factory('explorationData', [
-  '$http', 'warningsData', '$q', 'oppiaRequestCreator',
-  function($http, warningsData, $q, oppiaRequestCreator) {
+  '$http', '$log', 'warningsData', '$q', 'oppiaRequestCreator',
+  function($http, $log, warningsData, $q, oppiaRequestCreator) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationUrl = '/create/' + pathnameArray[2];
     var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
@@ -36,7 +36,7 @@ oppia.factory('explorationData', [
       // Returns a promise that supplies the data for the current exploration.
       getData: function() {
         if (explorationData.data) {
-          console.log('Found exploration data in cache.');
+          $log.info('Found exploration data in cache.');
 
           var deferred = $q.defer();
           deferred.resolve(explorationData.data);
@@ -44,8 +44,8 @@ oppia.factory('explorationData', [
         } else {
           // Retrieve data from the server.
           return $http.get(explorationDataUrl).then(function(response) {
-            console.log('Retrieved exploration data.');
-            console.log(response.data);
+            $log.info('Retrieved exploration data.');
+            $log.info(response.data);
 
             explorationData.data = response.data;
             return response.data;
@@ -75,7 +75,7 @@ oppia.factory('explorationData', [
           {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
         ).success(function(data) {
           warningsData.clear();
-          console.log('Changes to this exploration were saved successfully.');
+          $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = data;
           if (successCallback) {
             successCallback();

@@ -19,7 +19,7 @@
  */
 
 function ReaderExploration(
-    $scope, $http, $rootScope, $sce, $timeout, $modal, $window, warningsData,
+    $scope, $http, $rootScope, $sce, $timeout, $modal, $window, $log, warningsData,
     messengerService, oppiaRequestCreator) {
   // The pathname is expected to be: /[exploration_id]
   $scope.explorationId = pathnameArray[2];
@@ -154,7 +154,7 @@ function ReaderExploration(
   $scope.reloadInteractiveIframe = function(content) {
     var iframe = document.getElementById('inputTemplate');
     if (!iframe) {
-      console.log('Error: No interactive iframe found.');
+      $log.error('No interactive iframe found.');
       return;
     }
 
@@ -307,8 +307,8 @@ function ReaderExploration(
   $window.onresize = $scope.adjustPageHeight.bind(null, false);
 
   $window.addEventListener('message', function(evt) {
-    console.log('Event received.');
-    console.log(evt.data);
+    $log.info('Event received.');
+    $log.info(evt.data);
 
     if (evt.origin != $window.location.protocol + '//' + $window.location.host) {
       return;
@@ -329,5 +329,5 @@ function ReaderExploration(
  * Injects dependencies in a way that is preserved by minification.
  */
 ReaderExploration.$inject = [
-  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', '$window', 'warningsData', 'messengerService', 'oppiaRequestCreator'
+  '$scope', '$http', '$rootScope', '$sce', '$timeout', '$modal', '$window', '$log', 'warningsData', 'messengerService', 'oppiaRequestCreator'
 ];

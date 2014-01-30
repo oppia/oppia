@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function WidgetRepository($scope, $http, activeInputData) {
+function WidgetRepository($scope, $http, $log) {
   $scope.widgetType = ('interactive' in WidgetRepositoryConfig ?
                        'interactive' : 'noninteractive');
 
@@ -44,7 +44,7 @@ function WidgetRepository($scope, $http, activeInputData) {
     if ($scope.widgetType == 'noninteractive') {
       data.parentIndex = $scope.parentIndex;
       if ($scope.parentIndex === null) {
-        console.log('ERROR: Non-interactive widget has no parentIndex.');
+        $log.error('Non-interactive widget has no parentIndex.');
       }
     }
 
@@ -61,4 +61,4 @@ function WidgetRepository($scope, $http, activeInputData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-WidgetRepository.$inject = ['$scope', '$http', 'activeInputData'];
+WidgetRepository.$inject = ['$scope', '$http', '$log'];

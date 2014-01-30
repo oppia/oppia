@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('warningsData', [function() {
+oppia.factory('warningsData', ['$log', function($log) {
   var warningsData = {warnings: []};
   // This is to prevent infinite loops.
   var MAX_TOTAL_WARNINGS = 100;
@@ -29,7 +29,7 @@ oppia.factory('warningsData', [function() {
    * @param {string} warning The warning message to display.
    */
   warningsData.addWarning = function(warning) {
-    console.log('WARNING: ' + warning);
+    $log.error(warning);
     warningsSoFar++;
     if (warningsSoFar > MAX_TOTAL_WARNINGS) {
       return;

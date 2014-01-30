@@ -27,19 +27,39 @@ oppia.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 }]);
 
+oppia.config(function($provide) {
+  $provide.decorator('$log', function($delegate) {
+    var _originalError = $delegate.error;
+
+    if (!GLOBALS.DEV_MODE) {
+      $delegate.log = function(message) { };
+      $delegate.info = function(message) { };
+      // TODO(sll): Send errors (and maybe warnings) to the backend.
+      $delegate.warn = function(message) { };
+      $delegate.error = function(message) {
+        if (String(message).indexOf('$digest already in progress') === -1) {
+          _originalError(message);
+        }
+      };
+    }
+
+    return $delegate;
+  });
+})
+
 // Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', function() {
+oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {
       if (!obj) {
-        console.log('Error: empty obj was passed to JSON escaper.');
+        $log.error('Empty obj was passed to JSON escaper.');
         return '';
       }
       return this.unescapedStrToEscapedStr(JSON.stringify(obj));
     },
     escapedJsonToObj: function(json) {
       if (!json) {
-        console.log('Error: empty string was passed to JSON decoder.');
+        $log.error('Empty string was passed to JSON decoder.');
         return '';
       }
       return JSON.parse(this.escapedStrToUnescapedStr(json));
@@ -62,7 +82,7 @@ oppia.factory('oppiaHtmlEscaper', function() {
     }
   };
   return htmlEscaper;
-});
+}]);
 
 // Service for converting requests to a form that can be sent to the server.
 oppia.factory('oppiaRequestCreator', [function() {
