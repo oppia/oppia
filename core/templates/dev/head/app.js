@@ -27,8 +27,8 @@ oppia.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.endSymbol(']>');
 }]);
 
-oppia.config(function($provide) {
-  $provide.decorator('$log', function($delegate) {
+oppia.config(['$provide', function($provide) {
+  $provide.decorator('$log', ['$delegate', function($delegate) {
     var _originalError = $delegate.error;
 
     if (!GLOBALS.DEV_MODE) {
@@ -44,8 +44,8 @@ oppia.config(function($provide) {
     }
 
     return $delegate;
-  });
-})
+  }]);
+}]);
 
 // Service for HTML serialization and escaping.
 oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
