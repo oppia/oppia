@@ -228,6 +228,11 @@ function reloadOppiaTag(oppiaNode) {
   iframe.setAttribute('style', 'margin: 10px;');
   iframe.setAttribute('class', 'oppia-no-scroll');
 
+  // Hide the iframe first so that autofocus will not scroll the page.
+  iframe.style.position = 'fixed';
+  iframe.style.top = '-9999px';
+  iframe.style.visibility = 'hidden';
+
   oppiaNode.parentNode.replaceChild(iframe, oppiaNode);
 }
 
@@ -291,6 +296,13 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
 window.OPPIA_PLAYER.onExplorationLoaded = function(iframeNode) {
   // FIXME: This function can be overwritten.
   _log('onExplorationLoaded event triggered on ' + iframeNode + '.');
+
+  setTimeout(function() {
+    // Show the oppia contents after making sure the rendering happened.
+    iframeNode.style.position = 'inherit';
+    iframeNode.style.visibility = 'inherit';
+    iframeNode.style.top = 'inherit';
+  }, 0);
 };
 
 /**
