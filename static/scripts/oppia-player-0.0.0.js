@@ -272,6 +272,25 @@ window.OPPIA_PLAYER = {
     }
 
     window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
+  },
+  onExplorationLoaded: function(iframeNode) {
+    setTimeout(function() {
+      // Show the oppia contents after making sure the rendering happened.
+      iframeNode.style.position = 'inherit';
+      iframeNode.style.visibility = 'inherit';
+      iframeNode.style.top = 'inherit';
+    }, 0);
+    window.OPPIA_PLAYER.onExplorationLoadedPostHook(iframeNode);
+  },
+  onStateTransition: function(iframeNode, oldStateName, jsonAnswer, newStateName) {
+    window.OPPIA_PLAYER.onStateTransitionPostHook(
+      iframeNode, oldStateName, jsonAnswer, newStateName);
+  },
+  onExplorationReset: function(iframeNode, stateName) {
+    window.OPPIA_PLAYER.onExplorationResetPostHook(iframeNode, stateName);
+  },
+  onExplorationCompleted: function(iframeNode) {
+    window.OPPIA_PLAYER.onExplorationCompletedPostHook(iframeNode);
   }
 };
 
@@ -293,16 +312,9 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
  * @param {object} iframeNode The iframe node that is the source of the
  *     postMessage call.
  */
-window.OPPIA_PLAYER.onExplorationLoaded = function(iframeNode) {
+window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(iframeNode) {
   // FIXME: This function can be overwritten.
   _log('onExplorationLoaded event triggered on ' + iframeNode + '.');
-
-  setTimeout(function() {
-    // Show the oppia contents after making sure the rendering happened.
-    iframeNode.style.position = 'inherit';
-    iframeNode.style.visibility = 'inherit';
-    iframeNode.style.top = 'inherit';
-  }, 0);
 };
 
 /**
@@ -313,7 +325,8 @@ window.OPPIA_PLAYER.onExplorationLoaded = function(iframeNode) {
  * @param {string} jsonAnswer A JSON representation of the reader's answer.
  * @param {string} newStateName The name of the destination state.
  */
-window.OPPIA_PLAYER.onStateTransition = function(iframeNode, oldStateName, jsonAnswer, newStateName) {
+window.OPPIA_PLAYER.onStateTransitionPostHook = function(
+    iframeNode, oldStateName, jsonAnswer, newStateName) {
   // FIXME: This function can be overwritten.
   _log('onStateTransition event triggered on ' + iframeNode + '.');
   _log(oldStateName);
@@ -327,7 +340,7 @@ window.OPPIA_PLAYER.onStateTransition = function(iframeNode, oldStateName, jsonA
  *     postMessage call.
  * @param {string} stateName The reader's current state, before the reset.
  */
-window.OPPIA_PLAYER.onExplorationReset = function(iframeNode, stateName) {
+window.OPPIA_PLAYER.onExplorationResetPostHook = function(iframeNode, stateName) {
   // FIXME: This function can be overwritten.
   _log('onExplorationReset event triggered on ' + iframeNode + '.');
   _log(stateName);
@@ -338,7 +351,7 @@ window.OPPIA_PLAYER.onExplorationReset = function(iframeNode, stateName) {
  * @param {object} iframeNode The iframe node that is the source of the
  *     postMessage call.
  */
-window.OPPIA_PLAYER.onExplorationCompleted = function(iframeNode) {
+window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
   // FIXME: This function can be overwritten.
   _log('onExplorationCompleted event triggered on ' + iframeNode + '.');
 };
