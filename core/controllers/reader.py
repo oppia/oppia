@@ -58,16 +58,21 @@ class ExplorationPage(base.BaseHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
+        is_iframed = (self.request.get('iframed') == 'true')
+
         self.values.update({
             'content': skins_services.get_skin_html(exploration.default_skin),
             'exploration_version': version,
-            'iframed': (self.request.get('iframed') == 'true'),
+            'iframed': is_iframed,
             'is_public': rights_manager.is_exploration_public(exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
         })
 
-        self.render_template(
-            'reader/reader_exploration.html', iframe_restriction=None)
+        if is_iframed:
+            self.render_template(
+                'reader/reader_exploration.html', iframe_restriction=None)
+        else:
+            self.render_template('reader/reader_exploration.html')
 
 
 class ExplorationHandler(base.BaseHandler):
