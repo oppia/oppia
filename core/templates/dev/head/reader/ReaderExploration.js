@@ -57,7 +57,6 @@ function ReaderExploration(
     $scope.initializePage();
   };
 
-  // Initializes the story page using data from the server.
   $scope.initializePage = function() {
     $scope.responseLog = [];
     $scope.changeInputTemplateIframeHeight(400);
