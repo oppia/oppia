@@ -105,10 +105,6 @@ function generateNewRandomId() {
   }
 }
 
-function getOppiaTagList() {
-  return document.getElementsByTagName('oppia');
-}
-
 /**
  * Transforms an <oppia/> tag into an iframe that embeds an Oppia exploration.
  * The following attributes on the tag are recognized:
@@ -241,9 +237,10 @@ function reloadParentOppiaTag(buttonNode) {
 }
 
 window.onload = function() {
-  var oppiaTagList = getOppiaTagList();
-  for (var i = 0; i < oppiaTagList.length; i++) {
-    reloadOppiaTag(oppiaTagList[i]);
+  // Note that document.getElementsByTagName() is a live view of the DOM and
+  // will change in response to DOM multations.
+  while (document.getElementsByTagName('oppia').length > 0) {
+    reloadOppiaTag(document.getElementsByTagName('oppia')[0]);
   }
 };
 
