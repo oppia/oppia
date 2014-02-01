@@ -248,17 +248,17 @@ textarea {
   float: left;
   margin: 7px;
   min-width: 200px;
-  padding-bottom: 2px;
   width: 30%;
 }
 
 .oppia-gallery-tile-top, .oppia-gallery-tile-bottom {
-  padding: 2px 10px;
+  padding: 0 10px;
 }
 .oppia-gallery-tile-top:hover {
   background-color: #ddd;
 }
 .oppia-gallery-tile-bottom {
+  padding-bottom: 5px;
   white-space: nowrap;
 }
 
@@ -267,7 +267,7 @@ textarea {
 }
 
 .oppia-gallery-tile-description {
-  margin: 10px 0;
+  padding: 10px 0;
 }
 
 .oppia-gallery-tile-title {
