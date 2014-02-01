@@ -235,6 +235,7 @@ oppia.directive('richTextEditor', [
                 superscript: {visible: false},
                 unLink: {visible: false}
               },
+              css: '/css/rte.css',
               debug: true,
               events: {
                 save: function(event) {
