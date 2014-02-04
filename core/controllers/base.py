@@ -131,8 +131,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.values['is_moderator'] = rights_manager.Actor(
             self.user_id).is_moderator()
         self.values['is_admin'] = rights_manager.Actor(self.user_id).is_admin()
-        self.values['is_super_admin'] = rights_manager.Actor(
-            self.user_id).is_super_admin()
+        self.values['is_super_admin'] = user_services.is_super_admin(
+            self.user_id, self.request)
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))

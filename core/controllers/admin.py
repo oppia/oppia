@@ -25,6 +25,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -40,7 +41,7 @@ def require_super_admin(handler):
             self.redirect(
                 current_user_services.create_login_url(self.request.uri))
             return
-        if not rights_manager.Actor(self.user_id).is_super_admin():
+        if not user_services.is_super_admin(self.user_id, self.request):
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application', self.user_id)
         return handler(self, **kwargs)

@@ -35,11 +35,6 @@ def set_property(committer_id, name, value):
     if config_property is None:
         raise Exception('No config property with name %s found.')
 
-    if (committer_id != feconf.ADMIN_COMMITTER_ID and not
-            rights_manager.Actor(committer_id).is_super_admin()):
-        raise Exception(
-            'Only a super admin can set config property datastore overrides.')
-
     value = obj_services.Registry.get_object_class_by_type(
         config_property.obj_type).normalize(value)
 

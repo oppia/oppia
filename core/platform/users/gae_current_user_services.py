@@ -35,14 +35,21 @@ def create_logout_url(slug):
     return users.create_logout_url(slug)
 
 
-def is_current_user_super_admin(request=None):
-    """Checks whether the current user owns this app."""
-    return users.is_current_user_admin()
-
-
 def get_current_user(request):
     """Returns the current user."""
     return users.get_current_user()
+
+
+def is_super_admin(user_id, request):
+    """Checks whether the user with the given user_id owns this app.
+
+    For GAE, the user in question is also required to be the current user.
+    """
+    user = users.get_current_user()
+    if user is None:
+        return False
+
+    return user.user_id() == user_id and users.is_current_user_admin()
 
 
 def get_user_id_from_email(email):

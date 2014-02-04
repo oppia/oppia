@@ -36,15 +36,6 @@ def create_logout_url(slug):
     return ''
 
 
-def is_current_user_super_admin(request=None):
-    """Checks whether the current user owns this app."""
-    user = get_current_user(request)
-    if user:
-        return user.is_superuser
-    else:
-        return False
-
-
 def get_current_user(request):
     """Returns the current user."""
     session_key = request.cookies.get('sessionid')
@@ -55,6 +46,15 @@ def get_current_user(request):
         return user
     except Session.DoesNotExist:
         return None
+
+
+def is_super_admin(user_id, request):
+    """Checks whether the user with the given user_id owns this app."""
+    user = User.objects.get(pk=uid)
+    if user:
+        return user.is_superuser
+    else:
+        return False
 
 
 def get_user_id_from_email(email):

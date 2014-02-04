@@ -249,16 +249,8 @@ class Actor(object):
         # Note that this may be None.
         self.user_id = user_id
 
-    def is_super_admin(self):
-        current_user = current_user_services.get_current_user(None)
-        if current_user is None:
-            return False
-        return (self.user_id == current_user.user_id()
-                and current_user_services.is_current_user_super_admin(None))
-
     def is_admin(self):
-        return (self.is_super_admin() or
-                self.user_id in config_domain.ADMIN_IDS.value)
+        return self.user_id in config_domain.ADMIN_IDS.value
 
     def is_moderator(self):
         return (self.is_admin() or
