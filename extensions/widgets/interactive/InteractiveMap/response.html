@@ -1,6 +1,7 @@
 {% if not stateSticky %}
 <div class="oppia-reader-response-container">
-  <iframe class="logContent" width="100%" frameborder="0" height="400px">
-  </iframe>
+  <img
+    src="http://maps.googleapis.com/maps/api/staticmap?center={{answer}}&zoom=8&size=500x400&maptype=roadmap&visual_refresh=true&markers=color:red|{{answer}}&sensor=false"
+    style="margin: 3px auto; display: block;">
 </div>
 {% endif %}
