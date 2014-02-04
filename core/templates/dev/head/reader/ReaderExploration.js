@@ -34,6 +34,9 @@ function ReaderExploration(
     // Show content when the page is loaded.
     $scope.showPage = true;
     $scope.adjustPageHeight(false);
+    // This is needed to actually apply the showPage() changes. Otherwise, the
+    // page can sometimes end up being blank.
+    $scope.$apply();
   };
 
   $scope.urlParams = $scope.getUrlParams();

@@ -87,9 +87,12 @@
 
         <script>
           window.tryRegisteringIframeLoad = function() {
-            if (window.onIframeLoad) {
-              window.onIframeLoad();
-            }
+            var _timer = setInterval(function() {
+              if (window.onIframeLoad) {
+                clearInterval(_timer);
+                window.onIframeLoad();
+              }
+            }, 1000);
           };
         </script>
 
