@@ -14,6 +14,10 @@
     <script>
       document.getElementById('submitButton').textContent = GLOBALS.buttonText;
 
+      window.parent.postMessage(
+        JSON.stringify({'widgetHeight': document.documentElement.scrollHeight}),
+        window.location.protocol + '//' + window.location.host);
+
       var submitAnswer = function() {
   	    if (parent.location.pathname.indexOf('/explore') === 0) {
           window.parent.postMessage(

@@ -1,12 +1,6 @@
 function MultipleChoiceInput($scope) {
   $scope.choices = GLOBALS.choices;
 
-  window.onWidgetLoad = function() {
-    window.parent.postMessage(
-      JSON.stringify({'widgetHeight': document.body.scrollHeight}),
-      window.location.protocol + '//' + window.location.host);
-  };
-
   $scope.submitAnswer = function(answer) {
     if (!answer) {
       return;

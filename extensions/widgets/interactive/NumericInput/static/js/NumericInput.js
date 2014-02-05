@@ -1,6 +1,6 @@
 window.onWidgetLoad = function() {
   window.parent.postMessage(
-    JSON.stringify({'widgetHeight': document.body.scrollHeight}),
+    JSON.stringify({'widgetHeight': document.documentElement.scrollHeight}),
     window.location.protocol + '//' + window.location.host);
 };
 

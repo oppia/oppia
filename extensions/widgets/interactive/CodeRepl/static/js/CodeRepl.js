@@ -48,7 +48,7 @@ function CodeRepl($scope) {
   jsrepl.loadLanguage(GLOBALS.language, function () {
     // Initialization done. Allow submit.
     window.parent.postMessage(
-      JSON.stringify({'widgetHeight': document.body.scrollHeight}),
+      JSON.stringify({'widgetHeight': document.documentElement.scrollHeight}),
       window.location.protocol + '//' + window.location.host);
 
     document.getElementById('run_button').disabled = false;
