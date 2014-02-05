@@ -1,7 +1,12 @@
-<html ng-app="repl">
+<!DOCTYPE html>
+<html class="ng-cloak">
   <head>
+    <style>
+      .ng-cloak { display: none; }
+    </style>
+
     <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
-    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
     {% if language in ['coffeescript', 'javascript', 'lua', 'python', 'ruby', 'scheme'] %}
       <script src="/third_party/static/code-mirror-3.19.0/mode/{{language}}/{{language}}.js">
@@ -17,8 +22,7 @@
       GLOBALS.postCode = JSON.parse('{{postCode|js_string}}');
     </script>
 
-    <script type="text/javascript"
-            src="/third_party/static/jsrepl/jsrepl.js" id="jsrepl-script">
+    <script src="/third_party/static/jsrepl/jsrepl.js" id="jsrepl-script">
     </script>
   </head>
   <body>
@@ -34,7 +38,16 @@
       </form>
     </div>
 
-    <script src="/extensions/widgets/interactive/CodeRepl/static/js/CodeRepl.js">
+    <script>
+      function onScriptLoad() {
+        angular.module('repl', ['ui.codemirror']).config(function($interpolateProvider) {
+          $interpolateProvider.startSymbol('<[');
+          $interpolateProvider.endSymbol(']>');
+        });
+        angular.bootstrap(document, ['repl']);
+      }
+    </script>
+    <script src="/extensions/widgets/interactive/CodeRepl/static/js/CodeRepl.js" onload="onScriptLoad()">
     </script>
   </body>
 </html>

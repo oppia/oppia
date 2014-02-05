@@ -21,7 +21,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('messengerService', ['$log', function($log) {
+oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };
@@ -80,9 +80,9 @@ oppia.factory('messengerService', ['$log', function($log) {
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: function(messageTitle, messageData) {
       // Only send a message if the oppia window is iframed.
-      if (window.parent !== window &&
+      if ($window.parent !== $window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        var idAndVersionHash = window.location.hash.substring(1);
+        var idAndVersionHash = $window.location.hash.substring(1);
         if (!idAndVersionHash) {
           return;
         }
@@ -105,10 +105,12 @@ oppia.factory('messengerService', ['$log', function($log) {
             $log.error('Error validating payload: ' + payload);
           }
 
+          $log.info(payload);
+
           // The targetOrigin needs to be * because any page can iframe an
           // exploration.
-          window.parent.postMessage(
-            {title: messageTitle, payload: payload, sourceTagId: sourceTagId},
+          $window.parent.postMessage(
+            JSON.stringify({title: messageTitle, payload: payload, sourceTagId: sourceTagId}),
             '*');
         }
       }

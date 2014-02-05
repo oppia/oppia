@@ -173,15 +173,24 @@ function ReaderExploration(
     }
     parentNode.appendChild(newIframe);
 
-    var doc = (
-      newIframe.contentDocument ? newIframe.contentDocument :
-      newIframe.contentWindow ? newIframe.contentWindow.document :
-      iframe.document
-    );
+    var doc = null;
+    if (newIframe.contentDocument) {
+      doc = newIframe.contentDocument;
+    } else if (newIframe.contentWindow) {  // Internet Explorer
+      doc = newIframe.contentWindow.document;
+    } else if (newIframe.document) {
+      doc = newIframe.document;
+    }
+
+    // Check if the current browser is IE (6+).
+    var ieBrowser = /*@cc_on!@*/false || !!document.documentMode;
 
     doc.open();
     doc.writeln(content);
-    doc.close();
+    if (!ieBrowser) {
+      // Some versions of Internet Explorer crash on the close() step.
+      doc.close();
+    }
   };
 
   $scope.loadPage = function(data) {
@@ -194,6 +203,7 @@ function ReaderExploration(
     $scope.stateName = data.state_name;
     $scope.title = data.title;
     $scope.stateHistory = data.state_history;
+
     // We need to generate the HTML (with the iframe) before populating it.
     $scope.reloadInteractiveIframe($scope.inputTemplate);
 
@@ -308,7 +318,7 @@ function ReaderExploration(
 
   $window.onresize = $scope.adjustPageHeight.bind(null, false);
 
-  $window.addEventListener('message', function(evt) {
+  $scope.receiveMessageFromInteractiveWidget = function(evt) {
     $log.info('Event received.');
     $log.info(evt.data);
 
@@ -316,15 +326,25 @@ function ReaderExploration(
       return;
     }
 
-    if (evt.data.hasOwnProperty('widgetHeight')) {
+    var data = JSON.parse(evt.data);
+
+    if (data.hasOwnProperty('widgetHeight')) {
       // Change the height of the included iframe.
       $scope.changeInputTemplateIframeHeight(
-        parseInt(evt.data.widgetHeight, 10) + 2);
+        parseInt(data['widgetHeight'], 10) + 2);
     } else {
       // Submit an answer to the server.
-      $scope.submitAnswer(JSON.parse(evt.data)['submit'], 'submit');
+      $scope.submitAnswer(data['submit'], 'submit');
     }
-  }, false);
+  };
+
+  if ($window.addEventListener) {
+    $window.addEventListener(
+      'message', $scope.receiveMessageFromInteractiveWidget, false);
+  } else if ($window.attachEvent) {
+    $window.attachEvent(
+      'onmessage', $scope.receiveMessageFromInteractiveWidget, false);
+  }
 }
 
 /**

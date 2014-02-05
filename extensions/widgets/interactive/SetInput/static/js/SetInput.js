@@ -1,14 +1,6 @@
-var set = angular.module('set', []);
-
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
-set.config(function($interpolateProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
-});
-
 window.onWidgetLoad = function() {
   window.parent.postMessage(
-    {'widgetHeight': document.body.scrollHeight},
+    JSON.stringify({'widgetHeight': document.body.scrollHeight}),
     window.location.protocol + '//' + window.location.host);
 };
 

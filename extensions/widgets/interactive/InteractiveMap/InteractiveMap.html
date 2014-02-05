@@ -1,6 +1,11 @@
-<html ng-app="im">
+<!DOCTYPE html>
+<html class="ng-cloak">
   <head>
-    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <style>
+      .ng-cloak { display: none; }
+    </style>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js"></script>
     <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
 
@@ -19,7 +24,19 @@
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVzSQrZdd0p_ydBaxtbRL9NJRVacRkH4w&sensor=false">
     </script>
-    <script src="/extensions/widgets/interactive/InteractiveMap/static/js/InteractiveMap.js">
+
+    <script>
+      function onScriptLoad() {
+        angular.module('im', []).config(function($interpolateProvider) {
+          $interpolateProvider.startSymbol('<[');
+          $interpolateProvider.endSymbol(']>');
+        });
+        angular.bootstrap(document, ['im']);
+        google.maps.event.addDomListener(window, 'load', initialize);
+      }
+    </script>
+
+    <script src="/extensions/widgets/interactive/InteractiveMap/static/js/InteractiveMap.js" onload="onScriptLoad()">
     </script>
   </head>
   <body onload="onWidgetLoad()">

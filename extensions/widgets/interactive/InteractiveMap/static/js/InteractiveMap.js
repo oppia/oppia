@@ -1,14 +1,6 @@
-im = angular.module('im', []);
-
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
-im.config(function($interpolateProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
-});
-
 window.onWidgetLoad = function() {
   window.parent.postMessage(
-    {'widgetHeight': document.body.scrollHeight},
+    JSON.stringify({'widgetHeight': document.body.scrollHeight}),
     window.location.protocol + '//' + window.location.host);
 };
 
@@ -34,4 +26,3 @@ function initialize() {
     }
   });
 }
-google.maps.event.addDomListener(window, 'load', initialize);

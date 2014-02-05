@@ -1,10 +1,11 @@
-<html ng-app="text" class="ng-cloak">
+<!DOCTYPE html>
+<html class="ng-cloak">
   <head>
     <style>
       .ng-cloak { display: none; }
     </style>
 
-    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
 
     <script>
@@ -30,7 +31,17 @@
       </form>
     </div>
 
-    <script src="/extensions/widgets/interactive/TextInput/static/js/TextInput.js">
+    <script>
+      function onScriptLoad() {
+        angular.module('text', []).config(function($interpolateProvider) {
+          $interpolateProvider.startSymbol('<[');
+          $interpolateProvider.endSymbol(']>');
+        });
+        angular.bootstrap(document, ['text']);
+      }
+    </script>
+
+    <script src="/extensions/widgets/interactive/TextInput/static/js/TextInput.js" onload="onScriptLoad()">
     </script>
   </body>
 </html>

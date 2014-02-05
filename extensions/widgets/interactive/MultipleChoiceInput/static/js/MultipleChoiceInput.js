@@ -1,17 +1,9 @@
-var mc = angular.module('mc', []);
-
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
-mc.config(function($interpolateProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
-});
-
 function MultipleChoiceInput($scope) {
   $scope.choices = GLOBALS.choices;
 
   window.onWidgetLoad = function() {
     window.parent.postMessage(
-      {'widgetHeight': document.body.scrollHeight},
+      JSON.stringify({'widgetHeight': document.body.scrollHeight}),
       window.location.protocol + '//' + window.location.host);
   };
 
@@ -27,3 +19,8 @@ function MultipleChoiceInput($scope) {
     }
   };
 }
+
+/**
+ * Injects dependencies in a way that is preserved by minification.
+ */
+MultipleChoiceInput.$inject = ['$scope'];

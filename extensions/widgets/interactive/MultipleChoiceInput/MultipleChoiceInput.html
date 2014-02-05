@@ -1,4 +1,5 @@
-<html ng-app="mc">
+<!DOCTYPE html>
+<html>
   <head>
     <style>
       body {
@@ -8,7 +9,7 @@
       }
     </style>
 
-    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
 
     <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
@@ -42,12 +43,22 @@
         </div>
 
         <br>
-        
+
         <input type="submit" value="Submit">
       </form>
     </div>
 
-    <script src="/extensions/widgets/interactive/MultipleChoiceInput/static/js/MultipleChoiceInput.js">
+    <script>
+      function onScriptLoad() {
+        angular.module('mc', []).config(function($interpolateProvider) {
+          $interpolateProvider.startSymbol('<[');
+          $interpolateProvider.endSymbol(']>');
+        });
+        angular.bootstrap(document, ['mc']);
+      }
+    </script>
+
+    <script src="/extensions/widgets/interactive/MultipleChoiceInput/static/js/MultipleChoiceInput.js" onload="onScriptLoad()">
     </script>
   </body>
 </html>
