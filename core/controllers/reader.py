@@ -222,12 +222,9 @@ class FeedbackHandler(base.BaseHandler):
         # Append the reader's answer to the response HTML.
         old_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
-        reader_response_html, reader_response_iframe = (
-            old_widget.get_reader_response_html(
-                old_state.widget.customization_args, old_params, answer, sticky)
-        )
+        reader_response_html = old_widget.get_reader_response_html(
+            old_state.widget.customization_args, old_params, answer, sticky)
         values['reader_response_html'] = reader_response_html
-        values['reader_response_iframe'] = reader_response_iframe
 
         # Add Oppia's feedback to the response HTML.
         html_output = '<div>%s</div>' % jinja_utils.parse_string(

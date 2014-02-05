@@ -166,10 +166,10 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
-            # In this directory there should only be a config.yaml file, an
+            # In this directory there should only be a config .py file, an
             # html entry-point file, a response.html file, (optionally) a
-            # directory named 'static', (optionally) a response_iframe.html
-            # file and (optionally) a stats_response.html file.
+            # directory named 'static' and (optionally) a stats_response.html
+            # file.
             dir_contents = os.listdir(widget_dir)
             self.assertLessEqual(len(dir_contents), 6)
 
@@ -186,13 +186,6 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(
                     os.path.join(widget_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, 'response_iframe.html')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass

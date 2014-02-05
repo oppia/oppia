@@ -114,24 +114,15 @@ class BaseWidget(object):
         return bool(self._handlers)
 
     @property
-    def _response_template_and_iframe(self):
+    def _response_template(self):
         """The template that generates the html to display reader responses."""
         if not self.is_interactive:
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        html = utils.get_file_contents(os.path.join(
+        return utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX,
             self.id, 'response.html'))
-
-        try:
-            iframe = utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX,
-                self.id, 'response_iframe.html'))
-        except IOError:
-            iframe = ''
-
-        return html, iframe
 
     @property
     def _stats_log_template(self):
@@ -231,10 +222,7 @@ class BaseWidget(object):
         # sticky in the exploration and the new state uses the same widget.
         parameters['stateSticky'] = sticky
 
-        html, iframe = self._response_template_and_iframe
-        html = jinja_utils.parse_string(html, parameters)
-        iframe = jinja_utils.parse_string(iframe, parameters)
-        return html, iframe
+        return jinja_utils.parse_string(self._response_template, parameters)
 
     def get_stats_log_html(self, state_customization_args,
                            context_params, answer):
