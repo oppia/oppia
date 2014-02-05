@@ -1,3 +1,9 @@
+function onWidgetLoad() {
+  window.parent.postMessage(
+    JSON.stringify({'widgetHeight': document.documentElement.scrollHeight}),
+    window.location.protocol + '//' + window.location.host);
+}
+
 function MultipleChoiceInput($scope) {
   $scope.choices = GLOBALS.choices;
 

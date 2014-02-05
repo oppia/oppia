@@ -1,4 +1,6 @@
 function CodeRepl($scope) {
+  $scope.hasLoaded = false;
+
   $scope.language = GLOBALS.language;
   $scope.preCode = GLOBALS.preCode;
   $scope.postCode = GLOBALS.postCode;
@@ -45,8 +47,11 @@ function CodeRepl($scope) {
     },
   });
 
-  jsrepl.loadLanguage(GLOBALS.language, function () {
+  jsrepl.loadLanguage(GLOBALS.language, function() {
     // Initialization done. Allow submit.
+    $scope.hasLoaded = true;
+    $scope.$apply();
+
     window.parent.postMessage(
       JSON.stringify({'widgetHeight': document.documentElement.scrollHeight}),
       window.location.protocol + '//' + window.location.host);

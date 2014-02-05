@@ -27,15 +27,23 @@
   </head>
   <body>
     <div ng-controller="CodeRepl">
-      <div>
-        <em>Language: <[language]></em>
+      <div ng-show="hasLoaded">
+        <div>
+          <em>Language: <[language]></em>
+        </div>
+        <br>
+        <form ng-submit="runCode(code)">
+          <textarea ui-codemirror="codemirrorOptions" ng-model="code" required autofocus>
+          </textarea>
+          <button type="submit">Run</button>
+        </form>
       </div>
-      <br>
-      <form ng-submit="runCode(code)">
-        <textarea ui-codemirror="codemirrorOptions" ng-model="code" required autofocus>
-        </textarea>
-        <button type="submit">Run</button>
-      </form>
+
+      <div ng-hide="hasLoaded">
+        <center>
+          Initializing coding panel...
+        </center>
+      </div>
     </div>
 
     <script>
