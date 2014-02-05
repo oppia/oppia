@@ -183,7 +183,7 @@ function ReaderExploration(
     }
 
     // Check if the current browser is IE (6+).
-    var ieBrowser = /*@cc_on!@*/false || !!document.documentMode;
+    var ieBrowser = !!document.documentMode;
 
     doc.open();
     doc.writeln(content);
