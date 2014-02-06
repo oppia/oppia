@@ -51,11 +51,11 @@ def webapp_add_wsgi_middleware(app):
         t1 = time.time()
         link = 'http://%s%s/details?time=%s' % (
             self.env.get('HTTP_HOST', ''),
-            '/_ah/stats',
+            recording.config.stats_url,
             int(self.start_timestamp * 1000))
         logging.debug('Saved; key: %s, part: %s bytes, full: %s bytes, '
                       'overhead: %.3f + %.3f; link: %s',
-                      key, len_part, len_full, self.overhead, t1-t0, link)
+                      key, len_part, len_full, self.overhead, t1 - t0, link)
 
     recording.Recorder.save = save
 
