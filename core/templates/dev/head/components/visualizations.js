@@ -555,11 +555,27 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         if (highlightStates) {
           nodeEnter.append('svg:rect')
+            .on('click', function(d) {
+              if (d.name != END_DEST) {
+                scope.$parent.stateName = d.name;
+                if (!stateStats) {
+                  scope.$parent.showStateEditor(d.name);
+                   // The call to $apply() is needed in order to trigger the
+                  // tab change event on the parent controller.
+                  scope.$apply();
+                } else {
+                  scope.$parent.showStateStatsModal(d.name, highlightStates[d.name]);
+                }
+              }
+            })
             .attr({
-              'width': '16',
-              'height': '16',
+              'width': '22',
+              'height': '22',
               'x': function(d) { return d.x0; },
               'y': function(d) { return d.y0; },
+              'class': function(d) {
+                return d.name !== END_DEST ? 'clickable' : null;
+              },
               'transform': function(d) {
                 return 'rotate(-10,' + (d.x0 - 10) + ',' + (d.y0 - 5) + ')';
               }
@@ -594,13 +610,13 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .attr({
               'fill': 'firebrick',
               'text-anchor': 'middle',
-              'x': function(d) { return d.x0 + 8; },
-              'y': function(d) { return d.y0 + 14; },
+              'x': function(d) { return d.x0 + 11; },
+              'y': function(d) { return d.y0 + 17; },
               'transform': function(d) {
-                return 'rotate(-10,' + (d.x0 - 10) + ',' + (d.y0 - 5) + ')';
+                return 'rotate(-10,' + d.x0 + ',' + (d.y0 - 4) + ')';
               }
             }).style({
-              'font-size': '16px',
+              'font-size': '22px',
             });
         }
 
