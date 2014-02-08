@@ -98,6 +98,7 @@ class UtilsTests(test_utils.GenericTestBase):
             ('Abc', 'abc'),
             ('abc_def', 'abc_def'),
             ('Abc012Def345', 'abc012-def345'),
+            ('abcDef', 'abc-def'),
         ]
 
         for test_case in test_cases:

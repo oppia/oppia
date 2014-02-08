@@ -1,45 +1,6 @@
-<!DOCTYPE html>
-<html class="ng-cloak">
-  <head>
-    <style>
-      .ng-cloak { display: none; }
-    </style>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/third_party/static/jqueryui-1.10.3/jquery-ui.min.js"></script>
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
-
-    <script>
-      var GLOBALS = {};
-      GLOBALS.coords = [JSON.parse('{{latitude|js_string}}'), JSON.parse('{{longitude|js_string}}')];
-      GLOBALS.zoom = JSON.parse('{{zoom|js_string}}');
-    </script>
-
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 100% }
-    </style>
-    <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVzSQrZdd0p_ydBaxtbRL9NJRVacRkH4w&sensor=false">
-    </script>
-
-    <script>
-      function onScriptLoad() {
-        angular.module('im', []).config(function($interpolateProvider) {
-          $interpolateProvider.startSymbol('<[');
-          $interpolateProvider.endSymbol(']>');
-        });
-        angular.bootstrap(document, ['im']);
-        google.maps.event.addDomListener(window, 'load', initialize);
-      }
-    </script>
-
-    <script src="/extensions/widgets/interactive/InteractiveMap/static/js/InteractiveMap.js" onload="onScriptLoad()">
-    </script>
-  </head>
-  <body onload="onWidgetLoad()">
-    <div id="map-canvas" style="width: 600px; height: 400px; margin: auto"></div>
-  </body>
-</html>
+<div>
+  <div id="map_canvas" ui-map="map" ui-options="mapOptions"
+  style="width: 600px; height: 400px; margin: auto"
+  ui-event="{'map-click': 'registerClick($event, $params)'}">
+  </div>
+</div>

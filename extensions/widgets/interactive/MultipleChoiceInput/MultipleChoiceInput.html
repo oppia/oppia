@@ -1,64 +1,16 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      body {
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 14px;
-        color: #333;
-      }
-    </style>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
-
-    <!-- See http://docs.mathjax.org/en/latest/start.html#mathjax-cdn -->
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        /* Hide the 'loading' and 'processing' messages. */
-        messageStyle: 'none',
-        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-      });
-    </script>
-    <script type="text/javascript"
-            src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-
-    <script>
-      var GLOBALS = {};
-      GLOBALS.choices = JSON.parse('{{choices|js_string}}');
-    </script>
-  </head>
-
-  <body onload="onWidgetLoad()">
-    <div ng-controller="MultipleChoiceInput">
-      <form ng-submit="submitAnswer(answer)">
-        <div ng-repeat="choice in choices track by $index">
-          <label>
-            <input type="radio" ng-model="$parent.answer"
-                   name="choiceGroup" id="<[$index]>"
-                   value="<[$index]>">
-            <[choice]>
-          </label>
-        </div>
-
-        <br>
-
-        <input type="submit" value="Submit">
-      </form>
+<div>
+  <form ng-submit="submitAnswer(answer)">
+    <div ng-repeat="choice in choices track by $index">
+      <label>
+        <input type="radio" ng-model="$parent.answer"
+               name="choiceGroup" id="<[$index]>"
+               value="<[$index]>">
+        <[choice]>
+      </label>
     </div>
 
-    <script>
-      function onScriptLoad() {
-        angular.module('mc', []).config(function($interpolateProvider) {
-          $interpolateProvider.startSymbol('<[');
-          $interpolateProvider.endSymbol(']>');
-        });
-        angular.bootstrap(document, ['mc']);
-      }
-    </script>
+    <br>
 
-    <script src="/extensions/widgets/interactive/MultipleChoiceInput/static/js/MultipleChoiceInput.js" onload="onScriptLoad()">
-    </script>
-  </body>
-</html>
+    <input type="submit" value="Submit">
+  </form>
+</div>

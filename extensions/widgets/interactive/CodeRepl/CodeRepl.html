@@ -1,61 +1,13 @@
-<!DOCTYPE html>
-<html class="ng-cloak">
-  <head>
-    <style>
-      .ng-cloak { display: none; }
-    </style>
+<div>
+  <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
 
-    <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
-    {% if language in ['coffeescript', 'javascript', 'lua', 'python', 'ruby', 'scheme'] %}
-      <script src="/third_party/static/code-mirror-3.19.0/mode/{{language}}/{{language}}.js">
-      </script>
-    {% endif %}
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
-    <script src="/third_party/static/ui-codemirror-0.1.0/src/ui-codemirror.js"></script>
-    <script>
-      var GLOBALS = {};
-      GLOBALS.language = JSON.parse('{{language|js_string}}');
-      GLOBALS.placeholder = JSON.parse('{{placeholder|js_string}}');
-      GLOBALS.preCode = JSON.parse('{{preCode|js_string}}');
-      GLOBALS.postCode = JSON.parse('{{postCode|js_string}}');
-    </script>
-
-    <script src="/third_party/static/jsrepl/jsrepl.js" id="jsrepl-script">
-    </script>
-  </head>
-  <body>
-    <div ng-controller="CodeRepl">
-      <div ng-show="hasLoaded">
-        <div>
-          <em>Language: <[language]></em>
-        </div>
-        <br>
-        <form ng-submit="runCode(code)">
-          <textarea ui-codemirror="codemirrorOptions" ng-model="code" required autofocus>
-          </textarea>
-          <button type="submit">Run</button>
-        </form>
-      </div>
-
-      <div ng-hide="hasLoaded">
-        <center>
-          Initializing coding panel...
-        </center>
-      </div>
-    </div>
-
-    <script>
-      function onScriptLoad() {
-        angular.module('repl', ['ui.codemirror']).config(function($interpolateProvider) {
-          $interpolateProvider.startSymbol('<[');
-          $interpolateProvider.endSymbol(']>');
-        });
-        angular.bootstrap(document, ['repl']);
-      }
-    </script>
-    <script src="/extensions/widgets/interactive/CodeRepl/static/js/CodeRepl.js" onload="onScriptLoad()">
-    </script>
-  </body>
-</html>
+  <div>
+    <em>Language: <[language]></em>
+  </div>
+  <br>
+  <form ng-submit="runCode(code)">
+    <textarea ui-codemirror="codemirrorOptions" ng-model="code" required autofocus>
+    </textarea>
+    <button type="submit" ng-disabled="!hasLoaded">Run</button>
+  </form>
+</div>

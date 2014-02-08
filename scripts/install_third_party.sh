@@ -221,6 +221,25 @@ if [ ! -d "$THIRD_PARTY_DIR/static/ui-codemirror-0.1.0" ]; then
   mv $THIRD_PARTY_DIR/static/ui-codemirror-src0.1.0 $THIRD_PARTY_DIR/static/ui-codemirror-0.1.0
 fi
 
+echo Checking whether ui-map is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/static/ui-map-0.5.0" ]; then
+  echo Installing ui-map
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/angular-ui/ui-map/archive/v0.5.0.zip -O angular-ui-map-download.zip
+  unzip angular-ui-map-download.zip -d $THIRD_PARTY_DIR/static/
+  rm angular-ui-map-download.zip
+fi
+
+# ui-utils contains ui-event, which is needed for ui-map.
+echo Checking whether ui-utils is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/static/ui-utils-0.1.1" ]; then
+  echo Installing ui-utils
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip -O angular-ui-utils-download.zip
+  unzip angular-ui-utils-download.zip -d $THIRD_PARTY_DIR/static/
+  rm angular-ui-utils-download.zip
+fi
+
 echo Checking whether bleach is installed in $THIRD_PARTY_DIR
 if [ ! -d "$THIRD_PARTY_DIR/bleach-1.2.2" ]; then
   echo Installing bleach

@@ -84,20 +84,16 @@
         <!-- This iframe must always be contained within a div in
         which it is the only element. For more information, please
         see the ReaderExploration.js file. -->
-
-        <script>
-          window.tryRegisteringIframeLoad = function() {
-            var _timer = setInterval(function() {
-              if (window.onIframeLoad) {
-                clearInterval(_timer);
-                window.onIframeLoad();
-              }
-            }, 1000);
-          };
-        </script>
-
-        <iframe id="inputTemplate" width="100%" seamless="seamless"
-                frameborder="0" onload="tryRegisteringIframeLoad()"></iframe>
+        <div ng-hide="answerIsBeingProcessed">
+          <div angular-html-bind="inputTemplate"></div>
+        </div>
+        <div ng-show="answerIsBeingProcessed">
+          <center style="font-size: 8em;">
+            <span class="oppia-loading-dot-one">.</span>
+            <span class="oppia-loading-dot-two">.</span>
+            <span class="oppia-loading-dot-three">.</span>
+          </center>
+        </div>
       </div>
     </div>
   </div>

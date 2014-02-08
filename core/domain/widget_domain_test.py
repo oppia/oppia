@@ -56,16 +56,30 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        code = widget.get_raw_code({}, {})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"', code)
+        code = widget.get_html_template()
+        self.assertIn('input ng-if="rows == 1"', code)
 
-        code = widget.get_raw_code({'placeholder': {'value': 'F4'}}, {})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
+        tag = widget.get_interactive_widget_tag({}, {})
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;Type your answer here.&#34;" '
+            'rows-with-value="1" columns-with-value="60">'
+            '</oppia-interactive-text-input>', tag)
 
-        code = widget.get_raw_code(
+        tag = widget.get_interactive_widget_tag(
+            {'placeholder': {'value': 'F4'}}, {})
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
+            'columns-with-value="60"></oppia-interactive-text-input>', tag)
+
+        tag = widget.get_interactive_widget_tag(
             {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
             {'ntg': 'F4'})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
+            'columns-with-value="60"></oppia-interactive-text-input>', tag)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
             {'placeholder': {'value': 'F4'}}, {}
@@ -75,7 +89,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'handlers', 'raw', 'customization_args'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');',
+        self.assertIn('input ng-if="rows == 1"',
                       parameterized_widget_dict['raw'])
 
         self.assertDictContainsSubset({

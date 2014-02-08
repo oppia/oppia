@@ -1,47 +1,12 @@
-<!DOCTYPE html>
-<html class="ng-cloak">
-  <head>
-    <style>
-      .ng-cloak { display: none; }
-    </style>
+<div>
+  <form ng-submit="submitAnswer(answer)">
+    <input ng-if="rows == 1" ng-model="$parent.answer"
+           placeholder="<[placeholder]>" size="<[columns]>" required autofocus>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
+    <textarea ng-if="rows != 1" ng-model="$parent.answer"
+              placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[columns]>">
+    </textarea>
 
-    <script>
-      var GLOBALS = {};
-      GLOBALS.placeholder = JSON.parse('{{placeholder|js_string}}');
-      GLOBALS.columns = JSON.parse('{{columns|js_string}}');
-      GLOBALS.rows = JSON.parse('{{rows|js_string}}');
-    </script>
-  </head>
-
-  <body onload="onWidgetLoad()">
-    <div ng-controller="TextInput">
-      <form ng-submit="submitAnswer(answer)">
-
-        <input ng-if="rows == 1" ng-model="$parent.answer"
-               placeholder="<[placeholder]>" size="<[cols]>" required autofocus>
-
-        <textarea ng-if="rows != 1" ng-model="$parent.answer"
-                  placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[cols]>">
-        </textarea>
-
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-
-    <script>
-      function onScriptLoad() {
-        angular.module('text', []).config(function($interpolateProvider) {
-          $interpolateProvider.startSymbol('<[');
-          $interpolateProvider.endSymbol(']>');
-        });
-        angular.bootstrap(document, ['text']);
-      }
-    </script>
-
-    <script src="/extensions/widgets/interactive/TextInput/static/js/TextInput.js" onload="onScriptLoad()">
-    </script>
-  </body>
-</html>
+    <button type="submit">Submit</button>
+  </form>
+</div>

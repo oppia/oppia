@@ -26,6 +26,8 @@ import feconf
 import jinja_utils
 import utils
 
+import json
+
 
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
@@ -198,14 +200,58 @@ class BaseWidget(object):
 
         return parameters
 
-    def get_raw_code(self, state_customization_args, context_params,
-                     preview_mode=False):
-        """Gets the raw code for a parameterized widget."""
-        return jinja_utils.parse_string(
-            self.template,
-            self._get_widget_param_instances(
-                state_customization_args, context_params,
-                preview_mode=preview_mode))
+    def get_interactive_widget_tag(self, state_customization_args,
+                                   context_params, preview_mode=False):
+        """Gets the widgetParams attribute value for an interactive widget."""
+        if state_customization_args is None:
+            state_customization_args = {}
+
+        tag_name = ('oppia-interactive-%s' %
+                    utils.camelcase_to_hyphenated(self.id))
+
+        attr_strings = []
+        for param in self.params:
+            value_generator = param.generator(**param.init_args)
+            # Use the given customization args. If they do not exist, use the
+            # default customization args for the parameter.
+            args_to_use = (
+                state_customization_args[param.name]
+                if param.name in state_customization_args
+                else param.customization_args
+            )
+
+            try:
+                generated_value = value_generator.generate_value(
+                    context_params, **args_to_use)
+            except Exception:
+                if preview_mode:
+                    generated_value = value_generator.default_value
+                else:
+                    raise
+
+            # Normalize the generated values to the correct obj_type.
+            param_value = (
+                obj_services.Registry.get_object_class_by_type(
+                    param.obj_type).normalize(generated_value))
+
+            prefix = '%s-with-' % utils.camelcase_to_hyphenated(param.name)
+            for arg in param.customization_args:
+                arg_name = '%s%s' % (
+                    prefix, utils.camelcase_to_hyphenated(arg))
+                attr_strings.append(
+                    jinja_utils.parse_string(
+                        '{{arg_name}}="{{arg_value}}"', {
+                            'arg_name': arg_name,
+                            'arg_value': json.dumps(param_value),
+                        }
+                    )
+                )
+
+        return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
+
+    def get_html_template(self):
+        """Gets the html template for a parameterized widget."""
+        return jinja_utils.parse_string(self.template, {})
 
     def get_reader_response_html(self, state_customization_args,
                                  context_params, answer, sticky):
@@ -263,8 +309,7 @@ class BaseWidget(object):
             'category': self.category,
             'description': self.description,
             'widget_id': self.id,
-            'raw': self.get_raw_code(
-                customization_args, context_params, preview_mode=preview_mode),
+            'raw': self.get_html_template(),
         }
 
         param_instances = self._get_widget_param_instances(

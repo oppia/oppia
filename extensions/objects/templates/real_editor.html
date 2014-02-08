@@ -4,7 +4,7 @@
 </span>
 
 <span ng-if="active || alwaysEditable">
-  <input type="number" ng-model="localValue.label" placeholder="Enter a decimal number.">
+  <input type="number" ng-model="localValue.label" placeholder="Enter a decimal number." step="any">
   <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
     Close
   </button>

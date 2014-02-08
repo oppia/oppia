@@ -30,15 +30,6 @@ function ReaderExploration(
     $scope.explorationDataUrl += '?v=' + GLOBALS.explorationVersion;
   }
 
-  $window.onIframeLoad = function() {
-    // Show content when the page is loaded.
-    $scope.showPage = true;
-    $scope.adjustPageHeight(false);
-    // This is needed to actually apply the showPage() changes. Otherwise, the
-    // page can sometimes end up being blank.
-    $scope.$apply();
-  };
-
   $scope.urlParams = $scope.getUrlParams();
   $scope.iframed = ($scope.urlParams.hasOwnProperty('iframed') &&
                     $scope.urlParams['iframed']);
@@ -49,11 +40,6 @@ function ReaderExploration(
     return $scope.showPage ? {} : {opacity: 0};
   };
 
-  $scope.changeInputTemplateIframeHeight = function(height) {
-    var iframe = document.getElementById('inputTemplate');
-    iframe.height = height + 'px';
-  };
-
   $scope.resetPage = function() {
     messengerService.sendMessage(
       messengerService.EXPLORATION_RESET, $scope.stateName);
@@ -62,7 +48,6 @@ function ReaderExploration(
 
   $scope.initializePage = function() {
     $scope.responseLog = [];
-    $scope.changeInputTemplateIframeHeight(400);
     $http.get($scope.explorationDataUrl)
         .success(function(data) {
           $scope.explorationTitle = data.title;
@@ -143,56 +128,6 @@ function ReaderExploration(
 
   $scope.answerIsBeingProcessed = false;
 
-  /**
-   * Removes the interactive iframe from the page, and replaces it with a new
-   *     iframe before adding content. This is a necessary prerequisite for
-   *     successful MathJax loading in the interactive iframes.
-   *
-   * IMPORTANT: This code assumes that the iframe is the only child in its
-   *     parent element.
-   *
-   * @param {string} content The content to inject into the interactive iframe.
-  */
-  $scope.reloadInteractiveIframe = function(content) {
-    var iframe = document.getElementById('inputTemplate');
-    if (!iframe) {
-      $log.error('No interactive iframe found.');
-      return;
-    }
-
-    var attrs = iframe.attributes;
-    var parentNode = iframe.parentNode;
-    parentNode.removeChild(iframe);
-
-    var newIframe = document.createElement('iframe');
-    for (var i = 0; i < attrs.length; i++) {
-      var attrib = attrs[i];
-      if (attrib.specified) {
-        newIframe.setAttribute(attrib.name, attrib.value);
-      }
-    }
-    parentNode.appendChild(newIframe);
-
-    var doc = null;
-    if (newIframe.contentDocument) {
-      doc = newIframe.contentDocument;
-    } else if (newIframe.contentWindow) {  // Internet Explorer
-      doc = newIframe.contentWindow.document;
-    } else if (newIframe.document) {
-      doc = newIframe.document;
-    }
-
-    // Check if the current browser is IE (6+).
-    var ieBrowser = !!document.documentMode;
-
-    doc.open();
-    doc.writeln(content);
-    if (!ieBrowser) {
-      // Some versions of Internet Explorer crash on the close() step.
-      doc.close();
-    }
-  };
-
   $scope.loadPage = function(data) {
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
@@ -204,10 +139,9 @@ function ReaderExploration(
     $scope.title = data.title;
     $scope.stateHistory = data.state_history;
 
-    // We need to generate the HTML (with the iframe) before populating it.
-    $scope.reloadInteractiveIframe($scope.inputTemplate);
-
     messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
+
+    $scope.showPage = true;
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -251,7 +185,24 @@ function ReaderExploration(
 
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
-    $scope.inputTemplate = data.interactive_html;
+    if (data.interactive_html) {
+      // This is a bit of a hack. When a refresh happens, AngularJS compares
+      // $scope.inputTemplate to the previous value of $scope.inputTemplate.
+      // If they are the same, then $scope.inputTemplate is not updated, and
+      // the reader's previous answers still remain present. The random suffix
+      // makes the new template different from the previous one, and thus
+      // indirectly forces a refresh.
+      var randomSuffix = '';
+      var N = Math.round(Math.random() * 1000);
+      for (var i = 0; i < N; i++) {
+        randomSuffix += ' ';
+      }
+
+      // A non-empty interactive_html means that the previous widget
+      // is not sticky and should be replaced.
+      $scope.inputTemplate = data.interactive_html + randomSuffix;
+    }
+
     $scope.stateName = data.state_name;
     $scope.finished = data.finished;
 
@@ -262,13 +213,6 @@ function ReaderExploration(
     $scope.responseLog.push(
       data.reader_response_html, data.oppia_html
     );
-
-    // We need to generate the HTML (with the iframe) before populating it.
-    if ($scope.inputTemplate) {
-      // A non-empty interactive_html means that the previous widget
-      // is not sticky and should be replaced.
-      $scope.reloadInteractiveIframe($scope.inputTemplate);
-    }
 
     if (document.getElementById('response')) {
       $('html, body, iframe').animate(
@@ -303,34 +247,6 @@ function ReaderExploration(
   };
 
   $window.onresize = $scope.adjustPageHeight.bind(null, false);
-
-  $scope.receiveMessageFromInteractiveWidget = function(evt) {
-    $log.info('Event received.');
-    $log.info(evt.data);
-
-    if (evt.origin != $window.location.protocol + '//' + $window.location.host) {
-      return;
-    }
-
-    var data = JSON.parse(evt.data);
-
-    if (data.hasOwnProperty('widgetHeight')) {
-      // Change the height of the included iframe.
-      $scope.changeInputTemplateIframeHeight(
-        parseInt(data['widgetHeight'], 10) + 2);
-    } else {
-      // Submit an answer to the server.
-      $scope.submitAnswer(data['submit'], 'submit');
-    }
-  };
-
-  if ($window.addEventListener) {
-    $window.addEventListener(
-      'message', $scope.receiveMessageFromInteractiveWidget, false);
-  } else if ($window.attachEvent) {
-    $window.attachEvent(
-      'onmessage', $scope.receiveMessageFromInteractiveWidget, false);
-  }
 }
 
 /**

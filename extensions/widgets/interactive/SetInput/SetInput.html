@@ -1,45 +1,18 @@
-<!DOCTYPE html>
-<html class="ng-cloak">
-  <head>
-    <style>
-      .ng-cloak { display: none; }
-    </style>
+<div>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
-  </head>
+  <ul>
+    <li ng-repeat="element in answer track by $index">
+      <[element]>
+      <button type="button" ng-click="deleteElement($index)">
+        Delete
+      </button>
+    </li>
+  </ul>
 
-  <body onload="onWidgetLoad()">
-    <div ng-controller="SetInput">
+  <form ng-submit="addElement(newElement)">
+    <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
+    <button type="submit">+</button>
+  </form>
 
-      <ul>
-        <li ng-repeat="element in answer track by $index">
-          <[element]>
-          <button type="button" ng-click="deleteElement($index)">
-            Delete
-          </button>
-        </li>
-      </ul>
-
-      <form ng-submit="addElement(newElement)">
-        <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
-        <button type="submit">+</button>
-      </form>
-
-      <button type="button" ng-click="submitAnswer(answer)">Submit</button>
-    </div>
-
-    <script>
-      function onScriptLoad() {
-        angular.module('set', []).config(function($interpolateProvider) {
-          $interpolateProvider.startSymbol('<[');
-          $interpolateProvider.endSymbol(']>');
-        });
-        angular.bootstrap(document, ['set']);
-      }
-    </script>
-
-    <script src="/extensions/widgets/interactive/SetInput/static/js/SetInput.js" onload="onScriptLoad()">
-    </script>
-  </body>
-</html>
+  <button type="button" ng-click="submitAnswer(answer)">Submit</button>
+</div>

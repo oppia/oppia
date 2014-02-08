@@ -100,7 +100,7 @@ class ExplorationHandler(base.BaseHandler):
 
         interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
-        interactive_html = interactive_widget.get_raw_code(
+        interactive_html = interactive_widget.get_interactive_widget_tag(
             init_state.widget.customization_args, reader_params)
 
         self.values.update({
@@ -157,10 +157,12 @@ class FeedbackHandler(base.BaseHandler):
                     html_output += '<br>'
                 html_output += state_html
 
-            interactive_html = '' if sticky else (
+            interactive_html = (
+                '' if sticky else
                 widget_registry.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-                ).get_raw_code(new_state.widget.customization_args, new_params)
+                ).get_interactive_widget_tag(
+                    new_state.widget.customization_args, new_params)
             )
 
             return (new_params, html_output, interactive_html)
