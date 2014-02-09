@@ -21,7 +21,10 @@ import os
 import sys
 import time
 
+# Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
+# The number of lines to record for an RPC stacktrace.
+appstats_MAX_STACK = 50
 
 
 def webapp_add_wsgi_middleware(app):
