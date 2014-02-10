@@ -31,7 +31,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'CodeRepl',
-      controller: function($scope, $attrs) {
+      controller:  ['$scope', '$attrs', function($scope, $attrs) {
         $scope.language = oppiaHtmlEscaper.escapedJsonToObj($attrs.languageWithValue);
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj($attrs.preCodeWithValue);
@@ -107,7 +107,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             error: $scope.err
           }, 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -119,13 +119,13 @@ oppia.directive('oppiaInteractiveContinue', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'Continue',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj($attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
           $scope.$parent.$parent.submitAnswer('', 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -137,7 +137,7 @@ oppia.directive('oppiaInteractiveFileReadInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'FileReadInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = '';
 
         $scope.submitAnswer = function(el) {
@@ -172,7 +172,7 @@ oppia.directive('oppiaInteractiveFileReadInput', [
             }
           });
         };
-      }
+      }]
     };
   }
 ]);
@@ -184,7 +184,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'InteractiveMap',
-      controller: function($scope, $attrs, $element) {
+      controller: ['$scope', 'attrs', function($scope, $attrs) {
         $scope.coords = [
           oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
           oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
@@ -209,7 +209,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 
           $scope.$parent.$parent.submitAnswer(ll.lat() + ',' + ll.lng(), 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -221,7 +221,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'MultipleChoiceInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choicesWithValue);
 
         $scope.submitAnswer = function(answer) {
@@ -230,7 +230,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
           }
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -242,11 +242,11 @@ oppia.directive('oppiaInteractiveNumericInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'NumericInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.submitAnswer = function(answer) {
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -258,7 +258,7 @@ oppia.directive('oppiaInteractiveSetInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'SetInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = [];
 
         $scope.addElement = function(newElement) {
@@ -277,7 +277,7 @@ oppia.directive('oppiaInteractiveSetInput', [
         $scope.submitAnswer = function(answer) {
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
-      }
+      }]
     };
   }
 ]);
@@ -289,7 +289,7 @@ oppia.directive('oppiaInteractiveTarFileReadInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'TarFileReadInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = '';
         $scope.filename = '';
 
@@ -332,7 +332,7 @@ oppia.directive('oppiaInteractiveTarFileReadInput', [
             }
           });
         };
-      }
+      }]
     };
   }
 ]);
@@ -344,7 +344,7 @@ oppia.directive('oppiaInteractiveTextInput', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'TextInput',
-      controller: function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
         $scope.columns = oppiaHtmlEscaper.escapedJsonToObj($attrs.columnsWithValue);
@@ -358,7 +358,7 @@ oppia.directive('oppiaInteractiveTextInput', [
 
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
-      }
+      }]
     };
   }
 ]);
