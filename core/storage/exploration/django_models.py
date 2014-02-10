@@ -152,7 +152,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         All such explorations will have a status of 'private'.
         """
-        # TODO(sunu0000): Implement this.
+        return ExplorationRightsModel.objects.filter(
+            viewer_ids__contains=user_id).filter(deleted=False)[:QUERY_LIMIT]
 
     @classmethod
     def get_editable(cls, user_id):
@@ -160,7 +161,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         This includes both private and public explorations.
         """
-        # TODO(sunu0000): Implement this.
+        return ExplorationRightsModel.objects.filter(
+            editor_ids__contains=user_id).filter(
+            deleted=False)[:QUERY_LIMIT]
 
     @classmethod
     def get_owned(cls, user_id):
@@ -168,4 +171,5 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         This includes both private and public explorations.
         """
-        # TODO(sunu0000): Implement this.
+        return ExplorationRightsModel.objects.filter(
+            owner_ids__contains=user_id).filter(deleted=False)[:QUERY_LIMIT]

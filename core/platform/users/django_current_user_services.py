@@ -24,16 +24,12 @@ from django.contrib.auth.models import User
 
 def create_login_url(slug):
     """Creates a login url."""
-    # Currently we have no way to implement this on non-GAE platforms
-    # as a stand alone app.
-    return ''
+    return '/auth/login'
 
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    # Currently we have no way to implement this on non-GAE platforms
-    # as a stand alone app.
-    return ''
+    return '/auth/logout'
 
 
 def get_current_user(request):
@@ -44,16 +40,15 @@ def get_current_user(request):
         uid = session.get_decoded().get('_auth_user_id')
         user = User.objects.get(pk=uid)
         return user
-    except Session.DoesNotExist:
+    except (Session.DoesNotExist, User.DoesNotExist):
         return None
 
 
 def is_super_admin(user_id, request):
     """Checks whether the user with the given user_id owns this app."""
-    user = User.objects.get(pk=uid)
-    if user:
-        return user.is_superuser
-    else:
+    try:
+        return User.objects.get(pk=user_id).is_superuser
+    except User.DoesNotExist:
         return False
 
 
@@ -62,4 +57,19 @@ def get_user_id_from_email(email):
 
     Returns None if the email address does not correspond to a valid user id.
     """
-    return email
+    try:
+        user = User.objects.get(email=email)
+        user_id = str(user.id)
+    except User.DoesNotExist:
+        user_id = None
+    return user_id
+
+
+def get_user_id(user):
+    """ Given an user object, get the user id. """
+    return str(user.id)
+
+
+def get_user_email(user):
+    """ Given an user object, get the user's email. """
+    return user.email

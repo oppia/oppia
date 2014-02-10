@@ -120,11 +120,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.values = {}
 
         self.user = current_user_services.get_current_user(self.request)
-        self.user_id = self.user.user_id() if self.user else None
+        self.user_id = current_user_services.get_user_id(
+            self.user) if self.user else None
 
         if self.user_id:
+            email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
-                self.user_id, self.user.email())
+                self.user_id, email)
             self.values['user_email'] = user_settings.email
             self.values['username'] = user_settings.username
 

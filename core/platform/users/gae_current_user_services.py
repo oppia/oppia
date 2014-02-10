@@ -75,3 +75,13 @@ def get_user_id_from_email(email):
         return unicode(user_id)
     else:
         return None
+
+
+def get_user_id(user):
+    """ Given an user object, get the user id. """
+    return user.user_id()
+
+
+def get_user_email(user):
+    """ Given an user object, get the user's email. """
+    return user.email()

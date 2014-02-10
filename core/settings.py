@@ -1,4 +1,3 @@
-import os
 # Django settings for oppia project.
 
 DEV = True
@@ -105,12 +104,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'oppia.urls'
+ROOT_URLCONF = 'core.platform.auth.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'oppia.wsgi.application'
-
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -126,6 +123,8 @@ INSTALLED_APPS = (
     'core.storage.file',
     'core.storage.statistics',
     'core.storage.user',
+    'social.apps.django_app.default',
+    'core.platform.auth.app',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -140,3 +139,19 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     },
 }
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.contrib.messages.context_processors.messages',
+    'social.apps.django_app.context_processors.backends',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'social.backends.google.GoogleOpenId',
+)
+
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/'

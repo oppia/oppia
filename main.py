@@ -19,7 +19,7 @@ __author__ = 'Sean Lip'
 import feconf
 import os
 if feconf.PLATFORM == 'django':
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+    os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
 
 from core.controllers import admin
 from core.controllers import base
@@ -216,8 +216,14 @@ app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
 
 # Called on non-GAE platforms to start the development server.
 def main():
-    from paste import httpserver
-    httpserver.serve(app, host='127.0.0.1', port='8080')
+    from werkzeug.wsgi import DispatcherMiddleware
+    from core.platform.auth.wsgi import application as auth
+
+    application = DispatcherMiddleware(app, {
+        '/auth': auth
+    })
+    from werkzeug.serving import run_simple
+    run_simple('localhost', 8080, application, use_reloader=True, use_debugger=True)
 
 if __name__ == '__main__':
     main()
