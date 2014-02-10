@@ -29,7 +29,7 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
         'description': 'The options that the reader can select from.',
         'generator': generators.Copier,
         'init_args': {
-            'objType': 'UnicodeString',
+            'objType': 'Html',
             'addItemText': 'Add choice',
         },
         'customization_args': {

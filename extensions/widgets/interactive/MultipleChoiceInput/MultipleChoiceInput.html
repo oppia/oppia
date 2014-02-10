@@ -3,9 +3,8 @@
     <div ng-repeat="choice in choices track by $index">
       <label>
         <input type="radio" ng-model="$parent.answer"
-               name="choiceGroup" id="<[$index]>"
-               value="<[$index]>">
-        <[choice]>
+               name="choiceGroup" value="<[$index]>">
+        <span angular-html-bind="choice"></span>
       </label>
     </div>
 
