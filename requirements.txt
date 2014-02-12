@@ -16,3 +16,4 @@ six==1.3.0
 webapp2==2.5.2
 wsgiref==0.1.2
 python-social-auth
+Werkzeug
