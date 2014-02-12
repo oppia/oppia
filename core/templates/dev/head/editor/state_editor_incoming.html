@@ -14,7 +14,7 @@
         <span ng-if="stateName == incomingStateName" title="This state points to itself." class="oppia-cursor-pointer">
           ⟳
         </span>
-        (<[incomingState.rules | commaSeparatedList]>)
+        (<span angular-html-bind="incomingState.rules | commaSeparatedList"></span>)
       </li>
     </ul>
 

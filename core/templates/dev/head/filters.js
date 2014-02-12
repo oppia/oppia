@@ -79,7 +79,7 @@ oppia.filter('parameterizeRuleDescription', function() {
       var varName = description.match(pattern)[1];
       var replacementText = inputs[varName];
       if (choices) {
-        replacementText = "'" + choices.value[inputs[varName]] + "'";
+        replacementText = '\'' + choices.value[inputs[varName]] + '\'';
       }
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);

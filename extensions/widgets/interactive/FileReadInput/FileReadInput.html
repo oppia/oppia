@@ -1,22 +1,4 @@
-<html ng-app="fileInputWidget">
-  <head>
-    <script src="/third_party/static/jquery-2.0.3/jquery.min.js"></script>
-    <script src="/third_party/static/angularjs-1.2.0-rc.3/angular.min.js"></script>
-
-    <script>
-      var GLOBALS = {};
-    </script>
-  </head>
-
-  <body onload="onWidgetLoad()">
-    <div ng-controller="FileReadInput">
-
-        <input onchange="angular.element(this).scope().submitAnswer(this)"
-               type="file" required>
-
-    </div>
-
-    <script src="/extensions/widgets/interactive/FileReadInput/static/js/FileReadInput.js">
-    </script>
-  </body>
-</html>
+<div ng-controller="FileReadInput">
+  <input onchange="angular.element(this).scope().submitAnswer(this)"
+         type="file" required>
+</div>

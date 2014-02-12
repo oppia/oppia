@@ -28,7 +28,7 @@
                     <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
                   </span>
                   <span ng-class="{'oppia-red': isRuleConfusing(rule)}">
-                    Answer <[rule | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
+                    Answer <span angular-html-bind="rule | parameterizeRuleDescription: widgetCustomizationArgs.choices"></span>
                   </span>
                 </center>
               </td>

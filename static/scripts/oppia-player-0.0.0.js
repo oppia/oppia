@@ -36,8 +36,9 @@ function _log(message) {
 /**
  * [THIS SPECIFICATION IS ONLY VALID FOR VERSION 0.0.0 OF THIS SCRIPT]
  *
- * Receives messages from embedded Oppia iframes. Each message has a title and
- * a payload. The structure of the payload depends on what the title is:
+ * Receives JSON-encoded messages from embedded Oppia iframes. Each message has
+ * a title and a payload. The structure of the payload depends on what the
+ * title is:
  *   - 'heightChange': The payload is an Object with the following fields:
  *         height: a positive integer, and
  *         scroll: boolean -- scroll down to bottom if true.
@@ -50,44 +51,47 @@ function _log(message) {
  *   - 'explorationCompleted': The payload is an empty Object.
  */
 window.addEventListener('message', function(evt) {
+  var data = JSON.parse(evt.data);
   // Allow only requests from oppiaserver or the server that this container is
   // running on.
   if (evt.origin == 'http://localhost:8181' ||
       evt.origin == 'https://oppiaserver.appspot.com' ||
       evt.origin == 'https://www.oppia.org' ||
       evt.origin == window.location.protocol + '//' + window.location.host) {
-    _log(evt.data);
-    var iframeNode = document.getElementById(evt.data.sourceTagId);
+    _log(data);
+    var iframeNode = document.getElementById(data.sourceTagId);
 
-    switch(evt.data.title) {
+    switch(data.title) {
       case 'heightChange':
-        // TODO(sll): Validate that evt.data.payload is a dict with one field
+        // TODO(sll): Validate that data.payload is a dict with one field
         // whose key is 'height' and whose value is a positive integer.
         // TODO(sll): These should pass the iframe source, too (in case there are
         // multiple oppia iframes on a page).
-        window.OPPIA_PLAYER.onHeightChange(iframeNode,
-            evt.data.payload.height, evt.data.payload.scroll);
+        window.OPPIA_PLAYER.onHeightChange(
+          iframeNode, data.payload.height, data.payload.scroll);
         break;
       case 'explorationLoaded':
         window.OPPIA_PLAYER.onExplorationLoaded(iframeNode);
         break;
       case 'stateTransition':
         window.OPPIA_PLAYER.onStateTransition(
-          iframeNode, evt.data.payload.oldStateName, evt.data.payload.jsonAnswer,
-          evt.data.payload.newStateName);
+          iframeNode, data.payload.oldStateName, data.payload.jsonAnswer,
+          data.payload.newStateName);
         break;
       case 'explorationReset':
         // This needs to be set in order to allow the scrollHeight of the iframe
         // content to be calculated accurately within the iframe's JS.
         iframeNode.style.height = 'auto';
         window.OPPIA_PLAYER.onExplorationReset(
-          iframeNode, evt.data.payload.stateName);
+          iframeNode, data.payload.stateName);
         break;
       case 'explorationCompleted':
         window.OPPIA_PLAYER.onExplorationCompleted(iframeNode);
         break;
       default:
-        console.log('Error: event ' + evt.data.title + 'not recognized.');
+        if (console) {
+          console.log('Error: event ' + data.title + ' not recognized.');
+        }
     }
   }
 }, false);
@@ -127,7 +131,9 @@ function generateNewRandomId() {
  */
 function reloadOppiaTag(oppiaNode) {
   if (!oppiaNode.getAttribute('oppia-id')) {
-    console.log('Error: oppia node has no id.');
+    if (console) {
+      console.log('Error: oppia node has no id.');
+    }
 
     var div = document.createElement('div');
 

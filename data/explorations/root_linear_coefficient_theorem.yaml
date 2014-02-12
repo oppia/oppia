@@ -1,427 +1,441 @@
 default_skin: conversation_v1
+init_state_name: Start
 param_changes: []
 param_specs: {}
-schema_version: 1
+schema_version: 2
 states:
-- content:
-  - type: text
-    value: "Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(a + b)(c + d) = ac + ad + bc + bd&amp;quot;\"\
-      ></oppia-noninteractive-math>.<br>"
-  name: Start
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: Simple Expansion
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: Continue
-- content:
-  - type: text
-    value: "What about something a little harder? \_Can you tell me what the terms\
-      \ are in the expansion of this:<div><oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;(x-3)(x+2)(x-5)&amp;quot;\"></oppia-noninteractive-math><br><br>If\
-      \ a, b, c, and d are the coefficients of\_<oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;x^3&amp;quot;\"></oppia-noninteractive-math>,\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>,\_\
-      <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x&amp;quot;\"></oppia-noninteractive-math>\_\
-      and\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;1&amp;quot;\"\
-      ></oppia-noninteractive-math>, respectively, format your answer as the string:\
-      \ a,b,c,d (without spaces).</div>"
-  name: Simple Expansion
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 1,-6,-1,30
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: More General Expansion
-        feedback:
-        - Good!  Now let's look at a slightly more general expansion.
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Simple Expansion
-        feedback:
-        - Sorry, try again.  Remember to format it exactly as shown.
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
-      ></oppia-noninteractive-math>?"
-  name: More General Expansion
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - $x^3 - a x^2 - b x - c$
-        - $x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc$
-        - $x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc$
-        - $x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc$
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 2
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Particular coefficients (part 1)
-        feedback:
-        - Great!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: More General Expansion
-        feedback:
-        - Nope!  Try again.
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "Did you notice something about the previous answer? \_What happens if\
-      \ we consider an even more general expression:<br><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
-      ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
-      \ term (the term with no x's)?"
-  name: Particular coefficients (part 1)
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - $a_1$
-        - $a_1 + a_2 + a_3 + ... + a_n$
-        - $1$
-        - $a_1 a_2 a_3 ... a_n$
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 3
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Particular coefficients (part 2)
-        feedback:
-        - That's correct!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Particular coefficients (part 1)
-        feedback:
-        - Nope!  Try again.
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "<span>Again, consider the expression:</span><br><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
-      ></oppia-noninteractive-math><br><br><span>What is the absolute value of the\
-      \ linear term (the\_</span><oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;x^1&amp;quot;\"></oppia-noninteractive-math>\_<span>term)?</span><br>"
-  name: Particular coefficients (part 2)
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - $a_1 a_2 + a_2 a_3 + ... + a_n a_1$
-        - $a_1 + a_2 + a_3 + ... + a_n$
-        - $a_2$
-        - $a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n$
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 3
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient Signs
-        feedback:
-        - Yep!  Admit it, you just chose the longest answer...
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Particular coefficients (part 2)
-        feedback:
-        - 'This one''s a little tricky.  Maybe trying this case will help you out?
-
-          $(x - a_1) * (x - a_2) * (x - a_3)$'
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "<span>Here's that expression again:</span><div><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
-      ></oppia-noninteractive-math><span><br></span><br>If\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
-      is even, what's the sign of the constant term? \_How about the linear term?</div><div><br>Likewise,\
-      \ if\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"\
-      ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
-      \ \_What's the sign of the linear term?</div>"
-  name: Coefficient Signs
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - $+,-,-,+$
-        - $+,+,+,+$
-        - $+,-,+,-$
-        - $-,+,-,+$
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 0
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Quotient of terms
-        feedback:
-        - Good.  As a side note, what do you think the sign is of the x^i term given
-          n is even? Given n is odd?
-        param_changes: []
-      - definition:
-          inputs:
-            x: 1
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient signs WA1
-        feedback:
-        - Hmm... that's a bit weird isn't it?  The expression had only negative signs,
-          and your answer has all positive signs...
-        param_changes: []
-      - definition:
-          inputs:
-            x: 2
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient signs WA1
-        feedback:
-        - That looks correct, but let's try a sample case just to make sure.
-        param_changes: []
-      - definition:
-          inputs:
-            x: 3
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient signs WA2
-        feedback:
-        - That looks a little fishy... let's try a sample case just to be sure...
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Coefficient Signs
-        feedback:
-        - Oops, if you have reached this case, something has gone wrong...
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "Here's the general expression again:<div><oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;(x - a_1)(x - a_2)(x - a_3) ... (x - a_n&amp;quot;\"></oppia-noninteractive-math><br><br>When\_\
-      <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
-      is even, the constant and linear terms have opposite signs...</div><div><br>when\_\
-      <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
-      is odd, the constant and linear terms also have opposite signs...<br><br>What,\
-      \ then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
-  name: Quotient of terms
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - Positive
-        - Negative
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 1
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Quotient part 2
-        feedback:
-        - Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative, but 3 /
-          5 is positive.
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Quotient of terms
-        feedback:
-        - Try again!  (If you're wrong this time... I have no words for you...)
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "<div>If we tried a simple case, like:<br><br></div><div><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - 3)(x - 4)(x - 1)&amp;quot;\"></oppia-noninteractive-math></div><div><br></div><div>where\_\
-      <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1 = 3&amp;quot;\"\
-      ></oppia-noninteractive-math>,\_<oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;a_2=4&amp;quot;\"></oppia-noninteractive-math>, and\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;a_3 = 1&amp;quot;\"></oppia-noninteractive-math>,\
-      \ then you're suggesting that the constant term should be positive, right?</div><div><br></div><div>What\
-      \ is the constant term?</div>"
-  name: Coefficient signs WA1
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: -12.0
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient Signs
-        feedback:
-        - Right!  But wait-- that's not positive.  Let's try the previous question
-          again...
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Coefficient signs WA1
-        feedback:
-        - Try again.  We want the constant term.
-        param_changes: []
-    sticky: false
-    widget_id: NumericInput
-- content:
-  - type: text
-    value: "You said \"-,+,-,+\" meaning if you expand:<div><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - a_1) (x - a_2) (x - a_3) ... (x - a_n)&amp;quot;\"\
-      ></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_is even, you should get\
-      \ that the constant term is negative. \_Let's try it on this sample case:</div><div><br></div><div><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(x - 3) (x - 4)&amp;quot;\"></oppia-noninteractive-math><br><br>What\
-      \ is the coefficient of the constant term?</div>"
-  name: Coefficient signs WA2
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 12.0
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Coefficient Signs
-        feedback:
-        - Right.  And that's not negative.  Let's try the previous question again...
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Coefficient signs WA2
-        feedback:
-        - Nope!  Try again.
-        param_changes: []
-    sticky: false
-    widget_id: NumericInput
-- content:
-  - type: text
-    value: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;(-1)^{n+1} a_1 a_2 ... a_{n-1} + a_1 a_2\
-      \ ... a_{n-2} a_n + ... + a_2 a_3 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>and\
-      \ the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;(-1)^n a_1 a_2 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>(where,\
-      \ as discussed before, the sign is added in).<br><br>What happens when we divide\
-      \ the linear coefficient by the constant term?</div>"
-  name: Quotient part 2
-  param_changes: []
-  widget:
-    customization_args:
-      choices:
-        value:
-        - $1$
-        - $(-1)^n * (1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
-        - $(-1)(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
-        - $(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)$
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 2
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Theorem
-        feedback:
-        - Yep... that leads us to the statement of the theorem...
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Quotient part 2
-        feedback:
-        - Oops, that's not right.  Careful; signs can be tricky!
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: "The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
-      <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x^n + c_{n-1} x^{n-1}\
-      \ + ... + c_2 x^2 + c_1 x^1 + c_0&amp;quot;\"></oppia-noninteractive-math><br>with\
-      \ roots\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1&amp;quot;\"\
-      ></oppia-noninteractive-math>,\_<oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;a_2&amp;quot;\"></oppia-noninteractive-math>, ...,\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;a_n&amp;quot;\"></oppia-noninteractive-math>:<br><br>The\
-      \ sum of the reciprocals of the roots:\_<oppia-noninteractive-math raw_latex-with-value=\"\
-      &amp;quot;(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"></oppia-noninteractive-math><br>is\
-      \ equal to the negative coefficient of the linear term:\_<oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;-c_1&amp;quot;\"></oppia-noninteractive-math><br><br>or...<div><br><oppia-noninteractive-math\
-      \ raw_latex-with-value=\"&amp;quot;c_1 = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"\
-      ></oppia-noninteractive-math></div>"
-  name: Theorem
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: END
-        feedback:
-        - Congrats!  We may use this theorem later on to prove something even more
-          interesting...
-        param_changes: []
-    sticky: false
-    widget_id: Continue
+  Coefficient Signs:
+    content:
+    - type: text
+      value: "<span>Here's that expression again:</span><div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
+        ></oppia-noninteractive-math><span><br></span><br>If\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
+        is even, what's the sign of the constant term? \_How about the linear term?</div><div><br>Likewise,\
+        \ if\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"\
+        ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
+        \ \_What's the sign of the linear term?</div>"
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,+,+,+&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,+,-&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;-,+,-,+&amp;quot;"></oppia-noninteractive-math>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Quotient of terms
+          feedback:
+          - Good.  As a side note, what do you think the sign is of the x^i term given
+            n is even? Given n is odd?
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient signs WA1
+          feedback:
+          - Hmm... that's a bit weird isn't it?  The expression had only negative
+            signs, and your answer has all positive signs...
+          param_changes: []
+        - definition:
+            inputs:
+              x: 2
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient signs WA1
+          feedback:
+          - That looks correct, but let's try a sample case just to make sure.
+          param_changes: []
+        - definition:
+            inputs:
+              x: 3
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient signs WA2
+          feedback:
+          - That looks a little fishy... let's try a sample case just to be sure...
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Coefficient Signs
+          feedback:
+          - Oops, if you have reached this case, something has gone wrong...
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Coefficient signs WA1:
+    content:
+    - type: text
+      value: "<div>If we tried a simple case, like:<br><br></div><div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - 3)(x - 4)(x - 1)&amp;quot;\"></oppia-noninteractive-math></div><div><br></div><div>where\_\
+        <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1 = 3&amp;quot;\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;a_2=4&amp;quot;\"></oppia-noninteractive-math>, and\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;a_3 = 1&amp;quot;\"></oppia-noninteractive-math>,\
+        \ then you're suggesting that the constant term should be positive, right?</div><div><br></div><div>What\
+        \ is the constant term?</div>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: -12.0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient Signs
+          feedback:
+          - Right!  But wait-- that's not positive.  Let's try the previous question
+            again...
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Coefficient signs WA1
+          feedback:
+          - Try again.  We want the constant term.
+          param_changes: []
+      sticky: false
+      widget_id: NumericInput
+  Coefficient signs WA2:
+    content:
+    - type: text
+      value: "You said \"-,+,-,+\" meaning if you expand:<div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - a_1) (x - a_2) (x - a_3) ... (x -\
+        \ a_n)&amp;quot;\"></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
+        is even, you should get that the constant term is negative. \_Let's try it\
+        \ on this sample case:</div><div><br></div><div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - 3) (x - 4)&amp;quot;\"></oppia-noninteractive-math><br><br>What\
+        \ is the coefficient of the constant term?</div>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 12.0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient Signs
+          feedback:
+          - Right.  And that's not negative.  Let's try the previous question again...
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Coefficient signs WA2
+          feedback:
+          - Nope!  Try again.
+          param_changes: []
+      sticky: false
+      widget_id: NumericInput
+  More General Expansion:
+    content:
+    - type: text
+      value: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
+        ></oppia-noninteractive-math>?"
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;x^3 - a x^2
+            - b x - c&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;x^3 + (a+b+c)x^2
+            + (ab+bc+ca)x + abc&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;x^3 - (a+b+c)x^2
+            + (ab+bc+ca)x - abc&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;x^3 + (a+b+c)x^2
+            - (ab+bc+ca)x + abc&amp;quot;"></oppia-noninteractive-math>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 2
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Particular coefficients (part 1)
+          feedback:
+          - Great!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: More General Expansion
+          feedback:
+          - Nope!  Try again.
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Particular coefficients (part 1):
+    content:
+    - type: text
+      value: "Did you notice something about the previous answer? \_What happens if\
+        \ we consider an even more general expression:<br><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
+        ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
+        \ term (the term with no x's)?"
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 + a_2 +
+            a_3 + ... + a_n&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;1&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 a_2 a_3
+            ... a_n&amp;quot;"></oppia-noninteractive-math>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 3
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Particular coefficients (part 2)
+          feedback:
+          - That's correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Particular coefficients (part 1)
+          feedback:
+          - Nope!  Try again.
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Particular coefficients (part 2):
+    content:
+    - type: text
+      value: "<span>Again, consider the expression:</span><br><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
+        ></oppia-noninteractive-math><br><br><span>What is the absolute value of the\
+        \ linear term (the\_</span><oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;x^1&amp;quot;\"></oppia-noninteractive-math>\_<span>term)?</span><br>"
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 a_2 + a_2
+            a_3 + ... + a_n a_1&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 + a_2 +
+            a_3 + ... + a_n&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_2&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;a_1 a_2 ...
+            a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2 a_3 ... a_n&amp;quot;"></oppia-noninteractive-math>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 3
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Coefficient Signs
+          feedback:
+          - Yep!  Admit it, you just chose the longest answer...
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Particular coefficients (part 2)
+          feedback:
+          - "This one's a little tricky.  Maybe trying this case will help you out?\_\
+            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x - a_1)\
+            \ (x - a_2) (x - a_3)&amp;quot;\"></oppia-noninteractive-math>"
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Quotient of terms:
+    content:
+    - type: text
+      value: Here's the general expression again:<div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(x
+        - a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;"></oppia-noninteractive-math><br><br>When&nbsp;<oppia-noninteractive-math
+        raw_latex-with-value="&amp;quot;n&amp;quot;"></oppia-noninteractive-math>&nbsp;is
+        even, the constant and linear terms have opposite signs...</div><div><br>when&nbsp;<oppia-noninteractive-math
+        raw_latex-with-value="&amp;quot;n&amp;quot;"></oppia-noninteractive-math>&nbsp;is
+        odd, the constant and linear terms also have opposite signs...<br><br>What,
+        then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - Positive
+          - Negative
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Quotient part 2
+          feedback:
+          - Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative, but 3
+            / 5 is positive.
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Quotient of terms
+          feedback:
+          - Try again!
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Quotient part 2:
+    content:
+    - type: text
+      value: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(-1)^{n+1} a_1 a_2 ... a_{n-1} + a_1 a_2\
+        \ ... a_{n-2} a_n + ... + a_2 a_3 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>and\
+        \ the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;(-1)^n a_1 a_2 ... a_n&amp;quot;\"></oppia-noninteractive-math><br><br>(where,\
+        \ as discussed before, the sign is added in).<br><br>What happens when we\
+        \ divide the linear coefficient by the constant term?</div>"
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;1&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)^n * (1/a_1
+            + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(-1)(1/a_1
+            + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
+          - <oppia-noninteractive-math raw_latex-with-value="&amp;quot;(1/a_1 + 1/a_2
+            + 1/a_3 + ... + 1/a_n)&amp;quot;"></oppia-noninteractive-math>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 2
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Theorem
+          feedback:
+          - Yep... that leads us to the statement of the theorem...
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Quotient part 2
+          feedback:
+          - Oops, that's not right.  Careful; signs can be tricky!
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Simple Expansion:
+    content:
+    - type: text
+      value: "What about something a little harder? \_Can you tell me what the terms\
+        \ are in the expansion of this:<div><oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;(x-3)(x+2)(x-5)&amp;quot;\"></oppia-noninteractive-math><br><br>If\
+        \ a, b, c, and d are the coefficients of\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;x^3&amp;quot;\"></oppia-noninteractive-math>,\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>,\_\
+        <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x&amp;quot;\"\
+        ></oppia-noninteractive-math>\_and\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;1&amp;quot;\"></oppia-noninteractive-math>, respectively, format\
+        \ your answer as the string: a,b,c,d (without spaces).</div>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1,-6,-1,30
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: More General Expansion
+          feedback:
+          - Good!  Now let's look at a slightly more general expansion.
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Simple Expansion
+          feedback:
+          - Sorry, try again.  Remember to format it exactly as shown.
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Start:
+    content:
+    - type: text
+      value: "Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(a + b)(c + d) = ac + ad + bc + bd&amp;quot;\"\
+        ></oppia-noninteractive-math>.<br>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Simple Expansion
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  Theorem:
+    content:
+    - type: text
+      value: "The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
+        <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x^n + c_{n-1}\
+        \ x^{n-1} + ... + c_2 x^2 + c_1 x^1 + c_0&amp;quot;\"></oppia-noninteractive-math><br>with\
+        \ roots\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1&amp;quot;\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;a_2&amp;quot;\"></oppia-noninteractive-math>, ...,\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;a_n&amp;quot;\"></oppia-noninteractive-math>:<br><br>The\
+        \ sum of the reciprocals of the roots:\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"></oppia-noninteractive-math><br>is\
+        \ equal to the negative coefficient of the linear term:\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;-c_1&amp;quot;\"></oppia-noninteractive-math><br><br>or...<div><br><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;c_1 = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;\"\
+        ></oppia-noninteractive-math></div>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback:
+          - Congrats!  We may use this theorem later on to prove something even more
+            interesting...
+          param_changes: []
+      sticky: false
+      widget_id: Continue

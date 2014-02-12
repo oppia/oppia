@@ -100,7 +100,7 @@ class ExplorationHandler(base.BaseHandler):
 
         interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
-        interactive_html = interactive_widget.get_raw_code(
+        interactive_html = interactive_widget.get_interactive_widget_tag(
             init_state.widget.customization_args, reader_params)
 
         self.values.update({
@@ -157,10 +157,12 @@ class FeedbackHandler(base.BaseHandler):
                     html_output += '<br>'
                 html_output += state_html
 
-            interactive_html = '' if sticky else (
+            interactive_html = (
+                '' if sticky else
                 widget_registry.Registry.get_widget_by_id(
                     feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-                ).get_raw_code(new_state.widget.customization_args, new_params)
+                ).get_interactive_widget_tag(
+                    new_state.widget.customization_args, new_params)
             )
 
             return (new_params, html_output, interactive_html)
@@ -222,12 +224,9 @@ class FeedbackHandler(base.BaseHandler):
         # Append the reader's answer to the response HTML.
         old_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
-        reader_response_html, reader_response_iframe = (
-            old_widget.get_reader_response_html(
-                old_state.widget.customization_args, old_params, answer, sticky)
-        )
+        reader_response_html = old_widget.get_reader_response_html(
+            old_state.widget.customization_args, old_params, answer, sticky)
         values['reader_response_html'] = reader_response_html
-        values['reader_response_iframe'] = reader_response_iframe
 
         # Add Oppia's feedback to the response HTML.
         html_output = '<div>%s</div>' % jinja_utils.parse_string(

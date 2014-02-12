@@ -1,14 +1,13 @@
 <div class="oppia-reader-response-container">
-  <span class="oppia-reader-response"></span>
+  <div ng-controller="MultipleChoiceInputResponse">
+    <span class="oppia-reader-response" angular-html-bind="response"></span>
+  </div>
   <script>
-    // We can not simply render choices[answer] in the span tag above
-    // because we need to JSON parse them first.
-    var choices = JSON.parse('{{choices|js_string}}');
-    var answer = JSON.parse('{{answer|js_string}}');
-    var elems = document.getElementsByClassName('oppia-reader-response');
-  
-    // Since we have the span tag created before this script section, there
-    // should always be at least one element.
-    elems[elems.length - 1].textContent = choices[answer];
+    function MultipleChoiceInputResponse($scope) {
+      $scope.choices = JSON.parse('{{choices|js_string}}');
+      $scope.answer = JSON.parse('{{answer|js_string}}');
+
+      $scope.response = $scope.choices[$scope.answer];
+    }
   </script>
 </div>

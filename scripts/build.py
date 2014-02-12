@@ -17,7 +17,7 @@
 import os
 import re
 import shutil
-from subprocess import call
+import subprocess
 
 HEAD_DIR = 'core/templates/dev/head/'
 OUT_DIR = 'core/templates/prod/head/'
@@ -30,7 +30,7 @@ def _minify(source_path, target_path):
         '../oppia_tools/yuicompressor-2.4.8/yuicompressor-2.4.8.jar')
     cmd = 'java -jar %s %s -o %s' % (
         YUICOMPRESSOR_DIR, source_path, target_path)
-    call(cmd, shell=True)
+    subprocess.check_call(cmd, shell=True)
 
 
 def ensure_directory_exists(f):

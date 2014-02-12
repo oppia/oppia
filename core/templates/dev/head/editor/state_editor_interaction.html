@@ -9,9 +9,7 @@
 {% block center %}
   <div>
     <div class="oppia-widget-preview">
-      <!-- This iframe is dynamically resized based on its content. -->
-      <iframe id="interactiveWidgetPreview" frameborder="0" width="100%" height="5px" seamless="seamless">
-      </iframe>
+      <div angular-html-bind="widgetPreviewHtml"></div>
     </div>
 
     <div>

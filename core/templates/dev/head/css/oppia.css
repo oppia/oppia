@@ -195,20 +195,42 @@ textarea {
 }
 .oppia-loading-dot-one {
   opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.0s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.0s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.0s;
 }
 .oppia-loading-dot-two {
   opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.3s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.3s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.3s;
 }
 .oppia-loading-dot-three {
   opacity: 0;
+  animation: dot 1.5s infinite;
+  animation-delay: 0.6s;
+  -moz-animation: dot 1.5s infinite;
+  -moz-animation-delay: 0.6s;
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.6s;
 }
 @-webkit-keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-keyframes dot {
   0% { opacity: 0; }
   0% { opacity: 0; }
   100% { opacity: 1; }

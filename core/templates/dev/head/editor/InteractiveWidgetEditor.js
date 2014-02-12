@@ -19,13 +19,15 @@
  */
 
 function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, explorationData, oppiaRequestCreator) {
-  // The id of the widget preview iframe.
-  $scope.previewIframeId = 'interactiveWidgetPreview';
-
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetParamSpecs = {};
   $scope.widgetHandlerSpecs = [];
+
+  // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
+  // preview.
+  $scope.submitAnswer = function(answer, handler) {};
+  $scope.adjustPageHeight = function(scroll) {};
 
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
@@ -39,7 +41,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
       $scope.widgetId = data.widget.widget_id;
       $scope.widgetCustomizationArgs = data.widget.customization_args;
 
-      $scope.addContentToIframeWithId($scope.previewIframeId, data.widget.raw);
+      $scope.widgetPreviewHtml = data.tag;
       if (successCallback) {
         successCallback();
       }
@@ -406,21 +408,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
   $scope.getCssClassForRule = function(rule) {
     return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
   };
-
-  window.addEventListener('message', function(evt) {
-    if (evt.origin != window.location.protocol + '//' + window.location.host) {
-      return;
-    }
-
-    if (evt.data.hasOwnProperty('widgetHeight')) {
-      $log.info('Resize event received for widget preview.');
-      $log.info(evt.data);
-      // Change the height of the included iframe.
-      var height = parseInt(evt.data.widgetHeight, 10) + 20;
-      var iframe = document.getElementById($scope.previewIframeId);
-      iframe.height = height + 'px';
-    }
-  }, false);
 
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
     if (newValue !== undefined && oldValue !== undefined) {

@@ -56,16 +56,30 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        code = widget.get_raw_code({}, {})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"', code)
+        code = widget.get_html_template()
+        self.assertIn('input ng-if="rows == 1"', code)
 
-        code = widget.get_raw_code({'placeholder': {'value': 'F4'}}, {})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
+        tag = widget.get_interactive_widget_tag({}, {})
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;Type your answer here.&#34;" '
+            'rows-with-value="1" columns-with-value="60">'
+            '</oppia-interactive-text-input>', tag)
 
-        code = widget.get_raw_code(
+        tag = widget.get_interactive_widget_tag(
+            {'placeholder': {'value': 'F4'}}, {})
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
+            'columns-with-value="60"></oppia-interactive-text-input>', tag)
+
+        tag = widget.get_interactive_widget_tag(
             {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
             {'ntg': 'F4'})
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');', code)
+        self.assertEqual(
+            '<oppia-interactive-text-input '
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
+            'columns-with-value="60"></oppia-interactive-text-input>', tag)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
             {'placeholder': {'value': 'F4'}}, {}
@@ -75,7 +89,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'handlers', 'raw', 'customization_args'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
-        self.assertIn('GLOBALS.placeholder = JSON.parse(\'\\"F4\\"\');',
+        self.assertIn('input ng-if="rows == 1"',
                       parameterized_widget_dict['raw'])
 
         self.assertDictContainsSubset({
@@ -166,10 +180,10 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
-            # In this directory there should only be a config.yaml file, an
+            # In this directory there should only be a config .py file, an
             # html entry-point file, a response.html file, (optionally) a
-            # directory named 'static', (optionally) a response_iframe.html
-            # file and (optionally) a stats_response.html file.
+            # directory named 'static' and (optionally) a stats_response.html
+            # file.
             dir_contents = os.listdir(widget_dir)
             self.assertLessEqual(len(dir_contents), 6)
 
@@ -186,13 +200,6 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(
                     os.path.join(widget_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, 'response_iframe.html')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
