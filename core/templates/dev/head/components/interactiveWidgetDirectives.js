@@ -46,7 +46,11 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
         // Options for the ui-codemirror display.
         $scope.codemirrorOptions = {
-          lineNumbers: true,
+          // TODO(sll): Re-enable this. (It is temporarily disabled because it
+          // leads to occasional errors where a grey box, and nothing else, is
+          // displayed. This may be related to issue
+          //   https://github.com/angular-ui/ui-codemirror/issues/24 .)
+          // lineNumbers: true,
           indentWithTabs: true,
           // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
           // 'scheme' have CodeMirror-supported syntax highlighting. For other

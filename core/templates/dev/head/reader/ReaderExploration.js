@@ -141,7 +141,7 @@ function ReaderExploration(
 
     messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
     $scope.showPage = true;
-    $scope.adjustPageHeight(true);
+    $scope.adjustPageHeight(false, null);
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -250,10 +250,10 @@ function ReaderExploration(
       if (callback) {
         callback();
       }
-    }, 200);
+    }, 500);
   };
 
-  $window.onresize = $scope.adjustPageHeight.bind(null, false);
+  $window.onresize = $scope.adjustPageHeight.bind(null, false, null);
 }
 
 /**

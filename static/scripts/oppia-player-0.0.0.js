@@ -252,9 +252,6 @@
     iframe.setAttribute('fixedwidth', fixedWidth);
     iframe.setAttribute('frameborder', 0);
     iframe.setAttribute('style', 'margin: 10px;');
-    iframe.setAttribute('scrolling', 'no');
-
-    iframe.style.overflow = 'hidden';
 
     // Hide the iframe first so that autofocus will not scroll the page.
     iframe.style.position = 'fixed';
