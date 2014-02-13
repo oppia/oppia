@@ -126,6 +126,9 @@
     }
   }
 
+  // Maps Oppia iframe ids to loading div ids.
+  var oppiaNodeIdsToLoadingDivIds = {};
+
   /**
    * Transforms an <oppia/> tag into an iframe that embeds an Oppia exploration.
    * The following attributes on the tag are recognized:
@@ -259,6 +262,24 @@
     iframe.style.visibility = 'hidden';
 
     oppiaNode.parentNode.replaceChild(iframe, oppiaNode);
+
+    // Create a div with a loading message.
+    var loadingDivId = tagId + '-loading';
+
+    var loadingDiv = document.createElement('div');
+    loadingDiv.setAttribute('id', loadingDivId);
+    var loadingMessageContainer = document.createElement('center');
+    var loadingMessageSpan = document.createElement('span');
+    loadingMessageSpan.style.fontSize = 'larger';
+    loadingMessageSpan.textContent = 'Loading...';
+
+    iframe.parentNode.appendChild(loadingDiv);
+    loadingDiv.appendChild(loadingMessageContainer);
+    loadingDiv.appendChild(document.createElement('br'));
+    loadingDiv.appendChild(document.createElement('br'));
+    loadingMessageContainer.appendChild(loadingMessageSpan);
+
+    oppiaNodeIdsToLoadingDivIds[tagId] = loadingDivId;
   }
 
   function reloadParentOppiaTag(buttonNode) {
@@ -300,6 +321,12 @@
       window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
     },
     onExplorationLoaded: function(iframeNode) {
+      // Remove the loading-message div.
+      var nodeId = iframeNode.getAttribute('id');
+      var nodeToRemove = document.getElementById(
+        oppiaNodeIdsToLoadingDivIds[nodeId]);
+      nodeToRemove.parentNode.removeChild(nodeToRemove);
+
       setTimeout(function() {
         // Show the oppia contents after making sure the rendering happened.
         iframeNode.style.position = 'inherit';
