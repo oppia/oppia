@@ -17,6 +17,8 @@ files = [
   'core/templates/dev/head/**/*.html'
 ];
 
+exclude = ['core/templates/dev/head/**/*-e2e.js'];
+
 preprocessors = {
   'core/templates/dev/head/**/*.html': 'html2js'
 };

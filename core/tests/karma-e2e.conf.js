@@ -1,22 +1,23 @@
-basePath = '../';
+basePath = '../../';
+
+frameworks = ['ng-scenario'];
 
 files = [
   ANGULAR_SCENARIO,
   ANGULAR_SCENARIO_ADAPTER,
-  'templates/dev/head/tests/e2e/*.js'
+	'core/templates/dev/head/**/*-e2e.js'
 ];
+
+port = 8181;
 
 autoWatch = false;
 
 browsers = ['Chrome'];
 
-singleRun = true;
+singleRun = false;
 
 proxies = {
-  '/': 'http://localhost:8000/'
+	'/': 'http://localhost:8181/'
 };
 
-junitReporter = {
-  outputFile: '../test_out/e2e.xml',
-  suite: 'e2e'
-};
+urlRoot = '/_karma_/';
