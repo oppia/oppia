@@ -49,14 +49,14 @@ function ReaderExploration(
   $scope.initializePage = function() {
     $scope.responseLog = [];
     $http.get($scope.explorationDataUrl)
-        .success(function(data) {
-          $scope.explorationTitle = data.title;
-          $scope.loadPage(data);
-          $window.scrollTo(0, 0);
-        }).error(function(data) {
-          warningsData.addWarning(
-              data.error || 'There was an error loading the exploration.');
-        });
+      .success(function(data) {
+        $scope.explorationTitle = data.title;
+        $scope.loadPage(data);
+        $window.scrollTo(0, 0);
+      }).error(function(data) {
+        warningsData.addWarning(
+            data.error || 'There was an error loading the exploration.');
+      });
   };
 
   $scope.initializePage();
@@ -140,8 +140,8 @@ function ReaderExploration(
     $scope.stateHistory = data.state_history;
 
     messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
-
     $scope.showPage = true;
+    $scope.adjustPageHeight(true);
   };
 
   $scope.submitAnswer = function(answer, handler) {
@@ -214,12 +214,13 @@ function ReaderExploration(
       data.reader_response_html, data.oppia_html
     );
 
-    if (document.getElementById('response')) {
-      $('html, body, iframe').animate(
-          {'scrollTop': document.getElementById('response').offsetTop},
-          'slow', 'swing');
-    }
-    $scope.adjustPageHeight(true);
+    $scope.adjustPageHeight(true, function() {
+      if (document.getElementById('response')) {
+        $('html, body, iframe').animate({
+          'scrollTop': document.getElementById('response').offsetTop
+        }, 'slow', 'swing');
+      }
+    });
 
     if ($scope.finished) {
       messengerService.sendMessage(
@@ -231,19 +232,25 @@ function ReaderExploration(
   // that the parent can be resized as necessary.
   $scope.lastRequestedHeight = 0;
   $scope.lastRequestedScroll = false;
-  $scope.adjustPageHeight = function(scroll) {
-    var newHeight = document.body.scrollHeight;
-    if (Math.abs($scope.lastRequestedHeight - newHeight) <= 10.5 &&
-        (!scroll || $scope.lastRequestedScroll)) {
-      return;
-    }
-    // Sometimes setting iframe height to the exact content height still
-    // produces scrollbar, so adding 10 extra px.
-    newHeight += 10;
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
+  $scope.adjustPageHeight = function(scroll, callback) {
+    window.setTimeout(function() {
+      var newHeight = document.body.scrollHeight;
+      if (Math.abs($scope.lastRequestedHeight - newHeight) <= 50.5 &&
+          (!scroll || $scope.lastRequestedScroll)) {
+        return;
+      }
+      // Sometimes setting iframe height to the exact content height still
+      // produces scrollbar, so adding 50 extra px.
+      newHeight += 50;
+      messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
         {height: newHeight, scroll: scroll});
-    $scope.lastRequestedHeight = newHeight;
-    $scope.lastRequestedScroll = scroll;
+      $scope.lastRequestedHeight = newHeight;
+      $scope.lastRequestedScroll = scroll;
+
+      if (callback) {
+        callback();
+      }
+    }, 200);
   };
 
   $window.onresize = $scope.adjustPageHeight.bind(null, false);

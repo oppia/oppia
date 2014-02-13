@@ -82,27 +82,32 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
       // Only send a message if the oppia window is iframed.
       if ($window.parent !== $window &&
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-        var idAndVersionHash = $window.location.hash.substring(1);
-        if (!idAndVersionHash) {
+        var hash = $window.location.hash.substring(1);
+        var hashParts = hash.split('&');
+        var hashDict = {};
+        for (var i = 0; i < hashParts.length; i++) {
+          if (hashParts[i].indexOf('=') === -1) {
+            $log.error('Invalid hash for embedding: ' + hash);
+            return;
+          }
+
+          var separatorLocation = hashParts[i].indexOf('=');
+          hashDict[hashParts[i].substring(0, separatorLocation)] = (
+            hashParts[i].substring(separatorLocation + 1));
+        }
+
+        if (!hashDict.tagid || !hashDict.version || !hashDict.secret) {
+          $log.error('Invalid hash for embedding: ' + hash);
           return;
         }
 
-        if (idAndVersionHash.indexOf('&') === -1) {
-          $log.error(
-              'Invalid id/version hash for embedding: ' + idAndVersionHash);
-        }
-
-        var separatorLocation = idAndVersionHash.indexOf('&');
-
-        var sourceTagId = idAndVersionHash.substring(0, separatorLocation);
-        var version = idAndVersionHash.substring(separatorLocation + 1);
-
-        if (version == '0.0.0') {
+        if (hashDict.version == '0.0.0') {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
           if (!MESSAGE_VALIDATORS[messageTitle](payload)) {
             $log.error('Error validating payload: ' + payload);
+            return;
           }
 
           $log.info(payload);
@@ -110,8 +115,15 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           // The targetOrigin needs to be * because any page can iframe an
           // exploration.
           $window.parent.postMessage(
-            JSON.stringify({title: messageTitle, payload: payload, sourceTagId: sourceTagId}),
-            '*');
+            JSON.stringify({
+              title: messageTitle,
+              payload: payload,
+              sourceTagId: hashDict.tagid,
+              secret: hashDict.secret
+            }), '*');
+        } else {
+          $log.error('Unknown version for embedding: ' + hashDict.version);
+          return;
         }
       }
     }

@@ -184,7 +184,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       restrict: 'E',
       scope: {},
       templateUrl: WIDGET_TEMPLATE_URL_PREFIX + 'InteractiveMap',
-      controller: ['$scope', 'attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.coords = [
           oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
           oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
