@@ -23,10 +23,24 @@ oppia.factory('explorationData', [
   '$http', '$log', 'warningsData', '$q', 'oppiaRequestCreator',
   function($http, $log, warningsData, $q, oppiaRequestCreator) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
-    var explorationUrl = '/create/' + pathnameArray[2];
-    var explorationDataUrl = '/createhandler/data/' + pathnameArray[2];
-    var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + pathnameArray[2];
-    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + pathnameArray[2];
+    var explorationId = '';
+    var pathnameArray = window.location.pathname.split('/');
+    for (var i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'create') {
+        var explorationId = pathnameArray[i + 1];
+        break;
+      }
+    }
+
+    if (!explorationId) {
+      $log.error('Unexpected call to explorationData for pathname ', pathnameArray[i]);
+      return;
+    }
+
+    var explorationUrl = '/create/' + explorationId;
+    var explorationDataUrl = '/createhandler/data/' + explorationData;
+    var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + explorationData;
+    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + explorationData;
 
     // TODO(sll): Find a fix for multiple users editing the same exploration
     // concurrently.
