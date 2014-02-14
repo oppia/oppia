@@ -51,7 +51,7 @@
     </script>
   </div>
 
-  <div class="oppia-content">
+  <div class="oppia-content" role="main">
     <a href="/learn" class="btn" ng-if="!iframed">
       Return to the gallery
     </a>
@@ -62,13 +62,13 @@
       <a href="" ng-click="resetPage()" class="pull-right oppia-exploration-header-sublink">
         Clear history and restart
       </a>
-      <h3><[title]></h3>
+      <h3 role="heading"><[title]></h3>
     </div>
 
     <div class="oppia-iframe-container oppia-exploration">
       <div ng-repeat="response in responseLog track by $index">
         <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>" class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[$last && !finished]]>">
-          <div angular-html-bind="response">
+          <div angular-html-bind="response" aria-live="assertive">
           </div>
         </div>
       </div>
