@@ -18,9 +18,6 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var editorUrl = '/editor/';
-var pathnameArray = window.location.pathname.split('/');
-
 // Global utility methods.
 function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
   $scope.warningsData = warningsData;

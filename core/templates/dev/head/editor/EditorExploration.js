@@ -466,11 +466,17 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $rootScope.loadingMessage = 'Loading';
 
   // The pathname should be: .../create/{exploration_id}
-  $scope.explorationId = pathnameArray[2];
+  $scope.pathnameArray = window.location.pathname.split('/');
+  for (var i = 0; i < $scope.pathnameArray.length; i++) {
+    if ($scope.pathnameArray[i] === 'create') {
+      $scope.explorationId = $scope.pathnameArray[i + 1];
+      break;
+    }
+  }
   // The exploration id needs to be attached to the root scope in order for
   // the file picker widget to work. (Note that an alternative approach might
   // also be to replicate this URL-based calculation in the file picker widget.)
-  $rootScope.explorationId = pathnameArray[2];
+  $rootScope.explorationId = $scope.explorationId;
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;

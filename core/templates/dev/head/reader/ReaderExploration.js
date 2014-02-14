@@ -21,10 +21,18 @@
 function ReaderExploration(
     $scope, $http, $rootScope, $sce, $timeout, $modal, $window, $log, warningsData,
     messengerService, oppiaRequestCreator) {
-  // The pathname is expected to be: /[exploration_id]
-  $scope.explorationId = pathnameArray[2];
+
+  // The pathname should be: .../explore/{exploration_id}
+  $scope.pathnameArray = window.location.pathname.split('/');
+  for (var i = 0; i < $scope.pathnameArray.length; i++) {
+    if ($scope.pathnameArray[i] === 'explore') {
+      $scope.explorationId = $scope.pathnameArray[i + 1];
+      break;
+    }
+  }
+
   // The following is needed for image displaying to work.
-  $rootScope.explorationId = pathnameArray[2];
+  $rootScope.explorationId = $scope.explorationId;
   $scope.explorationDataUrl = '/explorehandler/init/' + $scope.explorationId;
   if (GLOBALS.explorationVersion) {
     $scope.explorationDataUrl += '?v=' + GLOBALS.explorationVersion;
