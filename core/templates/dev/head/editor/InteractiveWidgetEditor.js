@@ -21,7 +21,6 @@
 function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, explorationData, oppiaRequestCreator) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
-  $scope.widgetParamSpecs = {};
   $scope.widgetHandlerSpecs = [];
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
@@ -36,12 +35,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
         {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
       $scope.widgetHandlerSpecs = data.widget.handlers;
-      $scope.widgetParamSpecs = data.widget.params;
 
       $scope.widgetId = data.widget.widget_id;
       $scope.widgetCustomizationArgs = data.widget.customization_args;
 
-      $scope.widgetPreviewHtml = data.tag;
+      $scope.widgetPreviewHtml = data.widget.tag;
       if (successCallback) {
         successCallback();
       }
@@ -415,77 +413,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
     }
   });
 
-  $scope.getCustomizationModalInstance = function(widgetId, widgetCustomizationArgs) {
-    // NB: This method is used for interactive widgets.
-    return $modal.open({
-      templateUrl: 'modals/customizeWidget',
-      backdrop: 'static',
-      resolve: {
-        widgetId: function() {
-          return widgetId;
-        },
-        widgetParamSpecs: function() {
-          return $scope.widgetParamSpecs;
-        },
-        widgetCustomizationArgs: function() {
-          return widgetCustomizationArgs;
-        }
-      },
-      controller: ['$scope', '$http', '$modalInstance', 'widgetId', 'widgetParamSpecs',
-        'widgetCustomizationArgs', 'warningsData', 'oppiaRequestCreator',
-        function($scope, $http, $modalInstance, widgetId, widgetParamSpecs,
-            widgetCustomizationArgs, warningsData, oppiaRequestCreator) {
-
-          $scope.widgetId = widgetId;
-          $scope.widgetParamSpecs = widgetParamSpecs;
-          $scope.widgetCustomizationArgs = widgetCustomizationArgs;
-
-          $scope.paramDescriptions = {};
-          for (var paramName in $scope.widgetParamSpecs) {
-            $scope.paramDescriptions[paramName] = $scope.widgetParamSpecs[paramName].description;
-          }
-
-          $scope.save = function(widgetCustomizationArgs) {
-            $scope.$broadcast('externalSave');
-            $modalInstance.close({
-              widgetCustomizationArgs: widgetCustomizationArgs
-            });
-          };
-
-          $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    });
-  };
-
-  $scope.showCustomizeInteractiveWidgetModal = function(index) {
-    warningsData.clear();
-    var widgetCustomizationArgsMemento = angular.copy(
-        $scope.widgetCustomizationArgs);
-
-    var modalInstance = $scope.getCustomizationModalInstance(
-        $scope.widgetId, $scope.widgetCustomizationArgs);
-
-    modalInstance.result.then(function(result) {
-      $scope.widgetCustomizationArgs = result.widgetCustomizationArgs;
-      if (!angular.equals($scope.widgetCustomizationArgs, widgetCustomizationArgsMemento)) {
-        $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
-        $scope.addStateChange(
-          'widget_customization_args', $scope.widgetCustomizationArgs,
-          widgetCustomizationArgsMemento
-        );
-      }
-      $log.info('Interactive customization modal saved.');
-    });
-  };
-
-  $scope.interactiveWidgetPickerIsShown = false;
+  $scope.interactiveWidgetEditorIsShown = false;
   $scope.interactiveWidgetRepository = null;
 
-  $scope.showInteractiveWidgetPicker = function() {
+  $scope.showInteractiveWidgetEditor = function() {
     warningsData.clear();
 
     if (!$scope.interactiveWidgetRepository) {
@@ -496,13 +427,16 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
           for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
             if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
               $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+              $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
+              $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
+              break;
             }
           }
         }
       });
     }
 
-    $scope.interactiveWidgetPickerIsShown = true;
+    $scope.interactiveWidgetEditorIsShown = true;
     $scope.widgetIdMemento = $scope.widgetId;
     $scope.widgetCustomizationArgsMemento = angular.copy($scope.widgetCustomizationArgs);
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
@@ -511,41 +445,68 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
       for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
         if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
           $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+          $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
+          $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
+          break;
         }
       }
     }
   };
 
   $scope.selectInteractiveWidget = function(tmpWidget) {
+    $scope.$broadcast('externalSave');
+
     var newWidget = $scope.cloneObject(tmpWidget);
 
-    if (!$scope.widgetId || $scope.widgetId != newWidget.widget_id) {
-      $scope.widgetId = newWidget.widget_id;
-      $scope.widgetCustomizationArgs = newWidget.customization_args;
-      // Preserve the old default rule.
+    if (!angular.equals(newWidget.widget_id, $scope.widgetIdMemento)) {
+      $scope.widgetId = angular.copy(newWidget.widget_id);
+      $scope.addStateChange('widget_id', $scope.widgetId, $scope.widgetIdMemento);
+
+      // Change the widget handlers, but preserve the old default rule.
       $scope.widgetHandlers = {
         'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
       };
+      $scope.addStateChange('widget_handlers', $scope.widgetHandlers, $scope.widgetHandlersMemento);
     }
 
-    $scope.addStateChange('widget_id', $scope.widgetId, $scope.widgetIdMemento);
-    $scope.addStateChange(
-      'widget_customization_args', $scope.widgetCustomizationArgs,
-      $scope.widgetCustomizationArgsMemento
-    );
+    if (!angular.equals(newWidget.customization_args, $scope.widgetCustomizationArgsMemento)) {
+      $scope.widgetCustomizationArgs = angular.copy(newWidget.customization_args);
+      $scope.addStateChange(
+        'widget_customization_args', $scope.widgetCustomizationArgs,
+        $scope.widgetCustomizationArgsMemento
+      );
+    }
+
     $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+    $scope.updateStatesData();
+    $scope.drawGraph();
 
-    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
+    $scope.states[$scope.stateName].widget.widget_id = $scope.widgetId;
+    $scope.states[$scope.stateName].widget.customization_args = angular.copy(
+      $scope.widgetCustomizationArgs);
 
-    $scope.closeInteractiveWidgetPicker();
+    $scope.closeInteractiveWidgetEditor();
   };
 
-  $scope.setTmpWidget = function(widget) {
-    $scope.tmpWidget = widget;
+  $scope.generateTmpWidgetPreview = function() {
+    $scope.tmpWidget.tag = 'Loading...';
+    $http.post(
+        '/widgets/interactive/' + $scope.tmpWidget.widget_id,
+        oppiaRequestCreator.createRequest({
+          customization_args: $scope.tmpWidget.customization_args
+        }),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    ).success(function(data) {
+      $scope.tmpWidget.tag = data.widget.tag;
+    });
   };
 
-  $scope.closeInteractiveWidgetPicker = function() {
-    $scope.interactiveWidgetPickerIsShown = false;
+  $scope.setNewTmpWidget = function(widget) {
+    $scope.tmpWidget = angular.copy(widget);
+  };
+
+  $scope.closeInteractiveWidgetEditor = function() {
+    $scope.interactiveWidgetEditorIsShown = false;
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;
     $scope.widgetCustomizationArgsMemento = null;

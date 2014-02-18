@@ -308,7 +308,7 @@ class BaseWidget(object):
             {PARAM_NAME: PARAM_DESCRIPTION_DICT}
 
         where PARAM_DESCRIPTION_DICT has the keys ['value', 'generator_id',
-        'init_args', 'customization_args', 'obj_type'].
+        'init_args', 'customization_args', 'obj_type', 'tag'].
 
         If preview_mode is True then a default parameter value is used when the
         customization_args are invalid. This is necessary if, for example, a
@@ -356,6 +356,9 @@ class BaseWidget(object):
                     rule_cls.description,
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
+
+            result['tag'] = self.get_interactive_widget_tag(
+                customization_args, {}, preview_mode=preview_mode)
 
         # Add RTE toolbar information for noninteractive widgets.
         if self.type == feconf.NONINTERACTIVE_PREFIX:

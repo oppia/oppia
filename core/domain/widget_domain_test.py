@@ -85,7 +85,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description', 'params',
-            'handlers', 'customization_args'])
+            'handlers', 'customization_args', 'tag'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
 

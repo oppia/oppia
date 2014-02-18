@@ -3,8 +3,10 @@
     <input ng-if="rows == 1" ng-model="$parent.answer"
            placeholder="<[placeholder]>" size="<[columns]>" required autofocus>
 
+    <!-- The 'width: auto' is necessary to get around auto-resizing by Twitter Bootstrap. -->
     <textarea ng-if="rows != 1" ng-model="$parent.answer"
-              placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[columns]>">
+              placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[columns]>"
+              style="width: auto;">
     </textarea>
 
     <button type="submit">Submit</button>

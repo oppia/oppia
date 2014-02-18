@@ -8,21 +8,21 @@
 
 {% block center %}
   <div>
-    <div ng-hide="interactiveWidgetPickerIsShown" class="oppia-interactive-widget-display oppia-preview">
+    <div ng-hide="interactiveWidgetEditorIsShown" class="oppia-interactive-widget-display oppia-preview">
       <div angular-html-bind="widgetPreviewHtml"></div>
     </div>
 
-    <div ng-show="interactiveWidgetPickerIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
+    <div ng-show="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
       <span class="pull-right" ng-if="tmpWidget">
         <button ng-click="selectInteractiveWidget(tmpWidget)">
           Use this interaction
         </button>
-        <button ng-click="closeInteractiveWidgetPicker()">
+        <button ng-click="closeInteractiveWidgetEditor()">
           Cancel
         </button>
       </span>
 
-      <h5>Interaction Picker</h5>
+      <h5>Interaction Editor</h5>
 
       <div class="container-fluid">
         <div class="row-fluid">
@@ -31,7 +31,7 @@
             <accordion close-others="true">
               <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
                 <ul>
-                  <li ng-repeat="widget in widgetList" ng-click="setTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'" style="list-style-type: none;">
+                  <li ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'" style="list-style-type: none;">
                     <[widget.name]>
                   </li>
                 </ul>
@@ -41,14 +41,33 @@
 
           <div class="span8">
             <div ng-show="tmpWidget">
-              <div>
-                <[tmpWidget.description]>
-              </div>
+              <accordion close-others="true">
+                <accordion-group is-open="true">
+                  <accordion-heading>
+                    <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
+                    <div style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()">
+                      Preview
+                    </div>
+                  </accordion-heading>
+                  <div class="oppia-preview">
+                    <div angular-html-bind="tmpWidget.tag"></div>
+                  </div>
+                </accordion-group>
 
-              <h5>Preview</h5>
-              <div class="oppia-preview">
-                <div angular-html-bind="tmpWidget.tag"></div>
-              </div>
+                <div ng-if="!isEmpty(tmpWidget.params)">
+                  <accordion-group heading="Customization">
+                    <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
+                      <strong><[tmpWidget.params[paramName].description]></strong>
+                      <value-generator-editor generator-id="paramSpecDict.generator_id"
+                                              init-args="paramSpecDict.init_args"
+                                              customization-args="tmpWidget.customization_args[paramName]"
+                                              obj-type="paramSpecDict.obj_type">
+                      </value-generator-editor>
+                      <br>
+                    </div>
+                  </accordion-group>
+                </div>
+              </accordion>
             </div>
           </div>
 
@@ -69,12 +88,7 @@
 {% endblock %}
 
 {% block right %}
-  <button ng-click="showInteractiveWidgetPicker()" class="pull-right" ng-hide="interactiveWidgetPickerIsShown">
-    Change type
-  </button>
-
-  <br><br>
-  <button ng-click="showCustomizeInteractiveWidgetModal()" class="pull-right" ng-if="!isEmpty(widgetCustomizationArgs)" ng-hide="interactiveWidgetPickerIsShown">
-    Customize
+  <button ng-click="showInteractiveWidgetEditor()" class="pull-right" ng-hide="interactiveWidgetEditorIsShown">
+    Edit interaction
   </button>
 {% endblock %}

@@ -20,7 +20,6 @@ import collections
 
 from core.controllers import base
 from core.domain import widget_registry
-import feconf
 
 
 class WidgetRepositoryHandler(base.BaseHandler):
@@ -36,11 +35,8 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
         widgets = collections.defaultdict(list)
         for widget in widget_list:
-            widget_instance_dict = widget.get_widget_instance_dict({}, {})
-            if widget_type == feconf.INTERACTIVE_PREFIX:
-                widget_instance_dict['tag'] = (
-                    widget.get_interactive_widget_tag({}, {}))
-            widgets[widget.category].append(widget_instance_dict)
+            widgets[widget.category].append(
+                widget.get_widget_instance_dict({}, {}))
 
         for category in widgets:
             widgets[category].sort()
@@ -67,9 +63,5 @@ class WidgetHandler(base.BaseHandler):
             'widget': widget.get_widget_instance_dict(
                 customization_args, {}, preview_mode=True),
         }
-
-        if widget_type == feconf.INTERACTIVE_PREFIX:
-            result['tag'] = widget.get_interactive_widget_tag(
-                customization_args, {})
 
         self.render_json(result)

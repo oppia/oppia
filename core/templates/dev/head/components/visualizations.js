@@ -86,12 +86,14 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       });
 
       scope.$watch('currentStateName', function(newStateName, oldStateName) {
-        drawGraph(
-          scope.val.nodes, scope.val.links, scope.val.initStateName,
-          scope.val.finalStateName, scope.nodeFill, scope.opacityMap,
-          scope.forbidNodeDeletion, scope.highlightStates, scope.stateStats,
-          scope.allowPanning, scope.currentStateName
-        );
+        if (scope.val) {
+          drawGraph(
+            scope.val.nodes, scope.val.links, scope.val.initStateName,
+            scope.val.finalStateName, scope.nodeFill, scope.opacityMap,
+            scope.forbidNodeDeletion, scope.highlightStates, scope.stateStats,
+            scope.allowPanning, scope.currentStateName
+          );
+        }
       })
 
       // Returns an object representing the nodes of the graph. The keys of the

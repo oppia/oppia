@@ -142,6 +142,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.discardChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
+      warningsData.clear();
       $scope.isDiscardInProgress = true;
 
       // Clear both change lists.
