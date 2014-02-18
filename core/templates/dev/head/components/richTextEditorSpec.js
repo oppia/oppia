@@ -26,7 +26,7 @@ describe('RTE directive', function() {
     $httpBackend = _$httpBackend_;
     $httpBackend.expectGET('/widgetrepository/data/noninteractive').respond({
       data: {
-        widgets: {
+        widgetRepository: {
           'Basic Input': [{
             frontend_name: 'image',
             name: 'Image',

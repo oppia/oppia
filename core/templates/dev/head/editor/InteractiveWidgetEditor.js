@@ -482,57 +482,74 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
     });
   };
 
-  $scope.showChooseInteractiveWidgetModal = function() {
+  $scope.interactiveWidgetPickerIsShown = false;
+  $scope.interactiveWidgetRepository = null;
+
+  $scope.showInteractiveWidgetPicker = function() {
     warningsData.clear();
 
-    var widgetIdMemento = $scope.widgetId;
-    var widgetCustomizationArgsMemento = angular.copy($scope.widgetCustomizationArgs);
-    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-
-    $modal.open({
-      templateUrl: 'modals/chooseInteractiveWidget',
-      backdrop: 'static',
-      resolve: {},
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        // Receive messages from the exploration editor broadcast (these
-        // messages originate from the widget repository).
-        // TODO(sll): This results in a "Cannot read property '$$nextSibling'
-        // of null" error in the exploration editor $broadcast. This error does
-        // not seem to have any side effects, but we should try and fix it. Is
-        // it because it is being triggered when a postMessage call happens?
-        $scope.$on('message', function(evt, arg) {
-          if (arg.origin != window.location.protocol + '//' + window.location.host) {
-            return;
+    if (!$scope.interactiveWidgetRepository) {
+      // Initializes the widget list using data from the server.
+      $http.get('/widgetrepository/data/interactive').success(function(data) {
+        $scope.interactiveWidgetRepository = data.widgetRepository;
+        for (var category in $scope.interactiveWidgetRepository) {
+          for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
+            if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
+              $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+            }
           }
-          if (arg.data.widgetType && arg.data.widgetType == 'interactive') {
-            $modalInstance.close(arg);
-          }
-        });
+        }
+      });
+    }
 
-        $scope.cancel = function() {
-          warningsData.clear();
-          $modalInstance.dismiss('cancel');
-        };
-      }]
-    }).result.then(function(arg) {
-      if (!$scope.widgetId || $scope.widgetId != arg.data.widget.widget_id) {
-        $scope.widgetId = arg.data.widget.widget_id;
-        $scope.widgetCustomizationArgs = arg.data.widget.customization_args;
-        // Preserve the old default rule.
-        $scope.widgetHandlers = {
-          'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
-        };
+    $scope.interactiveWidgetPickerIsShown = true;
+    $scope.widgetIdMemento = $scope.widgetId;
+    $scope.widgetCustomizationArgsMemento = angular.copy($scope.widgetCustomizationArgs);
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+
+    for (var category in $scope.interactiveWidgetRepository) {
+      for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
+        if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
+          $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+        }
       }
+    }
+  };
 
-      $scope.addStateChange('widget_id', $scope.widgetId, widgetIdMemento);
-      $scope.addStateChange(
-        'widget_customization_args', $scope.widgetCustomizationArgs,
-        widgetCustomizationArgsMemento
-      );
-      $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+  $scope.selectInteractiveWidget = function(tmpWidget) {
+    var newWidget = $scope.cloneObject(tmpWidget);
 
-      $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
-    });
+    if (!$scope.widgetId || $scope.widgetId != newWidget.widget_id) {
+      $scope.widgetId = newWidget.widget_id;
+      $scope.widgetCustomizationArgs = newWidget.customization_args;
+      // Preserve the old default rule.
+      $scope.widgetHandlers = {
+        'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
+      };
+    }
+
+    $scope.addStateChange('widget_id', $scope.widgetId, $scope.widgetIdMemento);
+    $scope.addStateChange(
+      'widget_customization_args', $scope.widgetCustomizationArgs,
+      $scope.widgetCustomizationArgsMemento
+    );
+    $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+
+    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
+
+    $scope.closeInteractiveWidgetPicker();
+  };
+
+  $scope.setTmpWidget = function(widget) {
+    $scope.tmpWidget = widget;
+  };
+
+  $scope.closeInteractiveWidgetPicker = function() {
+    $scope.interactiveWidgetPickerIsShown = false;
+    $scope.tmpWidget = null;
+    $scope.widgetIdMemento = null;
+    $scope.widgetCustomizationArgsMemento = null;
+    $scope.widgetHandlersMemento = null;
   };
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {

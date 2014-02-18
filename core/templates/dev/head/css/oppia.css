@@ -539,6 +539,21 @@ textarea {
   cursor: pointer;
 }
 
+.oppia-selected-accordion-item {
+  opacity: 0.5;
+  padding: 3px;
+}
+
+.oppia-unselected-accordion-item {
+  cursor: pointer;
+  padding: 3px;
+}
+.oppia-unselected-accordion-item:hover {
+  background-color: #18447e;
+  border-radius: 5px;
+  color: white;
+}
+
 .oppia-editable-name {
   color: #8f8661;
   font-weight: bold;
@@ -592,11 +607,14 @@ textarea {
   padding: 5px;
 }
 
-.oppia-widget-preview {
+.oppia-interactive-widget-display {
   border-bottom: 1px dashed #bbb;
   border-left: 1px dashed #bbb;
   border-right: 1px dashed #bbb;
   margin: 0 0 2px 0;
+}
+
+.oppia-preview {
   opacity: 0.7;
 }
 

@@ -207,7 +207,7 @@ oppia.directive('richTextEditor', [
             if ($scope.disallowOppiaWidgets) {
               $scope._NONINTERACTIVE_WIDGETS = [];
             } else {
-              $scope._NONINTERACTIVE_WIDGETS = response.data.widgets['Basic Input'];
+              $scope._NONINTERACTIVE_WIDGETS = response.data.widgetRepository['Basic Input'];
             }
 
             $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {

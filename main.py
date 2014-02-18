@@ -186,9 +186,6 @@ urls = [
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
 
     get_redirect_route(
-        r'/widgetrepository', widgets.WidgetRepositoryPage,
-        'widget_repository_page'),
-    get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
     get_redirect_route(
@@ -220,7 +217,8 @@ def main():
         '/auth': auth
     })
     from werkzeug.serving import run_simple
-    run_simple('localhost', 8080, application, use_reloader=True, use_debugger=True)
+    run_simple(
+        'localhost', 8080, application, use_reloader=True, use_debugger=True)
 
 if __name__ == '__main__':
     main()

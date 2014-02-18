@@ -22,33 +22,6 @@ from core.controllers import base
 from core.domain import widget_registry
 import feconf
 
-import jinja2
-
-
-class WidgetRepositoryPage(base.BaseHandler):
-    """Displays the widget repository page."""
-
-    def get(self):
-        """Returns the widget repository page."""
-        if self.request.get('iframed') == 'true':
-            self.values['iframed'] = True
-        if self.request.get('interactive') == 'true':
-            self.values['interactive'] = True
-        if 'parent_index' in self.request.GET.keys():
-            self.values['parent_index'] = self.request.get('parent_index')
-
-        all_interactive_widget_ids = (
-            widget_registry.Registry.get_widget_ids_of_type(
-                feconf.INTERACTIVE_PREFIX))
-        widget_js_directives = (
-            widget_registry.Registry.get_interactive_widget_js(
-                all_interactive_widget_ids))
-        self.values['widget_js_directives'] = jinja2.utils.Markup(
-            widget_js_directives)
-
-        self.render_template(
-            'editor/widget_repository.html', iframe_restriction='SAMEORIGIN')
-
 
 class WidgetRepositoryHandler(base.BaseHandler):
     """Populates the widget repository pages."""
@@ -72,15 +45,7 @@ class WidgetRepositoryHandler(base.BaseHandler):
         for category in widgets:
             widgets[category].sort()
 
-        response = {'widgets': widgets}
-
-        if widget_type == feconf.NONINTERACTIVE_PREFIX:
-            parent_index = self.request.get('parent_index')
-            if parent_index is None:
-                raise Exception(
-                    'Non-interactive widgets require a parent_index.')
-            else:
-                response['parent_index'] = parent_index
+        response = {'widgetRepository': widgets}
 
         self.render_json(response)
 
