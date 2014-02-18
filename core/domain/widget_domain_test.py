@@ -56,8 +56,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        code = widget.get_html_template()
-        self.assertIn('input ng-if="rows == 1"', code)
+        self.assertIn('input ng-if="rows == 1"', widget.js_code)
 
         tag = widget.get_interactive_widget_tag({}, {})
         self.assertEqual(
@@ -86,11 +85,9 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description', 'params',
-            'handlers', 'raw', 'customization_args'])
+            'handlers', 'customization_args'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
-        self.assertIn('input ng-if="rows == 1"',
-                      parameterized_widget_dict['raw'])
 
         self.assertDictContainsSubset({
             'placeholder': {
@@ -181,11 +178,11 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config .py file, an
-            # html entry-point file, a response.html file, (optionally) a
+            # html file, a JS file, a response.html file, (optionally) a
             # directory named 'static' and (optionally) a stats_response.html
             # file.
             dir_contents = os.listdir(widget_dir)
-            self.assertLessEqual(len(dir_contents), 6)
+            self.assertLessEqual(len(dir_contents), 7)
 
             optional_dirs_and_files_count = 0
 
@@ -212,16 +209,18 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 3, len(dir_contents),
+                optional_dirs_and_files_count + 4, len(dir_contents),
                 dir_contents
             )
 
             py_file = os.path.join(widget_dir, '%s.py' % widget_id)
             html_entry_point = os.path.join(widget_dir, '%s.html' % widget_id)
+            js_file = os.path.join(widget_dir, '%s.js' % widget_id)
             response_template = os.path.join(widget_dir, 'response.html')
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_entry_point))
+            self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(response_template))
 
             WIDGET_CONFIG_SCHEMA = [

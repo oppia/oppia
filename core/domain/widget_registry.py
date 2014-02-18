@@ -73,9 +73,20 @@ class Registry(object):
         cls._refresh_widgets_of_type(feconf.NONINTERACTIVE_PREFIX)
 
     @classmethod
+    def get_widget_ids_of_type(cls, widget_type):
+        """Get a list of all widget ids for the given widget type."""
+        if widget_type not in cls.WIDGET_TYPE_MAPPING:
+            raise Exception('Invalid widget type: %s' % widget_type)
+
+        if len(cls.WIDGET_TYPE_MAPPING[widget_type][0]) == 0:
+            Registry.refresh()
+        return cls.WIDGET_TYPE_MAPPING[widget_type][0].keys()
+
+    @classmethod
     def get_widgets_of_type(cls, widget_type):
-        """Get a list of widget classes whose id starts with widget_prefix."""
-        assert widget_type in cls.WIDGET_TYPE_MAPPING
+        """Get a list of all widget classes for the given widget type."""
+        if widget_type not in cls.WIDGET_TYPE_MAPPING:
+            raise Exception('Invalid widget type: %s' % widget_type)
 
         if len(cls.WIDGET_TYPE_MAPPING[widget_type][0]) == 0:
             Registry.refresh()
@@ -117,3 +128,21 @@ class Registry(object):
             widget_tags[tag_name] = attr_list
 
         return widget_tags
+
+    @classmethod
+    def get_interactive_widget_js(cls, widget_ids):
+        """Returns the JS for the given list of widget ids."""
+        widget_js_codes = []
+        for widget_id in widget_ids:
+            widget = cls.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
+            widget_js_codes.append(widget.js_code)
+
+        return ' \n'.join(widget_js_codes)
+
+    @classmethod
+    def get_noninteractive_widget_js(cls):
+        """Returns the JS for all noninteractive widgets."""
+        return ' \n'.join([
+            widget.js_code for widget in cls.get_widgets_of_type(
+                feconf.NONINTERACTIVE_PREFIX)
+        ])

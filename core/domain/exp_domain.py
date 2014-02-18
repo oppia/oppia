@@ -1170,3 +1170,10 @@ class Exploration(object):
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
         })
+
+    def get_interactive_widget_ids(self):
+        """Get all interactive widget ids used in this exploration."""
+        result = set([])
+        for (state_name, state) in self.states.iteritems():
+            result.add(state.widget.widget_id)
+        return list(result)

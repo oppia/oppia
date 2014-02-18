@@ -141,10 +141,26 @@ class BaseWidget(object):
             return '{{answer}}'
 
     @property
-    def template(self):
-        """The template used to generate the widget html."""
-        return utils.get_file_contents(os.path.join(
+    def js_code(self):
+        """The JS code containing directives and templates for the widget."""
+        js_directives = utils.get_file_contents(os.path.join(
+            feconf.WIDGETS_DIR, self.type, self.id, '%s.js' % self.id))
+
+        html_template = utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
+        if '<script>' in html_template or '</script>' in html_template:
+            raise Exception(
+                'Unexpected script tag in HTML template for widget ' % self.id)
+
+        widget_type = (
+            'interactiveWidget' if self.is_interactive
+            else 'noninteractiveWidget')
+        js_template = ("""
+            <script type="text/ng-template" id="%s/%s">
+              %s
+            </script>""" % (widget_type, self.id, html_template))
+
+        return '<script>%s</script>\n%s' % (js_directives, js_template)
 
     def _get_widget_param_instances(self, state_customization_args,
                                     context_params, preview_mode=False):
@@ -249,10 +265,6 @@ class BaseWidget(object):
 
         return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
 
-    def get_html_template(self):
-        """Gets the html template for a parameterized widget."""
-        return jinja_utils.parse_string(self.template, {})
-
     def get_reader_response_html(self, state_customization_args,
                                  context_params, answer, sticky):
         """Gets the parameterized HTML and iframes for a reader response."""
@@ -309,7 +321,6 @@ class BaseWidget(object):
             'category': self.category,
             'description': self.description,
             'widget_id': self.id,
-            'raw': self.get_html_template(),
         }
 
         param_instances = self._get_widget_param_instances(

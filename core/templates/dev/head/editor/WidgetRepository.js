@@ -53,8 +53,7 @@ function WidgetRepository($scope, $http, $log) {
   };
 
   $scope.previewWidget = function(category, index) {
-    $scope.addContentToIframeWithId(
-      'widgetPreview', $scope.widgets[category][index].raw);
+    $scope.widgetPreviewHtml = $scope.widgets[category][index].tag;
   };
 }
 

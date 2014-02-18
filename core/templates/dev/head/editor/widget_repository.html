@@ -39,8 +39,8 @@
       </div>
     </div>
 
-    <div>
-      <iframe id="widgetPreview" frameborder="0" width="100%" height="500px"></iframe>
+    <div class="oppia-widget-preview">
+      <div angular-html-bind="widgetPreviewHtml"></div>
     </div>
   </div>
 
@@ -63,4 +63,6 @@
   <script>
     {{ include_js_file('editor/WidgetRepository.js') }}
   </script>
+
+  {{ widget_js_directives }}
 {% endblock footer_js %}

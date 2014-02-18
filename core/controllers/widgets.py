@@ -22,6 +22,8 @@ from core.controllers import base
 from core.domain import widget_registry
 import feconf
 
+import jinja2
+
 
 class WidgetRepositoryPage(base.BaseHandler):
     """Displays the widget repository page."""
@@ -34,6 +36,16 @@ class WidgetRepositoryPage(base.BaseHandler):
             self.values['interactive'] = True
         if 'parent_index' in self.request.GET.keys():
             self.values['parent_index'] = self.request.get('parent_index')
+
+        all_interactive_widget_ids = (
+            widget_registry.Registry.get_widget_ids_of_type(
+                feconf.INTERACTIVE_PREFIX))
+        widget_js_directives = (
+            widget_registry.Registry.get_interactive_widget_js(
+                all_interactive_widget_ids))
+        self.values['widget_js_directives'] = jinja2.utils.Markup(
+            widget_js_directives)
+
         self.render_template(
             'editor/widget_repository.html', iframe_restriction='SAMEORIGIN')
 
@@ -51,8 +63,11 @@ class WidgetRepositoryHandler(base.BaseHandler):
 
         widgets = collections.defaultdict(list)
         for widget in widget_list:
-            widgets[widget.category].append(
-                widget.get_widget_instance_dict({}, {}))
+            widget_instance_dict = widget.get_widget_instance_dict({}, {})
+            if widget_type == feconf.INTERACTIVE_PREFIX:
+                widget_instance_dict['tag'] = (
+                    widget.get_interactive_widget_tag({}, {}))
+            widgets[widget.category].append(widget_instance_dict)
 
         for category in widgets:
             widgets[category].sort()
@@ -93,16 +108,3 @@ class WidgetHandler(base.BaseHandler):
                 customization_args, {})
 
         self.render_json(result)
-
-
-class WidgetTemplateHandler(base.BaseHandler):
-    """Retrieves the HTML template for a widget."""
-
-    def get(self, widget_type, widget_id):
-        """Handles GET requests."""
-        try:
-            widget = widget_registry.Registry.get_widget_by_id(
-                widget_type, widget_id)
-            self.response.write(widget.get_html_template())
-        except:
-            raise self.PageNotFoundException

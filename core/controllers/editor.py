@@ -28,6 +28,7 @@ from core.domain import obj_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
+from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -149,6 +150,14 @@ class ExplorationPage(EditorHandler):
         object_editors_js = OBJECT_EDITORS_JS.value
         value_generators_js = VALUE_GENERATORS_JS.value
 
+        all_interactive_widget_ids = (
+            widget_registry.Registry.get_widget_ids_of_type(
+                feconf.INTERACTIVE_PREFIX))
+        widget_js_directives = (
+            widget_registry.Registry.get_noninteractive_widget_js() +
+            widget_registry.Registry.get_interactive_widget_js(
+                all_interactive_widget_ids))
+
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
@@ -161,6 +170,7 @@ class ExplorationPage(EditorHandler):
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
         })
 
         self.render_template('editor/editor_exploration.html')

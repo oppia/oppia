@@ -38,9 +38,9 @@ oppia.factory('explorationData', [
     }
 
     var explorationUrl = '/create/' + explorationId;
-    var explorationDataUrl = '/createhandler/data/' + explorationData;
-    var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + explorationData;
-    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + explorationData;
+    var explorationDataUrl = '/createhandler/data/' + explorationId;
+    var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + explorationId;
+    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + explorationId;
 
     // TODO(sll): Find a fix for multiple users editing the same exploration
     // concurrently.
