@@ -491,7 +491,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             'x': function(d) { return d.x0; },
             'y': function(d) { return d.y0; },
             'class': function(d) {
-              return d.name !== END_DEST ? 'clickable' : null;
+              return (d.name !== END_DEST && d.name !== currentStateName) ? 'clickable' : null;
             }
           })
           .style({
@@ -518,7 +518,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             }
           })
           .on('click', function(d) {
-            if (d.name != END_DEST) {
+            if (d.name !== END_DEST) {
               scope.$parent.stateName = d.name;
               if (!stateStats) {
                 scope.$parent.showStateEditor(d.name);
@@ -529,6 +529,33 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
                 scope.$parent.showStateStatsModal(d.name, highlightStates[d.name]);
               }
             }
+          })
+          .on('mouseover', function(d) {
+            if (d.name !== END_DEST && d.name !== currentStateName) {
+              d3.select(this).transition().duration(150)
+                .attr('height', d.height + 6)
+                .attr('width', d.width + 6)
+                .attr('x', d.x0 - 3)
+                .attr('y', d.y0 - 3)
+                .style('fill', '#c6def8');
+            }
+          })
+          .on('mouseout', function(d) {
+            var fill = (
+              nodeFill ? nodeFill :
+              d.name == initStateName ? 'olive' :
+              d.name == END_DEST ? 'green' :
+              d.reachable === false ? 'pink' :
+              d.reachableFromEnd === false ? 'pink' :
+              'beige'
+            );
+
+            d3.select(this).transition().duration(150)
+              .attr('height', d.height)
+              .attr('width', d.width)
+              .attr('x', d.x0)
+              .attr('y', d.y0)
+              .style('fill', fill);
           });
 
         nodeEnter.append('svg:title')
