@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, explorationData, oppiaRequestCreator) {
+function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppiaRequestCreator) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -265,7 +265,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
           $scope.selectRule = function(description, name) {
             $scope.tmpRule.description = description;
             $scope.tmpRule.name = name;
-            $scope.tmpRule.dest = explorationData.stateName;
+            $scope.tmpRule.dest = $scope.stateName;
             $scope.tmpRule.destNew = '';
 
             // Finds the parameters and sets them in $scope.tmpRule.inputs.
@@ -515,7 +515,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
     if (!angular.equals(newHandlers, oldHandlers)) {
-      $scope.addStateChange('widget_handlers', newHandlers, oldHandlers);
+      $scope.addStateChange(
+        'widget_handlers', angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStatesData();
       $scope.drawGraph();
     }
@@ -532,5 +533,5 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, expl
 }
 
 InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', '$log', 'warningsData', 'explorationData', 'oppiaRequestCreator'
+  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator'
 ];
