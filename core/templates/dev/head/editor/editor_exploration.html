@@ -182,10 +182,11 @@
       <div class="row" ng-if="isCloned">
         <div class="span12">
           <div class="oppia-align-center oppia-warning">
-            <strong>Note:</strong> This is a private copy of a published exploration. If you would like to improve the
-            original exploration, please consider submitting feedback to it. (You can do this by
-            viewing it as a reader, and clicking the green Feedback button on the
-            left of the page.)
+            <strong>Note:</strong> This is a private, unpublishable copy of a
+            <a ng-href="<[getExplorationUrl(clonedFrom)]>" target="_blank">public exploration</a>.
+            You are very welcome to submit feedback to improve the original exploration: to do this,
+            click the previous link, then click the green Feedback button on the left of the page.
+            Thank you!
           </div>
         </div>
       </div>
@@ -292,8 +293,10 @@
               <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
                 <div class="oppia-state-editor-container">
                   {% include 'editor/editor_metadata.html' %}
-                  <hr>
-                  {% include 'editor/editor_version_history.html' %}
+                  <div ng-if="!isCloned">
+                    <hr>
+                    {% include 'editor/editor_version_history.html' %}
+                  </div>
                   <hr>
                   {% include 'editor/editor_viz.html' %}
                   <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor">

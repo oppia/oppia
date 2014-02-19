@@ -627,7 +627,16 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.isPublic = Boolean(
       rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
     $scope.isCloned = Boolean(rightsData.cloned_from);
+    $scope.clonedFrom = rightsData.cloned_from;
     $scope.isCommunityOwned = rightsData.community_owned;
+  };
+
+  $scope.getExplorationUrl = function(explorationId) {
+    if (explorationId) {
+      return '/explore/' + explorationId;
+    } else {
+      return '';
+    }
   };
 
   // Initializes the exploration page using data from the backend. Called on
