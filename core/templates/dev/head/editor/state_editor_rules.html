@@ -43,7 +43,7 @@
                 </span>
               </td>
               <td class="oppia-dest-bubble">
-                <center>
+                <div class="oppia-align-center">
                   <span ng-if="rule.dest == stateName">
                     ⟳
                   </span>
@@ -55,7 +55,7 @@
                       <[rule.dest]>
                     </a>
                   </span>
-                </center>
+                </div>
               </td>
             </tr>
           </table>
@@ -83,7 +83,9 @@
       <table style="width: 100%">
         <tr>
           <td style="vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
-            <center>(<em>New rules will be added here.</em>)</center>
+            <div class="oppia-align-center">
+              (<em>New rules will be added here.</em>)
+            </div>
           </td>
         </tr>
       </table>
@@ -123,7 +125,7 @@
               </span>
             </td>
             <td class="oppia-dest-bubble">
-              <center>
+              <div class="oppia-align-center">
                 <span ng-if="getDefaultRule(handlerName).dest == stateName">
                   ⟳
                 </span>
@@ -135,7 +137,7 @@
                     <[getDefaultRule(handlerName).dest]>
                   </a>
                 </span>
-              </center>
+              </div>
             </td>
           </tr>
         </table>

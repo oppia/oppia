@@ -14,11 +14,9 @@
 
 {% block content %}
   {% if announcement %}
-    <center>
-      <div class="oppia-warning">
-        {{ announcement }}
-      </div>
-    </center>
+    <div class="oppia-align-center oppia-warning">
+      {{ announcement }}
+    </div>
   {% endif %}
 
   <div ng-controller="EditorExploration" ng-cloak>
@@ -183,15 +181,12 @@
     <div class="container">
       <div class="row" ng-if="isCloned">
         <div class="span12">
-          <center>
-            <div class="oppia-warning">
-              <strong>Note:</strong> This is a private copy of a published exploration. If you would like to improve the
-              original exploration, please consider submitting feedback to it. (You can do this by
-              viewing it as a reader, and clicking the green Feedback button on the
-              left of the page.)
-            </div>
-            <br>
-          </center>
+          <div class="oppia-align-center oppia-warning">
+            <strong>Note:</strong> This is a private copy of a published exploration. If you would like to improve the
+            original exploration, please consider submitting feedback to it. (You can do this by
+            viewing it as a reader, and clicking the green Feedback button on the
+            left of the page.)
+          </div>
         </div>
       </div>
 
@@ -244,7 +239,7 @@
                 <button type="button" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
                   Release Ownership
                 </button>
-                <img class="oppia-help" src="/images/help.png""
+                <img class="oppia-help" src="/images/help.png"
                      tooltip="Click this button to release ownership of this exploration to the community."
                      tooltip-placement="bottom">
                 &nbsp;&nbsp;&nbsp;

@@ -168,6 +168,12 @@ textarea {
   text-decoration: none;
 }
 
+.oppia-align-center {
+  float: none;
+  margin: 0 auto;
+  text-align: center;
+}
+
 .oppia-no-scroll::-webkit-scrollbar {
   display: none;
 }

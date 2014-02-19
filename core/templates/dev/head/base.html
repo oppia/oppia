@@ -127,12 +127,12 @@
       </div>
 
       <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-        <center>
+        <div class="oppia-align-center">
           <[loadingMessage]>
           <span class="oppia-loading-dot-one">.</span>
           <span class="oppia-loading-dot-two">.</span>
           <span class="oppia-loading-dot-three">.</span>
-        </center>
+        </div>
       </div>
       <div ng-show="!loadingMessage">
         {% block content %}{% endblock %}

@@ -15,12 +15,10 @@
 
 {% block content %}
   {% if not is_public %}
-    <center>
-      <div class="oppia-warning">
-        <strong>Note:</strong> This is a preview of an unpublished exploration.
-      </div>
-      <br>
-    </center>
+    <div class="oppia-align-center oppia-warning">
+      <strong>Note:</strong> This is a preview of an unpublished exploration.
+    </div>
+    <br>
   {% endif %}
   {{ content }}
   <br><br><br>
