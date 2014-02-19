@@ -72,6 +72,8 @@ APPCFG_PATH = os.path.join(
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 
+THIRD_PARTY_DIR = os.path.join('.', 'third_party')
+
 
 class CD(object):
     """Context manager for changing the current working directory."""
@@ -141,6 +143,11 @@ CURRENT_GIT_VERSION = subprocess.check_output(
 
 print ''
 print 'Starting deployment process.'
+
+if not os.path.exists(THIRD_PARTY_DIR):
+    raise Exception(
+        'Could not find third_party directory at %s. Please run start.sh '
+        'prior to running this script.' % THIRD_PARTY_DIR)
 
 # Create a folder in which to save the release candidate.
 print 'Creating new release directory %s' % RELEASE_DIR_PATH
