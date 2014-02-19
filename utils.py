@@ -90,6 +90,11 @@ def get_exploration_components_from_dir(dir_path):
         for filename in files:
             filepath = os.path.join(root, filename)
             if root == dir_path:
+                if filepath.endswith('.DS_Store'):
+                    # These files are added automatically by Mac OS Xsystems.
+                    # We ignore them.
+                    continue
+
                 if yaml_content is not None:
                     raise Exception('More than one non-asset file specified '
                                     'for %s' % dir_path)
