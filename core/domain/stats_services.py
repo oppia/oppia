@@ -169,7 +169,8 @@ def get_state_rules_stats(exploration_id, state_name):
 def get_user_stats(user_id):
     """Returns a dict with user statistics for a given user"""
     user_stats = {}
-    user_stats['feedback'] = stats_services.get_feedback_items_for_user(user_id)
+    user_stats['feedback'] = ( 
+        stats_domain.FeedbackItem.get_feedback_items_for_user(user_id) )
 
     return user_stats
 
