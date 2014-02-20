@@ -164,6 +164,12 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
+def get_user_stats(user_id):
+    """Returns a dict with user statistics for a given user"""
+    user_stats = {}
+    user_stats['feedback'] = stats_services.get_feedback_items_for_user(user_id)
+
+    return user_stats
 
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""

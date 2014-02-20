@@ -165,6 +165,11 @@ class FeedbackItemModel(base_models.BaseModel):
         return feedback_entity
 
     @classmethod
+    def get_feedback_items_for_user(cls, user_id):
+        """Gets all feedback submitted by a given user."""
+        return cls.get_all().filter(
+            cls.submitter_id == user_id).fetch(QUERY_LIMIT)
+    @classmethod
     def get_new_feedback_items_for_target(cls, target_id):
         """Gets all 'new' feedback items corresponding to a given target_id."""
         return cls.get_all().filter(

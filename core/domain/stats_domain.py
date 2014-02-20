@@ -163,6 +163,13 @@ class FeedbackItem(object):
         return cls._get_feedback_items_for_target(target_id)
 
     @classmethod
+    def get_feedback_items_for_user(cls, user_id):
+        return [
+            FeedbackItem(f) for f in
+            stats_models.FeedbackItemModel.get_feedback_items_for_user(
+                user_id)]
+
+    @classmethod
     def _create_feedback_for_target(
             cls, target_id, content, additional_data, submitter_id):
         feedback_item_model = stats_models.FeedbackItemModel.get_or_create(
