@@ -17,7 +17,7 @@
   </div>
 
   <div ng-if="!!contentMemento">
-    <rich-text-editor html-content="content[0].value"></rich-text-editor>
+    <object-editor obj-type="Html" value="content[0].value" always-editable="true"></object-editor>
     <button ng-click="saveTextContent()">Close</button>
   </div>
 {% endblock %}

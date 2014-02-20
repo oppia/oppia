@@ -26,6 +26,7 @@ from core.domain import config_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -90,7 +91,11 @@ class AdminPage(base.BaseHandler):
         self.values.update({
             'demo_explorations': demo_explorations,
             'object_editors_js': jinja2.utils.Markup(
-                editor.OBJECT_EDITORS_JS.value)
+                editor.OBJECT_EDITORS_JS.value),
+            'value_generators_js': jinja2.utils.Markup(
+                editor.VALUE_GENERATORS_JS.value),
+            'widget_js_directives': jinja2.utils.Markup(
+                widget_registry.Registry.get_noninteractive_widget_js()),
         })
 
         self.render_template('admin/admin.html')

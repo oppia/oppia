@@ -90,10 +90,15 @@
     <script>
       {{ include_js_file('app.js') }}
       {{ include_js_file('admin/Admin.js') }}
+      {{ include_js_file('directives.js') }}
       {{ include_js_file('services/warningsData.js') }}
-      {{ include_js_file('components/richTextEditor.js') }}
       {{ include_js_file('components/objectEditor.js') }}
+      {{ include_js_file('components/valueGeneratorEditor.js') }}
+      {{ include_js_file('components/richTextEditor.js') }}
       {{ object_editors_js }}
+      {{ value_generators_js }}
     </script>
+
+    {{ widget_js_directives }}
   </body>
 </html>

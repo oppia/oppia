@@ -57,6 +57,7 @@ oppia.directive('richTextEditor', [
             var separatorLocation = attr.name.indexOf('-with-');
             if (separatorLocation === -1) {
               $log.error('RTE Error: invalid customization attribute ' + attr.name);
+              continue;
             }
             var paramName = attr.name.substring(0, separatorLocation);
             var argName = attr.name.substring(separatorLocation + 6);
