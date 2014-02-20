@@ -57,6 +57,15 @@
         <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
           <em>No explorations here yet!</em>
         </div>
+
+        <div ng-show="!isEmpty(feedback)">
+          <h5>Feedback I've submitted</h5>
+          <ul>
+            <li ng-repeat="f in feedback">
+              <[f.target_id]> <[f.status]> <[f.content]> 
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
