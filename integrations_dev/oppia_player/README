@@ -1,0 +1,21 @@
+Embedding Oppia explorations in any web page            Version {{VERSION}}
+--------------------------------------------
+
+Download the contents of the
+
+    /integrations/oppia_player_{{DATE}}_v{{VERSION}}/
+
+directory to a server, and insert the following HTML tag at the bottom of your
+web page:
+
+    <script src="PATH_TO_OPPIA_PLAYER_DIRECTORY/oppia-player-{{VERSION}}.js">
+    </script>
+
+Then, you can include tags of the form
+
+    <oppia oppia-id="fjJDek214F2g" exploration-version="3" src="https://www.oppia.org">
+    </oppia>
+
+in your webpage, and these will then be converted into iframes that embed
+playable Oppia explorations. The script also provides event hooks which you
+can overwrite in the page containing it.

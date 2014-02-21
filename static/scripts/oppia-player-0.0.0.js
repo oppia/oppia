@@ -20,7 +20,6 @@
  */
 
 
-
 (function() {
   var OPPIA_EMBED_GLOBALS = {
     version: '0.0.0'
@@ -133,6 +132,8 @@
    * Transforms an <oppia/> tag into an iframe that embeds an Oppia exploration.
    * The following attributes on the tag are recognized:
    *   - oppia-id (mandatory): The id of the Oppia exploration to embed.
+   *   - src: The server hosting the Oppia exploration. Defaults to the current
+   *       server.
    *   - locale: The preferred locale. Defaults to 'en' (which is the only one
    *       that is currently implemented).
    *   - height: The non-changing height of the iframe (can be specified as

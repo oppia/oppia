@@ -1,0 +1,6 @@
+This directory is for development of integration-related code. The files in
+this directory should not be used for actual integrations which are meant to
+be stable, since they are likely to change frequently.
+
+Instead, please see the integrations/ folder to find automatically-generated
+releases of code that can be used to integrate Oppia with other web pages.
