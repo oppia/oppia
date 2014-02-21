@@ -24,4 +24,4 @@ Currently-supported integrations include:
             integrations/gcb_oppia_tag_[DATE]_v[VERSION]
 
 (Here, DATE is the date when the version was released in the form YYYY_MM_DD,
-and VERSION is a version string in the form 0.0.0.)
+and VERSION is a version string in the form 0.0.0)
