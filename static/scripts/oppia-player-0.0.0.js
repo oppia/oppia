@@ -362,7 +362,7 @@
  */
 window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
   // FIXME: This function can be overwritten.
-  if (console) {
+  if (console && window.location.host.indexOf('localhost') !== -1) {
     console.log(
       'onHeightChangePostHook event triggered on ' + iframeNode + '.');
     console.log(newHeight);
@@ -376,7 +376,7 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
  */
 window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(iframeNode) {
   // FIXME: This function can be overwritten.
-  if (console) {
+  if (console && window.location.host.indexOf('localhost') !== -1) {
     console.log('onExplorationLoaded event triggered on ' + iframeNode + '.');
   }
 };
@@ -392,7 +392,7 @@ window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(iframeNode) {
 window.OPPIA_PLAYER.onStateTransitionPostHook = function(
     iframeNode, oldStateName, jsonAnswer, newStateName) {
   // FIXME: This function can be overwritten.
-  if (console) {
+  if (console && window.location.host.indexOf('localhost') !== -1) {
     console.log('onStateTransition event triggered on ' + iframeNode + '.');
     console.log(oldStateName);
     console.log(jsonAnswer);
@@ -408,7 +408,7 @@ window.OPPIA_PLAYER.onStateTransitionPostHook = function(
  */
 window.OPPIA_PLAYER.onExplorationResetPostHook = function(iframeNode, stateName) {
   // FIXME: This function can be overwritten.
-  if (console) {
+  if (console && window.location.host.indexOf('localhost') !== -1) {
     console.log('onExplorationReset event triggered on ' + iframeNode + '.');
     console.log(stateName);
   }
@@ -421,7 +421,7 @@ window.OPPIA_PLAYER.onExplorationResetPostHook = function(iframeNode, stateName)
  */
 window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
   // FIXME: This function can be overwritten.
-  if (console) {
+  if (console && window.location.host.indexOf('localhost') !== -1) {
     console.log(
       'onExplorationCompleted event triggered on ' + iframeNode + '.');
   }
