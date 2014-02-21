@@ -29,10 +29,27 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choicesWithValue);
 
+        $scope.answer = null;
+        $scope.errorMessage = '';
+
+        $scope.getErrorMessage = function() {
+          // This is used to re-trigger the aria-live warning when the
+          // user clicks the button multiple times without making a selection.
+          var randomSuffix = '';
+          var N = Math.round(Math.random() * 1000);
+          for (var i = 0; i < N; i++) {
+            randomSuffix += ' ';
+          }
+
+          return 'Please select an option.' + randomSuffix;
+        };
+
         $scope.submitAnswer = function(answer) {
-          if (!answer) {
+          if (answer === null || answer === undefined) {
+            $scope.errorMessage = $scope.getErrorMessage();
             return;
           }
+          $scope.errorMessage = '';
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
       }]
