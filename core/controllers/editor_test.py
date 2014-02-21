@@ -25,8 +25,6 @@ import feconf
 import test_utils
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class EditorTest(test_utils.GenericTestBase):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
@@ -267,8 +265,6 @@ class EditorTest(test_utils.GenericTestBase):
         self.logout()
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class StatsIntegrationTest(test_utils.GenericTestBase):
     """Test statistics recording using the default exploration."""
 
@@ -321,8 +317,6 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -413,8 +407,6 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class VersioningIntegrationTest(test_utils.GenericTestBase):
     """Test retrieval of old exploration versions."""
 

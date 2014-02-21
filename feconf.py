@@ -18,25 +18,20 @@
 
 import os
 
-from core import settings
-
 # Whether to unconditionally log info messages.
 DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
-PLATFORM = 'gae' if (
-    os.environ.get('SERVER_SOFTWARE') and (
-        os.environ['SERVER_SOFTWARE'].startswith('Development')
-        or os.environ['SERVER_SOFTWARE'].startswith('Google'))
-    ) else 'django'
+PLATFORM = 'gae'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
-    DEV_MODE = (os.environ.get('SERVER_SOFTWARE')
-                and os.environ['SERVER_SOFTWARE'].startswith('Development'))
-elif PLATFORM == 'django':
-    DEV_MODE = settings.DEV
+    DEV_MODE = (
+        not os.environ.get('SERVER_SOFTWARE')
+        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+else:
+    raise Exception('Invalid platform: expected one of [\'gae\']')
 
 TESTS_DATA_DIR = 'core/tests/data'
 SAMPLE_EXPLORATIONS_DIR = 'data/explorations'

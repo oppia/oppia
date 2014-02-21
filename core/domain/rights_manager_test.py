@@ -25,8 +25,6 @@ import test_utils
 import unittest
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class ExplorationRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on explorations work as expected."""
 

@@ -25,8 +25,6 @@ import test_utils
 import unittest
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'not running on GAE')
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
 

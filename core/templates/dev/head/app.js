@@ -21,7 +21,8 @@
 var oppia = angular.module(
   'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
 
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Django.
+// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
+// templates.
 oppia.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');

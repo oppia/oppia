@@ -32,54 +32,6 @@ class _Platform(object):
         raise NotImplementedError
 
 
-class _Django(_Platform):
-
-    @classmethod
-    def import_models(cls, model_names):
-
-        returned_models = []
-        for name in model_names:
-            if name == NAMES.base_model:
-                from core.storage.base_model import django_models as base_model
-                returned_models.append(base_model)
-            elif name == NAMES.config:
-                from core.storage.config import django_models as config_model
-                returned_models.append(config_model)
-            elif name == NAMES.exploration:
-                from core.storage.exploration import django_models as exp_model
-                returned_models.append(exp_model)
-            elif name == NAMES.file:
-                from core.storage.file import django_models as file_model
-                returned_models.append(file_model)
-            elif name == NAMES.statistics:
-                from core.storage.statistics import django_models as statistics_model
-                returned_models.append(statistics_model)
-            elif name == NAMES.user:
-                from core.storage.user import django_models as user_model
-                returned_models.append(user_model)
-            else:
-                raise Exception('Invalid model name: %s' % name)
-
-        return tuple(returned_models)
-
-    @classmethod
-    def import_transaction_services(cls):
-        from core.platform.transactions import django_transaction_services
-        return django_transaction_services
-
-    @classmethod
-    def import_current_user_services(cls):
-        from core.platform.users import django_current_user_services
-        return django_current_user_services
-
-    @classmethod
-    def import_memcache_services(cls):
-        from core.platform.memcache import django_memcache_services
-        return django_memcache_services
-
-    NAME = 'django'
-
-
 class _Gae(_Platform):
     @classmethod
     def import_models(cls, model_names):
@@ -129,7 +81,6 @@ class _Gae(_Platform):
 
 class Registry(object):
     _PLATFORM_MAPPING = {
-        _Django.NAME: _Django,
         _Gae.NAME: _Gae,
     }
 

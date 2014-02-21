@@ -24,8 +24,6 @@ import feconf
 import test_utils
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 

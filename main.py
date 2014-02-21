@@ -18,8 +18,6 @@ __author__ = 'Sean Lip'
 
 import feconf
 import os
-if feconf.PLATFORM == 'django':
-    os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
 
 from core.controllers import admin
 from core.controllers import base
@@ -199,26 +197,7 @@ urls = [
 # 404 error handler.
 error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
 
-if feconf.PLATFORM != 'gae':
-    urls = urls + generate_static_url_tuples() + error404_handler
-else:
-    urls = urls + error404_handler
+urls = urls + error404_handler
 
 
 app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
-
-
-# Called on non-GAE platforms to start the development server.
-def main():
-    from werkzeug.wsgi import DispatcherMiddleware
-    from core.platform.auth.wsgi import application as auth
-
-    application = DispatcherMiddleware(app, {
-        '/auth': auth
-    })
-    from werkzeug.serving import run_simple
-    run_simple(
-        'localhost', 8080, application, use_reloader=True, use_debugger=True)
-
-if __name__ == '__main__':
-    main()

@@ -1,2 +1,0 @@
-This directory contains a small stand-alone django application that is used for
-OpenID authentication on Non-GAE platforms.

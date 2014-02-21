@@ -236,7 +236,8 @@ class AppEngineTestBase(TestBase):
         os.environ['USER_IS_ADMIN'] = '0'
         self.testbed.deactivate()
 
+
 if feconf.PLATFORM == 'gae':
     GenericTestBase = AppEngineTestBase
 else:
-    GenericTestBase = TestBase
+    raise Exception('Invalid platform: expected one of [\'gae\']')

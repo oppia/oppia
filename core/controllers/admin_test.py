@@ -24,8 +24,6 @@ import feconf
 import test_utils
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_admin_page(self):

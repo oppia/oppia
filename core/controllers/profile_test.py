@@ -20,8 +20,6 @@ import feconf
 import test_utils
 
 
-@unittest.skipIf(feconf.PLATFORM != 'gae',
-                 'login not implemented for non-GAE platform')
 class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
     def test_redirect_to_prerequisites_page_happens(self):
