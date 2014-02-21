@@ -1,4 +1,4 @@
-Integrating Oppia with Course Builder                   Version {{VERSION}}
+Integrating Oppia with Course Builder                   Version 0.0.0
 -------------------------------------
 
 Course Builder is an open-source software package for creating online courses.
@@ -17,7 +17,7 @@ and create an oppia_tag directory.
 
 3. Copy the files in
 
-    /integrations/gcb_oppia_tag_{{DATE}}_v{{VERSION}}/coursebuilder/modules/oppia_tag
+    /integrations/gcb_oppia_tag_20140221_v0.0.0/coursebuilder/modules/oppia_tag
 
 into this directory.
 
