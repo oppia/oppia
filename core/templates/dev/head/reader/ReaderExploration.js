@@ -141,7 +141,10 @@ function ReaderExploration(
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [data.init_html];
+    $scope.responseLog = [{
+      previousReaderAnswer: '',
+      feedbackAndQuestion: data.init_html
+    }];
     $scope.params = data.params;
     $scope.stateName = data.state_name;
     $scope.title = data.title;
@@ -193,19 +196,20 @@ function ReaderExploration(
 
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
-    if (data.interactive_html) {
-      // This is a bit of a hack. When a refresh happens, AngularJS compares
-      // $scope.inputTemplate to the previous value of $scope.inputTemplate.
-      // If they are the same, then $scope.inputTemplate is not updated, and
-      // the reader's previous answers still remain present. The random suffix
-      // makes the new template different from the previous one, and thus
-      // indirectly forces a refresh.
-      var randomSuffix = '';
-      var N = Math.round(Math.random() * 1000);
-      for (var i = 0; i < N; i++) {
-        randomSuffix += ' ';
-      }
 
+    // This is a bit of a hack. When a refresh happens, AngularJS compares
+    // $scope.inputTemplate to the previous value of $scope.inputTemplate.
+    // If they are the same, then $scope.inputTemplate is not updated, and
+    // the reader's previous answers still remain present. The random suffix
+    // makes the new template different from the previous one, and thus
+    // indirectly forces a refresh.
+    var randomSuffix = '';
+    var N = Math.round(Math.random() * 1000);
+    for (var i = 0; i < N; i++) {
+      randomSuffix += ' ';
+    }
+
+    if (data.interactive_html) {
       // A non-empty interactive_html means that the previous widget
       // is not sticky and should be replaced.
       $scope.inputTemplate = data.interactive_html + randomSuffix;
@@ -218,9 +222,13 @@ function ReaderExploration(
     $scope.stateHistory = data.state_history;
 
     $scope.responseLog = $scope.responseLog || [];
-    $scope.responseLog.push(
-      data.reader_response_html, data.oppia_html
-    );
+
+    // The randomSuffix is also needed for previousReaderAnswer and for
+    // feedbackAndQuestion, so that the aria-live attribute will read it out.
+    $scope.responseLog.push({
+      previousReaderAnswer: data.reader_response_html + randomSuffix,
+      feedbackAndQuestion: data.oppia_html + randomSuffix,
+    });
 
     $scope.adjustPageHeight(true, function() {
       if (document.getElementById('response')) {

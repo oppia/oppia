@@ -67,8 +67,25 @@
 
     <div class="oppia-iframe-container oppia-exploration">
       <div ng-repeat="response in responseLog track by $index">
-        <div id="<[{true: 'response', false: 'conversation'}[$last && !finished]]>" class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[$last && !finished]]>">
-          <div angular-html-bind="response" aria-live="assertive">
+        <div ng-if="$index < responseLog.length - 1">
+          <div class="oppia-conversation-log">
+            <div angular-html-bind="response.previousReaderAnswer">
+            </div>
+            <div angular-html-bind="response.feedbackAndQuestion">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div aria-live="polite">
+        <div ng-show="responseLog.length > 0">
+          <div class="oppia-conversation-log"
+               angular-html-bind="responseLog[responseLog.length - 1].previousReaderAnswer">
+          </div>
+
+          <div class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[!finished]]>">
+            <div angular-html-bind="responseLog[responseLog.length - 1].feedbackAndQuestion">
+            </div>
           </div>
         </div>
       </div>
