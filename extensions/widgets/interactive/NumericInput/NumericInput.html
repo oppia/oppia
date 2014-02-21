@@ -1,9 +1,12 @@
 <div>
-  <form ng-submit="submitAnswer(answer)">
-    <input type="number" ng-model="answer" step="any" required autofocus
-           ng-focus="this.select()"
-           oninvalid="setCustomValidity('Please enter a number.')"
-           onchange="try{setCustomValidity('')}catch(e){}">
+  <form name="numericInputForm" ng-submit="submitAnswer(answer)" novalidate>
+    <input type="text" ng-model="answer" name="answer" validate-as-real-number
+           autofocus ng-focus="setFocus()" ng-blur="setBlur()" autocomplete="off">
+
     <button type="submit">Submit</button>
+
+    <span ng-show="errorMessage && numericInputForm.answer.$error.realNumber" style="color: red; margin-left: 30px;" aria-live="assertive">
+	  <[errorMessage]>
+	</span>
   </form>
 </div>

@@ -326,7 +326,9 @@
       var nodeId = iframeNode.getAttribute('id');
       var nodeToRemove = document.getElementById(
         oppiaNodeIdsToLoadingDivIds[nodeId]);
-      nodeToRemove.parentNode.removeChild(nodeToRemove);
+      if (nodeToRemove) {
+        nodeToRemove.parentNode.removeChild(nodeToRemove);
+      }
 
       setTimeout(function() {
         // Show the oppia contents after making sure the rendering happened.

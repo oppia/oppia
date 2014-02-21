@@ -27,10 +27,63 @@ oppia.directive('oppiaInteractiveNumericInput', [
       scope: {},
       templateUrl: 'interactiveWidget/NumericInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.inFocus = false;
+
+        $scope.answer = null;
+        $scope.errorMessage = '';
+
+        $scope.getErrorMessage = function() {
+          // This is used to re-trigger the aria-live warning when the
+          // user clicks the button multiple times without making a selection.
+          var randomSuffix = '';
+          var N = Math.round(Math.random() * 1000);
+          for (var i = 0; i < N; i++) {
+            randomSuffix += ' ';
+          }
+
+          return 'Please enter a valid number.' + randomSuffix;
+        };
+
+        $scope.setFocus = function() {
+          $scope.inFocus = true;
+        };
+
+        $scope.setBlur = function() {
+          $scope.inFocus = false;
+        };
+
         $scope.submitAnswer = function(answer) {
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          if (answer === null || answer === undefined ||
+              !$scope.numericInputForm.answer.$valid) {
+            $scope.errorMessage = $scope.getErrorMessage();
+          } else {
+            $scope.errorMessage = '';
+            $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          }
         };
       }]
     };
   }
 ]);
+
+oppia.directive('validateAsRealNumber', function() {
+  var FLOAT_REGEXP = /^\-?\d+((\.|\,)\d+)?$/;
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$parsers.unshift(function(viewValue) {
+        if (FLOAT_REGEXP.test(viewValue)) {
+          ctrl.$setValidity('realNumber', true);
+          return (
+            (typeof viewValue === 'number') ? viewValue :
+            parseFloat(viewValue.replace(',', '.'))
+          );
+        } else {
+          ctrl.$setValidity('realNumber', false);
+          return undefined;
+        }
+      });
+    }
+  };
+});
