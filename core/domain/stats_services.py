@@ -62,11 +62,11 @@ class EventHandler(object):
 
     @classmethod
     def record_state_feedback_from_reader(
-            cls, exploration_id, state_name, feedback, history):
+            cls, exploration_id, state_name, feedback, history, submitter_id):
         """Records user feedback for a particular state."""
         stats_domain.FeedbackItem.create_feedback_for_state(
             exploration_id, state_name, feedback,
-            additional_data={'history': history})
+            additional_data={'history': history}, submitter_id=submitter_id)
 
     @classmethod
     def record_exploration_feedback_from_reader(
