@@ -1,0 +1,120 @@
+/* The container around the staff and noteChoices.
+ * This keeps the note from dropping on top of the clef.
+ */
+
+.oppia-music-input-valid-note-area {
+  position: relative;
+  float:left;
+  margin: 0 0 0 11.0784%;
+  width: 87.34525%;
+  height: 43%;
+}
+
+/* The box around staff */
+ 
+.oppia-music-input-staff {
+  clear: both;
+  background: transparent;
+}
+
+/* The box around note choices */
+ 
+.oppia-music-input-note-choices {
+  clear: both;
+  float: right;
+  background: rgba(0, 0, 0, 0.04); /* Color of noteChoices box */
+  width: 5%;
+  padding: 2.3% 9% 5.83% 1.1%;
+  margin-bottom: 5.8%;
+  border: 0.2em solid #333;
+  -moz-border-radius: 11%;
+  -webkit-border-radius: 11%;
+  border-radius: 11%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* The invisible box around droppable staff */
+
+.oppia-music-input-staff {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  clear: both;
+  float: right;
+  width: 110.1%;
+  padding: 1.5% 0 3% 0;
+}
+
+/* The staff lines and ledger lines */
+
+.oppia-music-input-staff div {
+  position: relative;
+  border-width: thin;
+  width: 100%; /* width of music staff */
+  margin-bottom: 1.27%; /* space in between lines */
+  background: #000000;
+  color: transparent; 
+}
+
+.oppia-music-input-staff {
+  background-image: url(../images/treble_clef.png);
+  background-repeat: no-repeat;
+  background-position: 0.1% 42%;
+  background-size: 8.5% 89%;
+}
+
+.oppia-music-input-staff div:first-child {
+  background: transparent;
+  color: transparent;
+}
+
+.oppia-music-input-staff div:nth-child(even) {
+  background: transparent;
+  color: transparent;
+}
+
+.oppia-music-input-staff div:nth-child(13) {
+  background: transparent;
+  color: transparent;
+}
+ 
+.oppia-music-input-staff div.oppia-music-input-hovered {
+  background: #aaa;
+}
+
+.oppia-music-input-staff div {
+  border-style: solid;
+}
+
+/* Individual notes */
+
+.oppia-music-input-note-choices div {
+  width: 7.8%; 
+  height: 8.2%;  
+  position: relative;
+  background: transparent;
+}
+
+.oppia-music-input-note-choices div.oppia-music-input-natural-note {
+  float: left;
+  background-image: url(../images/whole_note.png);
+  background-repeat: no-repeat;
+  background-size: 71%;
+  background-position: center;
+  position: absolute;
+}
+
+.oppia-music-input-staff .oppia-music-input-ledger-line {
+  position: absolute;
+  width: 8%;
+}
+
+.oppia-music-input-on-staff {
+  position: absolute;
+}
+
+.oppia-music-input-control-buttons {
+  padding: 40% 0 5% 17.2%;
+}

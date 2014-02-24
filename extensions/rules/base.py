@@ -28,6 +28,9 @@ class CoordTwoDimRule(rule_domain.Rule):
     subject_type = objects.CoordTwoDim
 
 
+class MusicPhraseRule(rule_domain.Rule):
+		subject_type = objects.MusicPhrase
+
 class NonnegativeIntRule(rule_domain.Rule):
     subject_type = objects.NonnegativeInt
 

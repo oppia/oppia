@@ -46,6 +46,15 @@
 <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
+<script>
+  $(document).ready(function() {
+    MIDI.loadPlugin({
+      soundfontUrl: '/third_party/static/midi-js-09335a/soundfont/',
+      instrument: 'acoustic_grand_piano'
+    });
+  });
+</script>
+
 <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
 <script src="/third_party/static/jsrepl/jsrepl.js" id="jsrepl-script">
 </script>
@@ -55,6 +64,9 @@
 <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
 <script src="/third_party/static/code-mirror-3.19.0/mode/ruby/ruby.js"></script>
 <script src="/third_party/static/code-mirror-3.19.0/mode/scheme/scheme.js"></script>
+<script src="/third_party/static/midi-js-09335a/build/MIDI.min.js"></script>
+<!-- This is needed for MIDI.js to work. -->
+<script src="/third_party/static/midi-js-09335a/inc/base64binary.js"></script>
 <script src="/third_party/static/ui-codemirror-0.1.0/src/ui-codemirror.js"></script>
 
 <script src="/third_party/static/ui-utils-0.1.1/ui-utils.js"></script>

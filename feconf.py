@@ -23,14 +23,14 @@ DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
-PLATFORM = 'gae'
+PLATFORM = 'gae' 
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')
         or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-else:
+else:        
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
 TESTS_DATA_DIR = 'core/tests/data'
@@ -147,6 +147,9 @@ ALLOWED_WIDGETS = {
         'InteractiveMap': {
             'dir': 'extensions/widgets/interactive/InteractiveMap'
         },
+        'MusicNotesInput': {
+            'dir': 'extensions/widgets/interactive/MusicNotesInput'
+        },
         'SetInput': {
             'dir': 'extensions/widgets/interactive/SetInput'
         },
@@ -183,6 +186,7 @@ DEMO_EXPLORATIONS = [
     # please note that Oppia lacks many of the features of a full interactive
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
+    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
 ]
 
 # TODO(sll): Add all other URLs here.

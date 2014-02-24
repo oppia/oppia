@@ -116,6 +116,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.List, mappings, invalid_values)
 
+    def test_music_phrase(self):
+        """Tests objects of type MusicPhrase."""
+        mappings = [
+            ([{'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
+            {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}}], 
+            ['D4', 'F4']), 
+            ([{'readableNoteName': 'B4', 'noteDuration': {'num': 4, 'den': 1}},
+            {'readableNoteName': 'E5', 'noteDuration': {'num': 4, 'den': 1}}], 
+            ['B4', 'E5']),
+            ([{'readableNoteName': 'C5', 'noteDuration': {'num': 3, 'den': 2}},
+            {'readableNoteName': 'C4', 'noteDuration': {'num': 3, 'den': 2}}], 
+            ['C5', 'C4'])
+        ]
+        invalid_values = ['G4', {'n': 1}, 2.0, None]
+
+        self.check_normalization(objects.MusicPhrase, mappings, invalid_values)
+
     def test_set_of_unicode_string_validation(self):
         """Tests objects of type SetOfUnicodeString."""
         mappings = [

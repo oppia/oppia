@@ -160,8 +160,8 @@ class NonnegativeInt(Int):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
-    edit_html_filename = None
-    edit_js_filename = None
+    edit_html_filename = 'nonnegative_int_editor'
+    edit_js_filename = 'NonnegativeIntEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -389,6 +389,46 @@ class SanitizedUrl(BaseObject):
         except Exception as e:
             raise TypeError('Cannot convert to sanitized URL: %s. Error: %s' %
                             (raw, e))
+
+
+class MusicPhrase(BaseObject):
+    """List of Objects that represent a musical phrase."""
+    
+    description = ('A musical phrase that contains zero or more notes, rests, '
+                    'and time signature.')
+    edit_html_filename = 'music_phrase_editor'
+    edit_js_filename = 'MusicPhraseEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+
+        try:
+            valid_notes = [
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
+                'E5', 'F5', 'G5', 'A5'
+            ]
+            valid_properties = [
+                'readableNoteName', 'readableRestName', 'noteDuration', 
+                'restDuration', 'noteStart', 'restStart'
+            ]
+            assert isinstance(raw, list)
+            for item in raw:
+                if type(item) == dict:
+                    for prop in item:
+                        prop = str(prop)
+                        assert prop in valid_properties
+                        if prop == 'readableNoteName' or prop == 'readableRestName':
+                            assert str(item.get(prop)) in valid_notes
+                        elif prop == 'noteDuration' or prop == 'restDuration':
+                            for d in item[prop]:
+                                assert int(item[prop][d]) > 0
+                        elif prop == 'noteStart' or prop == 'restStart':
+                            for s in prop:
+                                assert int(item[prop][s]) > 0
+            return raw
+        except Exception as e:
+            raise TypeError('Cannot convert to Music Phrase: %s. '
+                            'Error: %s' % (raw, e))
 
 
 class TarFileString(BaseObject):

@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <span ng-show="localValue.length == 0">
+    <em>This list is currently empty.</em>
+  </span>
+
+  <div class="row-fluid" ng-repeat="item in localValue track by $index">
+    <div class="span1">
+      <[$index + 1]>
+    </div>
+
+    <div class="span8">
+      <select ng-model="item.label" ng-options="c as c['readableNoteName'] for c in choices" required>
+      </select>
+    </div>
+
+    <div class="span3">
+      <button type="button" class="pull-right" ng-click="deleteItem($index)">Delete</button>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <button type="button" ng-click="addItem()" class="pull-right">
+      <[getAddItemText()]>
+    </button>
+  </div>
+</div>

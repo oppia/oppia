@@ -90,7 +90,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     git checkout 13f89c2cab0ee9163e0077102478958a14afb781
 
     git submodule update --init --recursive
-
+    
     # Add a temporary backup file so that this script works on both Linux and Mac.
     TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
@@ -220,6 +220,16 @@ if [ ! -d "$THIRD_PARTY_DIR/static/ui-codemirror-0.1.0" ]; then
   unzip angular-ui-codemirror-download.zip -d $THIRD_PARTY_DIR/static/
   rm angular-ui-codemirror-download.zip
   mv $THIRD_PARTY_DIR/static/ui-codemirror-src0.1.0 $THIRD_PARTY_DIR/static/ui-codemirror-0.1.0
+fi
+
+echo Checking whether MIDI.js is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/static/midi-js-09335a" ]; then
+  echo Installing MIDI.js
+  mkdir -p $THIRD_PARTY_DIR/static/
+  wget https://github.com/mudcube/MIDI.js/archive/09335aa7078be606f6d2389a3defb6d616db9ff7.zip -O midi-js-download.zip
+  unzip midi-js-download.zip -d $THIRD_PARTY_DIR/static/
+  rm midi-js-download.zip
+  mv $THIRD_PARTY_DIR/static/MIDI.js-09335aa7078be606f6d2389a3defb6d616db9ff7 $THIRD_PARTY_DIR/static/midi-js-09335a
 fi
 
 echo Checking whether ui-map is installed in $THIRD_PARTY_DIR
