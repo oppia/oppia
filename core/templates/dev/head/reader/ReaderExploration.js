@@ -47,7 +47,7 @@ function ReaderExploration(
   $scope.hasInteractedAtLeastOnce = false;
 
   $window.addEventListener('beforeunload', function(e) {
-    if ($scope.hasInteractedAtLeastOnce) {
+    if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
       var confirmationMessage = (
           'If you navigate away from this page, your progress on the ' +
           'exploration will be lost.');
@@ -61,10 +61,9 @@ function ReaderExploration(
   };
 
   $scope.resetPage = function() {
-    if ($scope.hasInteractedAtLeastOnce) {
+    if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
       var confirmationMessage = 'Are you sure you want to restart this ' +
-                                'exploration? Your previous progress will ' +
-                                'be lost.'
+                                'exploration? Your progress will be lost.';
       if (!$window.confirm(confirmationMessage)) {
         return;
       };

@@ -111,10 +111,11 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
             rule_data: a list of dicts, each with the following keys:
                 (state_name, handler_name, rule_str).
         """
+        # TODO(sll): Use a hash instead to disambiguate.
         entity_ids = ['.'.join([
             exploration_id, datum['state_name'],
             datum['handler_name'], datum['rule_str']
-        ]) for datum in rule_data]
+        ])[:490] for datum in rule_data]
 
         entity_keys = [cls._get_entity_key(exploration_id, entity_id)
                        for entity_id in entity_ids]

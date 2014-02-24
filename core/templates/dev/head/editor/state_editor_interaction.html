@@ -8,11 +8,11 @@
 
 {% block center %}
   <div>
-    <div ng-hide="interactiveWidgetEditorIsShown" class="oppia-interactive-widget-display oppia-preview">
+    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-widget-display oppia-preview">
       <div angular-html-bind="widgetPreviewHtml"></div>
     </div>
 
-    <div ng-show="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
+    <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
       <span class="pull-right" ng-if="tmpWidget">
         <button ng-click="selectInteractiveWidget(tmpWidget)">
           Use this interaction

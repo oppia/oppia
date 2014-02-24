@@ -77,10 +77,28 @@ oppia.filter('parameterizeRuleDescription', function() {
       iter++;
 
       var varName = description.match(pattern)[1];
+      var varType = description.match(pattern)[2];
+      if (varType) {
+        varType = varType.substring(1);
+      }
+
       var replacementText = inputs[varName];
       if (choices) {
         replacementText = '\'' + choices.value[inputs[varName]] + '\'';
       }
+      // TODO(sll): Generalize this to use the inline string representation of
+      // an object type.
+      if (varType === 'MusicPhrase') {
+        replacementText = '[';
+        for (var i = 0; i < inputs[varName].length; i++) {
+          if (i !== 0) {
+            replacementText += ', ';
+          }
+          replacementText += inputs[varName][i].readableNoteName;
+        }
+        replacementText += ']';
+      }
+
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }

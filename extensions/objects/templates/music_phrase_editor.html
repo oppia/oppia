@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <span ng-show="localValue.length == 0">
-    <em>This list is currently empty.</em>
+    <em>This music phrase is currently empty.</em>
   </span>
 
   <div class="row-fluid" ng-repeat="item in localValue track by $index">
@@ -9,7 +9,7 @@
     </div>
 
     <div class="span8">
-      <select ng-model="item.label" ng-options="c as c['readableNoteName'] for c in choices" required>
+      <select ng-model="localValue[$index].label" ng-options="readableNoteName as readableNoteName for readableNoteName in choices" required>
       </select>
     </div>
 

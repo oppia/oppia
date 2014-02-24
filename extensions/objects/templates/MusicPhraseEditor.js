@@ -27,47 +27,25 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      $scope.initArgs = {};
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
-        if (newValue) {
-          $scope.initArgs = newValue;
-        }
-      }, true);
+      $scope.toParentValue = function(readableNoteName) {
+        return {
+          readableNoteName: readableNoteName,
+          noteDuration: {'num': 1, 'den': 1}
+        };
+      };
 
-      $scope.alwaysEditable = ($scope.$parent.alwaysEditable || '');
+      $scope.fromParentValue = function(parentValue) {
+        return parentValue.readableNoteName;
+      };
 
       $scope.choices = [
-        {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'C5', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'D5', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'E5', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'F5', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'G5', 'noteDuration': {'num': 1, 'den': 1}},
-        {'readableNoteName': 'A5', 'noteDuration': {'num': 1, 'den': 1}}
+        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5',
+        'A5'
       ];
-
-      $scope.isValidPhrase = function(input) {
-        for (var i = 0; i < $scope.choices.length; i++) {
-          if ($scope.choices[i] === input) {
-            return true;
-          }
-        }
-        return false;
-      };
 
       // Get the text for the 'Add Item' button.
       $scope.getAddItemText = function() {
-        if ($scope.initArgs && $scope.initArgs.addItemText) {
-          return $scope.initArgs.addItemText;
-        } else {
-          return 'Add List Element';
-        }
+        return 'Add Note';
       };
 
       // Reset the component each time the value changes (e.g. if this is part
@@ -81,37 +59,29 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
         $scope.localValue = [];
         if (newValue) {
           for (var i = 0; i < newValue.length; i++) {
-            $scope.localValue.push({'label': angular.copy(newValue[i])});
+            $scope.localValue.push({
+              'label': $scope.fromParentValue(newValue[i])
+            });
           }
         }
       }, true);
 
       $scope.addItem = function() {
         $scope.localValue.push({label: ''});
-        if (!$scope.alwaysEditable) {
-          $scope.activeItem = $scope.localValue.length - 1;
-        }
       };
 
       $scope.deleteItem = function(index) {
         $scope.localValue.splice(index, 1);
         $scope.$parent.value.splice(index, 1);
-        if (!$scope.alwaysEditable) {
-          $scope.activeItem = null;
-        }
       };
-
-      if (!$scope.alwaysEditable) {
-        $scope.activeItem = null;
-      }
 
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
-          var valuesOnly = [];
+          var parentValues = [];
           for (var i = 0; i < newValue.length; i++) {
-            valuesOnly.push(newValue[i].label);
+            parentValues.push($scope.toParentValue(newValue[i].label));
           }
-          $scope.$parent.value = valuesOnly;
+          $scope.$parent.value = parentValues;
         }
       }, true);
     }

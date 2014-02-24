@@ -102,7 +102,8 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
                 len(midi_user_sequence) >= target_sequence_length - self.k):
             num_correct_notes_needed = target_sequence_length - self.k
             if len(midi_user_sequence) > 1:
-                for i in range(target_sequence_length):
+                for i in range(min(
+                        len(midi_target_sequence), len(midi_user_sequence))):
                     if (midi_user_sequence[i] - self.y ==
                             midi_target_sequence[i]):
                         counter += 1
