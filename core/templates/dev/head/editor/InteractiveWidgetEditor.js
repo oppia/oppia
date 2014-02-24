@@ -49,6 +49,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   };
 
   $scope.initInteractiveWidget = function(data) {
+    $scope.resetInteractiveWidgetEditor();
+
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding handler name and the value has several keys:
     // - 'definition' (the rule definition)
@@ -413,7 +415,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     }
   });
 
-  $scope.interactiveWidgetEditorIsShown = false;
   $scope.interactiveWidgetRepository = null;
 
   $scope.showInteractiveWidgetEditor = function() {
@@ -485,7 +486,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.states[$scope.stateName].widget.customization_args = angular.copy(
       $scope.widgetCustomizationArgs);
 
-    $scope.closeInteractiveWidgetEditor();
+    $scope.resetInteractiveWidgetEditor();
   };
 
   $scope.generateTmpWidgetPreview = function() {
@@ -505,7 +506,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.tmpWidget = angular.copy(widget);
   };
 
-  $scope.closeInteractiveWidgetEditor = function() {
+  $scope.resetInteractiveWidgetEditor = function() {
     $scope.interactiveWidgetEditorIsShown = false;
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;

@@ -19,7 +19,7 @@
  */
 
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
-                   warningsData, activeInputData, oppiaRequestCreator) {
+  warningsData, activeInputData, oppiaRequestCreator) {
 
   $scope.$on('guiTabSelected', function(event, stateName) {
     $scope.stateName = stateName;
@@ -34,10 +34,20 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.stateNameMemento = $scope.stateName;
     $scope.uiStateName = $scope.stateName;
 
+    // This should only be non-null when the content editor is open.
+    $scope.contentMemento = null;
+
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
-  }
+  };
+
+  $scope.closeStateEditor = function() {
+    // TODO(sll): This broadcast is not reaching the noninteractive
+    // content RTE. Why?
+    $scope.$broadcast('externalSave');
+    $scope.$parent.selectMainTab();
+  };
 
   $scope.getIncomingStates = function(stateName) {
     var incomingStates = {},
@@ -132,9 +142,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
   };
 
-  // This should only be non-null when the content editor is open.
-  $scope.contentMemento = null;
-
   $scope.editContent = function() {
     $scope.contentMemento = angular.copy($scope.content);
   };
@@ -144,7 +151,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     if ($scope.contentMemento !== $scope.content) {
       // The $apply() call seems to be needed in order to ensure that the latest
       // values from the RTE are captured.
-      // TODO(sll): Do we need to update math?
       $scope.addStateChange(
           'content', angular.copy($scope.content),
           angular.copy($scope.contentMemento)
