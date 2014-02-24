@@ -1,7 +1,6 @@
-
 # coding: utf-8
 #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +31,7 @@ class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):
         ]).eval([
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
+
         self.assertTrue(music_phrase.Equals([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
@@ -41,14 +41,16 @@ class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):
             {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}}]
         ))
+
         self.assertFalse(music_phrase.Equals([
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}}
         ]).eval([
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
+
         self.assertFalse(music_phrase.Equals([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
-            {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}}, 
+            {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}}
         ]).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
@@ -57,48 +59,52 @@ class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):
         ]))
 
     def test_is_equal_to_except_for_rule(self):
-		self.assertTrue(music_phrase.IsEqualToExceptFor(1, [
+        self.assertTrue(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertTrue(music_phrase.IsEqualToExceptFor(1, [
+
+        self.assertTrue(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1).eval([
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertTrue(music_phrase.IsEqualToExceptFor(2, [
+
+        self.assertTrue(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 2).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsEqualToExceptFor(1, [
+        self.assertFalse(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsEqualToExceptFor(1, [
+
+        self.assertFalse(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1).eval([
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsEqualToExceptFor(2, [
+
+        self.assertFalse(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G5', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 2).eval([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'D4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
@@ -106,65 +112,71 @@ class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):
         ]))
 
     def test_is_transposition_of_rule(self):
-		self.assertTrue(music_phrase.IsTranspositionOf(7, [
+        self.assertTrue(music_phrase.IsTranspositionOf([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 7).eval([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertTrue(music_phrase.IsTranspositionOf(-2, [
+
+        self.assertTrue(music_phrase.IsTranspositionOf([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], -2).eval([
             {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsTranspositionOf(3, [
+
+        self.assertFalse(music_phrase.IsTranspositionOf([
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 3).eval([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsTranspositionOf(1, [
+
+        self.assertFalse(music_phrase.IsTranspositionOf([
             {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
 
     def test_is_transposition_of_except_for_rule(self):
-		self.assertTrue(music_phrase.IsTranspositionOfExceptFor(7, 1, [
+        self.assertTrue(music_phrase.IsTranspositionOfExceptFor([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 7, 1).eval([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertTrue(music_phrase.IsTranspositionOfExceptFor(-2, 1, [
+
+        self.assertTrue(music_phrase.IsTranspositionOfExceptFor([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'D5', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], -2, 1).eval([
             {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'D5', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsTranspositionOfExceptFor(3, 1, [
+
+        self.assertFalse(music_phrase.IsTranspositionOfExceptFor([
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 3, 1).eval([
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'A4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
-		self.assertFalse(music_phrase.IsTranspositionOfExceptFor(1, 1, [
+
+        self.assertFalse(music_phrase.IsTranspositionOfExceptFor([
             {'readableNoteName': 'F4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
-        ]).eval([
+        ], 1, 1).eval([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))

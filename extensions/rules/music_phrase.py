@@ -26,7 +26,7 @@ NOTE_MAP = {'C4': 60, 'D4': 62, 'E4': 64, 'F4': 65, 'G4': 67, 'A4': 69,
             'A5': 81}
 
 
-def get_midi_note_value(note):
+def _get_midi_note_value(note):
     if isinstance(note, dict):
         if note['readableNoteName'] in NOTE_MAP:
             return NOTE_MAP[note['readableNoteName']]
@@ -34,38 +34,37 @@ def get_midi_note_value(note):
         raise Exception('Invalid music note %s.' % note)
 
 
-def convert_sequence_to_midi(sequence):
-    return [get_midi_note_value(note) for note in sequence]
+def _convert_sequence_to_midi(sequence):
+    return [_get_midi_note_value(note) for note in sequence]
 
 
 class Equals(base.MusicPhraseRule):
     description = 'is equal to {{x|MusicPhrase}}'
 
     def _evaluate(self, subject):
-        return (convert_sequence_to_midi(subject) == 
-                convert_sequence_to_midi(self.x))
+        return (_convert_sequence_to_midi(subject) ==
+                _convert_sequence_to_midi(self.x))
 
 
 class IsLongerSequence(base.MusicPhraseRule):
     description = 'is a longer sequence than {{x|MusicPhrase}}'
 
     def _evaluate(self, subject):
-        return (len(convert_sequence_to_midi(subject)) > 
-                len(convert_sequence_to_midi(self.x)))
+        return (len(_convert_sequence_to_midi(subject)) >
+                len(_convert_sequence_to_midi(self.x)))
 
-        
+
 class IsEqualToExceptFor(base.MusicPhraseRule):
     description = ('is equal to {{x|MusicPhrase}} '
                    'except for {{k|NonnegativeInt}} notes')
 
     def _evaluate(self, subject):
-        midi_target_sequence = convert_sequence_to_midi(self.x)
-        midi_user_sequence = convert_sequence_to_midi(subject)
-        # target_sequence_length = len(midi_target_sequence)
-        # user_sequence_length = len(midi_user_sequence)
+        midi_target_sequence = _convert_sequence_to_midi(self.x)
+        midi_user_sequence = _convert_sequence_to_midi(subject)
         counter = 0
         num_correct_notes_needed = len(midi_target_sequence) - self.k
-        for i in range(min(len(midi_target_sequence), len(midi_user_sequence))):
+        for i in range(min(
+                len(midi_target_sequence), len(midi_user_sequence))):
             if midi_user_sequence[i] == midi_target_sequence[i]:
                 counter += 1
         return counter >= num_correct_notes_needed
@@ -78,8 +77,8 @@ class IsTranspositionOf(base.MusicPhraseRule):
     def _evaluate(self, subject):
         target_sequence_length = len(self.x)
         if (len(subject) == target_sequence_length):
-            midi_target_sequence = convert_sequence_to_midi(self.x)
-            midi_user_sequence = convert_sequence_to_midi(subject)
+            midi_target_sequence = _convert_sequence_to_midi(self.x)
+            midi_user_sequence = _convert_sequence_to_midi(subject)
             is_transposition = True
             for i in range(target_sequence_length):
                 if midi_user_sequence[i] - self.y != midi_target_sequence[i]:
@@ -96,15 +95,16 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
 
     def _evaluate(self, subject):
         counter = 0
-        midi_target_sequence = convert_sequence_to_midi(self.x)
-        midi_user_sequence = convert_sequence_to_midi(subject)
+        midi_target_sequence = _convert_sequence_to_midi(self.x)
+        midi_user_sequence = _convert_sequence_to_midi(subject)
         target_sequence_length = len(midi_target_sequence)
         if (len(midi_user_sequence) == target_sequence_length or
-            len(midi_user_sequence) >= target_sequence_length - self.k):        
+                len(midi_user_sequence) >= target_sequence_length - self.k):
             num_correct_notes_needed = target_sequence_length - self.k
             if len(midi_user_sequence) > 1:
                 for i in range(target_sequence_length):
-                    if midi_user_sequence[i] - self.y == midi_target_sequence[i]:
+                    if (midi_user_sequence[i] - self.y ==
+                            midi_target_sequence[i]):
                         counter += 1
             return counter >= num_correct_notes_needed
         else:
