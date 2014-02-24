@@ -44,11 +44,32 @@ function ReaderExploration(
 
   $scope.showPage = !$scope.iframed;
 
+  $scope.hasInteractedAtLeastOnce = false;
+
+  $window.addEventListener('beforeunload', function(e) {
+    if ($scope.hasInteractedAtLeastOnce) {
+      var confirmationMessage = (
+          'If you navigate away from this page, your progress on the ' +
+          'exploration will be lost.');
+      (e || $window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    }
+  });
+
   $scope.getStyle = function() {
     return $scope.showPage ? {} : {opacity: 0};
   };
 
   $scope.resetPage = function() {
+    if ($scope.hasInteractedAtLeastOnce) {
+      var confirmationMessage = 'Are you sure you want to restart this ' +
+                                'exploration? Your previous progress will ' +
+                                'be lost.'
+      if (!$window.confirm(confirmationMessage)) {
+        return;
+      };
+    }
+
     messengerService.sendMessage(
       messengerService.EXPLORATION_RESET, $scope.stateName);
     $scope.initializePage();
@@ -56,6 +77,7 @@ function ReaderExploration(
 
   $scope.initializePage = function() {
     $scope.responseLog = [];
+    $scope.inputTemplate = '';
     $http.get($scope.explorationDataUrl)
       .success(function(data) {
         $scope.explorationTitle = data.title;
@@ -137,6 +159,8 @@ function ReaderExploration(
   $scope.answerIsBeingProcessed = false;
 
   $scope.loadPage = function(data) {
+    $scope.hasInteractedAtLeastOnce = false;
+
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
@@ -193,6 +217,7 @@ function ReaderExploration(
   $scope.refreshPage = function(data) {
     warningsData.clear();
     $scope.answerIsBeingProcessed = false;
+    $scope.hasInteractedAtLeastOnce = true;
 
     $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
