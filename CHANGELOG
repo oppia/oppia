@@ -3,6 +3,47 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.1 (25 Feb 2014)
+--------------------
+Major deprecations:
+* Deprecate the Django branch of Oppia, and remove Django-related code from the codebase.
+
+Improvements to the workflow for embedding Oppia explorations in other pages:
+* Add versioned code that allows explorations to be embedded in Course Builder and in arbitrary web pages. This code is auto-generated from a script in integrations_dev/.
+* Capture more reader events, such as onExplorationLoaded, onStateTransition and onExplorationReset.
+* Display a loading message before the exploration fully loads.
+* Add a setting that allows the height of the exploration window to automatically expand as the reader plays through the exploration.
+
+Reader-visible improvements:
+* Add a confirmation dialog when the reader resets or navigates away from an exploration, after interacting with it at least once.
+* Improve the accessibility of the reader view, especially support for screen readers.
+* Ensure that the reader view supports Internet Explorer 9 and later, as well as Firefox and Chrome.
+
+Editor interface improvements:
+* Remove the separate tab for the state editor, and instead overlay the state editor on the exploration graph editor so that the exploration graph is always visible (and can be panned behind the state editor).
+* Make the graph visualization responsive, so that the sizes of the nodes adapt to the size of the browser window. Make the visualization fit within a single horizontal viewport without scrolling. Add some light animation effects.
+* Move the interactive widget editor inline (it used to be in a pop-up).
+* Load the version history lazily, rather than each time an exploration is loaded. Show summaries of each commit, and implement reverting functionality.
+* Do not show version history for cloned explorations, since they are not meant to be published.
+* Improve the UI for the statistics tab. Mark rules as generic/specific in order to determine which user answers should be displayed for improvement.
+* Allow noninteractive widgets to be used in feedback for rules.
+* Show the full feedback for a rule in the state editor, so that contributors do not have to click in order to view it.
+* Allow parameter changes to be swapped.
+
+Changes to widgets:
+* Convert all interactive widgets to Angular directives, and simplify the process for creating new widgets.
+* Add a new interactive music note input widget that allows the reader to enter a sequence of music notes. The widget is still in the pre-alpha stage, and can be accessed by removing the comments in feconf.py.
+* Add a noninteractive collapsible widget, which only shows its content when the reader clicks on it.
+* Add validation for the multiple-choice input and numeric input widgets, and allow the latter to accept floating-point numbers.
+* Remove the line numbers for the code window in the Code REPL widget, since having them occasionally causes the widget to be replaced by a blank grey screen.
+* Use a static map to display reader responses in the interactive map widget.
+
+Backend changes:
+* Add a sample end-to-end test.
+* Add a load test script for the reader view.
+* Increase the stack trace limit for appstats to 50 lines, to ease the inspection and debugging of load test logs.
+
+
 v1.2.0 (13 Jan 2014)
 --------------------
 NOTE: This version of Oppia is not backwards-compatible with earlier versions, due to significant changes to the datastore models.
