@@ -1,0 +1,10 @@
+<accordion>
+  <accordion-group is-open="isOpen">
+    <accordion-heading>
+      <i class="pull-right icon-plus-sign" ng-hide="isOpen"></i>
+      <i class="pull-right icon-minus-sign" ng-show="isOpen"></i>
+      <[heading]>
+    </accordion-heading>
+    <div angular-html-bind="content"></div>
+  </accordion-group>
+</accordion>

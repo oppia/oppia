@@ -19,6 +19,9 @@
  */
 
 describe('Iframed reader view', function() {
+  // TODO(sll): Ensure that exploration 0 is loaded prior to running the
+  // checks.
+
   beforeEach(function() {
     browser().navigateTo('/explore/0?iframed=true');
   });

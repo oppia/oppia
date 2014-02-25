@@ -115,6 +115,9 @@ MAX_FILE_SIZE_BYTES = 1048576
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {
+        'Collapsible': {
+            'dir': 'extensions/widgets/noninteractive/Collapsible'
+        },
         'Image': {
             'dir': 'extensions/widgets/noninteractive/Image'
         },
