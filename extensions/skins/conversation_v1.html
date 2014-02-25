@@ -83,7 +83,7 @@
                angular-html-bind="responseLog[responseLog.length - 1].previousReaderAnswer">
           </div>
 
-          <div class="<[{true: 'oppia-response', false: 'oppia-conversation-log'}[!finished]]>">
+          <div class="oppia-response">
             <div angular-html-bind="responseLog[responseLog.length - 1].feedbackAndQuestion">
             </div>
           </div>
@@ -92,7 +92,7 @@
 
       <br>
 
-      <div ng-show="finished" class="oppia-response">
+      <div ng-show="finished" class="oppia-response-finished">
         Congratulations, you've finished this exploration!
         Would you like to <a ng-click="resetPage()" href="">play again?</a>
       </div>
