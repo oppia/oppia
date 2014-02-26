@@ -187,7 +187,7 @@ def main():
         if result.errors or result.failures:
             raise Exception(
                 'Functional test suite failed: %s errors, %s failures of '
-                ' %s tests run.' % (
+                '%s tests run.' % (
                     len(result.errors), len(result.failures), result.testsRun))
 
     if tests_run == 0:

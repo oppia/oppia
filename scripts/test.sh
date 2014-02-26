@@ -50,4 +50,6 @@ fi
 python $COVERAGE_HOME/coverage run ./core/tests/gae_suite.py $@
 python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/*" --show-missing
 
-echo Done!
+echo ''
+echo 'SUCCESS!   All tests pass.'
+echo ''
