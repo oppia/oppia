@@ -7,6 +7,13 @@
 </h4>
 
 <div collapse="!versionHistoryIsShown">
+  <div ng-hide="explorationSnapshots" class="oppia-align-center">
+    Loading
+    <span class="oppia-loading-dot-one">.</span>
+    <span class="oppia-loading-dot-two">.</span>
+    <span class="oppia-loading-dot-three">.</span>
+  </div>
+
   <div ng-repeat="snapshot in explorationSnapshots">
     [<[snapshot.versionNumber]>]
     <strong><[snapshot.committerId]></strong>
