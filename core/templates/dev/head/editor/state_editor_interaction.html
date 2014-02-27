@@ -55,7 +55,7 @@
                 </accordion-group>
 
                 <div ng-if="!isEmpty(tmpWidget.params)">
-                  <accordion-group heading="Customization">
+                  <accordion-group heading="Edit">
                     <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
                       <strong><[tmpWidget.params[paramName].description]></strong>
                       <value-generator-editor generator-id="paramSpecDict.generator_id"
