@@ -14,8 +14,6 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -449,3 +447,44 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
             '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
+
+
+class ExplorationEditRightsTest(test_utils.GenericTestBase):
+    """Test the handling of edit rights for explorations."""
+
+    def test_user_banning(self):
+        """Test that banned users are banned."""
+        EXP_ID = '0'
+        exp_services.delete_demo(EXP_ID)
+        exp_services.load_demo(EXP_ID)
+
+        # Register new editors Joe and Sandra.
+        self.register_editor('joe@example.com', username='joe')
+        self.register_editor('sandra@example.com', username='sandra')
+
+        # Joe logs in.
+        self.login('joe@example.com')
+
+        response = self.testapp.get('/contribute', expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+
+        # Ban joe.
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'banned_usernames', ['joe'])
+
+        # Test that Joe is banned.
+        response = self.testapp.get('/contribute', expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+
+        # Joe logs out.
+        self.logout()
+
+        # Sandra logs in and is unaffected.
+        self.login('sandra@example.com')
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        self.logout()

@@ -177,6 +177,8 @@ def get_username(user_id):
     return get_user_settings(user_id, strict=True).username
 
 
+# NB: If we ever allow usernames to change, update the
+# config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     user_settings = get_user_settings(user_id, strict=True)
 

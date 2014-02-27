@@ -19,11 +19,9 @@ __author__ = 'Sean Lip'
 
 from core.domain import config_domain
 from core.domain import obj_services
-from core.domain import rights_manager
 from core.platform import models
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
-import feconf
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 

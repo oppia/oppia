@@ -30,7 +30,6 @@ import os
 import StringIO
 import zipfile
 
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager

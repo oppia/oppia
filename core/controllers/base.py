@@ -79,6 +79,10 @@ def require_registered_as_editor(handler):
                 self.request.uri))
             return
 
+        if self.username in config_domain.BANNED_USERNAMES.value:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+
         redirect_url = feconf.EDITOR_PREREQUISITES_URL
 
         if not user_services.has_user_registered_as_editor(self.user_id):
@@ -127,8 +131,10 @@ class BaseHandler(webapp2.RequestHandler):
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
+            self.username = user_settings.username
+
             self.values['user_email'] = user_settings.email
-            self.values['username'] = user_settings.username
+            self.values['username'] = self.username
 
         self.values['is_moderator'] = rights_manager.Actor(
             self.user_id).is_moderator()

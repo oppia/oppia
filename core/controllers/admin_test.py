@@ -14,13 +14,10 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
 
-import feconf
 import test_utils
 
 

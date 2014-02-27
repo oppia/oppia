@@ -195,3 +195,8 @@ ADMIN_EMAILS = ConfigProperty(
 MODERATOR_EMAILS = ConfigProperty(
     'moderator_emails', 'SetOfUnicodeString', 'Email addresses of moderators',
     [])
+BANNED_USERNAMES = ConfigProperty(
+    'banned_usernames',
+    'SetOfUnicodeString',
+    'Banned usernames (editing permissions for these users have been removed)',
+    [])

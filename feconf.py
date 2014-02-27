@@ -23,14 +23,14 @@ DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
-PLATFORM = 'gae' 
+PLATFORM = 'gae'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')
         or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-else:        
+else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
 TESTS_DATA_DIR = 'core/tests/data'
