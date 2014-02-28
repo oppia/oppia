@@ -41,6 +41,25 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
       return;
     }
 
+    if (username.length > 50) {
+      warningsData.addWarning('A username can have at most 50 characters.');
+      return;
+    }
+
+    var alphanumeric = /^[A-Za-z0-9]+$/;
+
+    if (!alphanumeric.test(username)) {
+      warningsData.addWarning('Usernames can only have alphanumeric characters.');
+      return;
+    }
+
+    var admin = /admin/i;
+
+    if (admin.test(username)) {
+      warningsData.addWarning('User names with \'admin\' are reserved.');
+      return;
+    }
+
     $http.post(
       '/editor_prerequisites_handler/data',
       oppiaRequestCreator.createRequest({
