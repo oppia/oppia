@@ -685,6 +685,10 @@ textarea {
     float: none;
     width: auto;
   }
+
+  .oppia-hide-if-small-screenwidth {
+    display: none;
+  }
 }
 
 .oppia-feedback-button {
