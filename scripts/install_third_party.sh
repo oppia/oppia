@@ -46,6 +46,12 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   rm node-download.tgz
 fi
 
+# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
+#
+#   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+#
+$TOOLS_DIR/node-0.10.1/bin/npm config set ca ""
+
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   echo Installing CoffeeScript
