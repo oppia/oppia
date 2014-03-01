@@ -15,11 +15,11 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import galleries
+from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
 import feconf
 import test_utils
-import unittest
 
 CAN_EDIT_STR = 'can_edit'
 CAN_CLONE_STR = 'can_clone'
@@ -212,8 +212,6 @@ class ContributeGalleryTest(test_utils.GenericTestBase):
 
     def test_contribute_gallery_handler(self):
         """Test the contribute gallery data handler."""
-        # Visit the splash page to make the demo exploration load.
-        self.testapp.get('/')
 
         # If the user is not logged in, redirect to a login page.
         response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
@@ -265,4 +263,278 @@ class ContributeGalleryTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain('Upload Existing Exploration')
 
+        self.logout()
+
+
+class ContributeGalleryRightsTest(test_utils.GenericTestBase):
+
+    EMAIL_A = 'a@example.com'
+    EMAIL_B = 'b@example.com'
+    EMAIL_C = 'c@example.com'
+    EMAIL_MODERATOR = 'moderator@example.com'
+    EMAIL_ADMIN = 'admin@example.com'
+
+    # These are initialized during the test setup.
+    exp_a_id = None
+    exp_b_id = None
+    exp_c_id = None
+
+    def setUp(self):
+        """Create three explorations, an admin, and a moderator.
+
+        Exploration A is owned by a@example.com and is private.
+        Exploration B is owned by b@example.com and is public but not
+            community-editable.
+        Exploration C is owned by c@example.com and is public and is
+            community-editable.
+
+        The person with email address moderator@example.com is a
+        moderator. The person with email address admin@example.com is
+        an admin.
+        """
+        super(ContributeGalleryRightsTest, self).setUp()
+
+        self.register_editor(self.EMAIL_A, username='a')
+        self.register_editor(self.EMAIL_B, username='b')
+        self.register_editor(self.EMAIL_C, username='c')
+        self.register_editor(self.EMAIL_MODERATOR, username='moderator')
+        self.register_editor(self.EMAIL_ADMIN, username='adm')
+
+        self.login(self.EMAIL_A)
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        EXP_A_DICT = {'title': 'A', 'category': 'Test Explorations'}
+        self.exp_a_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
+        )[galleries.EXPLORATION_ID_KEY]
+        self.logout()
+
+        self.login(self.EMAIL_B)
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        EXP_B_DICT = {'title': 'B', 'category': 'Test Explorations'}
+        self.exp_b_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, EXP_B_DICT, csrf_token
+        )[galleries.EXPLORATION_ID_KEY]
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_b_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        # Do the minimal change needed to make the exploration valid.
+        exp_dict = self.get_json('/createhandler/data/%s' % self.exp_b_id)
+        init_state_name = exp_dict['init_state_name']
+        widget_handlers = exp_dict['states'][
+            init_state_name]['widget']['handlers']
+        widget_handlers[0]['rule_specs'][0]['dest'] = 'END'
+        self.put_json(
+            '/createhandler/data/%s' % self.exp_b_id,
+            {
+                'version': 1,
+                'commit_message': 'Make exploration valid',
+                'change_list': [{
+                    'cmd': 'edit_state_property',
+                    'state_name': exp_dict['init_state_name'],
+                    'property_name': 'widget_handlers',
+                    'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }]
+            },
+            csrf_token
+        )
+        # Change the exploration status to public.
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, self.exp_b_id),
+            {'is_public': True, 'version': 2},
+            csrf_token
+        )
+        self.logout()
+
+        self.login(self.EMAIL_C)
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        EXP_C_DICT = {'title': 'C', 'category': 'Test Explorations'}
+        self.exp_c_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, EXP_C_DICT, csrf_token
+        )[galleries.EXPLORATION_ID_KEY]
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_c_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        # Do the minimal change needed to make the exploration valid.
+        exp_dict = self.get_json('/createhandler/data/%s' % self.exp_c_id)
+        init_state_name = exp_dict['init_state_name']
+        widget_handlers = exp_dict['states'][
+            init_state_name]['widget']['handlers']
+        widget_handlers[0]['rule_specs'][0]['dest'] = 'END'
+        self.put_json(
+            '/createhandler/data/%s' % self.exp_c_id,
+            {
+                'version': 1,
+                'commit_message': 'Make exploration valid',
+                'change_list': [{
+                    'cmd': 'edit_state_property',
+                    'state_name': exp_dict['init_state_name'],
+                    'property_name': 'widget_handlers',
+                    'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }]
+            },
+            csrf_token
+        )
+        # Change the exploration status to public and community-editable.
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, self.exp_c_id),
+            {'is_public': True, 'version': 2},
+            csrf_token
+        )
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, self.exp_c_id),
+            {'is_community_owned': True, 'version': 2},
+            csrf_token
+        )
+        self.logout()
+
+        # Now create a moderator and admin.
+        self.login('superadmin@example.com', is_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.ADMIN_EMAILS.name: [self.EMAIL_ADMIN],
+                config_domain.MODERATOR_EMAILS.name: [self.EMAIL_MODERATOR],
+            }
+        }, csrf_token)
+        self.logout()
+
+    def test_user_rights(self):
+        """Test user rights for explorations in the Contribute gallery."""
+
+        # user@example.com, a regular user, can see and edit only exploration
+        #     C, and cannot delete any of the explorations.
+        EMAIL_USER = 'user@example.com'
+        self.register_editor(EMAIL_USER)
+
+        self.login(EMAIL_USER)
+        response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_super_admin': False,
+            'categories': {
+                'Test Explorations': [{
+                    'can_edit': True,
+                    'title': 'C',
+                    'can_clone': True,
+                    'id': self.exp_c_id,
+                    'is_private': False,
+                    'is_cloned': False
+                }]
+            }
+        }, response_dict)
+
+        # TODO(sll): Write the following tests.
+        # Try to edit exploration A and B; should fail.
+        # Try to edit exploration C; should pass.
+        # Try to delete exploration A and B and C; should fail.
+        self.logout()
+
+    def test_moderator_rights(self):
+        """Test moderator rights for explorations in the Contribute gallery."""
+
+        # The moderator can see, edit and delete both Explorations B and C.
+        self.login(self.EMAIL_MODERATOR)
+        response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_super_admin': False,
+        }, response_dict)
+        self.assertEqual(sorted([{
+            'can_edit': True,
+            'title': 'B',
+            'can_clone': True,
+            'id': self.exp_b_id,
+            'is_private': False,
+            'is_cloned': False
+        }, {
+            'can_edit': True,
+            'title': 'C',
+            'can_clone': True,
+            'id': self.exp_c_id,
+            'is_private': False,
+            'is_cloned': False
+        }]), sorted(response_dict['categories']['Test Explorations']))
+
+        # TODO(sll): Write the following tests.
+        # Try to edit exploration A; should fail.
+        # Try to edit explorations B and C; should pass.
+        # Try to delete exploration A; should fail.
+        # Try to delete explorations B and C; should pass.
+        self.logout()
+
+    def test_admin_rights(self):
+        """Test admin rights for explorations in the Contribute gallery."""
+
+        # The admin can see, edit and delete both Explorations B and C.
+        self.login(self.EMAIL_ADMIN)
+        response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
+        self.assertDictContainsSubset({
+            'is_admin': True,
+            'is_super_admin': False,
+        }, response_dict)
+        self.assertEqual(sorted([{
+            'can_edit': True,
+            'title': 'B',
+            'can_clone': True,
+            'id': self.exp_b_id,
+            'is_private': False,
+            'is_cloned': False
+        }, {
+            'can_edit': True,
+            'title': 'C',
+            'can_clone': True,
+            'id': self.exp_c_id,
+            'is_private': False,
+            'is_cloned': False
+        }]), sorted(response_dict['categories']['Test Explorations']))
+
+        # TODO(sll): Write the following tests.
+        # Try to edit exploration A; should fail.
+        # Try to edit explorations B and C; should pass.
+        # Try to delete exploration A; should fail.
+        # Try to delete explorations B and C; should pass.
+        self.logout()
+
+    def test_superadmin_rights(self):
+        """Test super-admin rights in the Contribute gallery."""
+
+        # superadmin@example.com, a super admin, can see, edit and delete both
+        # explorations B and C.
+        EMAIL_SUPERADMIN = 'superadmin@example.com'
+        self.register_editor(EMAIL_SUPERADMIN)
+
+        self.login(EMAIL_SUPERADMIN, is_admin=True)
+        response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_super_admin': True,
+        }, response_dict)
+        self.assertEqual(sorted([{
+            'can_edit': True,
+            'title': 'B',
+            'can_clone': True,
+            'id': self.exp_b_id,
+            'is_private': False,
+            'is_cloned': False
+        }, {
+            'can_edit': True,
+            'title': 'C',
+            'can_clone': True,
+            'id': self.exp_c_id,
+            'is_private': False,
+            'is_cloned': False
+        }]), sorted(response_dict['categories']['Test Explorations']))
+
+        # TODO(sll): Write the following tests.
+        # Try to edit exploration A; should fail.
+        # Try to edit explorations B and C; should pass.
+        # Try to delete exploration A; should fail.
+        # Try to delete explorations B and C; should pass.
         self.logout()
