@@ -624,8 +624,12 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope.ownerNames = rightsData.owner_names;
     $scope.editorNames = rightsData.editor_names;
     $scope.viewerNames = rightsData.viewer_names;
+    $scope.isPrivate = Boolean(
+      rightsData.status === GLOBALS.EXPLORATION_STATUS_PRIVATE);
     $scope.isPublic = Boolean(
       rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
+    $scope.isPublicized = Boolean(
+      rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED);
     $scope.isCloned = Boolean(rightsData.cloned_from);
     $scope.clonedFrom = rightsData.cloned_from;
     $scope.isCommunityOwned = rightsData.community_owned;
@@ -804,6 +808,14 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
               warningsData.addWarning(
                 data.error || 'Error communicating with server.');
             });
+  };
+
+  $scope.publicizeExploration = function() {
+    $scope._saveExplorationRightsChange({is_publicized: true});
+  };
+
+  $scope.unpublicizeExploration = function() {
+    $scope._saveExplorationRightsChange({is_publicized: false});
   };
 
   $scope.showPublishExplorationModal = function() {
