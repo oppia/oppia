@@ -405,7 +405,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         }, csrf_token)
         self.logout()
 
-    def attempt_to_edit(self, exploration_id, expect_errors, version):
+    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
         if expect_errors:
             expected_status_int = 401
         else:
@@ -426,21 +426,24 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                 'change_list':[{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'category',
-                    'new_value': 'newCategory',
-                    'old_value': 'oldCategory'
+                    'new_value': 'New Category',
+                    'old_value': 'Test Explorations'
                 }]
             }, 
-            csrf_token, expect_errors, expected_status_int
+            csrf_token=csrf_token, expect_errors=expect_errors, 
+            expected_status_int=expected_status_int
         )
 
-    def attempt_to_delete(self, exploration_id, expect_errors):
+    def attempt_to_delete(self, exploration_id, expect_errors=False):
         if expect_errors:
             expected_status_int = 401
         else:
             expected_status_int = 200
 
         response = self.testapp.delete(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, str(exploration_id)), expect_errors=expect_errors)
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, str(exploration_id)), 
+            expect_errors=expect_errors
+        )
         self.assertEqual(response.status_int, expected_status_int)
 
 
@@ -470,13 +473,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             }
         }, response_dict)
 
-        self.attempt_to_edit(self.exp_a_id, True, 2)
-        self.attempt_to_edit(self.exp_b_id, True, 2)
-        self.attempt_to_edit(self.exp_c_id, False, 2)
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
 
-        self.attempt_to_delete(self.exp_a_id, True)
-        self.attempt_to_delete(self.exp_b_id, True)
-        self.attempt_to_delete(self.exp_c_id, True)
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         self.logout()
 
@@ -506,13 +509,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_cloned': False
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, False, 1)  ####!!!! ERROR
-        self.attempt_to_edit(self.exp_b_id, False, 2)
-        self.attempt_to_edit(self.exp_c_id, False, 2)
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
 
-        self.attempt_to_delete(self.exp_a_id, False)  #####!!!! ERROR
-        self.attempt_to_delete(self.exp_b_id, False)
-        self.attempt_to_delete(self.exp_c_id, False)
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id)
+        self.attempt_to_delete(self.exp_c_id)
 
         # TODO(sll): Write the following tests.
         # Try to edit exploration A; should fail.
@@ -547,13 +550,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_cloned': False
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, False, 1) ###!!! ERROR
-        self.attempt_to_edit(self.exp_b_id, False, 2)
-        self.attempt_to_edit(self.exp_c_id, False, 2)
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
 
-        self.attempt_to_delete(self.exp_a_id, False) ###!!! ERROR
-        self.attempt_to_delete(self.exp_b_id, False)
-        self.attempt_to_delete(self.exp_c_id, False)
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id)
+        self.attempt_to_delete(self.exp_c_id)
 
         # TODO(sll): Write the following tests.
         # Try to edit exploration A; should fail.
@@ -565,8 +568,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
     def test_superadmin_rights(self):
         """Test super-admin rights in the Contribute gallery."""
 
-        # superadmin@example.com, a super admin, can see, edit and delete both
-        # explorations B and C.
+        # superadmin@example.com, a super admin, can only edit exploration C
+        # and cannot delete any exploration (the same powers as users).
         EMAIL_SUPERADMIN = 'superadmin@example.com'
         self.register_editor(EMAIL_SUPERADMIN)
 
@@ -592,13 +595,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_cloned': False
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, True, 1)
-        self.attempt_to_edit(self.exp_b_id, True, 2) ###!!! ERROR
-        self.attempt_to_edit(self.exp_c_id, False, 2)
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
 
-        self.attempt_to_delete(self.exp_a_id, True)
-        self.attempt_to_delete(self.exp_b_id, True) ###!!! ERROR
-        self.attempt_to_delete(self.exp_c_id, True) ###!!! ERROR
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         # TODO(sll): Write the following tests.
         # Try to edit exploration A; should fail.
