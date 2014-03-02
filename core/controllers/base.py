@@ -136,11 +136,13 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.values['username'] = self.username
 
-        self.values['is_moderator'] = rights_manager.Actor(
-            self.user_id).is_moderator()
-        self.values['is_admin'] = rights_manager.Actor(self.user_id).is_admin()
+        self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
+        self.is_admin = rights_manager.Actor(self.user_id).is_admin()
         self.is_super_admin = user_services.is_super_admin(
             self.user_id, self.request)
+
+        self.values['is_moderator'] = self.is_moderator
+        self.values['is_admin'] = self.is_admin
         self.values['is_super_admin'] = self.is_super_admin
 
         if self.request.get('payload'):

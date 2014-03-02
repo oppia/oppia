@@ -644,6 +644,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
       $scope.currentUserIsAdmin = data.is_admin;
+      $scope.currentUserIsModerator = data.is_moderator;
       $scope.states = angular.copy(data.states);
       $scope.explorationTitle = data.title;
       $scope.explorationCategory = data.category;
@@ -847,7 +848,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
   };
 
-  $scope.deleteExploration = function() {
+  $scope.deleteExploration = function(role) {
     warningsData.clear();
 
     var modalInstance = $modal.open({
@@ -866,8 +867,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     });
 
     modalInstance.result.then(function() {
-      $http['delete']($scope.explorationDataUrl)
-      .success(function(data) {
+      var deleteUrl = $scope.explorationDataUrl;
+      if (role) {
+        deleteUrl += ('?role=' + role);
+      }
+      $http['delete'](deleteUrl).success(function(data) {
         $window.location = CONTRIBUTE_GALLERY_PAGE;
       });
     });

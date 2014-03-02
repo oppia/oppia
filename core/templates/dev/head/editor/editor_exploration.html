@@ -94,7 +94,7 @@
 
       <div class="modal-body">
         <p>
-          Really delete this exploration? This action cannot be reversed.
+          Really delete this exploration? <strong>This action cannot be reversed.</strong>
         </p>
       </div>
 
@@ -259,15 +259,29 @@
               <i class="icon-download-alt"></i>
             </a>
 
-            <span ng-if="currentUserIsAdmin || !isPublic">
+            <span ng-if="!isPublic">
               &nbsp;&nbsp;&nbsp;
-
               <button type="button" class="btn btn-danger"
-                      ng-click="deleteExploration()"
+                      ng-click="deleteExploration('')"
                       title="Delete this exploration">
                 <i class="icon-trash" title="Delete Exploration"></i>
               </button>
             </span>
+
+            <span ng-if="isPublic && (currentUserIsAdmin || currentUserIsModerator)">
+              &nbsp;&nbsp;&nbsp;
+              <button type="button" class="btn btn-danger"
+                      ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+                <i class="icon-trash"></i>
+                <span ng-if="currentUserIsAdmin">
+                  (as admin)
+                </span>
+                <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+                  (as moderator)
+                </span>
+              </button>
+            </span>
+
           </span>
 
           <h3>

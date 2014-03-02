@@ -46,6 +46,9 @@ ROLE_EDITOR = 'editor'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
 
+ROLE_ADMIN = 'admin'
+ROLE_MODERATOR = 'moderator'
+
 
 class ExplorationRights(object):
     """Domain object for the rights/publication status of an exploration."""
@@ -315,7 +318,7 @@ class Actor(object):
         return self.can_edit(exploration_id)
 
     def can_delete(self, exploration_id):
-        if self.is_admin():
+        if self.is_moderator():
             return True
 
         try:
