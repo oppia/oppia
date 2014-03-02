@@ -109,9 +109,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(self.EXP_ID))
-        self.assertTrue(
+        self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_edit(self.EXP_ID))
-        self.assertTrue(
+        self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_delete(self.EXP_ID))
 
         self.assertFalse(
@@ -262,11 +262,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         pass
 
     def test_can_publicize_exploration(self):
-        # User A creates an exploration, marks it private.
-        # User A publishes the exploration.
-        # User A cannot publicize the exploration.
-        # Admin can publicize the exploration.
-        pass
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_a).can_publicize(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_admin).can_publicize(
+                self.EXP_ID))
 
 
 class PageRightsTest(test_utils.GenericTestBase):

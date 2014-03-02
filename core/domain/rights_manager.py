@@ -311,23 +311,36 @@ class Actor(object):
         return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
-        return (self.has_explicit_editing_rights(exploration_id)
-                or self.is_moderator())
+        exp_rights = get_exploration_rights(exploration_id)
+        return (
+            self.has_explicit_editing_rights(exploration_id) or (
+                self.is_moderator() and
+                exp_rights.status != EXPLORATION_STATUS_PRIVATE
+            )
+        )
 
     def can_accept_submitted_change(self, exploration_id):
         return self.can_edit(exploration_id)
 
     def can_delete(self, exploration_id):
-        if self.is_moderator():
-            return True
-
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:
             return False
 
-        return (exp_rights.status == EXPLORATION_STATUS_PRIVATE and
-                self.is_owner(exploration_id))
+        is_deleting_own_private_exploration = (
+            exp_rights.status == EXPLORATION_STATUS_PRIVATE and
+            self.is_owner(exploration_id)
+        )
+
+        is_moderator_deleting_public_exploration = (
+            exp_rights.status == EXPLORATION_STATUS_PUBLIC and
+            self.is_moderator()
+        )
+
+        return (
+            is_deleting_own_private_exploration or
+            is_moderator_deleting_public_exploration)
 
     def can_publish(self, exploration_id):
         if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
@@ -577,4 +590,34 @@ def unpublish_exploration(committer_id, exploration_id):
 
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PRIVATE,
-        'Unpublished exploration.')
+        'Exploration unpublished.')
+
+
+def publicize_exploration(committer_id, exploration_id):
+    """Publicizes an exploration. Commits changes.
+
+    It is the responsibility of the caller to check that the exploration is
+    valid prior to publicizing it.
+    """
+    if not Actor(committer_id).can_publicize(exploration_id):
+        logging.error(
+            'User %s tried to publicize exploration %s but was refused '
+            'permission.' % (committer_id, exploration_id))
+        raise Exception('This exploration cannot be moved out of beta.')
+
+    _change_exploration_status(
+        committer_id, exploration_id, EXPLORATION_STATUS_PUBLICIZED,
+        'Exploration publicized.')
+
+
+def unpublicize_exploration(committer_id, exploration_id):
+    """Unpublicizes an exploration. Commits changes."""
+    if not Actor(committer_id).can_unpublicize(exploration_id):
+        logging.error(
+            'User %s tried to unpublicize exploration %s but was refused '
+            'permission.' % (committer_id, exploration_id))
+        raise Exception('This exploration cannot be moved back into beta.')
+
+    _change_exploration_status(
+        committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
+        'Exploration unpublicized.')

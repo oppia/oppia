@@ -223,6 +223,36 @@
         <div class="span12">
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
+            {% if can_publicize %}
+              <span ng-show="isPublic">
+                <button type="button" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  Move out of beta
+                  <span ng-if="currentUserIsAdmin">
+                    (as admin)
+                  </span>
+                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+                    (as moderator)
+                  </span>
+                </button>
+                &nbsp;&nbsp;&nbsp;
+              </span>
+            {% endif %}
+
+            {% if can_unpublicize %}
+              <span ng-show="isPublicized">
+                <button type="button" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  Move back into beta
+                  <span ng-if="currentUserIsAdmin">
+                    (as admin)
+                  </span>
+                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+                    (as moderator)
+                  </span>
+                </button>
+                &nbsp;&nbsp;&nbsp;
+              </span>
+            {% endif %}
+
             {% if can_publish %}
               <span ng-hide="isPublic">
                 <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
@@ -259,7 +289,7 @@
               <i class="icon-download-alt"></i>
             </a>
 
-            <span ng-if="!isPublic">
+            <span ng-if="isPrivate">
               &nbsp;&nbsp;&nbsp;
               <button type="button" class="btn btn-danger"
                       ng-click="deleteExploration('')"
@@ -286,8 +316,11 @@
 
           <h3>
             <[explorationTitle]>
-            <span ng-if="isPublic" class="label label-info">
+            <span ng-if="!isPrivate" class="label label-info">
               Published
+            </span>
+            <span ng-if="isPublic" class="label label-info">
+              Beta
             </span>
             <span ng-if="isCloned" class="label label-info">
               Cloned
