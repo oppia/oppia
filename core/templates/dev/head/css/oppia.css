@@ -440,6 +440,13 @@ textarea {
   border: 2px solid #78FA89;
 }
 
+.oppia-contribute-gallery-announcement {
+   border: 1px dashed black;
+   border-radius: 5px;
+   margin: 20px;
+   padding: 10px;
+}
+
 .oppia-gallery-frame {
   border-radius: 20px;
   margin: 10px;

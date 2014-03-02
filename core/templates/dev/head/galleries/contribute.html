@@ -5,6 +5,7 @@
 {% endblock subtitle %}
 
 {% block content %}
+
   <div class="container" ng-controller="ContributeGallery">
 
     <div class="row">
@@ -12,10 +13,10 @@
         <div class="oppia-gallery-frame">
           <span class="pull-right">
             <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
-              Include beta explorations by others
+              Include more beta explorations
             </button>
             <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
-              Hide beta explorations by others
+              Show fewer beta explorations
             </button>
           </span>
 
@@ -182,6 +183,14 @@
           </script>
         </div>
       </div>
+
+      {% if announcement %}
+        <div class="span4">
+          <div class="oppia-contribute-gallery-announcement">
+            {{ announcement }}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
@@ -191,4 +200,5 @@
   <script>
     {{ include_js_file('galleries/ContributeGallery.js') }}
   </script>
+  {{ widget_js_directives }}
 {% endblock footer_js %}

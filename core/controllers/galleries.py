@@ -24,9 +24,12 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+
+import jinja2
 
 
 EXPLORATION_ID_KEY = 'explorationId'
@@ -35,6 +38,11 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'allow_yaml_file_upload', 'Boolean',
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
+
+CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
+    'contribute_gallery_page_announcement', 'Html',
+    'An announcement to display on top of the contribute gallery page.',
+    default_value='')
 
 
 class LearnPage(base.BaseHandler):
@@ -105,9 +113,15 @@ class ContributePage(base.BaseHandler):
     @base.require_registered_as_editor
     def get(self):
         """Handles GET requests."""
+        widget_js_directives = (
+            widget_registry.Registry.get_noninteractive_widget_js())
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CONTRIBUTE,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'announcement': jinja2.utils.Markup(
+                CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT.value),
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
         })
         self.render_template('galleries/contribute.html')
 
