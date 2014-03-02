@@ -517,11 +517,6 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.attempt_to_delete(self.exp_b_id)
         self.attempt_to_delete(self.exp_c_id)
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
         self.logout()
 
     def test_admin_rights(self):
@@ -558,11 +553,6 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.attempt_to_delete(self.exp_b_id)
         self.attempt_to_delete(self.exp_c_id)
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
         self.logout()
 
     def test_superadmin_rights(self):
@@ -603,9 +593,4 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.attempt_to_delete(self.exp_b_id, expect_errors=True)
         self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
         self.logout()
