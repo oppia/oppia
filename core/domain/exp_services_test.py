@@ -22,6 +22,7 @@ import StringIO
 import unittest
 import zipfile
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -67,6 +68,10 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_NAME)
         self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_NAME)
 
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+        self.user_id_admin = self.get_user_id_from_email('admin@example.com')
+
     def save_new_default_exploration(self, exploration_id):
         """Saves a new default exploration written by self.OWNER_ID.
 
@@ -93,26 +98,46 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_public_explorations_summary_dict(self):
+    def test_get_non_private_explorations_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID)
         self.assertEqual(
-            exp_services.get_public_explorations_summary_dict(), {})
+            exp_services.get_non_private_explorations_summary_dict(), {})
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-        self.assertEqual(exp_services.get_public_explorations_summary_dict(), {
-            self.EXP_ID: {
-                'title': 'A title',
-                'category': 'A category',
-                'rights': {
-                    'owner_names': [self.OWNER_NAME],
-                    'editor_names': [],
-                    'viewer_names': [],
-                    'community_owned': False,
-                    'cloned_from': None,
-                    'status': rights_manager.EXPLORATION_STATUS_PUBLIC
-                }
-            }
-        })
+        self.assertEqual(
+        	exp_services.get_non_private_explorations_summary_dict(), {
+	            self.EXP_ID: {
+	                'title': 'A title',
+	                'category': 'A category',
+	                'rights': {
+	                    'owner_names': [self.OWNER_NAME],
+	                    'editor_names': [],
+	                    'viewer_names': [],
+	                    'community_owned': False,
+	                    'cloned_from': None,
+	                    'status': rights_manager.EXPLORATION_STATUS_PUBLIC
+	                }
+	            }
+	        }
+        )
+
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+        	exp_services.get_non_private_explorations_summary_dict(), {
+	            self.EXP_ID: {
+	                'title': 'A title',
+	                'category': 'A category',
+	                'rights': {
+	                    'owner_names': [self.OWNER_NAME],
+	                    'editor_names': [],
+	                    'viewer_names': [],
+	                    'community_owned': False,
+	                    'cloned_from': None,
+	                    'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED
+	                }
+	            }
+	        }
+        )
 
     def test_get_explicit_viewer_explorations_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID)

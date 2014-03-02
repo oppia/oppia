@@ -57,12 +57,19 @@ class LearnHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
-        explorations_dict = exp_services.get_public_explorations_summary_dict()
+        explorations_dict = (
+            exp_services.get_non_private_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
             categories[exploration_data['category']].append({
                 'id': eid,
+                'is_public': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLIC),
+                'is_publicized': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'title': exploration_data['title'],
                 'to_playtest': False,
             })
@@ -74,6 +81,12 @@ class LearnHandler(base.BaseHandler):
             for (eid, exploration_data) in playtest_dict.iteritems():
                 categories[exploration_data['category']].append({
                     'id': eid,
+                    'is_public': (
+                        exploration_data['rights']['status'] ==
+                        rights_manager.EXPLORATION_STATUS_PUBLIC),
+                    'is_publicized': (
+                        exploration_data['rights']['status'] ==
+                        rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                     'title': exploration_data['title'],
                     'to_playtest': True,
                 })
@@ -107,14 +120,13 @@ class ContributeHandler(base.BaseHandler):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
 
+        explorations_dict = (
+            exp_services.get_editable_explorations_summary_dict(
+                self.user_id))
         if (rights_manager.Actor(self.user_id).is_moderator() or
                 self.is_super_admin):
-            explorations_dict = (
-                exp_services.get_public_explorations_summary_dict())
-        else:
-            explorations_dict = (
-                exp_services.get_editable_explorations_summary_dict(
-                    self.user_id))
+            explorations_dict.update(
+                exp_services.get_non_private_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
@@ -130,6 +142,12 @@ class ContributeHandler(base.BaseHandler):
                 'is_private': (
                     exploration_data['rights']['status'] ==
                     rights_manager.EXPLORATION_STATUS_PRIVATE),
+                'is_public': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLIC),
+                'is_publicized': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'is_cloned': bool(exploration_data['rights']['cloned_from']),
             })
 

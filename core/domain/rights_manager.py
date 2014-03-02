@@ -181,10 +181,10 @@ def get_exploration_rights(exploration_id):
     return _get_exploration_rights_from_model(model)
 
 
-def get_public_exploration_rights():
+def get_non_private_exploration_rights():
     """Returns a list of rights domain objects for public explorations."""
     return [_get_exploration_rights_from_model(model) for model in
-            exp_models.ExplorationRightsModel.get_public()]
+            exp_models.ExplorationRightsModel.get_non_private()]
 
 
 def get_community_owned_exploration_rights():
@@ -229,6 +229,11 @@ def get_owned_exploration_rights(user_id):
     """
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_owned(user_id)]
+
+
+def is_exploration_private(exploration_id):
+    exploration_rights = get_exploration_rights(exploration_id)
+    return exploration_rights.status == EXPLORATION_STATUS_PRIVATE
 
 
 def is_exploration_public(exploration_id):

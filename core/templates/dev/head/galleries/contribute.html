@@ -10,11 +10,20 @@
     <div class="row">
       <div class="span8">
         <div class="oppia-gallery-frame">
+          <span class="pull-right">
+            <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
+              Include beta explorations by others
+            </button>
+            <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
+              Hide beta explorations by others
+            </button>
+          </span>
+
           <h3 class="oppia-page-title">
             Contribute
           </h3>
 
-          <div class="oppia-gallery" ng-if="categories">
+          <div class="oppia-gallery" ng-if="displayedCategories">
             <div class="tabbable tabs-left">
 
               <div class="oppia-gallery-menu">
@@ -22,7 +31,7 @@
                   <strong>Categories</strong>
                 </div>
                 <ul class="nav nav-pills nav-stacked" id="navTabs">
-                  <li ng-repeat="(category, explorations) in categories"
+                  <li ng-repeat="(category, explorations) in displayedCategories"
                       ng-class="{active: $index == 0}">
                     <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
                       <[category]>
@@ -32,7 +41,7 @@
               </div>
 
               <div class="tab-content oppia-gallery-tiles-container">
-                <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
                   <div class="container-fluid">
                     <div class="row-fluid">
 
@@ -70,6 +79,9 @@
 
                             <span ng-if="exploration.is_cloned" class="label label-info pull-right">
                               Cloned
+                            </span>
+                            <span ng-if="exploration.is_public" class="label label-info pull-right" style="opacity: 0.5">
+                              Beta
                             </span>
                             <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info pull-right">
                               Private

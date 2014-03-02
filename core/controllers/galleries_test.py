@@ -55,6 +55,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'categories': {
                 'Welcome': [{
+                    'is_public': True,
+                    'is_publicized': False,
                     'to_playtest': False,
                     'id': '0',
                     'title': 'Welcome to Oppia!'
@@ -148,6 +150,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'categories': {
                 'Test Explorations': [{
+                    'is_public': False,
+                    'is_publicized': False,
                     'to_playtest': True,
                     'id': exp_a_id,
                     'title': 'A'
@@ -412,7 +416,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             expected_status_int = 200
 
         response = self.testapp.get(
-            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id), 
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id),
             expect_errors=expect_errors
         )
         csrf_token = self.get_csrf_token_from_response(response)
@@ -429,8 +433,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'new_value': 'New Category',
                     'old_value': 'Test Explorations'
                 }]
-            }, 
-            csrf_token=csrf_token, expect_errors=expect_errors, 
+            },
+            csrf_token=csrf_token, expect_errors=expect_errors,
             expected_status_int=expected_status_int
         )
 
@@ -441,7 +445,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             expected_status_int = 200
 
         response = self.testapp.delete(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, str(exploration_id)), 
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, str(exploration_id)),
             expect_errors=expect_errors
         )
         self.assertEqual(response.status_int, expected_status_int)
@@ -468,7 +472,9 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'can_clone': True,
                     'id': self.exp_c_id,
                     'is_private': False,
-                    'is_cloned': False
+                    'is_cloned': False,
+                    'is_public': True,
+                    'is_publicized': False,
                 }]
             }
         }, response_dict)
@@ -499,14 +505,18 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
@@ -535,14 +545,18 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
@@ -575,14 +589,18 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)

@@ -219,9 +219,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         return;
       }
 
-      if ($scope.isPublic && warningMessage) {
+      if (!$scope.isPrivate && warningMessage) {
         $log.error(warningMessage);
-        // Warnings should be fixed before an exploration is published.
+        // If the exploration is not private, warnings should be fixed before
+        // it can be saved.
         warningsData.addWarning(warningMessage);
         return;
       }
@@ -248,7 +249,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             return deletedStates;
           },
           commitMessageIsOptional: function() {
-            return !$scope.isPublic;
+            return $scope.isPrivate;
           }
         },
         controller: [
