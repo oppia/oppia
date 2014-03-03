@@ -38,10 +38,6 @@ class UserServiceHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'moderator_page'
 
-    @base.require_moderator
-    def get(self):
-        """Handles GET requests."""
-        self.render_json({})
 
     @base.require_moderator
     def post(self):

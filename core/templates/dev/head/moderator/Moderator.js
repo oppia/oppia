@@ -19,15 +19,10 @@
 */
 
 function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
-  $rootScope.loadingMessage = 'Loading';
-
-  $http.get('/moderatorhandler/user_services').success(function(data) {
-    $rootScope.loadingMessage = '';
-    $scope.userEmail = ' ';
-  });
   
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
+    $scope.last_submitted_username = username;
     $http.post(
       '/moderatorhandler/user_services',
       oppiaRequestCreator.createRequest({
