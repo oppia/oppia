@@ -70,22 +70,6 @@ def require_user(handler):
     return test_login
 
 
-def require_moderator(handler):
-    """Decorator that checks whether a moderator is associated to the current session."""
-    def test_is_moderator(self, **kwargs):
-        """Check that the user is a moderator."""
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if not rights_manager.Actor(self.user_id).is_moderator():
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        return handler(self, **kwargs)
-    return test_is_moderator
-
 def require_registered_as_editor(handler):
     """Decorator that checks if the user has registered as an editor."""
     def test_registered_as_editor(self, **kwargs):
