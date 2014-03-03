@@ -21,20 +21,21 @@
 function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
   $rootScope.loadingMessage = 'Loading';
 
-  $http.get('/moderator/data/user_services').success(function(data) {
+  $http.get('/moderatorhandler/user_services').success(function(data) {
     $rootScope.loadingMessage = '';
+    $scope.userEmail = ' ';
   });
   
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $http.post(
-      '/moderator/data/user_services',
+      '/moderatorhandler/user_services',
       oppiaRequestCreator.createRequest({
         username: username
-        }),
-     {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
-      $scope.user_email = data.user_email; 
+      $scope.userEmail = data.user_email; 
     }).error(function(data) {
       warningsData.addWarning(data.error);
     });

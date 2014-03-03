@@ -86,6 +86,7 @@ def require_moderator(handler):
         return handler(self, **kwargs)
     return test_is_moderator
 
+
 def require_registered_as_editor(handler):
     """Decorator that checks if the user has registered as an editor."""
     def test_registered_as_editor(self, **kwargs):

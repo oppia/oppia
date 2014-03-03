@@ -16,8 +16,11 @@
           <button type="submit">Get Email</button>
         </form>
       </div>
+      <div ng-show="!userEmail">
+        <strong>No such user</strong>
+      </div>
       <div>
-        <[user_email]>
+        <[userEmail]>
       </div>
     </div>
   </div>

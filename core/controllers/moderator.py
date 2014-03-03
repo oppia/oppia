@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the profile page."""
+"""Controllers for the moderator page."""
 
 __author__ = 'yanamal@google.com (Yana Malysheva)'
 
@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import user_services
 import feconf
 import utils
+
 
 class ModeratorPage(base.BaseHandler):
     """The moderator page."""
