@@ -24,9 +24,12 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
+from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+
+import jinja2
 
 
 EXPLORATION_ID_KEY = 'explorationId'
@@ -35,6 +38,11 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'allow_yaml_file_upload', 'Boolean',
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
+
+CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
+    'contribute_gallery_page_announcement', 'Html',
+    'An announcement to display on top of the contribute gallery page.',
+    default_value='')
 
 
 class LearnPage(base.BaseHandler):
@@ -57,12 +65,19 @@ class LearnHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
-        explorations_dict = exp_services.get_public_explorations_summary_dict()
+        explorations_dict = (
+            exp_services.get_non_private_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
             categories[exploration_data['category']].append({
                 'id': eid,
+                'is_public': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLIC),
+                'is_publicized': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'title': exploration_data['title'],
                 'to_playtest': False,
             })
@@ -74,6 +89,12 @@ class LearnHandler(base.BaseHandler):
             for (eid, exploration_data) in playtest_dict.iteritems():
                 categories[exploration_data['category']].append({
                     'id': eid,
+                    'is_public': (
+                        exploration_data['rights']['status'] ==
+                        rights_manager.EXPLORATION_STATUS_PUBLIC),
+                    'is_publicized': (
+                        exploration_data['rights']['status'] ==
+                        rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                     'title': exploration_data['title'],
                     'to_playtest': True,
                 })
@@ -92,9 +113,15 @@ class ContributePage(base.BaseHandler):
     @base.require_registered_as_editor
     def get(self):
         """Handles GET requests."""
+        widget_js_directives = (
+            widget_registry.Registry.get_noninteractive_widget_js())
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CONTRIBUTE,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'announcement': jinja2.utils.Markup(
+                CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT.value),
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
         })
         self.render_template('galleries/contribute.html')
 
@@ -107,14 +134,13 @@ class ContributeHandler(base.BaseHandler):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
 
+        explorations_dict = (
+            exp_services.get_editable_explorations_summary_dict(
+                self.user_id))
         if (rights_manager.Actor(self.user_id).is_moderator() or
                 self.is_super_admin):
-            explorations_dict = (
-                exp_services.get_public_explorations_summary_dict())
-        else:
-            explorations_dict = (
-                exp_services.get_editable_explorations_summary_dict(
-                    self.user_id))
+            explorations_dict.update(
+                exp_services.get_non_private_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
@@ -130,6 +156,12 @@ class ContributeHandler(base.BaseHandler):
                 'is_private': (
                     exploration_data['rights']['status'] ==
                     rights_manager.EXPLORATION_STATUS_PRIVATE),
+                'is_public': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLIC),
+                'is_publicized': (
+                    exploration_data['rights']['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'is_cloned': bool(exploration_data['rights']['cloned_from']),
             })
 

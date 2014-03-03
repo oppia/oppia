@@ -55,6 +55,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'categories': {
                 'Welcome': [{
+                    'is_public': True,
+                    'is_publicized': False,
                     'to_playtest': False,
                     'id': '0',
                     'title': 'Welcome to Oppia!'
@@ -148,6 +150,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'categories': {
                 'Test Explorations': [{
+                    'is_public': False,
+                    'is_publicized': False,
                     'to_playtest': True,
                     'id': exp_a_id,
                     'title': 'A'
@@ -321,13 +325,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_b_id))
         csrf_token = self.get_csrf_token_from_response(response)
         # Do the minimal change needed to make the exploration valid.
-        exp_dict = self.get_json('/createhandler/data/%s' % self.exp_b_id)
+        exp_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_b_id))
         init_state_name = exp_dict['init_state_name']
         widget_handlers = exp_dict['states'][
             init_state_name]['widget']['handlers']
         widget_handlers[0]['rule_specs'][0]['dest'] = 'END'
         self.put_json(
-            '/createhandler/data/%s' % self.exp_b_id,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_b_id),
             {
                 'version': 1,
                 'commit_message': 'Make exploration valid',
@@ -360,13 +364,13 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_c_id))
         csrf_token = self.get_csrf_token_from_response(response)
         # Do the minimal change needed to make the exploration valid.
-        exp_dict = self.get_json('/createhandler/data/%s' % self.exp_c_id)
+        exp_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_c_id))
         init_state_name = exp_dict['init_state_name']
         widget_handlers = exp_dict['states'][
             init_state_name]['widget']['handlers']
         widget_handlers[0]['rule_specs'][0]['dest'] = 'END'
         self.put_json(
-            '/createhandler/data/%s' % self.exp_c_id,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_c_id),
             {
                 'version': 1,
                 'commit_message': 'Make exploration valid',
@@ -405,6 +409,48 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         }, csrf_token)
         self.logout()
 
+    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
+        if expect_errors:
+            expected_status_int = 401
+        else:
+            expected_status_int = 200
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id),
+            expect_errors=expect_errors
+        )
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.assertEqual(response.status_int, expected_status_int)
+
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exploration_id),
+            {
+                'version': version,
+                'commit_message': 'change category',
+                'change_list':[{
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'category',
+                    'new_value': 'New Category',
+                    'old_value': 'Test Explorations'
+                }]
+            },
+            csrf_token=csrf_token, expect_errors=expect_errors,
+            expected_status_int=expected_status_int
+        )
+
+    def attempt_to_delete(self, exploration_id, expect_errors=False):
+        if expect_errors:
+            expected_status_int = 401
+        else:
+            expected_status_int = 200
+
+        response = self.testapp.delete(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, str(exploration_id)),
+            expect_errors=expect_errors
+        )
+        self.assertEqual(response.status_int, expected_status_int)
+
+
     def test_user_rights(self):
         """Test user rights for explorations in the Contribute gallery."""
 
@@ -415,6 +461,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
 
         self.login(EMAIL_USER)
         response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
+
         self.assertDictContainsSubset({
             'is_admin': False,
             'is_super_admin': False,
@@ -425,15 +472,21 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'can_clone': True,
                     'id': self.exp_c_id,
                     'is_private': False,
-                    'is_cloned': False
+                    'is_cloned': False,
+                    'is_public': True,
+                    'is_publicized': False,
                 }]
             }
         }, response_dict)
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A and B; should fail.
-        # Try to edit exploration C; should pass.
-        # Try to delete exploration A and B and C; should fail.
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
+
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_c_id, expect_errors=True)
+
         self.logout()
 
     def test_moderator_rights(self):
@@ -452,21 +505,28 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
+
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id)
+        self.attempt_to_delete(self.exp_c_id)
+
         self.logout()
 
     def test_admin_rights(self):
@@ -485,28 +545,35 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
+
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id)
+        self.attempt_to_delete(self.exp_c_id)
+
         self.logout()
 
     def test_superadmin_rights(self):
         """Test super-admin rights in the Contribute gallery."""
 
-        # superadmin@example.com, a super admin, can see, edit and delete both
-        # explorations B and C.
+        # superadmin@example.com, a super admin, can only edit exploration C
+        # and cannot delete any exploration (the same powers as users).
         EMAIL_SUPERADMIN = 'superadmin@example.com'
         self.register_editor(EMAIL_SUPERADMIN)
 
@@ -522,19 +589,26 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }, {
             'can_edit': True,
             'title': 'C',
             'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
-            'is_cloned': False
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        # TODO(sll): Write the following tests.
-        # Try to edit exploration A; should fail.
-        # Try to edit explorations B and C; should pass.
-        # Try to delete exploration A; should fail.
-        # Try to delete explorations B and C; should pass.
+        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
+
+        self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+        self.attempt_to_delete(self.exp_c_id, expect_errors=True)
+
         self.logout()

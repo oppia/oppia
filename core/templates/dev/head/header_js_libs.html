@@ -63,7 +63,8 @@
   $(document).ready(function() {
     MIDI.loadPlugin({
       soundfontUrl: '/third_party/static/midi-js-09335a/soundfont/',
-      instrument: 'acoustic_grand_piano'
+      instrument: 'acoustic_grand_piano',
+      callback: function() {}
     });
   });
 </script>
