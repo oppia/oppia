@@ -91,6 +91,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         var horizontalGridKeys = [1, 2, 3, 4, 5, 6, 7, 8];
 
+        var MAXIMUM_NOTES_POSSIBLE = 8;
+
         // Sets grid positions and initializes widget after staff has loaded.
         $(document).ready(function() {
           setTimeout(function() {
@@ -126,7 +128,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           horizontalGridPositions = updateHorizontalGridPositions();
           verticalGridPositions = updateVerticalGridPositions();
 
-          repaintNotes(containerWidth, containerHeight);
+          repaintNotes();
         };
 
         $scope.init();
@@ -177,18 +179,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     helper: 'original',
                     stack: '.oppia-music-input-note-choices div',
                     tolerance: 'pointer',
-                    // Removes note from staff and noteSequence if 
-                    // note is dropped off of staff.
                     revert: function() {
-                      // Finds note to remove in notesequence.
-                      startPos = $(this).data('startLeftPos');
-                      // If note is out of droppable, remove it.
-                      var nearestStaffLine = findNearestStaffLine($(this).position().top, 4.75);
-                      if (nearestStaffLine) {
-                        $(this).css('top', nearestStaffLine);
-                      }
-                      else if (noteIsOffStaff($(this))) {
-                        revertNote(startPos);
+                      // If note is out of droppable or off staff, remove it.
+                      if (noteIsOffStaff($(this)) ||
+                          noteIsOutOfDroppable($(ui.helper))) {
+                        revertNote($(ui.helper));
                         sortNoteSequence();
                         $(this).remove();
                       }
@@ -200,7 +195,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           }
         }
 
-        function repaintNotes(containerWidth, containerHeight) {
+        function repaintNotes() {
           updateVerticalGridPositions(
             $('.oppia-music-input-staff div:first-child').position().top);
           for (var i = 0; i < noteSequence.length; i++) {
@@ -216,22 +211,33 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               cursor: 'pointer',
               stack: '.oppia-music-input-note-choices div',
               grid: [horizontalGridSpacing, 1],
-              // Removes note from staff and noteSequence if 
-              // note is dropped off of staff.
-              revert: function() {
-                // Finds note to remove in notesequence.
-                startPos = $(this).data('startLeftPos');
-                // If note is out of droppable, remove it.
-                if (noteIsOffStaff($(this))) {
-                  revertNote(startPos);
+              revert: function(event, ui) {
+                // If note is out of droppable or off staff, remove it.
+                if (noteIsOffStaff($(this)) ||
+                    noteIsOutOfDroppable($(this))) {
+                  revertNote($(this));
+                  sortNoteSequence();
                   $(this).remove();
                 }
               }
             })
+            // Position notes in relation to where they were before resize.
             .css({
-              top: getVerticalPosition(noteSequence[i].note.baseNoteMidiNumber) - NOTE_OFFSET,
-              left: getHorizontalPosition(noteSequence[i].note.noteStart['num'])
+              top:
+                getVerticalPosition(noteSequence[i].note.baseNoteMidiNumber) - NOTE_OFFSET,
+              left:
+                getHorizontalPosition(noteSequence[i].note.noteStart['num'])
             });
+            // Draws ledger lines.
+            var lineValue =
+              _getCorrespondingNoteName(noteSequence[i].note.baseNoteMidiNumber);
+            if (isLedgerLineNote(lineValue)) {
+              drawLedgerLine(
+                getVerticalPosition(noteSequence[i].note.baseNoteMidiNumber),
+                getHorizontalPosition(noteSequence[i].note.noteStart['num']),
+                lineValue
+              );
+            }
           }
         }
 
@@ -255,7 +261,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   var leftPos = ui.helper.position().left;
                   var topPos = $(event.target).position().top;
                   var noteType = ui.draggable.data('noteType');
-                  drawLedgerLine(topPos, leftPos, lineValue, noteType, $(ui.droppable));
+                  drawLedgerLine(topPos, leftPos, lineValue);
                 }
               },
               out: function(event, ui) {
@@ -281,26 +287,29 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
                 // This makes sure that a note can move vertically on it's position.
                 if (startPos !== leftPos) {
-                  // Moves the note to the next available spot on the staff.
-                  // If the staff is full, note is moved off staff, and thus removed.
-                  while (checkIfNotePositionTaken(leftPos)) {
-                    leftPos += horizontalGridSpacing;
+                  // If new note doesn't exceed the maximum note's that can fit 
+                  // on staff, then see if a position is available. Otherwise, 
+                  // remove the note.
+                  if (noteSequence.length + 1 <= MAXIMUM_NOTES_POSSIBLE) {
+
+                    // Moves the note to the next available spot on the staff.
+                    // If the staff is full, note is moved off staff, and thus removed.
+                    while (checkIfNotePositionTaken(leftPos)) {
+                      leftPos += horizontalGridSpacing;
+                    }
+                    $(ui.helper).css({top: topPos, left: leftPos});
+                  } else {
+                    $(ui.helper).remove();
                   }
-                  $(ui.helper).css({top: topPos, left: leftPos});
                 }
                   
                 // Adjusts note so it is right on top of the staff line.
                 $(ui.helper).css({top: topPos - NOTE_OFFSET});
-
-                // Draws ledger lines when note is dropped.
-                if (isLedgerLineNote(lineValue) && !noteIsOffStaff($(ui.helper))) {
-                  drawLedgerLine(topPos, leftPos, lineValue, noteValue, $(this));
-                }
                
                 // A note that is dragged from noteChoices box
                 // has an undefined noteId. This sets the id. 
                 // Otherwise, the note has an id.
-                var noteId;
+                var noteId = $(ui.helper).data('noteId');
                 if ($(ui.helper).data('noteId') === undefined) {
                   noteId = $scope.generateNoteId();
                   $(ui.helper).data('noteId', noteId);
@@ -316,6 +325,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   noteDuration: 4,
                   noteStart: setNoteStart(leftPos)
                 };
+
+                // Draws ledger lines when note is dropped.
+                if (isLedgerLineNote(lineValue) && !noteIsOffStaff($(ui.helper))) {
+                  drawLedgerLine(topPos, leftPos, lineValue);
+                }
 
                 if (noteIsOffStaff($(ui.helper))) {
                   removeNote(note);
@@ -386,7 +400,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         // Gets the staff top by dividing staff by a percentage of staff width.
         function computeStaffTop(containerHeight) {
-          return containerHeight / 1.98850574712644;
+          return containerHeight / 2;
         }
 
         // Gets the staff bottom by dividing staff by a percentage of staff width.
@@ -440,12 +454,69 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         function checkIfNotePositionTaken(leftPos) {
           for (var i = 0; i < noteSequence.length; i++) {
-            if (noteSequence[i].note.noteStart['num'] === setNoteStart(leftPos)['num']) {
+            if (setNoteStart(leftPos) !== undefined &&
+                noteSequence[i].note.noteStart['num'] ===
+                setNoteStart(leftPos)['num']) {
               return true;
             }
           }
           return false;
         }
+
+        // Checks a moved note's top position against the possible staff line 
+        // positions. If note is on a valid staff line position, 
+        // it will not be reverted
+        function noteIsOutOfDroppable(note) {
+          staffLinePositions = getStaffLinePositions();
+          for (var i = 0; i < staffLinePositions.length; i++) {
+            if (Math.floor(staffLinePositions[i]) ===
+                Math.floor(note.position().top + NOTE_OFFSET)) {
+              return false;
+            }
+          }
+          return true;
+        }
+
+        // This function removes the previous instance of a note that has 
+        // been moved to a new position. This checks to make sure that the 
+        // noteId is the same but that it is not the more recent version.
+        // Otherwise there would be a "trail" for each note's previous positions.
+        function removeNote(note) {
+          for (var i = 0; i < noteSequence.length; i++) {
+            if (noteSequence[i].note.noteId === note.noteId &&
+                noteSequence[i].note !== note) {
+              noteSequence.splice(i, 1);
+              return;
+            }
+          }
+        }
+
+        // Removes a note from the noteSequence if it is dropped off the staff.
+        function revertNote(note) {
+          for (var i = 0; i < noteSequence.length; i++) {
+            if (noteSequence[i].note.noteId === note.data('noteId')) {
+              noteSequence.splice(i, 1);
+              return;
+            }
+          }
+        }
+
+        // Sorts noteSequence by each note's noteStart property.
+        function sortNoteSequence() {
+          noteSequence.sort(function(a, b) {
+            if (a.note.noteStart && b.note.noteStart) {
+              return a.note.noteStart['num'] - b.note.noteStart['num'];
+            }
+          });
+        }
+
+        // Clear noteSequence values and remove all notes 
+        // and Ledger Lines from the staff.
+        $scope.clearSequence = function() {
+          noteSequence = [];
+          $('.oppia-music-input-on-staff').remove();
+          $('.oppia-music-input-ledger-line').remove();
+        };
 
         // Converts a note's leftPosition to a noteStart object by checking if 
         // leftPos is close to available horizontal grid position.
@@ -461,8 +532,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return (lineValue === 'C4' || lineValue === 'A5');
         }
 
-        function drawLedgerLine(topPos, leftPos, lineValue, noteValue, dropObj) {
-          var noteType = noteValue;
+        function drawLedgerLine(topPos, leftPos, lineValue) {
           var ledgerLine = $('<div></div>');
           ledgerLine.appendTo('.oppia-music-input-staff')
           .addClass('oppia-music-input-ledger-line oppia-music-input-natural-note')
@@ -483,49 +553,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             top: topPos,
             background: '#000000'
           });
-          dropObj.css({background: 'transparent'});
         }
-
-        // This function removes the previous instance of a note that has 
-        // been moved to a new position. This checks to make sure that the 
-        // noteId is the same but that it is not the more recent version.
-        // Otherwise there would be a "trail" for each note's previous positions.
-        function removeNote(note) {
-          for (var i = 0; i < noteSequence.length; i++) {
-            if (noteSequence[i].note.noteId === note.noteId &&
-                noteSequence[i].note !== note) {
-              noteSequence.splice(i, 1);
-              return;
-            }
-          }
-        }
-
-        // Reverts and removes a note that is dropped off of the staff.
-        function revertNote(startPos) {
-          for (var i = 0; i < noteSequence.length; i++) {
-            if (noteSequence[i].leftPos === startPos) {
-              noteSequence.splice(i, 1);
-              return;
-            }
-          }
-        }
-
-        // Sorts noteSequence by each note's left position.
-        function sortNoteSequence() {
-          noteSequence.sort(function(a, b) {
-            if (a.note.noteStart && b.note.noteStart) {
-              return a.note.noteStart['num'] - b.note.noteStart['num'];
-            }
-          });
-        }
-
-        // Clear noteSequence values and remove all notes 
-        // and Ledger Lines from the staff.
-        $scope.clearSequence = function() {
-          noteSequence = [];
-          $('.oppia-music-input-on-staff').remove();
-          $('.oppia-music-input-ledger-line').remove();
-        };
 
         function _getCorrespondingNoteName(baseNoteMidiNumber) {
           var correspondingNoteName = null;
@@ -656,15 +684,19 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         function playSequence(sequence) {
           var midiSequence = convertToMidiSequence(sequence);
           for (var i = 0; i < midiSequence.length; i++) {
-            playChord(midiSequence[i], getNoteStart(i+1));
+            // If first note in sequence, remove delay for immediate playback.
+            if (i === 0) {
+              playChord(midiSequence[i], 0);
+            } else {
+              playChord(midiSequence[i], getNoteStart(i));
+            }
           }
         }
 
         function playChord(midiChord, noteStart) {
-          for (var i = 0; i < midiChord.length; i++) {
-            MIDI.noteOn($scope.MIDI_CHANNEL, midiChord[i], $scope.MIDI_VELOCITY,
-                        $scope.MIDI_DELAY + noteStart);
-          }
+          MIDI.noteOn(
+            $scope.MIDI_CHANNEL, midiChord, $scope.MIDI_VELOCITY, noteStart
+          );
         }
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
