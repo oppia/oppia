@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -605,7 +607,7 @@ class ChangeListSummaryHandler(EditorHandler):
             try:
                 updated_exploration.validate(strict=True)
             except utils.ValidationError as e:
-                warning_message = str(e)
+                warning_message = unicode(e)
 
             self.render_json({
                 'summary': summary,
