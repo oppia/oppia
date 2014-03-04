@@ -73,7 +73,7 @@ class ExplorationPage(base.BaseHandler):
             'content': skins_services.get_skin_html(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
-            'is_public': rights_manager.is_exploration_public(exploration_id),
+            'is_private': rights_manager.is_exploration_private(exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
         })
