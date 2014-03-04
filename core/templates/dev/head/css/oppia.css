@@ -377,6 +377,19 @@ textarea {
   padding: 10px 10px;
 }
 
+.oppia-log-sticky-title {
+  background: #f3f3f3;
+  margin: 0;
+  position: fixed;
+  top: 0;
+  visibility: hidden;
+}
+.oppia-sticky-title-shown .oppia-log-sticky-title {
+  visibility: visible;
+  z-index: 100;
+  box-shadow: 1px 2px 2px 1px rgba(100,100,100,0.5);
+}
+
 .oppia-btn {
   background-image: -webkit-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   background-image: -moz-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
