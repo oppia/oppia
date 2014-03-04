@@ -14,7 +14,7 @@
 {% endblock header_js %}
 
 {% block content %}
-  {% if not is_public %}
+  {% if is_private %}
     <div class="oppia-align-center oppia-warning">
       <strong>Note:</strong> This is a preview of an unpublished exploration.
     </div>

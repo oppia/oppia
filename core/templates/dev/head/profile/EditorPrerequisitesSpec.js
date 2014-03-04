@@ -90,5 +90,24 @@ describe('Editor prerequisites controller', function() {
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Please choose a non-empty username.');
     });
+
+    it('should show warning if username is too long', function($http) {
+      scope.submitPrerequisitesForm(true, 'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'A username can have at most 50 characters.');
+    });
+
+    it('should show warning if username has non-alphanumeric characters', function($http) {
+      scope.submitPrerequisitesForm(true, 'a-a');
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'Usernames can only have alphanumeric characters.');
+    });
+
+    it('should show warning if username has \'admin\' in it', function($http) {
+      scope.submitPrerequisitesForm(true, 'administrator');
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+        'User names with \'admin\' are reserved.');
+    });
+
   });
 });

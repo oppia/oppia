@@ -255,7 +255,7 @@ textarea {
 .oppia-gallery-menu {
   border-right: 1px solid #bbb;
   float: left;
-  min-height: 300px;
+  min-height: 600px;
   padding: 10px 15px 0 15px;
   width: 150px;
 }
@@ -267,7 +267,9 @@ textarea {
 .oppia-gallery-tiles-container {
   background-color: white;
   border-radius: 3px;
-  min-height: 300px;
+  height: 100%;
+  /* This is the same as the min-height in .oppia-gallery-menu. */
+  min-height: 600px;
   padding-top: 10px;
 }
 
@@ -449,6 +451,13 @@ textarea {
 
 .oppia-form input.ng-valid.ng-dirty {
   border: 2px solid #78FA89;
+}
+
+.oppia-contribute-gallery-announcement {
+   border: 1px dashed black;
+   border-radius: 5px;
+   margin: 20px;
+   padding: 10px;
 }
 
 .oppia-gallery-frame {
@@ -697,6 +706,10 @@ textarea {
   .pull-right {
     float: none;
     width: auto;
+  }
+
+  .oppia-hide-if-small-screenwidth {
+    display: none;
   }
 }
 

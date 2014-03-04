@@ -30,7 +30,9 @@ describe('Gallery controller', function() {
         category: 'Geography',
         editors: [],
         id: '5',
+        is_private: false,
         is_public: true,
+        is_publicized: false,
         title: 'Landmarks'
       }
     };
@@ -42,7 +44,9 @@ describe('Gallery controller', function() {
         category: 'Personal',
         editors: [],
         id: '6',
+        is_private: false,
         is_public: true,
+        is_publicized: false,
         title: 'My Exploration'
       }
     };
