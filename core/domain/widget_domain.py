@@ -370,10 +370,19 @@ class BaseWidget(object):
 
     def get_handler_by_name(self, handler_name):
         """Get the handler for a widget, given the name of the handler."""
-        return next(h for h in self.handlers if h.name == handler_name)
+        try:
+            return next(h for h in self.handlers if h.name == handler_name)
+        except StopIteration:
+            raise Exception(
+                'Could not find handler with name %s' % handler_name)
 
     def get_rule_by_name(self, handler_name, rule_name):
         """Gets a rule, given its name and ancestors."""
         handler = self.get_handler_by_name(handler_name)
-        return next(
-            r for r in handler.rules if r.__name__ == rule_name)
+        try:
+            return next(
+                r for r in handler.rules if r.__name__ == rule_name)
+        except StopIteration:
+            raise Exception(
+                'Could not find rule with name %s for handler %s'
+                % (rule_name, handler_name))

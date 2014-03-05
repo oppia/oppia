@@ -572,8 +572,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
     def test_superadmin_rights(self):
         """Test super-admin rights in the Contribute gallery."""
 
-        # superadmin@example.com, a super admin, can only edit exploration C
-        # and cannot delete any exploration (the same powers as users).
+        # superadmin@example.com, a super admin, can edit all explorations,
+        # but cannot delete any of them.
         EMAIL_SUPERADMIN = 'superadmin@example.com'
         self.register_editor(EMAIL_SUPERADMIN)
 
@@ -603,8 +603,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_publicized': False,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
+        self.attempt_to_edit(self.exp_a_id)
+        self.attempt_to_edit(self.exp_b_id, version=2)
         self.attempt_to_edit(self.exp_c_id, version=2)
 
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)

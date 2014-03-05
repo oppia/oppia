@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,7 +119,8 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_edit(exploration_id):
+        if not (rights_manager.Actor(self.user_id).can_edit(exploration_id) or
+                self.is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)
@@ -605,7 +608,7 @@ class ChangeListSummaryHandler(EditorHandler):
             try:
                 updated_exploration.validate(strict=True)
             except utils.ValidationError as e:
-                warning_message = str(e)
+                warning_message = unicode(e)
 
             self.render_json({
                 'summary': summary,
