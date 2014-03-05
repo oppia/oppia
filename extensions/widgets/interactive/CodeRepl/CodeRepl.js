@@ -99,7 +99,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           $scope.evaluation = (evaluation || '');
           $scope.err = (err || '');
           $scope.$parent.$parent.submitAnswer({
-            code: $scope.code,
+            code: $scope.code || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
             error: $scope.err
