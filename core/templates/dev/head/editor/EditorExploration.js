@@ -191,9 +191,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         version: explorationData.data.version
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .then(function(response) {
-      var data = response.data;
-
+    .success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -351,6 +349,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
             $scope.isSaveInProgress = false;
           });
       });
+    }).error(function(data) {
+      $log.error(data);
+      warningsData.addWarning(
+        data.error || 'Error communicating with server.');
     });
   };
 
@@ -926,8 +928,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         state_name: newStateName
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .then(function(response) {
-      var data = response.data;
+    .success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       $scope.explorationChangeList.push({
@@ -941,6 +942,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       if (successCallback) {
         successCallback(newStateName);
       }
+    }).error(function(data) {
+      $log.error(data);
+      warningsData.addWarning(
+        data.error || 'Error communicating with server.');
     });
   };
 
