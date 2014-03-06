@@ -105,38 +105,38 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
         self.assertEqual(
-        	exp_services.get_non_private_explorations_summary_dict(), {
-	            self.EXP_ID: {
-	                'title': 'A title',
-	                'category': 'A category',
-	                'rights': {
-	                    'owner_names': [self.OWNER_NAME],
-	                    'editor_names': [],
-	                    'viewer_names': [],
-	                    'community_owned': False,
-	                    'cloned_from': None,
-	                    'status': rights_manager.EXPLORATION_STATUS_PUBLIC
-	                }
-	            }
-	        }
+            exp_services.get_non_private_explorations_summary_dict(), {
+                self.EXP_ID: {
+                    'title': 'A title',
+                    'category': 'A category',
+                    'rights': {
+                        'owner_names': [self.OWNER_NAME],
+                        'editor_names': [],
+                        'viewer_names': [],
+                        'community_owned': False,
+                        'cloned_from': None,
+                        'status': rights_manager.EXPLORATION_STATUS_PUBLIC
+                    }
+                }
+            }
         )
 
         rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
         self.assertEqual(
-        	exp_services.get_non_private_explorations_summary_dict(), {
-	            self.EXP_ID: {
-	                'title': 'A title',
-	                'category': 'A category',
-	                'rights': {
-	                    'owner_names': [self.OWNER_NAME],
-	                    'editor_names': [],
-	                    'viewer_names': [],
-	                    'community_owned': False,
-	                    'cloned_from': None,
-	                    'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED
-	                }
-	            }
-	        }
+            exp_services.get_non_private_explorations_summary_dict(), {
+                self.EXP_ID: {
+                    'title': 'A title',
+                    'category': 'A category',
+                    'rights': {
+                        'owner_names': [self.OWNER_NAME],
+                        'editor_names': [],
+                        'viewer_names': [],
+                        'community_owned': False,
+                        'cloned_from': None,
+                        'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED
+                    }
+                }
+            }
         )
 
     def test_get_explicit_viewer_explorations_summary_dict(self):
@@ -668,8 +668,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.widget_handlers['submit'][0]['definition']['rule_type'] = (
             rule_domain.DEFAULT_RULE_TYPE)
         with self.assertRaisesRegexp(
-                ValueError, 'Invalid ruleset: rules other than the last one '
-                            'should not be default rules.'):
+                ValueError,
+                'Invalid ruleset .*: rules other than the last one should '
+                'not be default rules.'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
@@ -684,7 +685,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.widget_handlers['submit'][1]['definition']['rule_type'] = 'atomic'
         with self.assertRaisesRegexp(
                 ValueError,
-                'Invalid ruleset: the last rule should be a default rule'):
+                'Invalid ruleset .* the last rule should be a default rule'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(

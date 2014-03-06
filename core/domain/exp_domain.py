@@ -519,13 +519,13 @@ class State(object):
             if rule_ind == len(ruleset) - 1:
                 if rule_type != rule_domain.DEFAULT_RULE_TYPE:
                     raise ValueError(
-                        'Invalid ruleset: the last rule should be a default '
-                        'rule')
+                        'Invalid ruleset %s: the last rule should be a '
+                        'default rule' % rule_dict)
             else:
                 if rule_type == rule_domain.DEFAULT_RULE_TYPE:
                     raise ValueError(
-                        'Invalid ruleset: rules other than the '
-                        'last one should not be default rules.')
+                        'Invalid ruleset %s: rules other than the '
+                        'last one should not be default rules.' % rule_dict)
 
                 # TODO(sll): Generalize this to Boolean combinations of rules.
                 matched_rule = generic_widget.get_rule_by_name(
