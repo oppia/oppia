@@ -594,6 +594,7 @@ textarea {
 }
 
 .oppia-state-editor-container {
+  min-height: 800px;
   position: relative;
 }
 
@@ -601,24 +602,24 @@ textarea {
   background-color: white;
   border: 3px solid black;
   border-radius: 5px;
-  height: 90%;
-  position: absolute;
+  height: 88%;
+  position: fixed;
   right: 0;
-  top: 0;
+  top: 10%;
   width: 70%;
   z-index: 100;
 }
 
 .oppia-state-editor-header {
   background: #ddd;
-  max-height: 10%;
-  padding: 3px 10px;
+  max-height: 7%;
+  padding: 1px 10px;
 }
 
 .oppia-state-editor-body {
-  max-height: 80%;
+  max-height: 90%;
   overflow-y: scroll;
-  padding: 10px;
+  padding: 5px 10px;
   position: relative;
 }
 

@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import datetime
 import os
 import StringIO
-import unittest
 import zipfile
 
 from core.domain import config_services
