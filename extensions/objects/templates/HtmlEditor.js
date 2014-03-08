@@ -46,7 +46,7 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
         $scope.openEditor = function() {
           $scope.active = true;
         };
-  
+
         $scope.closeEditor = function() {
           $scope.active = false;
         };

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppiaRequestCreator) {
+function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppiaRequestCreator, editorContextService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -51,6 +51,13 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   $scope.initInteractiveWidget = function(data) {
     $scope.resetInteractiveWidgetEditor();
 
+    if (!editorContextService.isInStateContext()) {
+      $log.error('Attempted to open interactive widget editor outside a state context.');
+      return;
+    }
+
+    $scope.stateName = editorContextService.getActiveStateName();
+
     // Stores rules in the form of key-value pairs. For each pair, the key is
     // the corresponding handler name and the value has several keys:
     // - 'definition' (the rule definition)
@@ -63,21 +70,12 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
       $scope.widgetHandlers[data.widget.handlers[i].name] = (
           data.widget.handlers[i].rule_specs);
     }
-    // When a change to widgetSticky is made and then cancelled, the
-    // cancellation itself causes the watch on widgetSticky to fire, which
-    // erroneously triggers a save update. The next two lines are therefore
-    // added to fully clear widgetSticky so that the line after it does not
-    // trigger a save update. (The call to $apply() is needed for this to
-    // work.)
-    $scope.widgetSticky = undefined;
-    $scope.$apply();
     $scope.widgetSticky = data.widget.sticky;
 
     $scope.generateWidgetPreview(data.widget.widget_id, data.widget.customization_args);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.stateName = $scope.$parent.stateName;
     $scope.initInteractiveWidget(stateData);
   });
 
@@ -267,7 +265,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
           $scope.selectRule = function(description, name) {
             $scope.tmpRule.description = description;
             $scope.tmpRule.name = name;
-            $scope.tmpRule.dest = $scope.stateName;
+            $scope.tmpRule.dest = editorContextService.getActiveStateName();
             $scope.tmpRule.destNew = '';
 
             // Finds the parameters and sets them in $scope.tmpRule.inputs.
@@ -402,7 +400,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   };
 
   $scope.isRuleConfusing = function(rule) {
-    return rule.feedback.length === 0 && rule.dest === $scope.stateName;
+    return rule.feedback.length === 0 && rule.dest === editorContextService.getActiveStateName();
   };
 
   $scope.getCssClassForRule = function(rule) {
@@ -412,6 +410,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   $scope.$watch('widgetSticky', function(newValue, oldValue) {
     if (newValue !== undefined && oldValue !== undefined) {
       $scope.addStateChange('widget_sticky', newValue, oldValue);
+      var activeStateName = editorContextService.getActiveStateName();
+      $scope.states[activeStateName].widget.sticky = newValue;
     }
   });
 
@@ -482,8 +482,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.updateStatesData();
     $scope.drawGraph();
 
-    $scope.states[$scope.stateName].widget.widget_id = $scope.widgetId;
-    $scope.states[$scope.stateName].widget.customization_args = angular.copy(
+    var activeStateName = editorContextService.getActiveStateName();
+    $scope.states[activeStateName].widget.widget_id = $scope.widgetId;
+    $scope.states[activeStateName].widget.customization_args = angular.copy(
       $scope.widgetCustomizationArgs);
 
     $scope.resetInteractiveWidgetEditor();
@@ -525,7 +526,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
 
   $scope.updateStatesData = function() {
     // Updates $scope.states from $scope.widgetHandlers.
-    var stateDict = $scope.states[$scope.stateName];
+    var activeStateName = editorContextService.getActiveStateName();
+    var stateDict = $scope.states[activeStateName];
     for (var i = 0; i < stateDict.widget.handlers.length; i++) {
       var handlerName = stateDict.widget.handlers[i].name;
       stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
@@ -534,5 +536,5 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
 }
 
 InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator'
+  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator', 'editorContextService'
 ];

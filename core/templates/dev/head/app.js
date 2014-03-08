@@ -42,6 +42,7 @@ oppia.config(['$provide', function($provide) {
           _originalError(message);
         }
       };
+      $delegate.error.logs = [];  // This keeps angular-mocks happy (in tests).
     }
 
     return $delegate;

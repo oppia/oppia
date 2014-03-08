@@ -20,7 +20,7 @@
 
 var END_DEST = 'END';
 
-// TODO(sll): Move all strings to the top of the file and internationalize them.
+// TODO(sll): Move all hardcoded strings to the top of the file.
 
 // Receive events from the iframed widget repository.
 oppia.run(['$rootScope', function($rootScope) {
@@ -29,11 +29,35 @@ oppia.run(['$rootScope', function($rootScope) {
   });
 }]);
 
+oppia.factory('editorContextService', ['$log', function($log) {
+  var activeStateName = null;
+
+  return {
+    getActiveStateName: function() {
+      return activeStateName;
+    },
+    setActiveStateName: function(newActiveStateName) {
+      if (newActiveStateName === '' || newActiveStateName === null) {
+        $log.error('Invalid active state name: ' + newActiveStateName);
+        return;
+      }
+      activeStateName = newActiveStateName;
+    },
+    clearActiveStateName: function() {
+      activeStateName = null;
+    },
+    isInStateContext: function() {
+      return (activeStateName !== null);
+    }
+  };
+}]);
+
 function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
-    $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator) {
+    $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
+    editorContextService) {
 
   $scope.currentlyInStateContext = function() {
-    return Boolean($scope.stateName);
+    return editorContextService.isInStateContext();
   };
 
   var CONTRIBUTE_GALLERY_PAGE = '/contribute';
@@ -93,7 +117,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
-    if (!$scope.stateName) {
+    if (!editorContextService.isInStateContext()) {
       warningsData.addWarning('Unexpected error: a state property was saved ' +
           'outside the context of a state. We would appreciate it if you ' +
           'reported this bug here: https://code.google.com/p/oppia/issues/list.');
@@ -106,7 +130,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 
     $scope.explorationChangeList.push({
       cmd: CMD_EDIT_STATE_PROPERTY,
-      state_name: $scope.stateName,
+      state_name: editorContextService.getActiveStateName(),
       property_name: backendName,
       new_value: newValue,
       old_value: oldValue
@@ -384,8 +408,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.showStateEditor = function(stateName) {
-    $scope.stateName = stateName;
-    $location.path('/gui/' + $scope.stateName);
+    editorContextService.setActiveStateName(stateName);
+    $location.path('/gui/' + stateName);
   };
 
   $scope.$watch(function() {
@@ -395,19 +419,20 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $log.info('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
-      $scope.stateName = path.substring('/gui/'.length);
+      editorContextService.setActiveStateName(path.substring('/gui/'.length));
 
       var callback = function() {
-        var stateData = $scope.states[$scope.stateName];
+        var stateName = editorContextService.getActiveStateName();
+        var stateData = $scope.states[stateName];
         if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
           // This state does not exist. Redirect to the exploration page.
-          warningsData.addWarning('State ' + $scope.stateName + ' does not exist.');
+          warningsData.addWarning('State ' + stateName + ' does not exist.');
           $location.path('/');
           return;
         } else {
           $scope.statsTabActive = false;
           $scope.mainTabActive = true;
-          $scope.$broadcast('guiTabSelected', $scope.stateName);
+          $scope.$broadcast('guiTabSelected');
           // Scroll to the relevant element (if applicable).
           // TODO(sfederwisch): Change the trigger so that there is exactly one
           // scroll action that occurs when the page finishes loading.
@@ -429,15 +454,13 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
-      $scope.stateName = '';
-      $scope.stateName = '';
+      editorContextService.clearActiveStateName();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
     } else {
       $location.path('/');
       $location.hash('');
-      $scope.stateName = '';
-      $scope.stateName = '';
+      editorContextService.clearActiveStateName();
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
     }
@@ -1000,8 +1023,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
         }
       }
 
-      if ($scope.stateName == deleteStateName) {
-        $scope.stateName = '';
+      if (editorContextService.getActiveStateName() === deleteStateName) {
+        editorContextService.clearActiveStateName();
         $scope.selectMainTab();
       }
 
@@ -1021,5 +1044,5 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 EditorExploration.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator'
+  'activeInputData', 'oppiaRequestCreator', 'editorContextService'
 ];

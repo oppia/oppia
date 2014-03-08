@@ -19,14 +19,19 @@
  */
 
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
-  warningsData, activeInputData, oppiaRequestCreator) {
+  warningsData, activeInputData, oppiaRequestCreator, editorContextService) {
 
-  $scope.$on('guiTabSelected', function(event, stateName) {
-    $scope.stateName = stateName;
+  $scope.$on('guiTabSelected', function(evt) {
     $scope.initStateEditor();
   });
 
   $scope.initStateEditor = function() {
+    if (!editorContextService.isInStateContext()) {
+      $log.error('Attempted to open state editor outside a state context.');
+      return;
+    }
+
+    $scope.stateName = editorContextService.getActiveStateName();
     var stateData = $scope.$parent.states[$scope.stateName];
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
@@ -96,7 +101,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
         'State names should be at most 50 characters long.');
       return;
     }
-    if (newStateName !== $scope.stateName &&
+    var activeStateName = editorContextService.getActiveStateName();
+    if (newStateName !== activeStateName &&
         $scope.states.hasOwnProperty(newStateName)) {
       warningsData.addWarning(
         'The name \'' + newStateName + '\' is already in use.');
@@ -109,25 +115,25 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
     if ($scope.stateNameMemento !== newStateName) {
       // Tidy up the rest of the states.
-      if ($scope.$parent.initStateName == $scope.stateName) {
+      if ($scope.$parent.initStateName == activeStateName) {
         $scope.$parent.initStateName = newStateName;
       }
 
       $scope.states[newStateName] = angular.copy(
-        $scope.states[$scope.stateName]);
-      delete $scope.states[$scope.stateName];
+        $scope.states[activeStateName]);
+      delete $scope.states[activeStateName];
       for (var otherStateName in $scope.states) {
         var handlers = $scope.states[otherStateName].widget.handlers;
         for (var i = 0; i < handlers.length; i++) {
           for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === $scope.stateName) {
+            if (handlers[i].rule_specs[j].dest === activeStateName) {
               handlers[i].rule_specs[j].dest = newStateName;
             }
           }
         }
       }
 
-      $scope.stateName = newStateName;
+      editorContextService.setActiveStateName(newStateName);
       $scope.$parent.showStateEditor(newStateName);
 
       $scope.$parent.addRenameStateChange(
@@ -168,4 +174,5 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 }
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
-    'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator'];
+    'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
+    'editorContextService'];

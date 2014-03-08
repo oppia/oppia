@@ -19,14 +19,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateReaderFeedback($scope, warningsData, explorationData) {
-
-  $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.stateName = $scope.$parent.stateName;
-    $scope.initReaderFeedback();
-  });
+function StateReaderFeedback($scope, $log, warningsData, explorationData, editorContextService) {
 
   $scope.initReaderFeedback = function() {
+    if (!editorContextService.isInStateContext()) {
+      $log.error('Attempted to open state reader feedback log outside a state context.');
+      return;
+    }
+
+    $scope.stateName = editorContextService.getActiveStateName();
     if ($scope.stateName && $scope.$parent.stats &&
         $scope.$parent.stats.stateStats[$scope.stateName]) {
       $scope.stateReaderFeedback = (
@@ -34,10 +35,13 @@ function StateReaderFeedback($scope, warningsData, explorationData) {
     }
   };
 
-  $scope.initReaderFeedback();
-
-  $scope.$watch('$parent.stats', function(newValue) {
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
     $scope.initReaderFeedback();
+  });
+  $scope.$watch('$parent.stats', function(newValue) {
+    if (editorContextService.isInStateContext()) {
+      $scope.initReaderFeedback();
+    }
   });
 
   $scope.resolveReaderFeedback = function(feedbackId, newStatus) {
@@ -46,4 +50,6 @@ function StateReaderFeedback($scope, warningsData, explorationData) {
   };
 }
 
-StateReaderFeedback.$inject = ['$scope', 'warningsData', 'explorationData'];
+StateReaderFeedback.$inject = [
+  '$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'
+];

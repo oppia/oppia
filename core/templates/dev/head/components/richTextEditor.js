@@ -161,9 +161,9 @@ oppia.directive('richTextEditor', [
                         $scope.widgetParamSpecs[paramName].description);
                   }
 
-		  $scope.cancel = function(){
-		    $modalInstance.dismiss('cancel');
-		  };
+                  $scope.cancel = function(){
+                    $modalInstance.dismiss('cancel');
+                  };
 
                   $scope.save = function(customizationArgs) {
                     $modalInstance.close({
