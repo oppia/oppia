@@ -48,9 +48,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope.closeStateEditor = function() {
-    // TODO(sll): This broadcast is not reaching the noninteractive
-    // content RTE. Why?
-    $scope.$broadcast('externalSave');
     $scope.$parent.selectMainTab();
   };
 
@@ -152,9 +149,13 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     $scope.contentMemento = angular.copy($scope.content);
   };
 
+  $scope.$on('externalSave', function() {
+    $scope.saveTextContent();
+  });
+
   $scope.saveTextContent = function() {
     $scope.$apply();
-    if ($scope.contentMemento !== $scope.content) {
+    if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
       // The $apply() call seems to be needed in order to ensure that the latest
       // values from the RTE are captured.
       $scope.addStateChange(

@@ -407,13 +407,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
   };
 
-  $scope.$watch('widgetSticky', function(newValue, oldValue) {
-    if (newValue !== undefined && oldValue !== undefined) {
-      $scope.addStateChange('widget_sticky', newValue, oldValue);
-      var activeStateName = editorContextService.getActiveStateName();
-      $scope.states[activeStateName].widget.sticky = newValue;
-    }
-  });
+  $scope.toggleWidgetSticky = function() {
+    $scope.addStateChange('widget_sticky', $scope.widgetSticky, !$scope.widgetSticky);
+    var activeStateName = editorContextService.getActiveStateName();
+    $scope.states[activeStateName].widget.sticky = $scope.widgetSticky;
+  };
 
   $scope.interactiveWidgetRepository = null;
 

@@ -56,6 +56,26 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService) {
 
+  $scope.saveActiveState = function() {
+    if (editorContextService.isInStateContext()) {
+      // If $apply() is not used here, AngularJS throws a "Cannot read property
+      // $$nextSibling of null" error.
+      $rootScope.$apply(function() {
+        $rootScope.$broadcast('externalSave');
+      });
+    }
+  };
+
+  $scope.saveAndClearActiveState = function() {
+    $scope.saveActiveState();
+    editorContextService.clearActiveStateName();
+  };
+
+  $scope.saveAndChangeActiveState = function(newStateName) {
+    $scope.saveActiveState();
+    editorContextService.setActiveStateName(newStateName);
+  };
+
   $scope.currentlyInStateContext = function() {
     return editorContextService.isInStateContext();
   };
@@ -206,6 +226,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   });
 
   $scope.saveChanges = function() {
+    $scope.saveAndClearActiveState();
+
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
     $http.post(
@@ -408,7 +430,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.showStateEditor = function(stateName) {
-    editorContextService.setActiveStateName(stateName);
+    $scope.saveAndChangeActiveState(stateName);
     $location.path('/gui/' + stateName);
   };
 
@@ -419,7 +441,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $log.info('Path is now ' + path);
 
     if (path.indexOf('/gui/') != -1) {
-      editorContextService.setActiveStateName(path.substring('/gui/'.length));
+      $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
 
       var callback = function() {
         var stateName = editorContextService.getActiveStateName();
@@ -454,13 +476,13 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       }
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
-      editorContextService.clearActiveStateName();
+      $scope.saveAndClearActiveState();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
     } else {
       $location.path('/');
       $location.hash('');
-      editorContextService.clearActiveStateName();
+      $scope.saveAndClearActiveState();
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
     }
