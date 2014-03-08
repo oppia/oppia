@@ -56,13 +56,25 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService) {
 
+  $scope.getActiveStateName = function() {
+    if (editorContextService.isInStateContext()) {
+      return editorContextService.getActiveStateName();
+    } else {
+      return '';
+    }
+  };
+
   $scope.saveActiveState = function() {
     if (editorContextService.isInStateContext()) {
-      // If $apply() is not used here, AngularJS throws a "Cannot read property
-      // $$nextSibling of null" error.
-      $rootScope.$apply(function() {
+      try {
         $rootScope.$broadcast('externalSave');
-      });
+      } catch (e) {
+        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+        // null" error. To get around this we must use $apply().
+        $rootScope.$apply(function() {
+          $rootScope.$broadcast('externalSave');
+        });
+      }
     }
   };
 
