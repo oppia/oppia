@@ -593,6 +593,25 @@ textarea {
   color: gray;
 }
 
+.oppia-state-name-container {
+  padding: 2px;
+  width: 60%;
+}
+
+.oppia-state-name {
+  border: 1px dotted gray;
+  cursor: pointer;
+  padding: 1px 3px;
+}
+.oppia-state-name:hover {
+  background-color: #E2E2E2;
+  border: 2px solid #18447E;
+  border-radius: 4px;
+}
+.oppia-state-name:hover::after {
+  content: ' ✎';
+}
+
 .oppia-state-editor-container {
   min-height: 800px;
   position: relative;

@@ -2,12 +2,21 @@
   <button class="pull-right" ng-click="closeStateEditor()">
     <i class="icon-minus"></i>
   </button>
-  <h5><[stateName]></h5>
+
+  <div class="oppia-state-name-container">
+    <h5 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-state-name">
+      <[stateName]>
+    </h5>
+
+    <span ng-if="stateNameEditorIsShown">
+      <input type="text" ng-model="$parent.tmpStateName" autofocus>
+      <button ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Save</button>
+    </span>
+  </div>
 </div>
 
 <div class="oppia-state-editor-body">
   <div class="container-fluid oppia-editor" ng-show="stateName">
-    {% include 'editor/state_editor_title.html' %}<br>
     {% include 'editor/state_editor_param.html' %}<br>
     {% include 'editor/state_editor_content.html' %}<br>
     <div ng-controller="InteractiveWidgetEditor">
