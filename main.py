@@ -17,12 +17,12 @@
 __author__ = 'Sean Lip'
 
 import feconf
-import os
 
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
 from core.controllers import galleries
+from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
 from core.controllers import reader
@@ -125,6 +125,12 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
         profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+
+    get_redirect_route(
+        r'/moderator', moderator.ModeratorPage, 'moderator_page'),
+    get_redirect_route(
+        r'/moderatorhandler/user_services',
+        moderator.UserServiceHandler, 'moderator_user_service_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,

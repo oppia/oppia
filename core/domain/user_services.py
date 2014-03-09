@@ -105,6 +105,19 @@ def is_username_taken(username):
         UserSettings.normalize_username(username))
 
 
+def get_email_from_username(username):
+    """Gets the email for a given username.
+
+    Returns None if the user is not found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_normalized_username(
+        UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return user_model.email
+
+
 def get_users_settings(user_ids):
     """Gets domain objects representing the settings for the given user ids."""
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
