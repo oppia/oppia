@@ -15,9 +15,6 @@
             <a class="btn btn-success btn-large" ng-click="showCreateExplorationModal(categoryList)">
               Create New Exploration
             </a>
-
-
-
           </span>
 
           <h3 class="oppia-page-title">
@@ -57,9 +54,6 @@
                 <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
                   <div class="container-fluid">
                     <div class="row-fluid">
-
-
-
                       <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
 
                         <div class="oppia-gallery-tile-top">
