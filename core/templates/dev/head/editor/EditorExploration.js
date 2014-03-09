@@ -831,8 +831,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     document.location.href = $scope.explorationDownloadUrl;
   };
 
-  $scope.downloadExplorationByVersion = function(versionNumber) {
-    document.location.href = $scope.explorationDownloadUrl + '?version=' + versionNumber;
+  $scope.downloadExplorationWithVersion = function(versionNumber) {
+    document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
   };
 
   /********************************************

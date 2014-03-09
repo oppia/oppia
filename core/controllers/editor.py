@@ -420,15 +420,15 @@ class ExplorationDownloadHandler(EditorHandler):
         """Handles GET requests."""
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        version = self.request.get('version', default_value = exploration.version)
+        version = self.request.get('v', default_value=exploration.version)
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
-            utils.to_ascii(exploration.title), utils.to_ascii(version))
+            utils.to_ascii(exploration.title), version)
 
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.zip' % filename)
+            'attachment; filename=%s.zip' % str(filename))
 
         self.response.write(exp_services.export_to_zip_file(exploration_id, version))
 
