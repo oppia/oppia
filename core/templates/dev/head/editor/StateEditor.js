@@ -31,13 +31,12 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       return;
     }
 
+    $scope.stateNameEditorIsShown = false;
+
     $scope.stateName = editorContextService.getActiveStateName();
     var stateData = $scope.$parent.states[$scope.stateName];
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
-
-    $scope.stateNameMemento = $scope.stateName;
-    $scope.uiStateName = $scope.stateName;
 
     // This should only be non-null when the content editor is open.
     $scope.contentMemento = null;
@@ -88,8 +87,24 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     return incomingStates;
   };
 
+  $scope.openStateNameEditor = function() {
+    $scope.stateNameEditorIsShown = true;
+    $scope.tmpStateName = $scope.stateName;
+    $scope.stateNameMemento = $scope.stateName;
+  };
+
+  $scope._getNormalizedStateName = function(newStateName) {
+    return $scope.normalizeWhitespace(newStateName);
+  };
+
+  $scope.saveStateNameAndRefresh = function(newStateName) {
+    var normalizedStateName = $scope._getNormalizedStateName(newStateName);
+    $scope.saveStateName(normalizedStateName);
+    $scope.$parent.showStateEditor(normalizedStateName);
+  };
+
   $scope.saveStateName = function(newStateName) {
-    newStateName = $scope.normalizeWhitespace(newStateName);
+    newStateName = $scope._getNormalizedStateName(newStateName);
     if (!$scope.isValidEntityName(newStateName, true)) {
       return;
     }
@@ -107,6 +122,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
 
     if ($scope.stateNameMemento === newStateName) {
+      $scope.stateNameEditorIsShown = false;
       return;
     }
 
@@ -131,17 +147,13 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       }
 
       editorContextService.setActiveStateName(newStateName);
-      $scope.$parent.showStateEditor(newStateName);
 
       $scope.$parent.addRenameStateChange(
         newStateName, $scope.stateNameMemento);
+      $scope.stateNameEditorIsShown = false;
+      $scope.drawGraph();
 
       $scope.initStateEditor();
-      $scope.stateNameMemento = newStateName;
-      $scope.uiStateName = newStateName;
-      $scope.drawGraph();
-      // Refresh the location hash.
-      $scope.$parent.showStateEditor(newStateName);
     }
   };
 
@@ -151,6 +163,10 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.$on('externalSave', function() {
     $scope.saveTextContent();
+
+    if ($scope.stateNameEditorIsShown) {
+      $scope.saveStateName($scope.tmpStateName);
+    }
   });
 
   $scope.saveTextContent = function() {
