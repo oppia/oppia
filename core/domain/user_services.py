@@ -110,9 +110,9 @@ def get_email_from_username(username):
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
     if user_model is None:
-      return None
+        return None
     else:
-      return user_model.email
+        return user_model.email
 
 
 def get_users_settings(user_ids):

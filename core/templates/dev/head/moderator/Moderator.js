@@ -22,7 +22,7 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
   
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
-    $scope.last_submitted_username = username;
+    $scope.lastSubmittedUsername = username;
     $http.post(
       '/moderatorhandler/user_services',
       oppiaRequestCreator.createRequest({
