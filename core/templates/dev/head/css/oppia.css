@@ -270,7 +270,6 @@ textarea {
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
-  padding-top: 10px;
 }
 
 .oppia-gallery-tile {
