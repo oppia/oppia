@@ -28,9 +28,13 @@ class ModeratorTest(test_utils.GenericTestBase):
         # Try accessing the moderator page without being a moderator or admin.
         self.login('user@example.com', is_admin=False)
         response = self.testapp.get('/moderator', expect_errors=True)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.assertEqual(response.status_int, 401)
         response = self.post_json(
-            '/moderatorhandler/user_services', {}, expect_errors=True,
+            '/moderatorhandler/user_services',
+            {'username': 'username'},
+            csrf_token=csrf_token,
+            expect_errors=True,
             expected_status_int=401)
         self.logout()
 

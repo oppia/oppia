@@ -128,7 +128,7 @@ urls = [
         profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
 
     get_redirect_route(
-        r'/moderator',moderator.ModeratorPage, 'moderator_page'),
+        r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
         r'/moderatorhandler/user_services',
         moderator.UserServiceHandler, 'moderator_user_service_handler'),
