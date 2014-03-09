@@ -12,12 +12,12 @@
       <div class="span8">
         <div class="oppia-gallery-frame">
           <span class="pull-right">
-            <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
-              Include more beta explorations
-            </button>
-            <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
-              Show fewer beta explorations
-            </button>
+            <a class="btn btn-success btn-large" ng-click="showCreateExplorationModal(categoryList)">
+              Create New Exploration
+            </a>
+
+
+
           </span>
 
           <h3 class="oppia-page-title">
@@ -42,9 +42,23 @@
               </div>
 
               <div class="tab-content oppia-gallery-tiles-container">
+
+                <div class="row-fluid">
+                  <div class="pull-right">
+                    <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
+                      Show more beta explorations
+                    </button>
+                    <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
+                      Show fewer beta explorations
+                    </button>
+                  </div>
+                </div>
+
                 <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
                   <div class="container-fluid">
                     <div class="row-fluid">
+
+
 
                       <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
 
@@ -104,9 +118,6 @@
           <br>
 
           <div>
-            <a class="btn btn-large" ng-click="showCreateExplorationModal(categoryList)">
-              Create New Exploration
-            </a>
 
             {% if allow_yaml_file_upload %}
               <a class="btn btn-large" ng-click="showUploadExplorationModal(categoryList)">

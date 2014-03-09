@@ -10,15 +10,6 @@
       <div class="span8">
         <div class="oppia-gallery-frame">
 
-          <span class="pull-right">
-            <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
-              Include beta explorations
-            </button>
-            <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
-              Hide beta explorations
-            </button>
-          </span>
-
           <h3 class="oppia-page-title">
             Gallery
           </h3>
@@ -41,6 +32,18 @@
               </div>
 
               <div class="tab-content oppia-gallery-tiles-container">
+
+                <div class="row-fluid">
+                  <div class="pull-right">
+                    <button ng-if="!areAllBetaExplorationsShown" ng-click="showBetaExplorations()">
+                      Show beta explorations
+                    </button>
+                    <button ng-if="areAllBetaExplorationsShown" ng-click="hideBetaExplorations()">
+                      Hide beta explorations
+                    </button>
+                  </div>
+                </div>
+
                 <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
                   <div class="container-fluid">
                     <div class="row-fluid">
