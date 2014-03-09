@@ -18,8 +18,6 @@ __author__ = 'yanamal@google.com (Yana Malysheva)'
 
 from core.controllers import base
 from core.domain import user_services
-import feconf
-import utils
 
 
 class ModeratorPage(base.BaseHandler):
@@ -38,7 +36,6 @@ class UserServiceHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'moderator_page'
 
-
     @base.require_moderator
     def post(self):
         """Handles POST requests."""
@@ -46,4 +43,3 @@ class UserServiceHandler(base.BaseHandler):
         self.render_json({
             'user_email': user_services.get_email_from_username(username),
         })
-                          

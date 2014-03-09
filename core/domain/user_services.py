@@ -106,7 +106,10 @@ def is_username_taken(username):
 
 
 def get_email_from_username(username):
-    """Gets the email for a given username. Returns None if user is not found."""
+    """Gets the email for a given username.
+
+    Returns None if the user is not found.
+    """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         UserSettings.normalize_username(username))
     if user_model is None:

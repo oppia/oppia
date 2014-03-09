@@ -17,6 +17,7 @@ import re
 import unittest
 import webtest
 
+from core.domain import config_domain
 from core.platform import models
 (base_models, exp_models, file_models, stats_models, user_models) = (
     models.Registry.import_models([
@@ -183,6 +184,32 @@ class TestBase(unittest.TestCase):
         })
         self.assertEqual(response.status_int, 200)
 
+        self.logout()
+
+    def set_admins(self, admin_emails):
+        """Set the ADMIN_EMAILS property."""
+        self.login('superadmin@example.com', is_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.ADMIN_EMAILS.name: admin_emails,
+            }
+        }, csrf_token)
+        self.logout()
+
+    def set_moderators(self, moderator_emails):
+        """Set the MODERATOR_EMAILS property."""
+        self.login('superadmin@example.com', is_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.MODERATOR_EMAILS.name: moderator_emails,
+            }
+        }, csrf_token)
         self.logout()
 
     def get_current_logged_in_user_id(self):

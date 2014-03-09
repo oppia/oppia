@@ -325,7 +325,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_b_id))
         csrf_token = self.get_csrf_token_from_response(response)
         # Do the minimal change needed to make the exploration valid.
-        exp_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_b_id))
+        exp_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_b_id))
         init_state_name = exp_dict['init_state_name']
         widget_handlers = exp_dict['states'][
             init_state_name]['widget']['handlers']
@@ -364,7 +365,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.exp_c_id))
         csrf_token = self.get_csrf_token_from_response(response)
         # Do the minimal change needed to make the exploration valid.
-        exp_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_c_id))
+        exp_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.exp_c_id))
         init_state_name = exp_dict['init_state_name']
         widget_handlers = exp_dict['states'][
             init_state_name]['widget']['handlers']
@@ -397,17 +399,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.logout()
 
         # Now create a moderator and admin.
-        self.login('superadmin@example.com', is_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.ADMIN_EMAILS.name: [self.EMAIL_ADMIN],
-                config_domain.MODERATOR_EMAILS.name: [self.EMAIL_MODERATOR],
-            }
-        }, csrf_token)
-        self.logout()
+        self.set_moderators([self.EMAIL_MODERATOR])
+        self.set_admins([self.EMAIL_ADMIN])
 
     def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
         if expect_errors:
@@ -427,7 +420,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             {
                 'version': version,
                 'commit_message': 'change category',
-                'change_list':[{
+                'change_list': [{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'category',
                     'new_value': 'New Category',
@@ -449,7 +442,6 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             expect_errors=expect_errors
         )
         self.assertEqual(response.status_int, expected_status_int)
-
 
     def test_user_rights(self):
         """Test user rights for explorations in the Contribute gallery."""
