@@ -412,6 +412,49 @@ states:
       widget_id: TextInput
 """)
 
+    UPDATED_YAML_CONTENT = (
+"""default_skin: conversation_v1
+init_state_name: (untitled state)
+param_changes: []
+param_specs: {}
+schema_version: 2
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Renamed state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Renamed state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
         exploration = self.save_new_default_exploration(self.EXP_ID)
@@ -444,6 +487,30 @@ states:
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
         self.assertEqual(zf.open('assets/abc.png').read(), raw_image)
+
+    def test_export_by_versions(self):
+        """Test export_to_zip_file() for different versions"""
+        exploration = self.save_new_default_exploration(self.EXP_ID)
+        self.assertEqual(exploration.version, 1)
+        exploration.add_states(['New state'])
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        self.assertEqual(exploration.version, 2)
+        exploration.rename_state(
+                    'New state', 'Renamed state')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        self.assertEqual(exploration.version, 3)
+
+        # Download version 2
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 2)
+        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        self.assertEqual(
+            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
+
+        # Download version 3
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 3)
+        zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
+        self.assertEqual(
+            zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
 
 def _get_change_list(state_name, property_name, new_value):

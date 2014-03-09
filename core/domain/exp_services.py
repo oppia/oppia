@@ -184,9 +184,9 @@ def count_explorations():
 
 
 # Methods for exporting states and explorations to other formats.
-def export_to_zip_file(exploration_id):
+def export_to_zip_file(exploration_id, version=None):
     """Returns a ZIP archive of the exploration."""
-    exploration = get_exploration_by_id(exploration_id)
+    exploration = get_exploration_by_id(exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
     o = StringIO.StringIO()
@@ -197,7 +197,7 @@ def export_to_zip_file(exploration_id):
             fs_domain.ExplorationFileSystem(exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            zf.writestr('assets/%s' % filepath, fs.get(filepath))
+            zf.writestr('assets/%s' % filepath, fs.get(filepath, version=version))
 
     return o.getvalue()
 

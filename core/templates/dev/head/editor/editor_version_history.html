@@ -23,6 +23,9 @@
       <span ng-show="snapshot.versionNumber !== currentVersion">
         | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
       </span>
+      <span>
+        | <a href="#" ng-click="downloadExplorationByVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
+      </span>
     </span>
   </div>
 </div>

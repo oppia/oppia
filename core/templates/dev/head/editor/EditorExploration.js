@@ -828,7 +828,11 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
    * Downloads the YAML representation of an exploration.
    */
   $scope.downloadExploration = function() {
-    document.location = $scope.explorationDownloadUrl;
+    document.location.href = $scope.explorationDownloadUrl;
+  };
+
+  $scope.downloadExplorationByVersion = function(versionNumber) {
+    document.location.href = $scope.explorationDownloadUrl + '?version=' + versionNumber;
   };
 
   /********************************************
