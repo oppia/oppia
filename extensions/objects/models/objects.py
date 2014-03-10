@@ -331,6 +331,7 @@ class TabContent(BaseObject):
             assert 'content' in raw
             raw['title'] = UnicodeString.normalize(raw['title'])
             raw['content'] = Html.normalize(raw['content'])
+            assert len(raw['title'])
             return raw
         except Exception as e:
             raise TypeError('Cannot convert to tab content: %s. Error: %s' %
@@ -393,7 +394,7 @@ class SanitizedUrl(BaseObject):
 
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
-    
+
     description = ('A musical phrase that contains zero or more notes, rests, '
                     'and time signature.')
     edit_html_filename = 'music_phrase_editor'
@@ -408,7 +409,7 @@ class MusicPhrase(BaseObject):
                 'E5', 'F5', 'G5', 'A5'
             ]
             valid_properties = [
-                'readableNoteName', 'readableRestName', 'noteDuration', 
+                'readableNoteName', 'readableRestName', 'noteDuration',
                 'restDuration', 'noteStart', 'restStart'
             ]
             assert isinstance(raw, list)

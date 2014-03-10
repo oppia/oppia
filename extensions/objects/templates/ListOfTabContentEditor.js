@@ -65,7 +65,7 @@ oppia.directive('listOfTabContentEditor', function($compile, warningsData) {
       }, true);
 
       $scope.addItem = function() {
-        $scope.localValue.push({label: {'title': '', 'content': ''}});
+        $scope.localValue.push({label: {'title': '[Tab Title]', 'content': ''}});
         if (!$scope.alwaysEditable) {
           $scope.activeItem = $scope.localValue.length - 1;
         }
@@ -87,6 +87,10 @@ oppia.directive('listOfTabContentEditor', function($compile, warningsData) {
         if (newValue && oldValue) {
           var valuesOnly = [];
           for (var i = 0; i < newValue.length; i++) {
+            if (newValue[i].label.title.length === 0) {
+              warningsData.addWarning('Tab titles are required.');
+              return;
+            }
             valuesOnly.push(newValue[i].label);
           }
           $scope.$parent.value = valuesOnly;
