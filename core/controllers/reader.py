@@ -147,34 +147,31 @@ class FeedbackHandler(base.BaseHandler):
             recorded_answer)
 
     def _append_content(self, exploration, sticky, finished, old_params,
-                        new_state, new_state_name, state_has_changed,
-                        html_output):
+                        new_state, new_state_name, state_has_changed):
         """Appends content for the new state to the output variables."""
         if finished:
-            return {}, html_output, ''
-        else:
-            # Populate new parameters.
-            new_params = exploration.update_with_state_params(
-                new_state_name, old_params)
+            return {}, '', ''
 
-            if state_has_changed:
-                # Append the content for the new state.
-                state_html = exploration.states[
-                    new_state_name].content[0].to_html(new_params)
+        # Populate new parameters.
+        new_params = exploration.update_with_state_params(
+            new_state_name, old_params)
 
-                if html_output and state_html:
-                    html_output += '<br>'
-                html_output += state_html
+        question_html = ''
+        if state_has_changed:
+            # Append the content for the new state.
+            question_html = exploration.states[
+                new_state_name].content[0].to_html(new_params)
 
-            interactive_html = (
-                '' if sticky else
-                widget_registry.Registry.get_widget_by_id(
-                    feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-                ).get_interactive_widget_tag(
-                    new_state.widget.customization_args, new_params)
-            )
+        interactive_html = (
+            '' if sticky else
+            widget_registry.Registry.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
+            ).get_interactive_widget_tag(
+                new_state.widget.customization_args, new_params)
+        )
+ 
+        return (new_params, question_html, interactive_html)
 
-            return (new_params, html_output, interactive_html)
 
     @require_viewer
     def post(self, exploration_id, escaped_state_name):
@@ -238,22 +235,24 @@ class FeedbackHandler(base.BaseHandler):
         values['reader_response_html'] = reader_response_html
 
         # Add Oppia's feedback to the response HTML.
-        html_output = '<div>%s</div>' % jinja_utils.parse_string(
+        feedback_html = '<div>%s</div>' % jinja_utils.parse_string(
             feedback, old_params)
 
         # Add the content for the new state to the response HTML.
         finished = (new_state_name == feconf.END_DEST)
         state_has_changed = (old_state_name != new_state_name)
-        new_params, html_output, interactive_html = (
+        new_params, question_html, interactive_html = (
             self._append_content(
                 exploration, sticky, finished, old_params, new_state,
-                new_state_name, state_has_changed, html_output))
+                new_state_name, state_has_changed))
 
         values.update({
             'interactive_html': interactive_html,
             'exploration_id': exploration_id,
             'state_name': new_state_name,
-            'oppia_html': html_output,
+            'feedback_html': feedback_html,
+            'question_html': question_html,
+            'block_number': block_number,
             'params': new_params,
             'finished': finished,
             'state_history': state_history,

@@ -165,7 +165,9 @@ function ReaderExploration(
     $scope.inputTemplate = data.interactive_html;
     $scope.responseLog = [{
       previousReaderAnswer: '',
-      feedbackAndQuestion: data.init_html
+      feedback: '',
+      question: data.init_html,
+      isMostRecentQuestion: true
     }];
     $scope.params = data.params;
     $scope.stateName = data.state_name;
@@ -211,6 +213,7 @@ function ReaderExploration(
     });
   };
 
+  var stickyTitleEl, titleEl;
   $scope.refreshPage = function(data) {
     warningsData.clear();
     $scope.answerIsBeingProcessed = false;
@@ -244,18 +247,30 @@ function ReaderExploration(
 
     $scope.responseLog = $scope.responseLog || [];
 
+    // TODO: Check the state chagne instead of question_html so that it works
+    // correctly when the new state doesn't have a question string.
+    var isQuestion = !!data.question_html;
+    if (isQuestion) {
+      // Clean up the previous isMostRecentQuestion marker.
+      $scope.responseLog.forEach(function(log) {
+        log.isMostRecentQuestion = false;
+      });
+    }
+
     // The randomSuffix is also needed for previousReaderAnswer and for
     // feedbackAndQuestion, so that the aria-live attribute will read it out.
     $scope.responseLog.push({
       previousReaderAnswer: data.reader_response_html + randomSuffix,
-      feedbackAndQuestion: data.oppia_html + randomSuffix,
+      feedback: data.feedback_html + randomSuffix,
+      question: data.question_html + randomSuffix,
+      isMostRecentQuestion: isQuestion
     });
-
+ 
+    var lastEntryEls = document.getElementsByClassName('oppia-last-log-entry');
     $scope.adjustPageHeight(true, function() {
-      if (document.getElementById('response')) {
-        $('html, body, iframe').animate({
-          'scrollTop': document.getElementById('response').offsetTop
-        }, 'slow', 'swing');
+      if (lastEntryEls.length > 0) {
+        $('html, body, iframe').animate(
+            {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
       }
     });
 
@@ -263,8 +278,9 @@ function ReaderExploration(
       messengerService.sendMessage(
         messengerService.EXPLORATION_COMPLETED, null);
     }
+    titleEl = stickyTitleEl = null;
   };
-
+ 
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
   $scope.lastRequestedHeight = 0;
@@ -290,9 +306,49 @@ function ReaderExploration(
     }, 500);
   };
 
-  $window.onresize = $scope.adjustPageHeight.bind(null, false, null);
-}
+  /**
+   * Shows or hides the sticky state title (question) element.
+   * The element for the most recent state title is duplicated (stickyTitleEl
+   * and titleEl). titleEl is in the document flow and scrolls with the page.
+   * When it scrolls out (to above the viewport) stickyTitleEl shows up to give
+   * the illusion the same element detached itself from the document flow and
+   * stayed on the screen.
+   */
+  $scope.adjustTitleEl = function() {
+    if (!titleEl || !stickyTitleEl) {
+      var titleEls = document.getElementsByClassName('oppia-log-title');
+      var stickyTitleEls = document.getElementsByClassName('oppia-log-sticky-title');
+      if (titleEls.length == 0 || stickyTitleEls.length == 0) {
+        // Give up for this round.
+        return;
+      }
+      titleEl = titleEls[0];
+      stickyTitleEl = stickyTitleEls[0];
+    }
 
+    var rect = titleEl.getBoundingClientRect();
+    if (rect.top < 0) {
+      // stickyTitleEl is position:fixed, so it does not get bound by parent's
+      // width. Copying the width from titleEl so that they'd look identical.
+      // -20 is to adjust for the padding.
+      // TODO: Find a way to avoid element manipulation (as this is AngularJS
+      // controller and should avoid doing that).
+      stickyTitleEl.style.width = (Math.floor(rect.width) - 20) + 'px';
+      $scope.stickyTitleShown = true;
+    } else {
+      $scope.stickyTitleShown = false;
+    }
+  };
+
+  $window.onresize = function() {
+    $scope.adjustPageHeight(false, null);
+    $scope.$apply($scope.adjustTitleEl);
+  };
+  $window.onscroll = function() {
+    $scope.$apply($scope.adjustTitleEl);
+  }
+}
+ 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
