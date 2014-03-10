@@ -26,7 +26,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_page(self):
         """Test that the admin page shows the expected sections."""
         # Login as an admin.
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com', is_super_admin=True)
 
         response = self.testapp.get('/admin')
 
@@ -54,7 +54,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
         # Login as an admin.
-        self.login('admin@example.com', is_admin=True)
+        self.login('admin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         self.assertEqual(response.status_int, 200)
         self.logout()
@@ -63,7 +63,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that configuration properties can be changed."""
 
         # Login as an admin.
-        self.login('admin@example.com', is_admin=True)
+        self.login('admin@example.com', is_super_admin=True)
 
         ANNOUNCEMENT_TEXT = 'TEST ANNOUNCEMENT'
 
@@ -102,7 +102,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertNotIn(ACTUAL_SITE_NAME, response.body)
 
         # Log in as an admin and customize the site name.
-        self.login('admin@example.com', is_admin=True)
+        self.login('admin@example.com', is_super_admin=True)
 
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -131,7 +131,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response.mustcontain(no=['Moderator', 'Admin'])
 
         # Log in as a superadmin. The role is set.
-        self.login('superadmin@example.com', is_admin=True)
+        self.login('superadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/')
         response.mustcontain('Admin', no=['Moderator'])
 

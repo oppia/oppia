@@ -188,7 +188,7 @@ class TestBase(unittest.TestCase):
 
     def set_admins(self, admin_emails):
         """Set the ADMIN_EMAILS property."""
-        self.login('superadmin@example.com', is_admin=True)
+        self.login('superadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -201,7 +201,7 @@ class TestBase(unittest.TestCase):
 
     def set_moderators(self, moderator_emails):
         """Set the MODERATOR_EMAILS property."""
-        self.login('superadmin@example.com', is_admin=True)
+        self.login('superadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -222,10 +222,10 @@ class TestBase(unittest.TestCase):
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
-    def login(self, email, is_admin=False):
+    def login(self, email, is_super_admin=False):
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
-        os.environ['USER_IS_ADMIN'] = '1' if is_admin else '0'
+        os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
         # TODO(sll): Move this to the tearDown() method of the generic test

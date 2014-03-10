@@ -569,7 +569,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         EMAIL_SUPERADMIN = 'superadmin@example.com'
         self.register_editor(EMAIL_SUPERADMIN)
 
-        self.login(EMAIL_SUPERADMIN, is_admin=True)
+        self.login(EMAIL_SUPERADMIN, is_super_admin=True)
         response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,

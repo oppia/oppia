@@ -36,9 +36,9 @@ class EditorTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
 
-        # Register and login as an admin.
+        # Register and login as an editor.
         self.register_editor('editor@example.com')
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         # Check that it is now possible to access the editor page.
         response = self.testapp.get('/create/0')
@@ -88,7 +88,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         # Register and log in as an admin.
         self.register_editor('editor@example.com')
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -216,7 +216,7 @@ class EditorTest(test_utils.GenericTestBase):
 
         # Register and log in as an editor.
         self.register_editor('editor@example.com')
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -274,7 +274,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         # Check, from the editor perspective, that no stats have been recorded.
         self.register_editor('editor@example.com')
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_visits'], 0)
@@ -304,7 +304,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         )
 
         # Now switch back to the editor perspective.
-        self.login('editor@example.com', is_admin=True)
+        self.login('editor@example.com')
 
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_visits'], 1)
@@ -350,19 +350,19 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
-        self.login(self.editor_email, is_admin=False)
+        self.login(self.editor_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_email, is_admin=False)
+        self.login(self.viewer_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_email, is_admin=False)
+        self.login(self.owner_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -380,25 +380,25 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
 
-        self.login(self.editor_email, is_admin=False)
+        self.login(self.editor_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_email, is_admin=False)
+        self.login(self.viewer_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_email, is_admin=False)
+        self.login(self.owner_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.admin_email, is_admin=True)
+        self.login(self.admin_email)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)

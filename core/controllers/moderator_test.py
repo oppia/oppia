@@ -26,7 +26,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
 
         # Try accessing the moderator page without being a moderator or admin.
-        self.login('user@example.com', is_admin=False)
+        self.login('user@example.com')
         response = self.testapp.get('/moderator', expect_errors=True)
         csrf_token = self.get_csrf_token_from_response(response)
         self.assertEqual(response.status_int, 401)
@@ -41,7 +41,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         # Try accessing the moderator page after logging in as a moderator.
         self.set_moderators(['moderator@example.com'])
 
-        self.login('moderator@example.com', is_admin=False)
+        self.login('moderator@example.com')
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 200)
         self.logout()
@@ -49,7 +49,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         # Try accessing the moderator page after logging in as an admin.
         self.set_admins(['admin@example.com'])
 
-        self.login('admin@example.com', is_admin=False)
+        self.login('admin@example.com')
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 200)
         self.logout()
