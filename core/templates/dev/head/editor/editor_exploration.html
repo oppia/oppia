@@ -369,6 +369,10 @@
     {% include 'components/param_change_editor.html' %}
   </script>
 
+  <script type="text/ng-template" id="inline/rule_editor">
+    {% include 'components/rule_editor.html' %}
+  </script>
+
 {% endblock content %}
 
 {% block footer_js %}
@@ -388,6 +392,7 @@
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
+    {{ include_js_file('components/ruleEditor.js') }}
   </script>
 
   {{ widget_js_directives }}

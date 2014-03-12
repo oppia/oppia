@@ -399,14 +399,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
   };
 
-  $scope.isRuleConfusing = function(rule) {
-    return rule.feedback.length === 0 && rule.dest === editorContextService.getActiveStateName();
-  };
-
-  $scope.getCssClassForRule = function(rule) {
-    return $scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning' : 'oppia-rule-bubble';
-  };
-
   $scope.toggleWidgetSticky = function() {
     $scope.addStateChange('widget_sticky', $scope.widgetSticky, !$scope.widgetSticky);
     var activeStateName = editorContextService.getActiveStateName();

@@ -20,55 +20,18 @@
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
       <div class="span9" style="padding: 5px;">
-          <table style="vertical-align: top; width: 100%">
-            <tr>
-              <td colspan=2 class="oppia-rule-bubble">
-                <center style="font-weight: bold;">
-                  <span ng-if="isRuleConfusing(rule)">
-                    <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-                  </span>
-                  <span ng-class="{'oppia-red': isRuleConfusing(rule)}">
-                    Answer <span angular-html-bind="rule | parameterizeRuleDescription: widgetCustomizationArgs.choices"></span>
-                  </span>
-                </center>
-              </td>
-            </tr>
-            <tr>
-              <td class="oppia-feedback-bubble">
-                <span ng-if="rule.feedback.length === 0">
-                  <em>This rule provides no feedback.</em>
-                </span>
-                <span ng-repeat="fb in rule.feedback">
-                    • <span angular-html-bind="fb"></span><br>
-                </span>
-              </td>
-              <td class="oppia-dest-bubble">
-                <div class="oppia-align-center">
-                  <span ng-if="rule.dest == stateName">
-                    ⟳
-                  </span>
-                  <span ng-if="rule.dest == 'END' || rule.dest == stateName">
-                    <[rule.dest]>
-                  </span>
-                  <span ng-if="rule.dest != 'END' && rule.dest != stateName">
-                    <a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-                      <[rule.dest]>
-                    </a>
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </table>
+        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId">
+        </rule-editor>
       </div>
 
       <div class="span3">
         <span class="pull-right">
           <button ng-click="openEditRuleModal(handlerName, $index)" class="oppia-rule-ctrl">Edit</button>
           <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl">⇑</button>
-          <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
+          <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">⇑</span>
 
           <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="oppia-rule-ctrl">⇓</button>
-          <span ng-hide="$index < handler.length - 2" class="oppia-grayed">⇓</span>
+          <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">⇓</span>
 
           <button ng-click="deleteRule(handlerName, $index)" class="oppia-rule-ctrl"> &times; </button>
         </span>
@@ -101,48 +64,10 @@
 
 {% block line3 %}
   <div class="row-fluid">
-    <div class="span9">
-      <table style="width: 100%;">
-          <tr>
-            <td colspan=2 ng-class="getCssClassForRule(handler[handler.length - 1])">
-              <center style="font-weight: bold;">
-                <span ng-if="isRuleConfusing(handler[handler.length - 1])">
-                  <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
-                </span>
-                <span>
-                  <[getDefaultRule(handlerName) | parameterizeRuleDescription: widgetCustomizationArgs.choices]>
-                </span>
-              </center>
-            </td>
-          </tr>
-          <tr>
-            <td class="oppia-feedback-bubble">
-              <span ng-if="getDefaultRule(handlerName).feedback.length === 0">
-                <em>This rule provides no feedback.</em>
-              </span>
-              <span ng-repeat="fb in getDefaultRule(handlerName).feedback">
-                • <span angular-html-bind="fb"></span><br>
-              </span>
-            </td>
-            <td class="oppia-dest-bubble">
-              <div class="oppia-align-center">
-                <span ng-if="getDefaultRule(handlerName).dest == stateName">
-                  ⟳
-                </span>
-                <span ng-if="getDefaultRule(handlerName).dest == 'END' || getDefaultRule(handlerName).dest == stateName">
-                    <[getDefaultRule(handlerName).dest]>
-                </span>
-                <span ng-if="getDefaultRule(handlerName).dest != 'END' && getDefaultRule(handlerName).dest != stateName">
-                  <a href="/create/<[explorationId]>#/gui/<[getDefaultRule(handlerName).dest]>">
-                    <[getDefaultRule(handlerName).dest]>
-                  </a>
-                </span>
-              </div>
-            </td>
-          </tr>
-        </table>
+    <div class="span9" style="padding: 5px;">
+      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId">
+      </rule-editor>
     </div>
-
     <div class="span3">
       <span class="pull-right">
         <button ng-click="openEditRuleModal(handlerName, handler.length - 1)" class="oppia-rule-ctrl">Edit</button>

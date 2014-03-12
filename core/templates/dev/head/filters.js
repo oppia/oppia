@@ -63,6 +63,9 @@ oppia.filter('parameterizeRuleDescription', function() {
       return '';
     }
     var description = input.description;
+    if (description == 'Default') {
+      return description;
+    }
     // TODO(sll): Generalize this to allow Boolean combinations of rules.
     var inputs = input.definition.inputs;
 
@@ -102,7 +105,7 @@ oppia.filter('parameterizeRuleDescription', function() {
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }
-    return finalRule;
+    return 'Answer ' + finalRule;
   };
 });
 

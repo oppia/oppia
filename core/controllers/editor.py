@@ -539,8 +539,9 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('No image supplied')
 
         file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS:
-            allowed_formats = ', '.join(feconf.ACCEPTED_IMAGE_FORMATS)
+        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
+            allowed_formats = ', '.join(
+                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
             raise Exception('Image file not recognized: it should be in '
                             'one of the following formats: %s.' %
                             allowed_formats)
@@ -555,7 +556,8 @@ class ImageUploadHandler(EditorHandler):
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
             extension = filename[dot_index+1:]
-            if extension != file_format:
+            if (extension not in
+                    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
                 raise self.InvalidInputException(
                     'Expected a filename ending in .%s; received %s' %
                     (file_format, filename))

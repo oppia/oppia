@@ -59,7 +59,14 @@ DEFAULT_STATE_NAME = '(untitled state)'
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'
 
-ACCEPTED_IMAGE_FORMATS = ['gif', 'jpeg', 'png']
+# A dict containing the accepted image formats (as determined by the imghdr
+# module) and the corresponding allowed extensions in the filenames of uploaded
+# files.
+ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
+    'jpeg': ['jpg', 'jpeg'],
+    'png': ['png'],
+    'gif': ['gif']
+}
 
 # Prefixes for widget ids in the datastore.
 INTERACTIVE_PREFIX = 'interactive'
