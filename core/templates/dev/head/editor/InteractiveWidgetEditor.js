@@ -417,7 +417,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
         for (var category in $scope.interactiveWidgetRepository) {
           for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
             if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
-              $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+              $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
               $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
               $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
               break;
@@ -435,7 +435,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     for (var category in $scope.interactiveWidgetRepository) {
       for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
         if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
-          $scope.tmpWidget = $scope.interactiveWidgetRepository[category][i];
+          $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
           $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
           $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
           break;

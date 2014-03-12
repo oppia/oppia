@@ -442,6 +442,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.showStateEditor = function(stateName) {
+    warningsData.clear()
     $scope.saveAndChangeActiveState(stateName);
     $location.path('/gui/' + stateName);
   };
