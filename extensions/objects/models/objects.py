@@ -26,6 +26,7 @@ from StringIO import StringIO
 import tarfile
 import urllib
 import urlparse
+import copy
 
 from core.domain import html_cleaner
 import feconf
@@ -468,3 +469,108 @@ class Filepath(UnicodeString):
 
         # The path will be prefixed with "[exploration_id]/assets".
         raw = super(Filepath, cls).normalize(raw)
+
+
+class CheckedProof(BaseObject):
+    """A proof attempt and any errors it makes."""
+
+    description = 'A proof attempt and any errors it makes.'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        # TODO (jacob): This is not being run
+        try:
+            assert isinstance(raw.get('assumptionsString'), basestring)
+            assert isinstance(raw.get('targetString'), basestring)
+            assert isinstance(raw.get('proofString'), basestring)
+            assert raw.get('correct') in [True, False]
+            if not raw.get('correct'):
+                assert isinstance(raw.get('errorCategory'), basestring)
+                assert isinstance(raw.get('errorCode'), basestring)
+                assert isinstance(raw.get('errorMessage'), basestring)
+                assert isinstance(raw.get('errorLine'), int)
+            return copy.deepcopy(raw)
+        except Exception:
+            raise TypeError('Cannot convert to checked proof %s' % raw)
+
+
+class LogicQuestion(BaseObject):
+    """A question giving a formula to prove"""
+
+    description = 'A question giving a formula to prove.'
+    edit_html_filename = 'logic_question_editor'
+    edit_js_filename = 'LogicQuestionEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+
+        def validateExpression(expression):
+            assert isinstance(expression, dict)
+            assert isinstance(expression.get('kind'), basestring)
+            assert isinstance(expression.get('operator'), basestring)
+            validateExpressionArray(expression.get('arguments'))
+            validateExpressionArray(expression.get('dummies'))
+
+        def validateExpressionArray(array):
+            assert isinstance(array, list)
+            for item in array:
+                validateExpression(item)
+
+        def validateTypingElementArray(array):
+            assert isinstance(array, list)
+            for element in array:
+                assert isinstance(element, dict)
+                assert isinstance(element.get('type'), basestring)
+                assert element.get('arbitrarily_many') in [True, False]
+
+        try:
+            if isinstance(raw, basestring):
+                assert raw == 'uninitialized'
+                return raw
+            else:
+                assert isinstance(raw, dict)
+                validateExpressionArray(raw.get('assumptions'))
+                validateExpressionArray(raw.get('results'))
+                assert len(raw.get('results')) == 1
+
+                assert isinstance(raw.get('language'), dict)
+                operators = raw.get('language').get('operators')
+                assert isinstance(operators, dict)
+                for item in operators:
+                    operator = operators.get(item)
+                    assert isinstance(operator.get('kind'), basestring)
+                    assert isinstance(operator.get('typing'), list)
+                    for typing_rule in operator.get('typing'):
+                        validateTypingElementArray(typing_rule.get('arguments'))
+                        validateTypingElementArray(typing_rule.get('dummies'))
+                        assert isinstance(typing_rule.get('output'), basestring)
+                    # TODO (jacob) uncomment once symbols are mandatory
+                    # assert isinstance(operator.get('symbols'), list)        
+                    # for symbol in operator.get('symbols'):
+                    #     assert isinstance(symbol, basestring)
+
+                assert isinstance (raw.get('defaultProofString'), basestring)
+
+                return copy.deepcopy(raw)
+        except Exception:
+            raise TypeError('Cannot convert to a logic question %s' % raw)
+
+
+class LogicErrorCategory(BaseObject):
+    """A string from a list of possible categories"""
+
+    description = 'One of the possible error categories of a logic proof.'
+    edit_html_filename = 'logic_error_category_editor'
+    edit_js_filename = 'LogicErrorCategoryEditor'
+
+    @classmethod
+    def normalize(cls, raw):
+        logging.warning(raw)
+        try:
+            assert raw in ['parsing', 'typing', 'line', 'layout', 'variables',
+                        'logic', 'target', 'mistake']
+        except Exception:
+            raise TypeError('Cannot convert to an error category.')
+        return raw

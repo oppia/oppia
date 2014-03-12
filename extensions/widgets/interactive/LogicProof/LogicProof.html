@@ -1,0 +1,21 @@
+<div>
+    <div ng-if="assumptionsString === ''">
+      Prove {{targetString}}.
+    </div>
+    <div ng-if="assumptionsString !== ''">
+      Assuming {{assumptionsString}}; prove {{targetString}}.
+    </div>
+    <table>
+      <tr>
+        <td> <textarea ng-model="proofString" ng-trim="false" ng-change="editProof()" rows="10" cols="50"></textarea> </td>
+        <td valign="top"> 
+          <font color="red"><pre>{{proofError}}</pre></font>
+        </td>
+      </tr>
+    </table>
+    <p>
+      <button ng-if="haveDefaultProof" ng-click="submitProof()">Continue</button>
+      <button ng-if="!haveDefaultProof" ng-click="submitProof()">Submit</button>
+    </p>
+</div>
+

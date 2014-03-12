@@ -162,6 +162,9 @@ ALLOWED_WIDGETS = {
         'CodeRepl': {
             'dir': 'extensions/widgets/interactive/CodeRepl'
         },
+        'LogicProof': {
+            'dir': 'extensions/widgets/interactive/LogicProof'
+        },
         # NOTE: Uncomment the following lines if you want to activate
         # the music input widget. This widget is still being developed
         # and is in pre-alpha stage.
