@@ -431,13 +431,14 @@ class ExplorationDownloadHandler(EditorHandler):
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
-            utils.to_ascii(exploration.title), version)
+            utils.to_ascii(exploration.title.replace(' ', '')), version)
 
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s.zip' % str(filename))
 
-        self.response.write(exp_services.export_to_zip_file(exploration_id, version))
+        self.response.write(
+            exp_services.export_to_zip_file(exploration_id, version))
 
 
 class ExplorationResourcesHandler(EditorHandler):

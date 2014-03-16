@@ -24,7 +24,6 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
-from core.domain import rights_manager
 from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
