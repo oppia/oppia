@@ -1,21 +1,39 @@
-<div class="container-fluid oppia-editor" ng-show="stateName">
-  {% include 'editor/state_editor_title.html' %}<br>
-  {% include 'editor/state_editor_param.html' %}<br>
-  {% include 'editor/state_editor_content.html' %}<br>
-  <div ng-controller="InteractiveWidgetEditor">
-    {% include 'editor/state_editor_interaction.html' %}<br>
-    {% include 'editor/state_editor_rules.html' %}
+<div class="oppia-state-editor-header">
+  <button class="pull-right" ng-click="closeStateEditor()">
+    <i class="icon-minus"></i>
+  </button>
+
+  <div class="oppia-state-name-container">
+    <h5 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-state-name">
+      <[stateName]>
+    </h5>
+
+    <span ng-if="stateNameEditorIsShown">
+      <input type="text" ng-model="$parent.tmpStateName" autofocus>
+      <button ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Save</button>
+    </span>
   </div>
-  <br>
-  <hr>
-  {% include 'editor/state_editor_incoming.html' %}
-  <br>
-  {% include 'editor/state_reader_feedback.html' %}
-  <br>
-  {% include 'editor/unresolved_answers.html' %}
-  <br>
-  <hr>
-  {% include 'editor/state_editor_footer.html' %}
 </div>
 
-{% include 'editor/state_editor_modals.html' %}
+<div class="oppia-state-editor-body">
+  <div class="container-fluid oppia-editor" ng-show="stateName">
+    {% include 'editor/state_editor_param.html' %}<br>
+    {% include 'editor/state_editor_content.html' %}<br>
+    <div ng-controller="InteractiveWidgetEditor">
+      {% include 'editor/state_editor_interaction.html' %}<br>
+      {% include 'editor/state_editor_rules.html' %}
+    </div>
+    <br>
+    <hr>
+    {% include 'editor/state_editor_incoming.html' %}
+    <br>
+    {% include 'editor/state_reader_feedback.html' %}
+    <br>
+    {% include 'editor/unresolved_answers.html' %}
+    <br>
+    <hr>
+    {% include 'editor/state_editor_footer.html' %}
+  </div>
+
+  {% include 'editor/state_editor_modals.html' %}
+</div>
