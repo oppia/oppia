@@ -197,7 +197,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_b, self.EXP_ID, self.user_id_e,
             rights_manager.ROLE_VIEWER)
 
-    def test_publishing_exploration(self):
+    def test_publishing_and_unpublishing_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.user_id_a, exp)
@@ -206,7 +206,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
-        rights_manager.unpublish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_a).can_unpublish(self.EXP_ID))
+
+        rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
@@ -225,7 +230,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.user_id_a, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 

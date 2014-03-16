@@ -372,10 +372,9 @@ class Actor(object):
 
         if exp_rights.status != EXPLORATION_STATUS_PUBLIC:
             return False
-        # TODO(sll): Deny unpublishing of the exploration if an
-        # external user has edited or submitted feedback for it since
-        # it was published.
-        return self.is_owner(exploration_id) or self.is_moderator()
+        if exp_rights.community_owned:
+            return False
+        return self.is_moderator()
 
     def can_modify_roles(self, exploration_id):
         try:

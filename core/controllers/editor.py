@@ -170,14 +170,16 @@ class ExplorationPage(EditorHandler):
                 EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
-            'can_publish': rights_manager.Actor(self.user_id).can_publish(
-                exploration_id),
             'can_publicize': rights_manager.Actor(
                 self.user_id).can_publicize(exploration_id),
-            'can_unpublicize': rights_manager.Actor(
-                self.user_id).can_unpublicize(exploration_id),
+            'can_publish': rights_manager.Actor(self.user_id).can_publish(
+                exploration_id),
             'can_release_ownership': rights_manager.Actor(
                 self.user_id).can_release_ownership(exploration_id),
+            'can_unpublicize': rights_manager.Actor(
+                self.user_id).can_unpublicize(exploration_id),
+            'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
+                exploration_id),
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
@@ -328,14 +330,19 @@ class ExplorationRightsHandler(EditorHandler):
             rights_manager.assign_role(
                 self.user_id, exploration_id, new_member_id, new_member_role)
 
-        elif is_public:
+        elif is_public is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+            if is_public:
+                try:
+                    exploration.validate(strict=True)
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(e)
 
-            rights_manager.publish_exploration(self.user_id, exploration_id)
+                rights_manager.publish_exploration(
+                    self.user_id, exploration_id)
+            else:
+                rights_manager.unpublish_exploration(
+                    self.user_id, exploration_id)
 
         elif is_publicized is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)

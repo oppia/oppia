@@ -883,6 +883,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope._saveExplorationRightsChange({is_publicized: false});
   };
 
+  $scope.unpublishExploration = function() {
+    $scope._saveExplorationRightsChange({is_public: false});
+  };
+
   $scope.showPublishExplorationModal = function() {
     warningsData.clear();
     $modal.open({
