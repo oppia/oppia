@@ -47,6 +47,14 @@ class Error404Handler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
+class WarmupHandler(base.BaseHandler):
+    """Handles warmup requests."""
+
+    def get(self):
+        """Handles GET warmup requests."""
+        pass
+
+
 # Regex for base64 id encoding
 r = '[A-Za-z0-9=_-]+'
 
@@ -75,6 +83,8 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
 
 # Register the URL with the responsible classes
 urls = [
+    get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
+
     webapp2.Route(
         r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),

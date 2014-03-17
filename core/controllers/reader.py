@@ -114,7 +114,6 @@ class ExplorationHandler(base.BaseHandler):
             init_state.widget.customization_args, reader_params)
 
         self.values.update({
-            'block_number': 0,
             'init_html': init_state.content[0].to_html(reader_params),
             'interactive_html': interactive_html,
             'params': reader_params,
@@ -185,8 +184,6 @@ class FeedbackHandler(base.BaseHandler):
         answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
         handler = self.payload.get('handler')
-        # The 0-based index of the last content block already on the page.
-        block_number = self.payload.get('block_number') + 1
         # Parameters associated with the reader.
         old_params = self.payload.get('params', {})
         old_params['answer'] = answer
@@ -199,6 +196,10 @@ class FeedbackHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
         old_state = exploration.states[old_state_name]
+        old_widget = widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
+
+        answer = old_widget.normalize_answer(answer, handler)
 
         rule = exploration.classify(
             old_state_name, handler, answer, old_params)
@@ -232,8 +233,6 @@ class FeedbackHandler(base.BaseHandler):
             handler, rule)
 
         # Append the reader's answer to the response HTML.
-        old_widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
         reader_response_html = old_widget.get_reader_response_html(
             old_state.widget.customization_args, old_params, answer, sticky)
         values['reader_response_html'] = reader_response_html
@@ -255,7 +254,6 @@ class FeedbackHandler(base.BaseHandler):
             'exploration_id': exploration_id,
             'state_name': new_state_name,
             'oppia_html': html_output,
-            'block_number': block_number,
             'params': new_params,
             'finished': finished,
             'state_history': state_history,

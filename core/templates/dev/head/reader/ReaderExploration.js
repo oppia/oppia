@@ -160,7 +160,6 @@ function ReaderExploration(
   $scope.loadPage = function(data) {
     $scope.hasInteractedAtLeastOnce = false;
 
-    $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
@@ -185,7 +184,6 @@ function ReaderExploration(
 
     var requestMap = {
       answer: answer,
-      block_number: $scope.blockNumber,
       handler: handler,
       params: $scope.params,
       state_history: $scope.stateHistory,
@@ -218,7 +216,6 @@ function ReaderExploration(
     $scope.answerIsBeingProcessed = false;
     $scope.hasInteractedAtLeastOnce = true;
 
-    $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
 
     // This is a bit of a hack. When a refresh happens, AngularJS compares

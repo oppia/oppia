@@ -1065,7 +1065,11 @@ class Exploration(object):
                     return rule_spec
 
             raise Exception(
-                'No matching rule found for handler %s.' % handler.name)
+                'No matching rule found for handler %s. Rule specs are %s.' % (
+                    handler.name,
+                    [rule_spec.to_dict() for rule_spec in handler.rule_specs]
+                )
+            )
 
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML

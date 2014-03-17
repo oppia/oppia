@@ -116,12 +116,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             feconf.EXPLORATION_TRANSITION_URL_PREFIX,
             self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
-            'answer': answer, 'block_number': self.last_block_number,
-            'handler': 'submit', 'params': self.last_params,
+            'answer': answer, 'handler': 'submit', 'params': self.last_params,
             'state_history': self.state_history,
         })
 
-        self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
         self.state_history += [self.last_state_name]
@@ -152,7 +150,6 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
 
-        self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
         self.state_history = [self.last_state_name]
@@ -194,3 +191,14 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             'My Name', 'Hello, I\'m My Name!.*get a pretty red')
         self.submit_and_compare(0, 'fork in the road')
         self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')
+
+    def test_huge_answers(self):
+        """Test correct behavior if huge answers are submitted."""
+        self.init_player(
+            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
+        self.submit_and_compare(
+            '0', 'In fact, the word Oppia means \'learn\'.')
+        # This could potentially cause errors in stats_models when the answer
+        # is persisted to the backend.
+        self.submit_and_compare(
+            'a' * 1000500, 'Sorry, nope, we didn\'t get it')

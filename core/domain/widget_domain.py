@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import logging
 import os
 
 from core.domain import obj_services
@@ -114,6 +115,20 @@ class BaseWidget(object):
     def is_interactive(self):
         """A widget is interactive iff its handlers array is non-empty."""
         return bool(self._handlers)
+
+    def normalize_answer(self, answer, handler_name):
+        """Normalizes a reader's input to this widget."""
+        for handler in self.handlers:
+            if handler.name == handler_name:
+                if handler.input_type is None:
+                    return answer
+                else:
+                    return handler.input_type.normalize(answer)
+
+        logging.error(
+            'Could not find handler in widget %s with name %s' %
+            (self.name, handler_name))
+        return answer
 
     @property
     def _response_template(self):
