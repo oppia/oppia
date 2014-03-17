@@ -39,13 +39,15 @@ class FakeRule(rule_domain.Rule):
 class RuleServicesUnitTests(test_utils.GenericTestBase):
     """Tests for rule services."""
 
-    def test_get_rules_for_input_type(self):
+    def test_get_rules_for_obj_type(self):
         self.assertEqual(
-            len(rule_domain.get_rules_for_input_type(objects.NonnegativeInt)),
-            1
-        )
+            len(rule_domain.get_rules_for_obj_type('NonnegativeInt')), 1)
         self.assertEqual(
-            len(rule_domain.get_rules_for_input_type(objects.Real)), 7)
+            len(rule_domain.get_rules_for_obj_type('Real')), 7)
+        self.assertEqual(
+            len(rule_domain.get_rules_for_obj_type('Null')), 0)
+        self.assertEqual(
+            len(rule_domain.get_rules_for_obj_type('FakeObjType')), 0)
 
 
 class RuleDomainUnitTests(test_utils.GenericTestBase):

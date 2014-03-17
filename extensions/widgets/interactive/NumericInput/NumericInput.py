@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.objects.models import objects
 
 
 class NumericInput(widget_domain.BaseWidget):
@@ -33,5 +32,5 @@ class NumericInput(widget_domain.BaseWidget):
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'input_type': objects.Real
+        'name': 'submit', 'obj_type': 'Real'
     }]

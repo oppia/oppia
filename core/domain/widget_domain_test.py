@@ -34,13 +34,16 @@ class AnswerHandlerUnitTests(test_utils.GenericTestBase):
 
     def test_rules_property(self):
         """Test that answer_handler.rules behaves as expected."""
-        answer_handler = widget_domain.AnswerHandler()
+        answer_handler = widget_domain.AnswerHandler('submit', 'Null')
         self.assertEqual(answer_handler.name, 'submit')
         self.assertEqual(answer_handler.rules, [])
 
         answer_handler = widget_domain.AnswerHandler(
-            input_type=objects.NonnegativeInt)
+            'submit', 'NonnegativeInt')
         self.assertEqual(len(answer_handler.rules), 1)
+
+        with self.assertRaisesRegexp(Exception, 'not a valid object class'):
+            widget_domain.AnswerHandler('submit', 'FakeObjType')
 
 
 class WidgetUnitTests(test_utils.GenericTestBase):
@@ -251,11 +254,12 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             )
 
             for handler in widget._handlers:
-                HANDLER_KEYS = ['name', 'input_type']
+                HANDLER_KEYS = ['name', 'obj_type']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
                 self.assertTrue(isinstance(handler['name'], basestring))
-                # TODO(sll): Check that the input_type is either None or a
-                # typed object.
+                # Check that the obj_type corresponds to a valid object class.
+                obj_services.Registry.get_object_class_by_type(
+                    handler['obj_type'])
 
             # Check that all handler names are unique.
             names = [handler.name for handler in widget.handlers]

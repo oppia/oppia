@@ -33,22 +33,20 @@ import json
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
 
-    def __init__(self, name='submit', input_type=None):
+    def __init__(self, name, obj_type):
         self.name = name
-        self.input_type = input_type
-        # TODO(sll): Add an assertion to check that input_type is either None
-        # or a class in extensions.objects.models.objects.
+        self.obj_type = obj_type
+        self.obj_class = obj_services.Registry.get_object_class_by_type(
+            obj_type)
 
     @property
     def rules(self):
-        return rule_domain.get_rules_for_input_type(self.input_type)
+        return rule_domain.get_rules_for_obj_type(self.obj_type)
 
     def to_dict(self):
         return {
             'name': self.name,
-            'input_type': (
-                None if self.input_type is None else self.input_type.__name__
-            )
+            'obj_type': self.obj_type,
         }
 
 
@@ -120,10 +118,7 @@ class BaseWidget(object):
         """Normalizes a reader's input to this widget."""
         for handler in self.handlers:
             if handler.name == handler_name:
-                if handler.input_type is None:
-                    return answer
-                else:
-                    return handler.input_type.normalize(answer)
+                return handler.obj_class.normalize(answer)
 
         logging.error(
             'Could not find handler in widget %s with name %s' %

@@ -51,6 +51,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             except TypeError:
                 pass
 
+    def test_null_validation(self):
+        """Tests objects of type Null."""
+        mappings = [('', None), ('20', None), (None, None)]
+        invalid_values = []
+
+        self.check_normalization(objects.Null, mappings, invalid_values)
+
     def test_number_validation(self):
         """Tests objects of type Number."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
