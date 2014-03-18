@@ -589,18 +589,6 @@ textarea {
   color: white;
 }
 
-.oppia-editable-name {
-  color: #8f8661;
-  font-weight: bold;
-}
-.oppia-editable-name:hover {
-  background: #efefef;
-  cursor: pointer;
-}
-.oppia-editable-name:hover::after {
-  content: ' ✎';
-}
-
 .oppia-placeholder {
   color: gray;
 }
@@ -610,18 +598,18 @@ textarea {
   width: 60%;
 }
 
-.oppia-state-name {
+.oppia-editable {
   border: 1px dotted gray;
   cursor: pointer;
   padding: 1px 3px;
 }
-.oppia-state-name:hover {
-  background-color: #E2E2E2;
-  border: 2px solid #18447E;
-  border-radius: 4px;
+.oppia-editable::after {
+  /* The Unicode characters below represent spaces. */
+  content: '\00a0\00a0\00a0\00a0\00a0 ✎';
 }
-.oppia-state-name:hover::after {
-  content: ' ✎';
+.oppia-editable:hover {
+  border: 2px solid #111;
+  opacity: 0.95;
 }
 
 .oppia-state-editor-container {
@@ -788,6 +776,15 @@ textarea {
 
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 3px;
+  color: #000;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.oppia-rule-bubble-description-picker {
+  background: #89B5F0;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 3px;

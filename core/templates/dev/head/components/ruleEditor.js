@@ -39,7 +39,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         // name is null.
         $scope.$watch('rule.definition.name', function(newValue, oldValue) {
           if (newValue === null) {
-            $scope.openRuleDescriptionEditor();
+            $scope.openRuleDescriptionEditorIfNotDefault();
             $scope.openRuleDescriptionPicker();
           }
         });
@@ -94,7 +94,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
-        $scope.openRuleDescriptionEditor = function() {
+        $scope.openRuleDescriptionEditorIfNotDefault = function() {
+          if ($scope.rule.description === 'Default') {
+            return;
+          }
+
           $scope.activeEditor = 'ruleDescription';
           $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
           $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
@@ -151,6 +155,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.getCssClassForRule = function(rule) {
           return ($scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning'
                                                : 'oppia-rule-bubble');
+        };
+
+        $scope.getEditableCssClassForRule = function(rule) {
+          return (rule.description == 'Default') ? '' : ' oppia-editable';
         };
 
         $scope.isRuleConfusing = function(rule) {
