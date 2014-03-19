@@ -608,7 +608,7 @@ textarea {
   content: '\00a0\00a0\00a0\00a0\00a0 ✎';
 }
 .oppia-editable:hover {
-  border: 2px solid #111;
+  border: 1px solid #111;
   opacity: 0.95;
 }
 

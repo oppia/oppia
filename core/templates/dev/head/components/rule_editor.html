@@ -40,17 +40,24 @@
 
         <div ng-if="ruleDescriptionPickerIsOpen" class="oppia-rule-bubble-description-picker">
           <h5 style="text-align: left;">Select a rule type</h5>
-          <div ng-repeat="(description, name) in allRuleTypes" class="oppia-rule">
-            Answer <span ng-bind-html="description | bracesToText"></span>
-            <button type="button" class="pull-right"
-                    ng-click="selectNewRuleType(description, name)">
-              Select
-            </button>
-          </div>
+          <table style="vertical-align: top; width: 100%">
+            <tr ng-repeat="(description, name) in allRuleTypes">
+              <td>
+                Answer <span ng-bind-html="description | bracesToText"></span>
+              </td>
+              <td>
+                <button type="button" class="pull-right"
+                        ng-click="selectNewRuleType(description, name)">
+                  Select
+                </button>
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
     </td>
   </tr>
+
   <tr>
     <td class="oppia-feedback-bubble">
       <div ng-if="activeEditor !== 'ruleFeedback'">
@@ -67,7 +74,8 @@
         <p>Feedback for the reader (chosen at random from the following):</p>
         <object-editor obj-type="List" init-args="FEEDBACK_LIST_INIT_ARGS" value="rule.feedback">
         </object-editor>
-        <button ng-click="closeRuleFeedbackEditor()">Close</button>
+        <hr>
+        <button ng-click="closeRuleFeedbackEditor()">Close feedback editor</button>
       </div>
     </td>
 

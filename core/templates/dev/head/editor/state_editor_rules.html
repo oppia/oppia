@@ -46,9 +46,9 @@
         <table style="width: 100%">
           <tr>
             <td style="vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
-              <div class="oppia-align-center">
-                (<em>New rules will be added here.</em>)
-              </div>
+              <button class="oppia-align-center" style="width: 100%;" ng-click="createTmpRule()">
+                Add new rule
+              </button>
             </td>
           </tr>
         </table>
@@ -64,9 +64,6 @@
       <span class="pull-right" style="padding-top: 5px;">
         <span ng-if="tmpRule">
           <button ng-click="cancelTmpRule()" class="oppia-rule-ctrl"> Cancel </button>
-        </span>
-        <span ng-if="!tmpRule">
-          <button ng-click="createTmpRule()" class="oppia-rule-ctrl"> Add new rule </button>
         </span>
       </span>
     </div>
