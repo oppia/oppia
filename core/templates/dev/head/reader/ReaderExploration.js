@@ -247,7 +247,7 @@ function ReaderExploration(
 
     $scope.responseLog = $scope.responseLog || [];
 
-    // TODO: Check the state chagne instead of question_html so that it works
+    // TODO: Check the state change instead of question_html so that it works
     // correctly when the new state doesn't have a question string.
     var isQuestion = !!data.question_html;
     if (isQuestion) {
@@ -265,7 +265,7 @@ function ReaderExploration(
       question: data.question_html + randomSuffix,
       isMostRecentQuestion: isQuestion
     });
- 
+
     var lastEntryEls = document.getElementsByClassName('oppia-last-log-entry');
     $scope.adjustPageHeight(true, function() {
       if (lastEntryEls.length > 0) {
@@ -280,7 +280,7 @@ function ReaderExploration(
     }
     titleEl = stickyTitleEl = null;
   };
- 
+
   // If the exploration is iframed, send data to its parent about its height so
   // that the parent can be resized as necessary.
   $scope.lastRequestedHeight = 0;
@@ -348,7 +348,7 @@ function ReaderExploration(
     $scope.$apply($scope.adjustTitleEl);
   }
 }
- 
+
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
