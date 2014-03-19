@@ -189,26 +189,23 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             0, '', 'to be sure our strategy works in all cases')
         self.submit_and_compare(0, 'try to guess', '')
  
-     def test_parametrized_adventure(self):
+    def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
             '8', 'Parameterized Adventure', 'Hello, brave adventurer')
         self.submit_and_compare(
-            'My Name', 'Hello, I\'m My Name!.*get a pretty red')
-        self.submit_and_compare(0, 'fork in the road')
-        self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')
+            'My Name', '', 'Hello, I\'m My Name!.*get a pretty red')
+        self.submit_and_compare(0, '', 'fork in the road')
+        self.submit_and_compare(
+            'ne', '', 'Hello, My Name. You have to pay a toll')
 
     def test_huge_answers(self):
         """Test correct behavior if huge answers are submitted."""
         self.init_player(
             '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
         self.submit_and_compare(
-            '0', 'In fact, the word Oppia means \'learn\'.')
+            '0', '', 'In fact, the word Oppia means \'learn\'.')
         # This could potentially cause errors in stats_models when the answer
         # is persisted to the backend.
         self.submit_and_compare(
-            'a' * 1000500, 'Sorry, nope, we didn\'t get it')
-            'My Name', '', 'Hello, I\'m My Name!.*get a pretty red')
-        self.submit_and_compare(0, '', 'fork in the road')
-        self.submit_and_compare('ne', 'You go northeast',
-            'Hello, My Name. You have to pay a toll')
+            'a' * 1000500, 'Sorry, nope, we didn\'t get it', '')

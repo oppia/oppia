@@ -252,7 +252,6 @@ class FeedbackHandler(base.BaseHandler):
             'state_name': new_state_name,
             'feedback_html': feedback_html,
             'question_html': question_html,
-            'block_number': block_number,
             'params': new_params,
             'finished': finished,
             'state_history': state_history,
