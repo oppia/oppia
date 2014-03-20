@@ -81,19 +81,18 @@
 
     <td class="oppia-dest-bubble">
       <div class="oppia-align-center" ng-if="activeEditor !== 'ruleDest'">
-        <div class="oppia-editable" ng-click="openRuleDestEditor()">
-          <span ng-if="rule.dest == getActiveStateName()">
-            ⟳ <[rule.dest]>
-          </span>
-          <span ng-if="rule.dest == 'END'">
-            <[rule.dest]>
-          </span>
-          <span ng-if="rule.dest != 'END' && rule.dest != getActiveStateName()">
-            <a href="/create/<[explorationId]>#/gui/<[rule.dest]>">
-              <[rule.dest]>
-            </a>
-          </span>
-        </div>
+        <span ng-if="rule.dest == getActiveStateName()">
+          ⟳ <[rule.dest]>
+        </span>
+        <span ng-if="rule.dest == 'END'">
+          <[rule.dest]>
+        </span>
+        <span ng-if="rule.dest != 'END' && rule.dest != getActiveStateName()">
+          <a href="/create/<[explorationId]>#/gui/<[rule.dest]>"><[rule.dest]></a>
+        </span>
+        <button ng-click="openRuleDestEditor()">
+          ✎
+        </button>
       </div>
 
       <div class="oppia-align-center" ng-if="activeEditor === 'ruleDest'">
