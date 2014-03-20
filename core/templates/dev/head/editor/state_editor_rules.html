@@ -20,7 +20,7 @@
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
       <div class="span9" style="padding: 5px;">
-        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false">
+        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
         </rule-editor>
       </div>
 
@@ -73,7 +73,7 @@
 {% block line3 %}
   <div class="row-fluid">
     <div class="span9" style="padding: 5px;">
-      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false">
+      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
       </rule-editor>
     </div>
     <div class="span3">
