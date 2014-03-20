@@ -66,6 +66,8 @@
                     <li {% if nav_mode == 'contact' %}class="active"{% endif %}>
                       <a href="/contact">Contact</a>
                     </li>
+                    {% block navbar_additions %}
+                    {% endblock %}
                   </ul>
 
                   <ul class="nav pull-right">

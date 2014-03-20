@@ -12,6 +12,27 @@
   </script>
 {% endblock header_js %}
 
+{% block navbar_additions %}
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      Help
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
+          Planning Your Exploration
+        </a>
+      </li>
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
+          Exploration Design Tips
+        </a>
+      </li>
+    </ul>
+  </li>
+{% endblock %}
+
 {% block content %}
   {% if announcement %}
     <div class="oppia-align-center oppia-warning">
@@ -190,34 +211,6 @@
             You are very welcome to submit feedback to improve the original exploration: to do this,
             click the previous link, then click the green Feedback button on the left of the page.
             Thank you!
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="span4">
-          <a href="/contribute" class="btn" ng-if="!iframed">
-            Return to the contributors' gallery
-          </a>
-        </div>
-
-        <div class="pull-right oppia-editor-reference">
-          <h5>
-            <a ng-click="usefulReferencesIsShown = !usefulReferencesIsShown" class="oppia-editor-section-header">
-              <i class="icon-plus-sign" ng-hide="usefulReferencesIsShown"></i>
-              <i class="icon-minus-sign" ng-show="usefulReferencesIsShown"></i>
-              Useful References
-            </a>
-          </h5>
-          <div collapse="!usefulReferencesIsShown" class="oppia-useful-references">
-            <ul>
-              <li>
-                <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">Planning Your Exploration</a>
-              </li>
-              <li>
-                <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">Exploration Design Tips</a>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
