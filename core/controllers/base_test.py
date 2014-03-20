@@ -97,7 +97,7 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         # This can be any value.
         ORIG_TIME = 100.0
 
-        TWO_HOURS_IN_SECS = 2 * 60 * 60
+        FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
         PADDING = 1
         current_time = ORIG_TIME
 
@@ -124,11 +124,11 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         self.assertTrue(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        current_time = ORIG_TIME + TWO_HOURS_IN_SECS - PADDING
+        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS - PADDING
         self.assertTrue(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        current_time = ORIG_TIME + TWO_HOURS_IN_SECS + PADDING
+        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS + PADDING
         self.assertFalse(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
@@ -144,13 +144,13 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
         self.assertTrue(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
 
-        current_time = ORIG_TIME + TWO_HOURS_IN_SECS + PADDING
+        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS + PADDING
         self.assertFalse(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
         self.assertTrue(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
 
-        current_time = ORIG_TIME + 100 + TWO_HOURS_IN_SECS + PADDING
+        current_time = ORIG_TIME + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING
         self.assertFalse(
             FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
         self.assertFalse(
