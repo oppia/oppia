@@ -73,6 +73,9 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.widgetSticky = data.widget.sticky;
 
     $scope.generateWidgetPreview(data.widget.widget_id, data.widget.customization_args);
+
+    $scope.tmpRule = null;
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -185,8 +188,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.widgetHandlersMemento = null;
   };
 
-  $scope.tmpRule = null;
-
   $scope.createTmpRule = function() {
     // A rule name of 'null' triggers the opening of the rule description
     // editor.
@@ -205,13 +206,14 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   };
 
   $scope.saveTmpRule = function() {
-    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
     // Move the tmp rule into the list of 'real' rules.
     var rules = $scope.widgetHandlers['submit'];
     rules.splice(rules.length - 1, 0, angular.copy($scope.tmpRule));
 
-    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
+    $scope.saveWidgetHandlers(
+      $scope.widgetHandlers, $scope.widgetHandlersMemento);
     $scope.tmpRule = null;
   }
 
@@ -220,28 +222,33 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   };
 
   $scope.swapRules = function(handlerName, index1, index2) {
-    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
     $scope.tmpRule = $scope.widgetHandlers[handlerName][index1];
     $scope.widgetHandlers[handlerName][index1] =
         $scope.widgetHandlers[handlerName][index2];
     $scope.widgetHandlers[handlerName][index2] = $scope.tmpRule;
 
-    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
+    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
   };
 
   $scope.deleteRule = function(handlerName, index) {
-    var widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
     $scope.widgetHandlers[handlerName].splice(index, 1);
-    $scope.saveWidgetHandlers($scope.widgetHandlers, widgetHandlersMemento);
+    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
+  };
+
+  $scope.saveRule = function() {
+    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
   };
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
-    if (!angular.equals(newHandlers, oldHandlers)) {
+    if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
       $scope.addStateChange(
         'widget_handlers', angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStatesData();
       $scope.drawGraph();
+      $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };
 

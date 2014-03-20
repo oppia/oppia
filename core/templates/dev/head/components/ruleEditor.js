@@ -29,7 +29,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       addState: '=',
       widgetHandlerSpecs: '=',
       isTmpRule: '@',
-      saveTmpRule: '='
+      saveTmpRule: '=',
+      saveRule: '='
     },
     templateUrl: 'inline/rule_editor',
     controller: [
@@ -137,8 +138,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
 
-          // TODO(sll): Ensure that saves are actually persisted and result
-          // in 'Save Changes' turning green.
+          if ($scope.isTmpRule !== 'true') {
+            $scope.saveRule();
+          }
         });
 
         $scope.$on('externalSave', function() {
