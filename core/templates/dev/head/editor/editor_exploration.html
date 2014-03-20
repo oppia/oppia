@@ -364,7 +364,7 @@
                   </div>
                   <hr>
                   {% include 'editor/editor_viz.html' %}
-                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor">
+                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor" draggable="{containment: 'window', delay: 200, distance: 5, handle: '.oppia-state-editor-header'}">
                     {% include 'editor/state_editor.html' %}
                   </div>
                 </div>

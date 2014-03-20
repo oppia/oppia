@@ -64,3 +64,15 @@ oppia.directive('selectOnClick', [function() {
     }
   };
 }]);
+
+
+// Makes an element draggable.
+oppia.directive('draggable', function() {
+  return {
+    restrict: 'A',
+    link: function(scope, elm, attrs) {
+      var options = scope.$eval(attrs.draggable);
+      elm.draggable(options);
+    }
+  };
+});
