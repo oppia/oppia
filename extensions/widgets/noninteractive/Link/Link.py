@@ -37,6 +37,17 @@ class Link(widget_domain.BaseWidget):
             'value': ''
         },
         'obj_type': 'SanitizedUrl',
+    }, {
+        'name': 'open_link_in_same_window',
+        'description': (
+            'Whether to open the linked page in the same window. '
+            'Warning: this may cause progress in an exploration to be lost.'),
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': False
+        },
+        'obj_type': 'Boolean',
     }]
 
     # The HTML tag name for this non-interactive widget.

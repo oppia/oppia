@@ -58,6 +58,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.Null, mappings, invalid_values)
 
+    def test_boolean_validation(self):
+        """Tests objects of type Boolean."""
+        mappings = [('', False), (False, False), (True, True), (None, False)]
+        invalid_values = [{}, [], ['a'], 'aabcc']
+
+        self.check_normalization(objects.Boolean, mappings, invalid_values)
+
     def test_number_validation(self):
         """Tests objects of type Number."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),

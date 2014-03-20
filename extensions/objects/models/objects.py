@@ -109,6 +109,9 @@ class Boolean(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
+            if raw is None or raw == '':
+                raw = False
+
             assert raw in [True, False]
             return raw
         except Exception:
