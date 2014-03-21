@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for sending messages to a parent iframe. Both inbound
- * and outbound communication with a parent iframe should pass through here.
- * Note inbound messages handlers need to assume the messages can be spams, e.g.
- * should not modify user data etc based solely on the messages from the
- * container page.
+ * @fileoverview Service for sending messages to a parent iframe. All outbound
+ * communication with a parent iframe should pass through here. (This
+ * communication should be outbound only; reverse communication should NOT
+ * be attempted due to cross-domain security issues.)
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -73,16 +72,6 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     },
   };
 
-  // Dispatch messages from the container page.
-  var msgCallbacks = {};
-  $window.addEventListener('message', function(evt) {
-    var data = JSON.parse(evt.data);
-    var cblist = msgCallbacks[data.title];
-    cblist && cblist.forEach(function(cb) {
-      cb.call(undefined, data);
-    });
-  });
-
   var messenger = {
     HEIGHT_CHANGE: 'heightChange',
     EXPLORATION_LOADED: 'explorationLoaded',
@@ -137,17 +126,6 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
       }
-    },
-
-    // Register a callback for the message.
-    on: function(msgTitle, callback) {
-      var cblist = [];
-      if (msgCallbacks[msgTitle]) {
-        cblist = msgCallbacks[msgTitle];
-      } else {
-        msgCallbacks[msgTitle] = cblist;
-      }
-      cblist.push(callback);
     }
   };
 

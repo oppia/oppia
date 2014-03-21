@@ -313,10 +313,8 @@ function ReaderExploration(
    * When it scrolls out (to above the viewport) stickyTitleEl shows up to give
    * the illusion the same element detached itself from the document flow and
    * stayed on the screen.
-   * optOffset is an optional parameter indicating the pixel offset of the
-   * document the contents is in w.r.t. the window. Used in iframed case.
    */
-  $scope.adjustTitleEl = function(optOffset) {
+  $scope.adjustTitleEl = function() {
     if (!titleEl || !stickyTitleEl) {
       var titleEls = document.getElementsByClassName('oppia-log-title');
       var stickyTitleEls = document.getElementsByClassName('oppia-log-sticky-title');
@@ -329,17 +327,13 @@ function ReaderExploration(
     }
 
     var rect = titleEl.getBoundingClientRect();
-    var offset = optOffset || 0;
-    if (rect.top + offset < 0) {
+    if (rect.top < 0) {
       // stickyTitleEl is position:fixed, so it does not get bound by parent's
       // width. Copying the width from titleEl so that they'd look identical.
       // -20 is to adjust for the padding.
       // TODO: Find a way to avoid element manipulation (as this is AngularJS
       // controller and should avoid doing that).
       stickyTitleEl.style.width = (Math.floor(rect.width) - 20) + 'px';
-      if (offset) {
-        stickyTitleEl.style.top = -offset + 'px';
-      }
       $scope.stickyTitleShown = true;
     } else {
       $scope.stickyTitleShown = false;
@@ -348,14 +342,11 @@ function ReaderExploration(
 
   $window.onresize = function() {
     $scope.adjustPageHeight(false, null);
-    $scope.$apply(function() { $scope.adjustTitleEl(); });
+    $scope.$apply($scope.adjustTitleEl);
   };
   $window.onscroll = function() {
-    $scope.$apply(function() { $scope.adjustTitleEl(); });
-  };
-  messengerService.on('scroll', function(data) {
-    $scope.$apply(function() { $scope.adjustTitleEl(data.rect.top); });
-  });
+    $scope.$apply($scope.adjustTitleEl);
+  }
 }
 
 /**
