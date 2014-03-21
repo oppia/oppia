@@ -22,13 +22,6 @@ var END_DEST = 'END';
 
 // TODO(sll): Move all hardcoded strings to the top of the file.
 
-// Receive events from the iframed widget repository.
-oppia.run(['$rootScope', function($rootScope) {
-  window.addEventListener('message', function(evt) {
-    $rootScope.$broadcast('message', evt);
-  });
-}]);
-
 oppia.factory('editorContextService', ['$log', function($log) {
   var activeStateName = null;
 

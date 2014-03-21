@@ -19,12 +19,12 @@
 {% block line1 %}
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
-      <div class="span9" style="padding: 5px;">
+      <div class="span10" style="padding: 5px;">
         <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
         </rule-editor>
       </div>
 
-      <div class="span3">
+      <div class="span2">
         <span class="pull-right">
           <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl">⇑</button>
           <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">⇑</span>
@@ -41,7 +41,7 @@
 
 {% block line2 %}
   <div class="row-fluid" ng-show="widgetId != 'Continue'">
-    <div class="span9">
+    <div class="span10">
       <div ng-if="!tmpRule">
         <table style="width: 100%">
           <tr>
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="span3">
+    <div class="span2">
       <span class="pull-right" style="padding-top: 5px;">
         <span ng-if="tmpRule">
           <button ng-click="cancelTmpRule()" class="oppia-rule-ctrl"> Cancel </button>
@@ -72,11 +72,11 @@
 
 {% block line3 %}
   <div class="row-fluid">
-    <div class="span9" style="padding: 5px;">
+    <div class="span10" style="padding: 5px;">
       <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
       </rule-editor>
     </div>
-    <div class="span3">
+    <div class="span2">
       <span class="pull-right">
         <span class="oppia-grayed oppia-rule-ctrl"> ⇑ </span>
         <span class="oppia-grayed oppia-rule-ctrl"> ⇓ </span>
