@@ -281,6 +281,13 @@
     loadingMessageContainer.appendChild(loadingMessageSpan);
 
     oppiaNodeIdsToLoadingDivIds[tagId] = loadingDivId;
+
+    window.onscroll = function() {
+      iframe.contentWindow.postMessage(JSON.stringify({
+          title: 'scroll',
+          rect: iframe.getBoundingClientRect()
+      }), '*');
+    };
   }
 
   function reloadParentOppiaTag(buttonNode) {
