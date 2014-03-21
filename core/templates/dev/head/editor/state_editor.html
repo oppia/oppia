@@ -4,13 +4,13 @@
   </button>
 
   <div class="oppia-state-name-container">
-    <h5 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-state-name">
+    <h5 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable">
       <[stateName]>
     </h5>
 
     <span ng-if="stateNameEditorIsShown">
       <input type="text" ng-model="$parent.tmpStateName" autofocus>
-      <button ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Save</button>
+      <button ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Close</button>
     </span>
   </div>
 </div>
@@ -34,6 +34,4 @@
     <hr>
     {% include 'editor/state_editor_footer.html' %}
   </div>
-
-  {% include 'editor/state_editor_modals.html' %}
 </div>

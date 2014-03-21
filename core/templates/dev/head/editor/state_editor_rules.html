@@ -20,13 +20,12 @@
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
       <div class="span9" style="padding: 5px;">
-        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId">
+        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
         </rule-editor>
       </div>
 
       <div class="span3">
         <span class="pull-right">
-          <button ng-click="openEditRuleModal(handlerName, $index)" class="oppia-rule-ctrl">Edit</button>
           <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl">⇑</button>
           <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">⇑</span>
 
@@ -43,20 +42,29 @@
 {% block line2 %}
   <div class="row-fluid" ng-show="widgetId != 'Continue'">
     <div class="span9">
-      <table style="width: 100%">
-        <tr>
-          <td style="vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
-            <div class="oppia-align-center">
-              (<em>New rules will be added here.</em>)
-            </div>
-          </td>
-        </tr>
-      </table>
+      <div ng-if="!tmpRule">
+        <table style="width: 100%">
+          <tr>
+            <td style="vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
+              <button class="oppia-align-center" style="width: 100%;" ng-click="createTmpRule()">
+                Add new rule
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div ng-if="tmpRule">
+        <rule-editor rule="tmpRule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule">
+        </rule-editor>
+      </div>
     </div>
 
     <div class="span3">
       <span class="pull-right" style="padding-top: 5px;">
-        <button ng-click="openAddRuleModal(handlerName)" class="oppia-rule-ctrl"> Add new rule </button>
+        <span ng-if="tmpRule">
+          <button ng-click="cancelTmpRule()" class="oppia-rule-ctrl"> Cancel </button>
+        </span>
       </span>
     </div>
   </div>
@@ -65,12 +73,11 @@
 {% block line3 %}
   <div class="row-fluid">
     <div class="span9" style="padding: 5px;">
-      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId">
+      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
       </rule-editor>
     </div>
     <div class="span3">
       <span class="pull-right">
-        <button ng-click="openEditRuleModal(handlerName, handler.length - 1)" class="oppia-rule-ctrl">Edit</button>
         <span class="oppia-grayed oppia-rule-ctrl"> ⇑ </span>
         <span class="oppia-grayed oppia-rule-ctrl"> ⇓ </span>
         <span class="oppia-grayed oppia-rule-ctrl"> &times; </span>

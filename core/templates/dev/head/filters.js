@@ -59,7 +59,7 @@ oppia.filter('bracesToText', function() {
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 oppia.filter('parameterizeRuleDescription', function() {
   return function(input, choices) {
-    if (!input) {
+    if (!input || !(input.description)) {
       return '';
     }
     var description = input.description;

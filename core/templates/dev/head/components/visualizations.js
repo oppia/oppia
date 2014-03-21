@@ -519,6 +519,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           })
           .on('click', function(d) {
             if (d.name !== END_DEST) {
+              scope.$parent.$broadcast('externalSave');
               scope.$parent.stateName = d.name;
               if (!stateStats) {
                 scope.$parent.showStateEditor(d.name);
@@ -651,7 +652,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         if (!forbidNodeDeletion) {
           // Add a 'delete node' handler.
-          // TODO(sll): Do not add this handler at all for the start or END nodes.
           nodeEnter.append('svg:rect')
             .attr({
               'height': 15,
