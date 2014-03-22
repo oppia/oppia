@@ -200,7 +200,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
         subject: 'answer'
       },
       dest: editorContextService.getActiveStateName(),
-      feedback: ['[New rule feedback]'],
+      feedback: [],
       param_changes: []
     };
   };

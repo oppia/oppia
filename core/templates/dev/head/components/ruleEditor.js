@@ -82,6 +82,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.activeEditor = 'ruleDest';
           $scope.ruleDestMemento = angular.copy($scope.rule.dest);
         };
+        $scope.$watch('rule.dest', function(newValue, oldValue) {
+          $scope.closeRuleDestEditor();
+        });
         $scope.closeRuleDestEditor = function() {
           $scope.activeEditor = null;
         };
@@ -145,9 +148,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.$on('externalSave', function() {
           $scope.closeRuleDestEditor();
-          if ($scope.rule.definition.name === null) {
-
-          }
         });
 
         $scope.getActiveStateName = function() {
