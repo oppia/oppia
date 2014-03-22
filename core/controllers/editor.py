@@ -38,8 +38,8 @@ import utils
 
 import jinja2
 
-# The number of exploration history snapshots to show by default.
-DEFAULT_NUM_SNAPSHOTS = 10
+# The maximum number of exploration history snapshots to show by default.
+DEFAULT_NUM_SNAPSHOTS = 30
 
 
 def get_value_generators_js():
@@ -186,7 +186,7 @@ class ExplorationPage(EditorHandler):
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
         })
 
-        self.render_template('editor/editor_exploration.html')
+        self.render_template('editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):

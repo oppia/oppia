@@ -43,7 +43,8 @@ class EditorTest(test_utils.GenericTestBase):
         # Check that it is now possible to access the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Exploration Metadata', response.body)
+        self.assertIn('Stats', response.body)
+        self.assertIn('History', response.body)
         # Test that the value generator JS is included.
         self.assertIn('RandomSelector', response.body)
 

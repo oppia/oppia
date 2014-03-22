@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Editor View
+  Exploration Editor
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -40,7 +40,7 @@
     </div>
   {% endif %}
 
-  <div ng-controller="EditorExploration" ng-cloak>
+  <div ng-controller="ExplorationEditor" ng-cloak>
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
         <h3>Publish Exploration</h3>
@@ -348,23 +348,25 @@
             </div>
 
             <tabset>
-              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
+              <tab heading="Main" active="mainTabActive" select="selectMainTab()">
                 <div class="oppia-state-editor-container">
-                  {% include 'editor/editor_metadata.html' %}
-                  <div ng-if="!isCloned">
-                    <hr>
-                    {% include 'editor/editor_version_history.html' %}
-                  </div>
-                  <hr>
-                  {% include 'editor/editor_viz.html' %}
+                  {% include 'editor/exploration_graph.html' %}
                   <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor" draggable="{containment: 'window', delay: 200, distance: 5, handle: '.oppia-state-editor-header'}">
                     {% include 'editor/state_editor.html' %}
                   </div>
                 </div>
               </tab>
 
-              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
+              <tab heading="Stats" active="statsTabActive" select="selectStatsTab()">
                 {% include 'editor/stats_viewer.html' %}
+              </tab>
+
+              <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
+                {% include 'editor/exploration_settings.html' %}
+              </tab>
+
+              <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="isCloned">
+                {% include 'editor/exploration_history.html' %}
               </tab>
             </tabset>
           </div>
@@ -388,7 +390,7 @@
   <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
   <script>
     {{ include_js_file('services/explorationData.js') }}
-    {{ include_js_file('editor/EditorExploration.js') }}
+    {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}

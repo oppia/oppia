@@ -1,0 +1,95 @@
+<div class="row-fluid">
+  <div class="span6">
+    <div>
+      <strong>Title</strong>: <input type="text" ng-model="explorationTitle" ng-blur="saveExplorationTitle(explorationTitle)">
+      <br>
+      <strong>Category</strong>: <input type="text" ng-model="explorationCategory" ng-blur="saveExplorationCategory(explorationCategory)">
+    </div>
+  </div>
+
+  <div class="span6">
+    <div ng-show="ownerNames.length > 0 && !isCloned">
+      <strong>Managers</strong>
+      <ul>
+        <li ng-repeat="ownerName in ownerNames track by $index">
+          <[ownerName]>
+        </li>
+      </ul>
+    </div>
+
+    <div ng-show="editorNames.length > 0 && !isCloned">
+      <strong>Collaborators</strong>
+      <ul>
+        <li ng-repeat="editorName in editorNames track by $index">
+          <[editorName]>
+        </li>
+      </ul>
+    </div>
+
+    <div ng-show="viewerNames.length > 0 && !isCloned">
+      <strong>Playtesters</strong>
+      <ul>
+        <li ng-repeat="viewerName in viewerNames track by $index">
+          <[viewerName]>
+        </li>
+      </ul>
+    </div>
+
+    {% if can_modify_roles %}
+      <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
+        <button type="button" ng-click="openEditRolesForm()">
+          Edit Roles
+        </button>
+      </div>
+
+      <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+        <strong>Add or Change Role</strong>
+        <br><br>
+        <form ng-submit="editRole(newMemberEmail, newMemberRole.value)">
+          Email: <input type="text" ng-model="newMemberEmail"
+                 placeholder="Email address">
+          <br>
+          Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
+          </select>
+          <br>
+          <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
+          <br>
+          <input type="submit" value="Save">
+          <button type="button" ng-click="closeEditRolesForm()"
+            ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+            Cancel
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<hr>
+
+<div>
+  <h5>Parameters used in this exploration</h5>
+  <div ng-show="isEmpty(paramSpecs)">
+    <em>No parameters used.</em>
+  </div>
+  <ol ng-show="!isEmpty(paramSpecs)">
+    <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
+      <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+    </li>
+  </ol>
+
+  <br>
+
+  <h5>
+    Parameters initialized at start of exploration
+    <img class="oppia-help" src="/images/help.png"
+         tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
+         tooltip-placement="right">
+  </h5>
+
+  <param-change-editor param-changes="explorationParamChanges"
+                       param-specs="paramSpecs"
+                       save-param-changes="saveExplorationParamChanges"
+                       add-exploration-param-spec="addExplorationParamSpec">
+  </param-change-editor>
+</div>
