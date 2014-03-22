@@ -132,6 +132,8 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
 
     var newWidget = $scope.cloneObject(tmpWidget);
 
+    $scope.tmpRule = null;
+
     if (!angular.equals(newWidget.widget_id, $scope.widgetIdMemento)) {
       $scope.widgetId = angular.copy(newWidget.widget_id);
       $scope.addStateChange('widget_id', $scope.widgetId, $scope.widgetIdMemento);
