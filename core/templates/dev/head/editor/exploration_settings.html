@@ -67,29 +67,31 @@
 
 <hr>
 
-<div>
-  <h5>Parameters used in this exploration</h5>
-  <div ng-show="isEmpty(paramSpecs)">
-    <em>No parameters used.</em>
+<div class="row-fluid">
+  <div class="span6">
+    <h5>Parameters used in this exploration</h5>
+    <div ng-show="isEmpty(paramSpecs)">
+      <em>No parameters used.</em>
+    </div>
+    <ol ng-show="!isEmpty(paramSpecs)">
+      <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
+        <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+      </li>
+    </ol>
   </div>
-  <ol ng-show="!isEmpty(paramSpecs)">
-    <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
-      <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
-    </li>
-  </ol>
 
-  <br>
+  <div class="span6">
+    <h5>
+      Parameters initialized at start of exploration
+      <img class="oppia-help" src="/images/help.png"
+           tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
+           tooltip-placement="right">
+    </h5>
 
-  <h5>
-    Parameters initialized at start of exploration
-    <img class="oppia-help" src="/images/help.png"
-         tooltip="This allows you to initialize the values of a reader's parameters before the reader begins the exploration."
-         tooltip-placement="right">
-  </h5>
-
-  <param-change-editor param-changes="explorationParamChanges"
-                       param-specs="paramSpecs"
-                       save-param-changes="saveExplorationParamChanges"
-                       add-exploration-param-spec="addExplorationParamSpec">
-  </param-change-editor>
+    <param-change-editor param-changes="explorationParamChanges"
+                         param-specs="paramSpecs"
+                         save-param-changes="saveExplorationParamChanges"
+                         add-exploration-param-spec="addExplorationParamSpec">
+    </param-change-editor>
+  </div>
 </div>

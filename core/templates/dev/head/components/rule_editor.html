@@ -58,7 +58,7 @@
     </td>
   </tr>
 
-  <tr>
+  <tr ng-if="rule.description">
     <td class="oppia-feedback-bubble">
       <div ng-if="activeEditor !== 'ruleFeedback'">
         <span ng-if="rule.feedback.length === 0">
