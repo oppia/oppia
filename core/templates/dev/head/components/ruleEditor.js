@@ -83,7 +83,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDestMemento = angular.copy($scope.rule.dest);
         };
         $scope.$watch('rule.dest', function(newValue, oldValue) {
-          $scope.closeRuleDestEditor();
+          // Note that rule.dest can change if a new rule is added. In this
+          // case, the destination editor will not yet have been opened.
+          if ($scope.activeEditor === 'ruleDest') {
+            $scope.closeRuleDestEditor();
+          }
         });
         $scope.closeRuleDestEditor = function() {
           $scope.activeEditor = null;

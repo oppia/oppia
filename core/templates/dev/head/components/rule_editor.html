@@ -58,7 +58,7 @@
     </td>
   </tr>
 
-  <tr ng-if="rule.description">
+  <tr ng-class="{'oppia-lightly-grayed': isTmpRule === 'true'}">
     <td class="oppia-feedback-bubble">
       <div ng-if="activeEditor !== 'ruleFeedback'">
         <span ng-if="rule.feedback.length === 0">
@@ -67,7 +67,9 @@
         <span ng-repeat="fb in rule.feedback">
           • <span angular-html-bind="fb"></span><br>
         </span>
-        <button ng-click="openRuleFeedbackEditor()">Edit</button>
+        <button ng-click="openRuleFeedbackEditor()" ng-disabled="isTmpRule === 'true'">
+          Edit
+        </button>
       </div>
 
       <div ng-if="activeEditor === 'ruleFeedback'">
@@ -90,7 +92,7 @@
         <span ng-if="rule.dest != 'END' && rule.dest != getActiveStateName()">
           <a href="/create/<[explorationId]>#/gui/<[rule.dest]>"><[rule.dest]></a>
         </span>
-        <button ng-click="openRuleDestEditor()">
+        <button ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
           ✎
         </button>
       </div>
