@@ -1,6 +1,13 @@
 <div class="container-fluid">
   <span ng-show="localValue.length == 0">
-    <em><[messageIfEmpty]></em>
+    <em>
+      <span ng-if="messageIfEmpty">
+        <[messageIfEmpty]>
+      </span>
+      <span ng-if="!messageIfEmpty">
+        (This list is currently empty.)
+      </span>
+    </em>
   </span>
 
   <div class="row-fluid" ng-repeat="item in localValue track by $index">
