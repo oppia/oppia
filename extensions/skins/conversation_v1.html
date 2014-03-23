@@ -67,24 +67,25 @@
 
     <div class="oppia-iframe-container oppia-exploration">
       <div ng-repeat="response in responseLog track by $index"
-          ng-class="{'oppia-last-log-entry': $last}"
-          aria-live="<[$last ? 'polite' : 'off']>"
-          aria-atomic="true">
+           ng-class="{'oppia-last-log-entry': $last}"
+           aria-live="<[$last ? 'polite' : 'off']>"
+           aria-atomic="true">
 
         <div class="oppia-conversation-log"
-             angular-html-bind="response.previousReaderAnswer"></div>
+             angular-html-bind="response.previousReaderAnswer">
+        </div>
         <div class="oppia-conversation-log"
-             angular-html-bind="response.feedback"></div>
+             angular-html-bind="response.feedback">
+        </div>
+
         <div ng-if="response.question">
           <div ng-if="!response.isMostRecentQuestion"
                class="oppia-conversation-log"
-               angular-html-bind="response.question"></div>
+               angular-html-bind="response.question">
+          </div>
           <div ng-if="response.isMostRecentQuestion"
-               ng-class="{'oppia-sticky-title-shown': stickyTitleShown}">
-            <div class="oppia-response oppia-log-sticky-title"
-                 angular-html-bind="response.question"></div>
-            <div class="oppia-response oppia-log-title"
-                 angular-html-bind="response.question"></div>
+               class="oppia-response oppia-log-title"
+               angular-html-bind="response.question">
           </div>
         </div>
       </div>

@@ -213,7 +213,6 @@ function ReaderExploration(
     });
   };
 
-  var stickyTitleEl, titleEl;
   $scope.refreshPage = function(data) {
     warningsData.clear();
     $scope.answerIsBeingProcessed = false;
@@ -247,8 +246,8 @@ function ReaderExploration(
 
     $scope.responseLog = $scope.responseLog || [];
 
-    // TODO: Check the state change instead of question_html so that it works
-    // correctly when the new state doesn't have a question string.
+    // TODO(sll): Check the state chagne instead of question_html so that it
+    // works correctly when the new state doesn't have a question string.
     var isQuestion = !!data.question_html;
     if (isQuestion) {
       // Clean up the previous isMostRecentQuestion marker.
@@ -257,12 +256,12 @@ function ReaderExploration(
       });
     }
 
-    // The randomSuffix is also needed for previousReaderAnswer and for
-    // feedbackAndQuestion, so that the aria-live attribute will read it out.
+    // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
+    // and 'question', so that the aria-live attribute will read it out.
     $scope.responseLog.push({
       previousReaderAnswer: data.reader_response_html + randomSuffix,
       feedback: data.feedback_html + randomSuffix,
-      question: data.question_html + randomSuffix,
+      question: data.question_html + (isQuestion ? randomSuffix : ''),
       isMostRecentQuestion: isQuestion
     });
 
@@ -278,7 +277,6 @@ function ReaderExploration(
       messengerService.sendMessage(
         messengerService.EXPLORATION_COMPLETED, null);
     }
-    titleEl = stickyTitleEl = null;
   };
 
   // If the exploration is iframed, send data to its parent about its height so
@@ -306,47 +304,9 @@ function ReaderExploration(
     }, 500);
   };
 
-  /**
-   * Shows or hides the sticky state title (question) element.
-   * The element for the most recent state title is duplicated (stickyTitleEl
-   * and titleEl). titleEl is in the document flow and scrolls with the page.
-   * When it scrolls out (to above the viewport) stickyTitleEl shows up to give
-   * the illusion the same element detached itself from the document flow and
-   * stayed on the screen.
-   */
-  $scope.adjustTitleEl = function() {
-    if (!titleEl || !stickyTitleEl) {
-      var titleEls = document.getElementsByClassName('oppia-log-title');
-      var stickyTitleEls = document.getElementsByClassName('oppia-log-sticky-title');
-      if (titleEls.length == 0 || stickyTitleEls.length == 0) {
-        // Give up for this round.
-        return;
-      }
-      titleEl = titleEls[0];
-      stickyTitleEl = stickyTitleEls[0];
-    }
-
-    var rect = titleEl.getBoundingClientRect();
-    if (rect.top < 0) {
-      // stickyTitleEl is position:fixed, so it does not get bound by parent's
-      // width. Copying the width from titleEl so that they'd look identical.
-      // -20 is to adjust for the padding.
-      // TODO: Find a way to avoid element manipulation (as this is AngularJS
-      // controller and should avoid doing that).
-      stickyTitleEl.style.width = (Math.floor(rect.width) - 20) + 'px';
-      $scope.stickyTitleShown = true;
-    } else {
-      $scope.stickyTitleShown = false;
-    }
-  };
-
   $window.onresize = function() {
     $scope.adjustPageHeight(false, null);
-    $scope.$apply($scope.adjustTitleEl);
   };
-  $window.onscroll = function() {
-    $scope.$apply($scope.adjustTitleEl);
-  }
 }
 
 /**
