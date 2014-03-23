@@ -235,6 +235,7 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   };
 
   $scope.deleteRule = function(handlerName, index) {
+    confirm('Are you sure you want to delete this rule?');
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
     $scope.widgetHandlers[handlerName].splice(index, 1);
     $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);

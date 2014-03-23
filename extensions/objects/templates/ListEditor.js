@@ -33,6 +33,8 @@ oppia.directive('listEditor', function($compile, warningsData) {
       $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
         if (newValue) {
           $scope.initArgs = newValue;
+          $scope.messageIfEmpty = (
+            newValue.messageIfEmpty || 'This list is currently empty.');
         }
       }, true);
 

@@ -639,18 +639,19 @@ textarea {
 }
 
 .oppia-state-content {
-  border-left: 1px dashed #bbb;
-  border-right: 1px dashed #bbb;
-  border-top: 1px dashed #bbb;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px dashed #ddd;
   min-height: 20px;
-  padding: 5px;
+  padding: 5px 10px 15px 10px;
 }
 
 .oppia-interactive-widget-display {
-  border-bottom: 1px dashed #bbb;
-  border-left: 1px dashed #bbb;
-  border-right: 1px dashed #bbb;
+  border-bottom: 1px dashed #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
   margin: 0 0 2px 0;
+  padding: 15px 10px 5px 10px;
 }
 
 .oppia-preview {

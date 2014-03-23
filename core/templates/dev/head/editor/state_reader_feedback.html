@@ -19,11 +19,14 @@
               </span>
             </li>
 
-            <div class="span2">
+            <div class="span1">
               <div class="pull-right" ng-if="!feedbackItem.deleted">
                 <button ng-click="resolveReaderFeedback(feedbackId, 'fixed')" title="Mark this feedback as fixed">Fixed</button>
                 <button ng-click="resolveReaderFeedback(feedbackId, 'will_not_fix')" title"Mark this feedback as ignored">Ignore</button>
               </div>
+            </div>
+
+            <div class="span1">
             </div>
           </div>
         </div>

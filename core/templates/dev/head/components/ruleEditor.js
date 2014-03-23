@@ -30,7 +30,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       widgetHandlerSpecs: '=',
       isTmpRule: '@',
       saveTmpRule: '=',
-      saveRule: '='
+      saveRule: '=',
+      deleteRule: '&'
     },
     templateUrl: 'inline/rule_editor',
     controller: [
@@ -58,6 +59,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         });
 
+        $scope.isDefaultRule = function() {
+          return ($scope.rule.description === 'Default');
+        };
+
         $scope.allDests = [];
         $scope.$watch('states', function(newValue) {
           // Returns a list of all states, as well as 'END'.
@@ -73,8 +78,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.activeEditor = null;
 
         $scope.FEEDBACK_LIST_INIT_ARGS = {
-          'objType': 'Html',
-          'addItemText': 'Add feedback message'
+          addItemText: 'Add feedback message',
+          disableControls: Boolean($scope.isTmpRule === 'true'),
+          objType: 'Html',
+          messageIfEmpty: 'This rule provides no feedback.'
         };
 
         $scope.ruleDestMemento = null;
@@ -93,17 +100,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.activeEditor = null;
         };
 
-        $scope.openRuleFeedbackEditor = function() {
-          $scope.activeEditor = 'ruleFeedback';
-        };
-        $scope.closeRuleFeedbackEditor = function() {
-          $scope.activeEditor = null;
-        };
-
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
         $scope.openRuleDescriptionEditorIfNotDefault = function() {
-          if ($scope.rule.description === 'Default') {
+          if ($scope.isDefaultRule()) {
             return;
           }
 
@@ -149,6 +149,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.saveRule();
           }
         });
+        $scope.$watch('rule.feedback', function(newValue, oldValue) {
+          if ($scope.isTmpRule !== 'true') {
+            $scope.saveRule();
+          }
+        }, true);
 
         $scope.$on('externalSave', function() {
           $scope.closeRuleDestEditor();
@@ -158,19 +163,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return editorContextService.getActiveStateName();
         };
 
-        $scope.getCssClassForRule = function(rule) {
-          return ($scope.isRuleConfusing(rule) ? 'oppia-rule-bubble-warning'
+        $scope.getCssClassForRule = function() {
+          return ($scope.isRuleConfusing() ? 'oppia-rule-bubble-warning'
                                                : 'oppia-rule-bubble');
         };
 
-        $scope.getEditableCssClassForRule = function(rule) {
-          return (rule.description == 'Default') ? '' : ' oppia-editable';
+        $scope.getEditableCssClassForRule = function() {
+          return $scope.isDefaultRule() ? '' : ' oppia-editable';
         };
 
-        $scope.isRuleConfusing = function(rule) {
+        $scope.isRuleConfusing = function() {
           return (
-            rule.feedback.length === 0 &&
-            rule.dest === editorContextService.getActiveStateName());
+            $scope.rule.feedback.length === 0 &&
+            $scope.rule.dest === editorContextService.getActiveStateName());
         };
 
         $scope.ruleDescriptionPickerIsOpen = false;

@@ -1,9 +1,13 @@
 <table style="vertical-align: top; width: 100%">
   <tr>
     <td colspan="2">
-      <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule(rule)" style="font-weight: bold; text-align: center;" ng-click="openRuleDescriptionEditorIfNotDefault()">
-        <div ng-class="getEditableCssClassForRule(rule)">
-          <span ng-if="isRuleConfusing(rule)">
+      <button ng-if="!isDefaultRule()" ng-click="deleteRule()" class="pull-right">
+        &times;
+      </button>
+
+      <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" style="font-weight: bold; text-align: center;" ng-click="openRuleDescriptionEditorIfNotDefault()">
+        <div ng-class="getEditableCssClassForRule()" style="margin-right: 30px;">
+          <span ng-if="isRuleConfusing()">
             <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
           </span>
           <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
@@ -11,7 +15,7 @@
       </div>
 
       <div ng-if="activeEditor === 'ruleDescription'">
-        <div ng-if="!ruleDescriptionPickerIsOpen" ng-class="getCssClassForRule(rule)">
+        <div ng-if="!ruleDescriptionPickerIsOpen" ng-class="getCssClassForRule()">
           <div>
             <button ng-click="openRuleDescriptionPicker()" title="Return to rule selector">
               &lt; &lt;
@@ -34,7 +38,7 @@
                 <[item.text]>
               </span>
             </span>
-            <button class="pull-right" ng-click="closeRuleDescriptionEditor()">Close</button>
+            <button class="pull-right" ng-click="closeRuleDescriptionEditor()">Save</button>
           </div>
         </div>
 
@@ -60,25 +64,12 @@
 
   <tr ng-class="{'oppia-lightly-grayed': isTmpRule === 'true'}">
     <td class="oppia-feedback-bubble">
-      <div ng-if="activeEditor !== 'ruleFeedback'">
-        <span ng-if="rule.feedback.length === 0">
-          <em>This rule provides no feedback.</em>
-        </span>
-        <span ng-repeat="fb in rule.feedback">
-          • <span angular-html-bind="fb"></span><br>
-        </span>
-        <button ng-click="openRuleFeedbackEditor()" ng-disabled="isTmpRule === 'true'">
-          Edit
-        </button>
-      </div>
+      <span ng-if="rule.feedback.length > 0">
+        Feedback options (one is chosen at random):
+      </span>
 
-      <div ng-if="activeEditor === 'ruleFeedback'">
-        <p>Feedback for the reader (chosen at random from the following):</p>
-        <object-editor obj-type="List" init-args="FEEDBACK_LIST_INIT_ARGS" value="rule.feedback">
-        </object-editor>
-        <hr>
-        <button ng-click="closeRuleFeedbackEditor()">Close feedback editor</button>
-      </div>
+      <object-editor obj-type="List" init-args="FEEDBACK_LIST_INIT_ARGS" value="rule.feedback" message-if-empty="This rule provides no feedback.">
+      </object-editor>
     </td>
 
     <td class="oppia-dest-bubble">

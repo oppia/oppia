@@ -18,9 +18,10 @@
 <div class="oppia-state-editor-body">
   <div class="container-fluid oppia-editor" ng-show="stateName">
     {% include 'editor/state_editor_param.html' %}<br>
-    {% include 'editor/state_editor_content.html' %}<br>
+    {% include 'editor/state_editor_content.html' %}
     <div ng-controller="InteractiveWidgetEditor">
       {% include 'editor/state_editor_interaction.html' %}<br>
+      {% include 'editor/state_editor_widget_sticky.html' %}<br>
       {% include 'editor/state_editor_rules.html' %}
     </div>
     <br>
