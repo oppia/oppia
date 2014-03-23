@@ -1,12 +1,11 @@
 <table style="vertical-align: top; width: 100%">
   <tr>
     <td colspan="2">
-      <button ng-if="!isDefaultRule()" ng-click="deleteRule()" class="pull-right">
-        &times;
-      </button>
-
-      <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" style="font-weight: bold; text-align: center;" ng-click="openRuleDescriptionEditorIfNotDefault()">
-        <div ng-class="getEditableCssClassForRule()" style="margin-right: 30px;">
+      <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" style="font-weight: bold; text-align: center;">
+        <button ng-if="!isDefaultRule()" ng-click="deleteRule()" class="pull-right">
+          &times;
+        </button>
+        <div ng-class="getEditableCssClassForRule()" style="margin-right: 30px;" ng-click="openRuleDescriptionEditorIfNotDefault()">
           <span ng-if="isRuleConfusing()">
             <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
           </span>
@@ -38,7 +37,10 @@
                 <[item.text]>
               </span>
             </span>
-            <button class="pull-right" ng-click="closeRuleDescriptionEditor()">Save</button>
+            <div>
+              <button class="pull-right" ng-click="closeRuleDescriptionEditor()">Close</button>
+            </div>
+            <div style="clear: both;"></div>
           </div>
         </div>
 

@@ -156,6 +156,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         }, true);
 
         $scope.$on('externalSave', function() {
+          $scope.closeRuleDescriptionEditor();
           $scope.closeRuleDestEditor();
         });
 
