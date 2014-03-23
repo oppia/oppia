@@ -113,6 +113,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.computeRuleDescriptionFragments();
         };
         $scope.closeRuleDescriptionEditor = function() {
+          $scope.closeRuleDescriptionPicker();
           $scope.activeEditor = null;
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
@@ -183,6 +184,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.openRuleDescriptionPicker = function() {
           $scope.ruleDescriptionPickerIsOpen = true;
         };
+        $scope.closeRuleDescriptionPicker = function() {
+          $scope.ruleDescriptionPickerIsOpen = false;
+        };
 
         $scope.selectNewRuleType = function(description, name) {
           $scope.rule.description = description;
@@ -213,7 +217,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             copyOfRule = copyOfRule.replace(pattern, ' ');
           }
 
-          $scope.ruleDescriptionPickerIsOpen = false;
+          $scope.closeRuleDescriptionPicker();
         };
 
 
