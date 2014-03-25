@@ -3,6 +3,48 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.2 (24 Mar 2014)
+--------------------
+Editor interface improvements:
+* Create separate tabs for exploration settings and version history.
+* Move help links to a tab in the navbar.
+* Allow older versions of explorations to be downloaded.
+* Fix a bug where the versions of files included with explorations were wrongly calculated, resulting in an error when the exploration was downloaded (issue 145).
+* Fix a couple of cases where the server connection error messages did not appear in the UI.
+* Improve the state editor: make it draggable, make the state name and rules editable inline, widen the working space, add a feedback link at the bottom, and fix a bug where parameter values in the interactive widget selector were stale (issue 137).
+
+Gallery interface improvements:
+* Move the "Create Exploration" button to the top of the gallery.
+* Allow announcements to be placed in the contributors' gallery.
+* Hide beta explorations in both galleries by default.
+
+Reader view improvements:
+* Remove the green feedback button for narrow viewports.
+
+Noninteractive widgets
+* Link widget: add an option to open links in the same window, rather than a new one.
+* Hint widget: require tab names to be specified (issue 92).
+* Image widget: allow images with .jpg extensions to be uploaded (issue 116).
+
+Interactive widgets
+* Multiple choice input: fix the vertical misalignment between radio buttons and their labels.
+* Code REPL: fix an issue where the 'code' key was sometimes missing from the data passed to the server, thus resulting in a server error.
+
+Backend changes:
+* Extend the CSRF token lifetime.
+* Normalize reader answers to the correct object type, before they are classified.
+
+Documentation:
+* Add a README file to the main repository with installation instructions.
+
+Dependencies:
+* Fix an npm breakage, as described in http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+
+Admin and moderator functionality:
+* Moderators can unpublish or delete explorations, and move them in or out of beta.
+* Admins can ban individual users.
+
+
 v1.2.1 (25 Feb 2014)
 --------------------
 Major deprecations:
