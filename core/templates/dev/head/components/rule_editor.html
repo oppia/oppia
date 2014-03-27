@@ -83,7 +83,9 @@
           <[rule.dest]>
         </span>
         <span ng-if="rule.dest != 'END' && rule.dest != getActiveStateName()">
-          <a href="/create/<[explorationId]>#/gui/<[rule.dest]>"><[rule.dest]></a>
+          <a href="/create/<[explorationId]>#/gui/<[getEscapedDest()]>">
+            <[rule.dest]>
+          </a>
         </span>
         <button ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
           ✎

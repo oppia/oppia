@@ -260,6 +260,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDescriptionFragments = result;
         };
 
+        $scope.getEscapedDest = function() {
+          return encodeURIComponent($scope.rule.dest);
+        };
+
         $scope.getExtendedChoiceArray = function(choices) {
           var result = [];
           for (var i = 0; i < choices.length; i++) {
