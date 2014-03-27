@@ -804,8 +804,9 @@ class Exploration(object):
                     if (rule.dest == state_name and not rule.feedback
                             and not state.widget.sticky):
                         raise utils.ValidationError(
-                            'State "%s" has a self-loop with no feedback. '
-                            'This is likely to frustrate the reader.' %
+                            'Please add feedback for any rules in state "%s" '
+                            'which loop back to that state, otherwise '
+                            'the reader is likely to get frustrated.' %
                             state_name)
 
     def _verify_all_states_reachable(self):
