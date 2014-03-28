@@ -7,7 +7,7 @@
         </button>
         <div ng-class="getEditableCssClassForRule()" style="margin-right: 30px;" ng-click="openRuleDescriptionEditorIfNotDefault()">
           <span ng-if="isRuleConfusing()">
-            <i class="icon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it will probably confuse readers."></i>
+            <i class="icon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></i>
           </span>
           <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
         </div>
