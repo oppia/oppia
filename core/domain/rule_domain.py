@@ -70,6 +70,14 @@ def get_rules_for_obj_type(obj_type):
     return results
 
 
+def is_generic(obj_type, rule_name):
+    """Checks whether this rule is labelled generic"""
+    rule_list = get_rules_for_obj_type(obj_type)
+    for rule_type in rule_list:
+        if rule_type.__name__ == rule_name:
+            return rule_type.is_generic
+
+
 def get_param_list(description):
     """Get a parameter list from the rule description."""
     param_list = []

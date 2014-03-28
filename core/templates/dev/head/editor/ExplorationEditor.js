@@ -643,12 +643,12 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.refreshExplorationStatistics = function() {
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
       var data = response.data;
-
       $scope.stats = {
         'numVisits': data.num_visits,
         'numCompletions': data.num_completions,
         'stateStats': data.state_stats,
-        'imp': data.imp
+        'imp': data.imp,
+        'expInfo': data.exp_info
       };
 
       $scope.chartData = [

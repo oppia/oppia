@@ -43,14 +43,18 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
           },
           rulesStats: function() {
             return rulesStats;
+          },
+          flagReasons: function() {
+            return $scope.stats.expInfo.stateInfos[stateName];
           }
         },
-        controller: ['$scope', '$modalInstance', 'stateName', 'stateStats', 'improvementType', 'rulesStats',
-          function($scope, $modalInstance, stateName, stateStats, improvementType, rulesStats) {
+        controller: ['$scope', '$modalInstance', 'stateName', 'stateStats', 'improvementType', 'rulesStats', 'flagReasons',
+          function($scope, $modalInstance, stateName, stateStats, improvementType, rulesStats, flagReasons) {
             $scope.stateName = stateName;
             $scope.stateStats = stateStats;
             $scope.improvementType = improvementType;
             $scope.rulesStats = rulesStats;
+            $scope.flagReasons = flagReasons;
 
             $scope.getNumTimesString = function(numberOfTimes) {
               var suffix = (numberOfTimes == 1 ? ' time' : ' times');

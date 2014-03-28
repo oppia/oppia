@@ -7,7 +7,7 @@
     <br>
 
     <h4>Common student paths </h4>
-    <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats"></state-graph-viz>
+    <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats" exp-stats="stats.expInfo"></state-graph-viz>
   </div>
 
   <div ng-if="stats.numVisits == 0">
@@ -34,6 +34,16 @@
         <i class="icon-warning-sign"></i>
         <em>
           This state may need more feedback. Students often return to it after giving an answer.
+        </em>
+      </div>
+
+      <div ng-if="flagReasons['flag_type'] == 'missing'"> 
+        <i class="icon-warning-sign"></i>
+        <em>
+          <[flagReasons.score]> students have answered '<[flagReasons.data]>' for this question.
+            <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
+              Add a rule for this answer
+            </a>
         </em>
       </div>
 

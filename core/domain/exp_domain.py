@@ -27,6 +27,7 @@ import logging
 import re
 import string
 
+
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import param_domain
@@ -150,7 +151,7 @@ class RuleSpec(object):
         }
 
     @classmethod
-    def from_dict(cls, rulespec_dict):
+    def from_dict_and_obj_type(cls, rulespec_dict, obj_type):
         return cls(
             rulespec_dict['definition'],
             rulespec_dict['dest'],
@@ -159,9 +160,10 @@ class RuleSpec(object):
                 param_change['name'], param_change['generator_id'],
                 param_change['customization_args'])
              for param_change in rulespec_dict['param_changes']],
+            obj_type,
         )
 
-    def __init__(self, definition, dest, feedback, param_changes):
+    def __init__(self, definition, dest, feedback, param_changes, obj_type):
         # A dict specifying the rule definition. E.g.
         #
         #   {'rule_type': 'default'}
@@ -184,11 +186,19 @@ class RuleSpec(object):
         # Exploration-level parameter changes to make if this rule is
         # triggered.
         self.param_changes = param_changes or []
+        self.obj_type = obj_type
 
     @property
     def is_default(self):
         """Returns True if this spec corresponds to the default rule."""
         return self.definition['rule_type'] == 'default'
+
+    @property
+    def is_generic(self):
+        """Returns whether this rule is generic."""
+        if self.is_default:
+            return True
+        return rule_domain.is_generic(self.obj_type, self.definition['name'])
 
     def get_feedback_string(self):
         """Returns a (possibly empty) string with feedback for this rule."""
@@ -205,8 +215,8 @@ class RuleSpec(object):
             return '%s(%s)' % (self.definition['name'], ','.join(param_list))
 
     @classmethod
-    def get_default_rule_spec(cls, state_name):
-        return RuleSpec({'rule_type': 'default'}, state_name, [], [])
+    def get_default_rule_spec(cls, state_name, obj_type):
+        return RuleSpec({'rule_type': 'default'}, state_name, [], [], obj_type)
 
     def validate(self):
         if not isinstance(self.definition, dict):
@@ -280,8 +290,7 @@ class RuleSpec(object):
                 cls.validate_rule_definition(child_rule, exp_param_specs)
 
 
-DEFAULT_RULESPEC = RuleSpec.get_default_rule_spec(feconf.END_DEST)
-DEFAULT_RULESPEC_STR = str(DEFAULT_RULESPEC)
+DEFAULT_RULESPEC_STR = 'Default'
 
 
 class AnswerHandlerInstance(object):
@@ -295,10 +304,10 @@ class AnswerHandlerInstance(object):
         }
 
     @classmethod
-    def from_dict(cls, handler_dict):
+    def from_dict_and_obj_type(cls, handler_dict, obj_type):
         return cls(
             handler_dict['name'],
-            [RuleSpec.from_dict(rs) for rs in handler_dict['rule_specs']],
+            [RuleSpec.from_dict_and_obj_type(rs, obj_type) for rs in handler_dict['rule_specs']],
         )
 
     def __init__(self, name, rule_specs=None):
@@ -308,7 +317,7 @@ class AnswerHandlerInstance(object):
         self.name = name
         self.rule_specs = [RuleSpec(
             rule_spec.definition, rule_spec.dest, rule_spec.feedback,
-            rule_spec.param_changes
+            rule_spec.param_changes, rule_spec.obj_type
         ) for rule_spec in rule_specs]
 
     @property
@@ -318,8 +327,8 @@ class AnswerHandlerInstance(object):
         return self.rule_specs[-1]
 
     @classmethod
-    def get_default_handler(cls, state_name):
-        return cls('submit', [RuleSpec.get_default_rule_spec(state_name)])
+    def get_default_handler(cls, state_name, obj_type):
+        return cls('submit', [RuleSpec.get_default_rule_spec(state_name, obj_type)])
 
     def validate(self):
         if self.name != 'submit':
@@ -350,11 +359,16 @@ class WidgetInstance(object):
         }
 
     @classmethod
+    def _get_obj_type(cls, widget_class_name):
+	return widget_registry.Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_class_name)._handlers[0]['obj_type']
+
+    @classmethod
     def from_dict(cls, widget_dict):
-        return cls(
+        obj_type = cls._get_obj_type(widget_dict['widget_id'])
+        return cls(    
             widget_dict['widget_id'],
             widget_dict['customization_args'],
-            [AnswerHandlerInstance.from_dict(h)
+            [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
              for h in widget_dict['handlers']],
             widget_dict['sticky'],
         )
@@ -426,11 +440,12 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, default_dest_state_name):
+        default_obj_type = WidgetInstance._get_obj_type(feconf.DEFAULT_WIDGET_ID)
         return cls(
             feconf.DEFAULT_WIDGET_ID,
             {},
             [AnswerHandlerInstance.get_default_handler(
-                default_dest_state_name)]
+                default_dest_state_name, default_obj_type)]
         )
 
 
@@ -513,7 +528,8 @@ class State(object):
                                      for feedback in rule_dict['feedback']]
             if 'param_changes' not in rule_dict:
                 rule_dict['param_changes'] = []
-            rule_spec = RuleSpec.from_dict(rule_dict)
+            obj_type = WidgetInstance._get_obj_type(self.widget.widget_id)
+            rule_spec = RuleSpec.from_dict_and_obj_type(rule_dict, obj_type)
             rule_type = rule_spec.definition['rule_type']
 
             if rule_ind == len(ruleset) - 1:
@@ -1137,7 +1153,7 @@ class Exploration(object):
                                     % pc.name)
 
             wdict = sdict['widget']
-            widget_handlers = [AnswerHandlerInstance.from_dict({
+            widget_handlers = [AnswerHandlerInstance.from_dict_and_obj_type({
                 'name': handler['name'],
                 'rule_specs': [{
                     'definition': rule_spec['definition'],
@@ -1146,7 +1162,7 @@ class Exploration(object):
                                  for feedback in rule_spec['feedback']],
                     'param_changes': rule_spec.get('param_changes', []),
                 } for rule_spec in handler['rule_specs']],
-            }) for handler in wdict['handlers']]
+            }, WidgetInstance._get_obj_type(wdict['widget_id'])) for handler in wdict['handlers']]
 
             state.widget = WidgetInstance(
                 wdict['widget_id'], wdict['customization_args'],

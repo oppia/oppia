@@ -133,17 +133,16 @@ class FeedbackHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_name,
-            old_params, handler, rule):
+            self, old_state, answer, exploration_id, exploration_version,
+            old_state_name, old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
 
         recorded_answer = widget.get_stats_log_html(
             old_state.widget.customization_args, old_params, answer)
-
         stats_services.EventHandler.record_answer_submitted(
-            exploration_id, old_state_name, handler, str(rule),
+            exploration_id, 1, old_state_name, handler, rule,
             recorded_answer)
 
     def _append_content(self, exploration, sticky, finished, old_params,
@@ -226,8 +225,8 @@ class FeedbackHandler(base.BaseHandler):
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, old_state_name, old_params,
-            handler, rule)
+            old_state, answer, exploration_id, exploration.version,
+            old_state_name, old_params, handler, rule)
 
         # Append the reader's answer to the response HTML.
         reader_response_html = old_widget.get_reader_response_html(

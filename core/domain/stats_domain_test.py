@@ -78,6 +78,8 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     """Test the state rule answer log domain object."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+        'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
@@ -97,8 +99,8 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.get_top_answers(2), [])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', 1, state_name, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'answer1')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -108,10 +110,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.get_top_answers(2), [('answer1', 1)])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', 1, state_name, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
@@ -124,10 +126,10 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             answer_log.get_top_answers(2), [('answer1', 2), ('answer2', 1)])
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer2')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
@@ -144,13 +146,25 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             'eid', 'title', 'category')
         exp_services.save_new_exploration('user_id', exp)
 
+        rule = exp_domain.RuleSpec.from_dict_and_obj_type({
+            'definition':  {
+                 'rule_type': 'atomic',
+                 'name': 'LessThan',
+                 'subject': 'answer',
+                 'inputs': {'x': 5}
+             },
+             'dest': 'dest',
+             'feedback': None,
+             'param_changes': []
+        }, 'Real')
+
         state_name = exp.init_state_name
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR,
+            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER, 'a_different_rule_repr',
+            'eid', 1, state_name, self.SUBMIT_HANDLER, rule,
             'answer2')
 
         default_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
@@ -159,7 +173,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(default_rule_answer_log.total_answer_count, 1)
 
         other_rule_answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', state_name, self.SUBMIT_HANDLER, 'a_different_rule_repr')
+            'eid', state_name, self.SUBMIT_HANDLER, str(rule))
         self.assertEquals(other_rule_answer_log.answers, {'answer2': 1})
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
@@ -175,14 +189,14 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.answers, {})
 
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', 1, state_name, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC_STR, 'answer1')
+            'eid', 1, state_name, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'answer1')
         stats_services.EventHandler.record_answer_submitted(
-            'eid', state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC_STR, 'answer2')
+            'eid', 1, state_name, self.SUBMIT_HANDLER,
+            self.DEFAULT_RULESPEC, 'answer2')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)

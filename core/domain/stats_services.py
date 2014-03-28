@@ -45,11 +45,13 @@ class EventHandler(object):
 
     @classmethod
     def record_answer_submitted(
-            cls, exploration_id, state_name, handler_name, rule_str, answer):
+            cls, exploration_id, exploration_version, state_name,
+            handler_name, rule, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
-            exploration_id, state_name, handler_name, rule_str, answer)
+            exploration_id, exploration_version, state_name,
+            handler_name, rule, answer)
 
     @classmethod
     def resolve_answers_for_default_rule(
@@ -163,6 +165,26 @@ def get_state_rules_stats(exploration_id, state_name):
         }
 
     return results
+
+
+def get_exploration_info(exploration_id):
+    """Returns statistics about an exploration for display.
+    Includes state-specific flags and is planned to have other
+    fields for statistics display on an exploration level."""
+    exploration_annotations = stats_domain.ExplorationAnnotations.get(
+        exploration_id)
+
+    state_infos = {}
+    for state_name in exploration_annotations.summarized_state_data:
+        state_infos[state_name] = (
+            exploration_annotations.summarized_state_data[state_name])
+
+    # TODO(sfederwisch): add other fields, like completion rate
+    # exploration_feedback, state hit counts and time stats
+    exp_info = {
+       'stateInfos': state_infos,
+    }
+    return exp_info
 
 
 def get_state_stats_for_exploration(exploration_id):

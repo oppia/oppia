@@ -187,3 +187,28 @@ class FeedbackItem(object):
 
     def change_status(self, new_status):
         self.status = new_status
+
+
+##########################################################
+# Domain object definitions below this line are for a new
+# set of statistics models that are meant to replace the
+# old ones.
+##########################################################
+
+# TODO(sll): Add domain objects here.
+class ExplorationAnnotations(object):
+    """"""
+    def __init__(self, summarized_state_data):
+        # Data from states that would be retrieved for display with 
+        # exploration as a whole, namely which states should be flagged.
+        # This is a dict keyed by state_name, and whose value is a dict
+        # with the following keys: 'flag_type', 'score', 'data'.
+        self.summarized_state_data = summarized_state_data
+
+    @classmethod
+    def get(cls, exploration_id):
+        exp_annotations_model = (
+            stats_models.ExplorationAnnotationsModel.get_or_create(
+                exploration_id))
+        return cls(exp_annotations_model.summarized_state_data)
+

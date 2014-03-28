@@ -59,7 +59,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       forbidNodeDeletion: '@',
       stateStats: '=',
       allowPanning: '@',
-      currentStateName: '='
+      currentStateName: '=',
+      expStats: '='
     },
     link: function(scope, element, attrs) {
       // The maximum number of nodes to show in a row.
@@ -80,7 +81,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             newVal.nodes, newVal.links, newVal.initStateName, newVal.finalStateName,
             scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
             scope.highlightStates, scope.stateStats, scope.allowPanning,
-            scope.currentStateName
+            scope.currentStateName, scope.expStats
           );
         }
       });
@@ -91,7 +92,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             scope.val.nodes, scope.val.links, scope.val.initStateName,
             scope.val.finalStateName, scope.nodeFill, scope.opacityMap,
             scope.forbidNodeDeletion, scope.highlightStates, scope.stateStats,
-            scope.allowPanning, scope.currentStateName
+            scope.allowPanning, scope.currentStateName, scope.expStats
           );
         }
       })
@@ -292,9 +293,18 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         return nodeData;
       }
 
+      function isStateFlagged(name, highlightStates, expStats, stateStats) {
+          var isHighlightState = (highlightStates && name in highlightStates);
+          var flagged = (expStats && name in expStats.stateInfos);
+          var hasFeedback = (
+            stateStats && stateStats[name] &&
+            Object.keys(stateStats[name].readerFeedback).length > 0);
+          return (isHighlightState || hasFeedback || flagged);
+      }
+
       function drawGraph(nodes, links, initStateName, finalStateName, nodeFill,
                          opacityMap, forbidNodeDeletion, highlightStates, stateStats,
-                         allowPanning, currentStateName) {
+                         allowPanning, currentStateName, expStats) {
         // Clear all SVG elements on the canvas.
         d3.select(element[0]).selectAll('svg').remove();
 
@@ -614,28 +624,19 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               'stroke-width': '1',
               'stroke': '#DDDDDD',
               'fill-opacity': function(d) {
-                var isHighlightState = (highlightStates && d.name in highlightStates);
-                var hasFeedback = (
-                  stateStats && stateStats[d.name] &&
-                  Object.keys(stateStats[d.name].readerFeedback).length > 0);
-                return (isHighlightState || hasFeedback) ? '1' : '0' ;
+                return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '1' : '0';
               },
               'stroke-opacity': function(d) {
-                var isHighlightState = (highlightStates && d.name in highlightStates);
-                var hasFeedback = (
-                  stateStats && stateStats[d.name] &&
-                  Object.keys(stateStats[d.name].readerFeedback).length > 0);
-                return (isHighlightState || hasFeedback) ? '1' : '0' ;
+                return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '1' : '0' ;
               }
             });
 
           nodeEnter.append('svg:text')
             .text(function(d) {
-              var isHighlightState = (d.name in highlightStates);
-              var hasFeedback = (
-                stateStats && stateStats[d.name] &&
-                Object.keys(stateStats[d.name].readerFeedback).length > 0);
-              return (isHighlightState || hasFeedback) ? '⚠' : '' ;
+              return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '⚠' : '';
             })
             .attr({
               'fill': 'firebrick',
