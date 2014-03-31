@@ -334,7 +334,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
        
         # todo(msl): change below
         # Switch to the reader perspective
-        self.logout()
+        #self.logout()
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
@@ -342,13 +342,17 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         #state_name = exploration_dict['state_name']
 
         response = self.testapp.get('/create/0')
+        #raise Exception(response.status_code)
+        #raise Exception(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
         
-        self.post_json(
-            '%s' % EXPLORATION_DOWNLOAD_URL,
-            {
-                'exploration_id': 0
-            }, csrf_token)
+        # self.post_json(
+        #     '%s' % EXPLORATION_DOWNLOAD_URL,
+        #     {
+        #         'exploration_id': 0
+        #     }, csrf_token)
 
         self.logout()
 
