@@ -283,6 +283,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         # Switch to the reader perspective. First submit the first
         # multiple-choice answer, then submit 'blah'.
+        self.logout()
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
@@ -312,6 +313,81 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # TODO(sll): Add more checks here.
+
+        self.logout()
+
+
+class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
+    """Test handler for exploration download."""
+
+    def test_exploration_download_handler_for_default_exploration(self):
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        EXPLORATION_DOWNLOAD_URL = '/createhandler/download/0'
+        
+        # editor perspective
+        self.register_editor('editor@example.com')
+        self.login('editor@example.com')
+        #editor_exploration_dict = self.get_json(EXPLORATION_DOWNLOAD_URL)
+
+       
+        # todo(msl): change below
+        # Switch to the reader perspective
+        self.logout()
+        exploration_dict = self.get_json(
+            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
+        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+
+        #state_name = exploration_dict['state_name']
+
+        response = self.testapp.get('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+        
+        self.post_json(
+            '%s' % EXPLORATION_DOWNLOAD_URL,
+            {
+                'exploration_id': 0
+            }, csrf_token)
+
+
+        #self.assertEqual(editor_exploration_dict['new_status'], 0)
+
+        # # Switch to the reader perspective. First submit the first
+        # # multiple-choice answer, then submit 'blah'.
+        #self.logout()
+        # exploration_dict = self.get_json(
+        #     '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
+        # self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+
+        # state_name = exploration_dict['state_name']
+
+        # # msl: use resolveReaderFeedback in explorationData.js?
+        
+        # exploration_dict = self.post_json(
+        #     '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+        #     {
+        #         'answer': '0', 'handler': 'submit',
+        #         'state_history': exploration_dict['state_history'],
+        #     }
+        # )
+        # state_name = exploration_dict['state_name']
+        # self.post_json(
+        #     '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
+        #     {
+        #         'answer': 'blah', 'handler': 'submit',
+        #         'state_history': exploration_dict['state_history']
+        #     }
+        # )
+
+        # # Now switch back to the editor perspective.
+        # self.login('editor@example.com')
+
+        # editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
+        # self.assertEqual(editor_exploration_dict['num_visits'], 1)
+        # self.assertEqual(editor_exploration_dict['num_completions'], 0)
+
+        # # TODO(sll): Add more checks here.
 
         self.logout()
 
