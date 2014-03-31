@@ -126,3 +126,13 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
                 Exception, 'URL query parameter name must be a string'):
             utils.set_url_query_parameter('http://test.com?a=b', None, 'value')
+
+    def test_convert_to_hash(self):
+        """Test convert_to_hash() method."""
+        orig_string = 'name_to_convert'
+        full_hash = utils.convert_to_hash(orig_string, 28)
+        abbreviated_hash = utils.convert_to_hash(orig_string, 5)
+
+        self.assertEqual(len(full_hash), 28)
+        self.assertEqual(len(abbreviated_hash), 5)
+        self.assertEqual(full_hash[:5], abbreviated_hash)

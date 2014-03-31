@@ -302,7 +302,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
                 '<', '\\u003c').replace('>', '\\u003e')
 
 
-def convert_to_hash(string, max_length=None):
+def convert_to_hash(string, max_length):
     """Convert a string to a SHA1 hash."""
     if not isinstance(string, basestring):
         raise Exception(
@@ -312,7 +312,4 @@ def convert_to_hash(string, max_length=None):
     encoded_string = base64.urlsafe_b64encode(
         hashlib.sha1(string).digest())
 
-    if max_length is None:
-        return encoded_string[:max_length]
-    else:
-        return encoded_string
+    return encoded_string[:max_length]

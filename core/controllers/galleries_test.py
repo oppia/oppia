@@ -85,6 +85,21 @@ class LearnGalleryTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_new_exploration_ids(self):
+        """Test generation of exploration ids."""
+        EDITOR_EMAIL = 'editor@example.com'
+        self.register_editor(EDITOR_EMAIL)
+        self.login(EDITOR_EMAIL)
+
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        EXP_A_DICT = {'title': 'A', 'category': 'Test Explorations'}
+        exp_a_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
+        )[galleries.EXPLORATION_ID_KEY]
+        self.assertEqual(len(exp_a_id), 12)
+
     def test_can_see_explorations_to_playtest(self):
         """Test viewability of playtestable explorations."""
         EDITOR_EMAIL = 'editor@example.com'

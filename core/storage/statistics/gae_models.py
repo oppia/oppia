@@ -18,9 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-import base64
 import logging
-import hashlib
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -236,7 +234,7 @@ class StateAnnotationsModel(base_models.BaseModel):
     unresolved_answers = ndb.JsonProperty(indexed=False)
     # Save key values to be used later.
     exp_id = ndb.StringProperty(indexed=False)
-    state_name = ndb.StringProperty(indexed=False) 
+    state_name = ndb.StringProperty(indexed=False)
 
     @classmethod
     def get_or_create(cls, exp_id, state_name):
@@ -277,7 +275,7 @@ class ExplorationAnnotationsModel(base_models.BaseModel):
     """Data related to an exploration"""
     # Threshold for an answer to qualify as 'missing'
     MISSING_ANSWER_THRESHOLD = 7
-    # Data from states that would be retrieved for display with 
+    # Data from states that would be retrieved for display with
     # exploration as a whole, namely which states should be flagged.
     # This is a dict keyed by state_name, and whose value is a dict
     # with the following keys: 'flag_type', 'score', 'data'.
@@ -312,7 +310,7 @@ class ExplorationAnnotationsModel(base_models.BaseModel):
                     'score': score,
                     'data': data
                 }
-        
+
     # TODO(sfederwisch): add functions for resolved answers, or similar changes
 
 
