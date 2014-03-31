@@ -199,10 +199,7 @@ DEMO_EXPLORATIONS = [
     # please note that Oppia lacks many of the features of a full interactive
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
-    # WARNING: This exploration relies on the music input widget, which is
-    # still in pre-alpha. Uncomment the following line if you want to be able
-    # to load it on the Oppia server.
-    # ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
+    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
 ]
 
 # TODO(sll): Add all other URLs here.

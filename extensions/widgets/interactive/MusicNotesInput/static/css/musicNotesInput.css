@@ -11,7 +11,7 @@
 }
 
 /* The box around staff */
- 
+
 .oppia-music-input-staff {
   clear: both;
   background: transparent;
@@ -19,7 +19,7 @@
 }
 
 /* The box around note choices */
- 
+
 .oppia-music-input-note-choices {
   clear: both;
   float: right;
@@ -50,50 +50,39 @@
 
 /* The staff lines and ledger lines */
 
-.oppia-music-input-staff div {
+.oppia-music-input-staff div.oppia-music-staff-position {
   position: relative;
-  border-width: thin;
-  width: 100%; /* width of music staff */
-  margin-bottom: 1.27%; /* space in between lines */
+  width: 100%;
+  margin: 0 0;
+  background: transparent;
+  color: transparent;
+  float: right;
+}
+
+.oppia-music-input-staff div.oppia-music-input-hovered {
+  background: #aaa;
+}
+
+.oppia-music-input-staff div.oppia-music-staff-line {
   background: #000000;
-  color: transparent; 
+  height: 2px;
+  position: absolute;
+  width: 100%;
 }
 
 .oppia-music-input-staff {
   background-image: url(../images/treble_clef.png);
   background-repeat: no-repeat;
-  background-position: 0.1% 42%;
+  background-position: 0.1% 62%;
   background-size: 8.5% 89%;
 }
 
-.oppia-music-input-staff div:first-child {
-  background: transparent;
-  color: transparent;
-}
-
-.oppia-music-input-staff div:nth-child(even) {
-  background: transparent;
-  color: transparent;
-}
-
-.oppia-music-input-staff div:nth-child(13) {
-  background: transparent;
-  color: transparent;
-}
- 
-.oppia-music-input-staff div.oppia-music-input-hovered {
-  background: #aaa;
-}
-
-.oppia-music-input-staff div {
-  border-style: solid;
-}
 
 /* Individual notes */
 
 .oppia-music-input-note-choices div {
-  width: 7.8%; 
-  height: 8.2%;  
+  width: 7.8%;
+  height: 8.2%;
   position: relative;
   background: transparent;
 }
@@ -110,10 +99,13 @@
 .oppia-music-input-staff .oppia-music-input-ledger-line {
   position: absolute;
   width: 8%;
+  padding-bottom: 0.35%;
+  background-color: #000000;
 }
 
 .oppia-music-input-on-staff {
   position: absolute;
+  z-index: 1000;
 }
 
 .oppia-music-input-control-buttons {
