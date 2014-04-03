@@ -74,11 +74,11 @@ class BaseJob(object):
             self.output = job_model.output
 
     def _update_status(self, strict=True):
-        """Updates the status of a job in the datastore.
+        """Saves the current status of a job domain object to the datastore.
 
         If strict is True, raises an error if the job does not exist.
         """
-        def update_status_in_transaction(job_id):
+        def _update_status_in_transaction(job_id):
             job_model = job_models.JobModel.get_by_id(self._job_id)
             if not job_model:
                 if strict:
@@ -101,7 +101,7 @@ class BaseJob(object):
             job_model.put()
 
         transaction_services.run_in_transaction(
-            update_status_in_transaction, self._job_id)
+            _update_status_in_transaction, self._job_id)
 
     def mark_queued(self):
         """Mark the state of a job as enqueued in the datastore.

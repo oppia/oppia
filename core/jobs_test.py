@@ -129,6 +129,8 @@ class JobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(another_job.status_code, jobs.STATUS_CODE_QUEUED)
 
     def test_one_job_runs_per_class(self):
+        # This tests that different instances of a job class refer to the same
+        # backend job.
         new_job = self.DummyJob()
         new_job.mark_queued()
         new_job.mark_started()
