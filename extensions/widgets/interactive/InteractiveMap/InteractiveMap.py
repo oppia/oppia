@@ -66,3 +66,8 @@ class InteractiveMap(widget_domain.BaseWidget):
     _handlers = [{
         'name': 'submit', 'obj_type': 'CoordTwoDim'
     }]
+
+    # Additional JS library dependencies that should be loaded in pages
+    # containing this widget. These should correspond to names of files in
+    # feconf.DEPENDENCIES_TEMPLATES_DIR.
+    _dependency_ids = []

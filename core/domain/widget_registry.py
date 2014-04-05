@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import pkgutil
 
+from core.domain import dependency_registry
 import feconf
 import utils
 
@@ -146,3 +147,19 @@ class Registry(object):
             widget.js_code for widget in cls.get_widgets_of_type(
                 feconf.NONINTERACTIVE_PREFIX)
         ])
+
+    @classmethod
+    def get_dependencies_html(cls, widget_ids):
+        """Returns HTML for the dependencies of the given interactive widgets.
+
+        The dependencies code is concatenated into a single string, in no
+        particular order.
+        """
+        all_dependency_ids = set([])
+        for widget_id in widget_ids:
+            widget = cls.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
+            all_dependency_ids.update(widget.dependency_ids)
+
+        return '\n'.join([
+            dependency_registry.Registry.get_dependency_html(dep)
+            for dep in all_dependency_ids])

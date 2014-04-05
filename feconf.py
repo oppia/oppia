@@ -45,6 +45,7 @@ OBJECTS_DIR = 'extensions/objects'
 SKINS_TEMPLATES_DIR = 'extensions/skins'
 FRONTEND_TEMPLATES_DIR = ('core/templates/dev/head' if DEV_MODE
                           else 'core/templates/prod/head')
+DEPENDENCIES_TEMPLATES_DIR = '%s/dependencies' % FRONTEND_TEMPLATES_DIR
 VALUE_GENERATORS_DIR = 'extensions/value_generators'
 
 # The id and name for the final state of an exploration.

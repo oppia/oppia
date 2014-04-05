@@ -160,6 +160,9 @@ class ExplorationPage(EditorHandler):
         all_interactive_widget_ids = (
             widget_registry.Registry.get_widget_ids_of_type(
                 feconf.INTERACTIVE_PREFIX))
+        widget_dependencies_html = (
+            widget_registry.Registry.get_dependencies_html(
+                all_interactive_widget_ids))
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
             widget_registry.Registry.get_interactive_widget_js(
@@ -184,6 +187,8 @@ class ExplorationPage(EditorHandler):
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'widget_dependencies_html': jinja2.utils.Markup(
+                widget_dependencies_html),
         })
 
         self.render_template('editor/exploration_editor.html')
