@@ -149,17 +149,22 @@ class Registry(object):
         ])
 
     @classmethod
-    def get_dependencies_html(cls, widget_ids):
-        """Returns HTML for the dependencies of the given interactive widgets.
+    def get_deduplicated_dependency_ids(cls, widget_ids):
+        """Return a list of dependency ids for the given widgets.
 
-        The dependencies code is concatenated into a single string, in no
+        Each entry of the resulting list is unique. The list is sorted in no
         particular order.
         """
-        all_dependency_ids = set([])
+        result = set([])
         for widget_id in widget_ids:
             widget = cls.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
-            all_dependency_ids.update(widget.dependency_ids)
+            result.update(widget.dependency_ids)
+        return list(result)
 
+    @classmethod
+    def get_dependencies_html(cls, widget_ids):
+        """Returns HTML for the dependencies of the given interactive widgets.
+        """
         return '\n'.join([
             dependency_registry.Registry.get_dependency_html(dep)
-            for dep in all_dependency_ids])
+            for dep in cls.get_deduplicated_dependency_ids(widget_ids)])
