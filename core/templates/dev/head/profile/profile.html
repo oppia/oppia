@@ -60,10 +60,15 @@
 
         <div ng-show="!isEmpty(feedback)">
           <h5>Feedback I've submitted</h5>
-          <ul>
-            <li ng-repeat="f in feedback">
-              <[f.target_id]> <[f.status]> <[f.content]> 
-            </li>
+          <dl class="dl-horizontal">
+            <div ng-repeat="f in feedback">
+              <dt><div class="oppia-feedback-status label">
+                <[f.status]>
+              </div></dt>
+              <dd><div class="oppia-feedback-content">
+                <[f.content]>
+              </div></dd>
+            </div>
           </ul>
         </div>
       </div>
