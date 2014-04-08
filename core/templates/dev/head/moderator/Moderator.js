@@ -19,7 +19,7 @@
 */
 
 function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
-  
+
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
@@ -30,11 +30,48 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
-      $scope.userEmail = data.user_email; 
+      $scope.userEmail = data.user_email;
     }).error(function(data) {
       warningsData.addWarning(data.error);
     });
-  }
+  };
+
+  $scope.getHumanReadableDate = function(millisSinceEpoch) {
+    var date = new Date(millisSinceEpoch);
+    return date.toUTCString();
+  };
+
+  $scope.getExplorationCreateUrl = function(explorationId) {
+    return '/create/' + explorationId;
+  };
+
+  $scope.recentCommitsCursor = null;
+  $scope.reachedEndOfCommits = false;
+  $scope.allCommits = [];
+  $scope.loadMoreCommits = function() {
+    if ($scope.reachedEndOfCommits) {
+      return;
+    }
+
+    var recentCommitsUrl = '/gallerieshandler/recent_commits';
+    if ($scope.recentCommitsCursor) {
+      recentCommitsUrl += ('?cursor=' + $scope.recentCommitsCursor);
+    }
+
+    $http.get(recentCommitsUrl).success(function(data) {
+      for (var i = 0; i < data.results.length; i++) {
+        $scope.allCommits.push(data.results[i]);
+      }
+      $scope.recentCommitsCursor = data.cursor;
+      if (!data.more) {
+        $scope.reachedEndOfCommits = true;
+      }
+    }).error(function(data) {
+      warningsData.addWarning(data.error);
+    });
+  };
+
+  $scope.loadMoreCommits();
 }
 
 /**

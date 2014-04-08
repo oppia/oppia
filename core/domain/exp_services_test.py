@@ -1277,8 +1277,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
-                    all_commits[ind - 1].created_on,
-                    all_commits[ind].created_on)
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
 
         commit_dicts = [commit.to_dict() for commit in all_commits]
 
@@ -1300,6 +1300,13 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-8])
 
+    def test_get_page_of_all_non_private_commits(self):
+        all_commits = exp_services.get_page_of_all_non_private_commits()[0]
+        self.assertEqual(len(all_commits), 1)
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
+
     def test_get_commit_log_for_exploration_id(self):
         all_commits = exp_services.get_page_of_all_commits_by_exp_id(
             self.EXP_ID_1)[0]
@@ -1307,8 +1314,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
-                    all_commits[ind - 1].created_on,
-                    all_commits[ind].created_on)
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
 
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
@@ -1328,8 +1335,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
-                    all_commits[ind - 1].created_on,
-                    all_commits[ind].created_on)
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
 
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
@@ -1346,8 +1353,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         for ind, commit in enumerate(all_commits):
             if ind != 0:
                 self.assertGreater(
-                    all_commits[ind - 1].created_on,
-                    all_commits[ind].created_on)
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
 
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
@@ -1396,7 +1403,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertTrue(more)
 
         all_commits, cursor, more = exp_services.get_page_of_all_commits(
-            page_size=5, start_cursor=cursor)
+            page_size=5, urlsafe_start_cursor=cursor)
         self.assertEqual(len(all_commits), 3)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
@@ -1406,3 +1413,12 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
         self.assertFalse(more)
+
+
+class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
+    """Test special cases relating to the exploration commit logs."""
+
+    def test_paging_with_no_commits(self):
+        all_commits, cursor, more = exp_services.get_page_of_all_commits(
+            page_size=5)
+        self.assertEqual(len(all_commits), 0)

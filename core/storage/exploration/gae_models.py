@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
@@ -296,24 +297,39 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def _fetch_page_sorted_by_last_updated(
-            cls, query, page_size, start_cursor):
-        return query.order(-cls.last_updated).fetch_page(
+            cls, query, page_size, urlsafe_start_cursor):
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        result = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
+        return (
+            result[0],
+            (result[1].urlsafe() if result[1] else None),
+            result[2])
 
     @classmethod
-    def get_all_commits(cls, page_size, start_cursor):
+    def get_all_commits(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, start_cursor)
+            cls.query(), page_size, urlsafe_start_cursor)
+
+    @classmethod
+    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor):
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(cls.post_commit_is_private == False),
+            page_size, urlsafe_start_cursor)
 
     @classmethod
     def get_all_commits_by_exp_id(
-            cls, exploration_id, page_size, start_cursor):
+            cls, exploration_id, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(cls.exploration_id == exploration_id),
-            page_size, start_cursor)
+            page_size, urlsafe_start_cursor)
 
     @classmethod
     def get_all_commits_by_user_id(
-            cls, user_id, page_size, start_cursor):
+            cls, user_id, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.user_id == user_id), page_size, start_cursor)
+            cls.query(cls.user_id == user_id), page_size, urlsafe_start_cursor)

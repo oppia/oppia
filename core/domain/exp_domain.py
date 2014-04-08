@@ -26,7 +26,7 @@ import copy
 import logging
 import re
 import string
-
+import time
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -124,10 +124,10 @@ class ExplorationCommitLogEntry(object):
         self.post_commit_is_private = post_commit_is_private
 
     def to_dict(self):
-        """This omits the user_id and (for now) commit_cmds."""
+        """This omits created_on, user_id and (for now) commit_cmds."""
         return {
-            'created_on': self.created_on,
-            'last_updated': self.last_updated,
+            # Represented as milliseconds since the Epoch.
+            'last_updated': time.mktime(self.last_updated.timetuple()) * 1000,
             'username': self.username,
             'exploration_id': self.exploration_id,
             'commit_type': self.commit_type,

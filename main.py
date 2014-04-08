@@ -127,6 +127,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.CLONE_EXPLORATION_URL,
         galleries.CloneExploration, 'clone_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
+        galleries.RecentCommitsHandler, 'recent_commits_handler'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(

@@ -756,7 +756,8 @@ def load_demo(exploration_id):
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
-def get_page_of_all_commits(page_size=DEFAULT_PAGE_SIZE, start_cursor=None):
+def get_page_of_all_commits(
+        page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns all commits to all explorations in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
@@ -766,7 +767,28 @@ def get_page_of_all_commits(page_size=DEFAULT_PAGE_SIZE, start_cursor=None):
     """
     results, cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits(
-            page_size, start_cursor))
+            page_size, urlsafe_start_cursor))
+
+    return ([exp_domain.ExplorationCommitLogEntry(
+        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.exploration_id, entry.commit_type, entry.commit_message,
+        entry.commit_cmds, entry.version, entry.post_commit_status,
+        entry.post_commit_community_owned, entry.post_commit_is_private
+    ) for entry in results], cursor, more)
+
+
+def get_page_of_all_non_private_commits(
+        page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns all non-private commits in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, cursor, more = (
+        exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
+            page_size, urlsafe_start_cursor))
 
     return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,
@@ -777,7 +799,8 @@ def get_page_of_all_commits(page_size=DEFAULT_PAGE_SIZE, start_cursor=None):
 
 
 def get_page_of_all_commits_by_exp_id(
-        exploration_id, page_size=DEFAULT_PAGE_SIZE, start_cursor=None):
+        exploration_id, page_size=DEFAULT_PAGE_SIZE,
+        urlsafe_start_cursor=None):
     """Returns all commits to the given exploration in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
@@ -787,7 +810,7 @@ def get_page_of_all_commits_by_exp_id(
     """
     results, cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_exp_id(
-            exploration_id, page_size, start_cursor))
+            exploration_id, page_size, urlsafe_start_cursor))
 
     return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,
@@ -798,7 +821,7 @@ def get_page_of_all_commits_by_exp_id(
 
 
 def get_page_of_all_commits_by_user_id(
-        user_id, page_size=DEFAULT_PAGE_SIZE, start_cursor=None):
+        user_id, page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns all commits by the given user_id in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
@@ -808,7 +831,7 @@ def get_page_of_all_commits_by_user_id(
     """
     results, cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_user_id(
-            user_id, page_size, start_cursor))
+            user_id, page_size, urlsafe_start_cursor))
 
     return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,
