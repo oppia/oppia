@@ -193,7 +193,6 @@ def get_exploration_info(exploration_id):
     }
     return exp_info
 
-
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
