@@ -102,6 +102,43 @@ class ExplorationChange(object):
             raise Exception('Invalid change_dict: %s' % change_dict)
 
 
+class ExplorationCommitLogEntry(object):
+    """Value object representing a commit to an exploration."""
+
+    def __init__(
+            self, created_on, last_updated, user_id, username, exploration_id,
+            commit_type, commit_message, commit_cmds, version,
+            post_commit_status, post_commit_community_owned,
+            post_commit_is_private):
+        self.created_on = created_on
+        self.last_updated = last_updated
+        self.user_id = user_id
+        self.username = username
+        self.exploration_id = exploration_id
+        self.commit_type = commit_type
+        self.commit_message = commit_message
+        self.commit_cmds = commit_cmds
+        self.version = version
+        self.post_commit_status = post_commit_status
+        self.post_commit_community_owned = post_commit_community_owned
+        self.post_commit_is_private = post_commit_is_private
+
+    def to_dict(self):
+        """This omits the user_id and (for now) commit_cmds."""
+        return {
+            'created_on': self.created_on,
+            'last_updated': self.last_updated,
+            'username': self.username,
+            'exploration_id': self.exploration_id,
+            'commit_type': self.commit_type,
+            'commit_message': self.commit_message,
+            'version': self.version,
+            'post_commit_status': self.post_commit_status,
+            'post_commit_community_owned': self.post_commit_community_owned,
+            'post_commit_is_private': self.post_commit_is_private,
+        }
+
+
 class Content(object):
     """Value object representing non-interactive content."""
 
@@ -365,7 +402,7 @@ class WidgetInstance(object):
     @classmethod
     def from_dict(cls, widget_dict):
         obj_type = cls._get_obj_type(widget_dict['widget_id'])
-        return cls(    
+        return cls(
             widget_dict['widget_id'],
             widget_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)

@@ -19,11 +19,16 @@
 __author__ = 'Sean Lip'
 
 import core.storage.base_model.gae_models as base_models
+import core.storage.user.gae_models as user_models
 
 from google.appengine.ext import ndb
 
 
 QUERY_LIMIT = 100
+
+EXPLORATION_STATUS_PRIVATE = 'private'
+EXPLORATION_STATUS_PUBLIC = 'public'
+EXPLORATION_STATUS_PUBLICIZED = 'publicized'
 
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -82,6 +87,38 @@ class ExplorationModel(base_models.VersionedModel):
         super(ExplorationModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this overrides the superclass method.
+        """
+        super(ExplorationModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        exp_rights = ExplorationRightsModel.get_by_id(self.id)
+
+        ExplorationCommitLogEntryModel(
+            id=('exploration-%s-%s' % (self.id, self.version)),
+            user_id=committer_id,
+            username=committer_username,
+            exploration_id=self.id,
+            commit_type=commit_type,
+            commit_message=commit_message,
+            commit_cmds=commit_cmds,
+            version=self.version,
+            post_commit_status=exp_rights.status,
+            post_commit_community_owned=exp_rights.community_owned,
+            post_commit_is_private=(
+                exp_rights.status == EXPLORATION_STATUS_PRIVATE)
+        ).put_async()
+
 
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
@@ -120,8 +157,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default='private', indexed=True,
-        choices=['private', 'public', 'publicized']
+        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        choices=[
+            EXPLORATION_STATUS_PRIVATE,
+            EXPLORATION_STATUS_PUBLIC,
+            EXPLORATION_STATUS_PUBLICIZED
+        ]
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -132,7 +173,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def get_non_private(cls):
         """Returns an iterable with non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status.IN(['public', 'publicized'])
+            ExplorationRightsModel.status.IN([
+                EXPLORATION_STATUS_PUBLIC, EXPLORATION_STATUS_PUBLICIZED])
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
@@ -181,3 +223,97 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this overrides the superclass method.
+        """
+        super(ExplorationRightsModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        # Create and delete events will already be recorded in the
+        # ExplorationModel.
+        if commit_type not in ['create', 'delete']:
+            committer_user_settings_model = (
+                user_models.UserSettingsModel.get_by_id(committer_id))
+            committer_username = (
+                committer_user_settings_model.username
+                if committer_user_settings_model else '')
+            ExplorationCommitLogEntryModel(
+                id=('rights-%s-%s' % (self.id, self.version)),
+                user_id=committer_id,
+                username=committer_username,
+                exploration_id=self.id,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=None,
+                post_commit_status=self.status,
+                post_commit_community_owned=self.community_owned,
+                post_commit_is_private=(
+                    self.status == EXPLORATION_STATUS_PRIVATE)
+            ).put_async()
+
+
+class ExplorationCommitLogEntryModel(base_models.BaseModel):
+    """Log of commits to explorations.
+
+    A new entry in this log is created each time a commit to ExplorationModel
+    or ExplorationRightsModel occurs.
+    """
+    # Update superclass model to make these properties indexed.
+    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+
+    # The id of the user.
+    user_id = ndb.StringProperty(indexed=True, required=True)
+    # The username of the user, at the time of the edit.
+    username = ndb.StringProperty(indexed=True, required=True)
+    # The id of the exploration being edited.
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
+    commit_type = ndb.StringProperty(indexed=True, required=True)
+    # The commit message.
+    commit_message = ndb.TextProperty(indexed=False)
+    # The commit_cmds dict for this commit.
+    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    # The version number of the exploration after this commit. Only populated
+    # for commits to an exploration (as opposed to its rights, etc.)
+    version = ndb.IntegerProperty()
+
+    # The status of the exploration after the edit event ('private', 'public',
+    # 'publicized').
+    post_commit_status = ndb.StringProperty(indexed=True, required=True)
+    # Whether the exploration is community-owned after the edit event.
+    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
+    # Whether the exploration is private after the edit event. Having a
+    # separate field for this makes queries faster, since an equality query
+    # on this property is faster than an inequality query on
+    # post_commit_status.
+    post_commit_is_private = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def _fetch_page_sorted_by_last_updated(
+            cls, query, page_size, start_cursor):
+        return query.order(-cls.last_updated).fetch_page(
+            page_size, start_cursor=start_cursor)
+
+    @classmethod
+    def get_all_commits(cls, page_size, start_cursor):
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(), page_size, start_cursor)
+
+    @classmethod
+    def get_all_commits_by_exp_id(
+            cls, exploration_id, page_size, start_cursor):
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(cls.exploration_id == exploration_id),
+            page_size, start_cursor)
+
+    @classmethod
+    def get_all_commits_by_user_id(
+            cls, user_id, page_size, start_cursor):
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(cls.user_id == user_id), page_size, start_cursor)

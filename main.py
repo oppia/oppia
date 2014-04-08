@@ -29,6 +29,8 @@ from core.controllers import reader
 from core.controllers import resources
 from core.controllers import services
 from core.controllers import widgets
+from core.platform import models
+transaction_services = models.Registry.import_transaction_services()
 
 import webapp2
 from webapp2_extras.routes import RedirectRoute
@@ -216,4 +218,5 @@ error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
 urls = urls + error404_handler
 
 
-app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
+app = transaction_services.toplevel_wrapper(
+    webapp2.WSGIApplication(urls, debug=feconf.DEBUG))
