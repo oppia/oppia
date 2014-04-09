@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 
@@ -52,5 +51,5 @@ class SetInput(widget_domain.BaseWidget):
         input_type = 'SetOf%s' % input_type
 
         return [{
-            'name': 'submit', 'input_type': getattr(objects, input_type)
+            'name': 'submit', 'obj_type': input_type
         }]

@@ -31,12 +31,21 @@ class Link(widget_domain.BaseWidget):
             'The URL for this link. It must start with http:// or https://'),
         'generator': generators.Copier,
         'init_args': {
-            'disallow_parse_with_jinja': True
+            'disallow_parse_with_jinja': True,
         },
         'customization_args': {
-            'value': ''
+            'value': 'https://www.example.com'
         },
         'obj_type': 'SanitizedUrl',
+    }, {
+        'name': 'open_link_in_same_window',
+        'description': 'Open the linked page in the same window?',
+        'generator': generators.Copier,
+        'init_args': {},
+        'customization_args': {
+            'value': False
+        },
+        'obj_type': 'Boolean',
     }]
 
     # The HTML tag name for this non-interactive widget.

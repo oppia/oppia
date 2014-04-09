@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 
@@ -60,5 +59,5 @@ class TextInput(widget_domain.BaseWidget):
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'input_type': objects.NormalizedString
+        'name': 'submit', 'obj_type': 'NormalizedString'
     }]

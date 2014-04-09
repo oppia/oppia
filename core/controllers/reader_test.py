@@ -116,12 +116,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             feconf.EXPLORATION_TRANSITION_URL_PREFIX,
             self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
-            'answer': answer, 'block_number': self.last_block_number,
-            'handler': 'submit', 'params': self.last_params,
+            'answer': answer, 'handler': 'submit', 'params': self.last_params,
             'state_history': self.state_history,
         })
 
-        self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
         self.state_history += [self.last_state_name]
@@ -129,14 +127,16 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         return reader_dict
 
-    def submit_and_compare(self, answer, expected_response):
+    def submit_and_compare(self, answer, expected_feedback, expected_question):
         """Submits an answer and compares the output to a regex.
 
         `expected_response` will be interpreted as a regex string.
         """
         reader_dict = self._submit_answer(answer)
         self.assertRegexpMatches(
-            reader_dict['oppia_html'], expected_response)
+            reader_dict['feedback_html'], expected_feedback)
+        self.assertRegexpMatches(
+            reader_dict['question_html'], expected_question)
         return self
 
     def init_player(self, exploration_id, expected_title, expected_response):
@@ -152,7 +152,6 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
 
-        self.last_block_number = reader_dict['block_number']
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
         self.state_history = [self.last_state_name]
@@ -166,31 +165,47 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.init_player(
             '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
         self.submit_and_compare(
-            '0', 'In fact, the word Oppia means \'learn\'.')
-        self.submit_and_compare('Finish', 'Check your spelling!')
+            '0', 'Yes!', 'In fact, the word Oppia means \'learn\'.')
+        self.submit_and_compare('Finish', 'Check your spelling!', '')
         self.submit_and_compare(
-            'Finnish', 'Yes! Oppia is the Finnish word for learn.')
+            'Finnish', 'Yes! Oppia is the Finnish word for learn.',
+            'What is the value of')
 
     def test_binary_search(self):
         """Test the binary search (lazy magician) exploration."""
         self.init_player(
             '2', 'The Lazy Magician', 'How does he do it?')
-        self.submit_and_compare('Dont know', 'town square')
-        self.submit_and_compare(0, 'Is it')
-        self.submit_and_compare(2, 'Do you want to play again?')
-        self.submit_and_compare(1, 'how do you think he does it?')
-        self.submit_and_compare('middle', 'what number the magician picked')
-        self.submit_and_compare(0, 'try it out')
-        self.submit_and_compare(10, 'best worst case')
+        self.submit_and_compare('Dont know', 'we should watch him first',
+            'town square')
+        self.submit_and_compare(0, '', 'Is it')
+        self.submit_and_compare(2, '', 'Do you want to play again?')
+        self.submit_and_compare(1, '', 'how do you think he does it?')
+        self.submit_and_compare('middle',
+            'he\'s always picking a number in the middle',
+            'what number the magician picked')
+        self.submit_and_compare(0, 'Exactly!', 'try it out')
+        self.submit_and_compare(10, '', 'best worst case')
         self.submit_and_compare(
-            0, 'to be sure our strategy works in all cases')
-        self.submit_and_compare(0, 'try to guess')
-
+            0, '', 'to be sure our strategy works in all cases')
+        self.submit_and_compare(0, 'try to guess', '')
+ 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
             '8', 'Parameterized Adventure', 'Hello, brave adventurer')
         self.submit_and_compare(
-            'My Name', 'Hello, I\'m My Name!.*get a pretty red')
-        self.submit_and_compare(0, 'fork in the road')
-        self.submit_and_compare('ne', 'Hello, My Name. You have to pay a toll')
+            'My Name', '', 'Hello, I\'m My Name!.*get a pretty red')
+        self.submit_and_compare(0, '', 'fork in the road')
+        self.submit_and_compare(
+            'ne', '', 'Hello, My Name. You have to pay a toll')
+
+    def test_huge_answers(self):
+        """Test correct behavior if huge answers are submitted."""
+        self.init_player(
+            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
+        self.submit_and_compare(
+            '0', '', 'In fact, the word Oppia means \'learn\'.')
+        # This could potentially cause errors in stats_models when the answer
+        # is persisted to the backend.
+        self.submit_and_compare(
+            'a' * 1000500, 'Sorry, nope, we didn\'t get it', '')

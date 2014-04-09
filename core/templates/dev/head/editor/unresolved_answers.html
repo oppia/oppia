@@ -10,7 +10,7 @@
       <div class="container-fluid">
         <div class="row-fluid">
           <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
-            <div class="span9">
+            <div class="span10">
               <span ng-show="item.count == 0">
                 <del><[item.answer]></del>
               </span>
@@ -21,10 +21,13 @@
               </span>
             </div>
 
-            <div class="span3">
+            <div class="span1">
               <span ng-show="item.count > 0">
                 <button ng-click="deleteUnresolvedAnswer(item.answer)" class="pull-right">Delete</button>
               </span>
+            </div>
+
+            <div class="span1">
             </div>
           </div>
         </div>

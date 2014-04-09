@@ -372,8 +372,8 @@ class BaseHandler(webapp2.RequestHandler):
 class CsrfTokenManager(object):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
-    # Max age of the token (2 hours).
-    _CSRF_TOKEN_AGE_SECS = 60 * 60 * 2
+    # Max age of the token (48 hours).
+    _CSRF_TOKEN_AGE_SECS = 60 * 60 * 48
     # Default user id for non-logged-in users.
     _USER_ID_DEFAULT = 'non_logged_in_user'
 

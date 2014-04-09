@@ -47,15 +47,14 @@ def get_obj_type_for_param_name(rule_class, param_name):
         'Rule %s has no param called %s' % (rule_class.__name__, param_name))
 
 
-def get_rules_for_input_type(input_type):
-    """Gets all rules for a given input type (of type objects.[...])."""
-    if input_type is None:
-        return []
+def get_rules_for_obj_type(obj_type):
+    """Gets all rules for a given object type.
 
+    Args:
+        obj_type: str. The name of the object type.
+    """
     rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
-    if not isinstance(input_type, basestring):
-        input_type = input_type.__name__
-    rule_class_name = '%sRule' % input_type
+    rule_class_name = '%sRule' % obj_type
     results = []
 
     for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
@@ -165,7 +164,7 @@ def get_rule_description(definition, param_specs, answer_type):
 
     param_specs is the param specifications list for the exploration.
 
-    answer_type is the type of the reader's answer.
+    answer_type is a str denoting the type of the reader's answer.
 
     Here is a sample definition in YAML form which represents the rule
     'if answer < 5 and (has_seen_before == True or answer > 2) and (
@@ -210,7 +209,7 @@ def get_rule_description(definition, param_specs, answer_type):
         else:
             subject_type = param_specs[definition['subject']].obj_type
 
-        all_rule_classes = get_rules_for_input_type(subject_type)
+        all_rule_classes = get_rules_for_obj_type(subject_type)
 
         rule = next(r for r in all_rule_classes
                     if r.__name__ == definition['name'])
@@ -258,7 +257,7 @@ def evaluate_rule(definition, param_specs, answer_type, context_params, answer,
         else:
             subject_type = param_specs[subject_name].obj_type
 
-        all_rule_classes = get_rules_for_input_type(subject_type)
+        all_rule_classes = get_rules_for_obj_type(subject_type)
         rule = next(r for r in all_rule_classes
                     if r.__name__ == definition['name'])
 

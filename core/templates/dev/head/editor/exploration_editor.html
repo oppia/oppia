@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Editor View
+  Exploration Editor
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -12,6 +12,27 @@
   </script>
 {% endblock header_js %}
 
+{% block navbar_additions %}
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      Help
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
+          Planning Your Exploration
+        </a>
+      </li>
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
+          Exploration Design Tips
+        </a>
+      </li>
+    </ul>
+  </li>
+{% endblock %}
+
 {% block content %}
   {% if announcement %}
     <div class="oppia-align-center oppia-warning">
@@ -19,7 +40,7 @@
     </div>
   {% endif %}
 
-  <div ng-controller="EditorExploration" ng-cloak>
+  <div ng-controller="ExplorationEditor" ng-cloak>
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
         <h3>Publish Exploration</h3>
@@ -195,34 +216,6 @@
       </div>
 
       <div class="row">
-        <div class="span4">
-          <a href="/contribute" class="btn" ng-if="!iframed">
-            Return to the contributors' gallery
-          </a>
-        </div>
-
-        <div class="pull-right oppia-editor-reference">
-          <h5>
-            <a ng-click="usefulReferencesIsShown = !usefulReferencesIsShown" class="oppia-editor-section-header">
-              <i class="icon-plus-sign" ng-hide="usefulReferencesIsShown"></i>
-              <i class="icon-minus-sign" ng-show="usefulReferencesIsShown"></i>
-              Useful References
-            </a>
-          </h5>
-          <div collapse="!usefulReferencesIsShown" class="oppia-useful-references">
-            <ul>
-              <li>
-                <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">Planning Your Exploration</a>
-              </li>
-              <li>
-                <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">Exploration Design Tips</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
         <div class="span12">
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
@@ -264,6 +257,21 @@
                 <img class="oppia-help" src="/images/help.png"
                      tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
                      tooltip-placement="bottom">
+                &nbsp;&nbsp;&nbsp;
+              </span>
+            {% endif %}
+
+            {% if can_unpublish %}
+              <span ng-show="isPublic">
+                <button type="button" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  Unpublish
+                  <span ng-if="currentUserIsAdmin">
+                    (as admin)
+                  </span>
+                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+                    (as moderator)
+                  </span>
+                </button>
                 &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
@@ -340,23 +348,25 @@
             </div>
 
             <tabset>
-              <tab heading="Exploration Details" active="mainTabActive" select="selectMainTab()">
+              <tab heading="Main" active="mainTabActive" select="selectMainTab()">
                 <div class="oppia-state-editor-container">
-                  {% include 'editor/editor_metadata.html' %}
-                  <div ng-if="!isCloned">
-                    <hr>
-                    {% include 'editor/editor_version_history.html' %}
-                  </div>
-                  <hr>
-                  {% include 'editor/editor_viz.html' %}
-                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor">
+                  {% include 'editor/exploration_graph.html' %}
+                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor" draggable="{containment: 'window', delay: 200, distance: 5, handle: '.oppia-state-editor-header'}">
                     {% include 'editor/state_editor.html' %}
                   </div>
                 </div>
               </tab>
 
-              <tab heading="Exploration Stats" active="statsTabActive" select="selectStatsTab()">
+              <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
                 {% include 'editor/stats_viewer.html' %}
+              </tab>
+
+              <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
+                {% include 'editor/exploration_settings.html' %}
+              </tab>
+
+              <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="isCloned">
+                {% include 'editor/exploration_history.html' %}
               </tab>
             </tabset>
           </div>
@@ -380,7 +390,7 @@
   <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
   <script>
     {{ include_js_file('services/explorationData.js') }}
-    {{ include_js_file('editor/EditorExploration.js') }}
+    {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}

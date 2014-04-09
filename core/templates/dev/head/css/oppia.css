@@ -547,10 +547,6 @@ textarea {
   padding: 10px;
 }
 
-.oppia-useful-references {
-  padding-right: 10px;
-}
-
 .oppia-warning {
   background: #F9EDBE;
   width: 80%;
@@ -576,18 +572,6 @@ textarea {
   color: white;
 }
 
-.oppia-editable-name {
-  color: #8f8661;
-  font-weight: bold;
-}
-.oppia-editable-name:hover {
-  background: #efefef;
-  cursor: pointer;
-}
-.oppia-editable-name:hover::after {
-  content: ' ✎';
-}
-
 .oppia-placeholder {
   color: gray;
 }
@@ -597,18 +581,18 @@ textarea {
   width: 60%;
 }
 
-.oppia-state-name {
+.oppia-editable {
   border: 1px dotted gray;
   cursor: pointer;
   padding: 1px 3px;
 }
-.oppia-state-name:hover {
-  background-color: #E2E2E2;
-  border: 2px solid #18447E;
-  border-radius: 4px;
+.oppia-editable::after {
+  /* The Unicode characters below represent spaces. */
+  content: '\00a0\00a0\00a0\00a0\00a0 ✎';
 }
-.oppia-state-name:hover::after {
-  content: ' ✎';
+.oppia-editable:hover {
+  border: 1px solid #111;
+  opacity: 0.95;
 }
 
 .oppia-state-editor-container {
@@ -642,18 +626,19 @@ textarea {
 }
 
 .oppia-state-content {
-  border-left: 1px dashed #bbb;
-  border-right: 1px dashed #bbb;
-  border-top: 1px dashed #bbb;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px dashed #ddd;
   min-height: 20px;
-  padding: 5px;
+  padding: 5px 10px 15px 10px;
 }
 
 .oppia-interactive-widget-display {
-  border-bottom: 1px dashed #bbb;
-  border-left: 1px dashed #bbb;
-  border-right: 1px dashed #bbb;
+  border-bottom: 1px dashed #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
   margin: 0 0 2px 0;
+  padding: 15px 10px 5px 10px;
 }
 
 .oppia-preview {
@@ -775,6 +760,15 @@ textarea {
 
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 3px;
+  color: #000;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.oppia-rule-bubble-description-picker {
+  background: #89B5F0;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 3px;

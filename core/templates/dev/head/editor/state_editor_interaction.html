@@ -4,12 +4,23 @@
 
 {% block info %}{% endblock %}
 
-{% block cls %}oppia-iframe-container{% endblock %}
+{% block cls %}oppia-interactive-widget-display{% endblock %}
 
 {% block center %}
   <div>
-    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-widget-display oppia-preview">
-      <div angular-html-bind="widgetPreviewHtml"></div>
+    <div ng-if="!interactiveWidgetEditorIsShown">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span11">
+            <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
+          </div>
+          <div class="span1">
+            <button ng-click="showInteractiveWidgetEditor()" class="pull-right">
+              ✎
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
@@ -74,21 +85,8 @@
         </div>
       </div>
     </div>
-
-    <div>
-      <label class="checkbox">
-        <input type="checkbox" ng-model="widgetSticky" ng-change="toggleWidgetSticky()">
-        Reuse the previous state's interaction, if possible.
-        <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
-        More info...
-        </a>
-      </label>
-    </div>
   </div>
 {% endblock %}
 
 {% block right %}
-  <button ng-click="showInteractiveWidgetEditor()" class="pull-right" ng-hide="interactiveWidgetEditorIsShown">
-    Edit interaction
-  </button>
 {% endblock %}

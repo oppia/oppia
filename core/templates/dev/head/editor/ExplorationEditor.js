@@ -22,13 +22,6 @@ var END_DEST = 'END';
 
 // TODO(sll): Move all hardcoded strings to the top of the file.
 
-// Receive events from the iframed widget repository.
-oppia.run(['$rootScope', function($rootScope) {
-  window.addEventListener('message', function(evt) {
-    $rootScope.$broadcast('message', evt);
-  });
-}]);
-
 oppia.factory('editorContextService', ['$log', function($log) {
   var activeStateName = null;
 
@@ -52,7 +45,7 @@ oppia.factory('editorContextService', ['$log', function($log) {
   };
 }]);
 
-function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $window,
+function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService) {
 
@@ -419,29 +412,41 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   ********************************************/
   $scope.mainTabActive = false;
   $scope.statsTabActive = false;
+  $scope.settingsTabActive = false;
+  $scope.historyTabActive = false;
 
   $scope.location = $location;
 
   var GUI_EDITOR_URL = '/gui';
   var STATS_VIEWER_URL = '/stats';
+  var SETTINGS_URL = '/settings';
+  var HISTORY_URL = '/history';
   var firstLoad = true;
 
   $scope.selectMainTab = function() {
     // This is needed so that if a state id is entered in the URL,
     // the first tab does not get selected automatically, changing
     // the location to '/'.
-    if (firstLoad) {
-      firstLoad = false;
-    } else {
+    if (!firstLoad || $location.path().indexOf('gui') === -1) {
       $location.path('/');
     }
+    firstLoad = false;
   };
 
   $scope.selectStatsTab = function() {
-    $location.path('/stats');
+    $location.path(STATS_VIEWER_URL);
+  };
+
+  $scope.selectSettingsTab = function() {
+    $location.path(SETTINGS_URL);
+  };
+
+  $scope.selectHistoryTab = function() {
+    $location.path(HISTORY_URL);
   };
 
   $scope.showStateEditor = function(stateName) {
+    warningsData.clear();
     $scope.saveAndChangeActiveState(stateName);
     $location.path('/gui/' + stateName);
   };
@@ -451,6 +456,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   }, function(newPath, oldPath) {
     var path = newPath;
     $log.info('Path is now ' + path);
+
+    $rootScope.$broadcast('externalSave');
 
     if (path.indexOf('/gui/') != -1) {
       $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
@@ -464,6 +471,8 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
           $location.path('/');
           return;
         } else {
+          $scope.settingsTabActive = false;
+          $scope.historyTabActive = false;
           $scope.statsTabActive = false;
           $scope.mainTabActive = true;
           $scope.$broadcast('guiTabSelected');
@@ -491,12 +500,35 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
       $scope.saveAndClearActiveState();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
+      $scope.settingsTabActive = false;
+      $scope.historyTabActive = false;
+    } else if (path == SETTINGS_URL) {
+      $location.hash('');
+      $scope.saveAndClearActiveState();
+      $scope.statsTabActive = false;
+      $scope.mainTabActive = false;
+      $scope.settingsTabActive = true;
+      $scope.historyTabActive = false;
+    } else if (path == HISTORY_URL) {
+      $location.hash('');
+      $scope.saveAndClearActiveState();
+      $scope.statsTabActive = false;
+      $scope.mainTabActive = false;
+      $scope.settingsTabActive = false;
+      $scope.historyTabActive = true;
+
+      if ($scope.explorationSnapshots === null) {
+        // TODO(sll): Do this on-hover rather than on-click.
+        $scope.refreshVersionHistory();
+      }
     } else {
       $location.path('/');
       $location.hash('');
       $scope.saveAndClearActiveState();
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
+      $scope.settingsTabActive = false;
+      $scope.historyTabActive = false;
     }
   });
 
@@ -546,17 +578,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
-  $scope.usefulReferencesIsShown = false;
-  $scope.versionHistoryIsShown = false;
   $scope.explorationSnapshots = null;
-
-  $scope.toggleVersionHistoryDisplay = function() {
-    if (!$scope.versionHistoryIsShown && $scope.explorationSnapshots === null) {
-      // TODO(sll): Do this on-hover rather than on-click.
-      $scope.refreshVersionHistory();
-    }
-    $scope.versionHistoryIsShown = !$scope.versionHistoryIsShown;
-  };
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
@@ -882,6 +904,10 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
     $scope._saveExplorationRightsChange({is_publicized: false});
   };
 
+  $scope.unpublishExploration = function() {
+    $scope._saveExplorationRightsChange({is_public: false});
+  };
+
   $scope.showPublishExplorationModal = function() {
     warningsData.clear();
     $modal.open({
@@ -1079,7 +1105,7 @@ function EditorExploration($scope, $http, $location, $anchorScroll, $modal, $win
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-EditorExploration.$inject = [
+ExplorationEditor.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService'

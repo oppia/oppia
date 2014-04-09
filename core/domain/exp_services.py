@@ -197,7 +197,11 @@ def export_to_zip_file(exploration_id, version=None):
             fs_domain.ExplorationFileSystem(exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            zf.writestr('assets/%s' % filepath, fs.get(filepath, version=version))
+            # Currently, the version number of all files is 1, since they are
+            # not modifiable post-upload.
+            # TODO(sll): When allowing editing of files, implement versioning
+            # for them.
+            zf.writestr('assets/%s' % filepath, fs.get(filepath, version=1))
 
     return o.getvalue()
 

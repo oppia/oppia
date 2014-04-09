@@ -10,6 +10,7 @@
 
 {% block center %}
   <div ng-if="!contentMemento">
+    <button ng-click="editContent()" class="pull-right">✎</button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
       In this section, type what you want the reader to see before interacting with this state.
     </span>
@@ -23,7 +24,4 @@
 {% endblock %}
 
 {% block right %}
-  <button ng-if="!contentMemento" ng-click="editContent()" class="pull-right">
-    Edit content
-  </button>
 {% endblock %}

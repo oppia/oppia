@@ -192,7 +192,13 @@ def process_submitted_answer(
         answer_log.answers[answer] += 1
     else:
         answer_log.answers[answer] = 1
-    answer_log.put()
+
+    # This may fail due to answer_log.answers being larger than 1 MB in size.
+    try:
+        answer_log.put()
+    except Exception as e:
+        logging.error(e)
+        pass
 
     counter = StateCounterModel.get_or_create(exploration_id, state_name)
     counter.active_answer_count += 1

@@ -254,7 +254,6 @@ class ReaderViewLoadTest(object):
         self.host = base_url
         self.exp_id = None
         self.last_state_name = None
-        self.last_block_number = None
         self.last_params = None
         self.state_history = None
 
@@ -302,7 +301,6 @@ class ReaderViewLoadTest(object):
         assert_contains(expected_response, body['init_html'])
 
         self.last_state_name = body['state_name']
-        self.last_block_number = body['block_number']
         self.last_params = body['params']
         self.state_history = [self.last_state_name]
 
@@ -310,15 +308,13 @@ class ReaderViewLoadTest(object):
         url = '%s/explorehandler/transition/%s/%s' % (
             self.host, self.exp_id, urllib.quote(self.last_state_name))
         body = self._post_json(url, {
-            'answer': answer, 'block_number': self.last_block_number,
-            'handler': 'submit', 'params': self.last_params,
+            'answer': answer, 'handler': 'submit', 'params': self.last_params,
             'state_history': self.state_history,
         })
 
         assert_contains(expected_response, body['oppia_html'])
 
         self.last_state_name = body['state_name']
-        self.last_block_number = body['block_number']
         self.last_params = body['params']
         self.state_history += [self.last_state_name]
 

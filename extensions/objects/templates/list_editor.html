@@ -1,6 +1,13 @@
 <div class="container-fluid">
   <span ng-show="localValue.length == 0">
-    <em>This list is currently empty.</em>
+    <em>
+      <span ng-if="messageIfEmpty">
+        <[messageIfEmpty]>
+      </span>
+      <span ng-if="!messageIfEmpty">
+        (This list is currently empty.)
+      </span>
+    </em>
   </span>
 
   <div class="row-fluid" ng-repeat="item in localValue track by $index">
@@ -8,18 +15,18 @@
       <[$index + 1]>
     </div>
 
-    <div class="span8">
+    <div class="span9">
       <object-editor obj-type="<[initArgs.objType]>" value="item.label" always-editable="<[alwaysEditable]>">
       </object-editor>
     </div>
 
-    <div class="span3">
-      <button type="button" class="pull-right" ng-click="deleteItem($index)">Delete</button>
+    <div class="span2">
+      <button type="button" class="pull-right" ng-click="deleteItem($index)" ng-disabled="!!initArgs.disableControls">Delete</button>
     </div>
   </div>
 
   <div class="row-fluid">
-    <button type="button" ng-click="addItem()" class="pull-right">
+    <button type="button" ng-click="addItem()" class="pull-right" ng-disabled="!!initArgs.disableControls">
       <[getAddItemText()]>
     </button>
   </div>

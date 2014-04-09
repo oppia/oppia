@@ -43,7 +43,8 @@ class EditorTest(test_utils.GenericTestBase):
         # Check that it is now possible to access the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Exploration Metadata', response.body)
+        self.assertIn('Stats', response.body)
+        self.assertIn('History', response.body)
         # Test that the value generator JS is included.
         self.assertIn('RandomSelector', response.body)
 
@@ -182,7 +183,7 @@ class EditorTest(test_utils.GenericTestBase):
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
             {
-                'answer': '0', 'block_number': 0, 'handler': 'submit',
+                'answer': '0', 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
@@ -191,7 +192,7 @@ class EditorTest(test_utils.GenericTestBase):
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
             {
-                'answer': 'blah', 'block_number': 0, 'handler': 'submit',
+                'answer': 'blah', 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
@@ -200,7 +201,7 @@ class EditorTest(test_utils.GenericTestBase):
             exploration_dict = self.post_json(
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
-                    'answer': 'blah2', 'block_number': 0, 'handler': 'submit',
+                    'answer': 'blah2', 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
                 }
             )
@@ -209,7 +210,7 @@ class EditorTest(test_utils.GenericTestBase):
             exploration_dict = self.post_json(
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
-                    'answer': 'blah3', 'block_number': 0, 'handler': 'submit',
+                    'answer': 'blah3', 'handler': 'submit',
                     'state_history': exploration_dict['state_history'],
                 }
             )
@@ -290,7 +291,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
             {
-                'answer': '0', 'block_number': 0, 'handler': 'submit',
+                'answer': '0', 'handler': 'submit',
                 'state_history': exploration_dict['state_history'],
             }
         )
@@ -298,7 +299,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
             {
-                'answer': 'blah', 'block_number': 0, 'handler': 'submit',
+                'answer': 'blah', 'handler': 'submit',
                 'state_history': exploration_dict['state_history']
             }
         )

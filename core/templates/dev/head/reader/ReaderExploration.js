@@ -160,13 +160,14 @@ function ReaderExploration(
   $scope.loadPage = function(data) {
     $scope.hasInteractedAtLeastOnce = false;
 
-    $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
     $scope.finished = data.finished;
     $scope.inputTemplate = data.interactive_html;
     $scope.responseLog = [{
       previousReaderAnswer: '',
-      feedbackAndQuestion: data.init_html
+      feedback: '',
+      question: data.init_html,
+      isMostRecentQuestion: true
     }];
     $scope.params = data.params;
     $scope.stateName = data.state_name;
@@ -185,7 +186,6 @@ function ReaderExploration(
 
     var requestMap = {
       answer: answer,
-      block_number: $scope.blockNumber,
       handler: handler,
       params: $scope.params,
       state_history: $scope.stateHistory,
@@ -218,7 +218,6 @@ function ReaderExploration(
     $scope.answerIsBeingProcessed = false;
     $scope.hasInteractedAtLeastOnce = true;
 
-    $scope.blockNumber = data.block_number;
     $scope.categories = data.categories;
 
     // This is a bit of a hack. When a refresh happens, AngularJS compares
@@ -247,18 +246,30 @@ function ReaderExploration(
 
     $scope.responseLog = $scope.responseLog || [];
 
-    // The randomSuffix is also needed for previousReaderAnswer and for
-    // feedbackAndQuestion, so that the aria-live attribute will read it out.
+    // TODO(sll): Check the state chagne instead of question_html so that it
+    // works correctly when the new state doesn't have a question string.
+    var isQuestion = !!data.question_html;
+    if (isQuestion) {
+      // Clean up the previous isMostRecentQuestion marker.
+      $scope.responseLog.forEach(function(log) {
+        log.isMostRecentQuestion = false;
+      });
+    }
+
+    // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
+    // and 'question', so that the aria-live attribute will read it out.
     $scope.responseLog.push({
       previousReaderAnswer: data.reader_response_html + randomSuffix,
-      feedbackAndQuestion: data.oppia_html + randomSuffix,
+      feedback: data.feedback_html + randomSuffix,
+      question: data.question_html + (isQuestion ? randomSuffix : ''),
+      isMostRecentQuestion: isQuestion
     });
 
+    var lastEntryEls = document.getElementsByClassName('oppia-last-log-entry');
     $scope.adjustPageHeight(true, function() {
-      if (document.getElementById('response')) {
-        $('html, body, iframe').animate({
-          'scrollTop': document.getElementById('response').offsetTop
-        }, 'slow', 'swing');
+      if (lastEntryEls.length > 0) {
+        $('html, body, iframe').animate(
+            {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
       }
     });
 
@@ -293,7 +304,9 @@ function ReaderExploration(
     }, 500);
   };
 
-  $window.onresize = $scope.adjustPageHeight.bind(null, false, null);
+  $window.onresize = function() {
+    $scope.adjustPageHeight(false, null);
+  };
 }
 
 /**

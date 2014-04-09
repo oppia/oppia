@@ -1032,11 +1032,10 @@ class Exploration(object):
                     state_dict['widget']['widget_id']
                 )
 
-                input_type = widget.get_handler_by_name(
-                    handler['name']).input_type
-
                 rule_spec['description'] = rule_domain.get_rule_description(
-                    rule_spec['definition'], self.param_specs, input_type
+                    rule_spec['definition'],
+                    self.param_specs,
+                    widget.get_handler_by_name(handler['name']).obj_type
                 )
 
         return state_dict
@@ -1055,17 +1054,18 @@ class Exploration(object):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.id))
 
-        if generic_handler.input_type is None:
-            return handler.rule_specs[0]
-        else:
-            for rule_spec in handler.rule_specs:
-                if rule_domain.evaluate_rule(
-                        rule_spec.definition, self.param_specs,
-                        generic_handler.input_type, params, answer, fs):
-                    return rule_spec
+        for rule_spec in handler.rule_specs:
+            if rule_domain.evaluate_rule(
+                    rule_spec.definition, self.param_specs,
+                    generic_handler.obj_type, params, answer, fs):
+                return rule_spec
 
-            raise Exception(
-                'No matching rule found for handler %s.' % handler.name)
+        raise Exception(
+            'No matching rule found for handler %s. Rule specs are %s.' % (
+                handler.name,
+                [rule_spec.to_dict() for rule_spec in handler.rule_specs]
+            )
+        )
 
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML

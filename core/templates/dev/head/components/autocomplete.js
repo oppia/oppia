@@ -58,6 +58,7 @@ oppia.directive('select2Dropdown', [function() {
       $(select2Node).select2({
         data: $scope.select2Choices,
         placeholder: $scope.placeholder,
+        allowClear: false,
         width: $scope.width || '250px',
         createSearchChoice: function(term, data) {
           if ($(data).filter(function() {

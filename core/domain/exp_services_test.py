@@ -492,9 +492,16 @@ states:
         """Test export_to_zip_file() for different versions."""
         exploration = self.save_new_default_exploration(self.EXP_ID)
         self.assertEqual(exploration.version, 1)
+
         exploration.add_states(['New state'])
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        fs.commit(self.OWNER_ID, 'abc.png', raw_image)
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
         self.assertEqual(exploration.version, 2)
+
         exploration.rename_state('New state', 'Renamed state')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
         self.assertEqual(exploration.version, 3)

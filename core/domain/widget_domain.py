@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import logging
 import os
 
 from core.domain import obj_services
@@ -32,22 +33,20 @@ import json
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
 
-    def __init__(self, name='submit', input_type=None):
+    def __init__(self, name, obj_type):
         self.name = name
-        self.input_type = input_type
-        # TODO(sll): Add an assertion to check that input_type is either None
-        # or a class in extensions.objects.models.objects.
+        self.obj_type = obj_type
+        self.obj_class = obj_services.Registry.get_object_class_by_type(
+            obj_type)
 
     @property
     def rules(self):
-        return rule_domain.get_rules_for_input_type(self.input_type)
+        return rule_domain.get_rules_for_obj_type(self.obj_type)
 
     def to_dict(self):
         return {
             'name': self.name,
-            'input_type': (
-                None if self.input_type is None else self.input_type.__name__
-            )
+            'obj_type': self.obj_type,
         }
 
 
@@ -114,6 +113,17 @@ class BaseWidget(object):
     def is_interactive(self):
         """A widget is interactive iff its handlers array is non-empty."""
         return bool(self._handlers)
+
+    def normalize_answer(self, answer, handler_name):
+        """Normalizes a reader's input to this widget."""
+        for handler in self.handlers:
+            if handler.name == handler_name:
+                return handler.obj_class.normalize(answer)
+
+        logging.error(
+            'Could not find handler in widget %s with name %s' %
+            (self.name, handler_name))
+        return answer
 
     @property
     def _response_template(self):

@@ -1,0 +1,48 @@
+<h4>Version History</h4>
+
+<div ng-hide="explorationSnapshots" class="oppia-align-center">
+  Loading
+  <span class="oppia-loading-dot-one">.</span>
+  <span class="oppia-loading-dot-two">.</span>
+  <span class="oppia-loading-dot-three">.</span>
+</div>
+
+<div ng-repeat="snapshot in explorationSnapshots">
+  [<[snapshot.versionNumber]>]
+  <strong><[snapshot.committerId]></strong>
+  <[snapshot.commitMessage]>
+  <span class="pull-right">
+    <em><[snapshot.createdOn]></em>
+    <span ng-show="snapshot.versionNumber !== currentVersion">
+      | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
+    </span>
+    <span>
+      | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
+    </span>
+  </span>
+</div>
+
+<script type="text/ng-template" id="modals/revertExploration">
+  <div class="modal-header">
+    <h3>Revert Exploration</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted.
+    </p>
+
+    <p>
+      Before reverting, you can preview the exploration you are reverting to by following <a href="/explore/<[explorationId]>?v=<[version]>" target="_blank">this link</a>. (It opens in a new window.)
+    </p>
+
+    <p>
+      Are you sure you want to revert this exploration to version <[version]>?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" ng-click="revert()">Revert</button>
+    <button class="btn" ng-click="cancel()">Cancel</button>
+  </div>
+</script>

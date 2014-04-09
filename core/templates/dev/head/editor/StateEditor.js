@@ -47,6 +47,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope.closeStateEditor = function() {
+    $scope.$broadcast('externalSave');
     $scope.$parent.selectMainTab();
   };
 

@@ -26,7 +26,17 @@ oppia.directive('oppiaNoninteractiveLink', [
       scope: {},
       templateUrl: 'noninteractiveWidget/Link',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj($attrs.urlWithValue);
+        if (!$attrs.openLinkInSameWindowWithValue) {
+          // This is done for backward-compatibility.
+          $scope.target = '_blank';
+        } else {
+          $scope.target = (
+            oppiaHtmlEscaper.escapedJsonToObj(
+              $attrs.openLinkInSameWindowWithValue) ? '_top' : '_blank');
+        }
+
+        var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.urlWithValue);
         if (untrustedUrl.indexOf('http://') !== 0 &&
             untrustedUrl.indexOf('https://') !== 0) {
           return;

@@ -88,6 +88,17 @@ class BaseObject(object):
             '%s.html' % cls.edit_html_filename))
 
 
+class Null(BaseObject):
+    """Class for a null object."""
+
+    description = 'A null object.'
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        return None
+
+
 class Boolean(BaseObject):
     """Class for booleans."""
 
@@ -99,6 +110,9 @@ class Boolean(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
+            if raw is None or raw == '':
+                raw = False
+
             assert raw in [True, False]
             return raw
         except Exception:
