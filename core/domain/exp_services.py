@@ -712,6 +712,9 @@ def save_new_exploration_from_yaml_and_assets(
 
 def delete_demo(exploration_id):
     """Deletes a single demo exploration."""
+    if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
+        raise Exception('Invalid demo exploration id %s' % exploration_id)
+
     exploration = get_exploration_by_id(exploration_id, strict=False)
     if not exploration:
         logging.info('Exploration with id %s was not deleted, because it '
