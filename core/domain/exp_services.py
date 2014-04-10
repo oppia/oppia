@@ -47,8 +47,6 @@ CMD_CLONE = 'clone'
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 
-DEFAULT_PAGE_SIZE = 50
-
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -756,16 +754,16 @@ def load_demo(exploration_id):
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
-def get_page_of_all_commits(
-        page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns all commits to all explorations in reverse time order.
+def get_next_page_of_all_commits(
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns a page of commits to all explorations in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
-    results, cursor, more = (
+    results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits(
             page_size, urlsafe_start_cursor))
 
@@ -774,19 +772,19 @@ def get_page_of_all_commits(
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], cursor, more)
+    ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def get_page_of_all_non_private_commits(
-        page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns all non-private commits in reverse time order.
+def get_next_page_of_all_non_private_commits(
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns a page of non-private commits in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
-    results, cursor, more = (
+    results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
             page_size, urlsafe_start_cursor))
 
@@ -795,20 +793,20 @@ def get_page_of_all_non_private_commits(
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], cursor, more)
+    ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def get_page_of_all_commits_by_exp_id(
-        exploration_id, page_size=DEFAULT_PAGE_SIZE,
+def get_next_page_of_all_commits_by_exp_id(
+        exploration_id, page_size=feconf.DEFAULT_PAGE_SIZE,
         urlsafe_start_cursor=None):
-    """Returns all commits to the given exploration in reverse time order.
+    """Returns a page of commits to this exploration in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
-    results, cursor, more = (
+    results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_exp_id(
             exploration_id, page_size, urlsafe_start_cursor))
 
@@ -817,19 +815,20 @@ def get_page_of_all_commits_by_exp_id(
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], cursor, more)
+    ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-def get_page_of_all_commits_by_user_id(
-        user_id, page_size=DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns all commits by the given user_id in reverse time order.
+def get_next_page_of_all_commits_by_user_id(
+        user_id, page_size=feconf.DEFAULT_PAGE_SIZE,
+        urlsafe_start_cursor=None):
+    """Returns a page of commits by the given user_id in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
-    results, cursor, more = (
+    results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_user_id(
             user_id, page_size, urlsafe_start_cursor))
 
@@ -838,4 +837,4 @@ def get_page_of_all_commits_by_user_id(
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], cursor, more)
+    ) for entry in results], new_urlsafe_start_cursor, more)

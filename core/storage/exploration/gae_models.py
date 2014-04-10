@@ -92,7 +92,7 @@ class ExplorationModel(base_models.VersionedModel):
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
 
-        Note that this overrides the superclass method.
+        Note that this extends the superclass method.
         """
         super(ExplorationModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
@@ -261,8 +261,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 class ExplorationCommitLogEntryModel(base_models.BaseModel):
     """Log of commits to explorations.
 
-    A new entry in this log is created each time a commit to ExplorationModel
-    or ExplorationRightsModel occurs.
+    A new instance of this model is created and saved every time a commit to
+    ExplorationModel or ExplorationRightsModel occurs.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)

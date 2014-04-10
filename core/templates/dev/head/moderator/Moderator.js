@@ -45,6 +45,8 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
     return '/create/' + explorationId;
   };
 
+  // TODO(sll): Abstract this out into a general utility function so that it
+  // can be used in multiple places.
   $scope.recentCommitsCursor = null;
   $scope.reachedEndOfCommits = false;
   $scope.allCommits = [];
@@ -53,7 +55,8 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
       return;
     }
 
-    var recentCommitsUrl = '/gallerieshandler/recent_commits';
+    var recentCommitsUrl = '/recentcommitshandler/recent_commits';
+    recentCommitsUrl += '?query_type=all_non_private_commits';
     if ($scope.recentCommitsCursor) {
       recentCommitsUrl += ('?cursor=' + $scope.recentCommitsCursor);
     }

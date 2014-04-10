@@ -1271,8 +1271,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         populate_datastore()
 
-    def test_get_page_of_all_commits(self):
-        all_commits = exp_services.get_page_of_all_commits()[0]
+    def test_get_next_page_of_all_commits(self):
+        all_commits = exp_services.get_next_page_of_all_commits()[0]
         self.assertEqual(len(all_commits), 8)
         for ind, commit in enumerate(all_commits):
             if ind != 0:
@@ -1300,15 +1300,16 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-8])
 
-    def test_get_page_of_all_non_private_commits(self):
-        all_commits = exp_services.get_page_of_all_non_private_commits()[0]
+    def test_get_next_page_of_all_non_private_commits(self):
+        all_commits = (
+            exp_services.get_next_page_of_all_non_private_commits()[0])
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
     def test_get_commit_log_for_exploration_id(self):
-        all_commits = exp_services.get_page_of_all_commits_by_exp_id(
+        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
             self.EXP_ID_1)[0]
         self.assertEqual(len(all_commits), 5)
         for ind, commit in enumerate(all_commits):
@@ -1329,7 +1330,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-5])
 
-        all_commits = exp_services.get_page_of_all_commits_by_exp_id(
+        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
             self.EXP_ID_2)[0]
         self.assertEqual(len(all_commits), 3)
         for ind, commit in enumerate(all_commits):
@@ -1347,7 +1348,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-3])
 
     def test_get_commit_log_for_explorations_by_user(self):
-        all_commits = exp_services.get_page_of_all_commits_by_user_id(
+        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
             self.ALBERT_ID)[0]
         self.assertEqual(len(all_commits), 6)
         for ind, commit in enumerate(all_commits):
@@ -1370,7 +1371,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-6])
 
-        all_commits = exp_services.get_page_of_all_commits_by_user_id(
+        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
             self.BOB_ID)[0]
         self.assertEqual(len(all_commits), 2)
         for ind, commit in enumerate(all_commits):
@@ -1386,7 +1387,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-2])
 
     def test_paging(self):
-        all_commits, cursor, more = exp_services.get_page_of_all_commits(
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
             page_size=5)
         self.assertEqual(len(all_commits), 5)
         commit_dicts = [commit.to_dict() for commit in all_commits]
@@ -1402,7 +1403,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-5])
         self.assertTrue(more)
 
-        all_commits, cursor, more = exp_services.get_page_of_all_commits(
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
             page_size=5, urlsafe_start_cursor=cursor)
         self.assertEqual(len(all_commits), 3)
         commit_dicts = [commit.to_dict() for commit in all_commits]
@@ -1419,6 +1420,6 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
     """Test special cases relating to the exploration commit logs."""
 
     def test_paging_with_no_commits(self):
-        all_commits, cursor, more = exp_services.get_page_of_all_commits(
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
             page_size=5)
         self.assertEqual(len(all_commits), 0)

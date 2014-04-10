@@ -247,13 +247,13 @@ class RecentCommitsHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        urlsafe_cursor = self.request.get('cursor')
-        all_commits, next_cursor, more = (
-            exp_services.get_page_of_all_non_private_commits(
-                urlsafe_start_cursor=urlsafe_cursor))
+        urlsafe_start_cursor = self.request.get('cursor')
+        all_commits, new_urlsafe_start_cursor, more = (
+            exp_services.get_next_page_of_all_non_private_commits(
+                urlsafe_start_cursor=urlsafe_start_cursor))
         all_commit_dicts = [commit.to_dict() for commit in all_commits]
         self.render_json({
             'results': all_commit_dicts,
-            'cursor': next_cursor,
+            'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
