@@ -84,7 +84,7 @@ class AdminPage(base.BaseHandler):
             })
 
         demo_explorations = [
-            (str(ind), exp[0]) for ind, exp in
+            (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
         self.values.update({
@@ -125,8 +125,8 @@ class AdminHandler(base.BaseHandler):
                 logging.info(
                     '[ADMIN] %s reloaded exploration %s' %
                     (self.user_id, exploration_id))
-                exp_services.delete_demo(str(exploration_id))
-                exp_services.load_demo(str(exploration_id))
+                exp_services.delete_demo(unicode(exploration_id))
+                exp_services.load_demo(unicode(exploration_id))
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
@@ -148,5 +148,5 @@ class AdminHandler(base.BaseHandler):
 
             self.render_json({})
         except Exception as e:
-            self.render_json({'error': str(e)})
+            self.render_json({'error': unicode(e)})
             raise

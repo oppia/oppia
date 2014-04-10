@@ -569,6 +569,32 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 '$$hashKey': '059'
             }]}
 
+    def test_update_state_name(self):
+        """Test updating of state name."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': '(untitled state)',
+            'new_state_name': 'new name',
+        }], 'Change state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn('new name', exploration.states)
+        self.assertNotIn('(untitled state)', exploration.states)
+
+    def test_update_state_name_with_unicode(self):
+        """Test updating of state name to one that uses unicode characters."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': '(untitled state)',
+            'new_state_name': u'¡Hola! αβγ',
+        }], 'Change state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn(u'¡Hola! αβγ', exploration.states)
+        self.assertNotIn('(untitled state)', exploration.states)
+
     def test_update_param_changes(self):
         """Test updating of param_changes."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
