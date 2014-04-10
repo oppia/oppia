@@ -25,7 +25,7 @@ import utils
 
 
 class Registry(object):
-    """Registry of all JavaScript library dependencies."""
+    """Registry of all JS/CSS library dependencies."""
 
     @classmethod
     def get_dependency_html(cls, dependency_id):
